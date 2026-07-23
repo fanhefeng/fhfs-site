@@ -13,7 +13,9 @@ export function LocaleSwitcher() {
   return (
     <button
       type="button"
-      onClick={() => router.replace(pathname, { locale: other })}
+      onClick={() =>
+        router.replace(pathname, { locale: other, scroll: false })
+      }
       className="ml-2 cursor-pointer rounded border border-line px-3 py-1.5 text-xs text-muted-fg transition-colors hover:border-gold/50 hover:text-gold"
       aria-label={t("localeSwitch")}
     >
