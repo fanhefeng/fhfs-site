@@ -44,7 +44,14 @@ export function AppCard({ app, locale }: { app: App; locale: Locale }) {
         rel="noopener noreferrer"
         className="mt-5 inline-flex w-fit items-center gap-2 rounded border border-neon-red/50 px-4 py-2 text-sm text-neon-red transition-all duration-200 hover:border-neon-red hover:[box-shadow:0_0_14px_rgba(255,77,109,0.35)] hover:[text-shadow:var(--glow-red)]"
       >
-        {t("download")} ↗
+        {t(
+          app.category === "game"
+            ? "play"
+            : app.category === "website"
+              ? "open"
+              : "download"
+        )}{" "}
+        ↗
       </a>
     </article>
   );

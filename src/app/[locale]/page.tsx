@@ -5,9 +5,9 @@ import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { getPosts, getWorks } from "@/lib/content";
+import { getPosts, getApps } from "@/lib/content";
 import { PostCard } from "@/components/blog/PostCard";
-import { WorkCard } from "@/components/cards/WorkCard";
+import { AppCard } from "@/components/cards/AppCard";
 import { ArtDecoDivider } from "@/components/deco/ArtDecoDivider";
 import { NeonSign } from "@/components/fx/NeonSign";
 import { SpotlightReveal } from "@/components/fx/SpotlightReveal";
@@ -26,7 +26,7 @@ export default async function HomePage({ params }: Props) {
   const t = await getTranslations("home");
   const tc = await getTranslations("common");
   const posts = getPosts(locale as Locale).slice(0, 3);
-  const works = getWorks().slice(0, 2);
+  const apps = getApps().slice(0, 4);
 
   return (
     <main className="flex-1">
@@ -89,17 +89,13 @@ export default async function HomePage({ params }: Props) {
         </h2>
         <ArtDecoDivider className="mb-10" />
         <div className="grid gap-6 sm:grid-cols-2">
-          {works.map((work) => (
-            <WorkCard
-              key={work._meta.path}
-              work={work}
-              locale={locale as Locale}
-            />
+          {apps.map((app) => (
+            <AppCard key={app._meta.path} app={app} locale={locale as Locale} />
           ))}
         </div>
         <p className="mt-8 text-center">
           <Link
-            href="/portfolio"
+            href="/software"
             className="text-sm text-neon-blue transition-all hover:[text-shadow:var(--glow-blue)]"
           >
             {t("viewAll")} →

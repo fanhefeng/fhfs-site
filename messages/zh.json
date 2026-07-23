@@ -12,7 +12,7 @@
     "intro": "这里是我的小酒馆——写字、做东西、放点自己喜欢的音乐。",
     "enter": "进店看看",
     "latestPosts": "最新随笔",
-    "featuredWorks": "近期作品",
+    "featuredWorks": "招牌软件",
     "viewAll": "查看全部"
   },
   "blog": {
@@ -34,13 +34,22 @@
   "portfolio": {
     "title": "作品集",
     "subtitle": "台上的保留曲目",
-    "visit": "查看作品"
+    "visit": "查看作品",
+    "empty": "墙上还空着——创意作品陆续上墙中，先去「软件」页逛逛。"
   },
   "software": {
     "title": "软件",
-    "subtitle": "我做的一些工具，欢迎试用",
+    "subtitle": "我做的一些东西，欢迎试用",
     "download": "前往官网",
-    "platforms": "平台"
+    "play": "在线试玩",
+    "open": "访问网站",
+    "platforms": "平台",
+    "categories": {
+      "desktop": "桌面应用",
+      "tool": "工具",
+      "game": "小游戏",
+      "website": "网站"
+    }
   },
   "footer": {
     "rights": "保留所有权利",

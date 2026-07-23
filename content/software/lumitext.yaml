@@ -1,0 +1,11 @@
+name: Lumitext
+category: desktop
+tagline:
+  zh: macOS 自定义文字屏保
+  en: Custom-text screensaver for macOS
+description:
+  zh: 为 macOS Tahoe 打造的文字屏保——任意文字、任意字体，自选字重、字号、颜色和九宫格位置，所见即所得的实时预览。Swift 原生编写。
+  en: A custom-text screensaver for macOS Tahoe. Type any text, pick the font, weight, size, color and position on a 9-way grid — with a live WYSIWYG preview. Written in native Swift.
+website: https://github.com/fanhefeng/lumitext
+platforms: [macOS]
+order: 3

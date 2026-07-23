@@ -1,0 +1,11 @@
+name: FHF Links
+category: website
+tagline:
+  zh: 多用户的个人社交主页平台
+  en: Multi-user link-in-bio platform
+description:
+  zh: 仿 Linktree 的多用户社交主页平台——注册即拥有专属 /用户名 公开主页，链接按钮、社交图标、二维码展示、分享卡片导出一应俱全，后台集中管理。
+  en: A multi-user Linktree-style platform. Sign up and get your own /username page — link buttons, social icons, QR codes for every profile, exportable share cards, all managed from a dashboard.
+website: https://fhf-links.vercel.app
+platforms: [Web]
+order: 6

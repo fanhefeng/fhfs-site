@@ -27,11 +27,19 @@ export default async function PortfolioPage({ params }: Props) {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <SectionTitle title={t("title")} subtitle={t("subtitle")} />
-      <div className="grid gap-6 sm:grid-cols-2">
-        {works.map((work) => (
-          <WorkCard key={work._meta.path} work={work} locale={locale as Locale} />
-        ))}
-      </div>
+      {works.length === 0 ? (
+        <p className="text-center text-muted-fg">{t("empty")}</p>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2">
+          {works.map((work) => (
+            <WorkCard
+              key={work._meta.path}
+              work={work}
+              locale={locale as Locale}
+            />
+          ))}
+        </div>
+      )}
     </main>
   );
 }

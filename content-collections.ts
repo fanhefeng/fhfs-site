@@ -92,6 +92,7 @@ const apps = defineCollection({
     name: z.string(),
     tagline: localeSchema,
     description: localeSchema,
+    category: z.enum(["desktop", "tool", "game", "website"]),
     icon: z.string().optional(),
     website: z.string(),
     platforms: z.array(z.string()).default([]),

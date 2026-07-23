@@ -12,7 +12,7 @@
     "intro": "This is my little club — I write, I build things, and I play the music I love.",
     "enter": "Step inside",
     "latestPosts": "Latest notes",
-    "featuredWorks": "Recent works",
+    "featuredWorks": "Signature software",
     "viewAll": "View all"
   },
   "blog": {
@@ -34,13 +34,22 @@
   "portfolio": {
     "title": "Portfolio",
     "subtitle": "The standards I keep in rotation",
-    "visit": "View work"
+    "visit": "View work",
+    "empty": "The wall is still bare — creative works coming soon. Check the Software page meanwhile."
   },
   "software": {
     "title": "Software",
-    "subtitle": "Tools I've built — help yourself",
+    "subtitle": "Things I've built — help yourself",
     "download": "Visit website",
-    "platforms": "Platforms"
+    "play": "Play online",
+    "open": "Open site",
+    "platforms": "Platforms",
+    "categories": {
+      "desktop": "Desktop Apps",
+      "tool": "Tools",
+      "game": "Mini Games",
+      "website": "Websites"
+    }
   },
   "footer": {
     "rights": "All rights reserved",

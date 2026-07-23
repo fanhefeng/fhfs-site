@@ -1,9 +1,0 @@
-title:
-  zh: 示例作品 · 待替换
-  en: Sample Work · Replace Me
-description:
-  zh: 这是一个占位作品条目。复制这个 YAML 文件即可添加新作品，字段含中英双语。
-  en: A placeholder entry. Duplicate this YAML file to add a new work; fields are bilingual.
-year: 2025
-tags: [Placeholder]
-order: 2
