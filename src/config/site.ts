@@ -10,9 +10,9 @@ export const site = {
     en: "Personal blog, portfolio and software showcase, in a late-night jazz & neon mood.",
   },
   /** Production origin, used for metadata/sitemap/RSS. Update after binding a domain. */
-  url: "https://example.com",
+  url: "https://fhfs-site.vercel.app",
   author: "Fhf",
   social: {
-    github: "https://github.com/yourname",
+    github: "https://github.com/fanhefeng",
   },
 } as const;
