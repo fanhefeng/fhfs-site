@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "首页",
+    "blog": "博客",
+    "about": "关于我",
+    "portfolio": "作品集",
+    "software": "软件"
+  },
+  "home": {
+    "welcome": "Welcome to",
+    "tagline": "深夜爵士，代码与霓虹",
+    "intro": "这里是我的小酒馆——写字、做东西、放点自己喜欢的音乐。",
+    "enter": "进店看看",
+    "latestPosts": "最新随笔",
+    "featuredWorks": "近期作品",
+    "viewAll": "查看全部"
+  },
+  "blog": {
+    "title": "博客",
+    "subtitle": "台上即兴，台下随笔",
+    "readMore": "阅读全文",
+    "tags": "标签",
+    "taggedWith": "标签：{tag}",
+    "empty": "还没有文章，酒馆刚开张。",
+    "fallbackNotice": "本文暂无中文版，以下为英文原文。",
+    "backToList": "返回列表",
+    "publishedOn": "发布于"
+  },
+  "about": {
+    "title": "关于我",
+    "subtitle": "个人简介与履历",
+    "timeline": "我的经历"
+  },
+  "portfolio": {
+    "title": "作品集",
+    "subtitle": "台上的保留曲目",
+    "visit": "查看作品"
+  },
+  "software": {
+    "title": "软件",
+    "subtitle": "我做的一些工具，欢迎试用",
+    "download": "前往官网",
+    "platforms": "平台"
+  },
+  "footer": {
+    "rights": "保留所有权利",
+    "builtWith": "凌晨写就，霓虹供电",
+    "rss": "RSS 订阅"
+  },
+  "common": {
+    "skipAnimation": "跳过动画",
+    "localeSwitch": "English"
+  },
+  "notFound": {
+    "title": "此处没有演出",
+    "description": "你找的页面不在节目单上。",
+    "backHome": "回到首页"
+  }
+}

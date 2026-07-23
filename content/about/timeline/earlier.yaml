@@ -1,0 +1,9 @@
+period: 更早
+title:
+  zh: 你的过往履历
+  en: Your earlier chapters
+org: 某公司 / 某学校
+description:
+  zh: 复制这个 YAML 文件添加更多时间线条目，order 数字越小越靠前。
+  en: Duplicate this YAML file for more timeline entries; lower `order` appears first.
+order: 2

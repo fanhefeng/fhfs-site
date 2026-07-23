@@ -1,5 +1,5 @@
 {
-  "name": "sebs-site",
+  "name": "fhfs-site",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,12 +8,26 @@
     "start": "next start"
   },
   "dependencies": {
+    "@content-collections/core": "^0.15.2",
+    "@content-collections/mdx": "^0.2.2",
+    "@content-collections/next": "^0.2.11",
+    "@gsap/react": "^2.1.2",
+    "feed": "^6.0.0",
+    "gsap": "^3.15.0",
+    "js-yaml": "^5.2.1",
     "next": "16.2.11",
+    "next-intl": "^4.13.3",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-pretty-code": "^0.14.4",
+    "rehype-slug": "^6.0.0",
+    "shiki": "^4.3.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

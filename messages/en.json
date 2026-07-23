@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "portfolio": "Portfolio",
+    "software": "Software"
+  },
+  "home": {
+    "welcome": "Welcome to",
+    "tagline": "Late-night jazz, code & neon",
+    "intro": "This is my little club — I write, I build things, and I play the music I love.",
+    "enter": "Step inside",
+    "latestPosts": "Latest notes",
+    "featuredWorks": "Recent works",
+    "viewAll": "View all"
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Improvised on stage, written down after hours",
+    "readMore": "Read more",
+    "tags": "Tags",
+    "taggedWith": "Tagged: {tag}",
+    "empty": "No posts yet — the club just opened.",
+    "fallbackNotice": "This post is not available in English yet; showing the Chinese original.",
+    "backToList": "Back to list",
+    "publishedOn": "Published on"
+  },
+  "about": {
+    "title": "About",
+    "subtitle": "Bio & résumé",
+    "timeline": "My journey"
+  },
+  "portfolio": {
+    "title": "Portfolio",
+    "subtitle": "The standards I keep in rotation",
+    "visit": "View work"
+  },
+  "software": {
+    "title": "Software",
+    "subtitle": "Tools I've built — help yourself",
+    "download": "Visit website",
+    "platforms": "Platforms"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "builtWith": "Written after midnight, powered by neon",
+    "rss": "RSS feed"
+  },
+  "common": {
+    "skipAnimation": "Skip intro",
+    "localeSwitch": "中文"
+  },
+  "notFound": {
+    "title": "No show tonight",
+    "description": "The page you're looking for isn't on the setlist.",
+    "backHome": "Back home"
+  }
+}

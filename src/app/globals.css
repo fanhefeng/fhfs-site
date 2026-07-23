@@ -1,26 +1,182 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+ * Design tokens — "Welcome to Seb's" late-night jazz club palette.
+ * Midnight blue stage light, warm neon red, cool neon blue, brass gold.
+ * ------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0f0f23;
+  --surface: #1a1a2e;
+  --surface-raised: #232338;
+  --fg: #f5f0e8;
+  --muted-fg: #9a94b8;
+  --neon-red: #ff4d6d;
+  --neon-blue: #4cc9f0;
+  --gold: #e8b44f;
+  --border: rgba(232, 180, 79, 0.15);
+
+  --glow-red: 0 0 7px rgba(255, 77, 109, 0.9), 0 0 20px rgba(255, 77, 109, 0.5),
+    0 0 42px rgba(255, 77, 109, 0.3);
+  --glow-blue: 0 0 7px rgba(76, 201, 240, 0.9), 0 0 20px rgba(76, 201, 240, 0.5),
+    0 0 42px rgba(76, 201, 240, 0.3);
+  --glow-gold: 0 0 6px rgba(232, 180, 79, 0.7), 0 0 18px rgba(232, 180, 79, 0.35);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-fg: var(--fg);
+  --color-muted-fg: var(--muted-fg);
+  --color-neon-red: var(--neon-red);
+  --color-neon-blue: var(--neon-blue);
+  --color-gold: var(--gold);
+  --color-line: var(--border);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sign: var(--font-sign), cursive;
+  --font-deco: var(--font-deco), var(--font-serif-sc), serif;
+  --font-serif-sc: var(--font-serif-sc), "Songti SC", "Noto Serif CJK SC", serif;
+  --font-body: var(--font-body), var(--font-serif-sc), "Songti SC", serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body), var(--font-serif-sc), "Songti SC",
+    "Noto Serif CJK SC", Georgia, serif;
+  /* Subtle stage-light vignette: brighter center, darker edges */
+  background-image: radial-gradient(
+    ellipse 120% 90% at 50% -10%,
+    rgba(76, 201, 240, 0.06),
+    transparent 55%
+  );
+  min-height: 100dvh;
+}
+
+::selection {
+  background: rgba(255, 77, 109, 0.35);
+  color: var(--fg);
+}
+
+/* Neon text helpers ------------------------------------------------------- */
+.neon-red {
+  color: var(--neon-red);
+  text-shadow: var(--glow-red);
+}
+.neon-blue {
+  color: var(--neon-blue);
+  text-shadow: var(--glow-blue);
+}
+.gold-glow {
+  color: var(--gold);
+  text-shadow: var(--glow-gold);
+}
+
+/* Card with a soft neon border on hover ----------------------------------- */
+.neon-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  transition: border-color 200ms ease, box-shadow 200ms ease,
+    transform 200ms ease;
+}
+.neon-card:hover {
+  border-color: rgba(255, 77, 109, 0.55);
+  box-shadow: 0 0 18px rgba(255, 77, 109, 0.18), 0 0 2px rgba(255, 77, 109, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Film grain overlay (animated in fx/FilmGrain) --------------------------- */
+.film-grain {
+  position: fixed;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .film-grain {
+    animation: grain-shift 0.9s steps(6) infinite;
+  }
+}
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -3%); }
+  60% { transform: translate(-2%, -2%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Prose tweaks for MDX ---------------------------------------------------- */
+.prose-club {
+  line-height: 1.75;
+  max-width: 68ch;
+}
+.prose-club h2,
+.prose-club h3 {
+  font-family: var(--font-deco), var(--font-serif-sc), serif;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  margin-top: 2.25em;
+  margin-bottom: 0.75em;
+}
+.prose-club h2 { font-size: 1.5rem; }
+.prose-club h3 { font-size: 1.2rem; }
+.prose-club p { margin: 1.1em 0; }
+.prose-club a {
+  color: var(--neon-blue);
+  text-decoration: underline;
+  text-decoration-color: rgba(76, 201, 240, 0.4);
+  text-underline-offset: 3px;
+  transition: text-shadow 200ms ease;
+}
+.prose-club a:hover { text-shadow: var(--glow-blue); }
+.prose-club blockquote {
+  border-left: 2px solid var(--gold);
+  padding-left: 1rem;
+  color: var(--muted-fg);
+  font-style: italic;
+}
+.prose-club ul, .prose-club ol { padding-left: 1.5rem; margin: 1em 0; }
+.prose-club li { margin: 0.35em 0; list-style: disc; }
+.prose-club ol li { list-style: decimal; }
+.prose-club code:not(pre code) {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+.prose-club pre {
+  background: #12121f !important;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.4em 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.prose-club img {
+  max-width: 100%;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+}
+.prose-club hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5em auto;
+  width: 60%;
+}
+
+/* Focus visibility -------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 3px;
+  border-radius: 2px;
 }

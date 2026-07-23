@@ -1,0 +1,10 @@
+title:
+  zh: 本站 · 深夜小馆
+  en: This Site · After Hours
+description:
+  zh: 以《爱乐之城》结尾 Seb's 爵士俱乐部为灵感的个人网站，Next.js + GSAP 打造霓虹开场。
+  en: A personal site inspired by Seb's jazz club from La La Land's epilogue, with a neon opening built on Next.js + GSAP.
+year: 2026
+url: https://example.com
+tags: [Next.js, GSAP, Design]
+order: 1
