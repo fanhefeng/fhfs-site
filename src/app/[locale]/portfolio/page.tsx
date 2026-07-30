@@ -5,6 +5,7 @@ import { getWorks } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
 import { SectionTitle } from "@/components/deco/SectionTitle";
+import { PosterLightbox } from "@/components/portfolio/PosterLightbox";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -27,6 +28,7 @@ export default async function PortfolioPage({ params }: Props) {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
       <SectionTitle title={t("title")} subtitle={t("subtitle")} />
+      <PosterLightbox kicker={t("lightboxKicker")} />
       {works.length === 0 ? (
         <p className="text-center text-muted-fg">{t("empty")}</p>
       ) : (

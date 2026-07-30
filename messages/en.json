@@ -1,5 +1,7 @@
 {
   "nav": {
+    "menu": "Menu",
+    "close": "Close",
     "home": "Home",
     "blog": "Blog",
     "about": "About",
@@ -13,7 +15,42 @@
     "enter": "Step inside",
     "latestPosts": "Latest notes",
     "featuredWorks": "Software I've built",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "viewAllNotes": "Setlist · all notes",
+    "viewAllWorks": "Menu · all works",
+    "heroSideNote": "Hejin, Shanxi · 1990 → Qingdao · tonight",
+    "heroPlaque": "Open all night · till first light",
+    "scrollCue": "Scroll · the show begins",
+    "trackWalkIn": "TRACK 01½ · WALK IN",
+    "windowTitle1": "Through the window",
+    "windowTitle2": "you see the light first",
+    "windowLede": "Keep scrolling — the camera goes through this window, into the room.",
+    "windowInsideTitle": "The door closes behind you",
+    "windowInsideBody": "It's dark in here and the piano hasn't started. Find a seat — what follows is what I write, what I build, and one poem.",
+    "windowReadout": "Camera push",
+    "loaderHint": "Click anywhere to enter",
+    "trackNotes": "TRACK 02 · SET LIST",
+    "notesHeading": "After-hours notes",
+    "notesSub": "Scroll to deal · click to read",
+    "trackPoem": "TRACK 03 · INTERLUDE",
+    "poemTitle": "The Programmer",
+    "poemAttribution": "— an alchemist of the digital age (original in Chinese)",
+    "trackTour": "TRACK 03½ · ON TOUR",
+    "tourHeading": "The road here",
+    "tourMarquee": "ON TOUR · 1990 → 2026 · HEJIN · TAIYUAN · WUXI · BEIJING · QINGDAO ·",
+    "trackWorks": "TRACK 04 · ON STAGE",
+    "worksHeading": "Works on the bar",
+    "sliderHint": "Drag it · flick it · or scroll the wheel",
+    "sliderVisit": "Take a look",
+    "trackWall": "TRACK 04½ · THE WALL",
+    "wallHeading": "The Wall",
+    "wallSwitch": "MAINS",
+    "wallHint": "Hit the mains · light the wall",
+    "tourWalkHint": "← → or drag · walk with him",
+    "trackEncore": "ENCORE · CITY OF STARS",
+    "encoreHeading": "City of stars",
+    "encoreLine": "Before you go, look up — every star shines in its own orbit. This little planet has been spinning since my 2023 portfolio.",
+    "encoreHint": "Drag · give it a spin"
   },
   "blog": {
     "title": "Blog",
@@ -24,18 +61,22 @@
     "empty": "No posts yet — the club just opened.",
     "fallbackNotice": "This post is not available in English yet; showing the Chinese original.",
     "backToList": "Back to list",
-    "publishedOn": "Published on"
+    "publishedOn": "Published on",
+    "flapLine1": "TONIGHT · NOTES LIVE",
+    "flapLine2": "DOORS ALWAYS OPEN · FREE"
   },
   "about": {
     "title": "About",
     "subtitle": "Bio & résumé",
-    "timeline": "My journey"
+    "timeline": "My journey",
+    "deskHint": "Drag to spin · tilt · wheel to zoom · double-click resets"
   },
   "portfolio": {
     "title": "Portfolio",
     "subtitle": "The standards I keep in rotation",
     "visit": "View work",
-    "empty": "The wall is still bare — creative works coming soon. Check the Software page meanwhile."
+    "empty": "The wall is still bare — creative works coming soon. Check the Software page meanwhile.",
+    "lightboxKicker": "POSTER BOX · CLICK TO SHUFFLE"
   },
   "software": {
     "title": "Software",
@@ -54,11 +95,17 @@
   "footer": {
     "rights": "All rights reserved",
     "builtWith": "Written after midnight, powered by neon",
-    "rss": "RSS feed"
+    "rss": "RSS feed",
+    "colNav": "Setlist",
+    "colContact": "Contact",
+    "backToTop": "Back to the overture",
+    "finale": "FINALE · Before you go",
+    "planetCredit": "3D planet model © cmzw · CC-BY-4.0"
   },
   "common": {
     "skipAnimation": "Skip intro",
-    "localeSwitch": "中文"
+    "localeSwitch": "中文",
+    "lightSwitch": "Pull the light · matinee / night"
   },
   "notFound": {
     "title": "No show tonight",

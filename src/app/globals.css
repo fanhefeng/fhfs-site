@@ -20,6 +20,43 @@
   --glow-blue: 0 0 7px rgba(76, 201, 240, 0.9), 0 0 20px rgba(76, 201, 240, 0.5),
     0 0 42px rgba(76, 201, 240, 0.3);
   --glow-gold: 0 0 6px rgba(232, 180, 79, 0.7), 0 0 18px rgba(232, 180, 79, 0.35);
+
+  /* Liquid-glass surface (Apple-style frosted panel) */
+  --glass-bg: rgba(26, 26, 46, 0.42);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+
+  /* FINALE footer stage floor (also feeds its legibility veil) */
+  --finale-bg: #0b0b18;
+  --finale-veil: 11, 11, 24;
+}
+
+/* ---------------------------------------------------------------------------
+ * Matinee (light) theme — the same club at noon: warm paper, ink type,
+ * neon signs powered down to a faint colored halo.
+ * ------------------------------------------------------------------------- */
+:root[data-theme="light"] {
+  --bg: #f4f1ea;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-raised: #ffffff;
+  --fg: #211c31;
+  --muted-fg: #6a6383;
+  --neon-red: #d6365a;
+  --neon-blue: #0e7fa8;
+  --gold: #a8741f;
+  --border: rgba(33, 28, 49, 0.12);
+
+  /* Daylight kills neon: small radius, low opacity — a memory of the glow. */
+  --glow-red: 0 0 4px rgba(214, 54, 90, 0.22);
+  --glow-blue: 0 0 4px rgba(14, 127, 168, 0.22);
+  --glow-gold: 0 0 4px rgba(168, 116, 31, 0.22);
+
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(33, 28, 49, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.65);
+
+  --finale-bg: #ece7db;
+  --finale-veil: 236, 231, 219;
 }
 
 @theme inline {
@@ -39,9 +76,20 @@
   --font-body: var(--font-body), var(--font-serif-sc), "Songti SC", serif;
 }
 
+html {
+  /* Reserve the scrollbar gutter for good. Without it, locking the page
+     during the overture removes the scrollbar, ScrollTrigger measures the
+     pinned sections at the wider size, and the baked-in pin-spacer width
+     leaves the page scrollable sideways once the scrollbar returns. */
+  scrollbar-gutter: stable;
+  /* Belt and braces: clip (not hidden) keeps position: sticky working. */
+  overflow-x: clip;
+}
+
 body {
   background: var(--bg);
   color: var(--fg);
+  overflow-x: clip;
   font-family: var(--font-body), var(--font-serif-sc), "Songti SC",
     "Noto Serif CJK SC", Georgia, serif;
   /* Subtle stage-light vignette: brighter center, darker edges */
@@ -51,6 +99,34 @@ body {
     transparent 55%
   );
   min-height: 100dvh;
+}
+
+/* Matinee: the stage vignette becomes a very faint warm skylight. */
+:root[data-theme="light"] body {
+  background-image: radial-gradient(
+    ellipse 120% 90% at 50% -10%,
+    rgba(232, 180, 79, 0.1),
+    transparent 55%
+  );
+}
+
+/* Theme switch: ease surface colors only — never a global * transition. */
+body,
+.glass {
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* Liquid glass — frosted, lit from above by a hairline highlight.
+ * Lives in the components layer so Tailwind utilities can still override
+ * individual sides/shadows (e.g. the header keeps only its bottom border). */
+@layer components {
+  .glass {
+    background-color: var(--glass-bg);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    backdrop-filter: blur(18px) saturate(1.5);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 var(--glass-highlight);
+  }
 }
 
 ::selection {
@@ -97,6 +173,9 @@ body {
   opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
+}
+:root[data-theme="light"] .film-grain {
+  opacity: 0.03;
 }
 @media (prefers-reduced-motion: no-preference) {
   .film-grain {
@@ -179,4 +258,70 @@ body {
   outline: 2px solid var(--neon-blue);
   outline-offset: 3px;
   border-radius: 2px;
+}
+
+/* Sliced-mask text reveal (S1) --------------------------------------------
+ * Wrap each line: <span class="split-line"><span class="split-inner">…
+ * The mask implies the text was always there, just hidden — never fade in. */
+.split-line {
+  display: block;
+  overflow: hidden;
+}
+.split-inner {
+  display: block;
+}
+
+/* Pulling the light = an old TV losing power ------------------------------
+ * View Transitions API: the browser snapshots the outgoing page; we
+ * collapse that snapshot to a bright scanline, then to a dot, while the
+ * new theme fades up underneath. Scoped to the one transition PullCord
+ * marks with data-vt="crt", so router/theme code elsewhere is untouched. */
+:root[data-vt="crt"]::view-transition-old(root) {
+  animation: crt-off 0.45s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+:root[data-vt="crt"]::view-transition-new(root) {
+  animation: crt-on 0.3s ease-out 0.34s both;
+}
+@keyframes crt-off {
+  0% {
+    transform: scaleY(1);
+    filter: brightness(1);
+  }
+  55% {
+    transform: scaleY(0.006);
+    filter: brightness(2.6) saturate(1.5);
+  }
+  80% {
+    transform: scaleY(0.004) scaleX(0.55);
+    filter: brightness(3.2);
+  }
+  100% {
+    transform: scaleY(0.002) scaleX(0.02);
+    filter: brightness(4);
+    opacity: 0;
+  }
+}
+@keyframes crt-on {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-vt="crt"]::view-transition-old(root),
+  :root[data-vt="crt"]::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* Track kicker — the mono "TRACK 02 · SET LIST" label of each act --------- */
+.track-kicker {
+  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  opacity: 0.85;
 }

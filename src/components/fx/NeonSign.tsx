@@ -9,6 +9,8 @@ const GLOW_BLUE =
   "0 0 7px rgba(76,201,240,0.9), 0 0 20px rgba(76,201,240,0.5), 0 0 42px rgba(76,201,240,0.3)";
 
 const INTRO_SEEN_KEY = "neon-intro-seen";
+const OVERTURE_SEEN_KEY = "fhfs-overture-seen";
+const OVERTURE_DONE_EVENT = "fhfs:overture-done";
 
 type Props = {
   welcome: string;
@@ -39,8 +41,9 @@ export function NeonSign({ welcome, name, tagline, skipLabel, children }: Props)
       const litWelcome = { color: "#4cc9f0", textShadow: GLOW_BLUE, opacity: 1 };
       const setFinal = () => {
         gsap.set(welcomeEl, litWelcome);
-        gsap.set(nameEl, { opacity: 1 });
-        gsap.set(q(".neon-name span"), litName);
+        // On repeat visits SplitText never ran, so there are no per-char
+        // spans — light the whole headline instead of querying for them.
+        gsap.set(nameEl, { ...litName, opacity: 1 });
         gsap.set(rest, { opacity: 1, y: 0 });
       };
 
@@ -64,6 +67,7 @@ export function NeonSign({ welcome, name, tagline, skipLabel, children }: Props)
         gsap.set(rest, { opacity: 0, y: 16 });
 
         const tl = gsap.timeline({
+          paused: true,
           onStart: () => setPlaying(true),
           onComplete: () => {
             sessionStorage.setItem(INTRO_SEEN_KEY, "1");
@@ -103,7 +107,25 @@ export function NeonSign({ welcome, name, tagline, skipLabel, children }: Props)
 
         tlRef.current = tl;
 
+        // Relay handoff: on a first visit the cinematic overture (loader)
+        // plays above us — the sign only hums on once its blade cut finishes.
+        // Any later visit this session starts immediately.
+        let timeoutId = 0;
+        const startNow = () => {
+          window.clearTimeout(timeoutId);
+          tl.play();
+        };
+        if (sessionStorage.getItem(OVERTURE_SEEN_KEY)) {
+          startNow();
+        } else {
+          window.addEventListener(OVERTURE_DONE_EVENT, startNow, { once: true });
+          // Safety net: never leave the stage dark if the loader misfires.
+          timeoutId = window.setTimeout(startNow, 12000);
+        }
+
         return () => {
+          window.clearTimeout(timeoutId);
+          window.removeEventListener(OVERTURE_DONE_EVENT, startNow);
           split.revert();
         };
       });
@@ -135,7 +157,7 @@ export function NeonSign({ welcome, name, tagline, skipLabel, children }: Props)
         <button
           type="button"
           onClick={skip}
-          className="absolute bottom-6 right-6 cursor-pointer text-xs text-muted-fg/70 transition-colors hover:text-fg"
+          className="absolute bottom-6 right-6 cursor-pointer text-xs text-muted-fg transition-colors hover:text-fg"
         >
           {skipLabel}
         </button>

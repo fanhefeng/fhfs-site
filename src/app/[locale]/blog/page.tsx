@@ -6,6 +6,7 @@ import { localeAlternates } from "@/lib/seo";
 import { PostCard } from "@/components/blog/PostCard";
 import { TagPill } from "@/components/blog/TagPill";
 import { SectionTitle } from "@/components/deco/SectionTitle";
+import { SplitFlap } from "@/components/fx/SplitFlap";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -29,6 +30,7 @@ export default async function BlogPage({ params }: Props) {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <SectionTitle title={t("title")} subtitle={t("subtitle")} />
+      <SplitFlap lines={[t("flapLine1"), t("flapLine2")]} />
       {tags.length > 0 && (
         <div className="mb-10 flex flex-wrap justify-center gap-2">
           {tags.map(({ tag }) => (

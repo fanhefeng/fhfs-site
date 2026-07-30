@@ -8,6 +8,10 @@ import { site } from "@/config/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FilmGrain } from "@/components/fx/FilmGrain";
+import { PullCord } from "@/components/fx/PullCord";
+import { SmoothScroll } from "@/components/fx/SmoothScroll";
+import { RouteTransition } from "@/components/fx/RouteTransition";
+import { ProgressHud } from "@/components/fx/ProgressHud";
 import "../globals.css";
 
 const signFont = Monoton({
@@ -70,11 +74,24 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html
       lang={locale === "zh" ? "zh-CN" : "en"}
+      data-theme="dark"
+      suppressHydrationWarning
       className={`${signFont.variable} ${decoFont.variable} ${serifSC.variable} ${bodyFont.variable} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
+        {/* Apply the saved theme before first paint — night show is the
+            default, the matinee only when explicitly pulled on. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");document.documentElement.dataset.theme=t==="light"?"light":"dark"}catch(e){}})()`,
+          }}
+        />
         <NextIntlClientProvider>
+          <SmoothScroll />
+          <RouteTransition />
+          <ProgressHud />
           <FilmGrain />
+          <PullCord />
           <Header />
           {children}
           <Footer />

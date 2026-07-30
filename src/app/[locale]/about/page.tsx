@@ -5,6 +5,7 @@ import { getAbout } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { Timeline } from "@/components/about/Timeline";
+import { Workstation } from "@/components/about/Workstation";
 import { SectionTitle } from "@/components/deco/SectionTitle";
 import { ArtDecoDivider } from "@/components/deco/ArtDecoDivider";
 
@@ -29,6 +30,10 @@ export default async function AboutPage({ params }: Props) {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-16">
       <SectionTitle title={t("title")} subtitle={t("subtitle")} />
+
+      {/* The 3D desk from the old portfolio — drag it, it spins back. */}
+      <Workstation hint={t("deskHint")} className="mb-14" />
+
       {about && <Mdx code={about.mdx} />}
 
       <h2 className="mb-2 mt-16 text-center font-deco text-2xl tracking-widest text-gold">

@@ -1,5 +1,7 @@
 {
   "nav": {
+    "menu": "节目单",
+    "close": "散场",
     "home": "首页",
     "blog": "博客",
     "about": "关于我",
@@ -13,7 +15,42 @@
     "enter": "进店看看",
     "latestPosts": "最新随笔",
     "featuredWorks": "我做的软件",
-    "viewAll": "查看全部"
+    "viewAll": "查看全部",
+    "viewAllNotes": "节目单 · 全部手札",
+    "viewAllWorks": "酒单 · 全部作品",
+    "heroSideNote": "山西河津 · 1990 → 青岛 · 今夜",
+    "heroPlaque": "全年无休 · 营业至天明",
+    "scrollCue": "向下 · 演出开始",
+    "trackWalkIn": "TRACK 01½ · WALK IN",
+    "windowTitle1": "隔着窗",
+    "windowTitle2": "先看见光",
+    "windowLede": "继续向下滚动 —— 镜头会穿过这扇窗，走进店里。",
+    "windowInsideTitle": "门在身后合上了",
+    "windowInsideBody": "里面很暗，钢琴还没开始。找个位置坐下——接下来是我写的东西、我做的东西，和一首诗。",
+    "windowReadout": "镜头推进",
+    "loaderHint": "点击任意处进场",
+    "trackNotes": "TRACK 02 · SET LIST",
+    "notesHeading": "深夜手札",
+    "notesSub": "滚动切牌 · 点击阅读",
+    "trackPoem": "TRACK 03 · INTERLUDE",
+    "poemTitle": "程序员",
+    "poemAttribution": "—— 数字时代的炼金术士",
+    "trackTour": "TRACK 03½ · ON TOUR",
+    "tourHeading": "来时的路",
+    "tourMarquee": "ON TOUR · 1990 → 2026 · 河津 · 太原 · 无锡 · 北京 · 青岛 ·",
+    "trackWorks": "TRACK 04 · ON STAGE",
+    "worksHeading": "吧台上的作品",
+    "sliderHint": "按住拖拽 · 松手有惯性 · 滚轮也能推",
+    "sliderVisit": "看看这件作品",
+    "trackWall": "TRACK 04½ · THE WALL",
+    "wallHeading": "海报墙",
+    "wallSwitch": "总闸",
+    "wallHint": "拉闸 · 让墙亮起来",
+    "tourWalkHint": "← → 或拖动 · 陪他走一段",
+    "trackEncore": "ENCORE · CITY OF STARS",
+    "encoreHeading": "星光之城",
+    "encoreLine": "散场之前，抬头看看——每一颗星都在自己的轨道上发光。这颗小星球从我 2023 年的旧作品集一路转到了这里。",
+    "encoreHint": "拖动 · 让它转起来"
   },
   "blog": {
     "title": "博客",
@@ -24,18 +61,22 @@
     "empty": "还没有文章，酒馆刚开张。",
     "fallbackNotice": "本文暂无中文版，以下为英文原文。",
     "backToList": "返回列表",
-    "publishedOn": "发布于"
+    "publishedOn": "发布于",
+    "flapLine1": "今夜 · 手札雅集",
+    "flapLine2": "全天开放 · 免费入场"
   },
   "about": {
     "title": "关于我",
     "subtitle": "个人简介与履历",
-    "timeline": "我的经历"
+    "timeline": "我的经历",
+    "deskHint": "拖动旋转 · 上下拖动俯仰 · 滚轮缩放 · 双击复位"
   },
   "portfolio": {
     "title": "作品集",
     "subtitle": "台上的保留曲目",
     "visit": "查看作品",
-    "empty": "墙上还空着——创意作品陆续上墙中，先去「软件」页逛逛。"
+    "empty": "墙上还空着——创意作品陆续上墙中，先去「软件」页逛逛。",
+    "lightboxKicker": "海报灯箱 · 点击换一张"
   },
   "software": {
     "title": "软件",
@@ -54,11 +95,17 @@
   "footer": {
     "rights": "保留所有权利",
     "builtWith": "凌晨写就，霓虹供电",
-    "rss": "RSS 订阅"
+    "rss": "RSS 订阅",
+    "colNav": "节目单",
+    "colContact": "联系",
+    "backToTop": "回到开场",
+    "finale": "FINALE · 散场之前",
+    "planetCredit": "3D 行星模型 © cmzw · CC-BY-4.0"
   },
   "common": {
     "skipAnimation": "跳过动画",
-    "localeSwitch": "English"
+    "localeSwitch": "English",
+    "lightSwitch": "拉灯 · 日场/夜场"
   },
   "notFound": {
     "title": "此处没有演出",
