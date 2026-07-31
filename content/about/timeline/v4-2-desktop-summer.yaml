@@ -1,0 +1,10 @@
+# fhf 4.2 — portreaper + lumitext created 2026-06-03, photo-browser 2026-06-14.
+version: "4.2"
+date: "2026-06-03"
+title:
+  zh: 一个夏天，三个桌面端
+  en: Three desktop apps in one summer
+note:
+  zh: Portreaper 清理占着端口不放的僵尸进程，Lumitext 是 macOS 自定义文字屏保，Photo Browser 本地优先地翻照片。
+  en: Portreaper hunts zombies squatting on ports, Lumitext is a custom-text macOS screensaver, Photo Browser reads your photos locally first.
+order: 4

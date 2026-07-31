@@ -1,0 +1,10 @@
+# fhf 4.5 — file-tidy and keyboard-piano were both created on 2026-07-20.
+version: "4.5"
+date: "2026-07-20"
+title:
+  zh: 一天里开了两个仓库
+  en: Two repos in one day
+note:
+  zh: File Tidy 用一条命令收拾干净下载目录，Keyboard Piano 让键盘变成一台琴——工具和玩具各一个。
+  en: File Tidy tidies your Downloads with one command; Keyboard Piano turns the keyboard into an instrument. One tool, one toy.
+order: 3

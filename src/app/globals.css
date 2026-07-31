@@ -1,81 +1,212 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
- * Design tokens — "Welcome to Seb's" late-night jazz club palette.
- * Midnight blue stage light, warm neon red, cool neon blue, brass gold.
+ * "The Quiet Issue" — gallery-editorial design system (Tailwind 4, CSS-first).
+ *
+ * Warm paper light theme is the default ("open gallery"); data-theme="dark"
+ * is the after-hours gallery. Glass is a *container* material (three tiers),
+ * aurora glow + 2.5% paper grain are the only atmosphere layers, amber is
+ * the single accent.
+ * ------------------------------------------------------------------------- */
+
+/* Tailwind's `dark:` variant follows the manual theme switch, not the OS —
+ * the inline script in layout.tsx resolves OS preference into data-theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* No built-in variant for this one — glass components use it to fall back
+ * to solid cards (see the .glass-* rules below for the non-utility path). */
+@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
+
+/* ---------------------------------------------------------------------------
+ * Runtime tokens — light ("open") is :root, dark ("closed") overrides.
+ * Everything a component reads at runtime lives here; @theme only maps
+ * these into utility names.
  * ------------------------------------------------------------------------- */
 :root {
-  --bg: #0f0f23;
-  --surface: #1a1a2e;
-  --surface-raised: #232338;
-  --fg: #f5f0e8;
-  --muted-fg: #9a94b8;
-  --neon-red: #ff4d6d;
-  --neon-blue: #4cc9f0;
-  --gold: #e8b44f;
-  --border: rgba(232, 180, 79, 0.15);
+  --bg: #faf9f6;
+  --surface: #f2f0ea;
+  --surface-raised: #ffffff;
+  --fg: #1a1a1a;
+  --fg-secondary: rgba(26, 26, 26, 0.62);
+  --fg-tertiary: rgba(26, 26, 26, 0.4);
+  /* The one accent: amber. ≥4.5:1 on paper, used for link underlines,
+   * current-state markers and the lit lamp. */
+  --accent: #b45309;
+  --line: rgba(26, 26, 26, 0.08);
 
-  --glow-red: 0 0 7px rgba(255, 77, 109, 0.9), 0 0 20px rgba(255, 77, 109, 0.5),
-    0 0 42px rgba(255, 77, 109, 0.3);
-  --glow-blue: 0 0 7px rgba(76, 201, 240, 0.9), 0 0 20px rgba(76, 201, 240, 0.5),
-    0 0 42px rgba(76, 201, 240, 0.3);
-  --glow-gold: 0 0 6px rgba(232, 180, 79, 0.7), 0 0 18px rgba(232, 180, 79, 0.35);
+  /* Aurora colors exist in both themes (glass needs something to refract);
+   * only the layer opacity changes per theme. */
+  --glow-warm: #ffb86b;
+  --glow-cool: #6e8bff;
+  --aurora-opacity: 0.1;
 
-  /* Liquid-glass surface (Apple-style frosted panel) */
-  --glass-bg: rgba(26, 26, 46, 0.42);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.06);
+  /* Warm paper needs warm shadows — cool grey shadows read dirty on it. */
+  --elev-card: 0 1px 2px rgba(120, 80, 40, 0.05), 0 8px 24px rgba(120, 80, 40, 0.08);
+  --elev-lift: 0 2px 6px rgba(120, 80, 40, 0.08), 0 18px 44px rgba(120, 80, 40, 0.13);
+  --elev-panel: 0 24px 64px rgba(120, 80, 40, 0.16);
+  --sticker-shadow-color: rgba(120, 80, 40, 0.22);
 
-  /* FINALE footer stage floor (also feeds its legibility veil) */
-  --finale-bg: #0b0b18;
-  --finale-veil: 11, 11, 24;
+  /* Glass · three tiers (see .glass-thin / .glass-thick / .liquid-chip).
+   * The brighter border-top is the shared "lit from above" convention. */
+  --glass-thin-bg: rgba(255, 255, 255, 0.55);
+  --glass-thin-border: rgba(255, 255, 255, 0.65);
+  --glass-thin-top: rgba(255, 255, 255, 0.85);
+  --glass-thin-shadow: 0 8px 32px rgba(20, 20, 30, 0.08);
+  --glass-thick-bg: rgba(255, 255, 255, 0.72);
+  --glass-thick-border: rgba(255, 255, 255, 0.55);
+  --glass-thick-top: rgba(255, 255, 255, 0.8);
+  --glass-thick-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --glass-thick-shadow: 0 16px 48px rgba(20, 20, 30, 0.16);
+  --chip-bg: rgba(255, 255, 255, 0.15);
+  --chip-border: rgba(255, 255, 255, 0.55);
+  --chip-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -8px 16px -8px rgba(255, 255, 255, 0.25);
+  --blur-thin: 12px;
+  --blur-thick: 20px;
+
+  /* Radii: chip / card / panel / full-capsule. Runtime names differ from
+   * the @theme keys (--radius-*) to avoid a self-referential theme value. */
+  --r-chip: 0.625rem;
+  --r-card: 1rem;
+  --r-panel: 1.5rem;
+
+  /* Code block canvas — dual values so rehype-pretty-code output reads well
+   * on paper and after hours (see .prose-editorial pre). */
+  --code-bg: var(--surface);
+  --code-border: var(--line);
+
+  /* Font stacks (runtime copies — @theme inline emits no :root vars).
+   * next/font variables are set on <html> by layout.tsx. CJK prefers the
+   * system PingFang/Songti first so the Noto webfonts stay a fallback. */
+  --font-stack-sans: var(--font-inter), "PingFang SC", var(--font-noto-sans-sc),
+    "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
+  --font-stack-serif: var(--font-instrument), "Songti SC", var(--font-noto-serif-sc),
+    "Noto Serif CJK SC", Georgia, serif;
+  --font-stack-mono: var(--font-geist-mono), ui-monospace, "SF Mono", SFMono-Regular,
+    Menlo, monospace;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0e0e11;
+  --surface: #141417;
+  --surface-raised: #1a1a1f;
+  --fg: rgba(255, 255, 255, 0.92);
+  --fg-secondary: rgba(255, 255, 255, 0.68);
+  --fg-tertiary: rgba(255, 255, 255, 0.45);
+  --accent: #b45309;
+  --line: rgba(255, 255, 255, 0.1);
+
+  /* The lamp is brighter after closing time. */
+  --aurora-opacity: 0.17;
+
+  --elev-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --elev-lift: 0 2px 6px rgba(0, 0, 0, 0.45), 0 18px 44px rgba(0, 0, 0, 0.5);
+  --elev-panel: 0 24px 64px rgba(0, 0, 0, 0.55);
+  --sticker-shadow-color: rgba(0, 0, 0, 0.5);
+
+  --glass-thin-bg: rgba(20, 20, 25, 0.45);
+  --glass-thin-border: rgba(255, 255, 255, 0.1);
+  --glass-thin-top: rgba(255, 255, 255, 0.18);
+  --glass-thin-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --glass-thick-bg: rgba(16, 16, 20, 0.62);
+  --glass-thick-border: rgba(255, 255, 255, 0.12);
+  --glass-thick-top: rgba(255, 255, 255, 0.22);
+  --glass-thick-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --glass-thick-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --chip-bg: rgba(255, 255, 255, 0.06);
+  --chip-border: rgba(255, 255, 255, 0.14);
+  --chip-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  --code-bg: var(--surface);
+  --code-border: var(--line);
+}
+
+/* Mobile GPUs pay dearly for large blur radii — drop both tiers. */
+@media (max-width: 767px) {
+  :root {
+    --blur-thin: 8px;
+    --blur-thick: 10px;
+  }
+}
+
+/* Registered so panel "materialize" can tween blur as a real length:
+ * backdrop-filter: blur(var(--panel-blur)) + GSAP tween 20px -> 0px.
+ * Only ever animated for entrance/exit instants, never continuously. */
+@property --panel-blur {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
 }
 
 /* ---------------------------------------------------------------------------
- * Matinee (light) theme — the same club at noon: warm paper, ink type,
- * neon signs powered down to a faint colored halo.
+ * Theme map — utility names for the runtime tokens above.
  * ------------------------------------------------------------------------- */
-:root[data-theme="light"] {
-  --bg: #f4f1ea;
-  --surface: rgba(255, 255, 255, 0.72);
-  --surface-raised: #ffffff;
-  --fg: #211c31;
-  --muted-fg: #6a6383;
-  --neon-red: #d6365a;
-  --neon-blue: #0e7fa8;
-  --gold: #a8741f;
-  --border: rgba(33, 28, 49, 0.12);
-
-  /* Daylight kills neon: small radius, low opacity — a memory of the glow. */
-  --glow-red: 0 0 4px rgba(214, 54, 90, 0.22);
-  --glow-blue: 0 0 4px rgba(14, 127, 168, 0.22);
-  --glow-gold: 0 0 4px rgba(168, 116, 31, 0.22);
-
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(33, 28, 49, 0.1);
-  --glass-highlight: rgba(255, 255, 255, 0.65);
-
-  --finale-bg: #ece7db;
-  --finale-veil: 236, 231, 219;
-}
-
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
   --color-fg: var(--fg);
-  --color-muted-fg: var(--muted-fg);
-  --color-neon-red: var(--neon-red);
-  --color-neon-blue: var(--neon-blue);
-  --color-gold: var(--gold);
-  --color-line: var(--border);
+  --color-fg-secondary: var(--fg-secondary);
+  --color-fg-tertiary: var(--fg-tertiary);
+  --color-muted-fg: var(--fg-secondary);
+  --color-accent: var(--accent);
+  --color-line: var(--line);
+  --color-glow-warm: var(--glow-warm);
+  --color-glow-cool: var(--glow-cool);
 
-  --font-sign: var(--font-sign), cursive;
-  --font-deco: var(--font-deco), var(--font-serif-sc), serif;
-  --font-serif-sc: var(--font-serif-sc), "Songti SC", "Noto Serif CJK SC", serif;
-  --font-body: var(--font-body), var(--font-serif-sc), "Songti SC", serif;
+  --font-sans: var(--font-stack-sans);
+  --font-display: var(--font-stack-sans);
+  --font-serif: var(--font-stack-serif);
+  --font-mono: var(--font-stack-mono);
+
+  /* Type scale. Latin display sizes carry negative tracking; the :lang()
+   * guard below zeroes it for Chinese, which never tracks negative. */
+  --text-display: clamp(2.5rem, 7vw, 6.5rem);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 650;
+  --text-display-sm: clamp(2rem, 4.5vw, 3.5rem);
+  --text-display-sm--line-height: 1.1;
+  --text-display-sm--letter-spacing: -0.025em;
+  --text-display-sm--font-weight: 600;
+  --text-title: clamp(1.5rem, 3vw, 2.25rem);
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 600;
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.35;
+  --text-heading--letter-spacing: -0.01em;
+  --text-heading--font-weight: 600;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.7;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.55;
+  /* Mono meta line: 11–12px uppercase, wide tracking. */
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.5;
+  --text-meta--letter-spacing: 0.08em;
+  --tracking-meta: 0.08em;
+
+  --radius-chip: var(--r-chip);
+  --radius-card: var(--r-card);
+  --radius-panel: var(--r-panel);
+
+  --shadow-card: var(--elev-card);
+  --shadow-lift: var(--elev-lift);
+  --shadow-panel: var(--elev-panel);
 }
 
+/* Chinese display type never tracks negative (0 ~ +0.01em). :lang() reads
+ * the computed language, so an EN headline inside a zh page opts back into
+ * negative tracking simply by carrying lang="en". */
+:is(.text-display, .text-display-sm, .text-title, .text-heading):lang(zh-CN),
+.prose-editorial :is(h1, h2, h3, h4):lang(zh-CN) {
+  letter-spacing: 0.01em;
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
 html {
   /* Reserve the scrollbar gutter for good. Without it, locking the page
      during the overture removes the scrollbar, ScrollTrigger measures the
@@ -90,238 +221,407 @@ body {
   background: var(--bg);
   color: var(--fg);
   overflow-x: clip;
-  font-family: var(--font-body), var(--font-serif-sc), "Songti SC",
-    "Noto Serif CJK SC", Georgia, serif;
-  /* Subtle stage-light vignette: brighter center, darker edges */
-  background-image: radial-gradient(
-    ellipse 120% 90% at 50% -10%,
-    rgba(76, 201, 240, 0.06),
-    transparent 55%
-  );
+  font-family: var(--font-stack-sans);
   min-height: 100dvh;
 }
 
-/* Matinee: the stage vignette becomes a very faint warm skylight. */
-:root[data-theme="light"] body {
-  background-image: radial-gradient(
-    ellipse 120% 90% at 50% -10%,
-    rgba(232, 180, 79, 0.1),
-    transparent 55%
-  );
-}
-
-/* Theme switch: ease surface colors only — never a global * transition. */
-body,
-.glass {
+/* Theme switch: ease surface colors only — never a global * transition.
+ * The 1.2s view-transition cross-fade rides on top when available; this
+ * ≥300ms fallback keeps non-supporting browsers free of brightness jumps. */
+body {
   transition: background-color 0.35s ease, color 0.35s ease;
 }
 
-/* Liquid glass — frosted, lit from above by a hairline highlight.
- * Lives in the components layer so Tailwind utilities can still override
- * individual sides/shadows (e.g. the header keeps only its bottom border). */
-@layer components {
-  .glass {
-    background-color: var(--glass-bg);
-    -webkit-backdrop-filter: blur(18px) saturate(1.5);
-    backdrop-filter: blur(18px) saturate(1.5);
-    border: 1px solid var(--glass-border);
-    box-shadow: inset 0 1px 0 var(--glass-highlight);
-  }
-}
-
 ::selection {
-  background: rgba(255, 77, 109, 0.35);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
   color: var(--fg);
 }
 
-/* Neon text helpers ------------------------------------------------------- */
-.neon-red {
-  color: var(--neon-red);
-  text-shadow: var(--glow-red);
-}
-.neon-blue {
-  color: var(--neon-blue);
-  text-shadow: var(--glow-blue);
-}
-.gold-glow {
-  color: var(--gold);
-  text-shadow: var(--glow-gold);
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
-/* Card with a soft neon border on hover ----------------------------------- */
-.neon-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  transition: border-color 200ms ease, box-shadow 200ms ease,
-    transform 200ms ease;
-}
-.neon-card:hover {
-  border-color: rgba(255, 77, 109, 0.55);
-  box-shadow: 0 0 18px rgba(255, 77, 109, 0.18), 0 0 2px rgba(255, 77, 109, 0.4);
-  transform: translateY(-2px);
+/* Press feedback baseline: feedback lands on pointer-down, everywhere.
+ * The standalone `scale` property is used on purpose — GSAP writes
+ * `transform`, so hover/entrance tweens and the press snap compose instead
+ * of clobbering each other. (No effect on non-replaced inline links.) */
+@layer base {
+  a,
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :where(a, button, [role="button"], .press) {
+      transition: scale 100ms ease-out;
+    }
+    :where(a, button, [role="button"], .press):active {
+      scale: 0.97;
+    }
+  }
 }
 
-/* Film grain overlay (animated in fx/FilmGrain) --------------------------- */
-.film-grain {
+/* ---------------------------------------------------------------------------
+ * Components
+ * ------------------------------------------------------------------------- */
+@layer components {
+  /* Glass · tier 1 — cards and HUDs. Needs aurora/imagery behind it;
+   * never place glass on a flat solid, never stack glass on glass. */
+  .glass-thin {
+    background-color: var(--glass-thin-bg);
+    -webkit-backdrop-filter: blur(var(--blur-thin)) saturate(160%);
+    backdrop-filter: blur(var(--blur-thin)) saturate(160%);
+    border: 1px solid var(--glass-thin-border);
+    border-top-color: var(--glass-thin-top);
+    box-shadow: var(--glass-thin-shadow);
+  }
+
+  /* Glass · tier 2 — expanded island, FullNav, panels. */
+  .glass-thick {
+    background-color: var(--glass-thick-bg);
+    -webkit-backdrop-filter: blur(var(--blur-thick)) saturate(180%);
+    backdrop-filter: blur(var(--blur-thick)) saturate(180%);
+    border: 1px solid var(--glass-thick-border);
+    border-top-color: var(--glass-thick-top);
+    box-shadow: var(--glass-thick-inset), var(--glass-thick-shadow);
+  }
+
+  /* Glass · tier 3 — chips, capsules, small controls. High transparency,
+   * tiny blur, inner highlight: the low-cost liquid-glass look. */
+  .liquid-chip {
+    background-color: var(--chip-bg);
+    -webkit-backdrop-filter: blur(2px) saturate(160%);
+    backdrop-filter: blur(2px) saturate(160%);
+    border: 1px solid var(--chip-border);
+    border-radius: var(--r-chip);
+    box-shadow: var(--chip-inset);
+  }
+
+  /* Text sitting on glass: higher contrast, a step heavier, tracking up a
+   * hair — flat mid-grey text on glass is illegible over busy backdrops. */
+  .vibrancy {
+    color: color-mix(in srgb, var(--fg) 92%, transparent);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* ≥44px touch targets without inflating the visual: extend the hit area
+   * with a pseudo. The host just needs `position: relative` (included). */
+  .hit-ext {
+    position: relative;
+  }
+  .hit-ext::before {
+    content: "";
+    position: absolute;
+    inset: -0.625rem;
+  }
+}
+
+/* Accessibility fallbacks for every glass tier — outside @layer so they win
+ * over both the component rules and stray utility overrides. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-thin,
+  .glass-thick,
+  .liquid-chip {
+    background-color: var(--surface-raised);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-contrast: more) {
+  .glass-thin,
+  .glass-thick,
+  .liquid-chip {
+    background-color: var(--surface-raised);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-color: var(--fg-secondary);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Ambient layers (markup in fx/AuroraLayer and fx/GrainLayer)
+ * ------------------------------------------------------------------------- */
+
+/* Aurora: one warm + one cool glow drifting behind everything. Pure CSS
+ * gradients (no WebGL); blur is static, only transform animates, so the
+ * blurred blob rasterizes once and the 60–120s breath is compositor-only. */
+.aurora-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: clip;
+}
+.aurora-blob {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: var(--aurora-opacity);
+  will-change: transform;
+}
+.aurora-blob--warm {
+  width: clamp(340px, 56vw, 760px);
+  left: -12%;
+  top: -18%;
+  background: radial-gradient(circle at 35% 35%, var(--glow-warm), transparent 70%);
+  animation: aurora-a 90s ease-in-out infinite;
+}
+.aurora-blob--cool {
+  width: clamp(300px, 48vw, 640px);
+  right: -10%;
+  top: 4%;
+  background: radial-gradient(circle at 60% 40%, var(--glow-cool), transparent 70%);
+  animation: aurora-b 120s ease-in-out infinite;
+}
+@keyframes aurora-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(6%, -4%, 0) scale(1.12);
+  }
+  66% {
+    transform: translate3d(-5%, 6%, 0) scale(0.94);
+  }
+}
+@keyframes aurora-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  40% {
+    transform: translate3d(-7%, 5%, 0) scale(1.1);
+  }
+  70% {
+    transform: translate3d(4%, -6%, 0) scale(0.95);
+  }
+}
+/* Static under reduced motion and data-saver — the glow stays, the breath stops. */
+@media (prefers-reduced-motion: reduce), (prefers-reduced-data: reduce) {
+  .aurora-blob {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+/* Paper grain: 2.5% turbulence noise above the glass layers (anti-banding).
+ * Oversized so the barely-there drift never exposes an edge. */
+.grain-layer {
   position: fixed;
   inset: -100%;
   width: 300%;
   height: 300%;
   pointer-events: none;
-  z-index: 50;
-  opacity: 0.05;
+  z-index: 90;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
-:root[data-theme="light"] .film-grain {
-  opacity: 0.03;
-}
 @media (prefers-reduced-motion: no-preference) {
-  .film-grain {
-    animation: grain-shift 0.9s steps(6) infinite;
+  .grain-layer {
+    animation: grain-drift 6s steps(8) infinite;
   }
 }
-@keyframes grain-shift {
-  0% { transform: translate(0, 0); }
-  20% { transform: translate(-3%, 2%); }
-  40% { transform: translate(2%, -3%); }
-  60% { transform: translate(-2%, -2%); }
-  80% { transform: translate(3%, 3%); }
-  100% { transform: translate(0, 0); }
+@keyframes grain-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1.5%, 1%);
+  }
+  50% {
+    transform: translate(1%, -1.5%);
+  }
+  75% {
+    transform: translate(-1%, -1%);
+  }
 }
 
-/* Prose tweaks for MDX ---------------------------------------------------- */
-.prose-club {
-  line-height: 1.75;
+/* ---------------------------------------------------------------------------
+ * Theme cross-fade — the "lights on" ritual.
+ * LightSwitch marks the root with data-vt="theme", wraps the swap in
+ * document.startViewTransition, and the snapshots cross-fade over 1.2s.
+ * Route/locale transitions keep the default UA timing.
+ * ------------------------------------------------------------------------- */
+:root[data-vt="theme"]::view-transition-old(root),
+:root[data-vt="theme"]::view-transition-new(root) {
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-vt="theme"]::view-transition-old(root),
+  :root[data-vt="theme"]::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Editorial prose for MDX
+ * ------------------------------------------------------------------------- */
+.prose-editorial {
+  font-size: 1.0625rem;
+  line-height: 1.7;
   max-width: 68ch;
 }
-.prose-club h2,
-.prose-club h3 {
-  font-family: var(--font-deco), var(--font-serif-sc), serif;
-  color: var(--gold);
-  letter-spacing: 0.06em;
-  margin-top: 2.25em;
-  margin-bottom: 0.75em;
+.prose-editorial :is(h1, h2, h3, h4) {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin: 2.4em 0 0.7em;
+  /* Anchor jumps must clear the fixed island + its blur scrim. */
+  scroll-margin-top: 7rem;
 }
-.prose-club h2 { font-size: 1.5rem; }
-.prose-club h3 { font-size: 1.2rem; }
-.prose-club p { margin: 1.1em 0; }
-.prose-club a {
-  color: var(--neon-blue);
+/* The article page supplies its own header spacing — the body starts flush. */
+.prose-editorial > :first-child {
+  margin-top: 0;
+}
+/* rehype-autolink-headings (behavior: "wrap") puts an <a> around every
+ * heading. It is a permalink, not a reference: it must not inherit the amber
+ * underline meant for links inside prose. */
+.prose-editorial :is(h1, h2, h3, h4) > a,
+.prose-editorial :is(h1, h2, h3, h4) > a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.prose-editorial h2 {
+  font-size: 1.4375rem;
+}
+.prose-editorial h3 {
+  font-size: 1.1875rem;
+}
+.prose-editorial p {
+  margin: 1.15em 0;
+}
+/* Links: ink text with an amber underline; hover commits to amber. */
+.prose-editorial a {
+  color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgba(76, 201, 240, 0.4);
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-  transition: text-shadow 200ms ease;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
-.prose-club a:hover { text-shadow: var(--glow-blue); }
-.prose-club blockquote {
-  border-left: 2px solid var(--gold);
-  padding-left: 1rem;
-  color: var(--muted-fg);
+.prose-editorial a:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+/* After hours the amber needs a little warm light mixed in to stay legible. */
+:root[data-theme="dark"] .prose-editorial a:hover {
+  color: color-mix(in srgb, var(--accent) 55%, var(--glow-warm) 45%);
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, var(--glow-warm) 45%);
+}
+/* Pull quotes go serif italic — the editorial voice change. */
+.prose-editorial blockquote {
+  font-family: var(--font-stack-serif);
   font-style: italic;
+  font-size: 1.2em;
+  line-height: 1.6;
+  color: var(--fg-secondary);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  padding-left: 1.25rem;
+  margin: 1.8em 0;
 }
-.prose-club ul, .prose-club ol { padding-left: 1.5rem; margin: 1em 0; }
-.prose-club li { margin: 0.35em 0; list-style: disc; }
-.prose-club ol li { list-style: decimal; }
-.prose-club code:not(pre code) {
-  background: var(--surface-raised);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+.prose-editorial ul,
+.prose-editorial ol {
+  padding-left: 1.5rem;
+  margin: 1.1em 0;
+}
+.prose-editorial li {
+  margin: 0.35em 0;
+  list-style: disc;
+}
+.prose-editorial ol li {
+  list-style: decimal;
+}
+.prose-editorial li::marker {
+  color: var(--fg-tertiary);
+}
+.prose-editorial img {
+  max-width: 100%;
+  border-radius: var(--r-card);
+}
+.prose-editorial figcaption {
+  font-family: var(--font-stack-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--fg-tertiary);
+  margin-top: 0.6em;
+}
+.prose-editorial hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2.5em auto;
+  width: 40%;
+}
+.prose-editorial table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  margin: 1.4em 0;
+}
+.prose-editorial :is(th, td) {
+  border-bottom: 1px solid var(--line);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+.prose-editorial th {
+  font-weight: 600;
+}
+.prose-editorial :not(pre) > code {
+  font-family: var(--font-stack-mono);
+  font-size: 0.875em;
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
   padding: 0.15em 0.4em;
-  font-size: 0.9em;
 }
-.prose-club pre {
-  background: #12121f !important;
-  border: 1px solid var(--border);
-  border-radius: 0.6rem;
+/* Code blocks (rehype-pretty-code, keepBackground: false — the canvas is
+ * ours). Dual-theme token colors follow the documented pattern: with
+ * `theme: { light, dark }` every token carries `color: var(--shiki-light)`
+ * plus a `--shiki-dark` custom property, and we flip which one applies. */
+.prose-editorial pre {
+  font-family: var(--font-stack-mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--r-card);
   padding: 1rem 1.25rem;
   overflow-x: auto;
-  margin: 1.4em 0;
-  font-size: 0.9rem;
-  line-height: 1.6;
+  margin: 1.6em 0;
 }
-.prose-club img {
-  max-width: 100%;
-  border-radius: 0.6rem;
-  border: 1px solid var(--border);
+.prose-editorial code[data-theme*=" "],
+.prose-editorial code[data-theme*=" "] span {
+  color: var(--shiki-light);
 }
-.prose-club hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2.5em auto;
-  width: 60%;
+:root[data-theme="dark"] .prose-editorial code[data-theme*=" "],
+:root[data-theme="dark"] .prose-editorial code[data-theme*=" "] span {
+  color: var(--shiki-dark);
 }
-
-/* Focus visibility -------------------------------------------------------- */
-:focus-visible {
-  outline: 2px solid var(--neon-blue);
-  outline-offset: 3px;
-  border-radius: 2px;
+/* Single-dark-theme output (e.g. tokyo-night alone): tokens are tuned for a
+ * dark canvas, so in the light theme the block becomes a dark terminal card
+ * instead of showing dim tokens on paper. */
+:root:not([data-theme="dark"]) .prose-editorial pre:has(> code:not([data-theme*=" "])) {
+  background: #1a1b26;
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Sliced-mask text reveal (S1) --------------------------------------------
+/* ---------------------------------------------------------------------------
+ * Sliced-mask text reveal
  * Wrap each line: <span class="split-line"><span class="split-inner">…
- * The mask implies the text was always there, just hidden — never fade in. */
+ * The mask implies the text was always there, just hidden — never fade in.
+ * ------------------------------------------------------------------------- */
 .split-line {
   display: block;
   overflow: hidden;
 }
 .split-inner {
   display: block;
-}
-
-/* Pulling the light = an old TV losing power ------------------------------
- * View Transitions API: the browser snapshots the outgoing page; we
- * collapse that snapshot to a bright scanline, then to a dot, while the
- * new theme fades up underneath. Scoped to the one transition PullCord
- * marks with data-vt="crt", so router/theme code elsewhere is untouched. */
-:root[data-vt="crt"]::view-transition-old(root) {
-  animation: crt-off 0.45s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-}
-:root[data-vt="crt"]::view-transition-new(root) {
-  animation: crt-on 0.3s ease-out 0.34s both;
-}
-@keyframes crt-off {
-  0% {
-    transform: scaleY(1);
-    filter: brightness(1);
-  }
-  55% {
-    transform: scaleY(0.006);
-    filter: brightness(2.6) saturate(1.5);
-  }
-  80% {
-    transform: scaleY(0.004) scaleX(0.55);
-    filter: brightness(3.2);
-  }
-  100% {
-    transform: scaleY(0.002) scaleX(0.02);
-    filter: brightness(4);
-    opacity: 0;
-  }
-}
-@keyframes crt-on {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  :root[data-vt="crt"]::view-transition-old(root),
-  :root[data-vt="crt"]::view-transition-new(root) {
-    animation: none;
-  }
-}
-
-/* Track kicker — the mono "TRACK 02 · SET LIST" label of each act --------- */
-.track-kicker {
-  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.22em;
-  color: var(--gold);
-  text-transform: uppercase;
-  opacity: 0.85;
 }

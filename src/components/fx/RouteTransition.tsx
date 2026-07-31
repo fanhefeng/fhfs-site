@@ -1,65 +1,67 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { gsap, useGSAP, ScrollTrigger, CustomEase } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { site } from "@/config/site";
 
-/** Diagonal offset between the cut's left and right edges, in % (same as CinematicLoader). */
-const SKEW = 16;
-/** Blade sweeping in over the outgoing page. */
-const COVER_DURATION = 0.55;
-/** Blade slicing away off the incoming page. */
-const REVEAL_DURATION = 0.75;
+/** Veil frosting over the outgoing page. */
+const COVER_DURATION = 0.3;
+/** Incoming page materializing out of the frost. */
+const REVEAL_DURATION = 0.45;
 /**
- * Hard ceiling on how long the curtain may hang while we wait for the new
+ * Hard ceiling on how long the veil may hang while we wait for the new
  * route to commit. A navigation that stalls, redirects to the same path, or
- * never lands must never leave an opaque overlay on top of the site.
+ * never lands must never leave a frosted overlay on top of the site.
  */
 const NAV_TIMEOUT_MS = 1500;
 
 type Phase = "idle" | "covering" | "covered" | "revealing";
-/** Which side of the moving edge the curtain lives on. */
-type Shape = "cover" | "reveal";
 
 export type RouteTransitionProps = {
-  /** Tiny mono word printed on the curtain. Defaults to the site wordmark. */
+  /** Tiny mono word printed on the veil. Defaults to the site wordmark. */
   label?: string;
 };
 
 /**
- * Cinematic blade wipe between routes.
+ * Glass materialize between routes ("The Quiet Issue" curtain).
  *
- * Same visual language as the opening CinematicLoader: a glowing gold line
- * rides a diagonal four-point clip-path cut, driven by the "blade" CustomEase.
- * Clicks on in-site links are caught in the capture phase, the curtain sweeps
- * down over the old page, and only then do we actually navigate. When the new
- * pathname commits the same edge keeps travelling down and slices the curtain
- * away, revealing the new page from the top.
+ * Clicks on in-site links are caught in the capture phase; a full-screen
+ * glass veil frosts over the old page (opacity in + backdrop blur 0→thick,
+ * power3.out), only then do we actually navigate. When the new pathname
+ * commits, the incoming page materializes: the veil's `--panel-blur` runs
+ * back to 0 as it fades (power3.in — crisp exit) while <main> settles
+ * scale .98→1 (power3.out). Serves understanding + safety: the reader sees
+ * the page they left dissolve and the next one condense, never a hard cut.
  *
- * Design rules baked in here:
- * - One coverage value `prog.p` drives both halves, so a reveal that gets
- *   interrupted by another click simply runs backwards — the edge never jumps.
- * - clip-path is rebuilt per frame from a number (GSAP cannot tween polygon
- *   strings whose point counts differ), and the blade moves via a transform
- *   quickSetter — no per-frame layout writes.
- * - Every abnormal path (killed tween, double click, failed push, unmount)
- *   funnels into forceClear(), plus a timeout net, so the site can never be
- *   left uninteractive behind the curtain.
- * - prefers-reduced-motion: reduce means we never preventDefault at all, so
- *   navigation stays completely native.
+ * Mechanism skeleton (kept from the previous blade-wipe incarnation):
+ * - capture-phase interception; external links / hash jumps / downloads /
+ *   modifier clicks / `data-no-transition` all keep native behaviour;
+ * - cover → covered → revealing state machine gated on the pathname commit;
+ * - every abnormal path (killed tween, failed push, unmount) funnels into
+ *   forceClear(), plus a timeout net, so the site can never be left frosted;
+ * - lenis contract: stop() + overflow hidden while covered, then
+ *   scrollTo(immediate, force) → start() → ScrollTrigger.refresh();
+ * - prefers-reduced-motion: reduce never preventDefaults — navigation stays
+ *   completely native.
+ *
+ * New in this incarnation: the veil is pointer-events: none and the
+ * transition is interruptible — a click mid-cover simply retargets the
+ * pending destination, and a click mid-reveal kills the timeline and frosts
+ * again from the current opacity/blur values (no jumps, no locked UI).
+ * `--panel-blur` is only ever tweened at these entrance/exit instants.
  */
 export function RouteTransition({
   label = site.signName,
 }: RouteTransitionProps) {
   const container = useRef<HTMLDivElement>(null);
-  const curtainRef = useRef<HTMLDivElement>(null);
-  const bladeRef = useRef<HTMLDivElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
   // Raw pathname (locale prefix included) — the reveal is gated on the phase,
   // not on the path shape, so a locale switch that changes /zh/x to /en/x
-  // while no curtain is up is simply ignored.
+  // while no veil is up is simply ignored (it runs its own view transition).
   const pathname = usePathname();
   const router = useRouter();
 
@@ -69,43 +71,24 @@ export function RouteTransition({
 
   useGSAP(
     () => {
-      const curtain = curtainRef.current;
-      const blade = bladeRef.current;
+      const veil = veilRef.current;
       const wordmark = labelRef.current;
-      if (!curtain || !blade || !wordmark) return;
+      if (!veil || !wordmark) return;
 
-      // Slow wind-up, violent mid-swing, soft landing — the whole "blade"
-      // feel. Re-created here so this component does not depend on the
-      // loader having mounted first (CustomEase.create is idempotent).
-      CustomEase.create(
-        "blade",
-        "M0,0 C0.16,0 0.2,0.06 0.34,0.36 0.5,0.72 0.62,1 1,1"
-      );
-
-      const setBladeY = gsap.quickSetter(blade, "y", "vh");
-      gsap.set(blade, { rotate: -3.6 });
-
-      const prog = { p: 0 };
-      let shape: Shape = "cover";
-      let tween: gsap.core.Tween | null = null;
+      let tl: gsap.core.Timeline | null = null;
       let timer: number | undefined;
       let locked = false;
+      let pendingHref: string | null = null;
 
-      /**
-       * p = 0 is a bare page, p = 1 is a fully covered one. In "cover" the
-       * curtain sits above the moving edge, in "reveal" below it — so in both
-       * halves the edge (and the blade riding it) travels top to bottom, and
-       * at p = 1 both shapes cover the viewport identically.
-       */
-      const applyCut = (p: number) => {
-        const yl = (shape === "cover" ? p : 1 - p) * (100 + SKEW);
-        const yr = yl - SKEW;
-        curtain.style.clipPath =
-          shape === "cover"
-            ? `polygon(0% 0%, 100% 0%, 100% ${yr}%, 0% ${yl}%)`
-            : `polygon(0% ${yl}%, 100% ${yr}%, 100% 100%, 0% 100%)`;
-        setBladeY((yl + yr) / 2);
-      };
+      /** The page body that materializes. Missing <main> = veil-only. */
+      const page = () => document.querySelector("main");
+
+      /* The frost target respects the responsive glass budget: --blur-thick
+       * is 20px on desktop, 10px on mobile (globals.css). Read once per
+       * cover — an event-driven read, never per frame. */
+      const targetBlur = () =>
+        getComputedStyle(veil).getPropertyValue("--blur-thick").trim() ||
+        "20px";
 
       const lock = () => {
         if (locked) return;
@@ -137,108 +120,134 @@ export function RouteTransition({
       /** Last resort: whatever went wrong, the page must be usable again. */
       const forceClear = () => {
         clearTimer();
-        tween?.kill();
-        tween = null;
-        shape = "cover";
-        prog.p = 0;
-        applyCut(0);
-        gsap.set(curtain, { autoAlpha: 0, pointerEvents: "none" });
-        gsap.set(blade, { autoAlpha: 0 });
+        tl?.kill();
+        tl = null;
+        pendingHref = null;
+        gsap.set(veil, { autoAlpha: 0, "--panel-blur": "0px" });
         gsap.set(wordmark, { autoAlpha: 0 });
+        const main = page();
+        if (main) gsap.set(main, { clearProps: "transform" });
         phaseRef.current = "idle";
         unlock();
+      };
+
+      /** Push the latest pending destination and arm the stall net. */
+      const commit = () => {
+        clearTimer();
+        // Nothing is allowed to leave the veil up forever.
+        timer = window.setTimeout(forceClear, NAV_TIMEOUT_MS);
+        const href = pendingHref;
+        if (!href) {
+          forceClear();
+          return;
+        }
+        try {
+          router.push(href);
+        } catch {
+          forceClear();
+        }
       };
 
       const reveal = () => {
         if (phaseRef.current !== "covered") return;
         clearTimer();
-        tween?.kill();
+        tl?.kill();
         phaseRef.current = "revealing";
+        pendingHref = null;
 
         // New route, new top. Lenis is stopped right now, hence `force`.
         const lenis = window.__lenis;
         if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
         else window.scrollTo(0, 0);
 
-        gsap.to(wordmark, {
-          autoAlpha: 0,
-          duration: 0.22,
-          ease: "power1.out",
-          overwrite: true,
-        });
+        const main = page();
 
-        shape = "reveal";
-        prog.p = 1;
-        gsap.set(blade, { autoAlpha: 1 });
-        applyCut(1);
-
-        tween = gsap.to(prog, {
-          p: 0,
-          duration: REVEAL_DURATION,
-          ease: "blade",
-          onUpdate: () => applyCut(prog.p),
+        tl = gsap.timeline({
           onComplete: () => {
             clearTimer();
-            tween = null;
-            shape = "cover";
-            prog.p = 0;
-            applyCut(0);
-            gsap.set(curtain, { autoAlpha: 0, pointerEvents: "none" });
-            gsap.set(blade, { autoAlpha: 0 });
+            tl = null;
+            gsap.set(veil, { autoAlpha: 0, "--panel-blur": "0px" });
             phaseRef.current = "idle";
             unlock();
-            // The incoming page built its pins while scrolling was locked and
-            // the layout was still settling — remeasure against the final one.
+            // The incoming page built its pins while scrolling was locked
+            // and the layout was still settling — remeasure the final one.
             ScrollTrigger.refresh();
           },
         });
 
-        // Net in case something else kills the tween mid-flight.
+        tl.to(
+          wordmark,
+          { autoAlpha: 0, duration: 0.18, ease: "power1.out", overwrite: "auto" },
+          0
+        )
+          // The veil departs power3.in — lingers a beat, then snaps clear.
+          .to(
+            veil,
+            {
+              autoAlpha: 0,
+              "--panel-blur": "0px",
+              duration: REVEAL_DURATION,
+              ease: "power3.in",
+            },
+            0
+          );
+
+        if (main) {
+          // The set() lands behind full frost, so the snap to .98 is unseen.
+          // clearProps on arrival: a transformed <main> would otherwise turn
+          // into the containing block for fixed descendants (HUD, FAB).
+          gsap.set(main, { scale: 0.98, transformOrigin: "50% 38%" });
+          tl.to(
+            main,
+            {
+              scale: 1,
+              duration: REVEAL_DURATION + 0.05,
+              ease: "power3.out",
+              clearProps: "transform",
+            },
+            0
+          );
+        }
+
+        // Net in case something else kills the timeline mid-flight.
         timer = window.setTimeout(
           forceClear,
-          REVEAL_DURATION * 1000 + 400
+          (REVEAL_DURATION + 0.05) * 1000 + 400
         );
       };
       revealRef.current = reveal;
 
-      const cover = (go: () => void) => {
+      const cover = () => {
         clearTimer();
-        tween?.kill();
+        // Interrupting a reveal: kill it and frost again from the current
+        // opacity/blur — gsap.to picks up mid-flight values, so the veil
+        // never jumps.
+        tl?.kill();
         lock();
-
-        // A fresh cover sweeps a new blade down the page. Interrupting a
-        // reveal instead runs that same cut backwards, so the edge stays
-        // continuous rather than flipping to the other half of the screen.
-        const resuming = phaseRef.current === "revealing";
-        if (!resuming) {
-          shape = "cover";
-          prog.p = 0;
-        }
         phaseRef.current = "covering";
 
-        gsap.set(curtain, { autoAlpha: 1, pointerEvents: "auto" });
-        gsap.set(blade, { autoAlpha: 1 });
-        gsap.to(wordmark, {
-          autoAlpha: 1,
-          duration: 0.34,
-          ease: "power1.out",
-          overwrite: true,
-        });
-        applyCut(prog.p);
-
-        tween = gsap.to(prog, {
-          p: 1,
-          duration: Math.max(0.12, COVER_DURATION * (1 - prog.p)),
-          ease: resuming ? "power2.inOut" : "blade",
-          onUpdate: () => applyCut(prog.p),
+        tl = gsap.timeline({
           onComplete: () => {
-            tween = null;
+            tl = null;
             phaseRef.current = "covered";
-            // Nothing is allowed to leave the curtain up forever.
-            timer = window.setTimeout(forceClear, NAV_TIMEOUT_MS);
-            go();
+            commit();
           },
         });
+
+        tl.to(
+          veil,
+          {
+            autoAlpha: 1,
+            "--panel-blur": targetBlur(),
+            duration: COVER_DURATION,
+            ease: "power3.out",
+          },
+          0
+        ).to(
+          wordmark,
+          { autoAlpha: 1, duration: 0.28, ease: "power1.out", overwrite: "auto" },
+          0.05
+        );
       };
 
       const prefersReduced = () =>
@@ -274,42 +283,23 @@ export function RouteTransition({
         if (url.pathname === window.location.pathname) return;
 
         e.preventDefault();
-        // Already mid-transition: swallow the click instead of stacking a
-        // second curtain on top of the first.
-        if (phaseRef.current === "covering" || phaseRef.current === "covered") {
+        pendingHref = `${url.pathname}${url.search}${url.hash}`;
+
+        // Interruptible, never locked: mid-cover we only retarget the
+        // pending destination; already covered we re-route on the spot;
+        // idle or mid-reveal we (re)frost from wherever the veil is now.
+        if (phaseRef.current === "covering") return;
+        if (phaseRef.current === "covered") {
+          commit();
           return;
         }
-
-        const href = `${url.pathname}${url.search}${url.hash}`;
-        cover(() => {
-          try {
-            router.push(href);
-          } catch {
-            forceClear();
-          }
-        });
-      };
-
-      // The curtain is opaque, so anything focusable behind it would take an
-      // invisible focus ring — and Enter would activate an unseen link.
-      const onFocusIn = (e: FocusEvent) => {
-        if (phaseRef.current === "idle") return;
-        const target = e.target;
-        if (
-          target instanceof HTMLElement &&
-          target !== document.body &&
-          !container.current?.contains(target)
-        ) {
-          target.blur();
-        }
+        cover();
       };
 
       document.addEventListener("click", onClick, true);
-      window.addEventListener("focusin", onFocusIn);
 
       return () => {
         document.removeEventListener("click", onClick, true);
-        window.removeEventListener("focusin", onFocusIn);
         revealRef.current = null;
         forceClear();
       };
@@ -318,7 +308,7 @@ export function RouteTransition({
   );
 
   useEffect(() => {
-    // First mount belongs to CinematicLoader's opening curtain, not to us.
+    // First mount belongs to OvertureLight's opening ritual, not to us.
     if (lastPathRef.current === null) {
       lastPathRef.current = pathname;
       return;
@@ -327,60 +317,61 @@ export function RouteTransition({
     lastPathRef.current = pathname;
 
     // Only a navigation we covered gets uncovered. A locale switch (which
-    // replaces the route with scroll: false) or a browser Back never raised a
-    // curtain, so it must not be scrolled to top or animated here.
+    // replaces the route with scroll: false) or a browser Back never raised
+    // the veil, so it must not be scrolled to top or animated here.
     if (phaseRef.current !== "covered") return;
 
-    // Let the incoming route paint one frame behind the curtain first.
+    // Let the incoming route paint one frame behind the frost first.
     const raf = requestAnimationFrame(() => revealRef.current?.());
     return () => cancelAnimationFrame(raf);
   }, [pathname]);
 
   return (
     <div ref={container} className="contents">
-      {/* Curtain palette: midnight stage at night, warm paper after hours.
+      {/* Veil tint: warm paper by day, after-hours ink by night. Under
+          prefers-reduced-transparency the frost becomes a near-solid card
+          and the blur is dropped entirely (the tween then no-ops visually).
           Component-private tokens — do not move these into globals.css. */}
       <style>{`
         :root {
-          --curtain-bg: #0a0a18;
-          --curtain-blade-core: #fff;
-          --curtain-ink: var(--fg);
-          --curtain-glow-rgb: 232, 180, 79;
+          --veil-bg: rgba(250, 249, 246, 0.62);
         }
-        :root[data-theme="light"] {
-          --curtain-bg: #f0ead9;
-          --curtain-blade-core: #fff;
-          --curtain-glow-rgb: 168, 116, 31;
+        :root[data-theme="dark"] {
+          --veil-bg: rgba(14, 14, 17, 0.55);
+        }
+        @media (prefers-reduced-transparency: reduce) {
+          :root {
+            --veil-bg: rgba(250, 249, 246, 0.96);
+          }
+          :root[data-theme="dark"] {
+            --veil-bg: rgba(14, 14, 17, 0.96);
+          }
+          .route-veil {
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+          }
         }
       `}</style>
       <div
-        ref={curtainRef}
+        ref={veilRef}
         aria-hidden="true"
-        className="invisible pointer-events-none fixed inset-0 z-[95] grid place-items-center opacity-0"
-        // Must match applyCut(0) in "cover" shape or the first frame flashes.
-        style={{
-          background: "var(--curtain-bg)",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% -16%, 0% 0%)",
-        }}
+        className="route-veil invisible pointer-events-none fixed inset-0 z-[95] grid place-items-center opacity-0"
+        style={
+          {
+            background: "var(--veil-bg)",
+            WebkitBackdropFilter: "blur(var(--panel-blur)) saturate(140%)",
+            backdropFilter: "blur(var(--panel-blur)) saturate(140%)",
+            "--panel-blur": "0px",
+          } as CSSProperties
+        }
       >
         <div
           ref={labelRef}
-          className="invisible font-mono text-[11px] tracking-[0.42em] text-muted-fg opacity-0"
+          className="invisible font-mono text-meta tracking-meta uppercase text-fg-tertiary opacity-0"
         >
           {label}
         </div>
       </div>
-      {/* The blade: a glowing diagonal line riding the mouth of the cut. */}
-      <div
-        ref={bladeRef}
-        aria-hidden="true"
-        className="invisible pointer-events-none fixed top-0 left-[-10%] z-[96] h-[2px] w-[120%] opacity-0 will-change-transform"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, var(--gold) 18%, var(--curtain-blade-core) 50%, var(--gold) 82%, transparent)",
-          boxShadow: "0 0 24px 4px rgba(var(--curtain-glow-rgb), 0.5)",
-        }}
-      />
     </div>
   );
 }

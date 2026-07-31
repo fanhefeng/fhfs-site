@@ -1,0 +1,72 @@
+"use client";
+
+import { useRef } from "react";
+import { gsap, useGSAP, SplitText, EASE } from "@/lib/gsap";
+
+/** Any CJK ideograph/kana in the headline means "do not scramble". */
+const CJK = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/;
+
+/**
+ * The article headline, entering once.
+ *
+ * Latin titles decode: a single 0.9s ScrambleText pass with a lowercase
+ * character set — a typewriter finding the words, not a hacker terminal.
+ * Chinese titles get a line-level mask reveal instead: scrambling CJK swaps
+ * glyph widths every frame, which reads as noise rather than typing.
+ *
+ * The real text is always in the DOM (SSR/SEO), so reduced motion, a failed
+ * hydration or a stalled font simply leaves a normal headline.
+ */
+export function PostTitle({
+  title,
+  className,
+}: {
+  title: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLHeadingElement>(null);
+
+  useGSAP(
+    () => {
+      const el = ref.current;
+      if (!el) return;
+      const mm = gsap.matchMedia();
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        if (CJK.test(title)) {
+          // SplitText's own mask wrappers match the .split-line/.split-inner
+          // convention in globals.css: the line slides out from behind a
+          // clip, implying it was always there.
+          const split = SplitText.create(el, { type: "lines", mask: "lines" });
+          gsap.from(split.lines, {
+            yPercent: 110,
+            duration: 0.7,
+            stagger: 0.08,
+            ease: EASE.default,
+            overwrite: "auto",
+          });
+          return () => split.revert();
+        }
+
+        gsap.to(el, {
+          duration: 0.9,
+          ease: "none",
+          overwrite: "auto",
+          scrambleText: {
+            text: title,
+            chars: "lowerCase",
+            speed: 0.6,
+            revealDelay: 0.15,
+          },
+        });
+      });
+    },
+    { scope: ref, dependencies: [title] }
+  );
+
+  return (
+    <h1 ref={ref} className={className}>
+      {title}
+    </h1>
+  );
+}

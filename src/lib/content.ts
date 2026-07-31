@@ -39,6 +39,29 @@ export function getAllSlugs(): string[] {
   return [...new Set(publishedPosts.map((p) => p.slug))];
 }
 
+/** CJK ideographs and kana — counted per character, unlike Latin words. */
+const CJK = /[぀-ヿ㐀-鿿豈-﫿]/g;
+
+/**
+ * Reading time in whole minutes, mixed-script aware: ~350 CJK characters or
+ * ~220 Latin words per minute. Code fences, JSX/HTML tags and bare URLs are
+ * dropped first — nobody reads a stack trace at prose speed.
+ *
+ * The single source of truth: the home list, the blog index and the article
+ * header all call this, so one post never advertises two different times.
+ * Derived from the raw MDX at build time — no frontmatter to maintain.
+ */
+export function readingMinutes(source: string): number {
+  const text = source
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/https?:\/\/\S+/g, " ");
+  const cjk = text.match(CJK)?.length ?? 0;
+  const latin =
+    text.replace(CJK, " ").match(/[A-Za-z0-9][A-Za-z0-9'’-]*/g)?.length ?? 0;
+  return Math.max(1, Math.round(cjk / 350 + latin / 220));
+}
+
 export function getAllTags(locale: Locale): { tag: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const post of getPosts(locale)) {

@@ -60,8 +60,8 @@ export function Workstation({ hint, className }: Props) {
     camera.position.set(0, 1.3, 6.6);
     camera.lookAt(0, 0.15, 0);
 
-    // Club lighting: cool wash from above, warm key from the wings, and a
-    // faint neon-blue rim from the back left. Tuned for physical units.
+    // Gallery lighting: cool wash from above, warm key from the wings, and a
+    // faint cool rim from the back left. Tuned for physical units.
     scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x12121f, 3.0));
     const keyLight = new THREE.DirectionalLight(0xffd9a0, 3.8);
     keyLight.position.set(4, 6, 3);

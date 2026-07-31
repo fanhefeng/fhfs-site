@@ -1,0 +1,10 @@
+# fhf 2.0 — the github.com/fanhefeng account was registered on 2017-05-19.
+version: "2.0"
+date: "2017-05-19"
+title:
+  zh: 有了一个放代码的地方
+  en: A place to put the code
+note:
+  zh: 注册 GitHub。往后所有版本号，都能在那条提交曲线上找到影子。
+  en: Signed up for GitHub. Every version above leaves its shadow on that commit graph.
+order: 9

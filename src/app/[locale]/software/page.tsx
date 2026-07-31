@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import type { Locale } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import { getApps } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
-import { AppCard } from "@/components/cards/AppCard";
-import { SectionTitle } from "@/components/deco/SectionTitle";
+import { Reveal } from "@/components/fx/Reveal";
+import { SoftwareGallery } from "@/components/software/SoftwareGallery";
+import { DeviceShowcase } from "@/components/software/DeviceShowcase";
+import { toSoftwareApp } from "@/components/software/appMeta";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -18,41 +22,41 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const CATEGORY_ORDER = ["desktop", "tool", "game", "website"] as const;
-
+/**
+ * Software — the keynote bento. Stays a Server Component: the apps are read
+ * from the YAML collection at build time and flattened to a plain payload
+ * (localized strings, CTA key, accent hue) before crossing into the two
+ * client islands, so nothing about the data is client work.
+ */
 export default async function SoftwarePage({ params }: Props) {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("software");
-  const apps = getApps();
+
+  const apps = getApps().map((app, i) => toSoftwareApp(app, i, locale as Locale));
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
-      <SectionTitle title={t("title")} subtitle={t("subtitle")} />
-      <div className="flex flex-col gap-16">
-        {CATEGORY_ORDER.map((category) => {
-          const group = apps.filter((app) => app.category === category);
-          if (group.length === 0) return null;
-          return (
-            <section key={category}>
-              <h2 className="mb-6 flex items-center gap-4 font-deco text-xl tracking-[0.2em] text-gold">
-                <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-transparent to-gold/40" />
-                {t(`categories.${category}`)}
-                <span aria-hidden className="h-px flex-1 bg-gradient-to-l from-transparent to-gold/40" />
-              </h2>
-              <div className="grid gap-6 sm:grid-cols-2">
-                {group.map((app) => (
-                  <AppCard
-                    key={app._meta.path}
-                    app={app}
-                    locale={locale as Locale}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 pb-24 pt-16 sm:pt-20">
+      <header className="mb-12 max-w-[42rem]">
+        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+          {t("kicker")}
+        </p>
+        <h1 className="mt-3 text-display-sm text-fg">{t("title")}</h1>
+        <p className="mt-4 text-body text-fg-secondary">{t("subtitle")}</p>
+      </header>
+
+      <SoftwareGallery apps={apps} />
+
+      {apps.length > 0 && (
+        <Reveal as="section" className="mt-28">
+          <div className="mb-8 max-w-[42rem]">
+            <h2 className="text-title text-fg">{t("deviceTitle")}</h2>
+            <p className="mt-3 text-body text-fg-secondary">{t("deviceSub")}</p>
+          </div>
+          <DeviceShowcase apps={apps} />
+        </Reveal>
+      )}
     </main>
   );
 }

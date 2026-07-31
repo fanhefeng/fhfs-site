@@ -1,24 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useRef, type RefObject } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { site } from "@/config/site";
+import { LightSwitch } from "@/components/ui/LightSwitch";
+import { LocaleSwitcher } from "./LocaleSwitcher";
 
-/**
- * The five stage boards. Numbers and mono captions are deliberately
- * untranslated set-list jargon — same register as the TRACK kickers.
- */
 const ITEMS = [
-  { href: "/", key: "home", note: "DOORS · OPEN ALL NIGHT" },
-  { href: "/blog", key: "blog", note: "SET 01 · AFTER-HOURS NOTES" },
-  { href: "/about", key: "about", note: "SET 02 · THE MAN AT THE BAR" },
-  { href: "/portfolio", key: "portfolio", note: "SET 03 · SELECTED WORKS" },
-  { href: "/software", key: "software", note: "SET 04 · HOUSE SPECIALS" },
+  { href: "/", key: "home" },
+  { href: "/blog", key: "blog" },
+  { href: "/about", key: "about" },
+  { href: "/portfolio", key: "portfolio" },
+  { href: "/software", key: "software" },
 ] as const;
 
+const REDUCED = "(prefers-reduced-motion: reduce)";
+
 export type FullNavProps = {
-  /** Whether the curtain-call menu is shown. Owned by the Header. */
+  /** Whether the sheet is shown. Owned by the Header. */
   open: boolean;
   /**
    * Ask the owner to flip `open` to false. Fired on Escape, on clicking the
@@ -26,37 +27,42 @@ export type FullNavProps = {
    */
   onClose: () => void;
   /**
-   * The Header's hamburger button. Focus returns to it when the menu closes,
-   * and Tab cycles through it (it stays visible above the boards).
+   * The Header's burger button. Focus returns to it when the sheet closes,
+   * and Tab cycles through it (it stays visible above the glass).
    */
   triggerRef: RefObject<HTMLButtonElement | null>;
 };
 
 /**
- * Full-screen "curtain call" navigation.
+ * Full-screen glass navigation (mobile-first). A glass-thick shade draws
+ * down from the top with a light back.out(1.2) settle while the nav words
+ * cascade up; behind it the page recedes (main scale .98 + 2px blur).
+ * Closing is deliberately asymmetric — the whole sheet sinks and dissolves
+ * into blur, built from to() tweens so a mid-flight toggle simply takes
+ * over from wherever things are (raMQBVQ's clear() + rebuild pattern:
+ * entrances are fromTo, exits are to).
  *
- * Opening: vertical stage boards slam in from the right (back.out overshoot,
- * staggered), their poster text rising just behind. Closing is deliberately
- * asymmetric — the boards drop off the bottom of the stage with a random
- * tilt, last board first, like scenery being struck after the show. Both
- * sequences are built on ONE timeline via tl.clear(), so a re-toggle mid-
- * flight simply rebuilds from wherever the boards currently are.
- *
- * Scroll is locked while open (Lenis stop + overflow hidden, restored with a
- * forced re-sync — same contract as CinematicLoader). Reduced motion swaps
- * both directions for a plain 0.2s fade. On a route commit the layer resets
- * instantly with no animation: RouteTransition's blade is already covering
- * the screen, so animating here would play to nobody.
+ * Scroll is locked while open per the Lenis contract: stop() + overflow
+ * hidden, restored with scrollTo(y, immediate, force) → start() →
+ * ScrollTrigger.refresh(). Reduced motion swaps both directions for a plain
+ * 0.2s fade. On a route commit the layer resets instantly — RouteTransition
+ * already owns the screen, so animating here would play to nobody.
  */
 export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const lockedRef = useRef(false);
   const openRef = useRef(open);
   const prevOpenRef = useRef(false);
   const lastPathRef = useRef<string | null>(null);
+  /** True once a close (or reset) has fully settled — the next open may
+   *  safely use fromTo without yanking a mid-flight panel back to the top. */
+  const settledClosedRef = useRef(true);
 
   const t = useTranslations("nav");
+  const tf = useTranslations("footer");
+  const locale = useLocale();
   const pathname = usePathname();
 
   const lock = useCallback(() => {
@@ -71,11 +77,36 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
     lockedRef.current = false;
     document.documentElement.style.overflow = "";
     // Re-sync before resuming, otherwise Lenis snaps back to the offset it
-    // held when it was stopped (same contract as CinematicLoader's unlock).
+    // held when it was stopped (site-wide scroll-lock contract).
     window.__lenis?.scrollTo(window.scrollY, { immediate: true, force: true });
     window.__lenis?.start();
-    // Pins may have been measured without a scrollbar; remeasure once.
     ScrollTrigger.refresh();
+  }, []);
+
+  /** Push the page back while the sheet is up (scale + blur on <main>). */
+  const pushMain = useCallback((show: boolean, reduced: boolean) => {
+    const main = document.querySelector<HTMLElement>("main");
+    if (!main || reduced) return;
+    if (show) {
+      gsap.to(main, {
+        scale: 0.98,
+        filter: "blur(2px)",
+        transformOrigin: "50% 20%",
+        duration: 0.5,
+        ease: "power3.out",
+        overwrite: "auto",
+      });
+    } else {
+      gsap.to(main, {
+        scale: 1,
+        filter: "blur(0px)",
+        duration: 0.4,
+        ease: "power2.out",
+        overwrite: "auto",
+        // A transformed <main> breaks fixed/sticky descendants — clean up.
+        onComplete: () => gsap.set(main, { clearProps: "transform,filter,transformOrigin" }),
+      });
+    }
   }, []);
 
   // One persistent timeline; open/close sequences are rebuilt onto it with
@@ -90,98 +121,92 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
   useEffect(() => {
     openRef.current = open;
     const root = rootRef.current;
+    const panel = panelRef.current;
     const tl = tlRef.current;
-    if (!root || !tl) return;
+    if (!root || !panel || !tl) return;
     // Initial mount in the closed state: nothing to animate, nothing to lock.
     if (!prevOpenRef.current && !open) return;
     prevOpenRef.current = open;
 
-    const boards = gsap.utils.toArray<HTMLElement>(".fn-board", root);
-    const texts = gsap.utils.toArray<HTMLElement>(".fn-text", root);
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const items = gsap.utils.toArray<HTMLElement>(".fn-item", root);
+    const reduced = window.matchMedia(REDUCED).matches;
 
     tl.clear();
 
     if (open) {
       lock();
       gsap.set(root, { autoAlpha: 1, pointerEvents: "auto" });
+      pushMain(true, reduced);
 
       if (reduced) {
-        // Reduced motion: no slam, no fall — a quiet fade both ways.
-        gsap.set(boards, { xPercent: 0, y: 0, rotation: 0 });
-        gsap.set(texts, { y: 0, autoAlpha: 1 });
+        gsap.set(panel, { yPercent: 0, y: 0, autoAlpha: 1, filter: "blur(0px)" });
+        gsap.set(items, { y: 0, autoAlpha: 1 });
+        tl.fromTo(root, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "none" });
+      } else if (settledClosedRef.current) {
+        // Fresh open: the shade draws down ("closing time" — the gallery
+        // blind), links cascade up behind it.
         tl.fromTo(
-          root,
-          { autoAlpha: 0 },
-          { autoAlpha: 1, duration: 0.2, ease: "none" }
-        );
-      } else {
-        // Boards may still be lying at the bottom from the last curtain
-        // call — stand them back up before they re-enter from the wings.
-        gsap.set(boards, { y: 0, rotation: 0 });
-        tl.fromTo(
-          boards,
-          { xPercent: 101 },
-          {
-            xPercent: 0,
-            duration: 0.7,
-            ease: "back.out(1.4)",
-            stagger: 0.12,
-          },
+          panel,
+          { yPercent: -103, y: 0, autoAlpha: 1, filter: "blur(0px)" },
+          { yPercent: 0, duration: 0.65, ease: "back.out(1.2)" },
           0
         ).fromTo(
-          texts,
-          { y: 26, autoAlpha: 0 },
-          {
-            y: 0,
-            autoAlpha: 1,
-            duration: 0.7,
-            ease: "expo.out",
-            stagger: 0.03,
-          },
-          0.2
+          items,
+          { y: 28, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out", stagger: 0.06 },
+          0.18
+        );
+      } else {
+        // Reopened mid-close: recover from current positions — no restart.
+        tl.to(
+          panel,
+          { yPercent: 0, y: 0, autoAlpha: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" },
+          0
+        ).to(
+          items,
+          { y: 0, autoAlpha: 1, duration: 0.3, ease: "power3.out", stagger: 0.03 },
+          0.05
         );
       }
+      settledClosedRef.current = false;
       tl.play(0);
 
-      // Focus moves into the dialog immediately so Escape/Tab work even
-      // while the boards are still flying in.
-      root.querySelector<HTMLElement>("a[href]")?.focus({
-        preventScroll: true,
-      });
+      // Focus moves into the dialog immediately so Escape/Tab work while
+      // the shade is still drawing down.
+      root.querySelector<HTMLElement>("a[href]")?.focus({ preventScroll: true });
     } else {
-      // Closing: boards must not swallow clicks while they fall.
+      // Closing: the sheet must not swallow clicks while it sinks.
       gsap.set(root, { pointerEvents: "none" });
+      pushMain(false, reduced);
 
       if (reduced) {
         tl.to(root, { autoAlpha: 0, duration: 0.2, ease: "none" });
       } else {
-        // The curtain-call drop: whole boards tumble off the bottom of the
-        // stage with a random tilt, last one first.
+        // The quiet exit: everything sinks together and dissolves into
+        // blur — no tumbling scenery in this issue.
         tl.to(
-          boards,
-          {
-            y: "160vh",
-            rotation: "random(-15, 15)",
-            duration: 0.85,
-            ease: "power3.in",
-            stagger: { from: "end", each: 0.05 },
-          },
+          items,
+          { y: 14, autoAlpha: 0, duration: 0.28, ease: "power2.in", stagger: { each: 0.02, from: "end" } },
           0
-        ).set(root, { autoAlpha: 0 });
+        ).to(
+          panel,
+          { y: 48, autoAlpha: 0, filter: "blur(10px)", duration: 0.38, ease: "power2.in" },
+          0.05
+        );
       }
       tl.add(() => {
+        gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
+        gsap.set(panel, { clearProps: "transform,opacity,visibility,filter" });
+        settledClosedRef.current = true;
         unlock();
         triggerRef.current?.focus({ preventScroll: true });
       });
       tl.play(0);
     }
-  }, [open, lock, unlock, triggerRef]);
+  }, [open, lock, unlock, pushMain, triggerRef]);
 
-  // Escape closes; Tab is trapped in a fixed cycle: the five board links,
-  // then the header toggle button (still visible above the boards).
+  // Escape closes; Tab is trapped in a fixed cycle: the sheet's links and
+  // controls, then the header burger (still visible above the glass).
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -193,9 +218,11 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
       if (e.key !== "Tab") return;
       const root = rootRef.current;
       if (!root) return;
-      const links = Array.from(root.querySelectorAll<HTMLElement>("a[href]"));
+      const focusables = Array.from(
+        root.querySelectorAll<HTMLElement>("a[href], button:not([disabled])")
+      );
       const trigger = triggerRef.current;
-      const cycle = trigger ? [...links, trigger] : links;
+      const cycle = trigger ? [...focusables, trigger] : focusables;
       if (cycle.length === 0) return;
       e.preventDefault();
       const idx = cycle.indexOf(document.activeElement as HTMLElement);
@@ -212,9 +239,9 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, onClose, triggerRef]);
 
-  // Route commit while the layer is up (or mid-fall): reset instantly.
-  // RouteTransition's blade already owns the screen at this point — the
-  // menu must simply not exist on the incoming page.
+  // Route commit while the layer is up (or mid-sink): reset instantly.
+  // RouteTransition already owns the screen at this point — the sheet must
+  // simply not exist on the incoming page.
   useEffect(() => {
     if (lastPathRef.current === null) {
       lastPathRef.current = pathname;
@@ -225,7 +252,12 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
 
     tlRef.current?.clear();
     const root = rootRef.current;
+    const panel = panelRef.current;
     if (root) gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
+    if (panel) gsap.set(panel, { clearProps: "transform,opacity,visibility,filter" });
+    const main = document.querySelector<HTMLElement>("main");
+    if (main) gsap.set(main, { clearProps: "transform,filter,transformOrigin" });
+    settledClosedRef.current = true;
     unlock();
     if (openRef.current) onClose();
   }, [pathname, unlock, onClose]);
@@ -236,69 +268,80 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
   return (
     <div
       ref={rootRef}
+      id="fullnav"
       role="dialog"
       aria-modal="true"
       aria-label={t("menu")}
       className="invisible pointer-events-none fixed inset-0 z-[70] overflow-hidden opacity-0"
     >
-      {/* Board palette: private tokens so no raw colors leak into markup.
-          The gradient rides on an opaque --bg base because the matinee
-          --surface is translucent white — boards must never see through. */}
-      <style>{`
-        .fn-board {
-          background-color: var(--bg);
-          background-image: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
-          box-shadow: -14px 0 36px var(--fn-shadow), 0 -10px 30px var(--fn-shadow);
-        }
-        :root { --fn-shadow: rgba(0, 0, 0, 0.4); }
-        :root[data-theme="light"] { --fn-shadow: rgba(33, 28, 49, 0.14); }
-      `}</style>
-      <nav className="flex h-full w-full flex-col md:flex-row">
-        {ITEMS.map((item, i) => {
-          const active =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
-          return (
-            <div
-              key={item.href}
-              // The -mt/-ml pixel overlaps close subpixel seams between
-              // adjacent boards (flex rounding lets the page glint through).
-              className="fn-board relative -mt-px min-h-0 flex-1 border-t border-line will-change-transform first:mt-0 first:border-t-0 md:-ml-px md:mt-0 md:border-t-0 md:border-l md:first:ml-0 md:first:border-l-0"
-            >
+      {/* The shade: one full-bleed glass-thick surface (its blur is the
+          scrim). Border/radius zeroed — a sheet, not a card. */}
+      <div
+        ref={panelRef}
+        className="glass-thick absolute inset-0 flex flex-col rounded-none border-0 will-change-transform"
+      >
+        <nav
+          aria-label={t("ariaLabel")}
+          className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-1 px-8 pt-24"
+        >
+          {ITEMS.map((item, i) => {
+            const active =
+              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
               <Link
+                key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 onClick={() => {
                   // Already on this page: nothing will navigate, so the
-                  // click just takes a bow and closes the curtain.
+                  // click just lowers the shade again.
                   if (item.href === pathname) onClose();
                 }}
-                // First stripe / all columns start below the glass header bar
-                // (the header stays visible above the boards for the X button).
-                className={`group flex h-full w-full items-center justify-between gap-4 px-7 outline-none focus-visible:-outline-offset-4 focus-visible:outline-2 focus-visible:outline-gold md:flex-col md:items-stretch md:px-6 md:pt-24 md:pb-8 ${
-                  i === 0 ? "pt-16" : ""
-                }`}
+                className="fn-item group flex min-h-12 w-full items-baseline gap-4 py-1"
               >
-                <span className="fn-text font-mono text-[11px] tracking-[0.3em] text-gold md:self-start">
-                  {String(i).padStart(2, "0")}
+                <span className="font-mono text-[11px] tracking-meta text-fg-tertiary">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
                 <span
-                  className={`fn-text flex flex-1 items-center justify-center text-center font-deco text-[clamp(1.7rem,7vw,3.4rem)] leading-none transition-[text-shadow,color] duration-300 ${
-                    active
-                      ? "text-gold [text-shadow:var(--glow-gold)]"
-                      : "text-fg group-hover:text-gold group-hover:[text-shadow:var(--glow-gold)]"
+                  className={`text-display-sm transition-colors ${
+                    active ? "text-accent" : "text-fg group-hover:text-accent"
                   }`}
                 >
                   {t(item.key)}
                 </span>
-                <span className="fn-text hidden font-mono text-[10px] tracking-[0.22em] text-muted-fg md:block md:self-center md:text-center">
-                  {item.note}
-                </span>
               </Link>
-            </div>
-          );
-        })}
-      </nav>
+            );
+          })}
+        </nav>
+
+        {/* Secondary row: quiet mono links. RSS is a file route, so it must
+            bypass both the i18n Link and the route transition. */}
+        <div className="fn-item mx-auto flex w-full max-w-xl items-center gap-6 px-8 pb-5">
+          <a
+            href={`/${locale}/rss.xml`}
+            data-no-transition=""
+            className="hit-ext font-mono text-meta uppercase text-fg-secondary transition-colors hover:text-fg"
+          >
+            {tf("rss")}
+          </a>
+          <a
+            href={site.social.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hit-ext font-mono text-meta uppercase text-fg-secondary transition-colors hover:text-fg"
+          >
+            GitHub
+          </a>
+        </div>
+
+        {/* Utility row: language + the lights. */}
+        <div className="fn-item mx-auto flex w-full max-w-xl items-center justify-between px-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
+          <LocaleSwitcher />
+          <LightSwitch />
+        </div>
+      </div>
     </div>
   );
 }
+
+export default FullNav;

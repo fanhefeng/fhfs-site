@@ -1,58 +1,180 @@
-import { useTranslations } from "next-intl";
-import type { Locale } from "@/i18n/routing";
-import type { App } from "content-collections";
+"use client";
 
-export function AppCard({ app, locale }: { app: App; locale: Locale }) {
+import { useRef } from "react";
+import { useTranslations } from "next-intl";
+import { gsap, useGSAP } from "@/lib/gsap";
+import { Sticker } from "@/components/ui/Sticker";
+import { AppMock } from "@/components/software/AppMock";
+import { appMonogram, mockAccent, type SoftwareApp } from "@/components/software/appMeta";
+
+type Props = {
+  app: SoftwareApp;
+  /** Drives the sticker's deterministic tilt — pass the list index. */
+  index: number;
+  /**
+   * `feature` is the col-span-2 hero tile (big schematic, full description),
+   * `tile` the regular bento cell, `rail` the compact card on the mobile
+   * swipe rail.
+   */
+  variant?: "feature" | "tile" | "rail";
+  className?: string;
+};
+
+/**
+ * One app in the bento. Glass-thin container, sticker monogram (glass is the
+ * container material, stickers are the contents), and a state-aware schematic
+ * of the app's interface that cross-fades with the gallery lights.
+ *
+ * Hover is a 4px lift with a two-layer shadow cross-fade — box-shadow is
+ * never tweened, the resting and lifted shadows are separate painted layers
+ * whose opacity swaps. Fine pointers only, and skipped under reduced motion.
+ */
+export function AppCard({ app, index, variant = "tile", className }: Props) {
   const t = useTranslations("software");
+  const rootRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      if (!root) return;
+      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const rest = root.querySelector<HTMLElement>("[data-shadow='rest']");
+        const lift = root.querySelector<HTMLElement>("[data-shadow='lift']");
+        const plate = root.querySelector<HTMLElement>("[data-plate]");
+        if (!rest || !lift || !plate) return;
+
+        // overwrite:'auto' throughout — a flick across a bento grid fires
+        // enter/leave faster than the tweens finish.
+        const to = (hover: boolean) => {
+          // The shadow plates ride along so the card and its shadow stay
+          // welded; opacity is tweened separately (overwrite:'auto' only
+          // kills conflicting properties, so the two never fight).
+          gsap.to([plate, rest, lift], {
+            y: hover ? -4 : 0,
+            duration: 0.35,
+            ease: "power3.out",
+            overwrite: "auto",
+          });
+          gsap.to(rest, { opacity: hover ? 0 : 1, duration: 0.35, overwrite: "auto" });
+          gsap.to(lift, { opacity: hover ? 1 : 0, duration: 0.35, overwrite: "auto" });
+        };
+
+        const onEnter = () => to(true);
+        const onLeave = () => to(false);
+        root.addEventListener("pointerenter", onEnter);
+        root.addEventListener("pointerleave", onLeave);
+        return () => {
+          root.removeEventListener("pointerenter", onEnter);
+          root.removeEventListener("pointerleave", onLeave);
+          gsap.killTweensOf([plate, rest, lift]);
+        };
+      });
+    },
+    { scope: rootRef }
+  );
+
+  const feature = variant === "feature";
+  const rail = variant === "rail";
 
   return (
-    <article className="neon-card flex flex-col p-6">
-      <div className="flex items-center gap-3">
-        {app.icon ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={app.icon}
-            alt=""
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-lg border border-line"
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-line font-sign text-lg text-gold"
+    <article
+      ref={rootRef}
+      data-app-card
+      data-category={app.category}
+      className={`group relative isolate ${rail ? "h-full" : ""} ${className ?? ""}`}
+    >
+      {/* The two shadow plates. They live behind the glass and only swap
+       * opacity, so nothing repaints a box-shadow mid-animation. */}
+      <span
+        aria-hidden
+        data-shadow="rest"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-card shadow-card"
+      />
+      <span
+        aria-hidden
+        data-shadow="lift"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-card opacity-0 shadow-lift"
+      />
+
+      <div
+        data-plate
+        className={`glass-thin flex h-full flex-col overflow-hidden rounded-card shadow-none will-change-transform ${
+          feature ? "sm:flex-row" : ""
+        }`}
+      >
+        {/* Schematic screenshot — the feature tile puts it beside the copy,
+         * everyone else wears it as a lid. */}
+        <AppMock
+          app={app}
+          label={t("mockAlt", { name: app.name })}
+          className={
+            feature
+              ? "aspect-[16/10] w-full shrink-0 border-b border-line sm:aspect-auto sm:order-last sm:w-1/2 sm:border-b-0 sm:border-l"
+              : `w-full shrink-0 border-b border-line ${rail ? "aspect-[16/9]" : "aspect-[16/10]"}`
+          }
+        />
+
+        <div
+          className={`flex min-w-0 flex-1 flex-col ${feature ? "gap-3 p-6 sm:p-7" : "gap-2 p-5"}`}
+        >
+          <div className="flex items-start gap-3">
+            <Sticker seed={index} className="shrink-0">
+              <span
+                className="flex size-10 items-center justify-center rounded-[0.75rem] font-mono text-xs font-semibold tracking-[0.02em] text-white"
+                style={{
+                  background: `linear-gradient(150deg, ${mockAccent(
+                    app.hue,
+                    "light"
+                  )}, ${mockAccent(app.hue, "dark")})`,
+                }}
+              >
+                {appMonogram(app.name)}
+              </span>
+            </Sticker>
+            <div className="min-w-0">
+              <h3
+                lang="en"
+                className={`vibrancy ${feature ? "text-title" : "text-heading"} truncate`}
+              >
+                {app.name}
+              </h3>
+              <p className="truncate text-caption text-fg-secondary">{app.tagline}</p>
+            </div>
+          </div>
+
+          <p
+            className={`text-caption leading-relaxed text-fg-secondary ${
+              feature ? "" : "line-clamp-3"
+            }`}
           >
-            {app.name.charAt(0)}
-          </span>
-        )}
-        <div>
-          <h2 className="font-deco text-lg tracking-wide text-fg">{app.name}</h2>
-          <p className="text-xs text-muted-fg">{app.tagline[locale]}</p>
+            {app.description}
+          </p>
+
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pt-2">
+            {app.platforms.length > 0 ? (
+              <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+                {app.platforms.join(" · ")}
+              </p>
+            ) : (
+              <span />
+            )}
+            <a
+              href={app.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center gap-1.5 text-caption font-medium text-fg underline decoration-accent/55 decoration-1 underline-offset-4 transition-colors duration-200 hover:text-accent hover:decoration-accent"
+            >
+              {t(app.cta)}
+              <span aria-hidden className="translate-y-px">
+                ↗
+              </span>
+            </a>
+          </div>
         </div>
       </div>
-      <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-fg">
-        {app.description[locale]}
-      </p>
-      {app.platforms.length > 0 && (
-        <p className="mt-3 text-xs text-muted-fg/70">
-          {t("platforms")}: {app.platforms.join(" · ")}
-        </p>
-      )}
-      <a
-        href={app.website}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-5 inline-flex w-fit items-center gap-2 rounded border border-neon-red/50 px-4 py-2 text-sm text-neon-red transition-all duration-200 hover:border-neon-red hover:[box-shadow:0_0_14px_rgba(255,77,109,0.35)] hover:[text-shadow:var(--glow-red)]"
-      >
-        {t(
-          app.category === "game"
-            ? "play"
-            : app.category === "website"
-              ? "open"
-              : "download"
-        )}{" "}
-        ↗
-      </a>
     </article>
   );
 }

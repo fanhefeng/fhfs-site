@@ -1,0 +1,14 @@
+# fhf 1.0 — PLACEHOLDER. The origin story isn't in this repo, so it isn't
+# invented here. Replace with the real starting point (hometown, the first
+# computer, the first line of code) and give it a date.
+version: "1.0"
+dateLabel:
+  zh: 待填
+  en: TBD
+title:
+  zh: （待填：最初的那台机器）
+  en: "(TODO: the very first machine)"
+note:
+  zh: （待填：从哪里开始的——第一台电脑、第一行代码、第一次觉得这件事有意思。）
+  en: "(TODO: where it began — the first computer, the first line of code, the first time this felt interesting.)"
+order: 10

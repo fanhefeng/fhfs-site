@@ -1,20 +1,24 @@
 /**
- * Site-wide constants. Change `signName` to put your own name on the neon sign.
+ * Site-wide constants. Change `signName` to put your own name on the masthead.
  */
 export const site = {
-  /** The name lit up on the neon sign, "Seb's" style. All caps: the marquee
-   *  font only has capitals, so anything lowercase here would only show up
-   *  in places that render the name in a normal typeface (the ASCII footer). */
-  signName: "FHF'S",
-  title: { zh: "FHF'S — 深夜小馆", en: "FHF'S — After Hours" },
+  /** The wordmark on the masthead / dynamic-island logo badge. Lowercase on
+   *  purpose — the editorial identity sets the name quiet and small, and the
+   *  changelog on /about numbers releases as `fhf 1.0 → 5.x`. */
+  signName: "fhf",
+  title: { zh: "fhf — 安静的个人杂志", en: "fhf — The Quiet Issue" },
   description: {
-    zh: "个人博客、作品集与软件展示。深夜爵士与霓虹风格的个人网站。",
-    en: "Personal blog, portfolio and software showcase, in a late-night jazz & neon mood.",
+    zh: "fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文章、自研软件与动效实验。",
+    en: "The personal site of fhf — a quiet magazine and private gallery of essays, self-built software, and motion experiments.",
   },
   /** Production origin, used for metadata/sitemap/RSS. Update after binding a domain. */
   url: "https://fhfs-site.vercel.app",
-  author: "FHF",
+  author: "fhf",
   social: {
     github: "https://github.com/fanhefeng",
+    /** Revealed under the tear-off sticker in the footer.
+     *  TODO(user): fill in a real public address — left empty on purpose so
+     *  the sticker can render a graceful fallback instead of a fake email. */
+    email: "",
   },
 } as const;

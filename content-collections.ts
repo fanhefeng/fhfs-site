@@ -11,7 +11,17 @@ const mdxOptions: Options = {
   rehypePlugins: [
     rehypeSlug,
     [rehypeAutolinkHeadings, { behavior: "wrap" }],
-    [rehypePrettyCode, { theme: "tokyo-night", keepBackground: false }],
+    /* Dual theme: every token ships `color: var(--shiki-light)` plus a
+     * `--shiki-dark` custom property, and .prose-editorial (globals.css)
+     * flips which one wins on `[data-theme="dark"]`. keepBackground stays
+     * off — the code card's canvas is ours, not the theme's. */
+    [
+      rehypePrettyCode,
+      {
+        theme: { light: "github-light", dark: "tokyo-night" },
+        keepBackground: false,
+      },
+    ],
   ],
 };
 
@@ -100,16 +110,26 @@ const apps = defineCollection({
   }),
 });
 
+/**
+ * The About page changelog: a life numbered like software releases
+ * (`fhf 1.0` → `fhf 5.x`). One entry per YAML file, newest first by `order`.
+ *
+ * `date` is an ISO day (`2026-07-31`) — the UI derives the big year from it
+ * and pops the full date in the node tooltip. Leave `date` out when the real
+ * date is unknown and give `dateLabel` a localized placeholder instead: the
+ * page must never invent a date it cannot source.
+ */
 const timeline = defineCollection({
   name: "timeline",
   directory: "content/about/timeline",
   include: "*.yaml",
   parser: "yaml",
   schema: z.object({
-    period: z.string(),
+    version: z.string(),
+    date: z.string().optional(),
+    dateLabel: localeSchema.optional(),
     title: localeSchema,
-    org: z.string().optional(),
-    description: localeSchema,
+    note: localeSchema,
     order: z.number(),
   }),
 });
