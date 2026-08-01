@@ -147,8 +147,17 @@ export function HomeHero() {
         return w;
       };
 
-      /** Contact: the keyword, the cord and the colophon card light up. */
+      /**
+       * Contact: the keyword, the cord and the colophon card light up.
+       *
+       * Reached from timeline callbacks, which can still fire a frame after
+       * the component goes away (a StrictMode remount, a fast navigation off
+       * the cover). Building tweens then would resolve targets against a
+       * scope whose ref React has already cleared — GSAP warns "Invalid
+       * scope" and animates a detached div. Nothing to light: bail.
+       */
       const ignite = (animate: boolean) => {
+        if (!container.current) return;
         const word = root.querySelector<HTMLElement>(".hero-kinetic");
         if (word) word.dataset.lit = "true";
         wire.dataset.lit = "true";
@@ -210,6 +219,9 @@ export function HomeHero() {
         let ro: ResizeObserver | null = null;
 
         const plugIn = () => {
+          // Same late-callback guard as ignite(): this runs from the end of
+          // the entrance timeline, which may outlive the component by a frame.
+          if (!container.current) return;
           const w = placeWire();
           if (w == null) return;
           // Offset first, then reveal — otherwise the plug flashes for one
