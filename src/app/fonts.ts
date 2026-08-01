@@ -18,18 +18,24 @@ const sans = Inter({
   display: "swap",
 });
 
+/* Preload is reserved for Inter, which sets the body copy. The other two
+ * carry a handful of words each — an italic accent, a line of meta — and
+ * preloading all three had the browser fetching four files up front and
+ * reporting them unused. They still load, just without the head start. */
 const serif = Instrument_Serif({
   weight: "400",
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-instrument",
   display: "swap",
+  preload: false,
 });
 
 const mono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
   display: "swap",
+  preload: false,
 });
 
 const sansSC = Noto_Sans_SC({
