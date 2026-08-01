@@ -42,10 +42,21 @@ export default function GlobalNotFound() {
   });
 
   return (
-    // No theme preset script: this page is served outside the app shell, so
-    // it stays on warm paper rather than risking a flash of the wrong theme.
-    <html lang="zh-CN" data-theme="light" className={`${fontVariables} h-full antialiased`}>
+    <html
+      lang="zh-CN"
+      suppressHydrationWarning
+      className={`${fontVariables} h-full antialiased`}
+    >
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
+        {/* Same pre-paint theme script as the app shell: a reader who keeps
+            the lights off should not get a white page thrown at them just
+            because they mistyped a URL. No ThemeKeeper needed — nothing
+            re-renders this document on the client. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`,
+          }}
+        />
         <NotFoundStage
           blocks={blocks}
           sticker={{

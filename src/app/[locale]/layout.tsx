@@ -8,6 +8,7 @@ import { site } from "@/config/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuroraLayer } from "@/components/fx/AuroraLayer";
+import { ThemeKeeper } from "@/components/fx/ThemeKeeper";
 import { GrainLayer } from "@/components/fx/GrainLayer";
 import { SmoothScroll } from "@/components/fx/SmoothScroll";
 import { RouteTransition } from "@/components/fx/RouteTransition";
@@ -46,9 +47,15 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
+    // No data-theme here on purpose. React only touches attributes it
+    // renders, so leaving it out hands the attribute entirely to the script
+    // below and to LightSwitch. Rendering it would reset the theme to this
+    // value every time React re-renders <html> on the client — which is what
+    // a locale switch does, and it used to drop dark-mode readers back onto
+    // paper mid-session. globals.css treats "no attribute" as light, so the
+    // pre-paint default is unchanged.
     <html
       lang={locale === "zh" ? "zh-CN" : "en"}
-      data-theme="light"
       suppressHydrationWarning
       className={`${fontVariables} h-full antialiased`}
     >
@@ -57,17 +64,22 @@ export default async function LocaleLayout({ children, params }: Props) {
             the default; a stored choice wins, otherwise the OS preference.
             Contract: localStorage 'fhfs-theme' + data-theme + 'fhfs:theme'.
 
-            Must stay a raw <script>, despite React 19's dev-only "script tag
-            while rendering" warning. next/script defers even
+            Must stay a raw <script>. next/script defers even
             beforeInteractive through the self.__next_s queue: measured here,
             that lands the theme 15ms *after* first paint (a white flash for
-            dark-mode readers), where this inline tag lands 8ms before it. */}
+            dark-mode readers), where this inline tag lands 8ms before it.
+
+            React 19 warns about script tags during client renders (dev only —
+            it is stripped from production builds). That warning is accurate
+            and harmless: this only ever needs to run for the initial
+            document, and ThemeKeeper above covers every later re-render. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`,
           }}
         />
         <NextIntlClientProvider>
+          <ThemeKeeper />
           <SmoothScroll />
           <RouteTransition />
           <OvertureLight />
