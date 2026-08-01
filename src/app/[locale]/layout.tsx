@@ -98,7 +98,13 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
         {/* Apply the saved theme before first paint — warm paper (light) is
             the default; a stored choice wins, otherwise the OS preference.
-            Contract: localStorage 'fhfs-theme' + data-theme + 'fhfs:theme'. */}
+            Contract: localStorage 'fhfs-theme' + data-theme + 'fhfs:theme'.
+
+            Must stay a raw <script>, despite React 19's dev-only "script tag
+            while rendering" warning. next/script defers even
+            beforeInteractive through the self.__next_s queue: measured here,
+            that lands the theme 15ms *after* first paint (a white flash for
+            dark-mode readers), where this inline tag lands 8ms before it. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`,
