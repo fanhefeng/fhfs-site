@@ -1,0 +1,64 @@
+import type { Metadata } from "next";
+import { NotFoundStage } from "@/components/notfound/NotFoundStage";
+import { routing } from "@/i18n/routing";
+import { site } from "@/config/site";
+import zh from "../../messages/zh.json";
+import en from "../../messages/en.json";
+import { fontVariables } from "./fonts";
+import "./globals.css";
+
+/**
+ * The 404 served for any URL that matches no route.
+ *
+ * It has to exist separately from `[locale]/not-found.tsx` because this site's
+ * root layout lives under a dynamic segment (`app/[locale]/layout.tsx`) and
+ * every dynamic route is `dynamicParams: false` — an unknown slug or an
+ * unknown path 404s at the routing layer, before any segment (and therefore
+ * any segment-level not-found) renders. Next serves this file instead, which
+ * is why it must return a whole document and dress itself.
+ *
+ * One page answers every locale, so it offers both languages rather than
+ * guessing. There is no intl provider here — copy is read straight from the
+ * message catalogues at build time.
+ */
+
+export const metadata: Metadata = {
+  title: `${zh.notFound.title} · ${en.notFound.title}`,
+  description: en.notFound.description,
+};
+
+export default function GlobalNotFound() {
+  const blocks = routing.locales.map((locale) => {
+    const m = locale === "zh" ? zh : en;
+    return {
+      lang: locale === "zh" ? "zh-CN" : "en",
+      title: m.notFound.title,
+      description: m.notFound.description,
+      homeHref: `/${locale}`,
+      homeLabel: m.notFound.backHome,
+      blogHref: `/${locale}/blog`,
+      blogLabel: m.notFound.readInstead,
+    };
+  });
+
+  return (
+    // No theme preset script: this page is served outside the app shell, so
+    // it stays on warm paper rather than risking a flash of the wrong theme.
+    <html lang="zh-CN" data-theme="light" className={`${fontVariables} h-full antialiased`}>
+      <body className="min-h-dvh flex flex-col bg-bg text-fg">
+        <NotFoundStage
+          blocks={blocks}
+          sticker={{
+            lang: "zh-CN",
+            hint: zh.notFound.stickerHint,
+            aria: zh.notFound.stickerAria,
+            secret: zh.notFound.stickerSecret,
+          }}
+        />
+        <footer className="px-6 pb-10 text-center font-mono text-caption tracking-meta text-fg-tertiary">
+          {site.signName}
+        </footer>
+      </body>
+    </html>
+  );
+}
