@@ -280,6 +280,17 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
         ref={panelRef}
         className="glass-thick absolute inset-0 flex flex-col rounded-none border-0 will-change-transform"
       >
+        {/* The visible toggle lives in the island, outside this dialog — and
+            aria-modal hides everything outside it. Without a close control in
+            here, a screen reader user has no way out but Escape. */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="liquid-chip absolute left-1/2 top-6 z-10 -translate-x-1/2 rounded-chip px-4 py-2 font-mono text-meta uppercase tracking-meta text-fg-secondary opacity-0 focus-visible:opacity-100"
+        >
+          {t("close")}
+        </button>
+
         <nav
           aria-label={t("ariaLabel")}
           className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-1 px-8 pt-24"

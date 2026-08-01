@@ -75,7 +75,7 @@ export function DeviceShowcase({ apps }: { apps: SoftwareApp[] }) {
               key={`mac-${current.id}`}
               app={current}
               label={t("mockAlt", { name: current.name })}
-              className="absolute inset-0"
+              className="h-full w-full"
             />
           </div>
         </DeviceFrame>
@@ -86,7 +86,7 @@ export function DeviceShowcase({ apps }: { apps: SoftwareApp[] }) {
               app={current}
               chrome="bare"
               label={t("mockAlt", { name: current.name })}
-              className="absolute inset-0"
+              className="h-full w-full"
             />
           </div>
         </DeviceFrame>

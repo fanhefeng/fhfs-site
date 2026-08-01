@@ -70,11 +70,19 @@ export function Workstation({ hint, className }: Props) {
     rimLight.position.set(-4, 2, -3);
     scene.add(rimLight);
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-      antialias: true,
-    });
+    // A decorative desk must never take the page down with it: browsers with
+    // WebGL disabled, blocklisted GPUs and headless runners all throw here.
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+      });
+    } catch {
+      setStatus("skipped");
+      return;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
 
@@ -471,10 +479,10 @@ export function Workstation({ hint, className }: Props) {
             status === "ready" ? "opacity-0" : "opacity-100"
           }`}
         >
-          <div className="h-8 w-8 animate-spin rounded-full border border-gold/50 border-t-transparent motion-reduce:animate-none" />
+          <div className="h-8 w-8 animate-spin rounded-full border border-accent/50 border-t-transparent motion-reduce:animate-none" />
         </div>
         {/* Captions live inside the stage, bottom corners, like the other acts */}
-        <div className="pointer-events-none absolute inset-x-6 bottom-2 flex items-baseline justify-between font-mono text-[10px] tracking-[0.12em] text-muted-fg sm:inset-x-10">
+        <div className="pointer-events-none absolute inset-x-6 bottom-2 flex items-baseline justify-between font-mono text-[10px] tracking-[0.12em] text-fg-tertiary sm:inset-x-10">
           <span>{hint}</span>
           <a
             href="https://sketchfab.com/3d-models/gaming-desktop-pc-d1d8282c9916438091f11aeb28787b66"

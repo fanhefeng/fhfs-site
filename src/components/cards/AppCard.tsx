@@ -84,7 +84,7 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
       ref={rootRef}
       data-app-card
       data-category={app.category}
-      className={`group relative isolate ${rail ? "h-full" : ""} ${className ?? ""}`}
+      className={`group relative isolate h-full ${className ?? ""}`}
     >
       {/* The two shadow plates. They live behind the glass and only swap
        * opacity, so nothing repaints a box-shadow mid-animation. */}

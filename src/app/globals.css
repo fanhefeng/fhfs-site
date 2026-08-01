@@ -27,8 +27,10 @@
   --surface: #f2f0ea;
   --surface-raised: #ffffff;
   --fg: #1a1a1a;
-  --fg-secondary: rgba(26, 26, 26, 0.62);
-  --fg-tertiary: rgba(26, 26, 26, 0.4);
+  /* Both tiers clear 4.5:1 on paper: tertiary carries dates, counts and
+   * captions at 11-12px, so hierarchy comes from size, not from fading out. */
+  --fg-secondary: rgba(26, 26, 26, 0.72);
+  --fg-tertiary: rgba(26, 26, 26, 0.6);
   /* The one accent: amber. ≥4.5:1 on paper, used for link underlines,
    * current-state markers and the lit lamp. */
   --accent: #b45309;
@@ -93,7 +95,9 @@
   --fg: rgba(255, 255, 255, 0.92);
   --fg-secondary: rgba(255, 255, 255, 0.68);
   --fg-tertiary: rgba(255, 255, 255, 0.45);
-  --accent: #b45309;
+  /* The same amber, opened up two stops: #b45309 only reaches 3.8:1 against
+   * #0e0e11, which fails for the link and current-state text it carries. */
+  --accent: #d97706;
   --line: rgba(255, 255, 255, 0.1);
 
   /* The lamp is brighter after closing time. */
@@ -521,12 +525,21 @@ body {
 .prose-editorial blockquote {
   font-family: var(--font-stack-serif);
   font-style: italic;
+  /* CJK faces ship no italic, so the browser shears the glyphs instead. A
+   * synthesised oblique on Chinese reads as a rendering fault, not a voice —
+   * on Chinese pages the serif face alone carries the shift. */
+
   font-size: 1.2em;
   line-height: 1.6;
   color: var(--fg-secondary);
   border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
   padding-left: 1.25rem;
   margin: 1.8em 0;
+}
+/* `:lang()` follows inherited lang, so this catches both a Chinese page and a
+ * Chinese echo line sitting inside an English one. */
+:is(.prose-editorial blockquote, .no-cjk-oblique):lang(zh) {
+  font-style: normal;
 }
 .prose-editorial ul,
 .prose-editorial ol {

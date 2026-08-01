@@ -138,7 +138,9 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
               key={app.id}
               data-flip-item
               // The lead app is the keynote tile — two columns wide.
-              className={i === 0 ? "col-span-2" : ""}
+              // h-full so a short card still fills its grid row rather than
+              // leaving a hole under it.
+              className={i === 0 ? "col-span-2 h-full" : "h-full"}
               style={shown ? undefined : { display: "none" }}
             >
               <AppCard app={app} index={i} variant={i === 0 ? "feature" : "tile"} />

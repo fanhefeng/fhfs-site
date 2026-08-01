@@ -226,7 +226,7 @@ export default function NotFoundPage() {
             <div className="absolute inset-0 flex items-end justify-end rounded-[14px] border border-dashed border-line bg-surface p-3">
               <p
                 data-secret
-                className="max-w-[76%] text-right font-serif text-[12px] italic leading-snug text-fg-secondary"
+                className="no-cjk-oblique max-w-[76%] text-right font-serif text-[12px] italic leading-snug text-fg-secondary"
               >
                 {t("stickerSecret")}
               </p>

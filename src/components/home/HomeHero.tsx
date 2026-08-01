@@ -264,7 +264,15 @@ export function HomeHero() {
           window.clearTimeout(timeoutId);
           play();
         };
-        if (sessionStorage.getItem(OVERTURE_SEEN_KEY)) {
+        // Storage can throw outright (Safari private mode, blocked cookies).
+        // Losing the relay must never leave the headline hidden at autoAlpha 0.
+        let overtureSeen = false;
+        try {
+          overtureSeen = !!sessionStorage.getItem(OVERTURE_SEEN_KEY);
+        } catch {
+          overtureSeen = true;
+        }
+        if (overtureSeen) {
           startNow();
         } else {
           window.addEventListener(OVERTURE_DONE_EVENT, startNow, { once: true });

@@ -74,17 +74,20 @@ export function OvertureLight() {
       mm.add("(prefers-reduced-motion: reduce)", finishInstant);
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        if (sessionStorage.getItem(SEEN_KEY)) {
+        // Blocked storage (private mode, cookie policy) must not strand the
+        // page behind the curtain — treat a throw as "already seen".
+        let seen = true;
+        try {
+          seen = !!sessionStorage.getItem(SEEN_KEY);
+        } catch {
+          seen = true;
+        }
+        if (seen) {
           finishInstant();
           return;
         }
 
         setPhase("playing");
-        // Easter egg — a self-mockery carried over from the owner's old me.md.
-        console.log(
-          "%c一个废物。",
-          "color:#b45309;font-size:14px;font-family:serif;"
-        );
 
         // Lock scrolling while the lights are still off (lenis contract).
         window.__lenis?.stop();
@@ -167,7 +170,11 @@ export function OvertureLight() {
             unlock();
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("focusin", onFocusIn);
-            sessionStorage.setItem(SEEN_KEY, "1");
+            try {
+              sessionStorage.setItem(SEEN_KEY, "1");
+            } catch {
+              /* Replaying the overture beats crashing the page. */
+            }
             setPhase("done");
           }, END_AT);
 

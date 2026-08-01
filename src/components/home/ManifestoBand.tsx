@@ -141,7 +141,7 @@ export function ManifestoBand() {
                 tracking guard in globals.css picks the right rule. */}
             <p
               lang={locale === "zh" ? "en" : "zh-CN"}
-              className="band-text mt-4 block font-serif text-title italic text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]"
+              className="band-text no-cjk-oblique mt-4 block font-serif text-title italic text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]"
             >
               {t("sloganEcho")}
             </p>

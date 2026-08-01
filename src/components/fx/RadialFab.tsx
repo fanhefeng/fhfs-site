@@ -210,6 +210,30 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
       ref={rootRef}
       className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-50 size-14 md:hidden print:hidden"
     >
+      {/* The trigger comes first in the DOM so tabbing continues *into* the
+          items it just revealed, instead of stepping backwards past them.
+          Position is absolute/relative, so paint order is unaffected. */}
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-label={t("fabAria")}
+        onClick={() => setOpen((v) => !v)}
+        className="glass-thick relative z-[2] grid size-14 cursor-pointer place-items-center rounded-full text-fg"
+      >
+        <svg
+          ref={iconRef}
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="size-5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
+
       {actions.map((action) =>
         action.href ? (
           <a
@@ -241,27 +265,6 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
           </button>
         )
       )}
-
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-label={t("fabAria")}
-        onClick={() => setOpen((v) => !v)}
-        className="glass-thick relative z-[2] grid size-14 cursor-pointer place-items-center rounded-full text-fg"
-      >
-        <svg
-          ref={iconRef}
-          aria-hidden="true"
-          viewBox="0 0 24 24"
-          className="size-5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </button>
 
       {/* Copy confirmation lives in the live region only — no extra chrome. */}
       <span aria-live="polite" className="sr-only">

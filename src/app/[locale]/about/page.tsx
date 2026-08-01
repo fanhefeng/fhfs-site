@@ -64,7 +64,7 @@ export default async function AboutPage({
           {t("title")}
         </p>
         <h1 className="mt-5 text-display-sm">{site.author}</h1>
-        <p className="mt-4 font-serif text-title italic leading-tight text-fg-secondary">
+        <p className="no-cjk-oblique mt-4 font-serif text-title italic leading-tight text-fg-secondary">
           {t("keywords")}
         </p>
         <p className="mt-6 max-w-[46ch] text-body text-fg-secondary">
