@@ -125,6 +125,18 @@ export function HomeHero() {
 
       /** Timelines built after the effect body ran — killed by hand. */
       const spawned: gsap.core.Timeline[] = [];
+      /**
+       * Tweens created from a timeline callback are built in whatever GSAP
+       * context happens to be current — during the unmount revert that is a
+       * context whose scope is already gone, and every target resolved
+       * through its selector logs "Invalid scope". Building them inside a
+       * fresh, scope-less context makes GSAP resolve element references
+       * directly. Killed alongside `spawned`.
+       */
+      const isolated: gsap.Context[] = [];
+      const isolate = (fn: () => void) => {
+        isolated.push(gsap.context(fn));
+      };
 
       /**
        * Park the cord so its plug meets the left edge of the keyword, riding
@@ -159,11 +171,14 @@ export function HomeHero() {
        */
       let plugged = false;
       let lit = false;
+      /** Set first thing in cleanup: a revert must not restart the mechanism. */
+      let disposed = false;
 
       /** Contact: the keyword, the cord and the colophon card light up. */
       const ignite = (animate: boolean) => {
-        if (lit || !container.current) return;
+        if (disposed || lit || !container.current) return;
         lit = true;
+        isolate(() => {
         const word = root.querySelector<HTMLElement>(".hero-kinetic");
         if (word) word.dataset.lit = "true";
         wire.dataset.lit = "true";
@@ -191,6 +206,7 @@ export function HomeHero() {
             .to(ring, { autoAlpha: 0.4, duration: 0.5 }, 0.7);
         }
         spawned.push(tl);
+        });
       };
 
       const mm = gsap.matchMedia();
@@ -225,8 +241,9 @@ export function HomeHero() {
         let ro: ResizeObserver | null = null;
 
         const plugIn = () => {
-          if (plugged || !container.current) return;
+          if (disposed || plugged || !container.current) return;
           plugged = true;
+          isolate(() => {
           const w = placeWire();
           if (w == null) return;
           // Offset first, then reveal — otherwise the plug flashes for one
@@ -237,12 +254,20 @@ export function HomeHero() {
           tl.to(slide, { x: 0, duration: 0.85, ease: "power3.out" })
             // The click: a short recoil as the plug seats itself.
             .to(slide, { x: -3, duration: 0.07, ease: "power2.out" })
-            .to(slide, { x: 0, duration: 0.32, ease: "back.out(3)" })
-            .add(() => ignite(true), "-=0.26");
+            // Contact rides this tween's onStart rather than a positioned
+            // .add(): a zero-duration callback tween gets re-rendered (and
+            // re-fired) when the context reverts on unmount.
+            .to(slide, {
+              x: 0,
+              duration: 0.32,
+              ease: "back.out(3)",
+              onStart: () => ignite(true),
+            });
           spawned.push(tl);
           // From here on the cord only re-places itself; it never replays.
           ro = new ResizeObserver(() => placeWire());
           ro.observe(root);
+          });
         };
 
         const play = () => {
@@ -254,7 +279,14 @@ export function HomeHero() {
             type: "lines",
             mask: "lines",
           });
-          const tl = gsap.timeline();
+          // onComplete, not a trailing .add(): see plugIn above.
+          const tl = gsap.timeline({
+            onComplete: () => {
+              split?.revert();
+              split = null;
+              plugIn();
+            },
+          });
           tl.from(
             split.lines,
             { yPercent: 110, duration: 0.9, stagger: 0.08, ease: "power3.out" },
@@ -262,12 +294,7 @@ export function HomeHero() {
           )
             .to(markInner, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.05)
             .to(card, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.55)
-            .to(cue, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06 }, 0.75)
-            .add(() => {
-              split?.revert();
-              split = null;
-              plugIn();
-            });
+            .to(cue, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06 }, 0.75);
           spawned.push(tl);
         };
 
@@ -329,10 +356,20 @@ export function HomeHero() {
       });
 
       return () => {
+        // Before anything is killed: killing/reverting re-renders the
+        // zero-duration `.add()` tweens, which calls straight back into the
+        // mechanism below.
+        disposed = true;
         spawned.forEach((tl) => tl.kill());
+        isolated.forEach((ctx) => ctx.kill());
       };
     },
-    { scope: container }
+    // No `scope`. Every target here is an element reference, so the scope
+    // bought nothing — but it made GSAP resolve each of them through the
+    // context's selector, which warns "Invalid scope" for every tween built
+    // while the context is being reverted on unmount. The local `q()` below
+    // still scopes the few string selectors, and the context still tracks and
+    // reverts the animations either way.
   );
 
   return (
