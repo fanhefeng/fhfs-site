@@ -69,10 +69,19 @@ export default async function LocaleLayout({ children, params }: Props) {
             that lands the theme 15ms *after* first paint (a white flash for
             dark-mode readers), where this inline tag lands 8ms before it.
 
-            React 19 warns about script tags during client renders (dev only —
-            it is stripped from production builds). That warning is accurate
-            and harmless: this only ever needs to run for the initial
-            document, and ThemeKeeper above covers every later re-render. */}
+            React 19 logs "Encountered a script tag while rendering" on every
+            locale switch, since that re-renders this layout on the client.
+            Measured: 1 in `next dev`, 0 in a production build — it is a
+            development warning. It is also accurate and harmless here: the
+            script only ever needs to run for the initial document, and
+            ThemeKeeper below covers every later re-render.
+
+            Alternatives, all measured and all worse: next/script (theme lands
+            15ms after first paint), moving this into <head> (same warning,
+            and Next asks you not to hand-write <head>), hoisting the document
+            to a top-level app/layout.tsx (loses the per-locale <html lang> in
+            the SSR output), dropping the script for ThemeKeeper alone (first
+            paint flashes for anyone whose choice differs from their OS). */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`,
