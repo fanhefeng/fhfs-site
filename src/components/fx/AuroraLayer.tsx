@@ -5,6 +5,10 @@
  * transform-only breath, styles in globals.css), so this stays a Server
  * Component with zero client JS. Brighter after hours via --aurora-opacity;
  * static under prefers-reduced-motion and prefers-reduced-data.
+ *
+ * The breath is stepped, not continuous, and has to stay that way — see the
+ * measurements in globals.css. This layer sits on every page of the site, so
+ * a continuous animation here is a permanent tax on every visitor's battery.
  */
 export function AuroraLayer() {
   return (

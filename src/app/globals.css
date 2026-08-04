@@ -352,7 +352,24 @@ body {
 
 /* Aurora: one warm + one cool glow drifting behind everything. Pure CSS
  * gradients (no WebGL); blur is static, only transform animates, so the
- * blurred blob rasterizes once and the 60–120s breath is compositor-only. */
+ * blurred blob rasterizes once and the 60–120s breath is compositor-only.
+ *
+ * Compositor-only is not the same as free, and that distinction was costing
+ * ~28% of a GPU process on an idle page. A continuous animation — any
+ * continuous animation, of any size — means the page never reaches a still
+ * frame, so the compositor keeps producing frames at the display's refresh
+ * rate (120 Hz here) and WindowServer keeps compositing them, forever. It was
+ * measured: replacing both blobs with a single animated 1×1px div cost exactly
+ * the same, and shrinking the blob, dropping the blur, or dropping the scale
+ * changed nothing. The bill is per *frame*, not per pixel.
+ *
+ * So the fix is to stop asking for frames rather than to make them cheaper:
+ * steps() quantises the drift to roughly one frame per second. Across a 30s
+ * keyframe segment each step moves the blob ~1.4px and scales it ~2.9px —
+ * both far under the 100px blur, so the breath still reads as continuous.
+ * .grain-layer has always done this (steps(8)) and is the reason it barely
+ * registered next to the aurora. Anything continuous added to this file will
+ * bring the idle cost straight back. */
 .aurora-layer {
   position: fixed;
   inset: 0;
@@ -373,14 +390,14 @@ body {
   left: -12%;
   top: -18%;
   background: radial-gradient(circle at 35% 35%, var(--glow-warm), transparent 70%);
-  animation: aurora-a 90s ease-in-out infinite;
+  animation: aurora-a 90s steps(30) infinite;
 }
 .aurora-blob--cool {
   width: clamp(300px, 48vw, 640px);
   right: -10%;
   top: 4%;
   background: radial-gradient(circle at 60% 40%, var(--glow-cool), transparent 70%);
-  animation: aurora-b 120s ease-in-out infinite;
+  animation: aurora-b 120s steps(30) infinite;
 }
 @keyframes aurora-a {
   0%,
@@ -411,6 +428,47 @@ body {
   .aurora-blob {
     animation: none;
     will-change: auto;
+  }
+}
+
+/* The intro's scroll hint, stepped for the reason the aurora above is stepped.
+ * Tailwind's `animate-pulse` is a continuous ease, and a continuous ease is a
+ * standing request for frames at the display's refresh rate — here on top of a
+ * 3D canvas that is otherwise completely idle, which put the parked intro
+ * stage at roughly a third of a GPU process all by itself. It also never
+ * stopped once scrolled past: the opening frame fades out on opacity, so the
+ * line stayed in the DOM, invisible, still animating.
+ *
+ * 16 steps over 2s moves opacity by at most ~0.06 at a time on a 1px line —
+ * there is nothing there to see stepping.
+ *
+ * Stepping alone still leaves 8 frames a second, and every one of those
+ * recomposites the whole page — including the 2.7 MP canvas underneath, which
+ * measured 8% of a GPU process for one 1px line. Promoting the line to its own
+ * layer does not help: the cost is the page-level composite each frame asks
+ * for, not the repaint. So the breath is also finite. Eight rounds is about
+ * sixteen seconds; a visitor who has not scrolled by then is not going to be
+ * persuaded by a line, and the page can fall completely still. The last
+ * keyframe is opacity 1, so it settles fully visible rather than mid-fade.
+ *
+ * Narrative.tsx removes the class outright once the opening frame is behind
+ * us — the frame fades out on opacity, so without that the line would go on
+ * breathing where nobody can see it. */
+.pulse-stepped {
+  animation: pulse-stepped 2s steps(16) 8;
+}
+@keyframes pulse-stepped {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pulse-stepped {
+    animation: none;
   }
 }
 

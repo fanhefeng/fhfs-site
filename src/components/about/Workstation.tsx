@@ -3,15 +3,34 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
+import { prefersReducedMotion, prefersSaveData } from "@/lib/three/guards";
+import { DRACO_DECODER_PATH } from "@/lib/three/draco";
 
 /* "Gaming Desktop PC" by Yolala1232 (sketchfab.com/Yolala1232), CC-BY-4.0 —
  * the hero model of the owner's old fhf-portfolio, now living on the About
  * page. Compressed from 8.5 MB to 1.1 MB (Draco + 1024px WebP) at build
  * time; the Draco decoder is served from /draco/. */
 const MODEL_URL = "/models/workstation.glb";
-const DRACO_PATH = "/draco/";
 /** Idle turntable speed, rad/s — slow enough to read as "alive", not spin. */
 const IDLE_SPIN = 0.16;
+/**
+ * Frames per second once nobody is touching the piece.
+ *
+ * The stage is deliberately never still — turntable, breath, LED pulse and a
+ * lissajous camera drift, all of them slow on purpose. Slow is exactly why it
+ * does not need the display's full refresh rate: at 0.16 rad/s a 120 Hz frame
+ * advances the turntable by 0.08°, and drawing four of those to move what one
+ * frame at 30 fps moves is the same picture bought four times. Measured on a
+ * 120 Hz panel, an on-screen stage sat at ~37% of a GPU process.
+ *
+ * Interaction is not throttled — a drag has to track the finger, so the loop
+ * runs flat out until the piece is left alone (see `idle` below). Everything
+ * time-based reads `delta` or absolute time, so the motion is identical at
+ * either cadence; only the sampling is coarser, and a 3.6s breath sampled 108
+ * times is not a cadence anyone can see.
+ */
+const IDLE_FPS = 30;
+const IDLE_FRAME_MS = 1000 / IDLE_FPS;
 /** The export's forward axis points away from camera; ~2.6 rad shows the
  * desk face-on with a pleasant three-quarter angle. */
 const HOME_Y = 2.6;
@@ -39,13 +58,8 @@ export function Workstation({ hint, className }: Props) {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-    const nav = navigator as Navigator & {
-      connection?: { saveData?: boolean };
-    };
-    if (nav.connection?.saveData) {
+    const reducedMotion = prefersReducedMotion();
+    if (prefersSaveData()) {
       setStatus("skipped");
       return;
     }
@@ -286,6 +300,17 @@ export function Workstation({ hint, className }: Props) {
     let lastFrame = 0;
     const loop = () => {
       const now = performance.now();
+
+      // Hands-off? Then 30 fps is plenty (see IDLE_FPS). The three conditions
+      // are the same ones the body below uses to decide it is coasting: still
+      // pressed, still carrying release inertia, or inside the 1.2s beat
+      // before the idle spin resumes. Returning early leaves `lastFrame`
+      // untouched, so the skipped time lands in the next `delta` and every
+      // delta-driven motion keeps its real-world speed.
+      const idle =
+        !dragging && Math.abs(velY) <= 0.02 && now - lastPointerAt > 1200;
+      if (idle && lastFrame && now - lastFrame < IDLE_FRAME_MS) return;
+
       const t = now / 1000;
       const delta = lastFrame ? Math.min((now - lastFrame) / 1000, 0.1) : 0;
       lastFrame = now;
@@ -339,7 +364,7 @@ export function Workstation({ hint, className }: Props) {
       ]).then(([{ GLTFLoader }, { DRACOLoader }]) => {
         if (disposed) return;
         const draco = new DRACOLoader();
-        draco.setDecoderPath(DRACO_PATH);
+        draco.setDecoderPath(DRACO_DECODER_PATH);
         const loader = new GLTFLoader();
         loader.setDRACOLoader(draco);
         loader.load(
@@ -408,11 +433,19 @@ export function Workstation({ hint, className }: Props) {
       });
     };
 
+    // A hidden tab has nobody to show frames to. Browsers throttle rAF in
+    // backgrounded tabs, but "throttled" is not "stopped" and the guarantees
+    // vary — a window merely occluded by another, or one of several tabs the
+    // user keeps switching between, can go on drawing. Stopping outright is
+    // both cheaper and something we can actually rely on.
     const setLoop = (on: boolean) => {
       if (reducedMotion) return;
-      renderer.setAnimationLoop(on ? loop : null);
-      if (on) lastFrame = 0;
+      const run = on && !document.hidden;
+      renderer.setAnimationLoop(run ? loop : null);
+      if (run) lastFrame = 0;
     };
+    const onVisibility = () => setLoop(visibleNow);
+    document.addEventListener("visibilitychange", onVisibility);
     const io = new IntersectionObserver(
       ([entry]) => {
         const near = entry?.isIntersecting ?? false;
@@ -443,6 +476,7 @@ export function Workstation({ hint, className }: Props) {
       introTl?.kill();
       spinTween?.kill();
       renderer.setAnimationLoop(null);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", onResize);
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);
@@ -472,14 +506,25 @@ export function Workstation({ hint, className }: Props) {
       >
         <canvas ref={canvasRef} className="h-full w-full" />
         {/* Minimal loading state: a gold ring that quietly spins until the
-            model lands, then fades away. Static under reduced motion. */}
+            model lands, then fades away. Static under reduced motion.
+
+            The spin is dropped on ready, not merely faded out: the ring stays
+            mounted for its 700ms fade, and a continuous animation on a mounted
+            element keeps the entire page compositing at the display's refresh
+            rate for as long as it runs — which, when it was only ever hidden
+            behind opacity-0, meant permanently. Stopping mid-fade is not
+            visible; the ring is on its way to invisible either way. */}
         <div
           aria-hidden
           className={`pointer-events-none absolute inset-0 grid place-items-center transition-opacity duration-700 ${
             status === "ready" ? "opacity-0" : "opacity-100"
           }`}
         >
-          <div className="h-8 w-8 animate-spin rounded-full border border-accent/50 border-t-transparent motion-reduce:animate-none" />
+          <div
+            className={`h-8 w-8 rounded-full border border-accent/50 border-t-transparent motion-reduce:animate-none ${
+              status === "ready" ? "" : "animate-spin"
+            }`}
+          />
         </div>
         {/* Captions live inside the stage, bottom corners, like the other acts */}
         <div className="pointer-events-none absolute inset-x-6 bottom-2 flex items-baseline justify-between font-mono text-[10px] tracking-[0.12em] text-fg-tertiary sm:inset-x-10">
