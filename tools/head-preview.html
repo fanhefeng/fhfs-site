@@ -1,0 +1,137 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>head.glb preview</title>
+<!--
+  本地校准工具，不进构建产物。放在 public/ 外面是故意的：它从 esm.sh 现取
+  three.js，留在 public/ 就等于把一个外部 CDN 的入口发布到线上站点。
+
+  跑法：在仓库根目录起一个静态服务器，让 tools/ 和 public/ 落在同一个 origin 下
+
+      python3 -m http.server 8000
+
+  然后开 http://localhost:8000/tools/head-preview.html 。需要联网（three.js
+  走 esm.sh）。模型用相对路径 `../public/models/head.glb`：这么直出仓库时
+  public/ 这一层是不会被剥掉的，站点里的 `/models/head.glb` 在这儿取不到。
+
+  用途：正交四视图 + 一把刻度尺，用来读 src/lib/intro/stickers.ts 的
+  MODEL_ANCHOR_FROM_TOP（脸中心位于模型总高的百分之几）。见 docs/INTRO3D.md §3。
+-->
+<style>
+  body { margin: 0; background: #f4f0ea; font: 13px ui-monospace, monospace; color: #333; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .cell { position: relative; }
+  .cell canvas { display: block; width: 100%; }
+  .tag { position: absolute; top: 6px; left: 8px; background: #0009; color: #fff; padding: 2px 6px; border-radius: 3px; }
+</style>
+<div class="grid" id="grid"></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.185.1", "three/addons/": "https://esm.sh/three@0.185.1/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+const SIZE = 520;
+
+// 红线画的就是 src/lib/intro/stickers.ts 里 MODEL_ANCHOR_FROM_TOP 的当前值——
+// 改那边就同步改这里，否则这把尺子会在下一次换模型时把人带偏。
+// 蓝线只是每 0.05 一档的参照刻度。
+const ANCHOR = 0.44;
+const TICKS = [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6];
+
+// [标签, 水平角(度), 垂直角(度), 是否画 anchorFromTop 刻度]
+const VIEWS = [
+  ["FRONT + 刻度", 0, 0, true],
+  ["3/4 左", -35, 0, false],
+  ["正侧", -90, 0, false],
+  ["略仰视", 0, -20, false],
+];
+
+const gltf = await new GLTFLoader().loadAsync("../public/models/head.glb");
+const root = gltf.scene;
+
+// 归一化：把模型缩放到高度 2、中心在原点（和 normalizeModel 的前半段一致）
+//
+// position 要乘 scale。three 合成的是 matrix = T · R · S，平移发生在缩放之后，
+// 所以直接 sub(center) 会少缩一次、把模型偏出去 (scale-1)·center。当前这颗头
+// 本来就近似以原点为中心，偏差只有千分之一，看不出来——但这个工具存在的唯一
+// 理由就是换模型之后重新标定，而新模型不保证是居中导出的：拿一个基座在 y=0
+// 的 1 单位高模型进来，就会被摆到 y ∈ [0,2]，而正交相机只框 [-1.05,1.05]，
+// 头顶直接裁掉，尺子上读到的每一档都是错的百分比。
+const box = new THREE.Box3().setFromObject(root);
+const size = new THREE.Vector3(), center = new THREE.Vector3();
+box.getSize(size); box.getCenter(center);
+const scale = 2 / size.y;
+root.scale.setScalar(scale);
+root.position.copy(center).multiplyScalar(-scale);
+root.updateMatrixWorld(true);
+
+const grid = document.getElementById("grid");
+
+for (const [label, theta, phi, ruler] of VIEWS) {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  grid.appendChild(cell);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(SIZE, SIZE, false);
+  renderer.setClearColor(0xf4f0ea);
+  const canvas = renderer.domElement;
+  canvas.width = SIZE; canvas.height = SIZE;
+  cell.appendChild(canvas);
+
+  const scene = new THREE.Scene();
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x666655, 2.2));
+  const key = new THREE.DirectionalLight(0xffffff, 1.6);
+  key.position.set(2, 3, 4);
+  scene.add(key);
+  scene.add(root.clone(true));
+
+  // 正交相机，视高恰好 = 模型高度 2 → 屏幕 y 线性对应模型高度百分比
+  const cam = new THREE.OrthographicCamera(-1.05, 1.05, 1.05, -1.05, 0.01, 50);
+  const t = THREE.MathUtils.degToRad(theta), p = THREE.MathUtils.degToRad(phi);
+  cam.position.set(
+    5 * Math.cos(p) * Math.sin(t),
+    5 * Math.sin(p),
+    5 * Math.cos(p) * Math.cos(t),
+  );
+  cam.lookAt(0, 0, 0);
+  renderer.render(scene, cam);
+
+  // 刻度：模型顶端 y=+1 对应屏幕 y=SIZE*(1.05-1)/2.1，按 anchorFromTop 比例画线
+  // 必须画在独立的叠加 canvas 上——WebGL canvas 拿不到 2d context
+  if (ruler) {
+    const overlay = document.createElement("canvas");
+    overlay.width = overlay.height = SIZE;
+    Object.assign(overlay.style, { position: "absolute", inset: "0", width: "100%" });
+    cell.appendChild(overlay);
+    const ctx = overlay.getContext("2d");
+    const top = SIZE * (1.05 - 1) / 2.1;
+    const modelH = SIZE * 2 / 2.1;
+    ctx.font = "12px ui-monospace, monospace";
+    const line = (a, current) => {
+      const y = top + modelH * a;
+      ctx.strokeStyle = current ? "#e11d48" : "#2563eb88";
+      ctx.lineWidth = current ? 2 : 1;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(SIZE, y); ctx.stroke();
+      ctx.fillStyle = current ? "#e11d48" : "#2563eb";
+      ctx.fillText(
+        current ? `${a.toFixed(2)} ← MODEL_ANCHOR_FROM_TOP（当前配置）` : a.toFixed(2),
+        4,
+        y - 3,
+      );
+    };
+    // 参照刻度先画，红线压在上面——两者重合时要看得见的是红的那条
+    for (const a of TICKS) if (Math.abs(a - ANCHOR) > 1e-6) line(a, false);
+    line(ANCHOR, true);
+  }
+
+  const tag = document.createElement("div");
+  tag.className = "tag";
+  tag.textContent = label;
+  cell.appendChild(tag);
+}
+
+document.title = "ready";
+</script>

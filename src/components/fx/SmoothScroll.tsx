@@ -42,7 +42,22 @@ export function SmoothScroll() {
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
+    // Lenis re-measures the page when its own ResizeObserver on <html> fires.
+    // Here it never fires: `html { overflow-x: clip }` makes the root a clip
+    // container, so its box stays exactly one viewport tall however long the
+    // document gets. Lenis therefore keeps the scroll limit it measured on
+    // whichever page it last saw resize — walk from a short route into a tall
+    // one (the ten-viewport /intro track) and the page simply stops moving at
+    // the previous page's bottom, halfway through the story.
+    //
+    // <body> is the element whose box does follow the content, so watch that
+    // and hand Lenis the new size. This also covers late-landing content on
+    // any route: fonts, images, an opened accordion.
+    const remeasure = new ResizeObserver(() => lenis.resize());
+    remeasure.observe(document.body);
+
     return () => {
+      remeasure.disconnect();
       gsap.ticker.remove(raf);
       lenis.destroy();
       window.__lenis = null;

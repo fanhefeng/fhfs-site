@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import type { ElementType, ReactNode, Ref } from "react";
+import type { ReactNode, Ref } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 
 type Props = {
@@ -35,7 +35,13 @@ export function Reveal({
   stagger,
 }: Props) {
   const ref = useRef<HTMLElement>(null);
-  const Tag = as as ElementType;
+  // Pinned to one concrete tag rather than ElementType: @react-three/fiber
+  // merges every three.js element into the global JSX.IntrinsicElements, so
+  // the props of an open-ended element union intersect down to `never` and
+  // even `children` stops type-checking. Every tag `as` allows is a plain
+  // HTML element, so the props are interchangeable and only the ref needs
+  // restating.
+  const Tag = as as "div";
 
   useGSAP(
     () => {
@@ -65,7 +71,7 @@ export function Reveal({
   );
 
   return (
-    <Tag ref={ref as Ref<never>} className={className}>
+    <Tag ref={ref as Ref<HTMLDivElement>} className={className}>
       {children}
     </Tag>
   );

@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { getAbout, getTimeline } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
+import { DotDoodle } from "@/components/fx/DotDoodle";
 import { Workstation } from "@/components/about/Workstation";
 import { StickerWall } from "@/components/about/StickerWall";
 import { Changelog, type ChangelogEntry } from "@/components/about/Changelog";
@@ -63,13 +65,34 @@ export default async function AboutPage({
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("title")}
         </p>
-        <h1 className="mt-5 text-display-sm">{site.author}</h1>
+        {/* The name, set in a dot matrix that keeps it half-hidden until you
+            point at it. The heading still *is* the name for anything that
+            reads the page — the canvas is decoration layered over it. */}
+        <h1 className="mt-5">
+          {/* Taller than the display-sm it replaces: a field of sparse dots
+              carries less visual weight than solid type at the same height. */}
+          <DotDoodle text={site.author} className="h-[clamp(3rem,13vw,5rem)]" />
+          <span className="sr-only">{site.author}</span>
+        </h1>
         <p className="no-cjk-oblique mt-4 font-serif text-title italic leading-tight text-fg-secondary">
           {t("keywords")}
         </p>
         <p className="mt-6 max-w-[46ch] text-body text-fg-secondary">
           {t("lead")}
         </p>
+
+        {/* The same person, told the other way round — a head you scroll
+            around instead of a column you read. Kept to a quiet line here so
+            the essay below stays the main act. */}
+        <Link
+          href="/intro"
+          className="hit-ext mt-7 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
+        >
+          <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {t("introTitle")}
+          </span>
+          {t("introLink")} →
+        </Link>
       </header>
 
       {/* The 3D desk, kept from the old portfolio. Loads only when scrolled

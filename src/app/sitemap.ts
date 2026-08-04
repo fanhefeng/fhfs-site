@@ -6,7 +6,14 @@ import { getAllSlugs, getAllTags, getPost } from "@/lib/content";
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
-  const staticPaths = ["", "/blog", "/about", "/portfolio", "/software"];
+  const staticPaths = [
+    "",
+    "/blog",
+    "/about",
+    "/intro",
+    "/portfolio",
+    "/software",
+  ];
 
   const alternatesFor = (path: string) => ({
     languages: Object.fromEntries(

@@ -65,7 +65,84 @@
     "changelogTitle": "Changelog",
     "changelogAria": "Life milestones, numbered like software releases",
     "changelogDot": "Released {date}",
-    "colophon": "Written in Qingdao · local time {time}"
+    "colophon": "Written in Qingdao · local time {time}",
+    "introTitle": "Meet me the other way round",
+    "introLink": "Come closer"
+  },
+  "intro": {
+    "title": "Another introduction",
+    "subtitle": "A face covered in stickers. Scroll all the way through it.",
+    "role": "engineer · writer · maker of small software",
+    "meta": "FRONTEND · 3D · AI",
+    "tagline": "One link, instead of a résumé.",
+    "scrollHint": "Scroll · come closer",
+    "loading": "Loading",
+    "outroTitle": "Say hello?",
+    "outroBody": "If you got this far, the stickers did their job.",
+    "linkAbout": "About me",
+    "linkWriting": "Read something",
+    "resumeRegion": "Résumé in text — the same content as the 3D scene",
+    "nodes": {
+      "frontend": {
+        "kicker": "01 — the day job",
+        "title": "Front-end engineering",
+        "body": "React / Next.js / TypeScript. This site is the exhibit: bilingual routing, a content pipeline and a motion system, all written by hand.",
+        "bullets": [
+          "A zh/en site on App Router + next-intl",
+          "Posts are MDX, compiled at build time",
+          "One token set, colour semantics down to components"
+        ]
+      },
+      "webgl": {
+        "kicker": "02 — the craft",
+        "title": "3D and graphics",
+        "body": "Three.js and React Three Fiber. The web should not be all rectangles — the face you are looking at is the argument.",
+        "bullets": [
+          "Scroll-driven 3D narrative",
+          "Runtime decals and procedural textures",
+          "The trade-offs of 3D on a phone"
+        ]
+      },
+      "design": {
+        "kicker": "03 — half a designer",
+        "title": "Design systems",
+        "body": "I can draw it myself, and argue with a designer about it. Colour semantics through to glass tiers, one token set all the way down.",
+        "bullets": [
+          "Three tiers: primitive → semantic → component",
+          "Light and dark, switched like opening and closing a gallery"
+        ]
+      },
+      "ai": {
+        "kicker": "04 — what I'm on now",
+        "title": "Building with AI",
+        "body": "Putting models into real work, not demos. The head you are looking at came out of a single photograph — stylised, then rebuilt in 3D.",
+        "bullets": [
+          "Image-to-image stylisation, single-image reconstruction",
+          "Prompts kept like code, re-runnable"
+        ]
+      },
+      "ship": {
+        "kicker": "05 — how I work",
+        "title": "Shipping beats perfect",
+        "body": "Ship it, then iterate. One version goes out; the rest is the next version's problem.",
+        "bullets": [
+          "Every change records its why",
+          "Anything repeatable becomes a script"
+        ]
+      },
+      "oss": {
+        "kicker": "06 — spare hours",
+        "title": "Open source",
+        "body": "Whatever can be public sits on GitHub. Small tools written for myself; now and then someone else finds a use.",
+        "bullets": ["Small and sharp over popular"]
+      },
+      "slow": {
+        "kicker": "07 — the human bit",
+        "title": "Slowly",
+        "body": "Write slowly, build slowly, never rush. A light left on is enough.",
+        "bullets": []
+      }
+    }
   },
   "portfolio": {
     "kicker": "Gallery · Craft",

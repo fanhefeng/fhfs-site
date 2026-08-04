@@ -65,7 +65,78 @@
     "changelogTitle": "版本履历",
     "changelogAria": "以软件版本号排列的人生节点",
     "changelogDot": "发布日期 {date}",
-    "colophon": "写于青岛 · 当地时间 {time}"
+    "colophon": "写于青岛 · 当地时间 {time}",
+    "introTitle": "换一种方式认识我",
+    "introLink": "走近这张脸"
+  },
+  "intro": {
+    "title": "另一种自我介绍",
+    "subtitle": "一张贴满标签的脸，滚动着看完。",
+    "role": "工程师 · 写字的人 · 做软件的人",
+    "meta": "FRONTEND · 3D · AI",
+    "tagline": "用一条链接，代替一份简历。",
+    "scrollHint": "向下滚动 · 走近这张脸",
+    "loading": "正在加载",
+    "outroTitle": "聊聊？",
+    "outroBody": "看到这里，说明这张脸上的标签起作用了。",
+    "linkAbout": "关于我",
+    "linkWriting": "读点文章",
+    "resumeRegion": "文字版简历（3D 内容的等价文本）",
+    "nodes": {
+      "frontend": {
+        "kicker": "01 — 主业",
+        "title": "前端工程",
+        "body": "React / Next.js / TypeScript。这个站点本身就是现场：双语路由、内容管线、动效系统，都是手写的。",
+        "bullets": [
+          "App Router + next-intl 的中英双语站",
+          "文章用 MDX，构建期编译成组件",
+          "一套 token 从颜色语义一路贯到组件"
+        ]
+      },
+      "webgl": {
+        "kicker": "02 — 手艺",
+        "title": "3D 与图形",
+        "body": "Three.js 与 React Three Fiber。相信网页不该只有矩形——你现在看到的这张脸就是证据。",
+        "bullets": [
+          "滚动驱动的 3D 叙事",
+          "运行时贴花与程序化纹理",
+          "移动端 3D 的取舍"
+        ]
+      },
+      "design": {
+        "kicker": "03 — 半个设计师",
+        "title": "设计系统",
+        "body": "能自己出图，也能跟设计师吵架。全站从颜色语义到玻璃层级，都是一套 token 管到底。",
+        "bullets": [
+          "三层 token：原始值 → 语义 → 组件",
+          "亮暗双主题，切换是一次开馆与闭馆"
+        ]
+      },
+      "ai": {
+        "kicker": "04 — 现在在做的",
+        "title": "AI 应用开发",
+        "body": "把大模型接进真实的活儿里，而不是做 Demo。你正在看的这颗头，就是一张照片经过风格化和单图重建生成的。",
+        "bullets": ["图生图风格化 + 单图三维重建", "提示词当代码管，随时可复跑"]
+      },
+      "ship": {
+        "kicker": "05 — 工作方式",
+        "title": "交付大于完美",
+        "body": "先上线，再迭代。做完一版就发出去，剩下的交给下一版。",
+        "bullets": ["每次改动都留下「为什么」", "能自动化的都写成脚本"]
+      },
+      "oss": {
+        "kicker": "06 — 业余时间",
+        "title": "开源",
+        "body": "能公开的都放在 GitHub 上。写给自己用的小工具，偶尔也有别人用得上。",
+        "bullets": ["小而美优先，不追 star 数"]
+      },
+      "slow": {
+        "kicker": "07 — 人味",
+        "title": "慢慢来",
+        "body": "慢慢写，慢慢做，不着急。留一盏亮着的灯，就够了。",
+        "bullets": []
+      }
+    }
   },
   "portfolio": {
     "kicker": "画廊 · 手艺",
