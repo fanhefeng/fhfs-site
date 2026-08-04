@@ -16,10 +16,14 @@ import { gsap, useGSAP } from "@/lib/gsap";
  * just a quiet page count in the margin of the magazine.
  */
 export function ProgressHud() {
-  // usePathname (from @/i18n/navigation) is locale-stripped, so a blog
-  // article is exactly "/blog/<slug>" — the list route "/blog" stays bare.
+  // usePathname (from @/i18n/navigation) is locale-stripped, so the three
+  // blog routes read as "/blog" (list), "/blog/<slug>" (article) and
+  // "/blog/tags/<tag>" (tag list). Anchor both ends: without the trailing $,
+  // "[^/]+" swallows "tags" and every tag listing grows a reading-progress
+  // chip plus its role="progressbar" live region — a percentage for a page
+  // that is not an article and has nothing to read through.
   const pathname = usePathname();
-  if (!/^\/blog\/[^/]+/.test(pathname)) return null;
+  if (!/^\/blog\/[^/]+$/.test(pathname)) return null;
   // Remount per article so progress/entrance state never leaks across posts.
   return <ReadingChip key={pathname} />;
 }

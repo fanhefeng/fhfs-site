@@ -27,8 +27,10 @@ export type FullNavProps = {
    */
   onClose: () => void;
   /**
-   * The Header's burger button. Focus returns to it when the sheet closes,
-   * and Tab cycles through it (it stays visible above the glass).
+   * The Header's burger button. Focus returns to it when the sheet is
+   * dismissed — but never when a navigation closed it, since by then the
+   * reader is on the new page. Tab also cycles through it (it stays visible
+   * above the glass).
    */
   triggerRef: RefObject<HTMLButtonElement | null>;
 };
@@ -59,6 +61,14 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
   /** True once a close (or reset) has fully settled — the next open may
    *  safely use fromTo without yanking a mid-flight panel back to the top. */
   const settledClosedRef = useRef(true);
+  /** The <main> we actually pushed. Pages own their own <main>, so by the time
+   *  a close unwinds, re-querying would hand back the INCOMING page's element:
+   *  never pushed, yet stamped with an inline filter/transform that turns it
+   *  into the containing block its fixed/sticky children are positioned
+   *  against — plus a delayed clearProps landing mid-materialize. */
+  const pushedMainRef = useRef<HTMLElement | null>(null);
+  /** Set when the close was ordered by a route commit, not by a dismiss. */
+  const closedByRouteRef = useRef(false);
 
   const t = useTranslations("nav");
   const tf = useTranslations("footer");
@@ -85,9 +95,10 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
 
   /** Push the page back while the sheet is up (scale + blur on <main>). */
   const pushMain = useCallback((show: boolean, reduced: boolean) => {
-    const main = document.querySelector<HTMLElement>("main");
-    if (!main || reduced) return;
     if (show) {
+      const main = document.querySelector<HTMLElement>("main");
+      if (!main || reduced) return;
+      pushedMainRef.current = main;
       gsap.to(main, {
         scale: 0.98,
         filter: "blur(2px)",
@@ -96,17 +107,22 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
         ease: "power3.out",
         overwrite: "auto",
       });
-    } else {
-      gsap.to(main, {
-        scale: 1,
-        filter: "blur(0px)",
-        duration: 0.4,
-        ease: "power2.out",
-        overwrite: "auto",
-        // A transformed <main> breaks fixed/sticky descendants — clean up.
-        onComplete: () => gsap.set(main, { clearProps: "transform,filter,transformOrigin" }),
-      });
+      return;
     }
+    const main = pushedMainRef.current;
+    pushedMainRef.current = null;
+    // Gone with its page (or never pushed, under reduced motion): the styles
+    // left with the element, and whatever <main> is on screen now is not ours.
+    if (!main?.isConnected) return;
+    gsap.to(main, {
+      scale: 1,
+      filter: "blur(0px)",
+      duration: 0.4,
+      ease: "power2.out",
+      overwrite: "auto",
+      // A transformed <main> breaks fixed/sticky descendants — clean up.
+      onComplete: () => gsap.set(main, { clearProps: "transform,filter,transformOrigin" }),
+    });
   }, []);
 
   // One persistent timeline; open/close sequences are rebuilt onto it with
@@ -120,6 +136,9 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
 
   useEffect(() => {
     openRef.current = open;
+    // Read on every run, so a verdict can never survive into a later close.
+    const byRoute = closedByRouteRef.current;
+    closedByRouteRef.current = false;
     const root = rootRef.current;
     const panel = panelRef.current;
     const tl = tlRef.current;
@@ -175,6 +194,13 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
       // the shade is still drawing down.
       root.querySelector<HTMLElement>("a[href]")?.focus({ preventScroll: true });
     } else {
+      // A route commit already tore the layer down instantly (see the pathname
+      // effect below) and RouteTransition owns the screen from here. Replaying
+      // the sink would animate nothing anyone can see, re-dirty the incoming
+      // <main>, and — 0.4s after the reader landed on the new page — drag
+      // their focus off it and back onto the burger.
+      if (byRoute) return;
+
       // Closing: the sheet must not swallow clicks while it sinks.
       gsap.set(root, { pointerEvents: "none" });
       pushMain(false, reduced);
@@ -255,11 +281,21 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
     const panel = panelRef.current;
     if (root) gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
     if (panel) gsap.set(panel, { clearProps: "transform,opacity,visibility,filter" });
-    const main = document.querySelector<HTMLElement>("main");
-    if (main) gsap.set(main, { clearProps: "transform,filter,transformOrigin" });
+    // Only the <main> we pushed gets reset. The one on screen now belongs to
+    // the incoming page and is RouteTransition's to animate; if the outgoing
+    // one is already detached there is nothing left to clean.
+    const pushedMain = pushedMainRef.current;
+    pushedMainRef.current = null;
+    if (pushedMain?.isConnected)
+      gsap.set(pushedMain, { clearProps: "transform,filter,transformOrigin" });
     settledClosedRef.current = true;
     unlock();
-    if (openRef.current) onClose();
+    if (openRef.current) {
+      // Tell the close path this was a navigation: no exit animation, and no
+      // focus handoff back to the burger.
+      closedByRouteRef.current = true;
+      onClose();
+    }
   }, [pathname, unlock, onClose]);
 
   // Whatever happens, an unmount must never leave the page unscrollable.

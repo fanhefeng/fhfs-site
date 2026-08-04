@@ -109,6 +109,33 @@ export function OvertureLight() {
           ScrollTrigger.refresh();
         };
 
+        /** Once shown, the overture is spent for this session — and recording
+         *  that in the timeline's last frame alone is not enough. A context
+         *  revert (the [locale] layout remounts on a locale switch; a
+         *  reduced-motion flip kills this media context) skips the terminal
+         *  callback, and the next mount then replays the whole opaque
+         *  blackout, scroll lock included. Never written up front either:
+         *  HomeHero reads this same key on mount to decide whether to wait
+         *  for the done event, and it must still wait. Reduced motion and
+         *  blocked storage never reach here — an overture that was never
+         *  shown stays owed. */
+        const markSeen = () => {
+          try {
+            sessionStorage.setItem(SEEN_KEY, "1");
+          } catch {
+            /* Replaying the overture beats crashing the page. */
+          }
+        };
+
+        /** Proof the blackout actually reached the screen. Dev Strict Mode
+         *  mounts, reverts and remounts inside a single commit — not one
+         *  frame is painted in between, so that teardown still owes the
+         *  visitor the overture, while a genuine mid-play unmount does not. */
+        let shown = false;
+        const shownFrame = requestAnimationFrame(() => {
+          shown = true;
+        });
+
         // The blackout is opaque, so anything focusable behind it would take
         // an invisible focus ring — and Enter would activate an unseen link.
         const onFocusIn = (e: FocusEvent) => {
@@ -170,11 +197,7 @@ export function OvertureLight() {
             unlock();
             window.removeEventListener("keydown", onKeyDown);
             window.removeEventListener("focusin", onFocusIn);
-            try {
-              sessionStorage.setItem(SEEN_KEY, "1");
-            } catch {
-              /* Replaying the overture beats crashing the page. */
-            }
+            markSeen();
             setPhase("done");
           }, END_AT);
 
@@ -185,8 +208,10 @@ export function OvertureLight() {
         // Restore scroll even if we unmount mid-play (route change).
         return () => {
           unlock();
+          cancelAnimationFrame(shownFrame);
           window.removeEventListener("keydown", onKeyDown);
           window.removeEventListener("focusin", onFocusIn);
+          if (shown) markSeen();
         };
       });
     },

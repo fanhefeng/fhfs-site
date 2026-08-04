@@ -160,7 +160,8 @@ export function HomeHero() {
       };
 
       /**
-       * The mechanism runs exactly once per mount.
+       * The mechanism runs exactly once per run of a motion branch (`unlatch`
+       * below is the one thing allowed to rearm it, and only on a branch swap).
        *
        * Both of these are reached from `.add()` callbacks, which GSAP models
        * as zero-duration tweens — so `context.revert()` on unmount renders
@@ -171,8 +172,34 @@ export function HomeHero() {
        */
       let plugged = false;
       let lit = false;
-      /** Set first thing in cleanup: a revert must not restart the mechanism. */
+      /**
+       * Teardown marker. It is *not* what keeps a revert from restarting the
+       * mechanism: GSAP calls a context's returned cleanups last, after it has
+       * reverted every tween and killed every child (`Context.kill` runs `_r`
+       * at the end), so by the time this flips the re-render has already
+       * happened — the latches above are what survived it. This only catches a
+       * straggler that lands after teardown, once the branch cleanups below
+       * have cleared those latches.
+       */
       let disposed = false;
+
+      /**
+       * Flipping the OS reduce-motion switch mid-session reverts the branch's
+       * context, and GSAP restores every inline style it set: the cord is
+       * hidden and the lamp is dark again. The latches and the `data-lit`
+       * attributes are plain JS and DOM, so they survive that revert — the
+       * branch taking over would find the mechanism already spent and leave
+       * the cover unplugged and unlit. Both branches call this from cleanup,
+       * which runs *after* the revert, so a revert still cannot replay the
+       * mechanism it just tore down.
+       */
+      const unlatch = () => {
+        plugged = false;
+        lit = false;
+        const word = root.querySelector<HTMLElement>(".hero-kinetic");
+        if (word) word.dataset.lit = "false";
+        wire.dataset.lit = "false";
+      };
 
       /** Contact: the keyword, the cord and the colophon card light up. */
       const ignite = (animate: boolean) => {
@@ -215,24 +242,44 @@ export function HomeHero() {
       // Reduced motion: the cover is already open, the lamp already on.
       // Only the (discrete) measurement of the cord still runs.
       // ------------------------------------------------------------------
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        const settle = gsap.delayedCall(0.05, () => {
-          if (placeWire() == null) return;
+      mm.add("(prefers-reduced-motion: reduce)", (_branch, contextSafe) => {
+        let revealed = false;
+        /**
+         * The whole reveal, retried as one: the keyword measures null while it
+         * has no box (a bfcache restore, a route-transition overlay over the
+         * outgoing tree), and giving up there would strand this visitor with a
+         * dark lamp and no cord while the sr-only line still tells them the
+         * light came on.
+         */
+        const reveal = () => {
+          if (revealed || placeWire() == null) return;
+          revealed = true;
           gsap.set(wire, { autoAlpha: 1 });
           ignite(false);
-        });
-        const ro = new ResizeObserver(() => placeWire());
+        };
+        const settle = gsap.delayedCall(0.05, reveal);
+        // Wrapped, because an observer fires in no GSAP context at all: what
+        // it built would then escape the matchMedia revert that runs when the
+        // visitor flips the OS switch. GSAP restores this branch's context
+        // around a function it wrapped, so the retry owns what the first
+        // attempt would have owned. (GSAP always passes the wrapper; the type
+        // marks it optional because plain contexts share the signature.)
+        const retry = contextSafe ? contextSafe(reveal) : reveal;
+        // Armed before the first attempt: until the reveal lands this is what
+        // retries it, and only afterwards does it just re-place the cord.
+        const ro = new ResizeObserver(() => (revealed ? placeWire() : retry()));
         ro.observe(root);
         return () => {
           settle.kill();
           ro.disconnect();
+          unlatch();
         };
       });
 
       // ------------------------------------------------------------------
       // Full motion
       // ------------------------------------------------------------------
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      mm.add("(prefers-reduced-motion: no-preference)", (_branch, contextSafe) => {
         // Initial states in JS so the SSR markup stays readable without JS.
         gsap.set([headline, subline], { autoAlpha: 0 });
         gsap.set([markInner, card, ...cue], { autoAlpha: 0, y: 14 });
@@ -242,33 +289,46 @@ export function HomeHero() {
 
         const plugIn = () => {
           if (disposed || plugged || !container.current) return;
+          // Armed before the first attempt, never after it: the keyword
+          // measures null while it has no box (a bfcache restore, a
+          // route-transition overlay over the outgoing tree), and a mechanism
+          // that latched on the attempt would sit at opacity 0 for the rest of
+          // the session with nothing left to retry it. Until the plug seats
+          // this is that retry; after it, the cord only re-places itself.
+          if (!ro) {
+            ro = new ResizeObserver(() => (plugged ? placeWire() : retry()));
+            ro.observe(root);
+          }
+          const w = placeWire();
+          // Latch on a measurement that landed, not on the attempt.
+          if (w == null) return;
           plugged = true;
           isolate(() => {
-          const w = placeWire();
-          if (w == null) return;
-          // Offset first, then reveal — otherwise the plug flashes for one
-          // frame already seated in the word.
-          gsap.set(slide, { x: -(w + 320) });
-          gsap.set(wire, { autoAlpha: 1 });
-          const tl = gsap.timeline();
-          tl.to(slide, { x: 0, duration: 0.85, ease: "power3.out" })
-            // The click: a short recoil as the plug seats itself.
-            .to(slide, { x: -3, duration: 0.07, ease: "power2.out" })
-            // Contact rides this tween's onStart rather than a positioned
-            // .add(): a zero-duration callback tween gets re-rendered (and
-            // re-fired) when the context reverts on unmount.
-            .to(slide, {
-              x: 0,
-              duration: 0.32,
-              ease: "back.out(3)",
-              onStart: () => ignite(true),
-            });
-          spawned.push(tl);
-          // From here on the cord only re-places itself; it never replays.
-          ro = new ResizeObserver(() => placeWire());
-          ro.observe(root);
+            // Offset first, then reveal — otherwise the plug flashes for one
+            // frame already seated in the word.
+            gsap.set(slide, { x: -(w + 320) });
+            gsap.set(wire, { autoAlpha: 1 });
+            const tl = gsap.timeline();
+            tl.to(slide, { x: 0, duration: 0.85, ease: "power3.out" })
+              // The click: a short recoil as the plug seats itself.
+              .to(slide, { x: -3, duration: 0.07, ease: "power2.out" })
+              // Contact rides this tween's onStart rather than a positioned
+              // .add(): a zero-duration callback tween gets re-rendered (and
+              // re-fired) when the context reverts on unmount.
+              .to(slide, {
+                x: 0,
+                duration: 0.32,
+                ease: "back.out(3)",
+                onStart: () => ignite(true),
+              });
+            spawned.push(tl);
           });
         };
+        // Wrapped for the same reason as the reduced-motion retry: the first
+        // attempt inherits this branch's context from the timeline callback it
+        // rides, an observer callback inherits nothing, and a cord built
+        // outside the branch would survive a matchMedia revert.
+        const retry = contextSafe ? contextSafe(plugIn) : plugIn;
 
         const play = () => {
           gsap.set([headline, subline], { autoAlpha: 1 });
@@ -328,6 +388,7 @@ export function HomeHero() {
           window.removeEventListener(OVERTURE_DONE_EVENT, startNow);
           ro?.disconnect();
           split?.revert();
+          unlatch();
         };
       });
 
@@ -356,9 +417,11 @@ export function HomeHero() {
       });
 
       return () => {
-        // Before anything is killed: killing/reverting re-renders the
-        // zero-duration `.add()` tweens, which calls straight back into the
-        // mechanism below.
+        // This runs last, not first: GSAP reverts the tweens and the child
+        // contexts before it calls the functions they returned, and reverting
+        // re-renders (and re-fires) the callbacks that drive the mechanism.
+        // What holds through that is `plugged`/`lit`; `disposed` only closes
+        // the door behind them, after the branch cleanups cleared the latches.
         disposed = true;
         spawned.forEach((tl) => tl.kill());
         isolated.forEach((ctx) => ctx.kill());

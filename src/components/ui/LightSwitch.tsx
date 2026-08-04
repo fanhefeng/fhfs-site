@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 type Theme = "dark" | "light";
@@ -52,23 +52,33 @@ function playClick(lightsOn: boolean) {
  */
 export function LightSwitch({ className }: { className?: string }) {
   const t = useTranslations("common");
-  /* Server renders the light default; the real theme is read after mount so
-   * hydration matches and React then patches aria-pressed properly. */
+  /* The server cannot know the theme, so it renders the light default and
+   * the initialiser must match it — reading data-theme here would be a
+   * hydration mismatch. */
   const [theme, setTheme] = useState<Theme>("light");
+  /* Nothing paints from this (the knob honours motion-reduce in CSS); it only
+   * decides whether the toggle takes the view-transition path, so it may
+   * settle after paint. */
   const [reduced, setReduced] = useState(false);
 
-  useEffect(() => {
+  /* A layout effect, not a passive one: the pre-paint script in the layout
+   * has already put data-theme="dark" on <html>, so correcting after paint
+   * showed dark-mode readers one frame of a switch flipped fully on — knob
+   * right, filament lit, aria-pressed="true". React flushes a setState from
+   * here before the browser paints, so the wrong frame never lands. */
+  useLayoutEffect(() => {
     setTheme(readTheme());
     const sync = () => setTheme(readTheme());
     window.addEventListener("fhfs:theme", sync);
+    return () => window.removeEventListener("fhfs:theme", sync);
+  }, []);
+
+  useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReduced(mq.matches);
     update();
     mq.addEventListener("change", update);
-    return () => {
-      window.removeEventListener("fhfs:theme", sync);
-      mq.removeEventListener("change", update);
-    };
+    return () => mq.removeEventListener("change", update);
   }, []);
 
   const toggle = useCallback(() => {

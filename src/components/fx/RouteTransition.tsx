@@ -42,7 +42,8 @@ export type RouteTransitionProps = {
  * - every abnormal path (killed tween, failed push, unmount) funnels into
  *   forceClear(), plus a timeout net, so the site can never be left frosted;
  * - lenis contract: stop() + overflow hidden while covered, then
- *   scrollTo(immediate, force) → start() → ScrollTrigger.refresh();
+ *   scrollTo(immediate, force) → start() → ScrollTrigger.refresh(); the
+ *   reveal only resets to top when the committed URL carries no fragment;
  * - prefers-reduced-motion: reduce never preventDefaults — navigation stays
  *   completely native.
  *
@@ -155,10 +156,20 @@ export function RouteTransition({
         phaseRef.current = "revealing";
         pendingHref = null;
 
-        // New route, new top. Lenis is stopped right now, hence `force`.
-        const lenis = window.__lenis;
-        if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
-        else window.scrollTo(0, 0);
+        // New route, new top — but only when the committed URL has no
+        // fragment. Next writes the new URL in an insertion effect and
+        // scrolls the hash target into view in a layout effect, both of them
+        // before the passive effect that schedules this reveal: by now
+        // window.location IS the new URL, and a hash on it means the reader
+        // has already been put on the section they clicked. Resetting to 0
+        // here used to yank every cross-page "/page#section" link back to the
+        // top of the article. unlock() re-syncs Lenis to wherever we end up.
+        if (!window.location.hash) {
+          // Lenis is stopped right now, hence `force`.
+          const lenis = window.__lenis;
+          if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+          else window.scrollTo(0, 0);
+        }
 
         const main = page();
 
