@@ -10,16 +10,19 @@ import { Reveal } from "@/components/fx/Reveal";
 
 type Props = { params: Promise<{ locale: string; tag: string }> };
 
-export function generateStaticParams() {
+/**
+ * Every tag in use at build time gets a page. A tag that only appears on a
+ * post written later is rendered on first request instead — hence no
+ * `dynamicParams = false`; a tag nobody uses still 404s from `notFound()`.
+ */
+export async function generateStaticParams() {
   // Tags can differ per locale; union across locales.
   const tags = new Set<string>();
   for (const locale of routing.locales) {
-    for (const { tag } of getAllTags(locale)) tags.add(tag);
+    for (const { tag } of await getAllTags(locale)) tags.add(tag);
   }
   return [...tags].map((tag) => ({ tag }));
 }
-
-export const dynamicParams = false;
 
 function decodeTag(tag: string) {
   try {
@@ -47,7 +50,7 @@ export default async function TagPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("blog");
   const decoded = decodeTag(tag);
-  const posts = getPostsByTag(decoded, locale as Locale);
+  const posts = await getPostsByTag(decoded, locale as Locale);
   if (posts.length === 0) notFound();
   const years = groupPostsByYear(posts);
 

@@ -34,7 +34,9 @@ export default async function SoftwarePage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("software");
 
-  const apps = getApps().map((app, i) => toSoftwareApp(app, i, locale as Locale));
+  const apps = (await getApps()).map((app, i) =>
+    toSoftwareApp(app, i, locale as Locale)
+  );
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 pb-24 pt-16 sm:pt-20">

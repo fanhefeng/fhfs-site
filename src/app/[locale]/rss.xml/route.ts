@@ -28,7 +28,7 @@ export async function GET(
     author: { name: site.author },
   });
 
-  for (const post of getPosts(l)) {
+  for (const post of await getPosts(l)) {
     feed.addItem({
       title: post.title,
       id: `${site.url}/${l}/blog/${post.slug}`,

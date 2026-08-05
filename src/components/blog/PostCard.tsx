@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { readingMinutes, type LocalizedPost } from "@/lib/content";
+import type { PostSummary } from "@/lib/content";
 
 /**
  * Posts bucketed by publication year, newest year first, each bucket keeping
@@ -8,9 +8,9 @@ import { readingMinutes, type LocalizedPost } from "@/lib/content";
  * rather than a Date, so the grouping never drifts with the server timezone.
  */
 export function groupPostsByYear(
-  posts: LocalizedPost[]
-): { year: string; posts: LocalizedPost[] }[] {
-  const groups: { year: string; posts: LocalizedPost[] }[] = [];
+  posts: PostSummary[]
+): { year: string; posts: PostSummary[] }[] {
+  const groups: { year: string; posts: PostSummary[] }[] = [];
   for (const post of posts) {
     const year = post.date.slice(0, 4);
     const last = groups.at(-1);
@@ -27,9 +27,9 @@ export function groupPostsByYear(
  * and floats the reading time in beside the date; both are transform/opacity
  * only, so a long list stays cheap to render.
  */
-export function PostCard({ post }: { post: LocalizedPost }) {
+export function PostCard({ post }: { post: PostSummary }) {
   const t = useTranslations("blog");
-  const minutes = readingMinutes(post.content);
+  const minutes = post.readingMinutes;
   const [, month, day] = post.date.slice(0, 10).split("-");
 
   return (
@@ -43,11 +43,11 @@ export function PostCard({ post }: { post: LocalizedPost }) {
           {/* Underline as a scaled hairline: transform-only, no reflow. */}
           <span
             aria-hidden
-            className="absolute inset-x-0 -bottom-0.5 block h-px origin-left scale-x-0 bg-accent transition-transform duration-[250ms] ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
+            className="absolute inset-x-0 -bottom-0.5 block h-px origin-left scale-x-0 bg-accent transition-transform duration-[250ms] ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100"
           />
         </span>
         <span className="flex shrink-0 items-baseline gap-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:transition-none sm:inline-block">
+          <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 sm:inline-block">
             {t("readingTime", { minutes })}
           </span>
           <time dateTime={post.date} className="tabular-nums">

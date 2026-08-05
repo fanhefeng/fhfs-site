@@ -4,7 +4,7 @@ import { useId, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { gsap, useGSAP, EASE } from "@/lib/gsap";
 import type { Locale } from "@/i18n/routing";
-import type { Work } from "content-collections";
+import type { Work } from "@/lib/content";
 
 /* -------------------------------------------------------------------------
  * Specular edge — the card material's one flourish.
@@ -15,9 +15,9 @@ import type { Work } from "content-collections";
  * the item's own accent, which is why the filter lives *inside* each card
  * with a unique id instead of being shared.
  *
- * Fine pointer + motion allowed: the highlight follows the cursor and the
- * ring fades in on hover. Touch or reduced motion: a static, dimmer rim —
- * the edge is lit, it simply never moves.
+ * Fine pointer: the highlight follows the cursor and the ring fades in on
+ * hover. Touch: a static, dimmer rim — the edge is lit, it simply never
+ * moves.
  * ---------------------------------------------------------------------- */
 
 type SpecularEdgeProps = {
@@ -42,9 +42,8 @@ export function SpecularEdge({ color, width = 1 }: SpecularEdgeProps) {
     if (!ring || !light || !host) return;
 
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (!fine || still) {
+    if (!fine) {
       // Static rim: park the lamp above the top-left corner and leave it on.
       gsap.set(light, { attr: { x: host.offsetWidth * 0.28, y: 0, z: 56 } });
       gsap.set(ring, { opacity: 0.5 });

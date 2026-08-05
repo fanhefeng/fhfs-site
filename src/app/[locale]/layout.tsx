@@ -20,7 +20,17 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export const dynamicParams = false;
+/**
+ * There is deliberately no `dynamicParams = false` here.
+ *
+ * It reads like a per-segment switch but Next ANDs it down the whole route:
+ * leaving it on this layout would have pinned every nested dynamic segment to
+ * "404 unless prerendered", no matter what those segments declared. Since
+ * content now comes from a database that can gain a post between deploys,
+ * unknown params have to be allowed through and answered at request time.
+ *
+ * An unmatched locale still 404s — `hasLocale` below sees to that.
+ */
 
 type Props = {
   children: React.ReactNode;

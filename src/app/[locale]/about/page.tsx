@@ -41,15 +41,15 @@ export default async function AboutPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("about");
-  const about = getAbout(locale);
+  const about = await getAbout(locale);
 
   // Localize the changelog here so the client component ships plain strings.
   // An entry without a real `date` shows its placeholder label instead — the
   // page never invents a date it cannot source.
-  const entries: ChangelogEntry[] = getTimeline().map((entry) => {
+  const entries: ChangelogEntry[] = (await getTimeline()).map((entry) => {
     const dateText = entry.date ?? entry.dateLabel?.[locale] ?? "—";
     return {
-      id: entry._meta.path,
+      id: entry.key,
       version: entry.version,
       dateText,
       year: entry.date ? entry.date.slice(0, 4) : "—",
@@ -96,10 +96,10 @@ export default async function AboutPage({
       </header>
 
       {/* The 3D desk, kept from the old portfolio. Loads only when scrolled
-          near, and holds a single still frame under reduced motion. */}
+          near. */}
       <Workstation hint={t("deskHint")} className="mt-16" />
 
-      {about && <Mdx code={about.mdx} />}
+      {about && <Mdx html={about.html} />}
 
       <StickerWall
         locale={locale}

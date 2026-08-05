@@ -13,9 +13,10 @@ export const contentType = "image/png";
  * generateStaticParams the way pages do — declare the full locale × slug
  * matrix here or the card is only rendered on first request.
  */
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const slugs = await getAllSlugs();
   return routing.locales.flatMap((locale) =>
-    getAllSlugs().map((slug) => ({ locale, slug }))
+    slugs.map((slug) => ({ locale, slug }))
   );
 }
 
@@ -46,12 +47,12 @@ export default async function PostOgImage({
     : routing.defaultLocale;
   const other: Locale = l === "zh" ? "en" : "zh";
 
-  const post = getPost(slug, l);
+  const post = await getPost(slug, l);
   const title = post?.title ?? site.signName;
   // Bilingual typography: the counterpart title sits under the headline as a
   // quiet second deck. Skipped when the post only exists in one language (in
   // which case getPost falls back and both lookups return the same string).
-  const counterpart = getPost(slug, other);
+  const counterpart = await getPost(slug, other);
   const subtitle =
     counterpart && counterpart.title !== title ? counterpart.title : null;
 

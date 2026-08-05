@@ -6,7 +6,7 @@ import { routing, type Locale } from "@/i18n/routing";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
-import { getPosts, getApps, readingMinutes } from "@/lib/content";
+import { getPosts, getApps } from "@/lib/content";
 import { HomeHero } from "@/components/home/HomeHero";
 import { ManifestoBand } from "@/components/home/ManifestoBand";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
@@ -32,16 +32,16 @@ export default async function HomePage({ params }: Props) {
   const t = await getTranslations("home");
   const ts = await getTranslations("software");
 
-  const posts: WritingItem[] = getPosts(locale as Locale)
+  const posts: WritingItem[] = (await getPosts(locale as Locale))
     .slice(0, POST_COUNT)
     .map((post) => ({
       slug: post.slug,
       title: post.title,
       date: post.date.slice(0, 10).replaceAll("-", "."),
-      readingTime: t("readingTime", { minutes: readingMinutes(post.content) }),
+      readingTime: t("readingTime", { minutes: post.readingMinutes }),
     }));
 
-  const apps: BentoItem[] = getApps()
+  const apps: BentoItem[] = (await getApps())
     .slice(0, APP_COUNT)
     .map((app) => ({
       name: app.name,

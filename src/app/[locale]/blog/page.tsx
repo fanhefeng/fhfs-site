@@ -32,8 +32,8 @@ export default async function BlogPage({ params }: Props) {
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("blog");
-  const posts = getPosts(locale as Locale);
-  const tags = getAllTags(locale as Locale);
+  const posts = await getPosts(locale as Locale);
+  const tags = await getAllTags(locale as Locale);
   const years = groupPostsByYear(posts);
 
   return (

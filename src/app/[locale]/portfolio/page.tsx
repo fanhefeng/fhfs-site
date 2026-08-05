@@ -23,20 +23,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /**
- * Cover tints for the programmatic bento covers, keyed by app file name.
- * There are no screenshots in the repo, so a cover is colour + monogram +
- * name — deliberately editorial rather than a fake device mockup. Muted
- * gallery hues: every one of them reads on paper and after hours.
+ * Fallback cover tints, for an app saved without an accent of its own. There
+ * are no screenshots in the repo, so a cover is colour + monogram + name —
+ * deliberately editorial rather than a fake device mockup. Muted gallery
+ * hues: every one of them reads on paper and after hours.
+ *
+ * The per-app colour used to live here as a lookup table keyed by file name,
+ * while the software page derived a different one from list position — so the
+ * same app wore two colours depending on which page you were on. It is one
+ * stored column now.
  */
-const APP_ACCENT: Record<string, string> = {
-  portreaper: "#b45309",
-  "photo-browser": "#3e6d93",
-  lumitext: "#6b5ba8",
-  "file-tidy": "#4c7a5b",
-  "keyboard-piano": "#a8465f",
-  "fhf-links": "#2f6f72",
-};
-const ACCENT_CYCLE = Object.values(APP_ACCENT);
+const ACCENT_CYCLE = ["#b45309", "#3e6d93", "#6b5ba8", "#4c7a5b", "#a8465f", "#2f6f72"];
 
 /** "Photo Browser" → "PB", "Lumitext" → "Lu". */
 function monogramOf(name: string): string {
@@ -90,16 +87,15 @@ export default async function PortfolioPage({ params }: Props) {
   const t = await getTranslations("portfolio");
   const l = locale as Locale;
 
-  const works = getWorks();
+  const works = await getWorks();
   // The collage reuses the software data — one wall, two ways in.
-  const covers: BentoItem[] = getApps().map((app, i) => {
-    const key = app._meta.path;
+  const covers: BentoItem[] = (await getApps()).map((app, i) => {
     return {
-      id: key,
+      id: app.key,
       name: app.name,
       kicker: app.platforms[0] ?? app.category,
       monogram: monogramOf(app.name),
-      accent: APP_ACCENT[key] ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length],
+      accent: app.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length],
       href: "/software",
       label: t("coverLabel", { name: app.name }),
     };
@@ -145,7 +141,7 @@ export default async function PortfolioPage({ params }: Props) {
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {works.map((work, i) => (
               <WorkCard
-                key={work._meta.path}
+                key={work.key}
                 work={work}
                 locale={l}
                 accent={ACCENT_CYCLE[i % ACCENT_CYCLE.length]}

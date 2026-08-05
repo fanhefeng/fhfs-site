@@ -3,7 +3,7 @@ import { routing } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getAllSlugs, getAllTags, getPost } from "@/lib/content";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   const staticPaths = [
@@ -34,9 +34,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  for (const slug of getAllSlugs()) {
+  for (const slug of await getAllSlugs()) {
     for (const locale of routing.locales) {
-      const post = getPost(slug, locale);
+      const post = await getPost(slug, locale);
       entries.push({
         url: `${site.url}/${locale}/blog/${slug}`,
         lastModified: post ? new Date(post.date) : undefined,
@@ -47,7 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const tags = new Set<string>();
   for (const locale of routing.locales) {
-    for (const { tag } of getAllTags(locale)) tags.add(tag);
+    for (const { tag } of await getAllTags(locale)) tags.add(tag);
   }
   for (const tag of tags) {
     for (const locale of routing.locales) {

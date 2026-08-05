@@ -6,11 +6,14 @@ import { NotFoundStage } from "@/components/notfound/NotFoundStage";
 /**
  * The `notFound()` boundary inside a locale.
  *
- * Unmatched URLs never reach here — every dynamic route is
- * `dynamicParams: false`, so an unknown param 404s at the routing layer,
- * before any segment renders. Those are served by `app/global-not-found.tsx`.
- * This stays as the boundary for a page that calls `notFound()` itself, where
- * the locale *is* known and the page can speak one language.
+ * This is where an unknown post slug or tag lands: the segment renders, finds
+ * nothing in the database, and calls `notFound()` — so the locale is known and
+ * the page can speak one language. It used to be unreachable, back when every
+ * dynamic route was `dynamicParams: false` and unknown params 404d at the
+ * routing layer instead.
+ *
+ * A URL matching no route at all still never reaches here. Those are answered
+ * by `app/global-not-found.tsx`, which has to offer both languages.
  */
 export default function NotFoundPage() {
   const t = useTranslations("notFound");
