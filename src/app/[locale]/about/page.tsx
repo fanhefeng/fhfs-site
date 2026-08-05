@@ -5,7 +5,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { getAbout, getTimeline } from "@/lib/content";
+import { getAbout, getChips, getTimeline } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
@@ -42,6 +42,13 @@ export default async function AboutPage({
 
   const t = await getTranslations("about");
   const about = await getAbout(locale);
+
+  // Resolved to one language here so the wall — a client island — never sees
+  // a `{zh,en}` pair it has no use for.
+  const chips = (await getChips()).map((chip) => ({
+    label: chip.label[locale],
+    tone: chip.tone,
+  }));
 
   // Localize the changelog here so the client component ships plain strings.
   // An entry without a real `date` shows its placeholder label instead — the
@@ -102,7 +109,7 @@ export default async function AboutPage({
       {about && <Mdx html={about.html} />}
 
       <StickerWall
-        locale={locale}
+        chips={chips}
         title={t("stickersTitle")}
         hint={t("stickersHint")}
         ariaLabel={t("stickersAria")}

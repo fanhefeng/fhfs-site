@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import { fontVariables } from "../fonts";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
+import { getNavItems } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuroraLayer } from "@/components/fx/AuroraLayer";
@@ -56,6 +57,15 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
   setRequestLocale(locale);
 
+  // One nav table, three surfaces. These used to be three constants that had
+  // already drifted apart: /intro only ever reached the sitemap, and home only
+  // ever reached the full-screen menu.
+  const [headerLinks, footerLinks, menuLinks] = await Promise.all([
+    getNavItems("header"),
+    getNavItems("footer"),
+    getNavItems("fullnav"),
+  ]);
+
   return (
     // No data-theme here on purpose. React only touches attributes it
     // renders, so leaving it out hands the attribute entirely to the script
@@ -105,9 +115,9 @@ export default async function LocaleLayout({ children, params }: Props) {
           <ProgressHud />
           <AuroraLayer />
           <GrainLayer />
-          <Header />
+          <Header links={headerLinks} menuLinks={menuLinks} />
           {children}
-          <Footer />
+          <Footer items={footerLinks} />
         </NextIntlClientProvider>
       </body>
     </html>

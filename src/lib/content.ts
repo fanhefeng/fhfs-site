@@ -4,6 +4,11 @@ import { db } from "@/db";
 import {
   abouts,
   apps,
+  chips,
+  copyBlocks,
+  experiments,
+  introNodes,
+  navItems,
   posts,
   timelineEntries,
   works,
@@ -40,6 +45,11 @@ export const TAGS = {
   apps: "apps",
   works: "works",
   timeline: "timeline",
+  copy: "copy",
+  chips: "chips",
+  experiments: "experiments",
+  intro: "intro",
+  nav: "nav",
 } as const;
 
 const cacheOptions = (...tags: string[]) => ({
@@ -353,4 +363,150 @@ export const getWorks = unstable_cache(
       .orderBy(asc(works.sort)),
   ["works"],
   cacheOptions(TAGS.works)
+);
+
+// ---------------------------------------------------------------------------
+// What used to be hard-coded in components
+// ---------------------------------------------------------------------------
+
+export type Chip = { label: Localized; tone: "paper" | "ink" | "accent" };
+
+export const getChips = unstable_cache(
+  async (): Promise<Chip[]> =>
+    db
+      .select({ label: chips.label, tone: chips.tone })
+      .from(chips)
+      .orderBy(asc(chips.sort)),
+  ["chips"],
+  cacheOptions(TAGS.chips)
+);
+
+export type Experiment = {
+  key: string;
+  name: Localized;
+  description: Localized;
+  status: "live" | "wip" | "planned";
+  accent: string | null;
+  href: string | null;
+  demo: string | null;
+};
+
+export const getExperiments = unstable_cache(
+  async (): Promise<Experiment[]> =>
+    db
+      .select({
+        key: experiments.key,
+        name: experiments.name,
+        description: experiments.description,
+        status: experiments.status,
+        accent: experiments.accent,
+        href: experiments.href,
+        demo: experiments.demo,
+      })
+      .from(experiments)
+      .orderBy(asc(experiments.sort)),
+  ["experiments"],
+  cacheOptions(TAGS.experiments)
+);
+
+export type IntroNode = {
+  key: string;
+  kicker: Localized;
+  title: Localized;
+  period: Localized | null;
+  body: Localized;
+  bullets: { zh: string[]; en: string[] };
+  stickerLabel: string;
+  stickerIcon: string;
+};
+
+export const getIntroNodes = unstable_cache(
+  async (): Promise<IntroNode[]> =>
+    db
+      .select({
+        key: introNodes.key,
+        kicker: introNodes.kicker,
+        title: introNodes.title,
+        period: introNodes.period,
+        body: introNodes.body,
+        bullets: introNodes.bullets,
+        stickerLabel: introNodes.stickerLabel,
+        stickerIcon: introNodes.stickerIcon,
+      })
+      .from(introNodes)
+      .orderBy(asc(introNodes.sort)),
+  ["intro-nodes"],
+  cacheOptions(TAGS.intro)
+);
+
+/**
+ * Site copy that has been lifted out of the message catalogues, as a nested
+ * object shaped like them (`home.heroLine1` becomes `{ home: { heroLine1 } }`).
+ *
+ * This is an *override layer*: the JSON files remain the defaults and this is
+ * merged on top in `i18n/request.ts`. An empty table therefore reads exactly
+ * like the site did before any of this existed.
+ */
+const loadCopyOverrides = unstable_cache(
+  async (locale: Locale): Promise<Record<string, unknown>> => {
+    const rows = await db
+      .select({ key: copyBlocks.key, zh: copyBlocks.zh, en: copyBlocks.en })
+      .from(copyBlocks);
+
+    const out: Record<string, unknown> = {};
+    for (const row of rows) {
+      const path = row.key.split(".");
+      let node = out;
+      for (const segment of path.slice(0, -1)) {
+        if (typeof node[segment] !== "object" || node[segment] === null) {
+          node[segment] = {};
+        }
+        node = node[segment] as Record<string, unknown>;
+      }
+      node[path.at(-1)!] = row[locale];
+    }
+    return out;
+  },
+  ["copy-overrides"],
+  cacheOptions(TAGS.copy)
+);
+
+/**
+ * The one query on every page's render path, so it fails soft.
+ *
+ * The catch sits *outside* the cache on purpose: an error must not be stored.
+ * Neon's free tier sleeps, and a cold-start timeout cached under
+ * `revalidate: false` would pin an empty override layer in place for a year.
+ * Failing here instead means the page falls back to the JSON catalogue for
+ * this request and tries again on the next one — the site reads slightly out
+ * of date rather than not at all.
+ */
+export async function getCopyOverrides(
+  locale: Locale
+): Promise<Record<string, unknown>> {
+  try {
+    return await loadCopyOverrides(locale);
+  } catch (error) {
+    console.error("copy overrides unavailable, using message catalogue", error);
+    return {};
+  }
+}
+
+export type NavItem = { href: string; labelKey: string; surfaces: string[] };
+
+/** One list, filtered per surface — Header, Footer, FullNav and the sitemap. */
+export const getNavItems = unstable_cache(
+  async (surface: string): Promise<NavItem[]> => {
+    const rows = await db
+      .select({
+        href: navItems.href,
+        labelKey: navItems.labelKey,
+        surfaces: navItems.surfaces,
+      })
+      .from(navItems)
+      .orderBy(asc(navItems.sort));
+    return rows.filter((row) => row.surfaces.includes(surface));
+  },
+  ["nav-items"],
+  cacheOptions(TAGS.nav)
 );

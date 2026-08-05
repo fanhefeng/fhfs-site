@@ -4,7 +4,7 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing, type Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
-import { getApps, getWorks } from "@/lib/content";
+import { getApps, getExperiments, getWorks } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
 import { BentoHero, type BentoItem } from "@/components/portfolio/BentoHero";
@@ -44,41 +44,8 @@ function monogramOf(name: string): string {
   return name.slice(0, 2);
 }
 
-/**
- * The craft log. Entries are data here; their names and one-liners live in
- * messages (portfolio.experiments.<id>). Keep it honest: `status` says what
- * is actually running, and anything not built here links to its source.
- */
-const CRAFT_ENTRIES: CraftEntry[] = [
-  {
-    id: "bentoScrub",
-    status: "live",
-    accent: "#4c7a5b",
-  },
-  {
-    id: "specularEdge",
-    status: "live",
-    accent: "#b45309",
-    href: "https://codepen.io/jh3yy/pen/azORaYx",
-  },
-  {
-    id: "liquidLens",
-    status: "wip",
-    accent: "#3e6d93",
-    demo: "liquid-lens",
-  },
-  {
-    id: "shatteredGlass",
-    status: "planned",
-    accent: "#6b5ba8",
-    href: "https://experiments.thisiswhitespace.com/glass-hero",
-  },
-  {
-    id: "lightsOn",
-    status: "live",
-    accent: "#a8465f",
-  },
-];
+/** Fallback dot colour for an experiment saved without one. */
+const CRAFT_ACCENT = "#4c7a5b";
 
 export default async function PortfolioPage({ params }: Props) {
   const { locale } = await params;
@@ -88,6 +55,19 @@ export default async function PortfolioPage({ params }: Props) {
   const l = locale as Locale;
 
   const works = await getWorks();
+
+  // Name, sentence, status and colour arrive as one record now — the craft log
+  // used to be a constant here plus two message keys per language.
+  const craft: CraftEntry[] = (await getExperiments()).map((entry) => ({
+    id: entry.key,
+    name: entry.name[l],
+    description: entry.description[l],
+    status: entry.status,
+    accent: entry.accent ?? CRAFT_ACCENT,
+    href: entry.href ?? undefined,
+    demo: entry.demo === "liquid-lens" ? "liquid-lens" : undefined,
+  }));
+
   // The collage reuses the software data — one wall, two ways in.
   const covers: BentoItem[] = (await getApps()).map((app, i) => {
     return {
@@ -153,7 +133,7 @@ export default async function PortfolioPage({ params }: Props) {
 
       <div className="mx-auto w-full max-w-[680px] px-6 pt-20">
         <CraftList
-          entries={CRAFT_ENTRIES}
+          entries={craft}
           title={t("experimentsTitle")}
           subtitle={t("experimentsSub")}
           lensLinkHref={`/${locale}/software`}

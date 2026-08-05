@@ -5,6 +5,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { localeAlternates } from "@/lib/seo";
+import { getIntroNodes } from "@/lib/content";
 import {
   INTRO_STICKERS,
   type IntroCopy,
@@ -43,22 +44,27 @@ export default async function IntroPage({
 
   const t = await getTranslations("intro");
 
-  // One card per sticker, in the order the camera visits them. `t.raw` is the
-  // way to reach the bullet arrays — next-intl's `t` only returns strings.
-  // `period` is optional per node, and asking for a key that isn't there logs
-  // an error and yields the key path as text, so it goes through `t.has`
-  // first — that is a silent lookup, and it keeps the messages files from
-  // carrying empty strings whose only job is to keep the lookup quiet.
-  const copy: IntroCopy[] = INTRO_STICKERS.map((sticker) => ({
-    id: sticker.id,
-    kicker: t(`nodes.${sticker.id}.kicker`),
-    title: t(`nodes.${sticker.id}.title`),
-    period: t.has(`nodes.${sticker.id}.period`)
-      ? t(`nodes.${sticker.id}.period`)
-      : undefined,
-    body: t(`nodes.${sticker.id}.body`),
-    bullets: (t.raw(`nodes.${sticker.id}.bullets`) as string[]) ?? [],
-  }));
+  // One card per sticker, in the order the camera visits them. The résumé's
+  // words and the sticker's position are separate records joined by key: the
+  // angles were calibrated against one head model and mean nothing to an
+  // editor, while the prose changes without touching the scene. A node whose
+  // key has no sticker simply isn't visited.
+  const nodes = await getIntroNodes();
+  const byKey = new Map(nodes.map((node) => [node.key, node]));
+  const copy: IntroCopy[] = INTRO_STICKERS.flatMap((sticker) => {
+    const node = byKey.get(sticker.id);
+    if (!node) return [];
+    return [
+      {
+        id: sticker.id,
+        kicker: node.kicker[locale],
+        title: node.title[locale],
+        period: node.period?.[locale],
+        body: node.body[locale],
+        bullets: node.bullets[locale] ?? [],
+      },
+    ];
+  });
 
   // The email is deliberately empty in site config until there is a real
   // public address, so it is left out rather than faked.

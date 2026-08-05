@@ -1,19 +1,16 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getAllSlugs, getAllTags, getPost } from "@/lib/content";
+import { getAllSlugs, getAllTags, getNavItems, getPost } from "@/lib/content";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
-  const staticPaths = [
-    "",
-    "/blog",
-    "/about",
-    "/intro",
-    "/portfolio",
-    "/software",
-  ];
+  // The same nav table the header, footer and menu read — one place to add a
+  // page, rather than four lists to remember to update.
+  const staticPaths = (await getNavItems("sitemap")).map((item) =>
+    item.href === "/" ? "" : item.href
+  );
 
   const alternatesFor = (path: string) => ({
     languages: Object.fromEntries(
