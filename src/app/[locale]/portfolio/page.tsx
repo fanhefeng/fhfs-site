@@ -124,7 +124,7 @@ export default async function PortfolioPage({ params }: Props) {
                 key={work.key}
                 work={work}
                 locale={l}
-                accent={ACCENT_CYCLE[i % ACCENT_CYCLE.length]}
+                accent={work.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length]}
               />
             ))}
           </div>

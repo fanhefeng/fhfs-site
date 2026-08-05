@@ -1,7 +1,9 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
-import { readSession, SESSION_COOKIE } from "./lib/auth/session";
+// From ./lib/auth/token, not ./lib/auth/session: the latter imports
+// `next/headers`, which does not exist out here ahead of a route.
+import { readSession, SESSION_COOKIE } from "./lib/auth/token";
 
 const intlProxy = createMiddleware(routing);
 

@@ -157,6 +157,9 @@ export const works = pgTable("works", {
   cover: text(),
   url: text(),
   tags: text().array().notNull().default(sql`'{}'`),
+  // Stored for the same reason apps carry one: a colour derived from list
+  // position repaints the whole wall the moment anything is reordered.
+  accent: text(),
   sort: integer().notNull().default(0),
 });
 
@@ -238,21 +241,22 @@ export const copyBlocks = pgTable("copy_blocks", {
   note: text(),
 });
 
-/** Single row (id is pinned to 1). The old `src/config/site.ts`. */
-export const siteSettings = pgTable(
-  "site_settings",
-  {
-    id: integer().primaryKey().default(1),
-    signName: text("sign_name").notNull(),
-    title: localized().notNull(),
-    description: localized().notNull(),
-    url: text().notNull(),
-    author: text().notNull(),
-    // `email: ""` is meaningful — PeelSticker branches on the empty string.
-    social: jsonb().$type<{ github: string; email: string }>().notNull(),
-  },
-  (t) => [check("site_settings_singleton", sql`${t.id} = 1`)]
-);
+/*
+ * There is deliberately no `site_settings` table.
+ *
+ * It existed briefly and read to nobody: `src/config/site.ts` stayed the real
+ * source while a copy of it sat here, which is the exact duplication this
+ * whole migration was meant to end — and the worse kind, because the stale
+ * copy looked authoritative enough to edit.
+ *
+ * The split that settles it: content goes in the database, deployment config
+ * stays in code. `site.url` decides canonical URLs, hreflang, OG image
+ * addresses and the sitemap's domain; it belongs to the environment a build
+ * runs in, not to a row someone can retype. The rest — title, description,
+ * the signature, the GitHub link — changes about once a year, and buying it an
+ * editor would have meant threading async through forty-odd call sites, five
+ * client components and every `generateMetadata` on the site.
+ */
 
 // ---------------------------------------------------------------------------
 // Admin

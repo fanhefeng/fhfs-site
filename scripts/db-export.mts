@@ -82,7 +82,6 @@ const data = {
     .select()
     .from(schema.copyBlocks)
     .orderBy(asc(schema.copyBlocks.key)),
-  siteSettings: await db.select().from(schema.siteSettings),
 };
 
 // Serial ids and timestamps are restatements of the data, not part of it —

@@ -1,57 +1,34 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { jwtVerify, SignJWT } from "jose";
+import {
+  createSession as signSession,
+  readSession,
+  MAX_AGE_SECONDS,
+  SESSION_COOKIE,
+  type Session,
+} from "./token";
 
 /**
- * One user, one cookie.
+ * Sessions, from the request's point of view.
  *
- * The session is a signed JWT rather than a row: there is exactly one account,
- * so a sessions table would buy nothing but a query on every request. `jose`
- * runs on Web Crypto, which means the same code verifies in the proxy and in a
- * Server Action.
+ * Everything here touches `cookies()`, which only exists inside a request. The
+ * signing and verifying themselves live in `./token`, deliberately apart: the
+ * proxy has to verify a token and must not import a module that reaches for
+ * request-scoped APIs it cannot use.
  *
- * Note what this module deliberately does *not* do: authorise anything. The
- * proxy uses `readSession` for an optimistic check — it runs on every request,
- * including prefetches, so it may not touch the database — and every Server
- * Action calls `requireAdmin` for the real one. Server Actions are not routes;
- * a matcher edit or a moved file can take them out from under the proxy
- * without anything failing loudly.
+ * Note what this module does *not* do: authorise anything. The proxy performs
+ * an optimistic check — it runs on every request, prefetches included, so it
+ * may not touch the database — and every Server Action calls `requireAdmin`
+ * for the real one. Server Actions are not routes; a matcher edit or a moved
+ * file can take them out from under the proxy without anything failing loudly.
  */
 
-const COOKIE = "fhfs_admin";
-const MAX_AGE_SECONDS = 60 * 60 * 8;
-
-function secret(): Uint8Array {
-  const value = process.env.AUTH_SECRET;
-  if (!value) throw new Error("AUTH_SECRET is not set");
-  return new TextEncoder().encode(value);
-}
-
-export type Session = { sub: string };
-
 export async function createSession(): Promise<string> {
-  return new SignJWT({ sub: "admin" })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(`${MAX_AGE_SECONDS}s`)
-    .sign(secret());
-}
-
-/** Verifies a token's signature and expiry. No database, no side effects. */
-export async function readSession(
-  token: string | undefined
-): Promise<Session | null> {
-  if (!token) return null;
-  try {
-    const { payload } = await jwtVerify(token, secret());
-    return payload.sub === "admin" ? { sub: payload.sub } : null;
-  } catch {
-    return null;
-  }
+  return signSession();
 }
 
 export async function setSessionCookie(token: string): Promise<void> {
-  (await cookies()).set(COOKIE, token, {
+  (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     // `lax` rather than `strict`: a form POST followed by a redirect back into
@@ -63,11 +40,7 @@ export async function setSessionCookie(token: string): Promise<void> {
 }
 
 export async function clearSessionCookie(): Promise<void> {
-  (await cookies()).delete(COOKIE);
-}
-
-export async function currentSession(): Promise<Session | null> {
-  return readSession((await cookies()).get(COOKIE)?.value);
+  (await cookies()).delete(SESSION_COOKIE);
 }
 
 /**
@@ -76,9 +49,8 @@ export async function currentSession(): Promise<Session | null> {
  * the result cannot silently continue.
  */
 export async function requireAdmin(): Promise<Session> {
-  const session = await currentSession();
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const session = await readSession(token);
   if (!session) throw new Error("Not authenticated");
   return session;
 }
-
-export const SESSION_COOKIE = COOKIE;

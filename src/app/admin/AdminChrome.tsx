@@ -8,8 +8,11 @@ export const SECTIONS = [
   { href: "/admin/copy", label: "站点文案" },
   { href: "/admin/timeline", label: "版本履历" },
   { href: "/admin/apps", label: "软件" },
+  { href: "/admin/works", label: "作品集" },
   { href: "/admin/experiments", label: "实验" },
   { href: "/admin/intro", label: "简历节点" },
+  { href: "/admin/chips", label: "贴纸墙" },
+  { href: "/admin/nav", label: "导航" },
 ] as const;
 
 /**

@@ -100,6 +100,7 @@ export type Work = {
   cover: string | null;
   url: string | null;
   tags: string[];
+  accent: string | null;
 };
 
 export type App = {
@@ -128,29 +129,43 @@ const summaryColumns = {
   readingMinutes: posts.readingMinutes,
 };
 
-/** Prefers the asked-for locale, falls back to whatever exists. */
-const localeFirst = (locale: Locale) =>
-  sql`(${posts.locale} = ${locale}) desc`;
-
 /**
- * One row per slug, newest first, in the requested locale where there is one.
+ * What "this locale's index" means, in one place.
  *
- * The fallback is a sort, not a second query: `DISTINCT ON (slug)` keeps the
- * first row per slug, and the ordering puts the requested locale first. A post
- * that exists only in Chinese therefore still appears on the English index,
- * flagged so the article page can say so.
+ * Four queries below select different columns out of the same idea: one
+ * published row per slug, preferring the asked-for locale. `DISTINCT ON (slug)`
+ * keeps the first row per slug and `localeFirst` decides which that is, so a
+ * post written only in Chinese still appears on the English index — flagged,
+ * so the article page can say so.
+ *
+ * Drizzle's builder cannot be wrapped in a generic helper without its column
+ * types collapsing, so what is shared here is the *rule* rather than the query
+ * skeleton: change the fallback or what counts as published, and there is
+ * still only one place to change it.
  */
+const publishedOnly = eq(posts.draft, false);
+
+const indexOrder = (locale: Locale) =>
+  [posts.slug, sql`(${posts.locale} = ${locale}) desc`, asc(posts.id)] as const;
+
+/** For a single post, where `DISTINCT ON` is one `LIMIT 1` instead. */
+const localeFirst = (locale: Locale) => sql`(${posts.locale} = ${locale}) desc`;
+
+/** Newest first. ISO dates sort correctly as strings. */
+const byDateDesc = <T extends { date: string }>(rows: T[]) =>
+  rows.sort((a, b) => b.date.localeCompare(a.date));
+
 export const getPosts = unstable_cache(
   async (locale: Locale): Promise<PostSummary[]> => {
     const rows = await db
       .selectDistinctOn([posts.slug], summaryColumns)
       .from(posts)
-      .where(eq(posts.draft, false))
-      .orderBy(posts.slug, localeFirst(locale), asc(posts.id));
+      .where(publishedOnly)
+      .orderBy(...indexOrder(locale));
 
-    return rows
-      .map((row) => ({ ...row, isFallback: row.locale !== locale }))
-      .sort((a, b) => b.date.localeCompare(a.date));
+    return byDateDesc(
+      rows.map((row) => ({ ...row, isFallback: row.locale !== locale }))
+    );
   },
   ["posts-by-locale"],
   cacheOptions(TAGS.posts)
@@ -200,17 +215,17 @@ export const getAdjacentPosts = unstable_cache(
     older: { slug: string; title: string } | null;
     newer: { slug: string; title: string } | null;
   }> => {
-    const rows = await db
-      .selectDistinctOn([posts.slug], {
-        slug: posts.slug,
-        title: posts.title,
-        date: posts.date,
-      })
-      .from(posts)
-      .where(eq(posts.draft, false))
-      .orderBy(posts.slug, localeFirst(locale), asc(posts.id));
-
-    const ordered = rows.sort((a, b) => b.date.localeCompare(a.date));
+    const ordered = byDateDesc(
+      await db
+        .selectDistinctOn([posts.slug], {
+          slug: posts.slug,
+          title: posts.title,
+          date: posts.date,
+        })
+        .from(posts)
+        .where(publishedOnly)
+        .orderBy(...indexOrder(locale))
+    );
     const index = ordered.findIndex((row) => row.slug === slug);
     if (index === -1) return { older: null, newer: null };
 
@@ -234,13 +249,13 @@ export const getAllTags = unstable_cache(
     const rows = await db
       .selectDistinctOn([posts.slug], { tags: posts.tags, date: posts.date })
       .from(posts)
-      .where(eq(posts.draft, false))
-      .orderBy(posts.slug, localeFirst(locale), asc(posts.id));
+      .where(publishedOnly)
+      .orderBy(...indexOrder(locale));
 
     // Counted newest-first so that tags sharing a count come out in the order
     // a reader meets them down the index, rather than in slug order.
     const counts = new Map<string, number>();
-    for (const row of rows.sort((a, b) => b.date.localeCompare(a.date))) {
+    for (const row of byDateDesc(rows)) {
       for (const tag of row.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
     }
     return [...counts.entries()]
@@ -266,13 +281,14 @@ export const getPostsByTag = unstable_cache(
     const rows = await db
       .selectDistinctOn([posts.slug], summaryColumns)
       .from(posts)
-      .where(eq(posts.draft, false))
-      .orderBy(posts.slug, localeFirst(locale), asc(posts.id));
+      .where(publishedOnly)
+      .orderBy(...indexOrder(locale));
 
-    return rows
-      .filter((row) => row.tags.includes(tag))
-      .map((row) => ({ ...row, isFallback: row.locale !== locale }))
-      .sort((a, b) => b.date.localeCompare(a.date));
+    return byDateDesc(
+      rows
+        .filter((row) => row.tags.includes(tag))
+        .map((row) => ({ ...row, isFallback: row.locale !== locale }))
+    );
   },
   ["posts-by-tag"],
   cacheOptions(TAGS.posts)
@@ -358,6 +374,7 @@ export const getWorks = unstable_cache(
         cover: works.cover,
         url: works.url,
         tags: works.tags,
+        accent: works.accent,
       })
       .from(works)
       .orderBy(asc(works.sort)),
@@ -494,9 +511,15 @@ export async function getCopyOverrides(
 
 export type NavItem = { href: string; labelKey: string; surfaces: string[] };
 
+/**
+ * Where a link is allowed to appear. A union rather than a string, because a
+ * typo would otherwise return an empty list and silently remove a whole nav.
+ */
+export type NavSurface = "header" | "footer" | "fullnav" | "sitemap";
+
 /** One list, filtered per surface — Header, Footer, FullNav and the sitemap. */
 export const getNavItems = unstable_cache(
-  async (surface: string): Promise<NavItem[]> => {
+  async (surface: NavSurface): Promise<NavItem[]> => {
     const rows = await db
       .select({
         href: navItems.href,

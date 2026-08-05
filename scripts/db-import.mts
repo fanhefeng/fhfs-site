@@ -78,13 +78,6 @@ await db.delete(schema.copyBlocks);
 if (data.copyBlocks?.length)
   await db.insert(schema.copyBlocks).values(data.copyBlocks);
 
-for (const row of data.siteSettings ?? []) {
-  await db
-    .insert(schema.siteSettings)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.siteSettings.id, set: row });
-}
-
 const counts = Object.entries(data).map(
   ([table, rows]) => `${table} ${rows.length}`
 );

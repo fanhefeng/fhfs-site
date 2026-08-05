@@ -326,6 +326,138 @@ export async function saveExperiment(
   return { ok: true };
 }
 
+/**
+ * Chips and nav links are saved as whole lists.
+ *
+ * Neither has a natural key, both are short and ordered, and both are read as
+ * a sequence — so the sequence is what gets edited. Rows arrive numbered by
+ * their position in the form; the numbering is thrown away and the order in
+ * the list becomes `sort`, which means reordering, adding and removing are all
+ * the same operation and none of them can leave a gap behind.
+ */
+function collectRows(form: FormData, prefix: string): string[] {
+  const indices = new Set<string>();
+  for (const key of form.keys()) {
+    const match = new RegExp(`^${prefix}\\.(\\d+)\\.`).exec(key);
+    if (match) indices.add(match[1]);
+  }
+  return [...indices].sort((a, b) => Number(a) - Number(b));
+}
+
+export async function saveChips(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  await requireAdmin();
+
+  const rows = collectRows(form, "chip")
+    .map((i, index) => ({
+      label: {
+        zh: str(form, `chip.${i}.label.zh`),
+        en: str(form, `chip.${i}.label.en`),
+      },
+      tone: str(form, `chip.${i}.tone`) as "paper" | "ink" | "accent",
+      sort: index,
+    }))
+    // An emptied pair is how a row is deleted — there is no separate button.
+    .filter((row) => row.label.zh || row.label.en);
+
+  for (const row of rows) {
+    if (!["paper", "ink", "accent"].includes(row.tone)) {
+      return { error: "纸色只能是 paper / ink / accent。" };
+    }
+    // Proper nouns read the same either way, so one side may stand for both.
+    row.label.zh ||= row.label.en;
+    row.label.en ||= row.label.zh;
+  }
+
+  await db.delete(schema.chips);
+  if (rows.length) await db.insert(schema.chips).values(rows);
+
+  invalidate(TAGS.chips);
+  return { ok: true };
+}
+
+export async function saveNavItems(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  await requireAdmin();
+
+  const rows = collectRows(form, "nav")
+    .map((i, index) => ({
+      href: str(form, `nav.${i}.href`),
+      labelKey: str(form, `nav.${i}.labelKey`),
+      surfaces: ["header", "footer", "fullnav", "sitemap"].filter(
+        (surface) => form.get(`nav.${i}.surface.${surface}`) === "on"
+      ),
+      sort: index,
+    }))
+    .filter((row) => row.href);
+
+  for (const row of rows) {
+    if (!row.href.startsWith("/")) {
+      return { error: `路径要以 / 开头：${row.href}` };
+    }
+    if (!row.labelKey) {
+      return { error: `${row.href} 缺少文案 key。` };
+    }
+  }
+
+  await db.delete(schema.navItems);
+  if (rows.length) await db.insert(schema.navItems).values(rows);
+
+  invalidate(TAGS.nav);
+  return { ok: true };
+}
+
+export async function saveWork(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  await requireAdmin();
+
+  const key = str(form, "key");
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(key)) {
+    return { error: "key 只能用小写字母、数字和连字符。" };
+  }
+  const year = Number(form.get("year"));
+  if (!Number.isInteger(year) || year < 1990 || year > 2100) {
+    return { error: "年份填个四位数。" };
+  }
+
+  const row = {
+    key,
+    title: localized(form, "title"),
+    description: localized(form, "description"),
+    year,
+    cover: str(form, "cover") || null,
+    url: str(form, "url") || null,
+    tags: str(form, "tags")
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+    accent: str(form, "accent") || null,
+    sort: Number(form.get("sort") ?? 0),
+  };
+
+  await db
+    .insert(schema.works)
+    .values(row)
+    .onConflictDoUpdate({ target: schema.works.key, set: row });
+
+  invalidate(TAGS.works);
+  return { ok: true };
+}
+
+export async function deleteWork(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db.delete(schema.works).where(eq(schema.works.key, key));
+  invalidate(TAGS.works);
+}
+
 export async function saveIntroNode(
   _prev: ActionState,
   form: FormData

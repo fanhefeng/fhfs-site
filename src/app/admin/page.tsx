@@ -13,15 +13,18 @@ async function count(table: string): Promise<number> {
 }
 
 export default async function AdminHome() {
-  const [posts, abouts, copy, timeline, apps, experiments, intro] =
+  const [posts, abouts, copy, timeline, apps, works, experiments, intro, chips, nav] =
     await Promise.all([
       count("posts"),
       count("abouts"),
       count("copy_blocks"),
       count("timeline_entries"),
       count("apps"),
+      count("works"),
       count("experiments"),
       count("intro_nodes"),
+      count("chips"),
+      count("nav_items"),
     ]);
 
   const counts: Record<string, number> = {
@@ -30,8 +33,11 @@ export default async function AdminHome() {
     "/admin/copy": copy,
     "/admin/timeline": timeline,
     "/admin/apps": apps,
+    "/admin/works": works,
     "/admin/experiments": experiments,
     "/admin/intro": intro,
+    "/admin/chips": chips,
+    "/admin/nav": nav,
   };
 
   return (

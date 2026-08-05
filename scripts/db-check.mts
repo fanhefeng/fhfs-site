@@ -30,7 +30,6 @@ const TABLES = [
   "chips",
   "nav_items",
   "copy_blocks",
-  "site_settings",
 ];
 
 console.log("row counts");
