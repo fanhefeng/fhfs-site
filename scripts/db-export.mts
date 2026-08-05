@@ -36,28 +36,48 @@ const db = drizzle(url, { schema });
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "backup");
 
+/**
+ * Every ordering below is total, not just sorted.
+ *
+ * `sort` and `slug` repeat — two rows per slug, one per language — and a
+ * partial ordering leaves the tie to the planner, which is free to answer
+ * differently each time. That turns an unchanged database into a file that
+ * keeps rewriting itself, and a diff that cries wolf is a diff nobody reads.
+ */
 const data = {
-  posts: await db.select().from(schema.posts).orderBy(asc(schema.posts.slug)),
+  posts: await db
+    .select()
+    .from(schema.posts)
+    .orderBy(asc(schema.posts.slug), asc(schema.posts.locale)),
   abouts: await db.select().from(schema.abouts).orderBy(asc(schema.abouts.locale)),
   timelineEntries: await db
     .select()
     .from(schema.timelineEntries)
-    .orderBy(asc(schema.timelineEntries.sort)),
-  apps: await db.select().from(schema.apps).orderBy(asc(schema.apps.sort)),
-  works: await db.select().from(schema.works).orderBy(asc(schema.works.sort)),
+    .orderBy(asc(schema.timelineEntries.sort), asc(schema.timelineEntries.key)),
+  apps: await db
+    .select()
+    .from(schema.apps)
+    .orderBy(asc(schema.apps.sort), asc(schema.apps.key)),
+  works: await db
+    .select()
+    .from(schema.works)
+    .orderBy(asc(schema.works.sort), asc(schema.works.key)),
   experiments: await db
     .select()
     .from(schema.experiments)
-    .orderBy(asc(schema.experiments.sort)),
+    .orderBy(asc(schema.experiments.sort), asc(schema.experiments.key)),
   introNodes: await db
     .select()
     .from(schema.introNodes)
-    .orderBy(asc(schema.introNodes.sort)),
-  chips: await db.select().from(schema.chips).orderBy(asc(schema.chips.sort)),
+    .orderBy(asc(schema.introNodes.sort), asc(schema.introNodes.key)),
+  chips: await db
+    .select()
+    .from(schema.chips)
+    .orderBy(asc(schema.chips.sort), asc(schema.chips.id)),
   navItems: await db
     .select()
     .from(schema.navItems)
-    .orderBy(asc(schema.navItems.sort)),
+    .orderBy(asc(schema.navItems.sort), asc(schema.navItems.href)),
   copyBlocks: await db
     .select()
     .from(schema.copyBlocks)
