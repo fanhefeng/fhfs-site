@@ -76,8 +76,8 @@ function Line({ text, word }: { text: string; word: string | null }) {
  *
  * Timing follows the site handshake: on a first visit the entrance waits for
  * the overture's 'fhfs:overture-done'; any later visit this session starts
- * immediately. Under prefers-reduced-motion nothing moves — the cover is
- * simply there, already plugged in and lit.
+ * immediately. There is one version of this entrance and every visitor gets
+ * it — see the note in lib/three/guards.ts.
  */
 export function HomeHero() {
   const t = useTranslations("home");
@@ -132,9 +132,13 @@ export function HomeHero() {
        * through its selector logs "Invalid scope". Building them inside a
        * fresh, scope-less context makes GSAP resolve element references
        * directly. Killed alongside `spawned`.
+       *
+       * It is also how the two branches further down each get a teardown scope
+       * of their own — a context runs the function it is handed and keeps
+       * whatever that function returns as its cleanup.
        */
       const isolated: gsap.Context[] = [];
-      const isolate = (fn: () => void) => {
+      const isolate = (fn: gsap.ContextFunc) => {
         isolated.push(gsap.context(fn));
       };
 
@@ -184,13 +188,12 @@ export function HomeHero() {
       let disposed = false;
 
       /**
-       * Flipping the OS reduce-motion switch mid-session reverts the branch's
-       * context, and GSAP restores every inline style it set: the cord is
-       * hidden and the lamp is dark again. The latches and the `data-lit`
-       * attributes are plain JS and DOM, so they survive that revert — the
-       * branch taking over would find the mechanism already spent and leave
-       * the cover unplugged and unlit. Both branches call this from cleanup,
-       * which runs *after* the revert, so a revert still cannot replay the
+       * A context revert (a remount, a route change) makes GSAP restore every
+       * inline style it set: the cord is hidden and the lamp is dark again.
+       * The latches and the `data-lit` attributes are plain JS and DOM, so
+       * they survive that revert — the re-entry would find the mechanism
+       * already spent and leave the cover unplugged and unlit. Cleanup calls
+       * this *after* the revert, so a revert still cannot replay the
        * mechanism it just tore down.
        */
       const unlatch = () => {
@@ -202,84 +205,50 @@ export function HomeHero() {
       };
 
       /** Contact: the keyword, the cord and the colophon card light up. */
-      const ignite = (animate: boolean) => {
+      const ignite = () => {
         if (disposed || lit || !container.current) return;
         lit = true;
         isolate(() => {
-        const word = root.querySelector<HTMLElement>(".hero-kinetic");
-        if (word) word.dataset.lit = "true";
-        wire.dataset.lit = "true";
-        if (!animate) {
-          if (lamp) gsap.set(lamp, { autoAlpha: 1 });
-          if (ring) gsap.set(ring, { autoAlpha: 0.4 });
-          return;
-        }
-        const tl = gsap.timeline();
-        if (lamp) tl.to(lamp, { autoAlpha: 1, duration: 0.4 }, 0);
-        if (ring && light) {
-          // The point light sweeps the card's edge once, then settles — the
-          // glass reads as lit from the plug side, not as a glowing border.
-          tl.fromTo(ring, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0)
-            .fromTo(
-              light,
-              { attr: { x: 0 } },
-              {
-                attr: { x: card.offsetWidth },
-                duration: 1.2,
-                ease: "power2.inOut",
-              },
-              0
-            )
-            .to(ring, { autoAlpha: 0.4, duration: 0.5 }, 0.7);
-        }
-        spawned.push(tl);
+          const word = root.querySelector<HTMLElement>(".hero-kinetic");
+          if (word) word.dataset.lit = "true";
+          wire.dataset.lit = "true";
+          const tl = gsap.timeline();
+          if (lamp) tl.to(lamp, { autoAlpha: 1, duration: 0.4 }, 0);
+          if (ring && light) {
+            // The point light sweeps the card's edge once, then settles — the
+            // glass reads as lit from the plug side, not as a glowing border.
+            tl.fromTo(ring, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0)
+              .fromTo(
+                light,
+                { attr: { x: 0 } },
+                {
+                  attr: { x: card.offsetWidth },
+                  duration: 1.2,
+                  ease: "power2.inOut",
+                },
+                0
+              )
+              .to(ring, { autoAlpha: 0.4, duration: 0.5 }, 0.7);
+          }
+          spawned.push(tl);
         });
       };
 
-      const mm = gsap.matchMedia();
-
-      // ------------------------------------------------------------------
-      // Reduced motion: the cover is already open, the lamp already on.
-      // Only the (discrete) measurement of the cord still runs.
-      // ------------------------------------------------------------------
-      mm.add("(prefers-reduced-motion: reduce)", (_branch, contextSafe) => {
-        let revealed = false;
-        /**
-         * The whole reveal, retried as one: the keyword measures null while it
-         * has no box (a bfcache restore, a route-transition overlay over the
-         * outgoing tree), and giving up there would strand this visitor with a
-         * dark lamp and no cord while the sr-only line still tells them the
-         * light came on.
-         */
-        const reveal = () => {
-          if (revealed || placeWire() == null) return;
-          revealed = true;
-          gsap.set(wire, { autoAlpha: 1 });
-          ignite(false);
-        };
-        const settle = gsap.delayedCall(0.05, reveal);
-        // Wrapped, because an observer fires in no GSAP context at all: what
-        // it built would then escape the matchMedia revert that runs when the
-        // visitor flips the OS switch. GSAP restores this branch's context
-        // around a function it wrapped, so the retry owns what the first
-        // attempt would have owned. (GSAP always passes the wrapper; the type
-        // marks it optional because plain contexts share the signature.)
-        const retry = contextSafe ? contextSafe(reveal) : reveal;
-        // Armed before the first attempt: until the reveal lands this is what
-        // retries it, and only afterwards does it just re-place the cord.
-        const ro = new ResizeObserver(() => (revealed ? placeWire() : retry()));
-        ro.observe(root);
-        return () => {
-          settle.kill();
-          ro.disconnect();
-          unlatch();
-        };
-      });
-
-      // ------------------------------------------------------------------
-      // Full motion
-      // ------------------------------------------------------------------
-      mm.add("(prefers-reduced-motion: no-preference)", (_branch, contextSafe) => {
+      // The entrance and the wordmark handoff below are two separate teardown
+      // scopes, not one: each returns its own cleanup, and a returned function
+      // is how a GSAP context is told to tear down. Inlined into the single
+      // useGSAP callback they could not coexist — the entrance's `return` would
+      // end the callback there and the handoff would never be built.
+      //
+      // `isolate()` is what a scope is: a nested gsap.context, called with the
+      // same `(context, contextSafe)` signature a matchMedia branch gets, its
+      // returned cleanup run by the parent revert. These used to be
+      // `mm.add("all", …)`, which bought the same two scopes and, because GSAP
+      // wraps a string condition as `{matches: "all"}` (gsap-core.js:4055),
+      // also called `window.matchMedia("all")` and left both contexts on the
+      // global `_media` array — re-evaluated whenever any real query anywhere
+      // flipped, forever matching.
+      isolate((_ctx, contextSafe) => {
         // Initial states in JS so the SSR markup stays readable without JS.
         gsap.set([headline, subline], { autoAlpha: 0 });
         gsap.set([markInner, card, ...cue], { autoAlpha: 0, y: 14 });
@@ -319,15 +288,15 @@ export function HomeHero() {
                 x: 0,
                 duration: 0.32,
                 ease: "back.out(3)",
-                onStart: () => ignite(true),
+                onStart: ignite,
               });
             spawned.push(tl);
           });
         };
-        // Wrapped for the same reason as the reduced-motion retry: the first
-        // attempt inherits this branch's context from the timeline callback it
-        // rides, an observer callback inherits nothing, and a cord built
-        // outside the branch would survive a matchMedia revert.
+        // Wrapped because the first attempt inherits this branch's context
+        // from the timeline callback it rides, an observer callback inherits
+        // nothing, and a cord built outside the branch would survive a
+        // matchMedia revert.
         const retry = contextSafe ? contextSafe(plugIn) : plugIn;
 
         const play = () => {
@@ -396,7 +365,7 @@ export function HomeHero() {
       // away the big name shrinks toward its top-left corner and dissolves,
       // right where the island badge already sits. A scrubbed approximation
       // of the Flip morph — no cross-component state, nothing to desync.
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      isolate(() => {
         if (!markOuter) return;
         const tween = gsap.to(markOuter, {
           scale: 0.42,
@@ -455,9 +424,6 @@ export function HomeHero() {
         :root[data-theme="dark"] .hero-kinetic[data-lit="true"],
         :root[data-theme="dark"] .hero-wire[data-lit="true"] {
           color: color-mix(in srgb, var(--accent) 45%, var(--glow-warm) 55%);
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .hero-kinetic, .hero-wire { transition: none; }
         }
       `}</style>
 

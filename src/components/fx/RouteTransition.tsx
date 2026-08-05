@@ -43,9 +43,7 @@ export type RouteTransitionProps = {
  *   forceClear(), plus a timeout net, so the site can never be left frosted;
  * - lenis contract: stop() + overflow hidden while covered, then
  *   scrollTo(immediate, force) → start() → ScrollTrigger.refresh(); the
- *   reveal only resets to top when the committed URL carries no fragment;
- * - prefers-reduced-motion: reduce never preventDefaults — navigation stays
- *   completely native.
+ *   reveal only resets to top when the committed URL carries no fragment.
  *
  * New in this incarnation: the veil is pointer-events: none and the
  * transition is interruptible — a click mid-cover simply retargets the
@@ -261,15 +259,11 @@ export function RouteTransition({
         );
       };
 
-      const prefersReduced = () =>
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
       const onClick = (e: MouseEvent) => {
         // Modifier clicks, middle/right buttons and already-handled events
         // keep the browser's own behaviour (new tab, new window, menu).
         if (e.defaultPrevented || e.button !== 0) return;
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        if (prefersReduced()) return;
 
         const from = e.target instanceof Element ? e.target : null;
         const anchor = from?.closest("a[href]");

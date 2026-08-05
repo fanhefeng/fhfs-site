@@ -258,13 +258,11 @@ body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  @media (prefers-reduced-motion: no-preference) {
-    :where(a, button, [role="button"], .press) {
-      transition: scale 100ms ease-out;
-    }
-    :where(a, button, [role="button"], .press):active {
-      scale: 0.97;
-    }
+  :where(a, button, [role="button"], .press) {
+    transition: scale 100ms ease-out;
+  }
+  :where(a, button, [role="button"], .press):active {
+    scale: 0.97;
   }
 }
 
@@ -423,13 +421,6 @@ body {
     transform: translate3d(4%, -6%, 0) scale(0.95);
   }
 }
-/* Static under reduced motion and data-saver — the glow stays, the breath stops. */
-@media (prefers-reduced-motion: reduce), (prefers-reduced-data: reduce) {
-  .aurora-blob {
-    animation: none;
-    will-change: auto;
-  }
-}
 
 /* The intro's scroll hint, stepped for the reason the aurora above is stepped.
  * Tailwind's `animate-pulse` is a continuous ease, and a continuous ease is a
@@ -466,11 +457,6 @@ body {
     opacity: 0.5;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .pulse-stepped {
-    animation: none;
-  }
-}
 
 /* Paper grain: 2.5% turbulence noise above the glass layers (anti-banding).
  * Oversized so the barely-there drift never exposes an edge. */
@@ -484,11 +470,7 @@ body {
   opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .grain-layer {
-    animation: grain-drift 6s steps(8) infinite;
-  }
+  animation: grain-drift 6s steps(8) infinite;
 }
 @keyframes grain-drift {
   0%,
@@ -506,6 +488,31 @@ body {
   }
 }
 
+/* The site serves one full-motion version to everyone (DESIGN.md §1.5) — and
+ * this is the whole of the CSS exception. These three are the only animations
+ * here that repeat over a large area with nothing to stop them: the aurora and
+ * the grain never end at all, which is exactly the case WCAG 2.2.2 wants a stop
+ * mechanism for, and reduce-motion is the only stop signal a page gets. The
+ * glow, the paper and the scroll hint all stay; they simply hold still.
+ * Everything else on the site is a one-shot entrance and is not gated.
+ *
+ * Last in the section on purpose: these selectors carry no more specificity
+ * than the three rules above, so an earlier block would lose the cascade to
+ * `.grain-layer` and `.pulse-stepped` and stop only the aurora. (Verified in a
+ * browser — it did exactly that.)
+ *
+ * (`prefers-reduced-data` sat here before and did nothing — MDN is plain that
+ * it "is not supported by any user agent". Save-Data is handled where the
+ * megabytes are: `prefersSaveData()` skips both 3D scenes.) */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .grain-layer,
+  .pulse-stepped {
+    animation: none;
+    will-change: auto;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Theme cross-fade — the "lights on" ritual.
  * LightSwitch marks the root with data-vt="theme", wraps the swap in
@@ -516,12 +523,6 @@ body {
 :root[data-vt="theme"]::view-transition-new(root) {
   animation-duration: 1.2s;
   animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
-}
-@media (prefers-reduced-motion: reduce) {
-  :root[data-vt="theme"]::view-transition-old(root),
-  :root[data-vt="theme"]::view-transition-new(root) {
-    animation: none;
-  }
 }
 
 /* ---------------------------------------------------------------------------

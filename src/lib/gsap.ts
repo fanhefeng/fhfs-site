@@ -48,6 +48,21 @@ export const EASE = {
   exit: "power2.in",
 } as const;
 
+/**
+ * The one motion signal the site still branches on, and a deliberately narrow
+ * one: everybody gets the full-motion version (DESIGN.md §1.5). What this gates
+ * is the short list that has no stop button otherwise — five places in all:
+ * three endless CSS loops (`.aurora-blob`, `.grain-layer`, `.pulse-stepped`,
+ * all in one media block in globals.css), the inertial scroll hijack
+ * (SmoothScroll) and the opening blackout (OvertureLight). Entrances, reveals,
+ * curtains and hover effects are not on it.
+ *
+ * Reads the live browser, so it belongs in an effect, never in a render path
+ * that also runs on the server.
+ */
+export const prefersReducedMotion = (): boolean =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export {
   gsap,
   useGSAP,

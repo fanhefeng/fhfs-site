@@ -36,9 +36,6 @@ type Props = {
  * - each node pops a tooltip with the exact date on hover/focus, entering on
  *   `back.out` and leaving on the reversed ease at 2.2x — arrive generously,
  *   leave briskly.
- *
- * Under reduced motion the rail still tracks (it just jumps instantly, which
- * is a state change, not an animation) and the tooltip cross-fades in place.
  */
 export function Changelog({ entries, title, ariaLabel, className }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -62,8 +59,6 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
       if (!root) return;
 
       const items = gsap.utils.toArray<HTMLElement>("[data-entry]", root);
-      const mm = gsap.matchMedia();
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       /* --- year rail ------------------------------------------------------
        * One ScrollTrigger per entry; whichever entry owns the middle band of
@@ -77,7 +72,7 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
           current = row;
           gsap.to(strip, {
             y: -row * rowHeight,
-            duration: reduced ? 0 : 0.5,
+            duration: 0.5,
             ease: "power3.out",
             overwrite: "auto",
           });
@@ -95,16 +90,14 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
       }
 
       /* --- card entrance + node tooltips ---------------------------------- */
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.from(items, {
-          y: 24,
-          autoAlpha: 0,
-          duration: 0.6,
-          ease: "power2.out",
-          stagger: 0.06,
-          clearProps: "transform,opacity,visibility",
-          scrollTrigger: { trigger: root, start: "top 85%", once: true },
-        });
+      gsap.from(items, {
+        y: 24,
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: "power2.out",
+        stagger: 0.06,
+        clearProps: "transform,opacity,visibility",
+        scrollTrigger: { trigger: root, start: "top 85%", once: true },
       });
 
       const teardown: Array<() => void> = [];
@@ -120,15 +113,15 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
           autoAlpha: 1,
           y: 0,
           scale: 1,
-          duration: reduced ? 0.15 : 0.45,
+          duration: 0.45,
           // Arrive with a little overshoot, leave on the reversed ease.
-          ease: reduced ? "none" : "back.out(2.4)",
+          ease: "back.out(2.4)",
           easeReverse: "power2.in",
           paused: true,
         });
 
         const show = () => pop.timeScale(1).play();
-        const hide = () => pop.timeScale(reduced ? 1 : 2.2).reverse();
+        const hide = () => pop.timeScale(2.2).reverse();
 
         node.addEventListener("pointerenter", show);
         node.addEventListener("focus", show);
@@ -149,7 +142,10 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
         for (const off of teardown) off();
       };
     },
-    { scope: rootRef, dependencies: [entries.length] }
+    // revertOnUpdate: without it the teardown above is deferred to unmount, so
+    // a change in entry count would stack a second trigger, tween and listener
+    // set on every node.
+    { scope: rootRef, dependencies: [entries.length], revertOnUpdate: true }
   );
 
   return (

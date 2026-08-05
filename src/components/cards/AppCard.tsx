@@ -27,7 +27,7 @@ type Props = {
  *
  * Hover is a 4px lift with a two-layer shadow cross-fade — box-shadow is
  * never tweened, the resting and lifted shadows are separate painted layers
- * whose opacity swaps. Fine pointers only, and skipped under reduced motion.
+ * whose opacity swaps. Fine pointers only.
  */
 export function AppCard({ app, index, variant = "tile", className }: Props) {
   const t = useTranslations("software");
@@ -39,39 +39,36 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
       if (!root) return;
       if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const rest = root.querySelector<HTMLElement>("[data-shadow='rest']");
-        const lift = root.querySelector<HTMLElement>("[data-shadow='lift']");
-        const plate = root.querySelector<HTMLElement>("[data-plate]");
-        if (!rest || !lift || !plate) return;
+      const rest = root.querySelector<HTMLElement>("[data-shadow='rest']");
+      const lift = root.querySelector<HTMLElement>("[data-shadow='lift']");
+      const plate = root.querySelector<HTMLElement>("[data-plate]");
+      if (!rest || !lift || !plate) return;
 
-        // overwrite:'auto' throughout — a flick across a bento grid fires
-        // enter/leave faster than the tweens finish.
-        const to = (hover: boolean) => {
-          // The shadow plates ride along so the card and its shadow stay
-          // welded; opacity is tweened separately (overwrite:'auto' only
-          // kills conflicting properties, so the two never fight).
-          gsap.to([plate, rest, lift], {
-            y: hover ? -4 : 0,
-            duration: 0.35,
-            ease: "power3.out",
-            overwrite: "auto",
-          });
-          gsap.to(rest, { opacity: hover ? 0 : 1, duration: 0.35, overwrite: "auto" });
-          gsap.to(lift, { opacity: hover ? 1 : 0, duration: 0.35, overwrite: "auto" });
-        };
+      // overwrite:'auto' throughout — a flick across a bento grid fires
+      // enter/leave faster than the tweens finish.
+      const to = (hover: boolean) => {
+        // The shadow plates ride along so the card and its shadow stay
+        // welded; opacity is tweened separately (overwrite:'auto' only
+        // kills conflicting properties, so the two never fight).
+        gsap.to([plate, rest, lift], {
+          y: hover ? -4 : 0,
+          duration: 0.35,
+          ease: "power3.out",
+          overwrite: "auto",
+        });
+        gsap.to(rest, { opacity: hover ? 0 : 1, duration: 0.35, overwrite: "auto" });
+        gsap.to(lift, { opacity: hover ? 1 : 0, duration: 0.35, overwrite: "auto" });
+      };
 
-        const onEnter = () => to(true);
-        const onLeave = () => to(false);
-        root.addEventListener("pointerenter", onEnter);
-        root.addEventListener("pointerleave", onLeave);
-        return () => {
-          root.removeEventListener("pointerenter", onEnter);
-          root.removeEventListener("pointerleave", onLeave);
-          gsap.killTweensOf([plate, rest, lift]);
-        };
-      });
+      const onEnter = () => to(true);
+      const onLeave = () => to(false);
+      root.addEventListener("pointerenter", onEnter);
+      root.addEventListener("pointerleave", onLeave);
+      return () => {
+        root.removeEventListener("pointerenter", onEnter);
+        root.removeEventListener("pointerleave", onLeave);
+        gsap.killTweensOf([plate, rest, lift]);
+      };
     },
     { scope: rootRef }
   );

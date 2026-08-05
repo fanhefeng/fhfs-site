@@ -20,8 +20,7 @@ type Props = { apps: SoftwareApp[]; className?: string };
  *
  * SSR (and every viewport ≥768px, and no-JS) sees a plain scroll-snap row —
  * the carousel is layered on top only under `(max-width: 767px)`, and reverted
- * cleanly by gsap.matchMedia. Reduced motion keeps the dragging (that is the
- * user's own gesture) but drops the throw and the pop.
+ * cleanly by gsap.matchMedia.
  */
 export function MobileAppRail({ apps, className }: Props) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -40,7 +39,6 @@ export function MobileAppRail({ apps, className }: Props) {
         const items = gsap.utils.toArray<HTMLElement>("[data-rail-item]", track);
         const n = items.length;
         if (n < 2) return;
-        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         /* One mutable object is the single source of truth for the rail's
          * position; every driver (drag, throw, snap tween, focus) writes to
@@ -92,7 +90,6 @@ export function MobileAppRail({ apps, className }: Props) {
         };
 
         const popFocused = () => {
-          if (reduced) return;
           const idx = ((Math.round(pos.offset / step) % n) + n) % n;
           const card = items[idx].firstElementChild;
           if (!card) return;
@@ -113,7 +110,7 @@ export function MobileAppRail({ apps, className }: Props) {
         const snapTo = (target: number, pop = true) => {
           gsap.to(pos, {
             offset: target,
-            duration: reduced ? 0 : 0.45,
+            duration: 0.45,
             ease: EASE.default,
             overwrite: true,
             onUpdate: render,
@@ -129,10 +126,10 @@ export function MobileAppRail({ apps, className }: Props) {
         drag.instance = Draggable.create(proxy, {
           type: "x",
           trigger: viewport,
-          inertia: !reduced,
+          inertia: true,
           // Snap the *proxy* — offset is its exact mirror, so landing the
           // proxy on a multiple of `step` lands a card in the focus slot.
-          snap: reduced ? undefined : { x: (v: number) => Math.round(v / step) * step },
+          snap: { x: (v: number) => Math.round(v / step) * step },
           onPress() {
             gsap.killTweensOf(pos);
             gsap.set(proxy, { x: -pos.offset });

@@ -60,7 +60,6 @@ export function LiquidLens({
   // Capability check runs after mount only — SSR and first paint are always
   // the plain DOM, so hydration can never diverge.
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     setEnhanced(supportsHtmlInCanvas());
   }, []);
@@ -233,7 +232,6 @@ export function LiquidLens({
     const puck = puckRef.current;
     if (!box || !puck) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const xTo = gsap.quickTo(puck, "x", {
       duration: 0.35,

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 
 /** Quarter-circle sweep: 180° (due left) → 270° (straight up). */
 const START_ANGLE = 180;
@@ -49,14 +49,19 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
   }, [shareTitle]);
 
   const toTop = useCallback(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Lenis owns the scroll position when it is running; bypassing it would
     // fight the smoothing loop.
     if (window.__lenis) {
-      window.__lenis.scrollTo(0, { immediate: reduced, force: true });
+      window.__lenis.scrollTo(0, { force: true });
       return;
     }
-    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+    // No lenis means reduce-motion (SmoothScroll never built one) — the native
+    // fallback is not neutral here: `smooth` sweeps the whole article past the
+    // eye, a longer travel than the inertia the guard was there to refuse.
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
+    });
   }, []);
 
   /** Same three-part theme contract as LightSwitch: storage + attribute + event. */
@@ -78,8 +83,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
     const doc = document as Document & {
       startViewTransition?: (cb: () => void) => void;
     };
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduced && typeof doc.startViewTransition === "function") {
+    if (typeof doc.startViewTransition === "function") {
       document.documentElement.dataset.vt = "theme";
       doc.startViewTransition(apply);
       window.setTimeout(() => {
@@ -117,59 +121,40 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
       // also takes them out of the tab order while closed).
       gsap.set(items, { x: 0, y: 0, scale: 0.4, autoAlpha: 0 });
 
-      const mm = gsap.matchMedia();
-
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        const tl = gsap.timeline({ paused: true });
-        tl.to(items, {
-          x: (i: number) => pos[i].x,
-          y: (i: number) => pos[i].y,
-          scale: 1,
-          autoAlpha: 1,
-          duration: 0.001,
-        });
-        tlRef.current = tl;
-        return () => {
-          tlRef.current = null;
-        };
+      const tl = gsap.timeline({ paused: true });
+      items.forEach((el, i) => {
+        tl.to(
+          el,
+          {
+            x: pos[i].x,
+            y: pos[i].y,
+            scale: 1,
+            autoAlpha: 1,
+            duration: 0.6,
+            ease: "elastic.out(1, 0.5)",
+            easeReverse: "power3.in",
+            overwrite: "auto",
+          },
+          i * 0.05
+        );
       });
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const tl = gsap.timeline({ paused: true });
-        items.forEach((el, i) => {
-          tl.to(
-            el,
-            {
-              x: pos[i].x,
-              y: pos[i].y,
-              scale: 1,
-              autoAlpha: 1,
-              duration: 0.6,
-              ease: "elastic.out(1, 0.5)",
-              easeReverse: "power3.in",
-              overwrite: "auto",
-            },
-            i * 0.05
-          );
-        });
-        if (iconRef.current) {
-          tl.to(
-            iconRef.current,
-            {
-              rotation: 135,
-              duration: 0.5,
-              ease: "back.out(1.7)",
-              easeReverse: "power2.in",
-              overwrite: "auto",
-            },
-            0
-          );
-        }
-        tlRef.current = tl;
-        return () => {
-          tlRef.current = null;
-        };
-      });
+      if (iconRef.current) {
+        tl.to(
+          iconRef.current,
+          {
+            rotation: 135,
+            duration: 0.5,
+            ease: "back.out(1.7)",
+            easeReverse: "power2.in",
+            overwrite: "auto",
+          },
+          0
+        );
+      }
+      tlRef.current = tl;
+      return () => {
+        tlRef.current = null;
+      };
     },
     { scope: rootRef }
   );

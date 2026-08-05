@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
-import { prefersReducedMotion, prefersSaveData } from "@/lib/three/guards";
+import { prefersSaveData } from "@/lib/three/guards";
 import { DRACO_DECODER_PATH } from "@/lib/three/draco";
 
 /* "Gaming Desktop PC" by Yolala1232 (sketchfab.com/Yolala1232), CC-BY-4.0 —
@@ -34,6 +34,10 @@ const IDLE_FRAME_MS = 1000 / IDLE_FPS;
 /** The export's forward axis points away from camera; ~2.6 rad shows the
  * desk face-on with a pleasant three-quarter angle. */
 const HOME_Y = 2.6;
+/** Widest half-band around the desk where the wheel dollies instead of
+ *  scrolling the page — capped to a quarter of the stage on narrow screens
+ *  (see `onWheel`). */
+const DESK_BAND = 320;
 
 type Props = {
   hint: string;
@@ -45,8 +49,8 @@ type Props = {
  * A soft ground pool anchors it, an entrance beat swings it to face the
  * room, screens breathe, and a drag leaves it coasting on inertia.
  * Loads only when scrolled near, renders only while visible, and skips
- * itself entirely under Save-Data. Reduced-motion visitors get a single
- * still frame in the final pose.
+ * itself entirely under Save-Data. There is one version of this scene and
+ * everybody gets it — see the note in lib/three/guards.ts.
  */
 export function Workstation({ hint, className }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -58,7 +62,6 @@ export function Workstation({ hint, className }: Props) {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    const reducedMotion = prefersReducedMotion();
     if (prefersSaveData()) {
       setStatus("skipped");
       return;
@@ -268,10 +271,34 @@ export function Workstation({ hint, className }: Props) {
     // Wheel over the desk dollies the camera. The stage is full-bleed now,
     // so only hijack the wheel near the centred desk (or on a pinch, which
     // arrives as ctrl+wheel) — at the edges the page keeps scrolling.
+    //
+    // The band is measured against the stage's own box and capped at a quarter
+    // of it, never as a fixed offset from the viewport centre: ±320px covers
+    // every pixel of a 640px-wide window, and the page then cannot be scrolled
+    // past the desk at all. There have to be edges left for the promise above
+    // to hold. Measured on resize, so the handler itself reads no layout.
+    let deskCentre = 0;
+    let deskBand = 0;
+    const measureBand = () => {
+      const rect = container.getBoundingClientRect();
+      deskCentre = rect.left + rect.width / 2;
+      deskBand = Math.min(DESK_BAND, rect.width / 4);
+    };
+    measureBand();
+
     const onWheel = (e: WheelEvent) => {
-      const nearDesk =
-        Math.abs(e.clientX - window.innerWidth / 2) < 320;
-      if (!nearDesk && !e.ctrlKey) return;
+      const owns = Math.abs(e.clientX - deskCentre) < deskBand || e.ctrlKey;
+      // Lenis listens on window and never looks at `defaultPrevented`, so the
+      // call below cannot hold it off on its own — leave it at that and the
+      // desk zooms while the page scrolls out from under it. Its documented
+      // opt-out is `data-lenis-prevent-wheel`, read off the event's composed
+      // path; this listener sits below window on that path, so setting the
+      // attribute here still lands in time for the very event that set it.
+      // Only ever while the desk owns the wheel — left on, the stage would
+      // swallow every scroll again, which is the bug this whole band exists
+      // to avoid.
+      container.toggleAttribute("data-lenis-prevent-wheel", owns);
+      if (!owns) return;
       e.preventDefault();
       const speed = e.ctrlKey ? 0.008 : 0.0016;
       targetZoom = THREE.MathUtils.clamp(
@@ -286,16 +313,12 @@ export function Workstation({ hint, className }: Props) {
       targetZoom = 1;
       targetTilt = BASE_TILT;
     };
-    // Under reduced motion the loop never runs, so interactive targets
-    // would silently do nothing — don't steal the events in the first place.
-    if (!reducedMotion) {
-      container.addEventListener("pointerdown", onPointerDown);
-      container.addEventListener("pointermove", onPointerMove);
-      container.addEventListener("pointerup", onPointerUp);
-      container.addEventListener("pointercancel", onPointerUp);
-      container.addEventListener("wheel", onWheel, { passive: false });
-      container.addEventListener("dblclick", onDblClick);
-    }
+    container.addEventListener("pointerdown", onPointerDown);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerup", onPointerUp);
+    container.addEventListener("pointercancel", onPointerUp);
+    container.addEventListener("wheel", onWheel, { passive: false });
+    container.addEventListener("dblclick", onDblClick);
 
     let lastFrame = 0;
     const loop = () => {
@@ -411,16 +434,7 @@ export function Workstation({ hint, className }: Props) {
             turntable.add(root);
             model = root;
             setStatus("ready");
-            if (reducedMotion) {
-              // Straight to the final pose: no rise, no swing, pool lit.
-              intro.y = 0;
-              intro.s = 1;
-              intro.g = 1;
-              entrancePlayed = true;
-              groundMat.opacity = 1;
-              turntable.rotation.y = rotY;
-              renderer.render(scene, camera);
-            } else if (visibleNow) {
+            if (visibleNow) {
               playEntrance();
             }
           },
@@ -439,7 +453,6 @@ export function Workstation({ hint, className }: Props) {
     // user keeps switching between, can go on drawing. Stopping outright is
     // both cheaper and something we can actually rely on.
     const setLoop = (on: boolean) => {
-      if (reducedMotion) return;
       const run = on && !document.hidden;
       renderer.setAnimationLoop(run ? loop : null);
       if (run) lastFrame = 0;
@@ -452,7 +465,7 @@ export function Workstation({ hint, className }: Props) {
         visibleNow = near;
         if (near) {
           load();
-          if (!reducedMotion) playEntrance();
+          playEntrance();
         }
         setLoop(near);
       },
@@ -466,7 +479,7 @@ export function Workstation({ hint, className }: Props) {
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
-      if (reducedMotion) renderer.render(scene, camera);
+      measureBand();
     };
     window.addEventListener("resize", onResize);
 
@@ -506,7 +519,7 @@ export function Workstation({ hint, className }: Props) {
       >
         <canvas ref={canvasRef} className="h-full w-full" />
         {/* Minimal loading state: a gold ring that quietly spins until the
-            model lands, then fades away. Static under reduced motion.
+            model lands, then fades away.
 
             The spin is dropped on ready, not merely faded out: the ring stays
             mounted for its 700ms fade, and a continuous animation on a mounted
@@ -521,7 +534,7 @@ export function Workstation({ hint, className }: Props) {
           }`}
         >
           <div
-            className={`h-8 w-8 rounded-full border border-accent/50 border-t-transparent motion-reduce:animate-none ${
+            className={`h-8 w-8 rounded-full border border-accent/50 border-t-transparent ${
               status === "ready" ? "" : "animate-spin"
             }`}
           />

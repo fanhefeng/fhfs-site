@@ -92,6 +92,7 @@ export const EASE = {
 - **唯一例外：停不下来的那几处**（2026-08-05 补回）。判据只有三个字：**循环、大面积、夺走滚动**。WCAG 2.2.2（Pause, Stop, Hide）要求超过 5s 的自动运动必须可停，而浏览器只给了 `prefers-reduced-motion` 这一个信号——全删等于把「不能停」写死。当前落在例外里的一共五处，不要再扩：
   - CSS，globals.css 里同一个 media block：`.aurora-blob`、`.grain-layer`、`.pulse-stepped` → `animation: none`。光、纸和滚动提示都还在，只是不动。
   - `SmoothScroll`：Lenis 惯性滚动是全站唯一的滚动劫持，前庭风险最高。命中时直接不创建实例；所有 `window.__lenis` 消费方本来就写了原生滚动回退。
+    但**回退本身必须是中性的**：没有 lenis 就等于命中了 reduce，此时 `window.scrollTo({behavior:'smooth'})` 反而比被拒掉的惯性走得更远（长文回顶是整页扫过）。`RadialFab.toTop` 因此显式给 `behavior: prefersReducedMotion() ? 'auto' : 'smooth'`——这不是第六处例外，是这一处例外的落地补正，别照着它往别处加分支。`RouteTransition` 的 `window.scrollTo(0, 0)` 是两参数瞬时形式，本来就中性；全站没有 CSS `scroll-behavior: smooth`，加之前先确认这一点还成立。
   - `OvertureLight`：0.9s 不透明全屏黑幕 + 滚动锁 + 抢焦点。命中时走 `finishInstant()`，并**顺手写掉 session key**——HomeHero 靠这把钥匙判断接力不会来了，不写就会空等 8s 安全超时，首屏一片空白。
   入场、揭幕、路由帘幕、hover、pin/视差**一律不在例外里**：它们是一次性的，不属于「停不下来」那一类。`/intro` 的 3D 也不在（那张脸就是那一页的全部内容）。谓词统一用 `prefersReducedMotion()`（`src/lib/gsap.ts`），别在组件里再散写 media query。
   仍然保留的降级信号（它们是明确意图，不是提速副作用）：`navigator.connection.saveData`（JS 侧，跳过两个 3D 场景，即真正的流量大头）、`hasWebGL()`、`(hover: hover) and (pointer: fine)`（悬停类效果）、`(min-width: 768px)`（pin/视差）。

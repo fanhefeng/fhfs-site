@@ -36,6 +36,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local-only notes: anything named *.local.md stays on this machine
+*.local.md
+
 # vercel
 .vercel
 
