@@ -3,6 +3,12 @@
 > 本文档是全站重设计的唯一权威依据。由 14-agent 研究/提案/评审工作流产出：
 > 三位独立评审（用户契合度 / 可实现性 / 设计品味）一致选出本方案，并嫁接了另两个提案的 15 项优点。
 > 研究底稿（GSAP demo 拆解、推文实勘、apple-design skill、HTML-in-Canvas、趋势）见文末「参考材料」。
+>
+> **视觉设计仍然照本文档执行；内容管线已经不是了。** 后来内容从 `content/` 下的
+> MDX/YAML 迁进了 Neon Postgres（Drizzle 读取，`src/lib/content.ts` 是唯一读取层），
+> content-collections 已移除，`dynamicParams = false` 也全部删掉——新文章要能不重新
+> 部署就访问。下文凡提到内容文件、content-collections、全静态策略的段落，读作历史。
+> 现状见 README「内容存在哪」。
 
 ## 0. 核心概念
 
@@ -80,7 +86,18 @@ export const EASE = {
 - 开灯/主题切换：**1.2s `cubic-bezier(.42,0,.58,1)`**，包 `document.startViewTransition`，≥300ms 防亮度跳变。
 - press 反馈基类：`a, button { active: scale-[0.97], 100ms ease-out, touch-action: manipulation }`。
 - hover tween 硬规则 `overwrite: 'auto'`；插件注册：ScrollTrigger / SplitText / Flip / Draggable + InertiaPlugin / **ScrambleTextPlugin（补注册）** / CustomEase + CustomWiggle。
-- 每个动效组件内建 `gsap.matchMedia('(prefers-reduced-motion: reduce)')` 分支。
+- **全站单一动效版本，不再按 `prefers-reduced-motion` 分档**（2026-08-04 决策，取代原「每个动效组件内建 reduce 分支」的规则）。
+  原因是实测的误伤面：Windows 上该信号写作「显示动画」，被「轻松使用」开关、**性能选项 →「调整为最佳性能」**、节电模式任意一个关掉都会置为 `reduce`。这批访客从未表达过「少一点动效」，却拿到一个残缺版本且无从察觉——`/intro` 直接退化成纯文字简历，而这张脸就是那一页的全部内容。
+  这条规则覆盖**所有**表达方式，包括 Tailwind 的 `motion-reduce:` 变体——它编译出来就是 `@media (prefers-reduced-motion: reduce)`。首次执行时漏掉了这一类（只 grep 了 `prefers-reduced-motion` 字面量），复查时补删 9 处；以后加动效不要再引入。
+- **唯一例外：停不下来的那几处**（2026-08-05 补回）。判据只有三个字：**循环、大面积、夺走滚动**。WCAG 2.2.2（Pause, Stop, Hide）要求超过 5s 的自动运动必须可停，而浏览器只给了 `prefers-reduced-motion` 这一个信号——全删等于把「不能停」写死。当前落在例外里的一共五处，不要再扩：
+  - CSS，globals.css 里同一个 media block：`.aurora-blob`、`.grain-layer`、`.pulse-stepped` → `animation: none`。光、纸和滚动提示都还在，只是不动。
+  - `SmoothScroll`：Lenis 惯性滚动是全站唯一的滚动劫持，前庭风险最高。命中时直接不创建实例；所有 `window.__lenis` 消费方本来就写了原生滚动回退。
+  - `OvertureLight`：0.9s 不透明全屏黑幕 + 滚动锁 + 抢焦点。命中时走 `finishInstant()`，并**顺手写掉 session key**——HomeHero 靠这把钥匙判断接力不会来了，不写就会空等 8s 安全超时，首屏一片空白。
+  入场、揭幕、路由帘幕、hover、pin/视差**一律不在例外里**：它们是一次性的，不属于「停不下来」那一类。`/intro` 的 3D 也不在（那张脸就是那一页的全部内容）。谓词统一用 `prefersReducedMotion()`（`src/lib/gsap.ts`），别在组件里再散写 media query。
+  仍然保留的降级信号（它们是明确意图，不是提速副作用）：`navigator.connection.saveData`（JS 侧，跳过两个 3D 场景，即真正的流量大头）、`hasWebGL()`、`(hover: hover) and (pointer: fine)`（悬停类效果）、`(min-width: 768px)`（pin/视差）。
+  CSS 侧的 `prefers-reduced-data` 已删掉：MDN 明说 not supported by any user agent，那条规则从未生效过，留着只会让人以为 aurora 有开关。省流量归 `prefersSaveData()`。
+- GSAP 组件不需要 `gsap.matchMedia()` 包壳：`useGSAP` 本身就跑在 `gsap.context` 里，回调签名同为 `(context, contextSafe)`，返回的函数就是 teardown。需要多个各自持有 cleanup 的作用域时，用嵌套的 `gsap.context()`（见 `HomeHero` 的 `isolate()`），**不要**写 `mm.add("all", …)`：GSAP 会把字符串条件包成 `{matches: "all"}`，真的去调 `window.matchMedia("all")` 并把 context 挂上全局 `_media`，此后任何一处真实查询翻转都要把它重算一遍。带真实断点/指针查询的 matchMedia 照常使用。
+- `useGSAP` 带了 `dependencies` **且回调返回 teardown** 时，必须同时给 `revertOnUpdate: true`。@gsap/react 的判据是 `deferCleanup = dependencies.length && !revertOnUpdate`：漏了它，cleanup 被推迟到卸载，依赖一变就多出一套 ScrollTrigger / tween / 监听器。反过来，**不返回 teardown 的不要加**——那会在依赖变化时把已经应用的动效 revert 掉（`Header` 的两处开合就是这种情况）。
 
 ### 1.6 暗亮模式（「开灯」叙事）
 
@@ -102,7 +119,7 @@ export const EASE = {
 
 **Footer**：单行式极简：小字站名 + 导航 + RSS/GitHub + 本地时间落款（`Intl.DateTimeFormat` + `timeZone: 'Asia/Shanghai'`，「HH:mm in Qingdao」）+ 主题拨杆副本；右下角一张**可撕小贴纸**，撕开露出 email（CSS 3D 翻折 + 双层阴影，无 WebGL）。其余全静态——页脚是全站最安静的地方。ASCII 霓虹画退役。
 
-**RouteTransition**：保留机制骨架（捕获阶段点击拦截 / cover-reveal 状态机 / forceClear 兜底 / reduced-motion 直通 / `data-no-transition` 逃生口），幕布换玻璃 materialize：新页 `--panel-blur 20→0 + scale .98→1 + opacity`。locale 切换走 `document.startViewTransition` 整页 cross-fade。转场可中断、不锁 pointer-events。
+**RouteTransition**：保留机制骨架（捕获阶段点击拦截 / cover-reveal 状态机 / forceClear 兜底 / `data-no-transition` 逃生口），幕布换玻璃 materialize：新页 `--panel-blur 20→0 + scale .98→1 + opacity`。locale 切换走 `document.startViewTransition` 整页 cross-fade。转场可中断、不锁 pointer-events。
 
 **Loader（开灯仪式）**：首访每 session 一次，0.9s：**黑场中一枚小灯亮起，光晕以 clip-path 圆形扩散揭幕**（评审嫁接，替换纯 cross-fade）→ masthead 显形。保留 sessionStorage `'fhfs-overture-seen'` + `'fhfs:overture-done'` 事件握手。
 
@@ -160,7 +177,7 @@ bento grid（Apple keynote 式）：**分段控件筛选 All/Desktop/Tool/Game/W
 ### 2.7 404 `not-found.tsx`
 
 display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角**可剥离大贴纸彩蛋**（Draggable + clip-path 分割贴住/翘起区、投影随 lift 变软变大，撕开露一句话）。
-动效：404 数字 0.8s ScrambleText 解码（`chars:'0123456789'`——评审嫁接的参数）；P4 可选：文字吹散 canvas 粒子彩蛋（≤3000 粒 2D，按屏宽 1800/4500/9000 分档，移动端与 reduced-motion 禁用）。
+动效：404 数字 0.8s ScrambleText 解码（`chars:'0123456789'`——评审嫁接的参数）；P4 可选：文字吹散 canvas 粒子彩蛋（≤3000 粒 2D，按屏宽 1800/4500/9000 分档，移动端禁用）。
 
 ## 3. 组件处置清单
 

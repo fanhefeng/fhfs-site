@@ -1,9 +1,12 @@
 ---
 title: JS 手札三则：deepClone、path 与千分位
 date: 2024-12-03
-tags: [前端, 手札]
+tags:
+  - 前端
+  - 手札
 summary: 三个随手记下的技术点：用 WeakMap 防循环引用的深度克隆、path.join 与 path.resolve 的区别、正则实现千分位分隔。
 ---
+
 
 ## 深度克隆
 

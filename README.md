@@ -18,10 +18,11 @@ La La Land 霓虹爵士俱乐部风格的个人网站：博客、手札、作品
 
 全局：Lenis 惯性滚动与 GSAP 时钟统一（`ScrollTrigger.update` 挂 lenis scroll、
 `gsap.ticker` 驱动 `lenis.raf`）。站内换页时同一把金色刀刃斜切幕布
-（`RouteTransition`，捕获阶段接管站内链接点击）。所有动效都有
-`prefers-reduced-motion` 降级，信息不丢；SSR 输出完整内容，无 JS 也可读。
+（`RouteTransition`，捕获阶段接管站内链接点击）。全站单一动效版本，
+`prefers-reduced-motion` 只关掉停不下来的那几处——两条无限背景动画、惯性滚动、
+开场黑幕（理由与完整清单见 `docs/DESIGN.md` §1.5）；SSR 输出完整内容，无 JS 也可读。
 
-两个踩过的坑，改动相关代码前先读：
+三个踩过的坑，改动相关代码前先读：
 
 - **窗洞不能加 `will-change`**。`ClubWindow` 靠 `box-shadow: 0 0 0 60vmax` 把窗外
   涂成舱壁色，一旦该元素被提升为合成层，图层按 border-box 裁剪，60vmax 的扩散
@@ -29,6 +30,12 @@ La La Land 霓虹爵士俱乐部风格的个人网站：博客、手札、作品
 - **`html` 必须留 `scrollbar-gutter: stable`**。开场遮罩会锁 `overflow`，那一刻
   没有滚动条；ScrollTrigger 若在此时测量被 pin 的段落，会把 pin-spacer 宽度
   写死成含滚动条的宽度，遮罩撤走后整页就能横向滚动 15px。
+- **局部接管滚轮不能只靠 `preventDefault()`**。Lenis 的 wheel 监听挂在 window
+  上，且**从不检查 `defaultPrevented`**——`/about` 的 3D 工位曾经只调
+  `preventDefault()`，实测结果是镜头在推拉的同时页面照样滚走（实测 Δ595px）。
+  正确做法是 Lenis 自己的契约 `data-lenis-prevent-wheel`（它沿 composedPath 读
+  这个属性），并且**只在真正接管的那一刻打开**：常驻在全屏舞台上，页面就再也
+  滚不过去了。
 
 ## 技术栈
 
@@ -36,19 +43,37 @@ La La Land 霓虹爵士俱乐部风格的个人网站：博客、手札、作品
 - Tailwind CSS 4 · next-intl（zh/en 双语，`messages/*.json`）
 - GSAP 3.15（ScrollTrigger / SplitText / CustomEase，统一从 `src/lib/gsap.ts` 导入）
 - Lenis 1.3 · three.js（星空为唯一 3D 场景，命令式、无 R3F）
-- content-collections + MDX（`content/` 下博客、手札、软件、时间线均为内容文件）
+- Neon Postgres + Drizzle ORM（文章、软件、时间线、站点文案都在库里）
 
 ## 开发
 
 ```bash
 pnpm dev     # 开发
-pnpm build   # 生产构建（含 content-collections 编译）
+pnpm build   # 生产构建（构建期读库预渲染，需要 DATABASE_URL）
 pnpm start   # 预览生产构建
 ```
 
+## 内容存在哪
+
+内容全部在数据库里，`src/lib/content.ts` 是唯一的读取层：每个 getter 都带缓存标签，
+页面照旧全静态预渲染，改完内容用 `updateTag` 让相关页面失效即可，不必重新部署。
+
+```bash
+pnpm db:check    # 打印库里各表的真实内容
+pnpm db:export   # 导出到 backup/（db.json + 文章的 markdown 副本）
+pnpm db:import   # 从 backup/ 恢复
+pnpm db:studio   # 表格界面
+```
+
+`backup/` 跟着仓库走，所以内容仍然有 diff、有历史、有一份能离线读的纯文本副本 ——
+这是从文件搬进数据库时唯一真正会丢的东西，用 `db:export` 换回来了。
+
+`messages/*.json` 仍是**全部**文案的默认值；库里的 `copy_blocks` 只是叠在上面的
+覆盖层。表空了或者连不上库，站点就照 JSON 显示，不会白屏。
+
 ## 内容从哪来
 
-- `content/blog/note-*.zh.mdx` —— 从旧 VitePress 知识库（fanhefeng/fhf）精选改写的手札
+- 那几篇 `note-*` 手札 —— 从旧 VitePress 知识库（fanhefeng/fhf）精选改写
   （OSI 七层、macOS 主机名、JS 三则、简历方法论、《数字僧侣》）。
 - 动效方法论移植自本地 MOTION LAB 研究项目（三态插值、刀切转场、ASCII 采样、无限环）。
 - 星空与两个 3D 模型移植自旧作品集 fhf-portfolio。行星

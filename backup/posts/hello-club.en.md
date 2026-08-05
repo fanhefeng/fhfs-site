@@ -1,9 +1,12 @@
 ---
 title: "Grand Opening: Welcome to My After-Hours Club"
 date: 2026-07-24
-tags: [notes, website]
+tags:
+  - notes
+  - website
 summary: Why I styled my personal site after the neon sign at the end of La La Land.
 ---
+
 
 At the end of *La La Land*, Mia walks into that jazz club and sees the sign she once drew for Sebastian — **Seb's** — glowing in neon. The whole story lights up with it.
 

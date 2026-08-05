@@ -1,9 +1,13 @@
 ---
 title: macOS 主机名与 scutil 小抄
 date: 2024-12-20
-tags: [macOS, 手札]
-summary: ComputerName、HostName、LocalHostName 三种主机名的区别与设置方法，附 scutil 常用命令与 Finder 显示隐藏文件的小抄。
+tags:
+  - macOS
+  - 手札
+summary: ComputerName、HostName、LocalHostName 三种主机名的区别与设置方法，附 scutil 常用命令与 Finder
+  显示隐藏文件的小抄。
 ---
+
 
 ## 三种主机名的区别与设置
 

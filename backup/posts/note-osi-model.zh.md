@@ -1,9 +1,12 @@
 ---
 title: OSI 七层模型手札
 date: 2024-09-22
-tags: [网络, 手札]
+tags:
+  - 网络
+  - 手札
 summary: 从应用层到物理层，梳理 OSI 七层模型的各层职责与 PDU 逐层封装的过程。
 ---
+
 
 OSI 模型，即开放式通信系统互联参考模型（Open System Interconnection Reference Model），是国际标准化组织（ISO）提出的一个试图使各种计算机在世界范围内互连为网络的标准框架，简称 OSI。
 
