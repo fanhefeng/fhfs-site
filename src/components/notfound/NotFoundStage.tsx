@@ -25,12 +25,10 @@ function fold(p: number) {
   };
 }
 
-/** Resting lift under reduced motion — a static hint that it peels. */
-const REST_LIFT = 0.12;
 const REST = fold(0);
 
 /** One language's way out of the page. */
-export type NotFoundBlock = {
+type NotFoundBlock = {
   /** BCP-47 tag, so the CJK type guards in globals.css apply per block. */
   lang: string;
   title: string;
@@ -70,18 +68,15 @@ export function NotFoundStage({ blocks, sticker }: Props) {
     () => {
       const el = numberRef.current;
       if (!el) return;
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.to(el, {
-          duration: 0.8,
-          ease: "none",
-          scrambleText: {
-            text: "404",
-            chars: "0123456789",
-            speed: 0.6,
-            revealDelay: 0.15,
-          },
-        });
+      gsap.to(el, {
+        duration: 0.8,
+        ease: "none",
+        scrambleText: {
+          text: "404",
+          chars: "0123456789",
+          speed: 0.6,
+          revealDelay: 0.15,
+        },
       });
     },
     { scope: numberRef }
@@ -131,73 +126,55 @@ export function NotFoundStage({ blocks, sticker }: Props) {
         });
       };
 
-      const mm = gsap.matchMedia();
+      render();
+      peelApi.current = (to) => settle(to ?? (state.p > 0.5 ? 0 : 1));
 
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        // Static micro-lift: the affordance stays readable, nothing moves.
-        state.p = REST_LIFT;
-        render();
-        peelApi.current = (to) => {
-          state.p = to ?? (state.p > 0.5 ? REST_LIFT : 1);
+      // Draggable needs a real element; a detached proxy keeps the
+      // sticker's own transforms free (the GSAP proxy pattern).
+      const proxy = document.createElement("div");
+      const handle = root.querySelector<HTMLElement>("[data-handle]");
+      let startP = 0;
+      let startX = 0;
+      let startY = 0;
+      // Pulling roughly one sticker-width up-left peels it fully.
+      let pull = 1;
+
+      let dragger: Draggable | undefined;
+      dragger = Draggable.create(proxy, {
+        trigger: handle ?? root,
+        type: "x,y",
+        // The handle is a <button>; without this Draggable would refuse to
+        // start a drag on a clickable element.
+        dragClickables: true,
+        // Below this the gesture stays a click, so tapping still peels.
+        minimumMovement: 6,
+        allowContextMenu: true,
+        cursor: "grab",
+        activeCursor: "grabbing",
+        onPress() {
+          if (!dragger) return;
+          gsap.killTweensOf(state);
+          startP = state.p;
+          startX = dragger.x;
+          startY = dragger.y;
+          pull = root.getBoundingClientRect().width * 1.05 || 1;
+        },
+        onDrag() {
+          if (!dragger) return;
+          // Up and to the left both peel; their sum is the pull distance.
+          const pulled = startX - dragger.x + (startY - dragger.y);
+          state.p = gsap.utils.clamp(0, 1, startP + pulled / pull);
           render();
-          setPeeled(state.p > 0.5);
-        };
-        return () => {
-          peelApi.current = null;
-        };
-      });
+        },
+        onDragEnd() {
+          settle(state.p > 0.5 ? 1 : 0);
+        },
+      })[0];
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        render();
-        peelApi.current = (to) => settle(to ?? (state.p > 0.5 ? 0 : 1));
-
-        // Draggable needs a real element; a detached proxy keeps the
-        // sticker's own transforms free (the GSAP proxy pattern).
-        const proxy = document.createElement("div");
-        const handle = root.querySelector<HTMLElement>("[data-handle]");
-        let startP = 0;
-        let startX = 0;
-        let startY = 0;
-        // Pulling roughly one sticker-width up-left peels it fully.
-        let pull = 1;
-
-        let dragger: Draggable | undefined;
-        dragger = Draggable.create(proxy, {
-          trigger: handle ?? root,
-          type: "x,y",
-          // The handle is a <button>; without this Draggable would refuse to
-          // start a drag on a clickable element.
-          dragClickables: true,
-          // Below this the gesture stays a click, so tapping still peels.
-          minimumMovement: 6,
-          allowContextMenu: true,
-          cursor: "grab",
-          activeCursor: "grabbing",
-          onPress() {
-            if (!dragger) return;
-            gsap.killTweensOf(state);
-            startP = state.p;
-            startX = dragger.x;
-            startY = dragger.y;
-            pull = root.getBoundingClientRect().width * 1.05 || 1;
-          },
-          onDrag() {
-            if (!dragger) return;
-            // Up and to the left both peel; their sum is the pull distance.
-            const pulled = startX - dragger.x + (startY - dragger.y);
-            state.p = gsap.utils.clamp(0, 1, startP + pulled / pull);
-            render();
-          },
-          onDragEnd() {
-            settle(state.p > 0.5 ? 1 : 0);
-          },
-        })[0];
-
-        return () => {
-          dragger?.kill();
-          peelApi.current = null;
-        };
-      });
+      return () => {
+        dragger?.kill();
+        peelApi.current = null;
+      };
     },
     { scope: stickerRef }
   );

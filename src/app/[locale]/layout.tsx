@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { fontVariables } from "../fonts";
-import { routing, type Locale } from "@/i18n/routing";
+import { THEME_INIT_SCRIPT } from "../themeInit";
+import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
+import { getNavItems } from "@/lib/content";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuroraLayer } from "@/components/fx/AuroraLayer";
@@ -20,7 +22,17 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export const dynamicParams = false;
+/**
+ * There is deliberately no `dynamicParams = false` here.
+ *
+ * It reads like a per-segment switch but Next ANDs it down the whole route:
+ * leaving it on this layout would have pinned every nested dynamic segment to
+ * "404 unless prerendered", no matter what those segments declared. Since
+ * content now comes from a database that can gain a post between deploys,
+ * unknown params have to be allowed through and answered at request time.
+ *
+ * An unmatched locale still 404s — `hasLocale` below sees to that.
+ */
 
 type Props = {
   children: React.ReactNode;
@@ -31,7 +43,9 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const l = (hasLocale(routing.locales, locale) ? locale : "zh") as Locale;
+  const l: Locale = hasLocale(routing.locales, locale)
+    ? locale
+    : routing.defaultLocale;
   return {
     metadataBase: new URL(site.url),
     title: { default: site.title[l], template: `%s | ${site.signName}` },
@@ -46,6 +60,15 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
   setRequestLocale(locale);
 
+  // One nav table, three surfaces. These used to be three constants that had
+  // already drifted apart: /intro only ever reached the sitemap, and home only
+  // ever reached the full-screen menu.
+  const [headerLinks, footerLinks, menuLinks] = await Promise.all([
+    getNavItems("header"),
+    getNavItems("footer"),
+    getNavItems("fullnav"),
+  ]);
+
   return (
     // No data-theme here on purpose. React only touches attributes it
     // renders, so leaving it out hands the attribute entirely to the script
@@ -55,14 +78,13 @@ export default async function LocaleLayout({ children, params }: Props) {
     // paper mid-session. globals.css treats "no attribute" as light, so the
     // pre-paint default is unchanged.
     <html
-      lang={locale === "zh" ? "zh-CN" : "en"}
+      lang={htmlLang(locale)}
       suppressHydrationWarning
       className={`${fontVariables} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
-        {/* Apply the saved theme before first paint — warm paper (light) is
-            the default; a stored choice wins, otherwise the OS preference.
-            Contract: localStorage 'fhfs-theme' + data-theme + 'fhfs:theme'.
+        {/* Apply the saved theme before first paint — the script itself lives
+            in themeInit.ts, shared with the global 404's document.
 
             Must stay a raw <script>. next/script defers even
             beforeInteractive through the self.__next_s queue: measured here,
@@ -82,11 +104,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             to a top-level app/layout.tsx (loses the per-locale <html lang> in
             the SSR output), dropping the script for ThemeKeeper alone (first
             paint flashes for anyone whose choice differs from their OS). */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <NextIntlClientProvider>
           <ThemeKeeper />
           <SmoothScroll />
@@ -95,9 +113,9 @@ export default async function LocaleLayout({ children, params }: Props) {
           <ProgressHud />
           <AuroraLayer />
           <GrainLayer />
-          <Header />
+          <Header links={headerLinks} menuLinks={menuLinks} />
           {children}
-          <Footer />
+          <Footer items={footerLinks} />
         </NextIntlClientProvider>
       </body>
     </html>

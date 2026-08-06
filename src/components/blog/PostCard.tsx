@@ -1,16 +1,17 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { readingMinutes, type LocalizedPost } from "@/lib/content";
+import type { PostSummary } from "@/lib/content";
+import { Reveal } from "@/components/fx/Reveal";
 
 /**
  * Posts bucketed by publication year, newest year first, each bucket keeping
  * the incoming (date-descending) order. The year comes from the ISO string
  * rather than a Date, so the grouping never drifts with the server timezone.
  */
-export function groupPostsByYear(
-  posts: LocalizedPost[]
-): { year: string; posts: LocalizedPost[] }[] {
-  const groups: { year: string; posts: LocalizedPost[] }[] = [];
+function groupPostsByYear(
+  posts: PostSummary[]
+): { year: string; posts: PostSummary[] }[] {
+  const groups: { year: string; posts: PostSummary[] }[] = [];
   for (const post of posts) {
     const year = post.date.slice(0, 4);
     const last = groups.at(-1);
@@ -20,6 +21,28 @@ export function groupPostsByYear(
   return groups;
 }
 
+/** The year-bucketed index — /blog and every tag page render this list. */
+export function YearIndex({
+  posts,
+  yearAria,
+}: {
+  posts: PostSummary[];
+  yearAria: (year: string) => string;
+}) {
+  return groupPostsByYear(posts).map(({ year, posts: yearPosts }) => (
+    <section key={year} aria-label={yearAria(year)} className="mb-14 last:mb-0">
+      <h2 className="mb-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
+        {year}
+      </h2>
+      <Reveal as="ol" stagger={0.05} className="border-t border-line">
+        {yearPosts.map((post) => (
+          <PostCard key={post.slug} post={post} />
+        ))}
+      </Reveal>
+    </section>
+  ));
+}
+
 /**
  * One line of the magazine index: title on the left, mono date flush right.
  * No card, no summary, no thumbnail — the list is meant to be read like a
@@ -27,9 +50,9 @@ export function groupPostsByYear(
  * and floats the reading time in beside the date; both are transform/opacity
  * only, so a long list stays cheap to render.
  */
-export function PostCard({ post }: { post: LocalizedPost }) {
+function PostCard({ post }: { post: PostSummary }) {
   const t = useTranslations("blog");
-  const minutes = readingMinutes(post.content);
+  const minutes = post.readingMinutes;
   const [, month, day] = post.date.slice(0, 10).split("-");
 
   return (
@@ -43,11 +66,11 @@ export function PostCard({ post }: { post: LocalizedPost }) {
           {/* Underline as a scaled hairline: transform-only, no reflow. */}
           <span
             aria-hidden
-            className="absolute inset-x-0 -bottom-0.5 block h-px origin-left scale-x-0 bg-accent transition-transform duration-[250ms] ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100 motion-reduce:transition-none"
+            className="absolute inset-x-0 -bottom-0.5 block h-px origin-left scale-x-0 bg-accent transition-transform duration-[250ms] ease-out group-hover:scale-x-100 group-focus-visible:scale-x-100"
           />
         </span>
         <span className="flex shrink-0 items-baseline gap-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:transition-none sm:inline-block">
+          <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 sm:inline-block">
             {t("readingTime", { minutes })}
           </span>
           <time dateTime={post.date} className="tabular-nums">

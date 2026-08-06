@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
 
 /** Handshake contract (unchanged since the first-load loader shipped): once the
  * ritual ends — or is skipped — 'fhfs:overture-done' fires so the hero can
@@ -34,7 +34,7 @@ type Phase = "pending" | "playing" | "done";
  *
  * Mechanics kept from the old loader: sessionStorage + done-event handshake,
  * scroll lock under the lenis contract, "pending" phase so returning
- * visitors never see a flash, reduced-motion goes straight to the page.
+ * visitors never see a flash, reduce-motion goes straight to the page.
  * Click or Enter/Space/Escape fast-forwards (timeScale) instead of
  * jump-cutting. Under prefers-reduced-transparency the translucent glow
  * flood is dropped and the scrim fade alone does the unveiling.
@@ -68,152 +68,160 @@ export function OvertureLight() {
         window.dispatchEvent(new Event(DONE_EVENT));
       };
 
-      const mm = gsap.matchMedia();
-
-      // Reduced motion: never play — hand over the stage immediately.
-      mm.add("(prefers-reduced-motion: reduce)", finishInstant);
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // Blocked storage (private mode, cookie policy) must not strand the
-        // page behind the curtain — treat a throw as "already seen".
-        let seen = true;
+      /** Once shown — or deliberately skipped — the overture is spent for this
+       *  session. Recording it in the timeline's last frame alone is not
+       *  enough: a context revert (the [locale] layout remounts on a locale
+       *  switch) skips the terminal callback, and the next mount then replays
+       *  the whole opaque blackout, scroll lock included. Blocked storage never
+       *  reaches here — an overture that was never shown stays owed. */
+      const markSeen = () => {
         try {
-          seen = !!sessionStorage.getItem(SEEN_KEY);
+          sessionStorage.setItem(SEEN_KEY, "1");
         } catch {
-          seen = true;
+          /* Replaying the overture beats crashing the page. */
         }
-        if (seen) {
-          finishInstant();
-          return;
+      };
+
+      // Blocked storage (private mode, cookie policy) must not strand the
+      // page behind the curtain — treat a throw as "already seen".
+      let seen = true;
+      try {
+        seen = !!sessionStorage.getItem(SEEN_KEY);
+      } catch {
+        seen = true;
+      }
+      // Reduce-motion: an opaque full-viewport blackout that locks the page and
+      // blurs away anything the visitor tabs to is the one entrance worth
+      // skipping outright. The key is spent on the way past, because HomeHero
+      // reads it to learn the relay is not coming — otherwise the cover would
+      // sit at opacity 0 waiting out the 8s safety timeout.
+      if (prefersReducedMotion()) {
+        markSeen();
+        seen = true;
+      }
+      if (seen) {
+        finishInstant();
+        return;
+      }
+
+      setPhase("playing");
+
+      // Lock scrolling while the lights are still off (lenis contract).
+      window.__lenis?.stop();
+      document.documentElement.style.overflow = "hidden";
+      let locked = true;
+      const unlock = () => {
+        if (!locked) return;
+        locked = false;
+        document.documentElement.style.overflow = "";
+        // Re-sync before resuming: anything the user spun during the
+        // blackout must not teleport the page once it lifts.
+        window.__lenis?.scrollTo(window.scrollY, {
+          immediate: true,
+          force: true,
+        });
+        window.__lenis?.start();
+        // Pinned sections were measured while the page was locked and had
+        // no scrollbar; re-measure now that the real layout is back.
+        ScrollTrigger.refresh();
+      };
+
+      /** Proof the blackout actually reached the screen. Dev Strict Mode
+       *  mounts, reverts and remounts inside a single commit — not one
+       *  frame is painted in between, so that teardown still owes the
+       *  visitor the overture, while a genuine mid-play unmount does not. */
+      let shown = false;
+      const shownFrame = requestAnimationFrame(() => {
+        shown = true;
+      });
+
+      // The blackout is opaque, so anything focusable behind it would take
+      // an invisible focus ring — and Enter would activate an unseen link.
+      const onFocusIn = (e: FocusEvent) => {
+        const target = e.target;
+        if (locked && target instanceof HTMLElement && target !== document.body) {
+          target.blur();
         }
+      };
+      // Mouse users click to fast-forward; keyboard gets the same way out.
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+          e.preventDefault();
+          skip();
+        }
+      };
 
-        setPhase("playing");
+      // Initial states — set in JS so SSR markup stays untouched.
+      gsap.set(overlay, { autoAlpha: 1 });
+      gsap.set(scrim, { opacity: 1 });
+      gsap.set(cord, { scaleY: 0, transformOrigin: "50% 0%" });
+      gsap.set(bulb, { autoAlpha: 0 });
+      gsap.set(halo, { autoAlpha: 0, scale: 0.6 });
+      gsap.set(flood, {
+        autoAlpha: 1,
+        clipPath: `circle(0% at ${LAMP_X} ${LAMP_Y})`,
+      });
 
-        // Lock scrolling while the lights are still off (lenis contract).
-        window.__lenis?.stop();
-        document.documentElement.style.overflow = "hidden";
-        let locked = true;
-        const unlock = () => {
-          if (!locked) return;
-          locked = false;
-          document.documentElement.style.overflow = "";
-          // Re-sync before resuming: anything the user spun during the
-          // blackout must not teleport the page once it lifts.
-          window.__lenis?.scrollTo(window.scrollY, {
-            immediate: true,
-            force: true,
-          });
-          window.__lenis?.start();
-          // Pinned sections were measured while the page was locked and had
-          // no scrollbar; re-measure now that the real layout is back.
-          ScrollTrigger.refresh();
-        };
-
-        /** Once shown, the overture is spent for this session — and recording
-         *  that in the timeline's last frame alone is not enough. A context
-         *  revert (the [locale] layout remounts on a locale switch; a
-         *  reduced-motion flip kills this media context) skips the terminal
-         *  callback, and the next mount then replays the whole opaque
-         *  blackout, scroll lock included. Never written up front either:
-         *  HomeHero reads this same key on mount to decide whether to wait
-         *  for the done event, and it must still wait. Reduced motion and
-         *  blocked storage never reach here — an overture that was never
-         *  shown stays owed. */
-        const markSeen = () => {
-          try {
-            sessionStorage.setItem(SEEN_KEY, "1");
-          } catch {
-            /* Replaying the overture beats crashing the page. */
-          }
-        };
-
-        /** Proof the blackout actually reached the screen. Dev Strict Mode
-         *  mounts, reverts and remounts inside a single commit — not one
-         *  frame is painted in between, so that teardown still owes the
-         *  visitor the overture, while a genuine mid-play unmount does not. */
-        let shown = false;
-        const shownFrame = requestAnimationFrame(() => {
-          shown = true;
-        });
-
-        // The blackout is opaque, so anything focusable behind it would take
-        // an invisible focus ring — and Enter would activate an unseen link.
-        const onFocusIn = (e: FocusEvent) => {
-          const target = e.target;
-          if (locked && target instanceof HTMLElement && target !== document.body) {
-            target.blur();
-          }
-        };
-        // Mouse users click to fast-forward; keyboard gets the same way out.
-        const onKeyDown = (e: KeyboardEvent) => {
-          if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
-            e.preventDefault();
-            skip();
-          }
-        };
-
-        // Initial states — set in JS so SSR markup stays untouched.
-        gsap.set(overlay, { autoAlpha: 1 });
-        gsap.set(scrim, { opacity: 1 });
-        gsap.set(cord, { scaleY: 0, transformOrigin: "50% 0%" });
-        gsap.set(bulb, { autoAlpha: 0 });
-        gsap.set(halo, { autoAlpha: 0, scale: 0.6 });
-        gsap.set(flood, {
-          autoAlpha: 1,
-          clipPath: `circle(0% at ${LAMP_X} ${LAMP_Y})`,
-        });
-
-        const tl = gsap.timeline();
-        tl
-          // 1. The cord drops from the dark.
-          .to(cord, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 0)
-          // 2. The lamp warms up: a dim flicker first, then full.
-          .to(bulb, { autoAlpha: 0.55, duration: 0.08, ease: "power1.in" }, 0.16)
-          .to(bulb, { autoAlpha: 1, duration: 0.12, ease: "power1.out" }, 0.3)
-          .to(halo, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 0.18)
-          // 3. Light floods outward (clip-path circle) and pushes the dark
-          //    out — the unveiling is done by the glow, not by a wipe.
-          .to(
-            flood,
-            {
-              clipPath: `circle(135% at ${LAMP_X} ${LAMP_Y})`,
-              duration: 0.5,
-              ease: "power2.out",
-            },
-            FLOOD_AT
-          )
-          .to(scrim, { opacity: 0, duration: 0.44, ease: "power2.inOut" }, 0.42)
-          // 4. Relay: hand over before the last of the warm tint melts, so
-          //    the masthead starts rising under the fading light.
-          .add(() => {
-            window.dispatchEvent(new Event(DONE_EVENT));
-          }, DONE_AT)
-          .to(
-            overlay,
-            { autoAlpha: 0, duration: END_AT - 0.62, ease: "power1.inOut" },
-            0.62
-          )
-          .add(() => {
-            unlock();
-            window.removeEventListener("keydown", onKeyDown);
-            window.removeEventListener("focusin", onFocusIn);
-            markSeen();
-            setPhase("done");
-          }, END_AT);
-
-        tlRef.current = tl;
-        window.addEventListener("keydown", onKeyDown);
-        window.addEventListener("focusin", onFocusIn);
-
-        // Restore scroll even if we unmount mid-play (route change).
-        return () => {
+      const tl = gsap.timeline();
+      tl
+        // 1. The cord drops from the dark.
+        .to(cord, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 0)
+        // 2. The lamp warms up: a dim flicker first, then full.
+        .to(bulb, { autoAlpha: 0.55, duration: 0.08, ease: "power1.in" }, 0.16)
+        .to(bulb, { autoAlpha: 1, duration: 0.12, ease: "power1.out" }, 0.3)
+        .to(halo, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 0.18)
+        // 3. Light floods outward (clip-path circle) and pushes the dark
+        //    out — the unveiling is done by the glow, not by a wipe.
+        .to(
+          flood,
+          {
+            clipPath: `circle(135% at ${LAMP_X} ${LAMP_Y})`,
+            duration: 0.5,
+            ease: "power2.out",
+          },
+          FLOOD_AT
+        )
+        .to(scrim, { opacity: 0, duration: 0.44, ease: "power2.inOut" }, 0.42)
+        // 4. Relay: hand over before the last of the warm tint melts, so
+        //    the masthead starts rising under the fading light.
+        .add(() => {
+          window.dispatchEvent(new Event(DONE_EVENT));
+        }, DONE_AT)
+        .to(
+          overlay,
+          { autoAlpha: 0, duration: END_AT - 0.62, ease: "power1.inOut" },
+          0.62
+        )
+        .add(() => {
           unlock();
-          cancelAnimationFrame(shownFrame);
           window.removeEventListener("keydown", onKeyDown);
           window.removeEventListener("focusin", onFocusIn);
-          if (shown) markSeen();
-        };
-      });
+          markSeen();
+          setPhase("done");
+        }, END_AT);
+
+      tlRef.current = tl;
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("focusin", onFocusIn);
+
+      // Wall-clock net: if the ticker stalls mid-play, the page must not sit
+      // locked behind an opaque overlay with no timeline left to finish it.
+      // Jumping to the end fires the terminal callback — unlock included —
+      // and a timeline that finished normally is already at 1.
+      const failsafe = window.setTimeout(() => {
+        const active = tlRef.current;
+        if (active && active.progress() < 1) active.progress(1);
+      }, (END_AT + 3) * 1000);
+
+      // Restore scroll even if we unmount mid-play (route change).
+      return () => {
+        window.clearTimeout(failsafe);
+        unlock();
+        cancelAnimationFrame(shownFrame);
+        window.removeEventListener("keydown", onKeyDown);
+        window.removeEventListener("focusin", onFocusIn);
+        if (shown) markSeen();
+      };
     },
     { scope: container }
   );

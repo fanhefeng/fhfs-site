@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { hasLocale } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getAllSlugs, getPost } from "@/lib/content";
@@ -13,9 +14,10 @@ export const contentType = "image/png";
  * generateStaticParams the way pages do — declare the full locale × slug
  * matrix here or the card is only rendered on first request.
  */
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const slugs = await getAllSlugs();
   return routing.locales.flatMap((locale) =>
-    getAllSlugs().map((slug) => ({ locale, slug }))
+    slugs.map((slug) => ({ locale, slug }))
   );
 }
 
@@ -41,17 +43,17 @@ export default async function PostOgImage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const l = (routing.locales as readonly string[]).includes(locale)
-    ? (locale as Locale)
+  const l: Locale = hasLocale(routing.locales, locale)
+    ? locale
     : routing.defaultLocale;
   const other: Locale = l === "zh" ? "en" : "zh";
 
-  const post = getPost(slug, l);
+  const post = await getPost(slug, l);
   const title = post?.title ?? site.signName;
   // Bilingual typography: the counterpart title sits under the headline as a
   // quiet second deck. Skipped when the post only exists in one language (in
   // which case getPost falls back and both lookups return the same string).
-  const counterpart = getPost(slug, other);
+  const counterpart = await getPost(slug, other);
   const subtitle =
     counterpart && counterpart.title !== title ? counterpart.title : null;
 

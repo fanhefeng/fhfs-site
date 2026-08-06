@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { ReactNode } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
 
 type Props = {
   children: ReactNode;
@@ -18,8 +18,8 @@ type Props = {
  * to float above the plate (a small parallax). On leave both spring home
  * with an elastic wobble.
  *
- * Touch devices and prefers-reduced-motion get a completely inert wrapper —
- * no listeners are ever registered, so there is zero per-frame cost.
+ * Touch devices get a completely inert wrapper — no listeners are ever
+ * registered, so there is zero per-frame cost.
  */
 export function Magnetic({ children, strength = 0.4, className }: Props) {
   const wrapRef = useRef<HTMLSpanElement>(null);
@@ -30,10 +30,8 @@ export function Magnetic({ children, strength = 0.4, className }: Props) {
       const wrap = wrapRef.current;
       const inner = innerRef.current;
       if (!wrap || !inner) return;
-      // Magnetism only makes sense for a hovering fine pointer, and it is
-      // pure flourish — skip entirely under reduced motion.
-      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      // Magnetism only makes sense for a hovering fine pointer.
+      if (!isFinePointer()) return;
 
       /* Geometry is read once per hover (pointerenter) — an event-driven
        * read, never per frame. The wrapper itself moves during the hover,

@@ -11,11 +11,7 @@ import {
   type IntroText,
 } from "@/lib/intro/stickers";
 import { renderOnDemand, scrollState, useIntroStore } from "@/lib/intro/store";
-import {
-  hasWebGL,
-  prefersReducedMotion,
-  prefersSaveData,
-} from "@/lib/three/guards";
+import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 // Type-only, and therefore erased before bundling — importing the value would
 // drag the entire 3D graph back into this chunk and undo the split below.
 import type { Tone } from "./AvatarScene";
@@ -37,8 +33,8 @@ const EditorPanel =
 // three, fiber, drei and the head, behind a chunk that is only fetched
 // once the probe below says this visitor will actually see them. Statically
 // imported, they were preloaded straight from the route's HTML — i.e. before
-// the probe had run — so reduced-motion, Save-Data and no-WebGL visitors paid
-// for a scene they are deliberately never shown.
+// the probe had run — so Save-Data and no-WebGL visitors paid for a scene they
+// are deliberately never shown.
 const AvatarCanvas = dynamic(() => import("./AvatarCanvas"), { ssr: false });
 
 type Props = {
@@ -103,8 +99,8 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
     //
     // Gated on the build as well, and not only because the panel is dead
     // weight in production: editing skips every guard below, so on the live
-    // site the query string alone would hand a reduced-motion or Save-Data
-    // visitor the full 3D scene.
+    // site the query string alone would hand a Save-Data visitor the full
+    // 3D scene.
     const wantsEditor =
       EditorPanel !== null &&
       new URLSearchParams(window.location.search).has("edit");
@@ -120,14 +116,15 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
     // Save-Data is not a hint about connection speed here: the model plus
     // the whole 3D runtime is precisely the spend that setting exists to
     // refuse, and the résumé says the same things in text.
-    setMode(
-      prefersReducedMotion() || prefersSaveData() || !hasWebGL()
-        ? "fallback"
-        : "webgl"
-    );
+    //
+    // prefers-reduced-motion is deliberately absent — see the note in
+    // lib/three/guards.ts. The face is the page; gating it on a signal most
+    // Windows visitors trip while chasing speed cost far more people the
+    // whole point of /intro than it ever protected.
+    setMode(prefersSaveData() || !hasWebGL() ? "fallback" : "webgl");
   }, [setEditing]);
 
-  // A model that never arrives lands on the same visible résumé reduced-motion
+  // A model that never arrives lands on the same visible résumé Save-Data
   // visitors get, rather than taking the route down with it.
   const handleCanvasFailure = useCallback(() => setMode("fallback"), []);
 
@@ -165,7 +162,10 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
       ScrollTrigger.refresh();
       return () => trigger.kill();
     },
-    { dependencies: [mode, editing] }
+    // revertOnUpdate, or the teardown above never runs on a dependency change
+    // (useGSAP defers cleanup to unmount otherwise) and the fall back to the
+    // résumé leaves a trigger writing progress for a canvas that is gone.
+    { dependencies: [mode, editing], revertOnUpdate: true }
   );
 
   useEffect(() => {

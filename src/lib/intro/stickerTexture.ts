@@ -161,7 +161,6 @@ export function createStickerTexture(opts: {
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
-  texture.needsUpdate = true;
 
   return { texture, aspect: W / H };
 }

@@ -45,12 +45,11 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
 
   const change = useCallback((next: string) => {
     const grid = gridRef.current;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Capture *before* React re-renders — this is the "previous state" the
     // cards inherit their positions from. `offsetParent` is null while the
     // grid is display:none (phones show the rail instead), and there is
     // nothing to reshuffle then.
-    if (grid && grid.offsetParent !== null && !reduced) {
+    if (grid && grid.offsetParent !== null) {
       pending.current = Flip.getState(grid.querySelectorAll("[data-flip-item]"));
     }
     setFilter(next as AppFilter);
@@ -92,7 +91,7 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
       const mm = gsap.matchMedia();
       // Gated on the breakpoint too: below md the grid is display:none, and
       // ScrollTrigger would measure a zero-height trigger.
-      mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+      mm.add("(min-width: 768px)", () => {
         gsap.from(grid.querySelectorAll("[data-flip-item]"), {
           y: 24,
           autoAlpha: 0,
@@ -117,9 +116,11 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
           onChange={change}
           ariaLabel={t("filterAria")}
         />
+        {/* sr-only below sm, not hidden — the phone rail filters too, and
+            display:none would silence this live region for its readers. */}
         <p
           aria-live="polite"
-          className="hidden shrink-0 font-mono text-meta uppercase tracking-meta text-fg-tertiary sm:block"
+          className="sr-only shrink-0 font-mono text-meta uppercase tracking-meta text-fg-tertiary sm:not-sr-only sm:block"
         >
           {t("count", { count: visible.length })}
         </p>

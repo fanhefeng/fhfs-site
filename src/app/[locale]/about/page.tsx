@@ -5,7 +5,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { getAbout, getTimeline } from "@/lib/content";
+import { getAbout, getChips, getTimeline } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
@@ -18,7 +18,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/about">): Promise<Metadata> {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
+  if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "about" });
   return {
     title: t("title"),
@@ -41,15 +41,22 @@ export default async function AboutPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("about");
-  const about = getAbout(locale);
+  const about = await getAbout(locale);
+
+  // Resolved to one language here so the wall — a client island — never sees
+  // a `{zh,en}` pair it has no use for.
+  const chips = (await getChips()).map((chip) => ({
+    label: chip.label[locale],
+    tone: chip.tone,
+  }));
 
   // Localize the changelog here so the client component ships plain strings.
   // An entry without a real `date` shows its placeholder label instead — the
   // page never invents a date it cannot source.
-  const entries: ChangelogEntry[] = getTimeline().map((entry) => {
+  const entries: ChangelogEntry[] = (await getTimeline()).map((entry) => {
     const dateText = entry.date ?? entry.dateLabel?.[locale] ?? "—";
     return {
-      id: entry._meta.path,
+      id: entry.key,
       version: entry.version,
       dateText,
       year: entry.date ? entry.date.slice(0, 4) : "—",
@@ -96,13 +103,13 @@ export default async function AboutPage({
       </header>
 
       {/* The 3D desk, kept from the old portfolio. Loads only when scrolled
-          near, and holds a single still frame under reduced motion. */}
+          near. */}
       <Workstation hint={t("deskHint")} className="mt-16" />
 
-      {about && <Mdx code={about.mdx} />}
+      {about && <Mdx html={about.html} />}
 
       <StickerWall
-        locale={locale}
+        chips={chips}
         title={t("stickersTitle")}
         hint={t("stickersHint")}
         ariaLabel={t("stickersAria")}

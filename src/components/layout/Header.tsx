@@ -8,13 +8,14 @@ import { gsap, useGSAP, Flip } from "@/lib/gsap";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { FullNav } from "./FullNav";
+import type { NavLink } from "./Footer";
 
-const NAV_ITEMS = [
-  { href: "/blog", key: "blog" },
-  { href: "/about", key: "about" },
-  { href: "/portfolio", key: "portfolio" },
-  { href: "/software", key: "software" },
-] as const;
+type Props = {
+  /** The desktop row's links. */
+  links: NavLink[];
+  /** The full-screen menu's links — a longer list, home included. */
+  menuLinks: NavLink[];
+};
 
 /** Hamburger line geometry: three resting rows and the two X diagonals. */
 const LINES = [
@@ -25,7 +26,9 @@ const LINES = [
 
 /** Desktop = the island expands inline; below this the burger opens FullNav. */
 const DESKTOP = "(min-width: 768px)";
-const REDUCED = "(prefers-reduced-motion: reduce)";
+
+/** Hamburger ⇄ X morph, in seconds. */
+const GLYPH_DURATION = 0.35;
 
 /**
  * The dynamic-island masthead (after the JoRMPLg pattern): a floating
@@ -37,11 +40,11 @@ const REDUCED = "(prefers-reduced-motion: reduce)";
  * replayed bounce. On mobile the burger opens the FullNav sheet instead.
  *
  * Extras per spec: a cursor-following fePointLight glint on the capsule
- * edge (static border under reduced motion), a Flip-translated capsule
+ * edge, a Flip-translated capsule
  * indicator under the aria-current page, and a scroll-edge scrim that fades
  * in under the island once the page scrolls (mask-image gradient).
  */
-export function Header() {
+export function Header({ links, menuLinks }: Props) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const locale = useLocale();
@@ -82,7 +85,7 @@ export function Header() {
       gsap.to(ind, { autoAlpha: 0, duration: 0.15, overwrite: "auto" });
       return;
     }
-    if (instant || window.matchMedia(REDUCED).matches) {
+    if (instant) {
       Flip.fit(ind, active, { scale: false });
       gsap.set(ind, { autoAlpha: 1 });
     } else {
@@ -150,15 +153,6 @@ export function Header() {
       if (!tray) return;
 
       if (expanded) {
-        if (window.matchMedia(REDUCED).matches) {
-          gsap.set(tray, { visibility: "visible", width: "auto" });
-          gsap.set(gsap.utils.toArray<HTMLElement>(".isl-item", tray), {
-            autoAlpha: 1,
-            y: 0,
-          });
-          fitIndicator(true);
-          return;
-        }
         const tl = tlRef.current;
         if (tl && tl.progress() > 0) {
           tl.timeScale(1).play();
@@ -169,11 +163,6 @@ export function Header() {
         tlRef.current = fresh;
         fresh?.timeScale(1).play(0);
       } else {
-        if (window.matchMedia(REDUCED).matches) {
-          gsap.set(tray, { width: 0, visibility: "hidden" });
-          if (indicatorRef.current) gsap.set(indicatorRef.current, { autoAlpha: 0 });
-          return;
-        }
         const tl = tlRef.current;
         if (!tl || tl.progress() === 0) return;
         if (indicatorRef.current) {
@@ -192,24 +181,26 @@ export function Header() {
     () => {
       const [l1, l2, l3] = lineRefs.current;
       if (!l1 || !l2 || !l3) return;
-      const d = window.matchMedia(REDUCED).matches ? 0 : 0.35;
       const ease = "power2.inOut";
-      if (glyphOpen) {
-        gsap.to(l1, { attr: LINES[0].cross, duration: d, ease, overwrite: "auto" });
-        gsap.to(l2, { opacity: 0, duration: d * 0.55, ease, overwrite: "auto" });
-        gsap.to(l3, { attr: LINES[2].cross, duration: d, ease, overwrite: "auto" });
-      } else {
-        gsap.to(l1, { attr: LINES[0].rest, duration: d, ease, overwrite: "auto" });
-        gsap.to(l2, { opacity: 1, duration: d, ease, overwrite: "auto" });
-        gsap.to(l3, { attr: LINES[2].rest, duration: d, ease, overwrite: "auto" });
-      }
+      const [top, bottom] = glyphOpen
+        ? [LINES[0].cross, LINES[2].cross]
+        : [LINES[0].rest, LINES[2].rest];
+      gsap.to(l1, { attr: top, duration: GLYPH_DURATION, ease, overwrite: "auto" });
+      gsap.to(l3, { attr: bottom, duration: GLYPH_DURATION, ease, overwrite: "auto" });
+      // The middle line only fades, and it leaves quicker than it comes back.
+      gsap.to(l2, {
+        opacity: glyphOpen ? 0 : 1,
+        duration: GLYPH_DURATION * (glyphOpen ? 0.55 : 1),
+        ease,
+        overwrite: "auto",
+      });
     },
     { dependencies: [glyphOpen], scope: rootRef }
   );
 
   // Cursor-following specular glint: a fePointLight rides the pointer and
   // lights up the thin white ring hugging the capsule edge ("a torch swept
-  // across the glass"). Fine pointers only; reduced motion keeps the static
+  // across the glass"). Fine pointers only — a touch device keeps the static
   // glass border and never attaches a listener.
   useGSAP(
     () => {
@@ -220,8 +211,11 @@ export function Header() {
 
       const mm = gsap.matchMedia();
       mm.add(
-        "(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)",
+        "(hover: hover) and (pointer: fine)",
         () => {
+          const onEnter = () => {
+            gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
+          };
           const onMove = (e: PointerEvent) => {
             // Event-driven read; fePointLight x/y live in the ring's own
             // user space, so the island rect maps clientX/Y directly.
@@ -232,14 +226,15 @@ export function Header() {
               ease: "power2.out",
               overwrite: "auto",
             });
-            gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
           };
           const onLeave = () => {
             gsap.to(ring, { opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" });
           };
+          island.addEventListener("pointerenter", onEnter);
           island.addEventListener("pointermove", onMove);
           island.addEventListener("pointerleave", onLeave);
           return () => {
+            island.removeEventListener("pointerenter", onEnter);
             island.removeEventListener("pointermove", onMove);
             island.removeEventListener("pointerleave", onLeave);
           };
@@ -408,7 +403,7 @@ export function Header() {
                     aria-hidden="true"
                     className="invisible absolute top-0 left-0 rounded-full bg-fg/[0.05] opacity-0 dark:bg-white/10"
                   />
-                  {NAV_ITEMS.map((item) => {
+                  {links.map((item) => {
                     const active = pathname.startsWith(item.href);
                     return (
                       <Link
@@ -421,7 +416,7 @@ export function Header() {
                           active ? "text-accent" : "text-fg-secondary hover:text-fg"
                         }`}
                       >
-                        {t(item.key)}
+                        {t(item.labelKey)}
                       </Link>
                     );
                   })}
@@ -468,9 +463,9 @@ export function Header() {
         </div>
       </header>
 
-      <FullNav open={navOpen} onClose={() => setNavOpen(false)} triggerRef={burgerRef} />
+      <FullNav links={menuLinks} open={navOpen} onClose={() => setNavOpen(false)} triggerRef={burgerRef} />
     </>
   );
 }
 
-export default Header;
+

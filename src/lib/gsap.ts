@@ -48,16 +48,27 @@ export const EASE = {
   exit: "power2.in",
 } as const;
 
-export {
-  gsap,
-  useGSAP,
-  ScrollTrigger,
-  SplitText,
-  CustomEase,
-  CustomWiggle,
-  Flip,
-  Draggable,
-  InertiaPlugin,
-  ScrambleTextPlugin,
-  ExpoScaleEase,
-};
+/**
+ * The one motion signal the site still branches on, and a deliberately narrow
+ * one: everybody gets the full-motion version (DESIGN.md §1.5). What this gates
+ * is the short list that has no stop button otherwise — six places in all:
+ * three endless CSS loops (`.aurora-blob`, `.grain-layer`, `.pulse-stepped`,
+ * all in one media block in globals.css), the endless dot-matrix canvas
+ * (DotDoodle), the inertial scroll hijack (SmoothScroll) and the opening
+ * blackout (OvertureLight). Entrances, reveals, curtains and hover effects
+ * are not on it.
+ *
+ * Reads the live browser, so it belongs in an effect, never in a render path
+ * that also runs on the server.
+ */
+export const prefersReducedMotion = (): boolean =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** Mouse-class pointer — the gate on every hover-driven effect. */
+export const isFinePointer = (): boolean =>
+  window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+// CustomEase/CustomWiggle, InertiaPlugin and ScrambleTextPlugin are not
+// re-exported: registration alone makes their string forms ("wiggle(…)",
+// `inertia:`, `scrambleText:`) parseable, and no component imports the classes.
+export { gsap, useGSAP, ScrollTrigger, SplitText, Flip, Draggable, ExpoScaleEase };

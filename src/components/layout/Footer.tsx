@@ -7,12 +7,8 @@ import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { PeelSticker } from "@/components/ui/PeelSticker";
 
-const NAV_ITEMS = [
-  { href: "/blog", key: "blog" },
-  { href: "/about", key: "about" },
-  { href: "/portfolio", key: "portfolio" },
-  { href: "/software", key: "software" },
-] as const;
+/** A link in the site's one nav table, filtered to this surface. */
+export type NavLink = { href: string; labelKey: string };
 
 /**
  * "HH:mm in Qingdao" — the colophon clock. Formats wall time for
@@ -58,7 +54,7 @@ function useQingdaoTime(): string | null {
  * the email address. (The old ASCII-canvas finale, giant sign name and
  * model credit are retired.)
  */
-export function Footer() {
+export function Footer({ items }: { items: NavLink[] }) {
   const t = useTranslations("footer");
   const tNav = useTranslations("nav");
   const locale = useLocale();
@@ -92,9 +88,9 @@ export function Footer() {
           aria-label={t("navAria")}
           className="flex flex-wrap items-center gap-x-5 gap-y-1"
         >
-          {NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <Link key={item.href} href={item.href} className={linkClass}>
-              {tNav(item.key)}
+              {tNav(item.labelKey)}
             </Link>
           ))}
         </nav>

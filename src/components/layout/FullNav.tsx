@@ -7,18 +7,16 @@ import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import type { NavLink } from "./Footer";
 
-const ITEMS = [
-  { href: "/", key: "home" },
-  { href: "/blog", key: "blog" },
-  { href: "/about", key: "about" },
-  { href: "/portfolio", key: "portfolio" },
-  { href: "/software", key: "software" },
-] as const;
-
-const REDUCED = "(prefers-reduced-motion: reduce)";
 
 export type FullNavProps = {
+  /**
+   * The menu's links, in order, from the site's one nav table. Named `links`
+   * rather than `items` because the open/close effect already binds `items`
+   * to the DOM nodes it animates.
+   */
+  links: NavLink[];
   /** Whether the sheet is shown. Owned by the Header. */
   open: boolean;
   /**
@@ -46,11 +44,11 @@ export type FullNavProps = {
  *
  * Scroll is locked while open per the Lenis contract: stop() + overflow
  * hidden, restored with scrollTo(y, immediate, force) → start() →
- * ScrollTrigger.refresh(). Reduced motion swaps both directions for a plain
- * 0.2s fade. On a route commit the layer resets instantly — RouteTransition
- * already owns the screen, so animating here would play to nobody.
+ * ScrollTrigger.refresh(). On a route commit the layer resets instantly —
+ * RouteTransition already owns the screen, so animating here would play to
+ * nobody.
  */
-export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
+export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
@@ -94,10 +92,10 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
   }, []);
 
   /** Push the page back while the sheet is up (scale + blur on <main>). */
-  const pushMain = useCallback((show: boolean, reduced: boolean) => {
+  const pushMain = useCallback((show: boolean) => {
     if (show) {
       const main = document.querySelector<HTMLElement>("main");
-      if (!main || reduced) return;
+      if (!main) return;
       pushedMainRef.current = main;
       gsap.to(main, {
         scale: 0.98,
@@ -111,8 +109,8 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
     }
     const main = pushedMainRef.current;
     pushedMainRef.current = null;
-    // Gone with its page (or never pushed, under reduced motion): the styles
-    // left with the element, and whatever <main> is on screen now is not ours.
+    // Gone with its page: the styles left with the element, and whatever
+    // <main> is on screen now is not ours.
     if (!main?.isConnected) return;
     gsap.to(main, {
       scale: 1,
@@ -148,20 +146,15 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
     prevOpenRef.current = open;
 
     const items = gsap.utils.toArray<HTMLElement>(".fn-item", root);
-    const reduced = window.matchMedia(REDUCED).matches;
 
     tl.clear();
 
     if (open) {
       lock();
       gsap.set(root, { autoAlpha: 1, pointerEvents: "auto" });
-      pushMain(true, reduced);
+      pushMain(true);
 
-      if (reduced) {
-        gsap.set(panel, { yPercent: 0, y: 0, autoAlpha: 1, filter: "blur(0px)" });
-        gsap.set(items, { y: 0, autoAlpha: 1 });
-        tl.fromTo(root, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "none" });
-      } else if (settledClosedRef.current) {
+      if (settledClosedRef.current) {
         // Fresh open: the shade draws down ("closing time" — the gallery
         // blind), links cascade up behind it.
         tl.fromTo(
@@ -203,23 +196,19 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
 
       // Closing: the sheet must not swallow clicks while it sinks.
       gsap.set(root, { pointerEvents: "none" });
-      pushMain(false, reduced);
+      pushMain(false);
 
-      if (reduced) {
-        tl.to(root, { autoAlpha: 0, duration: 0.2, ease: "none" });
-      } else {
-        // The quiet exit: everything sinks together and dissolves into
-        // blur — no tumbling scenery in this issue.
-        tl.to(
-          items,
-          { y: 14, autoAlpha: 0, duration: 0.28, ease: "power2.in", stagger: { each: 0.02, from: "end" } },
-          0
-        ).to(
-          panel,
-          { y: 48, autoAlpha: 0, filter: "blur(10px)", duration: 0.38, ease: "power2.in" },
-          0.05
-        );
-      }
+      // The quiet exit: everything sinks together and dissolves into
+      // blur — no tumbling scenery in this issue.
+      tl.to(
+        items,
+        { y: 14, autoAlpha: 0, duration: 0.28, ease: "power2.in", stagger: { each: 0.02, from: "end" } },
+        0
+      ).to(
+        panel,
+        { y: 48, autoAlpha: 0, filter: "blur(10px)", duration: 0.38, ease: "power2.in" },
+        0.05
+      );
       tl.add(() => {
         gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
         gsap.set(panel, { clearProps: "transform,opacity,visibility,filter" });
@@ -331,7 +320,7 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
           aria-label={t("ariaLabel")}
           className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-1 px-8 pt-24"
         >
-          {ITEMS.map((item, i) => {
+          {links.map((item, i) => {
             const active =
               item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             return (
@@ -354,7 +343,7 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
                     active ? "text-accent" : "text-fg group-hover:text-accent"
                   }`}
                 >
-                  {t(item.key)}
+                  {t(item.labelKey)}
                 </span>
               </Link>
             );
@@ -391,4 +380,4 @@ export function FullNav({ open, onClose, triggerRef }: FullNavProps) {
   );
 }
 
-export default FullNav;
+

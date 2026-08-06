@@ -14,7 +14,7 @@ export const GLYPH_GRID = 7;
 
 const BLANK = ".......";
 
-export const DOT_GLYPHS: Readonly<Record<string, readonly string[]>> = {
+const DOT_GLYPHS: Readonly<Record<string, readonly string[]>> = {
   " ": [BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK],
   A: ["..###..", ".#...#.", "#.....#", "#.....#", "#######", "#.....#", "#.....#"],
   B: ["######.", "#.....#", "#.....#", "######.", "#.....#", "#.....#", "######."],

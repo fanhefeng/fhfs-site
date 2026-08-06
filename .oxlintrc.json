@@ -9,5 +9,5 @@
     "react/exhaustive-deps": "error",
     "react/rules-of-hooks": "error"
   },
-  "ignorePatterns": [".next", ".content-collections", "tools", "public"]
+  "ignorePatterns": [".next", "tools", "public"]
 }

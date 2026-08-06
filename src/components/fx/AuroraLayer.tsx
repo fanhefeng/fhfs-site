@@ -4,7 +4,7 @@
  * quiet descendant of the old neon. Pure CSS (gradients + 60–120s
  * transform-only breath, styles in globals.css), so this stays a Server
  * Component with zero client JS. Brighter after hours via --aurora-opacity;
- * static under prefers-reduced-motion and prefers-reduced-data.
+ * static under prefers-reduced-motion.
  *
  * The breath is stepped, not continuous, and has to stay that way — see the
  * measurements in globals.css. This layer sits on every page of the site, so

@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing, type Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
-import { getApps, getWorks } from "@/lib/content";
+import { getApps, getExperiments, getWorks } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
 import { BentoHero, type BentoItem } from "@/components/portfolio/BentoHero";
 import { CraftList, type CraftEntry } from "@/components/portfolio/CraftList";
 
-type Props = { params: Promise<{ locale: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[locale]/portfolio">): Promise<Metadata> {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "portfolio" });
   return {
     title: t("title"),
@@ -23,20 +22,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /**
- * Cover tints for the programmatic bento covers, keyed by app file name.
- * There are no screenshots in the repo, so a cover is colour + monogram +
- * name — deliberately editorial rather than a fake device mockup. Muted
- * gallery hues: every one of them reads on paper and after hours.
+ * Fallback cover tints, for an app saved without an accent of its own. There
+ * are no screenshots in the repo, so a cover is colour + monogram + name —
+ * deliberately editorial rather than a fake device mockup. Muted gallery
+ * hues: every one of them reads on paper and after hours.
+ *
+ * The per-app colour used to live here as a lookup table keyed by file name,
+ * while the software page derived a different one from list position — so the
+ * same app wore two colours depending on which page you were on. It is one
+ * stored column now.
  */
-const APP_ACCENT: Record<string, string> = {
-  portreaper: "#b45309",
-  "photo-browser": "#3e6d93",
-  lumitext: "#6b5ba8",
-  "file-tidy": "#4c7a5b",
-  "keyboard-piano": "#a8465f",
-  "fhf-links": "#2f6f72",
-};
-const ACCENT_CYCLE = Object.values(APP_ACCENT);
+const ACCENT_CYCLE = ["#b45309", "#3e6d93", "#6b5ba8", "#4c7a5b", "#a8465f", "#2f6f72"];
 
 /** "Photo Browser" → "PB", "Lumitext" → "Lu". */
 function monogramOf(name: string): string {
@@ -47,59 +43,38 @@ function monogramOf(name: string): string {
   return name.slice(0, 2);
 }
 
-/**
- * The craft log. Entries are data here; their names and one-liners live in
- * messages (portfolio.experiments.<id>). Keep it honest: `status` says what
- * is actually running, and anything not built here links to its source.
- */
-const CRAFT_ENTRIES: CraftEntry[] = [
-  {
-    id: "bentoScrub",
-    status: "live",
-    accent: "#4c7a5b",
-  },
-  {
-    id: "specularEdge",
-    status: "live",
-    accent: "#b45309",
-    href: "https://codepen.io/jh3yy/pen/azORaYx",
-  },
-  {
-    id: "liquidLens",
-    status: "wip",
-    accent: "#3e6d93",
-    demo: "liquid-lens",
-  },
-  {
-    id: "shatteredGlass",
-    status: "planned",
-    accent: "#6b5ba8",
-    href: "https://experiments.thisiswhitespace.com/glass-hero",
-  },
-  {
-    id: "lightsOn",
-    status: "live",
-    accent: "#a8465f",
-  },
-];
+/** Fallback dot colour for an experiment saved without one. */
+const CRAFT_ACCENT = "#4c7a5b";
 
-export default async function PortfolioPage({ params }: Props) {
+export default async function PortfolioPage({ params }: PageProps<"/[locale]/portfolio">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("portfolio");
-  const l = locale as Locale;
+  const l = locale;
 
-  const works = getWorks();
+  const works = await getWorks();
+
+  // Name, sentence, status and colour arrive as one record now — the craft log
+  // used to be a constant here plus two message keys per language.
+  const craft: CraftEntry[] = (await getExperiments()).map((entry) => ({
+    id: entry.key,
+    name: entry.name[l],
+    description: entry.description[l],
+    status: entry.status,
+    accent: entry.accent ?? CRAFT_ACCENT,
+    href: entry.href ?? undefined,
+    demo: entry.demo === "liquid-lens" ? "liquid-lens" : undefined,
+  }));
+
   // The collage reuses the software data — one wall, two ways in.
-  const covers: BentoItem[] = getApps().map((app, i) => {
-    const key = app._meta.path;
+  const covers: BentoItem[] = (await getApps()).map((app, i) => {
     return {
-      id: key,
+      id: app.key,
       name: app.name,
       kicker: app.platforms[0] ?? app.category,
       monogram: monogramOf(app.name),
-      accent: APP_ACCENT[key] ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length],
+      accent: app.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length],
       href: "/software",
       label: t("coverLabel", { name: app.name }),
     };
@@ -145,10 +120,10 @@ export default async function PortfolioPage({ params }: Props) {
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {works.map((work, i) => (
               <WorkCard
-                key={work._meta.path}
+                key={work.key}
                 work={work}
                 locale={l}
-                accent={ACCENT_CYCLE[i % ACCENT_CYCLE.length]}
+                accent={work.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length]}
               />
             ))}
           </div>
@@ -157,7 +132,7 @@ export default async function PortfolioPage({ params }: Props) {
 
       <div className="mx-auto w-full max-w-[680px] px-6 pt-20">
         <CraftList
-          entries={CRAFT_ENTRIES}
+          entries={craft}
           title={t("experimentsTitle")}
           subtitle={t("experimentsSub")}
           lensLinkHref={`/${locale}/software`}
