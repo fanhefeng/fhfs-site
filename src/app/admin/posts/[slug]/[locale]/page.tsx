@@ -25,14 +25,19 @@ export default async function EditPost({
     <AdminChrome
       title={post.title}
       action={
-        <a
-          href={`/${locale}/blog/${slug}`}
-          target="_blank"
-          rel="noreferrer"
-          className="text-caption text-fg-tertiary hover:text-accent"
-        >
-          在站上看 ↗
-        </a>
+        // A draft 404s on the site — no point linking to it.
+        post.draft ? (
+          <span className="text-caption text-fg-tertiary">草稿，未发布</span>
+        ) : (
+          <a
+            href={`/${locale}/blog/${slug}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-caption text-fg-tertiary hover:text-accent"
+          >
+            在站上看 ↗
+          </a>
+        )
       }
     >
       <PostForm

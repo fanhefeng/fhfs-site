@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ActionState } from "./actions";
 import { RecordForm, type Field, type RecordData } from "./RecordForm";
 
-export type ListRow = {
+type ListRow = {
   /** Stable identity, and the key React uses. */
   id: string;
   /** The row's headline, composed on the server. */

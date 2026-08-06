@@ -2,9 +2,10 @@
 
 import { useActionState } from "react";
 import { saveCopy, type ActionState } from "../actions";
-import { buttonClass, inputClass, labelClass } from "../AdminChrome";
+import { inputClass, labelClass } from "../AdminChrome";
+import { SaveControls } from "../SaveControls";
 
-export type CopyRow = {
+type CopyRow = {
   key: string;
   zh: string;
   en: string;
@@ -73,21 +74,7 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
         </section>
       ))}
 
-      <div className="sticky bottom-0 flex items-center gap-4 border-t border-line bg-bg py-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "保存中…" : "保存全部"}
-        </button>
-        {state.error && (
-          <p className="text-caption text-accent" role="alert">
-            {state.error}
-          </p>
-        )}
-        {state.ok && (
-          <p className="text-caption text-fg-secondary" role="status">
-            已保存，前台已刷新。
-          </p>
-        )}
-      </div>
+      <SaveControls state={state} pending={pending} label="保存全部" sticky />
     </form>
   );
 }

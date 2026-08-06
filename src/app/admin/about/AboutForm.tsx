@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { saveAbout, type ActionState } from "../actions";
-import { buttonClass, inputClass, labelClass } from "../AdminChrome";
+import { inputClass, labelClass } from "../AdminChrome";
+import { SaveControls } from "../SaveControls";
 
 export function AboutForm({
   about,
@@ -34,20 +35,7 @@ export function AboutForm({
         />
       </label>
 
-      {state.error && (
-        <p className="text-caption text-accent" role="alert">
-          {state.error}
-        </p>
-      )}
-      {state.ok && (
-        <p className="text-caption text-fg-secondary" role="status">
-          已保存，前台已刷新。
-        </p>
-      )}
-
-      <button type="submit" disabled={pending} className={buttonClass}>
-        {pending ? "保存中…" : "保存"}
-      </button>
+      <SaveControls state={state} pending={pending} />
     </form>
   );
 }

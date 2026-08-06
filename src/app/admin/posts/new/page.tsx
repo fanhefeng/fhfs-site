@@ -11,7 +11,9 @@ export default function NewPost() {
           locale: "zh",
           title: "",
           // Today, as a starting point rather than a claim — it is editable.
-          date: new Date().toISOString().slice(0, 10),
+          // sv-SE formats as YYYY-MM-DD in the server's local zone; the ISO
+          // string would be UTC, i.e. yesterday for a Qingdao morning.
+          date: new Intl.DateTimeFormat("sv-SE").format(new Date()),
           summary: "",
           tags: [],
           draft: false,

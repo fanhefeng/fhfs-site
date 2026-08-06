@@ -33,7 +33,7 @@ export default async function TimelinePage() {
         rows={rows.map((row) => ({
           id: row.key,
           label: `${row.version}  ${row.title.zh}`,
-          meta: row.date ?? "待填",
+          meta: row.date ?? row.dateLabel?.zh ?? "待填",
           data: row,
         }))}
       />

@@ -1,15 +1,14 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { saveChips, type ActionState } from "../actions";
-import { buttonClass, inputClass, labelClass } from "../AdminChrome";
+import { inputClass, labelClass } from "../AdminChrome";
+import { SaveControls } from "../SaveControls";
 
-export type ChipRow = {
+type ChipRow = {
   label: { zh: string; en: string };
   tone: "paper" | "ink" | "accent";
 };
-
-const BLANK: ChipRow = { label: { zh: "", en: "" }, tone: "paper" };
 
 /**
  * The whole wall on one page, in order.
@@ -17,13 +16,21 @@ const BLANK: ChipRow = { label: { zh: "", en: "" }, tone: "paper" };
  * Rows are positional: what you see is the order they appear on the wall, and
  * clearing both language fields is how one goes away. That keeps adding,
  * removing and reordering as the same gesture instead of three buttons.
+ *
+ * Inputs are controlled and re-synced from the server after a save. The save
+ * rewrites the whole table, so a form still showing stale values would
+ * quietly write them back — deleted rows included.
  */
 export function ChipsForm({ chips }: { chips: ChipRow[] }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     saveChips,
     {}
   );
-  const [rows, setRows] = useState<ChipRow[]>(chips);
+  const [rows, setRows] = useState(chips);
+  useEffect(() => setRows(chips), [chips]);
+
+  const edit = (index: number, row: ChipRow) =>
+    setRows(rows.map((r, i) => (i === index ? row : r)));
 
   return (
     <form action={formAction}>
@@ -37,7 +44,10 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
               {i === 0 && <span className={labelClass}>中文</span>}
               <input
                 name={`chip.${i}.label.zh`}
-                defaultValue={chip.label.zh}
+                value={chip.label.zh}
+                onChange={(e) =>
+                  edit(i, { ...chip, label: { ...chip.label, zh: e.target.value } })
+                }
                 className={inputClass}
               />
             </label>
@@ -45,7 +55,10 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
               {i === 0 && <span className={labelClass}>English</span>}
               <input
                 name={`chip.${i}.label.en`}
-                defaultValue={chip.label.en}
+                value={chip.label.en}
+                onChange={(e) =>
+                  edit(i, { ...chip, label: { ...chip.label, en: e.target.value } })
+                }
                 className={inputClass}
               />
             </label>
@@ -53,7 +66,10 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
               {i === 0 && <span className={labelClass}>纸色</span>}
               <select
                 name={`chip.${i}.tone`}
-                defaultValue={chip.tone}
+                value={chip.tone}
+                onChange={(e) =>
+                  edit(i, { ...chip, tone: e.target.value as ChipRow["tone"] })
+                }
                 className={inputClass}
               >
                 <option value="paper">paper</option>
@@ -67,27 +83,15 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
 
       <button
         type="button"
-        onClick={() => setRows([...rows, { ...BLANK, label: { zh: "", en: "" } }])}
+        onClick={() =>
+          setRows([...rows, { label: { zh: "", en: "" }, tone: "paper" }])
+        }
         className="mt-4 text-caption text-fg-tertiary hover:text-accent"
       >
         + 加一张
       </button>
 
-      <div className="sticky bottom-0 mt-6 flex items-center gap-4 border-t border-line bg-bg py-4">
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "保存中…" : "保存"}
-        </button>
-        {state.error && (
-          <p className="text-caption text-accent" role="alert">
-            {state.error}
-          </p>
-        )}
-        {state.ok && (
-          <p className="text-caption text-fg-secondary" role="status">
-            已保存，前台已刷新。
-          </p>
-        )}
-      </div>
+      <SaveControls state={state} pending={pending} sticky />
     </form>
   );
 }

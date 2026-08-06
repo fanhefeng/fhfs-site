@@ -1,6 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
+import { redirect } from "next/navigation";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
@@ -53,6 +54,10 @@ const localized = (form: FormData, key: string) => ({
   zh: str(form, `${key}.zh`),
   en: str(form, `${key}.en`),
 });
+
+/** Shared by every keyed table — an empty key would upsert a "" row forever. */
+const validKey = (key: string) => /^[a-z0-9][a-z0-9-]*$/.test(key);
+const KEY_ERROR = { error: "key 只能用小写字母、数字和连字符。" };
 
 export type ActionState = { error?: string; ok?: boolean };
 
@@ -108,6 +113,9 @@ export async function savePost(
     });
 
   invalidate(TAGS.posts);
+  // A first save leaves the "new post" page behind: its props are a blank
+  // draft, and React resets the form to props once the action completes.
+  if (form.get("isNew")) redirect(`/admin/posts/${slug}/${locale}`);
   return { ok: true };
 }
 
@@ -226,6 +234,9 @@ export async function saveTimelineEntry(
 ): Promise<ActionState> {
   await requireAdmin();
 
+  const key = str(form, "key");
+  if (!validKey(key)) return KEY_ERROR;
+
   const date = str(form, "date");
   const dateLabel = localized(form, "dateLabel");
   const hasLabel = Boolean(dateLabel.zh || dateLabel.en);
@@ -240,7 +251,7 @@ export async function saveTimelineEntry(
   }
 
   const row = {
-    key: str(form, "key"),
+    key,
     version: str(form, "version"),
     date: date || null,
     dateLabel: hasLabel ? dateLabel : null,
@@ -264,13 +275,16 @@ export async function saveApp(
 ): Promise<ActionState> {
   await requireAdmin();
 
+  const key = str(form, "key");
+  if (!validKey(key)) return KEY_ERROR;
+
   const category = str(form, "category");
   if (!["desktop", "tool", "game", "website"].includes(category)) {
     return { error: "分类只能是 desktop / tool / game / website。" };
   }
 
   const row = {
-    key: str(form, "key"),
+    key,
     name: str(form, "name"),
     tagline: localized(form, "tagline"),
     description: localized(form, "description"),
@@ -301,13 +315,16 @@ export async function saveExperiment(
 ): Promise<ActionState> {
   await requireAdmin();
 
+  const key = str(form, "key");
+  if (!validKey(key)) return KEY_ERROR;
+
   const status = str(form, "status");
   if (!["live", "wip", "planned"].includes(status)) {
     return { error: "状态只能是 live / wip / planned。" };
   }
 
   const row = {
-    key: str(form, "key"),
+    key,
     name: localized(form, "name"),
     description: localized(form, "description"),
     status: status as "live" | "wip" | "planned",
@@ -418,9 +435,7 @@ export async function saveWork(
   await requireAdmin();
 
   const key = str(form, "key");
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(key)) {
-    return { error: "key 只能用小写字母、数字和连字符。" };
-  }
+  if (!validKey(key)) return KEY_ERROR;
   const year = Number(form.get("year"));
   if (!Number.isInteger(year) || year < 1990 || year > 2100) {
     return { error: "年份填个四位数。" };
@@ -464,9 +479,12 @@ export async function saveIntroNode(
 ): Promise<ActionState> {
   await requireAdmin();
 
+  const key = str(form, "key");
+  if (!validKey(key)) return KEY_ERROR;
+
   const period = localized(form, "period");
   const row = {
-    key: str(form, "key"),
+    key,
     kicker: localized(form, "kicker"),
     title: localized(form, "title"),
     period: period.zh || period.en ? period : null,

@@ -4,23 +4,25 @@ import { works } from "@/db/schema";
 import { AdminChrome } from "../AdminChrome";
 import { WorkForm, type WorkDraft } from "./WorkForm";
 
-const BLANK: WorkDraft = {
-  key: "",
-  title: { zh: "", en: "" },
-  description: { zh: "", en: "" },
-  year: new Date().getFullYear(),
-  cover: null,
-  url: null,
-  tags: [],
-  accent: null,
-  sort: 0,
-};
-
 export default async function WorksPage() {
   const rows = await db
     .select()
     .from(works)
     .orderBy(asc(works.sort), asc(works.key));
+
+  // Built per render, not at module scope — a warm server instance would
+  // otherwise keep last year's default across New Year.
+  const blank: WorkDraft = {
+    key: "",
+    title: { zh: "", en: "" },
+    description: { zh: "", en: "" },
+    year: new Date().getFullYear(),
+    cover: null,
+    url: null,
+    tags: [],
+    accent: null,
+    sort: 0,
+  };
 
   return (
     <AdminChrome title="作品集">
@@ -46,7 +48,7 @@ export default async function WorksPage() {
             新作品
           </h2>
           <div className="mt-3">
-            <WorkForm isNew work={BLANK} />
+            <WorkForm isNew work={blank} />
           </div>
         </section>
       </div>

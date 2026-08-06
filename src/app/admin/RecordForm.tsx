@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import type { ActionState } from "./actions";
-import { buttonClass, inputClass, labelClass } from "./AdminChrome";
+import { inputClass, labelClass } from "./AdminChrome";
+import { SaveControls } from "./SaveControls";
 
 export type Field =
   | { name: string; label: string; kind: "text"; placeholder?: string; readOnly?: boolean }
@@ -26,12 +27,10 @@ export function RecordForm({
   action,
   fields,
   record,
-  submitLabel = "保存",
 }: {
   action: (prev: ActionState, form: FormData) => Promise<ActionState>;
   fields: Field[];
   record: RecordData;
-  submitLabel?: string;
 }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     action,
@@ -140,20 +139,7 @@ export function RecordForm({
         );
       })}
 
-      {state.error && (
-        <p className="text-caption text-accent" role="alert">
-          {state.error}
-        </p>
-      )}
-      {state.ok && (
-        <p className="text-caption text-fg-secondary" role="status">
-          已保存，前台已刷新。
-        </p>
-      )}
-
-      <button type="submit" disabled={pending} className={buttonClass}>
-        {pending ? "保存中…" : submitLabel}
-      </button>
+      <SaveControls state={state} pending={pending} />
     </form>
   );
 }

@@ -13,8 +13,10 @@ const FIELDS: Field[] = [
   { name: "period", label: "时间段（可空）", kind: "localized" },
   { name: "body", label: "正文", kind: "localizedArea", rows: 4 },
   { name: "bullets", label: "要点", kind: "lines", hint: "一行一条，空行忽略。" },
-  { name: "stickerLabel", label: "贴纸文字", kind: "text" },
-  { name: "stickerIcon", label: "贴纸 emoji", kind: "text" },
+  // 贴花贴图目前仍读代码里的 INTRO_STICKERS —— 这两个字段存进库但页面
+  // 还没消费它们，等渲染端接上前先如实标注。
+  { name: "stickerLabel", label: "贴纸文字（暂未生效）", kind: "text" },
+  { name: "stickerIcon", label: "贴纸 emoji（暂未生效）", kind: "text" },
   { name: "sort", label: "排序", kind: "number" },
 ];
 

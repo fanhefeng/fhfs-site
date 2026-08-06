@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { deleteWork, saveWork, type ActionState } from "../actions";
-import { buttonClass, inputClass, labelClass } from "../AdminChrome";
+import { inputClass, labelClass } from "../AdminChrome";
+import { SaveControls } from "../SaveControls";
 
 export type WorkDraft = {
   key: string;
@@ -128,24 +129,19 @@ export function WorkForm({
           </label>
         </div>
 
-        {state.error && (
-          <p className="text-caption text-accent" role="alert">
-            {state.error}
-          </p>
-        )}
-        {state.ok && (
-          <p className="text-caption text-fg-secondary" role="status">
-            已保存，前台已刷新。
-          </p>
-        )}
-
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "保存中…" : "保存"}
-        </button>
+        <SaveControls state={state} pending={pending} />
       </form>
 
       {!isNew && (
-        <form action={deleteWork} className="mt-8 border-t border-line pt-6">
+        <form
+          action={deleteWork}
+          onSubmit={(event) => {
+            if (!window.confirm(`确定删除「${work.key}」？删了就没有了。`)) {
+              event.preventDefault();
+            }
+          }}
+          className="mt-8 border-t border-line pt-6"
+        >
           <input type="hidden" name="key" value={work.key} />
           <button
             type="submit"

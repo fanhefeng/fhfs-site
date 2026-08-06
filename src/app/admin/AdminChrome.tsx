@@ -1,18 +1,19 @@
 import Link from "next/link";
 import { logout } from "./login/actions";
 
-/** The sections of the admin, in the order they matter. */
+/** The sections of the admin, in the order they matter. `table` is what the
+ *  dashboard counts — kept here so adding a section is a one-line change. */
 export const SECTIONS = [
-  { href: "/admin/posts", label: "文章" },
-  { href: "/admin/about", label: "关于页" },
-  { href: "/admin/copy", label: "站点文案" },
-  { href: "/admin/timeline", label: "版本履历" },
-  { href: "/admin/apps", label: "软件" },
-  { href: "/admin/works", label: "作品集" },
-  { href: "/admin/experiments", label: "实验" },
-  { href: "/admin/intro", label: "简历节点" },
-  { href: "/admin/chips", label: "贴纸墙" },
-  { href: "/admin/nav", label: "导航" },
+  { href: "/admin/posts", label: "文章", table: "posts" },
+  { href: "/admin/about", label: "关于页", table: "abouts" },
+  { href: "/admin/copy", label: "站点文案", table: "copy_blocks" },
+  { href: "/admin/timeline", label: "版本履历", table: "timeline_entries" },
+  { href: "/admin/apps", label: "软件", table: "apps" },
+  { href: "/admin/works", label: "作品集", table: "works" },
+  { href: "/admin/experiments", label: "实验", table: "experiments" },
+  { href: "/admin/intro", label: "简历节点", table: "intro_nodes" },
+  { href: "/admin/chips", label: "贴纸墙", table: "chips" },
+  { href: "/admin/nav", label: "导航", table: "nav_items" },
 ] as const;
 
 /**

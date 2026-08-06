@@ -13,37 +13,14 @@ async function count(table: string): Promise<number> {
 }
 
 export default async function AdminHome() {
-  const [posts, abouts, copy, timeline, apps, works, experiments, intro, chips, nav] =
-    await Promise.all([
-      count("posts"),
-      count("abouts"),
-      count("copy_blocks"),
-      count("timeline_entries"),
-      count("apps"),
-      count("works"),
-      count("experiments"),
-      count("intro_nodes"),
-      count("chips"),
-      count("nav_items"),
-    ]);
-
-  const counts: Record<string, number> = {
-    "/admin/posts": posts,
-    "/admin/about": abouts,
-    "/admin/copy": copy,
-    "/admin/timeline": timeline,
-    "/admin/apps": apps,
-    "/admin/works": works,
-    "/admin/experiments": experiments,
-    "/admin/intro": intro,
-    "/admin/chips": chips,
-    "/admin/nav": nav,
-  };
+  const counts = await Promise.all(
+    SECTIONS.map((section) => count(section.table))
+  );
 
   return (
     <AdminChrome title="内容">
       <ul className="divide-y divide-line border-y border-line">
-        {SECTIONS.map((section) => (
+        {SECTIONS.map((section, i) => (
           <li key={section.href}>
             <Link
               href={section.href}
@@ -51,7 +28,7 @@ export default async function AdminHome() {
             >
               <span className="text-body">{section.label}</span>
               <span className="font-mono text-meta text-fg-tertiary tabular-nums">
-                {counts[section.href]}
+                {counts[i]}
               </span>
             </Link>
           </li>

@@ -22,7 +22,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Reads cookies on every page; never a candidate for caching. */
+/** Every admin page reads the database directly for fresh rows — this keeps
+ *  the build from statically prerendering them with build-time data. */
 export const dynamic = "force-dynamic";
 
 export default function AdminLayout({

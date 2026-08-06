@@ -2,9 +2,10 @@
 
 import { useActionState } from "react";
 import { deletePost, savePost, type ActionState } from "../actions";
-import { buttonClass, inputClass, labelClass } from "../AdminChrome";
+import { inputClass, labelClass } from "../AdminChrome";
+import { SaveControls } from "../SaveControls";
 
-export type PostDraft = {
+type PostDraft = {
   slug: string;
   locale: "zh" | "en";
   title: string;
@@ -37,6 +38,10 @@ export function PostForm({
   return (
     <>
       <form action={formAction} className="space-y-5">
+        {/* Tells savePost to redirect to the edit page: this page's props are a
+            blank draft, and React resets the form to them after the action —
+            without the redirect a successful save wipes the editor. */}
+        {isNew && <input type="hidden" name="isNew" value="1" />}
         <div className="grid gap-5 sm:grid-cols-[1fr_6rem_10rem]">
           <label className="space-y-1.5">
             <span className={labelClass}>slug</span>
@@ -127,24 +132,19 @@ export function PostForm({
           />
         </label>
 
-        {state.error && (
-          <p className="text-caption text-accent" role="alert">
-            {state.error}
-          </p>
-        )}
-        {state.ok && (
-          <p className="text-caption text-fg-secondary" role="status">
-            已保存，前台已刷新。
-          </p>
-        )}
-
-        <button type="submit" disabled={pending} className={buttonClass}>
-          {pending ? "保存中…" : "保存"}
-        </button>
+        <SaveControls state={state} pending={pending} />
       </form>
 
       {!isNew && (
-        <form action={deletePost} className="mt-10 border-t border-line pt-6">
+        <form
+          action={deletePost}
+          onSubmit={(event) => {
+            if (!window.confirm(`确定删除「${post.slug}.${post.locale}」？删了就没有了。`)) {
+              event.preventDefault();
+            }
+          }}
+          className="mt-10 border-t border-line pt-6"
+        >
           <input type="hidden" name="slug" value={post.slug} />
           <input type="hidden" name="locale" value={post.locale} />
           <button
