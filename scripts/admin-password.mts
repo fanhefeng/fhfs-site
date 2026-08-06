@@ -10,7 +10,15 @@
 import { randomBytes } from "node:crypto";
 import { hashPassword } from "../src/lib/auth/password";
 
-const given = process.argv.slice(2).filter((arg) => !arg.startsWith("-"))[0];
+const args = process.argv.slice(2);
+// A password starting with "-" must not be silently dropped and replaced by
+// a random one — fail loudly instead.
+const flag = args.find((arg) => arg.startsWith("-"));
+if (flag) {
+  console.error(`unknown option ${flag} — pass the password as a plain argument`);
+  process.exit(1);
+}
+const given = args[0];
 const password = given ?? randomBytes(12).toString("base64url");
 
 console.log(`ADMIN_PASSWORD_HASH='${hashPassword(password)}'`);

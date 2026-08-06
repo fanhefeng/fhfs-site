@@ -12,6 +12,10 @@
  *   backup/db.json      every table, complete, and what db:import reads
  *   backup/posts/*.md   the prose again as markdown with frontmatter, so a
  *                       diff on an article reads like a diff on an article
+ *   backup/about.*.md   the about page's prose, outside posts/ so a post
+ *                       slugged "about" can never collide with it
+ *
+ * db:import reads only db.json — the markdown copies exist for the diff.
  *
  *   pnpm db:export
  */
@@ -122,7 +126,7 @@ for (const post of data.posts) {
 for (const about of data.abouts) {
   const frontmatter = toYaml({ title: about.title });
   await writeFile(
-    path.join(OUT, "posts", `about.${about.locale}.md`),
+    path.join(OUT, `about.${about.locale}.md`),
     `---\n${frontmatter}---\n\n${about.bodyMd}`
   );
 }

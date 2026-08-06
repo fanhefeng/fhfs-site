@@ -3,8 +3,12 @@
  *
  * The other half of `db:export` — a backup nobody can restore is not a
  * backup. Rows with a natural key are upserted and keyless tables are
- * replaced, so this is safe to run against a live database and safe to run
- * twice.
+ * replaced, so running it twice is safe. Two caveats worth knowing:
+ *
+ *  - The restore is additive: rows created after the backup was taken keep
+ *    existing. Delete strays by hand (or in /admin) if a true reset is meant.
+ *  - A deployed site keeps serving its cached pages until something calls
+ *    `updateTag` — press save on anything in /admin once after importing.
  *
  *   pnpm db:import
  */
@@ -67,16 +71,21 @@ for (const [table, rows] of keyed) {
   }
 }
 
-// Keyless tables: replaced wholesale.
-await db.delete(schema.chips);
-if (data.chips?.length) await db.insert(schema.chips).values(data.chips);
+// Keyless tables: replaced wholesale. Delete and insert travel in one
+// `db.batch()` — a single atomic request — so a failed insert cannot leave
+// the table empty (an empty nav_items is a site with no header).
+const keyless = [
+  [schema.chips, data.chips],
+  [schema.navItems, data.navItems],
+  [schema.copyBlocks, data.copyBlocks],
+] as const;
 
-await db.delete(schema.navItems);
-if (data.navItems?.length) await db.insert(schema.navItems).values(data.navItems);
-
-await db.delete(schema.copyBlocks);
-if (data.copyBlocks?.length)
-  await db.insert(schema.copyBlocks).values(data.copyBlocks);
+for (const [table, rows] of keyless) {
+  const del = db.delete(table as any);
+  await db.batch(
+    rows?.length ? [del, db.insert(table as any).values(rows)] : [del]
+  );
+}
 
 const counts = Object.entries(data).map(
   ([table, rows]) => `${table} ${rows.length}`
