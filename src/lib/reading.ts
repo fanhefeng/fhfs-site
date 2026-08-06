@@ -1,6 +1,10 @@
 /** CJK ideographs and kana — counted per character, unlike Latin words. */
 const CJK = /[぀-ヿ㐀-鿿豈-﫿]/g;
 
+/** The display-layer question — "is there any CJK in this string at all?" —
+ *  which decides italics and title animations rather than reading speed. */
+export const HAS_CJK = new RegExp(CJK.source);
+
 /**
  * Reading time in whole minutes, mixed-script aware: ~350 CJK characters or
  * ~220 Latin words per minute. Code fences, JSX/HTML tags and bare URLs are

@@ -319,6 +319,7 @@ export const getAbout = unstable_cache(
         html: abouts.bodyHtml,
       })
       .from(abouts)
+      .orderBy(asc(abouts.locale))
       .limit(1);
     return any ?? null;
   },

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { NotFoundStage } from "@/components/notfound/NotFoundStage";
-import { routing } from "@/i18n/routing";
+import { routing, htmlLang } from "@/i18n/routing";
+import { THEME_INIT_SCRIPT } from "./themeInit";
 import { site } from "@/config/site";
 import zh from "../../messages/zh.json";
 import en from "../../messages/en.json";
@@ -33,7 +34,7 @@ export default function GlobalNotFound() {
   const blocks = routing.locales.map((locale) => {
     const m = locale === "zh" ? zh : en;
     return {
-      lang: locale === "zh" ? "zh-CN" : "en",
+      lang: htmlLang(locale),
       title: m.notFound.title,
       description: m.notFound.description,
       homeHref: `/${locale}`,
@@ -54,11 +55,7 @@ export default function GlobalNotFound() {
             the lights off should not get a white page thrown at them just
             because they mistyped a URL. No ThemeKeeper needed — nothing
             re-renders this document on the client. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("fhfs-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){}})()`,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <NotFoundStage
           blocks={blocks}
           sticker={{

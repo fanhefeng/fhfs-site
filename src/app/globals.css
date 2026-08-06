@@ -45,7 +45,6 @@
   /* Warm paper needs warm shadows — cool grey shadows read dirty on it. */
   --elev-card: 0 1px 2px rgba(120, 80, 40, 0.05), 0 8px 24px rgba(120, 80, 40, 0.08);
   --elev-lift: 0 2px 6px rgba(120, 80, 40, 0.08), 0 18px 44px rgba(120, 80, 40, 0.13);
-  --elev-panel: 0 24px 64px rgba(120, 80, 40, 0.16);
   --sticker-shadow-color: rgba(120, 80, 40, 0.22);
 
   /* Glass · three tiers (see .glass-thin / .glass-thick / .liquid-chip).
@@ -72,8 +71,8 @@
   --r-card: 1rem;
   --r-panel: 1.5rem;
 
-  /* Code block canvas — dual values so rehype-pretty-code output reads well
-   * on paper and after hours (see .prose-editorial pre). */
+  /* Code block canvas (see .prose-editorial pre). Follows --surface/--line,
+   * so both themes read from this one pair. */
   --code-bg: var(--surface);
   --code-border: var(--line);
 
@@ -105,7 +104,6 @@
 
   --elev-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
   --elev-lift: 0 2px 6px rgba(0, 0, 0, 0.45), 0 18px 44px rgba(0, 0, 0, 0.5);
-  --elev-panel: 0 24px 64px rgba(0, 0, 0, 0.55);
   --sticker-shadow-color: rgba(0, 0, 0, 0.5);
 
   --glass-thin-bg: rgba(20, 20, 25, 0.45);
@@ -120,9 +118,6 @@
   --chip-bg: rgba(255, 255, 255, 0.06);
   --chip-border: rgba(255, 255, 255, 0.14);
   --chip-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-
-  --code-bg: var(--surface);
-  --code-border: var(--line);
 }
 
 /* Mobile GPUs pay dearly for large blur radii — drop both tiers. */
@@ -152,11 +147,8 @@
   --color-fg: var(--fg);
   --color-fg-secondary: var(--fg-secondary);
   --color-fg-tertiary: var(--fg-tertiary);
-  --color-muted-fg: var(--fg-secondary);
   --color-accent: var(--accent);
   --color-line: var(--line);
-  --color-glow-warm: var(--glow-warm);
-  --color-glow-cool: var(--glow-cool);
 
   --font-sans: var(--font-stack-sans);
   --font-display: var(--font-stack-sans);
@@ -197,14 +189,13 @@
 
   --shadow-card: var(--elev-card);
   --shadow-lift: var(--elev-lift);
-  --shadow-panel: var(--elev-panel);
 }
 
 /* Chinese display type never tracks negative (0 ~ +0.01em). :lang() reads
  * the computed language, so an EN headline inside a zh page opts back into
  * negative tracking simply by carrying lang="en". */
-:is(.text-display, .text-display-sm, .text-title, .text-heading):lang(zh-CN),
-.prose-editorial :is(h1, h2, h3, h4):lang(zh-CN) {
+:is(.text-display, .text-display-sm, .text-title, .text-heading):lang(zh),
+.prose-editorial :is(h1, h2, h3, h4):lang(zh) {
   letter-spacing: 0.01em;
 }
 
@@ -258,10 +249,10 @@ body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  :where(a, button, [role="button"], .press) {
+  :where(a, button, [role="button"]) {
     transition: scale 100ms ease-out;
   }
-  :where(a, button, [role="button"], .press):active {
+  :where(a, button, [role="button"]):active {
     scale: 0.97;
   }
 }
@@ -686,14 +677,14 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Sliced-mask text reveal
- * Wrap each line: <span class="split-line"><span class="split-inner">…
- * The mask implies the text was always there, just hidden — never fade in.
+ * Print: GSAP entrance tweens leave below-the-fold content at inline
+ * opacity 0 / hidden until scrolled to — paper never scrolls, so undo them.
  * ------------------------------------------------------------------------- */
-.split-line {
-  display: block;
-  overflow: hidden;
-}
-.split-inner {
-  display: block;
+@media print {
+  [style*="opacity"],
+  [style*="visibility"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
 }

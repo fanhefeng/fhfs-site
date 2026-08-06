@@ -6,9 +6,10 @@ import {
   getTranslations,
   getFormatter,
 } from "next-intl/server";
-import { routing, type Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getAdjacentPosts, getAllSlugs, getPost } from "@/lib/content";
+import { HAS_CJK } from "@/lib/reading";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
 import { TagPill } from "@/components/blog/TagPill";
@@ -16,11 +17,6 @@ import { RadialFab } from "@/components/fx/RadialFab";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
-
-/** CJK detection — decides whether the standfirst can take a real italic. */
-const CJK = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/;
-
-type Props = { params: Promise<{ locale: string; slug: string }> };
 
 /**
  * Every post that exists at build time is prerendered. Anything published
@@ -33,10 +29,10 @@ export async function generateStaticParams() {
   return (await getAllSlugs()).map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const post = await getPost(slug, locale as Locale);
+  const post = await getPost(slug, locale);
   if (!post) return {};
   return {
     title: post.title,
@@ -86,19 +82,19 @@ function TopScrim() {
  * you read. The headline decodes once (Latin) or masks in line by line
  * (Chinese); everything below it is static by design.
  */
-export default async function PostPage({ params }: Props) {
+export default async function PostPage({ params }: PageProps<"/[locale]/blog/[slug]">) {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("blog");
   const format = await getFormatter();
-  const post = await getPost(slug, locale as Locale);
+  const post = await getPost(slug, locale);
   if (!post) notFound();
 
   // Neighbours come from the same date-descending index the list page shows,
   // so "previous" always means the post published before this one. Fetched as
   // titles only — this page has no use for the other articles' bodies.
-  const { older, newer } = await getAdjacentPosts(post.slug, locale as Locale);
+  const { older, newer } = await getAdjacentPosts(post.slug, locale);
   const minutes = post.readingMinutes;
 
   return (
@@ -140,7 +136,7 @@ export default async function PostPage({ params }: Props) {
                 className={`mt-5 font-serif text-[1.1875rem] leading-relaxed text-fg-secondary ${
                   // Serif italic is the editorial voice change — but CJK has
                   // no true italic, and the synthesised slant reads as broken.
-                  CJK.test(post.summary) ? "" : "italic"
+                  HAS_CJK.test(post.summary) ? "" : "italic"
                 }`}
               >
                 {post.summary}

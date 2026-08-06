@@ -2,13 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing, type Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getAllTags, getPostsByTag } from "@/lib/content";
-import { PostCard, groupPostsByYear } from "@/components/blog/PostCard";
+import { YearIndex } from "@/components/blog/PostCard";
 import { Reveal } from "@/components/fx/Reveal";
-
-type Props = { params: Promise<{ locale: string; tag: string }> };
 
 /**
  * Every tag in use at build time gets a page. A tag that only appears on a
@@ -32,7 +30,7 @@ function decodeTag(tag: string) {
   }
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[locale]/blog/tags/[tag]">): Promise<Metadata> {
   const { locale, tag } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "blog" });
@@ -44,15 +42,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * state stated plainly ("N posts · clear filter") so the way out is never
  * more than one tap away.
  */
-export default async function TagPage({ params }: Props) {
+export default async function TagPage({ params }: PageProps<"/[locale]/blog/tags/[tag]">) {
   const { locale, tag } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("blog");
   const decoded = decodeTag(tag);
-  const posts = await getPostsByTag(decoded, locale as Locale);
+  const posts = await getPostsByTag(decoded, locale);
   if (posts.length === 0) notFound();
-  const years = groupPostsByYear(posts);
 
   return (
     <main className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
@@ -73,22 +70,7 @@ export default async function TagPage({ params }: Props) {
         </p>
       </Reveal>
 
-      {years.map(({ year, posts: yearPosts }) => (
-        <section
-          key={year}
-          aria-label={t("yearAria", { year })}
-          className="mb-14 last:mb-0"
-        >
-          <h2 className="mb-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
-            {year}
-          </h2>
-          <Reveal as="ol" stagger={0.05} className="border-t border-line">
-            {yearPosts.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
-          </Reveal>
-        </section>
-      ))}
+      <YearIndex posts={posts} yearAria={(year) => t("yearAria", { year })} />
     </main>
   );
 }

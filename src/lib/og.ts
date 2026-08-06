@@ -79,7 +79,7 @@ async function fetchWithRetry(url: string, label: string): Promise<Response> {
  * ImageResponse (satori). The default fetch user agent receives truetype URLs.
  * Runs at build time only — every OG route is `force-static`.
  */
-export async function loadGoogleFont(
+async function loadGoogleFont(
   family: string,
   text: string,
   weight = 400

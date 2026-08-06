@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { NotFoundStage } from "@/components/notfound/NotFoundStage";
+import { htmlLang } from "@/i18n/routing";
 
 /**
  * The `notFound()` boundary inside a locale.
@@ -24,7 +25,7 @@ export default function NotFoundPage() {
     <NotFoundStage
       blocks={[
         {
-          lang: locale === "zh" ? "zh-CN" : "en",
+          lang: htmlLang(locale),
           title: t("title"),
           description: t("description"),
           homeHref: prefix,
@@ -34,7 +35,7 @@ export default function NotFoundPage() {
         },
       ]}
       sticker={{
-        lang: locale === "zh" ? "zh-CN" : "en",
+        lang: htmlLang(locale),
         hint: t("stickerHint"),
         aria: t("stickerAria"),
         secret: t("stickerSecret"),

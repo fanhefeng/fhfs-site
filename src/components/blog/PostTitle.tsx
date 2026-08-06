@@ -2,9 +2,8 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP, SplitText, EASE } from "@/lib/gsap";
-
-/** Any CJK ideograph/kana in the headline means "do not scramble". */
-const CJK = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/;
+// Any CJK ideograph/kana in the headline means "do not scramble".
+import { HAS_CJK } from "@/lib/reading";
 
 /**
  * The article headline, entering once.
@@ -31,10 +30,9 @@ export function PostTitle({
       const el = ref.current;
       if (!el) return;
 
-      if (CJK.test(title)) {
-        // SplitText's own mask wrappers match the .split-line/.split-inner
-        // convention in globals.css: the line slides out from behind a
-        // clip, implying it was always there.
+      if (HAS_CJK.test(title)) {
+        // SplitText's `mask: "lines"` brings its own clip wrappers: the line
+        // slides out from behind a clip, implying it was always there.
         const split = SplitText.create(el, { type: "lines", mask: "lines" });
         gsap.from(split.lines, {
           yPercent: 110,

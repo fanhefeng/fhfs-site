@@ -1,5 +1,6 @@
 import { Feed } from "feed";
-import { routing, type Locale } from "@/i18n/routing";
+import { hasLocale } from "next-intl";
+import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getPosts } from "@/lib/content";
 
@@ -14,8 +15,8 @@ export async function GET(
   { params }: { params: Promise<{ locale: string }> }
 ) {
   const { locale } = await params;
-  const l = (routing.locales as readonly string[]).includes(locale)
-    ? (locale as Locale)
+  const l: Locale = hasLocale(routing.locales, locale)
+    ? locale
     : routing.defaultLocale;
 
   const feed = new Feed({
@@ -23,7 +24,7 @@ export async function GET(
     description: site.description[l],
     id: `${site.url}/${l}`,
     link: `${site.url}/${l}`,
-    language: l === "zh" ? "zh-CN" : "en",
+    language: htmlLang(l),
     copyright: `© ${new Date().getFullYear()} ${site.author}`,
     author: { name: site.author },
   });

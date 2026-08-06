@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { hasLocale } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getAllSlugs, getPost } from "@/lib/content";
@@ -42,8 +43,8 @@ export default async function PostOgImage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const l = (routing.locales as readonly string[]).includes(locale)
-    ? (locale as Locale)
+  const l: Locale = hasLocale(routing.locales, locale)
+    ? locale
     : routing.defaultLocale;
   const other: Locale = l === "zh" ? "en" : "zh";
 

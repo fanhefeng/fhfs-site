@@ -16,11 +16,8 @@
  * Deliberately unanimated: the reading column is the one place on the site
  * where nothing moves.
  */
-export function Mdx({ html, className }: { html: string; className?: string }) {
+export function Mdx({ html }: { html: string }) {
   return (
-    <div
-      className={`prose-editorial ${className ?? ""}`}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="prose-editorial" dangerouslySetInnerHTML={{ __html: html }} />
   );
 }

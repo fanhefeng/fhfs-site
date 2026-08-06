@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing, type Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getApps, getExperiments, getWorks } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
@@ -10,10 +10,9 @@ import { WorkCard } from "@/components/cards/WorkCard";
 import { BentoHero, type BentoItem } from "@/components/portfolio/BentoHero";
 import { CraftList, type CraftEntry } from "@/components/portfolio/CraftList";
 
-type Props = { params: Promise<{ locale: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[locale]/portfolio">): Promise<Metadata> {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "portfolio" });
   return {
     title: t("title"),
@@ -47,12 +46,12 @@ function monogramOf(name: string): string {
 /** Fallback dot colour for an experiment saved without one. */
 const CRAFT_ACCENT = "#4c7a5b";
 
-export default async function PortfolioPage({ params }: Props) {
+export default async function PortfolioPage({ params }: PageProps<"/[locale]/portfolio">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("portfolio");
-  const l = locale as Locale;
+  const l = locale;
 
   const works = await getWorks();
 

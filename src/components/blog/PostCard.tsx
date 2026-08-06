@@ -1,13 +1,14 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { PostSummary } from "@/lib/content";
+import { Reveal } from "@/components/fx/Reveal";
 
 /**
  * Posts bucketed by publication year, newest year first, each bucket keeping
  * the incoming (date-descending) order. The year comes from the ISO string
  * rather than a Date, so the grouping never drifts with the server timezone.
  */
-export function groupPostsByYear(
+function groupPostsByYear(
   posts: PostSummary[]
 ): { year: string; posts: PostSummary[] }[] {
   const groups: { year: string; posts: PostSummary[] }[] = [];
@@ -20,6 +21,28 @@ export function groupPostsByYear(
   return groups;
 }
 
+/** The year-bucketed index — /blog and every tag page render this list. */
+export function YearIndex({
+  posts,
+  yearAria,
+}: {
+  posts: PostSummary[];
+  yearAria: (year: string) => string;
+}) {
+  return groupPostsByYear(posts).map(({ year, posts: yearPosts }) => (
+    <section key={year} aria-label={yearAria(year)} className="mb-14 last:mb-0">
+      <h2 className="mb-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
+        {year}
+      </h2>
+      <Reveal as="ol" stagger={0.05} className="border-t border-line">
+        {yearPosts.map((post) => (
+          <PostCard key={post.slug} post={post} />
+        ))}
+      </Reveal>
+    </section>
+  ));
+}
+
 /**
  * One line of the magazine index: title on the left, mono date flush right.
  * No card, no summary, no thumbnail — the list is meant to be read like a
@@ -27,7 +50,7 @@ export function groupPostsByYear(
  * and floats the reading time in beside the date; both are transform/opacity
  * only, so a long list stays cheap to render.
  */
-export function PostCard({ post }: { post: PostSummary }) {
+function PostCard({ post }: { post: PostSummary }) {
   const t = useTranslations("blog");
   const minutes = post.readingMinutes;
   const [, month, day] = post.date.slice(0, 10).split("-");
