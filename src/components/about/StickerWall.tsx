@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, Draggable } from "@/lib/gsap";
+import { gsap, useGSAP, Draggable, isFinePointer } from "@/lib/gsap";
 import { Sticker } from "@/components/ui/Sticker";
 
 /**
@@ -11,7 +11,7 @@ import { Sticker } from "@/components/ui/Sticker";
  * their own pair, which the page unwraps before handing them over. `tone` only
  * picks a paper colour.
  */
-export type WallChip = {
+type WallChip = {
   label: string;
   tone: "paper" | "ink" | "accent";
 };
@@ -63,9 +63,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
       const puffs = gsap.utils.toArray<HTMLElement>("[data-puff]", wall);
       if (items.length === 0) return;
 
-      const finePointer = window.matchMedia(
-        "(hover: hover) and (pointer: fine)"
-      ).matches;
+      const finePointer = isFinePointer();
       const draggables: Draggable[] = [];
       const teardown: Array<() => void> = [];
 
@@ -229,7 +227,8 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
           const label = chip.label;
           return (
             <span
-              key={label}
+              // The label alone would collide when two chips share a word.
+              key={`${label}-${i}`}
               data-sticker
               className="relative inline-block select-none"
             >

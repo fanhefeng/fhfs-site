@@ -170,7 +170,15 @@ export function Workstation({ hint, className }: Props) {
           ? mesh.material
           : [mesh.material];
         for (const mat of mats) {
-          (mat as THREE.MeshStandardMaterial).map?.dispose();
+          // material.dispose() frees no textures, and this model carries
+          // emissive and metallic-roughness maps alongside the base color.
+          const std = mat as THREE.MeshStandardMaterial;
+          std.map?.dispose();
+          std.normalMap?.dispose();
+          std.emissiveMap?.dispose();
+          std.metalnessMap?.dispose();
+          std.roughnessMap?.dispose();
+          std.aoMap?.dispose();
           mat.dispose();
         }
       });
@@ -444,6 +452,10 @@ export function Workstation({ hint, className }: Props) {
             if (!disposed) setStatus("skipped");
           }
         );
+      }).catch(() => {
+        // A failed chunk load (offline, blocked CDN) must not leave the
+        // spinner up forever as an unhandled rejection.
+        if (!disposed) setStatus("skipped");
       });
     };
 

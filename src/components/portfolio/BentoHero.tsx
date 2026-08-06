@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Link } from "@/i18n/navigation";
 import { gsap, useGSAP, Flip, ExpoScaleEase } from "@/lib/gsap";
-import { SpecularEdge } from "@/components/cards/WorkCard";
+import { SpecularEdge } from "@/components/cards/SpecularEdge";
 
 export type BentoItem = {
   id: string;

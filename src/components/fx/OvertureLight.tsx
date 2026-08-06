@@ -204,8 +204,18 @@ export function OvertureLight() {
       window.addEventListener("keydown", onKeyDown);
       window.addEventListener("focusin", onFocusIn);
 
+      // Wall-clock net: if the ticker stalls mid-play, the page must not sit
+      // locked behind an opaque overlay with no timeline left to finish it.
+      // Jumping to the end fires the terminal callback — unlock included —
+      // and a timeline that finished normally is already at 1.
+      const failsafe = window.setTimeout(() => {
+        const active = tlRef.current;
+        if (active && active.progress() < 1) active.progress(1);
+      }, (END_AT + 3) * 1000);
+
       // Restore scroll even if we unmount mid-play (route change).
       return () => {
+        window.clearTimeout(failsafe);
         unlock();
         cancelAnimationFrame(shownFrame);
         window.removeEventListener("keydown", onKeyDown);

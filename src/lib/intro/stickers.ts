@@ -8,9 +8,9 @@
  * is where the decal goes (see `src/lib/intro/surface.ts`). That is what lets
  * the model be swapped without re-tuning a single number here.
  *
- * The copy for each sticker lives in `messages/{zh,en}.json` under
- * `intro.nodes.<id>` — this file stays language-neutral so the Canvas never
- * has to re-render when the locale changes.
+ * The copy for each sticker lives in the `intro_nodes` table, joined by
+ * `key` in the /intro page — this file stays language-neutral so the Canvas
+ * never has to re-render when the locale changes.
  */
 
 export type StickerShape = "badge" | "circle" | "banner";

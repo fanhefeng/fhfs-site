@@ -5,7 +5,7 @@ import type { CSSProperties } from "react";
 import { Reveal } from "@/components/fx/Reveal";
 import { LiquidLens } from "@/components/portfolio/LiquidLens";
 
-export type CraftStatus = "live" | "wip" | "planned";
+type CraftStatus = "live" | "wip" | "planned";
 
 export type CraftEntry = {
   id: string;

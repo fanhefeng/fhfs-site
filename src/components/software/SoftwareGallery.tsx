@@ -116,9 +116,11 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
           onChange={change}
           ariaLabel={t("filterAria")}
         />
+        {/* sr-only below sm, not hidden — the phone rail filters too, and
+            display:none would silence this live region for its readers. */}
         <p
           aria-live="polite"
-          className="hidden shrink-0 font-mono text-meta uppercase tracking-meta text-fg-tertiary sm:block"
+          className="sr-only shrink-0 font-mono text-meta uppercase tracking-meta text-fg-tertiary sm:not-sr-only sm:block"
         >
           {t("count", { count: visible.length })}
         </p>

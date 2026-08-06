@@ -61,6 +61,9 @@ export function SmoothScroll() {
     return () => {
       remeasure.disconnect();
       gsap.ticker.remove(raf);
+      // lagSmoothing(0) above is a global ticker side effect — put the GSAP
+      // default back so a world without Lenis is not left with it.
+      gsap.ticker.lagSmoothing(500, 33);
       lenis.destroy();
       window.__lenis = null;
     };

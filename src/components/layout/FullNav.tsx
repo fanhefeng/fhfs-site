@@ -380,4 +380,4 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
   );
 }
 
-export default FullNav;
+

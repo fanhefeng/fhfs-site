@@ -1,17 +1,23 @@
 import type { App } from "@/lib/content";
 import type { Locale } from "@/i18n/routing";
 
-/** The four buckets the segmented filter offers, in display order. */
-export const APP_CATEGORIES = ["desktop", "tool", "game", "website"] as const;
+/** The four buckets the segmented filter offers, in display order — the same
+ *  union `App["category"]` carries out of the database enum. */
+export const APP_CATEGORIES = [
+  "desktop",
+  "tool",
+  "game",
+  "website",
+] as const satisfies readonly App["category"][];
 
-export type AppCategory = (typeof APP_CATEGORIES)[number];
+type AppCategory = App["category"];
 export type AppFilter = "all" | AppCategory;
 
 /**
- * A single app, flattened for the client islands: the YAML records carry
- * `{zh,en}` objects and MDX-ish metadata that must never cross the server
- * boundary, so the page resolves everything (locale, CTA wording key, accent)
- * once at build time and ships a plain, serializable payload.
+ * A single app, flattened for the client islands: the database rows from
+ * `getApps()` carry `{zh,en}` objects, so the page resolves everything
+ * (locale, CTA wording key, hue) at render time and ships a plain,
+ * serializable payload.
  */
 export type SoftwareApp = {
   id: string;
@@ -58,7 +64,7 @@ export function toSoftwareApp(
   index: number,
   locale: Locale
 ): SoftwareApp {
-  const category = app.category as AppCategory;
+  const category = app.category;
   return {
     id: app.key,
     name: app.name,

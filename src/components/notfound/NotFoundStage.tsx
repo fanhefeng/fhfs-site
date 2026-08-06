@@ -28,7 +28,7 @@ function fold(p: number) {
 const REST = fold(0);
 
 /** One language's way out of the page. */
-export type NotFoundBlock = {
+type NotFoundBlock = {
   /** BCP-47 tag, so the CJK type guards in globals.css apply per block. */
   lang: string;
   title: string;

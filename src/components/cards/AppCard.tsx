@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
 import { Sticker } from "@/components/ui/Sticker";
 import { AppMock } from "@/components/software/AppMock";
 import { appMonogram, mockAccent, type SoftwareApp } from "@/components/software/appMeta";
@@ -37,7 +37,7 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
     () => {
       const root = rootRef.current;
       if (!root) return;
-      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      if (!isFinePointer()) return;
 
       const rest = root.querySelector<HTMLElement>("[data-shadow='rest']");
       const lift = root.querySelector<HTMLElement>("[data-shadow='lift']");
@@ -162,6 +162,9 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
               href={app.website}
               target="_blank"
               rel="noopener noreferrer"
+              // Several cards repeat the same CTA word — name the app for the
+              // screen-reader link list.
+              aria-label={`${t(app.cta)} — ${app.name}`}
               className="inline-flex min-h-11 items-center gap-1.5 text-caption font-medium text-fg underline decoration-accent/55 decoration-1 underline-offset-4 transition-colors duration-200 hover:text-accent hover:decoration-accent"
             >
               {t(app.cta)}

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { ReactNode } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
 
 type Props = {
   children: ReactNode;
@@ -31,7 +31,7 @@ export function Magnetic({ children, strength = 0.4, className }: Props) {
       const inner = innerRef.current;
       if (!wrap || !inner) return;
       // Magnetism only makes sense for a hovering fine pointer.
-      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      if (!isFinePointer()) return;
 
       /* Geometry is read once per hover (pointerenter) — an event-driven
        * read, never per frame. The wrapper itself moves during the hover,

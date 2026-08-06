@@ -2,14 +2,7 @@
 
 import { useCallback, useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-
-type Theme = "dark" | "light";
-
-const readTheme = (): Theme =>
-  typeof document !== "undefined" &&
-  document.documentElement.dataset.theme === "dark"
-    ? "dark"
-    : "light";
+import { readTheme, toggleTheme, type Theme } from "@/lib/theme";
 
 /* One AudioContext for every switch instance, created lazily inside the
  * first click (a user gesture, so autoplay policy is satisfied) — zero
@@ -70,37 +63,11 @@ export function LightSwitch({ className }: { className?: string }) {
   }, []);
 
   const toggle = useCallback(() => {
-    const next: Theme = readTheme() === "light" ? "dark" : "light";
-    const apply = () => {
-      document.documentElement.dataset.theme = next;
-      try {
-        localStorage.setItem("fhfs-theme", next);
-      } catch {
-        /* Private mode etc. — the theme still applies for this page view. */
-      }
-      window.dispatchEvent(new CustomEvent("fhfs:theme"));
-      setTheme(next);
-    };
-
     // Multimodal trio on the causal frame: sound + haptic + the cross-fade.
-    playClick(next === "light");
+    // The state update rides the 'fhfs:theme' event the toggle dispatches.
+    playClick(readTheme() === "dark");
     navigator.vibrate?.(10);
-
-    const doc = document as Document & {
-      startViewTransition?: (cb: () => void) => void;
-    };
-    if (typeof doc.startViewTransition === "function") {
-      // Scope the 1.2s theme cross-fade (globals.css) to this transition.
-      document.documentElement.dataset.vt = "theme";
-      doc.startViewTransition(apply);
-      window.setTimeout(() => {
-        if (document.documentElement.dataset.vt === "theme") {
-          delete document.documentElement.dataset.vt;
-        }
-      }, 1400);
-      return;
-    }
-    apply();
+    toggleTheme();
   }, []);
 
   const on = theme === "light";

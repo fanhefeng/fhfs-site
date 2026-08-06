@@ -552,6 +552,7 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
   const target = useRef(new THREE.Vector3());
   const aim = useRef(new THREE.Vector3());
   const axis = useRef(new THREE.Vector3());
+  const dir = useRef(new THREE.Vector3());
   const smoothed = useRef(0);
   const lastTick = useRef(0);
   const { camera, size, invalidate } = useThree();
@@ -602,7 +603,7 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
     const phi = THREE.MathUtils.lerp(a.phi, b.phi, t);
     const radius = THREE.MathUtils.lerp(a.radius, b.radius, t);
 
-    camera.position.copy(dirVector(theta, phi).multiplyScalar(radius));
+    camera.position.copy(dirVector(theta, phi, dir.current)).multiplyScalar(radius);
     target.current.lerpVectors(a.target, b.target, t);
     camera.lookAt(target.current);
 

@@ -60,7 +60,8 @@ export function RouteTransition({
 
   // Raw pathname (locale prefix included) — the reveal is gated on the phase,
   // not on the path shape, so a locale switch that changes /zh/x to /en/x
-  // while no veil is up is simply ignored (it runs its own view transition).
+  // while no veil is up is simply ignored (a locale swap deliberately has no
+  // transition of its own — the words swap in place).
   const pathname = usePathname();
   const router = useRouter();
 

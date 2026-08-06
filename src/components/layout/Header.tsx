@@ -213,6 +213,9 @@ export function Header({ links, menuLinks }: Props) {
       mm.add(
         "(hover: hover) and (pointer: fine)",
         () => {
+          const onEnter = () => {
+            gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
+          };
           const onMove = (e: PointerEvent) => {
             // Event-driven read; fePointLight x/y live in the ring's own
             // user space, so the island rect maps clientX/Y directly.
@@ -223,14 +226,15 @@ export function Header({ links, menuLinks }: Props) {
               ease: "power2.out",
               overwrite: "auto",
             });
-            gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
           };
           const onLeave = () => {
             gsap.to(ring, { opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" });
           };
+          island.addEventListener("pointerenter", onEnter);
           island.addEventListener("pointermove", onMove);
           island.addEventListener("pointerleave", onLeave);
           return () => {
+            island.removeEventListener("pointerenter", onEnter);
             island.removeEventListener("pointermove", onMove);
             island.removeEventListener("pointerleave", onLeave);
           };
@@ -464,4 +468,4 @@ export function Header({ links, menuLinks }: Props) {
   );
 }
 
-export default Header;
+

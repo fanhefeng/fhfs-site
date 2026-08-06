@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { toggleTheme } from "@/lib/theme";
 
 /** Quarter-circle sweep: 180° (due left) → 270° (straight up). */
 const START_ANGLE = 180;
@@ -64,43 +65,17 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
     });
   }, []);
 
-  /** Same three-part theme contract as LightSwitch: storage + attribute + event. */
-  const toggleTheme = useCallback(() => {
-    const next =
-      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    const apply = () => {
-      document.documentElement.dataset.theme = next;
-      try {
-        localStorage.setItem("fhfs-theme", next);
-      } catch {
-        /* Private mode — the choice still applies to this page view. */
-      }
-      window.dispatchEvent(new CustomEvent("fhfs:theme"));
-    };
-
+  /** Same flip LightSwitch does, minus the click sound — see lib/theme. */
+  const flipTheme = useCallback(() => {
     navigator.vibrate?.(10);
-
-    const doc = document as Document & {
-      startViewTransition?: (cb: () => void) => void;
-    };
-    if (typeof doc.startViewTransition === "function") {
-      document.documentElement.dataset.vt = "theme";
-      doc.startViewTransition(apply);
-      window.setTimeout(() => {
-        if (document.documentElement.dataset.vt === "theme") {
-          delete document.documentElement.dataset.vt;
-        }
-      }, 1400);
-      return;
-    }
-    apply();
+    toggleTheme();
   }, []);
 
   const actions: Action[] = [
     { key: "share", label: copied ? t("fabShareDone") : t("fabShare"), onClick: share },
     { key: "top", label: t("fabTop"), onClick: toTop },
     { key: "rss", label: t("fabRss"), href: `/${locale}/rss.xml` },
-    { key: "theme", label: t("fabTheme"), onClick: toggleTheme },
+    { key: "theme", label: t("fabTheme"), onClick: flipTheme },
   ];
 
   /* --- motion ----------------------------------------------------------- */
