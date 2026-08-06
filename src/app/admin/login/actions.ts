@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyPassword } from "@/lib/auth/password";
-import { isThrottled, pruneAttempts, recordAttempt } from "@/lib/auth/throttle";
+import { clearAttempts, isThrottled, recordAttempt } from "@/lib/auth/throttle";
 import {
   clearSessionCookie,
   createSession,
@@ -48,9 +48,7 @@ export async function login(
   }
 
   await setSessionCookie(await createSession());
-  // A successful sign-in clears the window it was counted in, so getting it
-  // right on the eighth try does not lock the next session out.
-  await pruneAttempts();
+  await clearAttempts(ip);
 
   const next = formData.get("next");
   redirect(typeof next === "string" && next.startsWith("/admin") ? next : "/admin");

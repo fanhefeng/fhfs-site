@@ -1,5 +1,5 @@
 import "server-only";
-import { and, gte, sql } from "drizzle-orm";
+import { and, eq, gte, lt, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { loginAttempts } from "@/db/schema";
 
@@ -23,12 +23,18 @@ export async function isThrottled(ip: string): Promise<boolean> {
   const [row] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(loginAttempts)
-    .where(and(sql`${loginAttempts.ip} = ${ip}`, gte(loginAttempts.at, since)));
+    .where(and(eq(loginAttempts.ip, ip), gte(loginAttempts.at, since)));
   return (row?.count ?? 0) >= MAX_ATTEMPTS;
 }
 
-/** Housekeeping: drop attempts old enough to be irrelevant. */
-export async function pruneAttempts(): Promise<void> {
+/**
+ * Called on a successful sign-in: forgets this address's window — so getting
+ * it right on the eighth try does not lock the next session out — and drops
+ * everyone's expired rows while it is here.
+ */
+export async function clearAttempts(ip: string): Promise<void> {
   const cutoff = new Date(Date.now() - WINDOW_MINUTES * 60_000);
-  await db.delete(loginAttempts).where(sql`${loginAttempts.at} < ${cutoff}`);
+  await db
+    .delete(loginAttempts)
+    .where(or(eq(loginAttempts.ip, ip), lt(loginAttempts.at, cutoff)));
 }

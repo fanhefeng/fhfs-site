@@ -1,12 +1,8 @@
 import "server-only";
 import { cookies } from "next/headers";
-import {
-  createSession as signSession,
-  readSession,
-  MAX_AGE_SECONDS,
-  SESSION_COOKIE,
-  type Session,
-} from "./token";
+import { readSession, MAX_AGE_SECONDS, SESSION_COOKIE, type Session } from "./token";
+
+export { createSession } from "./token";
 
 /**
  * Sessions, from the request's point of view.
@@ -22,10 +18,6 @@ import {
  * for the real one. Server Actions are not routes; a matcher edit or a moved
  * file can take them out from under the proxy without anything failing loudly.
  */
-
-export async function createSession(): Promise<string> {
-  return signSession();
-}
 
 export async function setSessionCookie(token: string): Promise<void> {
   (await cookies()).set(SESSION_COOKIE, token, {
