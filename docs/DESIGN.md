@@ -33,9 +33,9 @@
 | 文字次 | `rgba(26,26,26,.72)` | `rgba(255,255,255,.68)` |
 | 文字三级 | `rgba(26,26,26,.60)` | `rgba(255,255,255,.45)` |
 | Accent（唯一） | 琥珀 `#B45309`（链接下划线/当前态/开灯点缀，对纸底 4.7:1） | `#D97706`（`#B45309` 在 `#0E0E11` 上仅 3.8:1，不足以承载文字） |
+| 光晕 | — | 暖 `#FFB86B` + 冷 `#6E8BFF`（blur 100px、opacity .12–.18，仅存在于 AuroraLayer） |
 
 > 亮色两级次要文字的初稿值（.62/.40）实测只有 4.8:1 / **2.5:1**，三级文字承载日期、计数与 caption，必须过 4.5:1。层次改由字号与字重承担，不靠淡出。
-| 光晕 | — | 暖 `#FFB86B` + 冷 `#6E8BFF`（blur 100px、opacity .12–.18，仅存在于 AuroraLayer） |
 
 - **亮色阴影必须带暖色**：`rgba(120,80,40,0.08)` 系——暖白纸底上冷灰阴影会显脏（评审嫁接）。
 - FilmGrain 降维为 **2.5% opacity 纸感噪点层**（GrainLayer），置于玻璃层之上防 banding。
@@ -247,15 +247,9 @@ SSR 永远输出完整 DOM；`src/lib/htmlInCanvas.ts` 导出 `supportsHtmlInCan
 - **P4 可选增强**：HTML-in-Canvas 三项、404 粒子、About 序列帧。
 - **收尾**：删除退役组件与资产、OG 图/icon 新视觉、build + 浏览器逐页走查（双语×双主题×移动端视口）+ 终审 review。
 
-## 7. 参考材料（研究底稿，实现时按需深读）
+## 7. 参考材料
 
-Session scratchpad：`/private/tmp/claude-501/-Users-fhf-IT-code-mine-fhfs-site/91b50f46-b1f3-483c-bca2-683e34a954bc/scratchpad/`
-
-- `r01.json` — apple-design skill 19 条规范（press/弹簧/可中断/rubberband/vibrancy/scrim/热区…）
-- `r02.json` — HTML-in-Canvas 现状、API、demo、降级
-- `r03.json` — 代码库全量审计（组件逐个处置依据）
-- `r04.json` / `r07.json` — 11 个 GSAP demo 源码级拆解（azmKBBJ 磁吸、vYMzKZx bento Flip、RwKwLWK 无限流、JoRMPLg 灵动岛、gbwvbgQ 径向 FAB、JoRZaLY easeReverse、raMQBVQ 全屏菜单、MYyBrZw 横向散落、VwgevYW 序列帧、QWzZwxR scramble）
-- `r05.json` — Next.js 16.2.11 规则全文（含出处）
-- `r06.json` — 简约风趋势（rauno.me/emilkowal.ski/Linear/Family/Daylight 等）
-- `r08.json` — 6 条推文 + 3 网站浏览器实勘（feSpecularLighting、state-aware 图、粒子、碎玻璃、pretext、kinetic type、Sticker Forge、shulexiong、incommonwith）
-- `r09–r11.json` — 三份提案全文；`r12–r14.json` — 三份评审
+研究底稿（GSAP demo 拆解、apple-design 规范、趋势实勘、三份提案与评审）
+产出于一次性的 session scratchpad，目录已随会话回收，不再可读。它们的结论
+凡是重要的都已写进上文正文；GSAP demo 的出处编号（azmKBBJ、vYMzKZx、
+gbwvbgQ……）保留在各组件的注释里，可按需去 CodePen 回看原 demo。

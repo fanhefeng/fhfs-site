@@ -8,15 +8,15 @@
 
 | 要改什么 | 改哪里 |
 |---|---|
-| 文案（标题/正文/要点/kicker） | `messages/{zh,en}.json` 的 `intro` 段 |
+| 文案（标题/正文/要点/kicker/时间段） | 数据库 `intro_nodes` 表，在 `/admin/intro` 里编辑 |
 | 贴纸位置、大小、配色、图标、机位距离 | `src/lib/intro/stickers.ts` |
 | 模型本身 | `public/models/head.glb` + `src/lib/intro/stickers.ts` 顶部的常量 |
 
-配置与文案是分开的：`lib/intro/stickers.ts` 只放与语言无关的几何，页面（Server Component）把两者按 `id` 拼起来再传给客户端。这样切语言不会重渲染 Canvas。
+配置与文案是分开的：`lib/intro/stickers.ts` 只放与语言无关的几何，页面（Server Component）经 `getIntroNodes()` 读库后把两者按 `key == id` 拼起来再传给客户端。这样切语言不会重渲染 Canvas。页面框架文案（标题、滚动提示、链接）仍在 `messages/{zh,en}.json` 的 `intro` 段。
 
-新增/删除一张贴纸 = 在 `INTRO_STICKERS` 加一项 + 在两个 messages 文件的 `intro.nodes` 里加同名 `id`。滚动轨道长度（`(贴纸数 + 3) × 100dvh`，为什么是 +3 见 §6）会自己跟上。
+新增/删除一张贴纸 = 在 `INTRO_STICKERS` 加一项 + 在 `/admin/intro` 加一条同名 `key` 的记录。滚动轨道长度（`(贴纸数 + 3) × 100dvh`，为什么是 +3 见 §6）会自己跟上。`period` 是可空列，留空即不显示。
 
-`intro.nodes.<id>` 里只有 `kicker` / `title` / `body` / `bullets` 是必填的；`period` 可有可无，页面用 `t.has()` 判在不在，**不要为了「补齐结构」写一个空字符串进去**。
+注意：`intro_nodes` 里的「贴纸文字/贴纸 emoji」两个字段目前**尚未接进渲染**——贴花贴图仍读 `INTRO_STICKERS` 的 `label`/`icon`（admin 表单里已如实标注）。
 
 ## 2. 贴纸定位：方向角，不是坐标
 
