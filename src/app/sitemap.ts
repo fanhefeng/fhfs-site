@@ -1,56 +1,51 @@
 import type { MetadataRoute } from "next";
 import { routing } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getAllSlugs, getAllTags, getPost } from "@/lib/content";
+import { localeLanguages } from "@/lib/seo";
+import { getAllSlugs, getAllTags, getNavItems, getPost } from "@/lib/content";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
-  const staticPaths = [
-    "",
-    "/blog",
-    "/about",
-    "/intro",
-    "/portfolio",
-    "/software",
-  ];
-
-  const alternatesFor = (path: string) => ({
-    languages: Object.fromEntries(
-      routing.locales.map((l) => [
-        l === "zh" ? "zh-CN" : "en",
-        `${site.url}/${l}${path}`,
-      ])
-    ),
-  });
+  // The same nav table the header, footer and menu read — one place to add a
+  // page, rather than four lists to remember to update.
+  const staticPaths = (await getNavItems("sitemap")).map((item) =>
+    item.href === "/" ? "" : item.href
+  );
 
   for (const path of staticPaths) {
     for (const locale of routing.locales) {
       entries.push({
         url: `${site.url}/${locale}${path}`,
-        alternates: alternatesFor(path),
+        alternates: { languages: localeLanguages(path) },
         changeFrequency: path === "/blog" ? "weekly" : "monthly",
       });
     }
   }
 
-  for (const slug of getAllSlugs()) {
-    for (const locale of routing.locales) {
-      const post = getPost(slug, locale);
-      entries.push({
-        url: `${site.url}/${locale}/blog/${slug}`,
-        lastModified: post ? new Date(post.date) : undefined,
-        alternates: alternatesFor(`/blog/${slug}`),
-      });
-    }
-  }
+  // Both locales exist for every slug: the read layer falls back to the other
+  // language rather than 404ing, so each URL renders.
+  const slugs = await getAllSlugs();
+  entries.push(
+    ...(await Promise.all(
+      slugs.flatMap((slug) =>
+        routing.locales.map(async (locale) => {
+          const post = await getPost(slug, locale);
+          return {
+            url: `${site.url}/${locale}/blog/${slug}`,
+            lastModified: post ? new Date(post.date) : undefined,
+            alternates: { languages: localeLanguages(`/blog/${slug}`) },
+          };
+        })
+      )
+    ))
+  );
 
-  const tags = new Set<string>();
+  // Tags are per-locale strings, not translations of each other: a tag the
+  // other locale never uses 404s there, so each locale lists only its own —
+  // and no alternates, because there is no counterpart to point at.
   for (const locale of routing.locales) {
-    for (const { tag } of getAllTags(locale)) tags.add(tag);
-  }
-  for (const tag of tags) {
-    for (const locale of routing.locales) {
+    for (const { tag } of await getAllTags(locale)) {
       entries.push({
         url: `${site.url}/${locale}/blog/tags/${encodeURIComponent(tag)}`,
       });

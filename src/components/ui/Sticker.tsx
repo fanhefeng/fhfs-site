@@ -17,8 +17,13 @@ type Props = {
   className?: string;
 };
 
-/** Tiny LCG → stable pseudo-random in [0,1) from an integer seed. */
-const rand = (seed: number) => (((seed + 1) * 9301 + 49297) % 233280) / 233280;
+/** Stable pseudo-random in [0,1) from an integer seed. A sine hash, not an
+ *  LCG: one multiply-and-mod step ramps monotonically for sequential seeds,
+ *  which lined a wall of stickers up in slowly increasing tilt. */
+const rand = (seed: number) => {
+  const x = Math.sin(seed + 1) * 43758.5453;
+  return x - Math.floor(x);
+};
 
 /**
  * Sticker material — the "content" material of the site (glass is the

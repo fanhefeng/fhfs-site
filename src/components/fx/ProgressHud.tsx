@@ -34,9 +34,9 @@ function ReadingChip() {
   const fillRef = useRef<HTMLSpanElement>(null);
   const pctRef = useRef<HTMLSpanElement>(null);
 
-  /* Scroll → progress. Input-driven (also runs under reduced motion),
-   * rAF-throttled, and writes only transform/textContent — no layout
-   * mutations, no React re-renders per scroll tick. */
+  /* Scroll → progress. Input-driven, rAF-throttled, and writes only
+   * transform/textContent — no layout mutations, no React re-renders per
+   * scroll tick. */
   useEffect(() => {
     let raf = 0;
     const update = () => {
@@ -68,25 +68,16 @@ function ReadingChip() {
   }, []);
 
   /* Entrance: one small float-in, then the chip never animates again —
-   * only the fill's scaleX follows scroll. Reduced motion skips straight
-   * to the resting state. */
+   * only the fill's scaleX follows scroll. */
   useGSAP(
     () => {
       const root = rootRef.current;
       if (!root) return;
-      const mm = gsap.matchMedia();
-
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(root, { opacity: 1, y: 0 });
-      });
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.fromTo(
-          root,
-          { opacity: 0, y: 8 },
-          { opacity: 1, y: 0, duration: 0.35, overwrite: "auto" }
-        );
-      });
+      gsap.fromTo(
+        root,
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.35, overwrite: "auto" }
+      );
     },
     { scope: rootRef }
   );

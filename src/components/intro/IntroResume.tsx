@@ -15,7 +15,7 @@ type Props = {
    * the 3D stage is up (nothing inside a canvas reaches a screen reader or a
    * crawler). Unhides itself when focus enters it — see the wrapper below.
    * `visible` — the page itself, when WebGL is unavailable or the visitor
-   * asked for reduced motion. Same narrow column as the rest of the site.
+   * asked to save data. Same narrow column as the rest of the site.
    */
   variant: "seo" | "visible";
 };

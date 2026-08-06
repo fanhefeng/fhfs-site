@@ -23,8 +23,7 @@ type Props = {
 /**
  * The one scroll entrance of the site: y:24 / opacity:0 → 0.6s power2.out,
  * fired once at "top 85%". Content is always in the DOM (SSR/SEO safe) —
- * GSAP hides it only on the client just before the from-tween runs, and
- * reduced-motion users simply never see it move.
+ * GSAP hides it only on the client just before the from-tween runs.
  */
 export function Reveal({
   children,
@@ -47,24 +46,19 @@ export function Reveal({
     () => {
       const el = ref.current;
       if (!el) return;
-      // Reveals are pure flourish — under reduced motion the content is
-      // simply there. matchMedia registrations are reverted by useGSAP.
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const targets: gsap.TweenTarget =
-          stagger != null ? Array.from(el.children) : el;
-        gsap.from(targets, {
-          y,
-          autoAlpha: 0,
-          duration: 0.6,
-          ease: "power2.out",
-          delay,
-          stagger: stagger ?? 0,
-          // Leave no inline residue once landed, so hover tweens and Flip
-          // reads elsewhere see clean elements.
-          clearProps: "transform,opacity,visibility",
-          scrollTrigger: { trigger: el, start: "top 85%", once: true },
-        });
+      const targets: gsap.TweenTarget =
+        stagger != null ? Array.from(el.children) : el;
+      gsap.from(targets, {
+        y,
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: "power2.out",
+        delay,
+        stagger: stagger ?? 0,
+        // Leave no inline residue once landed, so hover tweens and Flip
+        // reads elsewhere see clean elements.
+        clearProps: "transform,opacity,visibility",
+        scrollTrigger: { trigger: el, start: "top 85%", once: true },
       });
     },
     { scope: ref }

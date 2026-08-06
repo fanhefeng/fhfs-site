@@ -21,8 +21,7 @@ type Props = {
  * one, which is what makes the control read as one physical part sliding.
  *
  * Buttons are ≥44px tall and remain plain buttons with `aria-pressed`; arrow
- * keys move between them for keyboard users. Under reduced motion the pill
- * simply appears in the new slot.
+ * keys move between them for keyboard users.
  */
 export function SegmentedFilter({
   options,
@@ -44,10 +43,9 @@ export function SegmentedFilter({
       if (!root || !pill) return;
       const btn = root.querySelector<HTMLElement>(`[data-seg="${CSS.escape(value)}"]`);
       if (!btn) return;
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const next = { x: btn.offsetLeft, width: btn.offsetWidth };
 
-      if (!animate || reduced) {
+      if (!animate) {
         gsap.set(pill, next);
         return;
       }

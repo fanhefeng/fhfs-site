@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Link } from "@/i18n/navigation";
 import { gsap, useGSAP, Flip, ExpoScaleEase } from "@/lib/gsap";
-import { SpecularEdge } from "@/components/cards/WorkCard";
+import { SpecularEdge } from "@/components/cards/SpecularEdge";
 
 export type BentoItem = {
   id: string;
@@ -46,7 +46,7 @@ const CLOSE_ROW = "38vh";
  * work per frame); backdrop blur is switched off for the duration; a width
  * change rebuilds the captured state, since Flip records pixels.
  *
- * Mobile and reduced motion never pin — the collage *is* the layout there.
+ * Mobile never pins — the collage *is* the layout there.
  */
 export function BentoHero({ items, ariaLabel, hint }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
@@ -84,7 +84,7 @@ export function BentoHero({ items, ariaLabel, hint }: Props) {
 
       const mm = gsap.matchMedia();
       mm.add(
-        "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+        "(min-width: 768px)",
         () => {
           // Capture the close-up, then revert — Flip.to() plays the diff.
           grid.style.setProperty("--bento-col", CLOSE_COL);
@@ -226,10 +226,8 @@ const BENTO_CSS = `
 }
 /* Hover lift uses the standalone translate property (not transform), so it
    composes with the Flip tween instead of fighting it. */
-@media (prefers-reduced-motion: no-preference) {
-  .bento-cell { transition: translate 0.3s ease-out; }
-  .bento-cell:hover { translate: 0 -4px; }
-}
+.bento-cell { transition: translate 0.3s ease-out; }
+.bento-cell:hover { translate: 0 -4px; }
 
 .bento-wash {
   position: absolute;

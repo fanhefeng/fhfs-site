@@ -2,9 +2,8 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP, SplitText, EASE } from "@/lib/gsap";
-
-/** Any CJK ideograph/kana in the headline means "do not scramble". */
-const CJK = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/;
+// Any CJK ideograph/kana in the headline means "do not scramble".
+import { HAS_CJK } from "@/lib/reading";
 
 /**
  * The article headline, entering once.
@@ -14,8 +13,8 @@ const CJK = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/;
  * Chinese titles get a line-level mask reveal instead: scrambling CJK swaps
  * glyph widths every frame, which reads as noise rather than typing.
  *
- * The real text is always in the DOM (SSR/SEO), so reduced motion, a failed
- * hydration or a stalled font simply leaves a normal headline.
+ * The real text is always in the DOM (SSR/SEO), so a failed hydration or a
+ * stalled font simply leaves a normal headline.
  */
 export function PostTitle({
   title,
@@ -30,38 +29,43 @@ export function PostTitle({
     () => {
       const el = ref.current;
       if (!el) return;
-      const mm = gsap.matchMedia();
 
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        if (CJK.test(title)) {
-          // SplitText's own mask wrappers match the .split-line/.split-inner
-          // convention in globals.css: the line slides out from behind a
-          // clip, implying it was always there.
-          const split = SplitText.create(el, { type: "lines", mask: "lines" });
-          gsap.from(split.lines, {
-            yPercent: 110,
-            duration: 0.7,
-            stagger: 0.08,
-            ease: EASE.default,
-            overwrite: "auto",
-          });
-          return () => split.revert();
-        }
-
-        gsap.to(el, {
-          duration: 0.9,
-          ease: "none",
+      if (HAS_CJK.test(title)) {
+        // SplitText's `mask: "lines"` brings its own clip wrappers: the line
+        // slides out from behind a clip, implying it was always there.
+        const split = SplitText.create(el, { type: "lines", mask: "lines" });
+        gsap.from(split.lines, {
+          yPercent: 110,
+          duration: 0.7,
+          stagger: 0.08,
+          ease: EASE.default,
           overwrite: "auto",
-          scrambleText: {
-            text: title,
-            chars: "lowerCase",
-            speed: 0.6,
-            revealDelay: 0.15,
-          },
         });
+        // useGSAP runs this inside a gsap.context, so a returned function is
+        // the context's cleanup — but only `revertOnUpdate` below makes it run
+        // on a title change rather than just at unmount.
+        return () => split.revert();
+      }
+
+      gsap.to(el, {
+        duration: 0.9,
+        ease: "none",
+        overwrite: "auto",
+        scrambleText: {
+          text: title,
+          chars: "lowerCase",
+          speed: 0.6,
+          revealDelay: 0.15,
+        },
       });
     },
-    { scope: ref, dependencies: [title] }
+    // revertOnUpdate is load-bearing, not decoration: without it useGSAP sets
+    // `deferCleanup` (deps present, no revertOnUpdate) and skips the revert on
+    // a dependency change, re-running the body against the same context. A
+    // soft-nav between two CJK posts reuses this instance, so the second
+    // SplitText would wrap lines that the first one had already wrapped —
+    // nested masks, mismeasured lines, and a headline that can stay clipped.
+    { scope: ref, dependencies: [title], revertOnUpdate: true }
   );
 
   return (

@@ -81,68 +81,7 @@
     "outroBody": "If you got this far, the stickers did their job.",
     "linkAbout": "About me",
     "linkWriting": "Read something",
-    "resumeRegion": "Résumé in text — the same content as the 3D scene",
-    "nodes": {
-      "frontend": {
-        "kicker": "01 — the day job",
-        "title": "Front-end engineering",
-        "body": "React / Next.js / TypeScript. This site is the exhibit: bilingual routing, a content pipeline and a motion system, all written by hand.",
-        "bullets": [
-          "A zh/en site on App Router + next-intl",
-          "Posts are MDX, compiled at build time",
-          "One token set, colour semantics down to components"
-        ]
-      },
-      "webgl": {
-        "kicker": "02 — the craft",
-        "title": "3D and graphics",
-        "body": "Three.js and React Three Fiber. The web should not be all rectangles — the face you are looking at is the argument.",
-        "bullets": [
-          "Scroll-driven 3D narrative",
-          "Runtime decals and procedural textures",
-          "The trade-offs of 3D on a phone"
-        ]
-      },
-      "design": {
-        "kicker": "03 — half a designer",
-        "title": "Design systems",
-        "body": "I can draw it myself, and argue with a designer about it. Colour semantics through to glass tiers, one token set all the way down.",
-        "bullets": [
-          "Three tiers: primitive → semantic → component",
-          "Light and dark, switched like opening and closing a gallery"
-        ]
-      },
-      "ai": {
-        "kicker": "04 — what I'm on now",
-        "title": "Building with AI",
-        "body": "Putting models into real work, not demos. The head you are looking at came out of a single photograph — stylised, then rebuilt in 3D.",
-        "bullets": [
-          "Image-to-image stylisation, single-image reconstruction",
-          "Prompts kept like code, re-runnable"
-        ]
-      },
-      "ship": {
-        "kicker": "05 — how I work",
-        "title": "Shipping beats perfect",
-        "body": "Ship it, then iterate. One version goes out; the rest is the next version's problem.",
-        "bullets": [
-          "Every change records its why",
-          "Anything repeatable becomes a script"
-        ]
-      },
-      "oss": {
-        "kicker": "06 — spare hours",
-        "title": "Open source",
-        "body": "Whatever can be public sits on GitHub. Small tools written for myself; now and then someone else finds a use.",
-        "bullets": ["Small and sharp over popular"]
-      },
-      "slow": {
-        "kicker": "07 — the human bit",
-        "title": "Slowly",
-        "body": "Write slowly, build slowly, never rush. A light left on is enough.",
-        "bullets": []
-      }
-    }
+    "resumeRegion": "Résumé in text — the same content as the 3D scene"
   },
   "portfolio": {
     "kicker": "Gallery · Craft",
@@ -156,28 +95,6 @@
     "experimentsTitle": "Experiments",
     "experimentsSub": "One-line studies, updated now and then.",
     "openDemo": "Open the demo",
-    "experiments": {
-      "bentoScrub": {
-        "name": "Step closer",
-        "desc": "Scrolling pushes the collage up toward full screen — Flip captures the end state, ScrollTrigger scrubs it, and it reverses whenever you do."
-      },
-      "specularEdge": {
-        "name": "Lit glass edge",
-        "desc": "A feSpecularLighting point light rides the card's hairline rim — the cursor is the torch, the colour is the project's own. Touch and reduced motion get a static rim."
-      },
-      "liquidLens": {
-        "name": "Liquid glass lens",
-        "desc": "HTML-in-Canvas draws the living DOM into a canvas, then a refracting puck magnifies it under the cursor — the link underneath stays clickable and focusable. Browsers without the API get CSS glass."
-      },
-      "shatteredGlass": {
-        "name": "Three.js shattered-glass hero",
-        "desc": "Five Voronoi-cut panes with dispersion, iridescence and clearcoat — someone else's experiment; this page just keeps the link."
-      },
-      "lightsOn": {
-        "name": "Lights on",
-        "desc": "The theme switch is opening and closing the gallery: a 1.2s cross-fade wrapped in a View Transition, aurora and imagery changing shift together."
-      }
-    },
     "lens": {
       "heading": "Glass over living DOM",
       "body": "This text is still real DOM: selectable, searchable, focusable. The glass is only painted on top of it.",

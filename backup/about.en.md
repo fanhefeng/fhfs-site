@@ -1,0 +1,8 @@
+---
+title: About
+---
+
+
+Hi, I run this little club. I write code by day, code by night, and words in between.
+
+I like building small, well-crafted tools, old movies, and jazz. This site is my corner of the internet: thoughts go in the blog, works hang on the wall, software sits on the counter — help yourself.

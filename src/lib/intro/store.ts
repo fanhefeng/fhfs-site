@@ -57,10 +57,10 @@ type State = {
    * The direction angle picked by clicking the model. Clicking does not write
    * `overrides` directly — the editor panel consumes this and writes them, so
    * the data flow stays one-way. Otherwise "panel edits store" and "click
-   * edits store" retrigger each other. `seq` distinguishes two clicks that
-   * land on the same spot.
+   * edits store" retrigger each other. A fresh object per click means two
+   * clicks on the same spot still re-fire the panel's effect.
    */
-  pick: { theta: number; phi: number; seq: number } | null;
+  pick: { theta: number; phi: number } | null;
   setPick: (theta: number, phi: number) => void;
 };
 
@@ -84,8 +84,7 @@ export const useIntroStore = create<State>((set) => ({
   resetOverrides: () => set({ overrides: {} }),
 
   pick: null,
-  setPick: (theta, phi) =>
-    set((s) => ({ pick: { theta, phi, seq: (s.pick?.seq ?? 0) + 1 } })),
+  setPick: (theta, phi) => set({ pick: { theta, phi } }),
 }));
 
 /** Merge a configured sticker with whatever the editor is overriding. */

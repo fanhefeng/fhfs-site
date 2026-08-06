@@ -11,8 +11,6 @@ type Props = {
    * bare mono word, because a headline area with stickers reads as clutter.
    */
   variant?: "sticker" | "plain";
-  /** Marks the tag currently filtering the list (tag route). */
-  active?: boolean;
   /** Index seed for the sticker's deterministic tilt. */
   seed?: number;
   className?: string;
@@ -26,7 +24,6 @@ export function TagPill({
   tag,
   count,
   variant = "plain",
-  active = false,
   seed = 0,
   className,
 }: Props) {
@@ -36,9 +33,7 @@ export function TagPill({
     return (
       <Link
         href={href}
-        className={`hit-ext relative inline-block font-mono text-meta uppercase tracking-meta transition-colors duration-200 ${
-          active ? "text-accent" : "text-fg-tertiary hover:text-accent"
-        } ${className ?? ""}`}
+        className={`hit-ext relative inline-block font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors duration-200 hover:text-accent ${className ?? ""}`}
       >
         #{tag}
       </Link>
@@ -48,26 +43,13 @@ export function TagPill({
   return (
     <Link
       href={href}
-      aria-current={active ? "page" : undefined}
       className={`hit-ext group relative inline-block align-middle ${className ?? ""}`}
     >
       <Sticker seed={seed}>
-        <span
-          className={`block rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-meta transition-colors duration-200 ${
-            active
-              ? "bg-accent text-white"
-              : "bg-surface-raised text-fg-secondary group-hover:text-accent"
-          }`}
-        >
+        <span className="block rounded-full bg-surface-raised px-3 py-1.5 font-mono text-[11px] uppercase tracking-meta text-fg-secondary transition-colors duration-200 group-hover:text-accent">
           {tag}
           {count != null && (
-            <span
-              className={`ml-1.5 tabular-nums ${
-                active ? "text-white/70" : "text-fg-tertiary"
-              }`}
-            >
-              {count}
-            </span>
+            <span className="ml-1.5 tabular-nums text-fg-tertiary">{count}</span>
           )}
         </span>
       </Sticker>

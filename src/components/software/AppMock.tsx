@@ -247,7 +247,7 @@ export function AppMock({ app, chrome = "window", label, className }: Props) {
       <Face app={app} tone="light" chrome={chrome} />
       {/* Only the top face's opacity moves, so the two never show through
        * each other half-way. */}
-      <div className="absolute inset-0 opacity-0 transition-opacity duration-[1200ms] ease-[cubic-bezier(0.42,0,0.58,1)] motion-reduce:transition-none dark:opacity-100">
+      <div className="absolute inset-0 opacity-0 transition-opacity duration-[1200ms] ease-[cubic-bezier(0.42,0,0.58,1)] dark:opacity-100">
         <Face app={app} tone="dark" chrome={chrome} />
       </div>
     </div>

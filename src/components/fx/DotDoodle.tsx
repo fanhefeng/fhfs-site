@@ -2,9 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { GLYPH_GRID, glyphFor } from "@/lib/dotGlyphs";
-// Not a WebGL scene, but the reduce-motion question is the same one, and the
-// answer should not drift from the two scenes that already ask it.
-import { prefersReducedMotion } from "@/lib/three/guards";
+import { prefersReducedMotion } from "@/lib/gsap";
 
 /** Gap between two glyph squares, in grid cells. */
 const LETTER_GAP = 1.35;
@@ -206,9 +204,6 @@ type Props = {
  * canvas's own `--fg`) at varying opacity, which is what lets the same code
  * sit on paper and on ink without a second palette.
  *
- * Reduced motion gets the surfaced state, held still — the name plainly
- * readable, which is the accessible outcome anyway.
- *
  * It is a canvas that never stops, so it owes the same energy contract as the
  * two WebGL scenes: off screen or backgrounded it stops outright, and at rest
  * it samples at `IDLE_FPS` rather than at the display's refresh rate.
@@ -228,7 +223,6 @@ export function DotDoodle({ text, className }: Props) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const reduced = prefersReducedMotion();
     const { cells, blocks } = buildCells(text);
     const noise = cells.filter((c) => !c.on);
     // Grouped so the tinted dots spread across the whole word instead of
@@ -281,8 +275,8 @@ export function DotDoodle({ text, className }: Props) {
     };
 
     /* ---- state the loop reads ---- */
-    let hovered = reduced; // reduced motion opens already surfaced
-    let hoverT = reduced ? 1 : 0;
+    let hovered = false;
+    let hoverT = 0;
     let elapsed = 0;
     let startedAt = 0;
     let lastFrameAt = 0;
@@ -290,15 +284,23 @@ export function DotDoodle({ text, className }: Props) {
     let running = false;
     let visible = false;
 
+    // An endless canvas loop owes the same reduce-motion contract as the CSS
+    // loops and the scroll hijack (see lib/gsap.ts): here the field holds
+    // still and hover snaps between its two settled states.
+    const still = prefersReducedMotion();
+    /** Past every intro delay — a fully materialized, settled field. */
+    const STILL_T = 20;
+    const redraw = () => draw(still ? STILL_T : elapsed);
+
     const draw = (t: number) => {
       if (cell <= 0) return;
 
-      // Reduced motion holds one frame; pick a phase where the drift happens
-      // to look settled rather than mid-flicker.
-      const time = reduced ? 3.7 : t;
       const h = hovered ? dampedSettle(hoverT) : smoothstep(hoverT);
       const step = (GLYPH_GRID + LETTER_GAP) * cell;
       const { ink } = palette;
+      // One style string per frame; per-dot opacity goes through globalAlpha,
+      // not 147 fresh rgba() strings a frame.
+      const inkStyle = `rgb(${ink[0] | 0}, ${ink[1] | 0}, ${ink[2] | 0})`;
 
       ctx.clearRect(0, 0, cssW, cssH);
 
@@ -309,18 +311,15 @@ export function DotDoodle({ text, className }: Props) {
           spawnAccent(t, c.block);
         }
 
-        let intro = 1;
-        if (!reduced) {
-          intro = clamp((t - c.introDelay) / 0.7, 0, 1);
-          intro = 1 - Math.pow(1 - intro, 3);
-          if (intro <= 0) continue;
-        }
+        let intro = clamp((t - c.introDelay) / 0.7, 0, 1);
+        intro = 1 - Math.pow(1 - intro, 3);
+        if (intro <= 0) continue;
 
         const n =
           0.5 +
           0.5 *
-            (0.62 * Math.sin(time * c.f1 + c.p1) +
-              0.38 * Math.sin(time * c.f2 + c.p2));
+            (0.62 * Math.sin(t * c.f1 + c.p1) +
+              0.38 * Math.sin(t * c.f2 + c.p2));
 
         // Hovering also retires the falloff: the square flattens into an even
         // matrix, which is what makes the surfaced name read as deliberate.
@@ -350,7 +349,7 @@ export function DotDoodle({ text, className }: Props) {
             (0.78 + 0.22 * fall);
         }
 
-        let rgb = ink;
+        let style = inkStyle;
         if (c.accent) {
           const age = t - c.accent.born;
           // Fade in and out, and step aside entirely while surfaced.
@@ -359,11 +358,7 @@ export function DotDoodle({ text, className }: Props) {
             (1 - h);
           if (fade > 0) {
             const a = c.accent.rgb;
-            rgb = [
-              lerp(ink[0], a[0], fade),
-              lerp(ink[1], a[1], fade),
-              lerp(ink[2], a[2], fade),
-            ];
+            style = `rgb(${lerp(ink[0], a[0], fade) | 0}, ${lerp(ink[1], a[1], fade) | 0}, ${lerp(ink[2], a[2], fade) | 0})`;
             alpha = lerp(alpha, 0.55 + 0.3 * n, fade);
             radius *= 1 + 0.1 * fade;
           }
@@ -372,11 +367,13 @@ export function DotDoodle({ text, className }: Props) {
         const x = originX + c.block * step + (c.col + 0.5) * cell;
         const y = originY + (c.row + 0.5) * cell;
 
-        ctx.fillStyle = `rgba(${rgb[0] | 0}, ${rgb[1] | 0}, ${rgb[2] | 0}, ${clamp(alpha * intro, 0, 1)})`;
+        ctx.globalAlpha = clamp(alpha * intro, 0, 1);
+        ctx.fillStyle = style;
         ctx.beginPath();
         ctx.arc(x, y, Math.max(0, radius) * intro, 0, Math.PI * 2);
         ctx.fill();
       }
+      ctx.globalAlpha = 1;
     };
 
     const frame = () => {
@@ -406,7 +403,7 @@ export function DotDoodle({ text, className }: Props) {
     };
 
     const start = () => {
-      if (running || reduced) return;
+      if (running) return;
       running = true;
       const now = performance.now();
       startedAt = now / 1000 - elapsed;
@@ -420,33 +417,40 @@ export function DotDoodle({ text, className }: Props) {
     /** Runs only while on screen, in a foreground tab — same contract as the
      *  heavier scenes on this site. */
     const sync = () => {
-      if (visible && !document.hidden) start();
-      else stop();
+      if (visible && !document.hidden) {
+        if (still) redraw();
+        else start();
+      } else stop();
     };
 
-    if (!layout()) {
-      // No box yet (a route transition still covering the outgoing tree).
-      // The ResizeObserver below fires as soon as there is one.
-    } else if (reduced) {
-      draw(0);
-    }
+    // No box yet (a route transition still covering the outgoing tree) means
+    // the ResizeObserver below fires as soon as there is one.
+    layout();
 
     const onEnter = () => {
       hovered = true;
-      // The transition still has to run under reduced motion's held frame —
-      // except there is nothing to run: it opens surfaced and stays there.
-      if (!reduced) start();
+      if (still) {
+        hoverT = 1;
+        redraw();
+        return;
+      }
+      start();
     };
     const onLeave = () => {
       hovered = false;
-      if (!reduced) start();
+      if (still) {
+        hoverT = 0;
+        redraw();
+        return;
+      }
+      start();
     };
     canvas.addEventListener("pointerenter", onEnter);
     canvas.addEventListener("pointerleave", onLeave);
     canvas.addEventListener("pointercancel", onLeave);
 
     const ro = new ResizeObserver(() => {
-      if (layout() && (reduced || !running)) draw(elapsed);
+      if (layout() && !running) redraw();
     });
     ro.observe(canvas);
 
@@ -471,7 +475,7 @@ export function DotDoodle({ text, className }: Props) {
           palette.accents[Math.floor(Math.random() * palette.accents.length)] ??
           c.accent.rgb;
       }
-      if (reduced || !running) draw(elapsed);
+      if (!running) redraw();
     });
     themeObserver.observe(document.documentElement, {
       attributes: true,

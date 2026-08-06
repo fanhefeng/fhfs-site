@@ -1,64 +1,88 @@
-# FHF'S — 深夜小馆
+# fhf — The Quiet Issue · 安静的个人杂志
 
-La La Land 霓虹爵士俱乐部风格的个人网站：博客、手札、作品与软件展示。
-母题是「一场深夜演出」——滚动条即唱片播放头（左下角 `SIDE A · 000%` 读数），
-每个区块是一支曲目。
+fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文章、自研软件与动效实验。
+暖纸色、编辑部式排版、一盏琥珀色的灯；深色主题是「闭馆后」的同一间画廊。
+完整设计语言（材质、动效语法、每页的叙事）见 `docs/DESIGN.md`。
 
-## 这场演出的节目单（首页）
+## 版面
 
-| 幕 | 区块 | 技术 |
-|---|---|---|
-| 序 | 电影式开场：圆环填充 → 逐字浮现 → 斜向刀切揭幕（每会话一次） | GSAP timeline + CustomEase + clip-path 逐帧 polygon |
-| TRACK 01 | 霓虹灯牌逐管点亮（接力：刀切完成后才通电），背后星空缓转 | SplitText + three.js Points |
-| TRACK 01½ | 推门进店：隔窗看见店内，镜头推进穿过窗户 | pin + scrub，`box-shadow: 0 0 0 60vmax` 挖窗，三层速率差 |
-| TRACK 02 | 深夜手札：笔记以 3D 切牌呈现，滚动驱动、松手吸附 | ScrollTrigger pin+scrub+snap，三态距离插值（单实例驱动全场） |
-| TRACK 03 | 诗歌幕间《程序员》：切片蒙版逐行揭示 | 遮罩优于淡入（S1） |
-| TRACK 04 | 作品滑块：无缝无限、跟手拖拽、惯性衰减、空闲自转 | 取模环 + pointer 惯性（0.94 衰减） |
-| FINALE | 全站页脚：站名实时转 ASCII 字符画，光标扫过成簇高亮 | Canvas 亮度采样（getImageData 仅 resize 时一次） |
-
-全局：Lenis 惯性滚动与 GSAP 时钟统一（`ScrollTrigger.update` 挂 lenis scroll、
-`gsap.ticker` 驱动 `lenis.raf`）。站内换页时同一把金色刀刃斜切幕布
-（`RouteTransition`，捕获阶段接管站内链接点击）。所有动效都有
-`prefers-reduced-motion` 降级，信息不丢；SSR 输出完整内容，无 JS 也可读。
-
-两个踩过的坑，改动相关代码前先读：
-
-- **窗洞不能加 `will-change`**。`ClubWindow` 靠 `box-shadow: 0 0 0 60vmax` 把窗外
-  涂成舱壁色，一旦该元素被提升为合成层，图层按 border-box 裁剪，60vmax 的扩散
-  会整个消失，画面变成"没有墙、直接看到店内"。
-- **`html` 必须留 `scrollbar-gutter: stable`**。开场遮罩会锁 `overflow`，那一刻
-  没有滚动条；ScrollTrigger 若在此时测量被 pin 的段落，会把 pin-spacer 宽度
-  写死成含滚动条的宽度，遮罩撤走后整页就能横向滚动 15px。
+- **首页** —— 杂志封面：报头、拉绳点灯的开场（每会话一次）、宣言横幅、
+  近期文章与软件的目录。
+- **/blog** —— 目录页式索引：按年分组的纯文字行，日期右对齐；文章页一栏
+  68ch，中文标题逐行揭示、拉丁标题解码进场。
+- **/portfolio** —— 封面拼贴（bento 滚动缩放）+ 在展作品 + 手作日志。
+- **/software** —— keynote 式 bento 展柜，分类筛选用 Flip 重排。
+- **/about** —— 点阵名字画布、可拖拽的 3D 工作台、贴纸墙、版本履历。
+- **/intro** —— R3F 的 3D 头像：滚动带镜头绕头飞行，每张贴纸停一站，
+  即一份滚动叙事的简历（`docs/INTRO3D.md`）。
+- **/admin** —— 浏览器里的编辑部：文章、文案、列表全部可编辑，保存即生效。
 
 ## 技术栈
 
 - Next.js 16 (App Router) + React 19 + TypeScript strict
 - Tailwind CSS 4 · next-intl（zh/en 双语，`messages/*.json`）
-- GSAP 3.15（ScrollTrigger / SplitText / CustomEase，统一从 `src/lib/gsap.ts` 导入）
-- Lenis 1.3 · three.js（星空为唯一 3D 场景，命令式、无 R3F）
-- content-collections + MDX（`content/` 下博客、手札、软件、时间线均为内容文件）
+- GSAP 3.15（ScrollTrigger / SplitText / Flip / Draggable / Inertia /
+  ScrambleText / CustomWiggle / ExpoScale，统一在 `src/lib/gsap.ts` 注册）
+- Lenis 1.3 惯性滚动，与 GSAP 时钟统一（`gsap.ticker` 驱动 `lenis.raf`）
+- three.js：/intro 用 @react-three/fiber + drei，/about 工作台为命令式 three
+- Neon Postgres + Drizzle ORM；admin 会话是 jose 签的 JWT，登录按 IP 限流
+
+全站单一动效版本，`prefers-reduced-motion` 只关掉停不下来的那几处——三条
+无限 CSS 循环、点阵画布、惯性滚动、开场黑幕（清单与理由见
+`src/lib/gsap.ts` 与 `docs/DESIGN.md` §1.5）；SSR 输出完整内容，无 JS 也可读。
+
+两个踩过的坑，改动相关代码前先读：
+
+- **`html` 必须留 `scrollbar-gutter: stable`**。开场遮罩会锁 `overflow`，那一刻
+  没有滚动条；ScrollTrigger 若在此时测量被 pin 的段落，会把 pin-spacer 宽度
+  写死成含滚动条的宽度，遮罩撤走后整页就能横向滚动 15px。
+- **局部接管滚轮不能只靠 `preventDefault()`**。Lenis 的 wheel 监听挂在 window
+  上，且**从不检查 `defaultPrevented`**——`/about` 的 3D 工位曾经只调
+  `preventDefault()`，实测结果是镜头在推拉的同时页面照样滚走（实测 Δ595px）。
+  正确做法是 Lenis 自己的契约 `data-lenis-prevent-wheel`（它沿 composedPath 读
+  这个属性），并且**只在真正接管的那一刻打开**。
 
 ## 开发
 
 ```bash
-pnpm dev     # 开发
-pnpm build   # 生产构建（含 content-collections 编译）
-pnpm start   # 预览生产构建
+pnpm dev             # 开发
+pnpm build           # 生产构建（构建期读库预渲染，需要 DATABASE_URL）
+pnpm start           # 预览生产构建
+pnpm check           # tsc --noEmit + oxlint
+pnpm admin:password  # 生成 ADMIN_PASSWORD_HASH 与 AUTH_SECRET
+pnpm db:generate     # schema 改动后生成迁移
+pnpm db:migrate      # 应用迁移
 ```
 
-## 内容从哪来
+## 内容存在哪
 
-- `content/blog/note-*.zh.mdx` —— 从旧 VitePress 知识库（fanhefeng/fhf）精选改写的手札
+内容全部在数据库里，日常编辑走 `/admin`。`src/lib/content.ts` 是唯一的读取层：
+每个 getter 都带缓存标签，页面照旧全静态预渲染，保存时 `updateTag` 让相关页面
+失效即可，不必重新部署。
+
+```bash
+pnpm db:check    # 打印库里各表的真实内容
+pnpm db:export   # 导出到 backup/（db.json + 文章的 markdown 副本）
+pnpm db:import   # 从 backup/ 恢复（按键 upsert，导入后在 /admin 保存一次刷缓存）
+pnpm db:studio   # 表格界面
+```
+
+`backup/` 跟着仓库走，所以内容仍然有 diff、有历史、有一份能离线读的纯文本副本 ——
+这是从文件搬进数据库时唯一真正会丢的东西，用 `db:export` 换回来了。
+
+`messages/*.json` 仍是**全部**文案的默认值；库里的 `copy_blocks` 只是叠在上面的
+覆盖层。表空了或者连不上库，站点就照 JSON 显示，不会白屏。
+
+## 内容与模型从哪来
+
+- 那几篇 `note-*` 手札 —— 从旧 VitePress 知识库（fanhefeng/fhf）精选改写
   （OSI 七层、macOS 主机名、JS 三则、简历方法论、《数字僧侣》）。
-- 动效方法论移植自本地 MOTION LAB 研究项目（三态插值、刀切转场、ASCII 采样、无限环）。
-- 星空与两个 3D 模型移植自旧作品集 fhf-portfolio。行星
-  ["Stylized planet" by cmzw](https://sketchfab.com/3d-models/stylized-planet-789725db86f547fc9163b00f302c3e70)
-  （CC-BY-4.0，页脚署名）是首页的 ENCORE 大模型展示区（可拖拽转动，
-  懒加载、非 Save-Data 时才下载）。
-  工作台
+- /about 的工作台
   ["Gaming Desktop PC" by Yolala1232](https://sketchfab.com/3d-models/gaming-desktop-pc-d1d8282c9916438091f11aeb28787b66)
-  （CC-BY-4.0，画布下方署名）在关于页，可拖拽旋转；原模型 8.5MB 经
+  （CC-BY-4.0，画布下方署名）；原模型 8.5MB 经
   `gltf-transform optimize`（Draco + 1024px WebP）压到 1.1MB，Draco 解码器
   自托管于 `public/draco/`。
+- /intro 的头像 `head.glb` 由单张照片重建（TRELLIS 风格化 v3），眼镜为程序
+  几何补回——重建会把镜片糊成阴影（`docs/INTRO3D.md`）。
 
 部署：Vercel（push 即发布）。

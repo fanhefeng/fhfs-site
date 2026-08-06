@@ -23,9 +23,9 @@ type Props = {
  * it back on.
  *
  * Pure CSS state machine: React only flips one boolean; all motion is CSS
- * transitions on transform/opacity (motion-reduce gets instant snaps). The
- * lift is sold by two stacked shadows cross-faded via opacity — box-shadow
- * itself is never animated. No GSAP, no per-frame JS.
+ * transitions on transform/opacity. The lift is sold by two stacked shadows
+ * cross-faded via opacity — box-shadow itself is never animated. No GSAP,
+ * no per-frame JS.
  */
 export function PeelSticker({
   email,
@@ -67,7 +67,7 @@ export function PeelSticker({
           soft lifted shadow while the corner curls, neither once torn off. */}
         <span
           aria-hidden
-          className={`absolute inset-0 z-[1] rounded-[10px] shadow-[0_2px_6px_var(--sticker-shadow-color)] transition-opacity duration-300 motion-reduce:transition-none ${
+          className={`absolute inset-0 z-[1] rounded-[10px] shadow-[0_2px_6px_var(--sticker-shadow-color)] transition-opacity duration-300 ${
             peeled
               ? "opacity-0"
               : "opacity-100 group-hover:opacity-0 group-focus-within:opacity-0"
@@ -75,7 +75,7 @@ export function PeelSticker({
         />
         <span
           aria-hidden
-          className={`absolute inset-0 z-[1] rounded-[10px] shadow-[0_10px_22px_var(--sticker-shadow-color)] transition-opacity duration-300 motion-reduce:transition-none ${
+          className={`absolute inset-0 z-[1] rounded-[10px] shadow-[0_10px_22px_var(--sticker-shadow-color)] transition-opacity duration-300 ${
             peeled
               ? "opacity-0"
               : "opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
@@ -95,14 +95,14 @@ export function PeelSticker({
           aria-label={ariaLabel}
           onClick={() => setPeeled((v) => !v)}
           style={peeled ? { transform: "rotateX(-118deg)" } : undefined}
-          className={`absolute inset-0 z-[2] block origin-top cursor-pointer rounded-[10px] transition-transform duration-[550ms] ease-[cubic-bezier(.22,1,.36,1)] [transform-style:preserve-3d] motion-reduce:transition-none ${
+          className={`absolute inset-0 z-[2] block origin-top cursor-pointer rounded-[10px] transition-transform duration-[550ms] ease-[cubic-bezier(.22,1,.36,1)] [transform-style:preserve-3d] ${
             peeled
               ? "pointer-events-none"
               : "hover:[transform:rotateX(-14deg)] focus-visible:[transform:rotateX(-14deg)]"
           }`}
         >
           <span
-            className={`absolute inset-0 block transition-opacity duration-300 [transform-style:preserve-3d] motion-reduce:transition-none ${
+            className={`absolute inset-0 block transition-opacity duration-300 [transform-style:preserve-3d] ${
               peeled ? "opacity-0 delay-200" : "opacity-100 delay-0"
             }`}
           >

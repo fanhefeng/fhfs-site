@@ -12,15 +12,18 @@ import * as THREE from "three";
  */
 
 /** Spherical angles (degrees) → unit vector. theta: horizontal, 0 = front
- *  (+Z); phi: vertical, positive = up. */
-export function dirVector(thetaDeg: number, phiDeg: number): THREE.Vector3 {
+ *  (+Z); phi: vertical, positive = up. Pass `out` from a per-frame caller so
+ *  the damping loop does not allocate a Vector3 every frame. */
+export function dirVector(
+  thetaDeg: number,
+  phiDeg: number,
+  out: THREE.Vector3 = new THREE.Vector3()
+): THREE.Vector3 {
   const t = THREE.MathUtils.degToRad(thetaDeg);
   const p = THREE.MathUtils.degToRad(phiDeg);
-  return new THREE.Vector3(
-    Math.sin(t) * Math.cos(p),
-    Math.sin(p),
-    Math.cos(t) * Math.cos(p)
-  ).normalize();
+  return out
+    .set(Math.sin(t) * Math.cos(p), Math.sin(p), Math.cos(t) * Math.cos(p))
+    .normalize();
 }
 
 /** Unit vector → spherical angles (degrees). The inverse of dirVector, used

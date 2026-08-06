@@ -81,62 +81,7 @@
     "outroBody": "看到这里，说明这张脸上的标签起作用了。",
     "linkAbout": "关于我",
     "linkWriting": "读点文章",
-    "resumeRegion": "文字版简历（3D 内容的等价文本）",
-    "nodes": {
-      "frontend": {
-        "kicker": "01 — 主业",
-        "title": "前端工程",
-        "body": "React / Next.js / TypeScript。这个站点本身就是现场：双语路由、内容管线、动效系统，都是手写的。",
-        "bullets": [
-          "App Router + next-intl 的中英双语站",
-          "文章用 MDX，构建期编译成组件",
-          "一套 token 从颜色语义一路贯到组件"
-        ]
-      },
-      "webgl": {
-        "kicker": "02 — 手艺",
-        "title": "3D 与图形",
-        "body": "Three.js 与 React Three Fiber。相信网页不该只有矩形——你现在看到的这张脸就是证据。",
-        "bullets": [
-          "滚动驱动的 3D 叙事",
-          "运行时贴花与程序化纹理",
-          "移动端 3D 的取舍"
-        ]
-      },
-      "design": {
-        "kicker": "03 — 半个设计师",
-        "title": "设计系统",
-        "body": "能自己出图，也能跟设计师吵架。全站从颜色语义到玻璃层级，都是一套 token 管到底。",
-        "bullets": [
-          "三层 token：原始值 → 语义 → 组件",
-          "亮暗双主题，切换是一次开馆与闭馆"
-        ]
-      },
-      "ai": {
-        "kicker": "04 — 现在在做的",
-        "title": "AI 应用开发",
-        "body": "把大模型接进真实的活儿里，而不是做 Demo。你正在看的这颗头，就是一张照片经过风格化和单图重建生成的。",
-        "bullets": ["图生图风格化 + 单图三维重建", "提示词当代码管，随时可复跑"]
-      },
-      "ship": {
-        "kicker": "05 — 工作方式",
-        "title": "交付大于完美",
-        "body": "先上线，再迭代。做完一版就发出去，剩下的交给下一版。",
-        "bullets": ["每次改动都留下「为什么」", "能自动化的都写成脚本"]
-      },
-      "oss": {
-        "kicker": "06 — 业余时间",
-        "title": "开源",
-        "body": "能公开的都放在 GitHub 上。写给自己用的小工具，偶尔也有别人用得上。",
-        "bullets": ["小而美优先，不追 star 数"]
-      },
-      "slow": {
-        "kicker": "07 — 人味",
-        "title": "慢慢来",
-        "body": "慢慢写，慢慢做，不着急。留一盏亮着的灯，就够了。",
-        "bullets": []
-      }
-    }
+    "resumeRegion": "文字版简历（3D 内容的等价文本）"
   },
   "portfolio": {
     "kicker": "画廊 · 手艺",
@@ -150,28 +95,6 @@
     "experimentsTitle": "实验",
     "experimentsSub": "一行一个的小练习，偶尔更新。",
     "openDemo": "打开原型",
-    "experiments": {
-      "bentoScrub": {
-        "name": "走近展品",
-        "desc": "滚动把首屏的拼贴一路推成近全屏——Flip 先捕获终态，ScrollTrigger 按滚动进度擦除，随时可以倒着滚回去。"
-      },
-      "specularEdge": {
-        "name": "被照亮的玻璃描边",
-        "desc": "卡片描边接一枚 feSpecularLighting 点光源，光标就是手电，光源颜色取每件作品自己的主色；触摸与减少动效下退为静态微光。"
-      },
-      "liquidLens": {
-        "name": "液态玻璃透镜",
-        "desc": "用 HTML-in-Canvas 把活的 DOM 画进画布，再在光标处叠一枚放大的折射透镜；下面的链接照样可点、可聚焦。不支持的浏览器退回 CSS 玻璃。"
-      },
-      "shatteredGlass": {
-        "name": "Three.js 碎玻璃 hero",
-        "desc": "Voronoi 切开的五块折射玻璃，色散、薄膜干涉、清漆高光一应俱全——别人的实验，这里只做记录和外链。"
-      },
-      "lightsOn": {
-        "name": "开灯",
-        "desc": "全站的亮暗切换是一次开馆与闭馆：1.2s 交叉淡化包在 View Transition 里，光晕和图像同时换班。"
-      }
-    },
     "lens": {
       "heading": "玻璃盖在活的 DOM 上",
       "body": "这段文字仍然是真的 DOM：可以选中、可以搜索、可以聚焦——玻璃只是画在它上面的一层。",

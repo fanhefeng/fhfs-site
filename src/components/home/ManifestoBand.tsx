@@ -7,9 +7,16 @@ import { gsap, useGSAP, ScrollTrigger, SplitText } from "@/lib/gsap";
 // Referenced so bundlers keep the plugins; registration lives in @/lib/gsap.
 void ScrollTrigger;
 
-/** The band only takes over the screen where a pin is comfortable. */
-const PINNED = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
-const CALM = "(max-width: 767px) and (prefers-reduced-motion: no-preference)";
+/** The band only takes over the screen where a pin is comfortable. The two
+ *  queries have to partition the range with nothing between them, so the
+ *  second is the negation of the first rather than a hand-picked bound: any
+ *  `max-width` twin leaves a sliver — 767.98px still misses (767.98, 768) —
+ *  and a fractional viewport is ordinary (browser zoom, non-integer DPR).
+ *  A width that matched neither would drop the band into no branch at all:
+ *  no pin, not even the calm fade-up, just inert SSR markup while the rest of
+ *  the page animates around it. */
+const PINNED = "(min-width: 768px)";
+const CALM = `not all and ${PINNED}`;
 
 /**
  * The one pinned section of the whole site (after the GSAP demo MYyBrZw).
@@ -23,8 +30,8 @@ const CALM = "(max-width: 767px) and (prefers-reduced-motion: no-preference)";
  *
  * Everything that makes it a band (full-height stage, max-content track, the
  * 100vw run-up) is written by GSAP inside the matchMedia branch, so the SSR
- * markup — and every mobile / reduced-motion visitor — gets a plain centered
- * statement that simply fades up. matchMedia reverts those inline styles when
+ * markup — and every mobile visitor — gets a plain centered statement that
+ * simply fades up. matchMedia reverts those inline styles when
  * the query stops matching, and `revertOnUpdate` re-splits after a locale
  * switch, where every glyph changes.
  */

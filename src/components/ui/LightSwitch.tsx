@@ -1,15 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-
-type Theme = "dark" | "light";
-
-const readTheme = (): Theme =>
-  typeof document !== "undefined" &&
-  document.documentElement.dataset.theme === "dark"
-    ? "dark"
-    : "light";
+import { readTheme, toggleTheme, type Theme } from "@/lib/theme";
 
 /* One AudioContext for every switch instance, created lazily inside the
  * first click (a user gesture, so autoplay policy is satisfied) — zero
@@ -56,10 +49,6 @@ export function LightSwitch({ className }: { className?: string }) {
    * the initialiser must match it — reading data-theme here would be a
    * hydration mismatch. */
   const [theme, setTheme] = useState<Theme>("light");
-  /* Nothing paints from this (the knob honours motion-reduce in CSS); it only
-   * decides whether the toggle takes the view-transition path, so it may
-   * settle after paint. */
-  const [reduced, setReduced] = useState(false);
 
   /* A layout effect, not a passive one: the pre-paint script in the layout
    * has already put data-theme="dark" on <html>, so correcting after paint
@@ -73,47 +62,13 @@ export function LightSwitch({ className }: { className?: string }) {
     return () => window.removeEventListener("fhfs:theme", sync);
   }, []);
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
   const toggle = useCallback(() => {
-    const next: Theme = readTheme() === "light" ? "dark" : "light";
-    const apply = () => {
-      document.documentElement.dataset.theme = next;
-      try {
-        localStorage.setItem("fhfs-theme", next);
-      } catch {
-        /* Private mode etc. — the theme still applies for this page view. */
-      }
-      window.dispatchEvent(new CustomEvent("fhfs:theme"));
-      setTheme(next);
-    };
-
     // Multimodal trio on the causal frame: sound + haptic + the cross-fade.
-    playClick(next === "light");
+    // The state update rides the 'fhfs:theme' event the toggle dispatches.
+    playClick(readTheme() === "dark");
     navigator.vibrate?.(10);
-
-    const doc = document as Document & {
-      startViewTransition?: (cb: () => void) => void;
-    };
-    if (!reduced && typeof doc.startViewTransition === "function") {
-      // Scope the 1.2s theme cross-fade (globals.css) to this transition.
-      document.documentElement.dataset.vt = "theme";
-      doc.startViewTransition(apply);
-      window.setTimeout(() => {
-        if (document.documentElement.dataset.vt === "theme") {
-          delete document.documentElement.dataset.vt;
-        }
-      }, 1400);
-      return;
-    }
-    apply();
-  }, [reduced]);
+    toggleTheme();
+  }, []);
 
   const on = theme === "light";
 
@@ -133,7 +88,7 @@ export function LightSwitch({ className }: { className?: string }) {
         className="liquid-chip relative block h-6 w-11 rounded-full"
       >
         <span
-          className={`absolute left-0.5 top-0.5 flex size-5 items-center justify-center rounded-full bg-surface-raised shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-[translate] duration-200 ease-out motion-reduce:transition-none ${
+          className={`absolute left-0.5 top-0.5 flex size-5 items-center justify-center rounded-full bg-surface-raised shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-[translate] duration-200 ease-out ${
             on ? "translate-x-5" : "translate-x-0"
           }`}
         >

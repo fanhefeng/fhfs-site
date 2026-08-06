@@ -5,11 +5,13 @@ import type { CSSProperties } from "react";
 import { Reveal } from "@/components/fx/Reveal";
 import { LiquidLens } from "@/components/portfolio/LiquidLens";
 
-export type CraftStatus = "live" | "wip" | "planned";
+type CraftStatus = "live" | "wip" | "planned";
 
 export type CraftEntry = {
-  /** Message key suffix: portfolio.experiments.<id>.name / .desc */
   id: string;
+  /** Already resolved to this page's language. */
+  name: string;
+  description: string;
   status: CraftStatus;
   /** Dot + hover rule colour. */
   accent: string;
@@ -32,9 +34,10 @@ type Props = {
  * experiment — name, one sentence, status. No cards, no thumbnails; the
  * list is text, and only the entry that *is* a live experiment renders one.
  *
- * Copy lives in messages under portfolio.experiments.<id>; status, colour and
- * links are page data, so adding an experiment is one constant plus two
- * strings per locale.
+ * Name, sentence, status, colour and links all arrive together as one record.
+ * They used to be split — a constant here, two message keys per language over
+ * there, joined by an id nothing checked — so adding an experiment meant
+ * editing three files and finding out later if you missed one.
  */
 export function CraftList({ entries, title, subtitle, lensLinkHref }: Props) {
   const t = useTranslations("portfolio");
@@ -54,15 +57,13 @@ export function CraftList({ entries, title, subtitle, lensLinkHref }: Props) {
             style={{ "--row-accent": entry.accent } as CSSProperties}
           >
             <div className="craft-line">
-              <h3 className="craft-name">
-                {t(`experiments.${entry.id}.name`)}
-              </h3>
+              <h3 className="craft-name">{entry.name}</h3>
               <span className={`craft-status craft-status--${entry.status}`}>
                 <span className="craft-dot" aria-hidden="true" />
                 {t(`status.${entry.status}`)}
               </span>
             </div>
-            <p className="craft-desc">{t(`experiments.${entry.id}.desc`)}</p>
+            <p className="craft-desc">{entry.description}</p>
             {entry.href && (
               <a
                 className="craft-link hit-ext"

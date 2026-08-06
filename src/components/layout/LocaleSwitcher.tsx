@@ -9,8 +9,9 @@ import { usePathname, useRouter } from "@/i18n/navigation";
  * (common.localeSwitch); the aria label spells out the direction.
  *
  * Scroll position survives the swap — router.replace with scroll: false is
- * the locale-switch contract. The whole-page cross-fade for locale swaps is
- * RouteTransition's concern, not this button's.
+ * the locale-switch contract. There is deliberately no transition around it:
+ * the words swap in place, and RouteTransition ignores the path change
+ * because no veil is up.
  */
 export function LocaleSwitcher({ className }: { className?: string }) {
   const locale = useLocale();
@@ -32,4 +33,4 @@ export function LocaleSwitcher({ className }: { className?: string }) {
   );
 }
 
-export default LocaleSwitcher;
+

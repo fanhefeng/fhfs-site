@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { gsap, EASE } from "@/lib/gsap";
+import { gsap, EASE, isFinePointer } from "@/lib/gsap";
 import {
   enableLayoutSubtree,
   getElementDrawingContext,
@@ -60,8 +60,7 @@ export function LiquidLens({
   // Capability check runs after mount only — SSR and first paint are always
   // the plain DOM, so hydration can never diverge.
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!isFinePointer()) return;
     setEnhanced(supportsHtmlInCanvas());
   }, []);
 
@@ -232,8 +231,7 @@ export function LiquidLens({
     const box = boxRef.current;
     const puck = puckRef.current;
     if (!box || !puck) return;
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!isFinePointer()) return;
 
     const xTo = gsap.quickTo(puck, "x", {
       duration: 0.35,

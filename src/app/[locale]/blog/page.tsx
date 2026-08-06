@@ -2,16 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing, type Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { getPosts, getAllTags } from "@/lib/content";
 import { localeAlternates } from "@/lib/seo";
-import { PostCard, groupPostsByYear } from "@/components/blog/PostCard";
+import { YearIndex } from "@/components/blog/PostCard";
 import { TagPill } from "@/components/blog/TagPill";
 import { Reveal } from "@/components/fx/Reveal";
 
-type Props = { params: Promise<{ locale: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[locale]/blog">): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "blog" });
@@ -27,14 +25,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * bucketed by year, dates flush right in mono. No cards, no thumbnails —
  * at this volume a reader wants to scan titles, not browse tiles.
  */
-export default async function BlogPage({ params }: Props) {
+export default async function BlogPage({ params }: PageProps<"/[locale]/blog">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("blog");
-  const posts = getPosts(locale as Locale);
-  const tags = getAllTags(locale as Locale);
-  const years = groupPostsByYear(posts);
+  const posts = await getPosts(locale);
+  const tags = await getAllTags(locale);
 
   return (
     <main className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
@@ -65,22 +62,7 @@ export default async function BlogPage({ params }: Props) {
       {posts.length === 0 ? (
         <p className="text-body text-fg-secondary">{t("empty")}</p>
       ) : (
-        years.map(({ year, posts: yearPosts }) => (
-          <section
-            key={year}
-            aria-label={t("yearAria", { year })}
-            className="mb-14 last:mb-0"
-          >
-            <h2 className="mb-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
-              {year}
-            </h2>
-            <Reveal as="ol" stagger={0.05} className="border-t border-line">
-              {yearPosts.map((post) => (
-                <PostCard key={post.slug} post={post} />
-              ))}
-            </Reveal>
-          </section>
-        ))
+        <YearIndex posts={posts} yearAria={(year) => t("yearAria", { year })} />
       )}
     </main>
   );

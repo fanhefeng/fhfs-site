@@ -31,25 +31,26 @@ export function DeviceShowcase({ apps }: { apps: SoftwareApp[] }) {
     () => {
       const root = screensRef.current;
       if (!root) return;
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // Channel change: the new schematic dissolves in place. No layout is
-        // touched, so this stays a compositor-only 0.35s.
-        gsap.fromTo(
-          root.querySelectorAll("[data-screen]"),
-          { autoAlpha: 0, scale: 1.015 },
-          {
-            autoAlpha: 1,
-            scale: 1,
-            duration: 0.35,
-            ease: "power2.out",
-            overwrite: "auto",
-            clearProps: "transform,opacity,visibility",
-          }
-        );
-      });
+      // Channel change: the new schematic dissolves in place. No layout is
+      // touched, so this stays a compositor-only 0.35s.
+      gsap.fromTo(
+        root.querySelectorAll("[data-screen]"),
+        { autoAlpha: 0, scale: 1.015 },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 0.35,
+          ease: "power2.out",
+          overwrite: "auto",
+          clearProps: "transform,opacity,visibility",
+        }
+      );
     },
-    { dependencies: [id], scope: screensRef, revertOnUpdate: true }
+    // No `revertOnUpdate`: the callback returns no teardown, and DESIGN.md §1.5
+    // keeps the flag for the ones that do. There is nothing to undo on a
+    // channel change either — the tween clears its own props on landing, and
+    // `overwrite: "auto"` retires whichever one is still in flight.
+    { dependencies: [id], scope: screensRef }
   );
 
   if (!current) return null;

@@ -1,17 +1,23 @@
-import type { App } from "content-collections";
+import type { App } from "@/lib/content";
 import type { Locale } from "@/i18n/routing";
 
-/** The four buckets the segmented filter offers, in display order. */
-export const APP_CATEGORIES = ["desktop", "tool", "game", "website"] as const;
+/** The four buckets the segmented filter offers, in display order — the same
+ *  union `App["category"]` carries out of the database enum. */
+export const APP_CATEGORIES = [
+  "desktop",
+  "tool",
+  "game",
+  "website",
+] as const satisfies readonly App["category"][];
 
-export type AppCategory = (typeof APP_CATEGORIES)[number];
+type AppCategory = App["category"];
 export type AppFilter = "all" | AppCategory;
 
 /**
- * A single app, flattened for the client islands: the YAML records carry
- * `{zh,en}` objects and MDX-ish metadata that must never cross the server
- * boundary, so the page resolves everything (locale, CTA wording key, accent)
- * once at build time and ships a plain, serializable payload.
+ * A single app, flattened for the client islands: the database rows from
+ * `getApps()` carry `{zh,en}` objects, so the page resolves everything
+ * (locale, CTA wording key, hue) at render time and ships a plain,
+ * serializable payload.
  */
 export type SoftwareApp = {
   id: string;
@@ -23,9 +29,9 @@ export type SoftwareApp = {
   platforms: string[];
   /**
    * Accent hue in degrees for the schematic UI mock. There are no real
-   * screenshots in the repo, so each app gets one deterministic hue and the
-   * mock is drawn from it — stable between server and client, and between
-   * builds, because it is derived from the app's position, not from random.
+   * screenshots in the repo, so each app gets one hue and the mock is drawn
+   * from it. It is a stored column rather than a function of list position,
+   * so reordering the shelf no longer repaints every app on it.
    */
   hue: number;
   /** Which `software.*` message labels the outbound link. */
@@ -33,8 +39,9 @@ export type SoftwareApp = {
 };
 
 /**
- * Hues picked to sit apart on the wheel yet stay muted enough to live on warm
- * paper: amber-adjacent, teal, violet, green, rose, blue.
+ * Fallback hues for an app saved without one — picked to sit apart on the
+ * wheel yet stay muted enough to live on warm paper: amber-adjacent, teal,
+ * violet, green, rose, blue.
  */
 const HUES = [42, 195, 285, 150, 15, 245];
 
@@ -57,16 +64,16 @@ export function toSoftwareApp(
   index: number,
   locale: Locale
 ): SoftwareApp {
-  const category = app.category as AppCategory;
+  const category = app.category;
   return {
-    id: app._meta.path,
+    id: app.key,
     name: app.name,
     tagline: app.tagline[locale],
     description: app.description[locale],
     category,
     website: app.website,
     platforms: app.platforms,
-    hue: HUES[index % HUES.length],
+    hue: app.hue ?? HUES[index % HUES.length],
     cta: category === "game" ? "play" : category === "website" ? "open" : "download",
   };
 }
