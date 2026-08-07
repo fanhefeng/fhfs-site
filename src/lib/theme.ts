@@ -9,6 +9,10 @@
 
 export type Theme = "dark" | "light";
 
+/** The localStorage key. The pre-paint script in `app/themeInit.ts` must
+ *  repeat this string literally — it is inlined raw into the HTML. */
+export const THEME_STORAGE_KEY = "fhfs-theme";
+
 export const readTheme = (): Theme =>
   typeof document !== "undefined" &&
   document.documentElement.dataset.theme === "dark"
@@ -23,7 +27,7 @@ export function toggleTheme(): void {
   const apply = () => {
     document.documentElement.dataset.theme = next;
     try {
-      localStorage.setItem("fhfs-theme", next);
+      localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
       /* Private mode etc. — the theme still applies for this page view. */
     }

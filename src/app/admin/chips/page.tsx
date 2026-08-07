@@ -1,10 +1,12 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { chips } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { ChipsForm } from "./ChipsForm";
 
 export default async function ChipsPage() {
+  await requireAdminPage();
   const rows = await db
     .select({ label: chips.label, tone: chips.tone })
     .from(chips)

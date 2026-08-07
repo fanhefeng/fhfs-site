@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { experiments } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { saveExperiment } from "../actions";
@@ -23,6 +24,7 @@ const FIELDS: Field[] = [
 ];
 
 export default async function ExperimentsPage() {
+  await requireAdminPage();
   const rows = await db
     .select()
     .from(experiments)

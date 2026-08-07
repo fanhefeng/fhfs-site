@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { hasLocale } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
 import { site } from "@/config/site";
 
@@ -22,5 +24,28 @@ export function localeAlternates(
   return {
     canonical: `${site.url}/${currentLocale}${path}`,
     languages,
+  };
+}
+
+/**
+ * `generateMetadata` for a section page: title/subtitle from one message
+ * namespace plus the alternates above. The section pages differ only in
+ * those two strings, so each exports
+ * `export const generateMetadata = sectionMetadata("about", "/about")`.
+ */
+export function sectionMetadata(namespace: string, path: string) {
+  return async function generateMetadata({
+    params,
+  }: {
+    params: Promise<{ locale: string }>;
+  }): Promise<Metadata> {
+    const { locale } = await params;
+    if (!hasLocale(routing.locales, locale)) return {};
+    const t = await getTranslations({ locale, namespace });
+    return {
+      title: t("title"),
+      description: t("subtitle"),
+      alternates: localeAlternates(path, locale),
+    };
   };
 }

@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { readSession, MAX_AGE_SECONDS, SESSION_COOKIE, type Session } from "./token";
 
 export { createSession } from "./token";
@@ -14,9 +15,11 @@ export { createSession } from "./token";
  *
  * Note what this module does *not* do: authorise anything. The proxy performs
  * an optimistic check — it runs on every request, prefetches included, so it
- * may not touch the database — and every Server Action calls `requireAdmin`
- * for the real one. Server Actions are not routes; a matcher edit or a moved
- * file can take them out from under the proxy without anything failing loudly.
+ * may not touch the database — and the real one happens per entry point:
+ * every Server Action calls `requireAdmin`, every admin page
+ * `requireAdminPage`. Server Actions are not routes; a matcher edit or a
+ * moved file can take them out from under the proxy without anything failing
+ * loudly.
  */
 
 export async function setSessionCookie(token: string): Promise<void> {
@@ -44,5 +47,18 @@ export async function requireAdmin(): Promise<Session> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   const session = await readSession(token);
   if (!session) throw new Error("Not authenticated");
+  return session;
+}
+
+/**
+ * The same check for admin pages, which render drafts and full table contents
+ * and would otherwise rest entirely on the proxy's matcher. Redirects rather
+ * than throws: an expired session on a bookmarked editor should land on the
+ * login form, not an error page.
+ */
+export async function requireAdminPage(): Promise<Session> {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  const session = await readSession(token);
+  if (!session) redirect("/admin/login");
   return session;
 }

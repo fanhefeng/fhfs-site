@@ -100,7 +100,9 @@ export function WorkForm({
             <input name="url" defaultValue={work.url ?? ""} className={inputClass} />
           </label>
           <label className="space-y-1.5">
-            <span className={labelClass}>封面路径（可空）</span>
+            {/* 列存在、也会保存，但 WorkCard 目前不渲染封面——
+                等渲染端接上前先如实标注。 */}
+            <span className={labelClass}>封面路径（暂未生效）</span>
             <input
               name="cover"
               defaultValue={work.cover ?? ""}

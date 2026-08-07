@@ -73,7 +73,6 @@ export const posts = pgTable(
     // would change the /blog/tags/[tag] URLs, so they stay an array.
     tags: text().array().notNull().default(sql`'{}'`),
     draft: boolean().notNull().default(false),
-    cover: text(),
     bodyMd: text("body_md").notNull(),
     bodyHtml: text("body_html").notNull(),
     readingMinutes: integer("reading_minutes").notNull(),
@@ -140,7 +139,6 @@ export const apps = pgTable("apps", {
   tagline: localized().notNull(),
   description: localized().notNull(),
   category: appCategoryEnum().notNull(),
-  icon: text(),
   website: text().notNull(),
   platforms: text().array().notNull().default(sql`'{}'`),
   accent: text(),
@@ -182,11 +180,15 @@ export const experiments = pgTable("experiments", {
 });
 
 /**
- * The /intro résumé. Merges `intro.nodes.<id>` (copy) with the *content* half
- * of `INTRO_STICKERS` (label, icon). The spatial half — direction, size,
+ * The /intro résumé, one row per sticker. The spatial half — direction, size,
  * rotation, distance — stays in `src/lib/intro/stickers.ts`, because those
  * numbers were hand-calibrated against one head model and mean nothing to an
  * editor. `key` is the join.
+ *
+ * `stickerLabel`/`stickerIcon` are stored but not yet consumed: the 3D scene
+ * still reads label and icon from `INTRO_STICKERS`, and the admin form labels
+ * the two fields accordingly. Wire the scene to these columns before treating
+ * them as the source of truth.
  */
 export const introNodes = pgTable("intro_nodes", {
   id: serial().primaryKey(),

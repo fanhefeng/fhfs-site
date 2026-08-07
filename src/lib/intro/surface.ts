@@ -27,7 +27,8 @@ export function dirVector(
 }
 
 /** Unit vector → spherical angles (degrees). The inverse of dirVector, used
- *  when the editor picks a spot by clicking the model. */
+ *  when the editor picks a spot by clicking the model. Does not mutate its
+ *  argument — callers can pass live vectors without cloning. */
 export function vectorToDir(v: THREE.Vector3): { theta: number; phi: number } {
   const n = v.clone().normalize();
   return {
@@ -43,19 +44,21 @@ export type SurfaceHit = {
   normal: THREE.Vector3;
 };
 
+/** How far out the ray starts, in world units — comfortably outside the
+ *  normalized model (height 2, centred on the origin). */
+const RAY_START_DISTANCE = 4;
+
 /**
- * Fire a ray from `dir` towards the centre; return the surface point it hits
+ * Fire a ray from `dir` towards the origin; return the surface point it hits
  * and the world-space normal there. Returns null on a miss — which happens
  * when the content asks for an angle off the side of the model, or the mesh
  * has a hole.
  */
 export function projectToSurface(
   target: THREE.Object3D,
-  dir: THREE.Vector3,
-  center = new THREE.Vector3(0, 0, 0),
-  radius = 4
+  dir: THREE.Vector3
 ): SurfaceHit | null {
-  const origin = center.clone().addScaledVector(dir, radius);
+  const origin = dir.clone().multiplyScalar(RAY_START_DISTANCE);
   raycaster.set(origin, dir.clone().negate());
   const hits = raycaster.intersectObject(target, true);
   if (!hits.length) return null;

@@ -502,7 +502,7 @@ function buildStops(
     const sticker = resolveSticker(raw, overrides);
     const hit = hits[sticker.id];
     if (!hit) return;
-    const d = vectorToDir(hit.position.clone());
+    const d = vectorToDir(hit.position);
     stops.push({
       index: i,
       theta: d.theta,
@@ -730,7 +730,7 @@ export default function AvatarScene({ tone }: { tone: Tone }) {
           // sticker there.
           if (!editing) return;
           e.stopPropagation();
-          const d = vectorToDir(e.point.clone());
+          const d = vectorToDir(e.point);
           setPick(+d.theta.toFixed(1), +d.phi.toFixed(1));
         }}
       />

@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Flip, gsap, useGSAP } from "@/lib/gsap";
+import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
 import { AppCard } from "@/components/cards/AppCard";
 import { SegmentedFilter, type Segment } from "./SegmentedFilter";
 import { MobileAppRail } from "./MobileAppRail";
@@ -93,14 +94,11 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
       // ScrollTrigger would measure a zero-height trigger.
       mm.add("(min-width: 768px)", () => {
         gsap.from(grid.querySelectorAll("[data-flip-item]"), {
-          y: 24,
-          autoAlpha: 0,
-          duration: 0.6,
-          ease: "power2.out",
+          ...REVEAL_VARS,
           stagger: 0.06,
           // Leave nothing inline behind — Flip measures these elements next.
           clearProps: "transform,opacity,visibility",
-          scrollTrigger: { trigger: grid, start: "top 85%", once: true },
+          scrollTrigger: { trigger: grid, start: REVEAL_START, once: true },
         });
       });
     },

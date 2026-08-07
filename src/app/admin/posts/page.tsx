@@ -2,9 +2,11 @@ import Link from "next/link";
 import { asc, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { posts } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 
 export default async function PostsIndex() {
+  await requireAdminPage();
   const rows = await db
     .select({
       slug: posts.slug,

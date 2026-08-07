@@ -15,6 +15,13 @@
       "when": 1785919704299,
       "tag": "0001_plain_gideon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786075396038,
+      "tag": "0002_purple_ogun",
+      "breakpoints": true
     }
   ]
 }

@@ -1,24 +1,14 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getPosts, getAllTags } from "@/lib/content";
-import { localeAlternates } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/seo";
 import { YearIndex } from "@/components/blog/PostCard";
 import { TagPill } from "@/components/blog/TagPill";
 import { Reveal } from "@/components/fx/Reveal";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/blog">): Promise<Metadata> {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: "blog" });
-  return {
-    title: t("title"),
-    description: t("subtitle"),
-    alternates: localeAlternates("/blog", locale),
-  };
-}
+export const generateMetadata = sectionMetadata("blog", "/blog");
 
 /**
  * The magazine's table of contents: a 720px column of plain text lines,

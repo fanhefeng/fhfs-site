@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { site } from "@/config/site";
 
 /** Veil frosting over the outgoing page. */
@@ -19,10 +20,8 @@ const NAV_TIMEOUT_MS = 1500;
 
 type Phase = "idle" | "covering" | "covered" | "revealing";
 
-export type RouteTransitionProps = {
-  /** Tiny mono word printed on the veil. Defaults to the site wordmark. */
-  label?: string;
-};
+/** Tiny mono word printed on the veil. */
+const VEIL_LABEL = site.signName;
 
 /**
  * Glass materialize between routes ("The Quiet Issue" curtain).
@@ -35,7 +34,7 @@ export type RouteTransitionProps = {
  * scale .98→1 (power3.out). Serves understanding + safety: the reader sees
  * the page they left dissolve and the next one condense, never a hard cut.
  *
- * Mechanism skeleton (kept from the previous blade-wipe incarnation):
+ * Mechanism:
  * - capture-phase interception; external links / hash jumps / downloads /
  *   modifier clicks / `data-no-transition` all keep native behaviour;
  * - cover → covered → revealing state machine gated on the pathname commit;
@@ -45,15 +44,13 @@ export type RouteTransitionProps = {
  *   scrollTo(immediate, force) → start() → ScrollTrigger.refresh(); the
  *   reveal only resets to top when the committed URL carries no fragment.
  *
- * New in this incarnation: the veil is pointer-events: none and the
- * transition is interruptible — a click mid-cover simply retargets the
- * pending destination, and a click mid-reveal kills the timeline and frosts
- * again from the current opacity/blur values (no jumps, no locked UI).
- * `--panel-blur` is only ever tweened at these entrance/exit instants.
+ * The veil is pointer-events: none and the transition is interruptible — a
+ * click mid-cover simply retargets the pending destination, and a click
+ * mid-reveal kills the timeline and frosts again from the current
+ * opacity/blur values (no jumps, no locked UI). `--panel-blur` is only ever
+ * tweened at these entrance/exit instants.
  */
-export function RouteTransition({
-  label = site.signName,
-}: RouteTransitionProps) {
+export function RouteTransition() {
   const container = useRef<HTMLDivElement>(null);
   const veilRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -93,21 +90,15 @@ export function RouteTransition({
       const lock = () => {
         if (locked) return;
         locked = true;
-        window.__lenis?.stop();
-        document.documentElement.style.overflow = "hidden";
+        lockScroll();
       };
 
+      // No refresh here — the reveal calls ScrollTrigger.refresh() itself,
+      // timed against the incoming page.
       const unlock = () => {
         if (!locked) return;
         locked = false;
-        document.documentElement.style.overflow = "";
-        // Re-sync before resuming, otherwise Lenis snaps back to whatever
-        // offset it held when we stopped it.
-        window.__lenis?.scrollTo(window.scrollY, {
-          immediate: true,
-          force: true,
-        });
-        window.__lenis?.start();
+        unlockScroll();
       };
 
       const clearTimer = () => {
@@ -375,7 +366,7 @@ export function RouteTransition({
           ref={labelRef}
           className="invisible font-mono text-meta tracking-meta uppercase text-fg-tertiary opacity-0"
         >
-          {label}
+          {VEIL_LABEL}
         </div>
       </div>
     </div>

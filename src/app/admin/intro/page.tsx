@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { introNodes } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { saveIntroNode } from "../actions";
@@ -21,6 +22,7 @@ const FIELDS: Field[] = [
 ];
 
 export default async function IntroPage() {
+  await requireAdminPage();
   const rows = await db.select().from(introNodes).orderBy(asc(introNodes.sort));
 
   return (

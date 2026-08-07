@@ -1,7 +1,9 @@
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../../AdminChrome";
 import { PostForm } from "../PostForm";
 
-export default function NewPost() {
+export default async function NewPost() {
+  await requireAdminPage();
   return (
     <AdminChrome title="新文章">
       <PostForm

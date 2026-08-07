@@ -57,7 +57,7 @@ export default async function PostOgImage({
   const subtitle =
     counterpart && counterpart.title !== title ? counterpart.title : null;
 
-  const date = post ? post.date.slice(0, 10).replace(/-/g, ".") : "";
+  const date = post ? post.date.replaceAll("-", ".") : "";
   const meta = [date, ...(post?.tags ?? []).slice(0, 3)]
     .filter(Boolean)
     .join("  ·  ");

@@ -65,7 +65,10 @@ export function LightSwitch({ className }: { className?: string }) {
   const toggle = useCallback(() => {
     // Multimodal trio on the causal frame: sound + haptic + the cross-fade.
     // The state update rides the 'fhfs:theme' event the toggle dispatches.
-    playClick(readTheme() === "dark");
+    // Leaving dark means the lights are about to come ON — the click sound
+    // is picked for the state we are entering, not the one we are in.
+    const lightsOn = readTheme() === "dark";
+    playClick(lightsOn);
     navigator.vibrate?.(10);
     toggleTheme();
   }, []);

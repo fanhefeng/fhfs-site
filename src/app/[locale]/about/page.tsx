@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
@@ -6,7 +5,7 @@ import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { getAbout, getChips, getTimeline } from "@/lib/content";
-import { localeAlternates } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
 import { Workstation } from "@/components/about/Workstation";
@@ -14,18 +13,7 @@ import { StickerWall } from "@/components/about/StickerWall";
 import { Changelog, type ChangelogEntry } from "@/components/about/Changelog";
 import { Colophon } from "@/components/about/Colophon";
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/[locale]/about">): Promise<Metadata> {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: "about" });
-  return {
-    title: t("title"),
-    description: t("subtitle"),
-    alternates: localeAlternates("/about", locale),
-  };
-}
+export const generateMetadata = sectionMetadata("about", "/about");
 
 /**
  * About — the narrow column (720px): a name, the desk, the essay, a wall of

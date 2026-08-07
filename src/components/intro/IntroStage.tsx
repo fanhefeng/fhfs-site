@@ -12,6 +12,7 @@ import {
 } from "@/lib/intro/stickers";
 import { renderOnDemand, scrollState, useIntroStore } from "@/lib/intro/store";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { readTheme } from "@/lib/theme";
 // Type-only, and therefore erased before bundling — importing the value would
 // drag the entire 3D graph back into this chunk and undo the split below.
 import type { Tone } from "./AvatarScene";
@@ -50,10 +51,7 @@ type Props = {
 function useThemeTone() {
   const [tone, setTone] = useState<Tone>("light");
   useEffect(() => {
-    const read = () =>
-      setTone(
-        document.documentElement.dataset.theme === "dark" ? "dark" : "light"
-      );
+    const read = () => setTone(readTheme());
     read();
     const mo = new MutationObserver(read);
     mo.observe(document.documentElement, {

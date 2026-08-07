@@ -1,50 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
+import { useQingdaoTime } from "@/lib/useQingdaoTime";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { PeelSticker } from "@/components/ui/PeelSticker";
 
 /** A link in the site's one nav table, filtered to this surface. */
 export type NavLink = { href: string; labelKey: string };
-
-/**
- * "HH:mm in Qingdao" — the colophon clock. Formats wall time for
- * Asia/Shanghai regardless of the visitor's zone and re-renders on the
- * minute (first tick aligned to the next :00 so it never drifts a minute
- * behind). Renders a placeholder until mounted, so SSR and hydration agree.
- */
-function useQingdaoTime(): string | null {
-  const [time, setTime] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hourCycle: "h23",
-      timeZone: "Asia/Shanghai",
-    });
-    const update = () => setTime(fmt.format(new Date()));
-    update();
-
-    let interval: number | undefined;
-    const align = window.setTimeout(
-      () => {
-        update();
-        interval = window.setInterval(update, 60_000);
-      },
-      (60 - new Date().getSeconds()) * 1000 + 100
-    );
-    return () => {
-      window.clearTimeout(align);
-      if (interval !== undefined) window.clearInterval(interval);
-    };
-  }, []);
-
-  return time;
-}
 
 /**
  * The quietest place on the site: a single-line colophon strip. Small

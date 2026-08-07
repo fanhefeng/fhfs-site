@@ -1,10 +1,12 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { abouts } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { AboutForm } from "./AboutForm";
 
 export default async function AboutPage() {
+  await requireAdminPage();
   const rows = await db.select().from(abouts).orderBy(asc(abouts.locale));
   const byLocale = new Map(rows.map((row) => [row.locale, row]));
 

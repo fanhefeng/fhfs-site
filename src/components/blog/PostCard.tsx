@@ -53,7 +53,7 @@ export function YearIndex({
 function PostCard({ post }: { post: PostSummary }) {
   const t = useTranslations("blog");
   const minutes = post.readingMinutes;
-  const [, month, day] = post.date.slice(0, 10).split("-");
+  const [, month, day] = post.date.split("-");
 
   return (
     <li className="border-b border-line last:border-b-0">

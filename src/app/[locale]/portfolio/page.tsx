@@ -1,25 +1,16 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getApps, getExperiments, getWorks } from "@/lib/content";
-import { localeAlternates } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
 import { BentoHero, type BentoItem } from "@/components/portfolio/BentoHero";
 import { CraftList, type CraftEntry } from "@/components/portfolio/CraftList";
+import { appMonogram } from "@/components/software/appMeta";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/portfolio">): Promise<Metadata> {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: "portfolio" });
-  return {
-    title: t("title"),
-    description: t("subtitle"),
-    alternates: localeAlternates("/portfolio", locale),
-  };
-}
+export const generateMetadata = sectionMetadata("portfolio", "/portfolio");
 
 /**
  * Fallback cover tints, for an app saved without an accent of its own. There
@@ -34,15 +25,6 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/portfoli
  */
 const ACCENT_CYCLE = ["#b45309", "#3e6d93", "#6b5ba8", "#4c7a5b", "#a8465f", "#2f6f72"];
 
-/** "Photo Browser" → "PB", "Lumitext" → "Lu". */
-function monogramOf(name: string): string {
-  const words = name.trim().split(/\s+/);
-  if (words.length > 1) {
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-  return name.slice(0, 2);
-}
-
 /** Fallback dot colour for an experiment saved without one. */
 const CRAFT_ACCENT = "#4c7a5b";
 
@@ -51,7 +33,6 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("portfolio");
-  const l = locale;
 
   const works = await getWorks();
 
@@ -59,8 +40,8 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
   // used to be a constant here plus two message keys per language.
   const craft: CraftEntry[] = (await getExperiments()).map((entry) => ({
     id: entry.key,
-    name: entry.name[l],
-    description: entry.description[l],
+    name: entry.name[locale],
+    description: entry.description[locale],
     status: entry.status,
     accent: entry.accent ?? CRAFT_ACCENT,
     href: entry.href ?? undefined,
@@ -73,7 +54,7 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
       id: app.key,
       name: app.name,
       kicker: app.platforms[0] ?? app.category,
-      monogram: monogramOf(app.name),
+      monogram: appMonogram(app.name),
       accent: app.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length],
       href: "/software",
       label: t("coverLabel", { name: app.name }),
@@ -122,7 +103,7 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
               <WorkCard
                 key={work.key}
                 work={work}
-                locale={l}
+                locale={locale}
                 accent={work.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length]}
               />
             ))}
