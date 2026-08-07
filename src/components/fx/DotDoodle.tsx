@@ -4,8 +4,49 @@ import { useEffect, useMemo, useRef } from "react";
 import { GLYPH_GRID, glyphFor } from "@/lib/dotGlyphs";
 import { prefersReducedMotion } from "@/lib/gsap";
 
-/** Gap between two glyph squares, in grid cells. */
-const LETTER_GAP = 1.35;
+/** Gap between two glyph fields, in grid cells. Tighter than it looks: the
+ *  rim below starves each field's edge, so the visual gutter runs wider than
+ *  the geometric one. */
+const LETTER_GAP = 0.8;
+
+/* ---- the field: a glyph padded by a ring of pure noise ---- */
+
+/** The glyph sits centred in a field one cell wider on every side. The ring
+ *  is what the rim can carve freely — the letterform itself never touches the
+ *  field's edge, so no stroke dot is ever lost to the outline. */
+const FIELD = GLYPH_GRID + 2;
+const PAD = 1;
+/** Superellipse exponent for the field's outline. A circle (2) would clip the
+ *  glyph's own corners — F and H reach all four — while a square is exactly
+ *  the die-cut look this is escaping. 4 rounds the field off and still leaves
+ *  every stroke dot inside the rim. */
+const EDGE_EXP = 4;
+/** Noise cells past this superellipse radius do not exist at all; the random
+ *  span keeps the boundary ragged instead of stamped. Field corners sit at
+ *  ~1.19, so all four always fall away. */
+const RIM_CUTOFF = 1.04;
+const RIM_JITTER = 0.13;
+/** Where the rim starts to bite, and how hard, on radius and alpha. Applied
+ *  outside the hover interpolation — the outline is the field's *shape*, not
+ *  a resting-state effect, so surfacing the name must not square it back up. */
+const RIM_START = 0.8;
+const RIM_END = 1.16;
+const RIM_SHRINK = 0.5;
+const RIM_FADE = 0.4;
+/** Static per-dot placement scatter, in cells. Strokes keep almost none so
+ *  the surfaced name stays crisp; noise wanders enough to lose the graph-
+ *  paper alignment. */
+const SCATTER_NOISE = 0.09;
+const SCATTER_GLYPH = 0.03;
+/** Dots are slightly squashed ellipses at a fixed random angle — the wobble
+ *  that reads as hand-inked rather than plotted. */
+const SQUASH = 0.11;
+/** Convex-lens warp: grid slots are projected onto a shallow spherical bulge,
+ *  so spacing dilates at the centre and compresses toward the edge. The value
+ *  is the arc, in radians, the field's half-width subtends — 0 would flatten
+ *  it back to graph paper. Constant like the rim: the bulge is the field's
+ *  shape, not a resting-state effect, so it holds while the name is surfaced. */
+const LENS = 0.7;
 
 /* ---- resting state: every dot drifts, the name hides inside the noise ---- */
 
@@ -20,10 +61,11 @@ const NOISE_ALPHA: readonly [number, number] = [0.12, 0.82];
 const NOISE_GAMMA = 1.3;
 const GLYPH_RADIUS = 0.375;
 const NOISE_RADIUS: readonly [number, number] = [0.24, 0.36];
-/** Corner dots shrink and dim toward the square's edge — the whole reason the
- *  resting field reads as organic rather than as a printed sheet. */
+/** Soft interior falloff, on top of the rim: dots ease off toward the edge
+ *  even before the outline starts to carve. Unlike the rim this one is a
+ *  resting-state effect and lets go on hover. */
 const FALLOFF = 0.45;
-/** Mean number of accent-tinted dots per glyph square. */
+/** Mean number of accent-tinted dots per glyph field. */
 const ACCENT_PER_BLOCK = 1.4;
 
 /* ---- hover: the noise collapses and the name surfaces ---- */
@@ -134,12 +176,22 @@ type Accent = { rgb: Rgb; born: number; life: number };
 
 type Cell = {
   block: number;
-  row: number;
-  col: number;
   /** Part of the letterform. */
   on: boolean;
-  /** Radial falloff for this cell, 1 at the square's centre. */
+  /** Radial falloff for this cell, 1 at the field's centre. */
   falloff: number;
+  /** How deep into the field's edge this cell sits, 0 inside → 1 at the rim. */
+  rim: number;
+  /** Drawing position inside the field, in cells: the grid slot pushed
+   *  through the lens warp, plus this dot's static scatter. */
+  px: number;
+  py: number;
+  /** Lens magnification at this slot — dots near the pole sit closer to the
+   *  eye and render a touch larger, dots at the horizon a touch smaller. */
+  bulge: number;
+  /** Ellipse squash ratio and its fixed orientation. */
+  sq: number;
+  rot: number;
   /** Two detuned sines per cell — cheap noise that never visibly loops. */
   p1: number;
   p2: number;
@@ -152,21 +204,45 @@ type Cell = {
 function buildCells(text: string): { cells: Cell[]; blocks: number } {
   const chars = [...text];
   const cells: Cell[] = [];
-  const mid = (GLYPH_GRID - 1) / 2;
+  const mid = (FIELD - 1) / 2;
 
   chars.forEach((char, block) => {
     const glyph = glyphFor(char);
-    for (let row = 0; row < GLYPH_GRID; row++) {
-      for (let col = 0; col < GLYPH_GRID; col++) {
-        const dx = (col - mid) / mid;
-        const dy = (row - mid) / mid;
-        const dist = Math.min(1, Math.hypot(dx, dy) / Math.SQRT2);
+    for (let row = 0; row < FIELD; row++) {
+      for (let col = 0; col < FIELD; col++) {
+        const on = glyph[row - PAD]?.[col - PAD] === "#";
+        const dx = Math.abs(col - mid) / mid;
+        const dy = Math.abs(row - mid) / mid;
+        const dist = Math.pow(
+          Math.pow(dx, EDGE_EXP) + Math.pow(dy, EDGE_EXP),
+          1 / EDGE_EXP
+        );
+        // Carve the outline: cells past the ragged cutoff never exist. Only
+        // noise is eligible — the glyph stays whole by the padding above.
+        if (!on && dist > RIM_CUTOFF + Math.random() * RIM_JITTER) continue;
+        const scatter = on ? SCATTER_GLYPH : SCATTER_NOISE;
+        // The lens: a slot's radial reach is where a sphere's surface would
+        // put it, so the first ring lands wide of the grid and the outermost
+        // ones pull in — spacing dilates at the pole, packs at the horizon.
+        const rdx = col - mid;
+        const rdy = row - mid;
+        const rr = Math.hypot(rdx, rdy) / mid;
+        const bulge =
+          rr > 0
+            ? Math.sin(rr * LENS) / (rr * Math.sin(LENS))
+            : LENS / Math.sin(LENS);
         cells.push({
           block,
-          row,
-          col,
-          on: glyph[row]?.[col] === "#",
-          falloff: 1 - FALLOFF * Math.pow(dist, 1.5),
+          on,
+          falloff: 1 - FALLOFF * Math.pow(Math.min(dist, 1), 1.5),
+          rim: smoothstep(
+            clamp((dist - RIM_START) / (RIM_END - RIM_START), 0, 1)
+          ),
+          px: mid + rdx * bulge + (Math.random() - 0.5) * 2 * scatter,
+          py: mid + rdy * bulge + (Math.random() - 0.5) * 2 * scatter,
+          bulge,
+          sq: 1 + (Math.random() - 0.5) * 2 * SQUASH,
+          rot: Math.random() * Math.PI,
           p1: Math.random() * Math.PI * 2,
           p2: Math.random() * Math.PI * 2,
           f1: 0.35 + Math.random() * 0.55,
@@ -189,6 +265,13 @@ type Props = {
 
 /**
  * The wordmark, set in a dot matrix that hides it.
+ *
+ * Each character sits in a field with a rounded, ragged outline rather than a
+ * die-cut square: the glyph is padded by a ring of pure noise, the field's
+ * corners are carved away along a superellipse, the grid itself bulges like a
+ * convex lens — wide spacing at the centre, packed toward the edge — and
+ * every dot carries a small fixed scatter and squash, so the whole thing
+ * reads as hand-inked.
  *
  * At rest every dot — the letterform's included — drifts through its own slow
  * brightness walk, so the name is only ever half-legible, with a few dots
@@ -214,7 +297,7 @@ export function DotDoodle({ text, className }: Props) {
   // Drives the CSS box, so it has to agree with the layout the loop computes.
   const aspect = useMemo(() => {
     const n = Math.max([...text].length, 1);
-    return (n * GLYPH_GRID + (n - 1) * LETTER_GAP) / GLYPH_GRID;
+    return (n * FIELD + (n - 1) * LETTER_GAP) / FIELD;
   }, [text]);
 
   useEffect(() => {
@@ -267,10 +350,10 @@ export function DotDoodle({ text, className }: Props) {
       canvas.height = Math.round(cssH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const cols = blocks * GLYPH_GRID + (blocks - 1) * LETTER_GAP;
-      cell = Math.min(cssW / cols, cssH / GLYPH_GRID);
+      const cols = blocks * FIELD + (blocks - 1) * LETTER_GAP;
+      cell = Math.min(cssW / cols, cssH / FIELD);
       originX = (cssW - cols * cell) / 2;
-      originY = (cssH - GLYPH_GRID * cell) / 2;
+      originY = (cssH - FIELD * cell) / 2;
       return true;
     };
 
@@ -296,7 +379,7 @@ export function DotDoodle({ text, className }: Props) {
       if (cell <= 0) return;
 
       const h = hovered ? dampedSettle(hoverT) : smoothstep(hoverT);
-      const step = (GLYPH_GRID + LETTER_GAP) * cell;
+      const step = (FIELD + LETTER_GAP) * cell;
       const { ink } = palette;
       // One style string per frame; per-dot opacity goes through globalAlpha,
       // not 147 fresh rgba() strings a frame.
@@ -321,7 +404,7 @@ export function DotDoodle({ text, className }: Props) {
             (0.62 * Math.sin(t * c.f1 + c.p1) +
               0.38 * Math.sin(t * c.f2 + c.p2));
 
-        // Hovering also retires the falloff: the square flattens into an even
+        // Hovering also retires the falloff: the field flattens into an even
         // matrix, which is what makes the surfaced name read as deliberate.
         const fall = lerp(c.falloff, 1, h);
 
@@ -364,13 +447,20 @@ export function DotDoodle({ text, className }: Props) {
           }
         }
 
-        const x = originX + c.block * step + (c.col + 0.5) * cell;
-        const y = originY + (c.row + 0.5) * cell;
+        // The rim and the lens last, over everything including tints, and
+        // outside `h`: the rounded outline and the bulge are the field's
+        // shape in every state.
+        radius *= (1 - RIM_SHRINK * c.rim) * c.bulge;
+        alpha *= 1 - RIM_FADE * c.rim;
+
+        const x = originX + c.block * step + (c.px + 0.5) * cell;
+        const y = originY + (c.py + 0.5) * cell;
 
         ctx.globalAlpha = clamp(alpha * intro, 0, 1);
         ctx.fillStyle = style;
         ctx.beginPath();
-        ctx.arc(x, y, Math.max(0, radius) * intro, 0, Math.PI * 2);
+        const r = Math.max(0, radius) * intro;
+        ctx.ellipse(x, y, r * c.sq, r / c.sq, c.rot, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
