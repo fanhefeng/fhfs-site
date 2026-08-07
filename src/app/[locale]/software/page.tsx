@@ -1,25 +1,15 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { getApps } from "@/lib/content";
-import { localeAlternates } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { SoftwareGallery } from "@/components/software/SoftwareGallery";
 import { DeviceShowcase } from "@/components/software/DeviceShowcase";
 import { toSoftwareApp } from "@/components/software/appMeta";
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/software">): Promise<Metadata> {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: "software" });
-  return {
-    title: t("title"),
-    description: t("subtitle"),
-    alternates: localeAlternates("/software", locale),
-  };
-}
+export const generateMetadata = sectionMetadata("software", "/software");
 
 /**
  * Software — the keynote bento. Stays a Server Component: the apps come out

@@ -1,5 +1,5 @@
 import {
-  INTRO_STICKERS,
+  STICKER_BY_ID,
   type IntroCopy,
   type IntroLink,
   type IntroText,
@@ -42,15 +42,15 @@ function ResumeDocument({ text, copy, links }: Omit<Props, "variant">) {
       </header>
 
       <div className="divide-y divide-line">
-        {copy.map((node, i) => (
-          <section key={node.id} className="py-9">
-            <StickerCopy
-              node={node}
-              sticker={INTRO_STICKERS[i]}
-              density="page"
-            />
-          </section>
-        ))}
+        {copy.map((node) => {
+          const hit = STICKER_BY_ID.get(node.id);
+          if (!hit) return null;
+          return (
+            <section key={node.id} className="py-9">
+              <StickerCopy node={node} sticker={hit.sticker} density="page" />
+            </section>
+          );
+        })}
       </div>
 
       <footer className="border-t border-line pt-10">

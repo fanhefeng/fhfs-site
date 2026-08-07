@@ -1,10 +1,12 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { copyBlocks } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { CopyForm } from "./CopyForm";
 
 export default async function CopyPage() {
+  await requireAdminPage();
   const rows = await db
     .select()
     .from(copyBlocks)

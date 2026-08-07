@@ -1,6 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { timelineEntries } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { saveTimelineEntry } from "../actions";
@@ -17,6 +18,7 @@ const FIELDS: Field[] = [
 ];
 
 export default async function TimelinePage() {
+  await requireAdminPage();
   const rows = await db
     .select()
     .from(timelineEntries)

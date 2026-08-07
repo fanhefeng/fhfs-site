@@ -7,7 +7,8 @@
     "blog": "Writing",
     "about": "About",
     "portfolio": "Craft",
-    "software": "Software"
+    "software": "Software",
+    "intro": "Intro"
   },
   "home": {
     "issueLabel": "The Quiet Issue · 2026",

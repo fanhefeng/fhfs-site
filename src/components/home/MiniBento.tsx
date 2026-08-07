@@ -1,5 +1,5 @@
-import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/fx/Reveal";
+import { SectionHeader } from "./SectionHeader";
 
 export type BentoItem = {
   name: string;
@@ -32,19 +32,12 @@ export function MiniBento({ items, title, viewAllLabel }: Props) {
 
   return (
     <section aria-labelledby="home-software">
-      <Reveal>
-        <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
-          <h2 id="home-software" className="text-title">
-            {title}
-          </h2>
-          <Link
-            href="/software"
-            className="hit-ext font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
-          >
-            {viewAllLabel}
-          </Link>
-        </div>
-      </Reveal>
+      <SectionHeader
+        id="home-software"
+        title={title}
+        href="/software"
+        viewAllLabel={viewAllLabel}
+      />
 
       <Reveal
         as="ul"

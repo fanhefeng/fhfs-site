@@ -6,13 +6,14 @@ import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { gsap, useGSAP, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { Magnetic } from "@/components/fx/Magnetic";
+import {
+  OVERTURE_DONE_EVENT,
+  OVERTURE_SEEN_KEY,
+} from "@/components/fx/OvertureLight";
+import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
 
 // Referenced so bundlers keep the plugins; registration lives in @/lib/gsap.
 void ScrollTrigger;
-
-/** Overture handshake — the site-wide loader contract (see OvertureLight). */
-const OVERTURE_SEEN_KEY = "fhfs-overture-seen";
-const OVERTURE_DONE_EVENT = "fhfs:overture-done";
 /** Safety net: never leave the cover blank if the overture misfires. */
 const RELAY_TIMEOUT = 8000;
 
@@ -529,31 +530,18 @@ export function HomeHero() {
         ref={cardRef}
         className="glass-thin relative mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 rounded-panel px-5 py-4 md:mt-14"
       >
-        <svg aria-hidden="true" focusable="false" className="absolute h-0 w-0">
-          <defs>
-            <filter id="hero-glint" x="-20%" y="-20%" width="140%" height="140%">
-              <feSpecularLighting
-                in="SourceAlpha"
-                surfaceScale={1.4}
-                specularConstant={1.1}
-                specularExponent={34}
-                lightingColor="#ffe9cf"
-                result="spec"
-              >
-                <fePointLight ref={lightRef} x={-200} y={22} z={64} />
-              </feSpecularLighting>
-              <feComposite in="spec" in2="SourceAlpha" operator="in" />
-            </filter>
-          </defs>
-        </svg>
-        <span
-          ref={ringRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute -inset-px rounded-panel opacity-0"
-          style={{
-            border: "1.5px solid rgba(255,255,255,0.9)",
-            filter: "url(#hero-glint)",
-          }}
+        <GlintDefs
+          id="hero-glint"
+          exponent={34}
+          x={-200}
+          y={22}
+          z={64}
+          lightRef={lightRef}
+        />
+        <GlintRing
+          filterId="hero-glint"
+          className="rounded-panel"
+          ringRef={ringRef}
         />
 
         <span className="relative flex items-center gap-3">

@@ -1,8 +1,7 @@
 "use client";
 
 import { useLayoutEffect } from "react";
-
-const KEY = "fhfs-theme";
+import { THEME_STORAGE_KEY } from "@/lib/theme";
 
 /** The stored choice, else — only when storage is unreadable — what <html>
  *  already carries, else the OS preference, else paper. */
@@ -12,7 +11,7 @@ function resolve(): "light" | "dark" {
   // private mode, third-party iframes, "block all cookies").
   let blocked = false;
   try {
-    const stored = localStorage.getItem(KEY);
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored === "light" || stored === "dark") return stored;
   } catch {
     blocked = true;

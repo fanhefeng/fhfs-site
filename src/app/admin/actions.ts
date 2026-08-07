@@ -55,9 +55,14 @@ const localized = (form: FormData, key: string) => ({
   en: str(form, `${key}.en`),
 });
 
-/** Shared by every keyed table — an empty key would upsert a "" row forever. */
+/** Shared by every keyed table — an empty key would upsert a "" row forever.
+ *  Post slugs obey the same grammar (they become URLs), with their own
+ *  error text. */
 const validKey = (key: string) => /^[a-z0-9][a-z0-9-]*$/.test(key);
 const KEY_ERROR = { error: "key 只能用小写字母、数字和连字符。" };
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_ERROR = { error: "日期要写成 YYYY-MM-DD。" };
 
 export type ActionState = { error?: string; ok?: boolean };
 
@@ -75,16 +80,14 @@ export async function savePost(
   const locale = parseLocale(str(form, "locale"));
   const bodyMd = String(form.get("bodyMd") ?? "");
 
-  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+  if (!validKey(slug)) {
     return { error: "slug 只能用小写字母、数字和连字符。" };
   }
   if (!locale) return { error: "语言只能是 zh 或 en。" };
   if (!str(form, "title")) return { error: "标题不能为空。" };
 
   const date = str(form, "date");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return { error: "日期要写成 YYYY-MM-DD。" };
-  }
+  if (!DATE_RE.test(date)) return DATE_ERROR;
 
   const row = {
     slug,
@@ -97,7 +100,6 @@ export async function savePost(
       .map((tag) => tag.trim())
       .filter(Boolean),
     draft: form.get("draft") === "on",
-    cover: null,
     bodyMd,
     // Rendered once, here, rather than on every read.
     bodyHtml: await renderMarkdown(bodyMd),
@@ -246,9 +248,7 @@ export async function saveTimelineEntry(
   if (!date && !hasLabel) {
     return { error: "日期和占位文字至少要填一个——这一栏不编造日期。" };
   }
-  if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return { error: "日期要写成 YYYY-MM-DD。" };
-  }
+  if (date && !DATE_RE.test(date)) return DATE_ERROR;
 
   const row = {
     key,
@@ -289,7 +289,6 @@ export async function saveApp(
     tagline: localized(form, "tagline"),
     description: localized(form, "description"),
     category: category as "desktop" | "tool" | "game" | "website",
-    icon: null,
     website: str(form, "website"),
     platforms: str(form, "platforms")
       .split(",")
@@ -388,8 +387,13 @@ export async function saveChips(
     row.label.en ||= row.label.zh;
   }
 
-  await db.delete(schema.chips);
-  if (rows.length) await db.insert(schema.chips).values(rows);
+  // Delete and insert travel in one `db.batch()` — a single atomic request —
+  // so a failed insert cannot leave the table empty. Same contract as
+  // scripts/db-import.mts.
+  const wipe = db.delete(schema.chips);
+  await db.batch(
+    rows.length ? [wipe, db.insert(schema.chips).values(rows)] : [wipe]
+  );
 
   invalidate(TAGS.chips);
   return { ok: true };
@@ -421,8 +425,12 @@ export async function saveNavItems(
     }
   }
 
-  await db.delete(schema.navItems);
-  if (rows.length) await db.insert(schema.navItems).values(rows);
+  // Atomic for the same reason as saveChips — an empty nav_items is a site
+  // with no header.
+  const wipe = db.delete(schema.navItems);
+  await db.batch(
+    rows.length ? [wipe, db.insert(schema.navItems).values(rows)] : [wipe]
+  );
 
   invalidate(TAGS.nav);
   return { ok: true };

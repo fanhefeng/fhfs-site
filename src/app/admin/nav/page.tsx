@@ -1,10 +1,12 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { navItems } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { NavForm } from "./NavForm";
 
 export default async function NavPage() {
+  await requireAdminPage();
   const rows = await db
     .select({
       href: navItems.href,

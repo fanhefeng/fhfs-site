@@ -2,13 +2,15 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
-/** Handshake contract (unchanged since the first-load loader shipped): once the
- * ritual ends — or is skipped — 'fhfs:overture-done' fires so the hero can
- * start its own entrance, and the session key stops replays. */
-const SEEN_KEY = "fhfs-overture-seen";
-const DONE_EVENT = "fhfs:overture-done";
+/** Handshake contract: once the ritual ends — or is skipped — the done event
+ * fires so the hero can start its own entrance, and the session key stops
+ * replays. Exported so HomeHero speaks the same strings — a drifted copy
+ * fails silently (the hero just waits out its safety timeout). */
+export const OVERTURE_SEEN_KEY = "fhfs-overture-seen";
+export const OVERTURE_DONE_EVENT = "fhfs:overture-done";
 
 /** Where the lamp hangs — cord length, glow flood and circle reveal all
  * share this origin so the light reads as one source. */
@@ -32,12 +34,12 @@ type Phase = "pending" | "playing" | "done";
  * underneath takes over (via the done event). Serves delight + safety: the
  * first thing this site ever does is turn the lights on for the reader.
  *
- * Mechanics kept from the old loader: sessionStorage + done-event handshake,
- * scroll lock under the lenis contract, "pending" phase so returning
- * visitors never see a flash, reduce-motion goes straight to the page.
- * Click or Enter/Space/Escape fast-forwards (timeScale) instead of
- * jump-cutting. Under prefers-reduced-transparency the translucent glow
- * flood is dropped and the scrim fade alone does the unveiling.
+ * Mechanics: sessionStorage + done-event handshake, scroll lock under the
+ * lenis contract, "pending" phase so returning visitors never see a flash,
+ * reduce-motion goes straight to the page. Click or Enter/Space/Escape
+ * fast-forwards (timeScale) instead of jump-cutting. Under
+ * prefers-reduced-transparency the translucent glow flood is dropped and
+ * the scrim fade alone does the unveiling.
  */
 export function OvertureLight() {
   const container = useRef<HTMLDivElement>(null);
@@ -65,7 +67,7 @@ export function OvertureLight() {
 
       const finishInstant = () => {
         setPhase("done");
-        window.dispatchEvent(new Event(DONE_EVENT));
+        window.dispatchEvent(new Event(OVERTURE_DONE_EVENT));
       };
 
       /** Once shown — or deliberately skipped — the overture is spent for this
@@ -76,7 +78,7 @@ export function OvertureLight() {
        *  reaches here — an overture that was never shown stays owed. */
       const markSeen = () => {
         try {
-          sessionStorage.setItem(SEEN_KEY, "1");
+          sessionStorage.setItem(OVERTURE_SEEN_KEY, "1");
         } catch {
           /* Replaying the overture beats crashing the page. */
         }
@@ -86,7 +88,7 @@ export function OvertureLight() {
       // page behind the curtain — treat a throw as "already seen".
       let seen = true;
       try {
-        seen = !!sessionStorage.getItem(SEEN_KEY);
+        seen = !!sessionStorage.getItem(OVERTURE_SEEN_KEY);
       } catch {
         seen = true;
       }
@@ -107,23 +109,12 @@ export function OvertureLight() {
       setPhase("playing");
 
       // Lock scrolling while the lights are still off (lenis contract).
-      window.__lenis?.stop();
-      document.documentElement.style.overflow = "hidden";
+      lockScroll();
       let locked = true;
       const unlock = () => {
         if (!locked) return;
         locked = false;
-        document.documentElement.style.overflow = "";
-        // Re-sync before resuming: anything the user spun during the
-        // blackout must not teleport the page once it lifts.
-        window.__lenis?.scrollTo(window.scrollY, {
-          immediate: true,
-          force: true,
-        });
-        window.__lenis?.start();
-        // Pinned sections were measured while the page was locked and had
-        // no scrollbar; re-measure now that the real layout is back.
-        ScrollTrigger.refresh();
+        unlockScroll({ refresh: true });
       };
 
       /** Proof the blackout actually reached the screen. Dev Strict Mode
@@ -185,7 +176,7 @@ export function OvertureLight() {
         // 4. Relay: hand over before the last of the warm tint melts, so
         //    the masthead starts rising under the fading light.
         .add(() => {
-          window.dispatchEvent(new Event(DONE_EVENT));
+          window.dispatchEvent(new Event(OVERTURE_DONE_EVENT));
         }, DONE_AT)
         .to(
           overlay,

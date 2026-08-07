@@ -1,8 +1,4 @@
-"use client";
-
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
 import { Sticker } from "@/components/ui/Sticker";
 import { AppMock } from "@/components/software/AppMock";
 import { appMonogram, mockAccent, type SoftwareApp } from "@/components/software/appMeta";
@@ -25,80 +21,35 @@ type Props = {
  * container material, stickers are the contents), and a state-aware schematic
  * of the app's interface that cross-fades with the gallery lights.
  *
- * Hover is a 4px lift with a two-layer shadow cross-fade — box-shadow is
- * never tweened, the resting and lifted shadows are separate painted layers
- * whose opacity swaps. Fine pointers only.
+ * Hover is a 4px lift with a two-layer shadow cross-fade, pure CSS — the same
+ * grammar as MiniBento's cells, and Tailwind's hover variants only engage on
+ * hover-capable pointers. Box-shadow is never transitioned: the resting and
+ * lifted shadows are separate painted layers whose opacity swaps while they
+ * ride the lift, so the card and its shadow stay welded.
  */
 export function AppCard({ app, index, variant = "tile", className }: Props) {
   const t = useTranslations("software");
-  const rootRef = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const root = rootRef.current;
-      if (!root) return;
-      if (!isFinePointer()) return;
-
-      const rest = root.querySelector<HTMLElement>("[data-shadow='rest']");
-      const lift = root.querySelector<HTMLElement>("[data-shadow='lift']");
-      const plate = root.querySelector<HTMLElement>("[data-plate]");
-      if (!rest || !lift || !plate) return;
-
-      // overwrite:'auto' throughout — a flick across a bento grid fires
-      // enter/leave faster than the tweens finish.
-      const to = (hover: boolean) => {
-        // The shadow plates ride along so the card and its shadow stay
-        // welded; opacity is tweened separately (overwrite:'auto' only
-        // kills conflicting properties, so the two never fight).
-        gsap.to([plate, rest, lift], {
-          y: hover ? -4 : 0,
-          duration: 0.35,
-          ease: "power3.out",
-          overwrite: "auto",
-        });
-        gsap.to(rest, { opacity: hover ? 0 : 1, duration: 0.35, overwrite: "auto" });
-        gsap.to(lift, { opacity: hover ? 1 : 0, duration: 0.35, overwrite: "auto" });
-      };
-
-      const onEnter = () => to(true);
-      const onLeave = () => to(false);
-      root.addEventListener("pointerenter", onEnter);
-      root.addEventListener("pointerleave", onLeave);
-      return () => {
-        root.removeEventListener("pointerenter", onEnter);
-        root.removeEventListener("pointerleave", onLeave);
-        gsap.killTweensOf([plate, rest, lift]);
-      };
-    },
-    { scope: rootRef }
-  );
 
   const feature = variant === "feature";
   const rail = variant === "rail";
 
   return (
     <article
-      ref={rootRef}
       data-app-card
       data-category={app.category}
       className={`group relative isolate h-full ${className ?? ""}`}
     >
-      {/* The two shadow plates. They live behind the glass and only swap
-       * opacity, so nothing repaints a box-shadow mid-animation. */}
       <span
         aria-hidden
-        data-shadow="rest"
-        className="pointer-events-none absolute inset-0 -z-10 rounded-card shadow-card"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-card shadow-card transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1 group-hover:opacity-0"
       />
       <span
         aria-hidden
-        data-shadow="lift"
-        className="pointer-events-none absolute inset-0 -z-10 rounded-card opacity-0 shadow-lift"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-card opacity-0 shadow-lift transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1 group-hover:opacity-100"
       />
 
       <div
-        data-plate
-        className={`glass-thin flex h-full flex-col overflow-hidden rounded-card shadow-none will-change-transform ${
+        className={`glass-thin flex h-full flex-col overflow-hidden rounded-card shadow-none transition-transform duration-300 ease-out group-hover:-translate-y-1 ${
           feature ? "sm:flex-row" : ""
         }`}
       >

@@ -1,10 +1,9 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { localeAlternates } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/seo";
 import { getIntroNodes } from "@/lib/content";
 import {
   INTRO_STICKERS,
@@ -13,18 +12,7 @@ import {
 } from "@/lib/intro/stickers";
 import { IntroStage } from "@/components/intro/IntroStage";
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/[locale]/intro">): Promise<Metadata> {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: "intro" });
-  return {
-    title: t("title"),
-    description: t("subtitle"),
-    alternates: localeAlternates("/intro", locale),
-  };
-}
+export const generateMetadata = sectionMetadata("intro", "/intro");
 
 /**
  * Intro — the same person as /about, told the other way round: a head you

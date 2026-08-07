@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP } from "@/lib/gsap";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
@@ -42,11 +43,10 @@ export type FullNavProps = {
  * over from wherever things are (raMQBVQ's clear() + rebuild pattern:
  * entrances are fromTo, exits are to).
  *
- * Scroll is locked while open per the Lenis contract: stop() + overflow
- * hidden, restored with scrollTo(y, immediate, force) → start() →
- * ScrollTrigger.refresh(). On a route commit the layer resets instantly —
- * RouteTransition already owns the screen, so animating here would play to
- * nobody.
+ * Scroll is locked while open via the shared contract in lib/scrollLock,
+ * unlocking with a ScrollTrigger refresh. On a route commit the layer
+ * resets instantly — RouteTransition already owns the screen, so animating
+ * here would play to nobody.
  */
 export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -76,19 +76,13 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
   const lock = useCallback(() => {
     if (lockedRef.current) return;
     lockedRef.current = true;
-    window.__lenis?.stop();
-    document.documentElement.style.overflow = "hidden";
+    lockScroll();
   }, []);
 
   const unlock = useCallback(() => {
     if (!lockedRef.current) return;
     lockedRef.current = false;
-    document.documentElement.style.overflow = "";
-    // Re-sync before resuming, otherwise Lenis snaps back to the offset it
-    // held when it was stopped (site-wide scroll-lock contract).
-    window.__lenis?.scrollTo(window.scrollY, { immediate: true, force: true });
-    window.__lenis?.start();
-    ScrollTrigger.refresh();
+    unlockScroll({ refresh: true });
   }, []);
 
   /** Push the page back while the sheet is up (scale + blur on <main>). */

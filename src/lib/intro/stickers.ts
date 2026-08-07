@@ -172,6 +172,16 @@ export const INTRO_STICKERS: IntroSticker[] = [
 ];
 
 /**
+ * Copy rows join back to stickers by id, never by array position: the copy
+ * comes from the database and a row can be missing there, which would shift
+ * every later index one step off its sticker. `index` is the camera-stop
+ * number — the same one `useIntroStore` publishes as `activeIndex`.
+ */
+export const STICKER_BY_ID = new Map(
+  INTRO_STICKERS.map((sticker, index) => [sticker.id, { sticker, index }])
+);
+
+/**
  * The shape of the words — still not the words. This is the contract the
  * Server Component fills and the whole client tree consumes, so it is stated
  * here rather than inside one of the `"use client"` components: types erase,

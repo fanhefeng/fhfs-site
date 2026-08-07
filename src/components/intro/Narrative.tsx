@@ -2,6 +2,7 @@
 
 import {
   INTRO_STICKERS,
+  STICKER_BY_ID,
   type IntroCopy,
   type IntroLink,
   type IntroSticker,
@@ -176,8 +177,10 @@ export function Narrative({ text, copy, links }: Props) {
 
       {/* One card per sticker. All of them stay in the DOM — only the active
           one is visible — so the page still reads as a whole document. */}
-      {copy.map((node, i) => {
-        const on = active === i;
+      {copy.map((node) => {
+        const hit = STICKER_BY_ID.get(node.id);
+        if (!hit) return null;
+        const on = active === hit.index;
         return (
           <article
             key={node.id}
@@ -188,11 +191,7 @@ export function Narrative({ text, copy, links }: Props) {
             }`}
           >
             <div className="glass-thin rounded-card p-6 sm:p-8">
-              <StickerCopy
-                node={node}
-                sticker={INTRO_STICKERS[i]}
-                density="card"
-              />
+              <StickerCopy node={node} sticker={hit.sticker} density="card" />
             </div>
           </article>
         );

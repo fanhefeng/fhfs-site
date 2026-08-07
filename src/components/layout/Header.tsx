@@ -7,6 +7,7 @@ import { site } from "@/config/site";
 import { gsap, useGSAP, Flip } from "@/lib/gsap";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
 import { FullNav } from "./FullNav";
 import type { NavLink } from "./Footer";
 
@@ -312,25 +313,15 @@ export function Header({ links, menuLinks }: Props) {
   return (
     <>
       <header ref={rootRef} className="pointer-events-none fixed inset-x-0 top-0 z-[80]">
-        {/* Specular-lighting filter for the edge glint (A1: feSpecularLighting
-            + fePointLight, composited into the ring's own alpha). */}
-        <svg aria-hidden="true" focusable="false" className="absolute h-0 w-0">
-          <defs>
-            <filter id="isl-glint" x="-20%" y="-20%" width="140%" height="140%">
-              <feSpecularLighting
-                in="SourceAlpha"
-                surfaceScale={1.4}
-                specularConstant={1.1}
-                specularExponent={36}
-                lightingColor="#ffe9cf"
-                result="spec"
-              >
-                <fePointLight ref={lightRef} x={-200} y={-200} z={70} />
-              </feSpecularLighting>
-              <feComposite in="spec" in2="SourceAlpha" operator="in" />
-            </filter>
-          </defs>
-        </svg>
+        {/* Specular-lighting filter for the edge glint. */}
+        <GlintDefs
+          id="isl-glint"
+          exponent={36}
+          x={-200}
+          y={-200}
+          z={70}
+          lightRef={lightRef}
+        />
 
         {/* Scroll-edge scrim: paper gradient + mask so content fades out
             before it slides under the island. Hidden while FullNav owns
@@ -361,22 +352,16 @@ export function Header({ links, menuLinks }: Props) {
             }`}
           >
             {/* Glint ring: lit by the fePointLight, invisible at rest. */}
-            <span
-              ref={ringRef}
-              aria-hidden="true"
-              className="pointer-events-none absolute -inset-px rounded-full opacity-0"
-              style={{
-                border: "1.5px solid rgba(255,255,255,0.9)",
-                filter: "url(#isl-glint)",
-              }}
+            <GlintRing
+              filterId="isl-glint"
+              className="rounded-full"
+              ringRef={ringRef}
             />
 
-            {/* Wordmark badge. data-flip-id is the landing target for the
-                home hero's shared logo morph (Flip, home page only). */}
+            {/* Wordmark badge. */}
             <Link
               href="/"
               aria-label={site.signName}
-              data-flip-id="masthead-logo"
               className="hit-ext relative z-[1] flex h-11 items-center rounded-full px-2.5 font-mono text-[13px] font-semibold lowercase tracking-[0.02em] text-fg"
             >
               {site.signName}

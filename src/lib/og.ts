@@ -7,16 +7,16 @@
  * mirror the light-theme tokens in globals.css and must be updated together.
  */
 
-/** Palette — the light ("open gallery") theme, hard-copied for satori. */
+/** Palette — the light ("open gallery") theme, hard-copied for satori.
+ *  Only the tokens the OG routes actually paint with; add more from
+ *  globals.css as they become needed. */
 export const OG = {
   paper: "#FAF9F6",
-  surface: "#F2F0EA",
   ink: "#1A1A1A",
   inkSecondary: "rgba(26,26,26,0.62)",
   inkTertiary: "rgba(26,26,26,0.40)",
   /** The single accent: amber. */
   accent: "#B45309",
-  line: "rgba(26,26,26,0.10)",
 } as const;
 
 export const OG_SIZE = { width: 1200, height: 630 };

@@ -115,7 +115,6 @@ for (const post of data.posts) {
     tags: post.tags,
     summary: post.summary,
     ...(post.draft ? { draft: true } : {}),
-    ...(post.cover ? { cover: post.cover } : {}),
   });
   await writeFile(
     path.join(OUT, "posts", `${post.slug}.${post.locale}.md`),

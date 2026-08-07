@@ -27,10 +27,11 @@ import type { Locale } from "@/i18n/routing";
  * the feed and the OG images together. `revalidate: false` means an entry
  * lives until a tag kills it — no polling, no background recompute.
  *
- * **Nothing is captured from module scope.** `unstable_cache` keys on a
- * function's arguments but not on the variables it closes over, so a module
- * level constant would quietly be shared across every cache entry. Everything
- * a getter needs, it takes as a parameter.
+ * **Nothing request-variable is captured from module scope.** `unstable_cache`
+ * keys on a function's arguments but not on the variables it closes over, so
+ * anything that differs between calls — locale, slug, tag, surface — must
+ * arrive as a parameter, and does. What the getters do close over (`db`, the
+ * column sets, the sort helpers) is constant for every entry by design.
  *
  * If this ever moves to Cache Components, it moves here and only here: each
  * `unstable_cache(fn, keys, opts)` becomes `'use cache'` + `cacheTag()`, and
@@ -204,8 +205,9 @@ export const getAllSlugs = unstable_cache(
  * The previous and next article by publication date.
  *
  * Deliberately its own query rather than an index lookup into `getPosts()`:
- * the article page only needs two titles, and this keeps it from pulling the
- * whole index in to find them.
+ * it still walks every published row to find the neighbours, but fetches only
+ * slug/title/date — not the summaries, tags and reading times the full index
+ * carries.
  */
 export const getAdjacentPosts = unstable_cache(
   async (
@@ -434,10 +436,11 @@ export type IntroNode = {
   period: Localized | null;
   body: Localized;
   bullets: { zh: string[]; en: string[] };
-  stickerLabel: string;
-  stickerIcon: string;
 };
 
+// `stickerLabel`/`stickerIcon` are deliberately not selected: the 3D scene
+// still reads label and icon from `INTRO_STICKERS` — see the note on the
+// table in db/schema.ts.
 export const getIntroNodes = unstable_cache(
   async (): Promise<IntroNode[]> =>
     db
@@ -448,8 +451,6 @@ export const getIntroNodes = unstable_cache(
         period: introNodes.period,
         body: introNodes.body,
         bullets: introNodes.bullets,
-        stickerLabel: introNodes.stickerLabel,
-        stickerIcon: introNodes.stickerIcon,
       })
       .from(introNodes)
       .orderBy(asc(introNodes.sort)),

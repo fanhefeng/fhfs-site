@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { posts } from "@/db/schema";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../../../AdminChrome";
 import { PostForm } from "../../PostForm";
 
@@ -10,6 +11,7 @@ export default async function EditPost({
 }: {
   params: Promise<{ slug: string; locale: string }>;
 }) {
+  await requireAdminPage();
   const { slug, locale } = await params;
   if (locale !== "zh" && locale !== "en") notFound();
 

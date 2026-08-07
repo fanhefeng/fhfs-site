@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { sql } from "drizzle-orm";
 import { db } from "@/db";
+import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome, SECTIONS } from "./AdminChrome";
 
 /** Reads straight from the table, not through the cached getters — the point
@@ -13,6 +14,7 @@ async function count(table: string): Promise<number> {
 }
 
 export default async function AdminHome() {
+  await requireAdminPage();
   const counts = await Promise.all(
     SECTIONS.map((section) => count(section.table))
   );

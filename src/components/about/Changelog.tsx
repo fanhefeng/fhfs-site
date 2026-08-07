@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
 
 /** One release of a person. The page localizes before handing it over. */
 export type ChangelogEntry = {
@@ -89,15 +90,14 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
         });
       }
 
-      /* --- card entrance + node tooltips ---------------------------------- */
+      /* --- card entrance + node tooltips ----------------------------------
+       * Inlined rather than wrapped in <Reveal>: the targets are nested <li>s
+       * that share this GSAP scope with the per-entry ScrollTriggers above. */
       gsap.from(items, {
-        y: 24,
-        autoAlpha: 0,
-        duration: 0.6,
-        ease: "power2.out",
+        ...REVEAL_VARS,
         stagger: 0.06,
         clearProps: "transform,opacity,visibility",
-        scrollTrigger: { trigger: root, start: "top 85%", once: true },
+        scrollTrigger: { trigger: root, start: REVEAL_START, once: true },
       });
 
       const teardown: Array<() => void> = [];

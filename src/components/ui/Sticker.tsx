@@ -8,12 +8,8 @@ type Props = {
    * always agree.
    */
   seed?: number;
-  /** Explicit tilt in degrees — overrides the seed. */
-  rotate?: number;
   /** Die-cut white edge thickness in px (the feMorphology dilate radius). */
   border?: number;
-  /** Optional fixed width in px, for image stickers. Text chips size naturally. */
-  size?: number;
   className?: string;
 };
 
@@ -36,22 +32,14 @@ const rand = (seed: number) => {
  * The tilt uses the standalone CSS `rotate` property on purpose: GSAP's
  * Draggable writes `transform`, so a dragged sticker keeps its lean.
  */
-export function Sticker({
-  children,
-  seed = 0,
-  rotate,
-  border = 3,
-  size,
-  className,
-}: Props) {
-  const tilt = rotate ?? Math.round((rand(seed) * 6 - 3) * 10) / 10;
+export function Sticker({ children, seed = 0, border = 3, className }: Props) {
+  const tilt = Math.round((rand(seed) * 6 - 3) * 10) / 10;
   const filterId = `sticker-edge-${border}`;
 
   const style: CSSProperties = {
     filter: `url(#${filterId}) drop-shadow(0 2px 8px var(--sticker-shadow-color))`,
     rotate: `${tilt}deg`,
     display: "inline-block",
-    ...(size != null ? { width: size } : null),
   };
 
   return (

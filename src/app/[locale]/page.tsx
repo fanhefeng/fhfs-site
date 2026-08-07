@@ -36,7 +36,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     .map((post) => ({
       slug: post.slug,
       title: post.title,
-      date: post.date.slice(0, 10).replaceAll("-", "."),
+      date: post.date.replaceAll("-", "."),
       readingTime: t("readingTime", { minutes: post.readingMinutes }),
     }));
 

@@ -54,7 +54,8 @@ function tracePath(
   ctx.closePath();
 }
 
-/** Shrink the type until it fits the available width. */
+/** Shrink the type until it fits the available width. On return `ctx.font`
+ *  is left set to the final face — callers may measure with it directly. */
 function fitFont(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -133,6 +134,7 @@ export function createStickerTexture(opts: {
     const iconW = ctx.measureText(icon).width;
 
     const labelPx = fitFont(ctx, label, "800", bh * 0.42, maxTextW - iconW - 20);
+    // Measured with the font fitFont just left on the context.
     const labelW = ctx.measureText(label).width;
 
     const totalW = iconW + 18 + labelW;

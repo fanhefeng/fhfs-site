@@ -130,7 +130,12 @@ export function MobileAppRail({ apps, className }: Props) {
           // Snap the *proxy* — offset is its exact mirror, so landing the
           // proxy on a multiple of `step` lands a card in the focus slot.
           snap: { x: (v: number) => Math.round(v / step) * step },
-          onPress() {
+          // Re-syncing the proxy must happen in onPressInit: Draggable records
+          // its start position between onPressInit and onPress, so a set made
+          // in onPress is overwritten by the first move. `snapTo` and
+          // `layout()` move `pos.offset` without touching the proxy, and a
+          // stale proxy makes the next drag start with a jump.
+          onPressInit() {
             gsap.killTweensOf(pos);
             gsap.set(proxy, { x: -pos.offset });
           },

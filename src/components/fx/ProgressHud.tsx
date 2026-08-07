@@ -11,9 +11,6 @@ import { gsap, useGSAP } from "@/lib/gsap";
  * percentage. It exists only where "how far into this am I?" is a real
  * question: blog article routes. Everywhere else it renders nothing, so the
  * rest of the site carries no per-scroll work from this component.
- *
- * The old turntable canvas is retired; scroll is no longer a record side,
- * just a quiet page count in the margin of the magazine.
  */
 export function ProgressHud() {
   // usePathname (from @/i18n/navigation) is locale-stripped, so the three

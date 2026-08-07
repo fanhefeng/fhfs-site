@@ -9,10 +9,6 @@ type Props = {
   /** Wrapper element — keep it semantic (section/ul/…), default div. */
   as?: "div" | "section" | "span" | "ul" | "ol" | "li" | "footer" | "aside";
   className?: string;
-  /** Travel distance in px (the site-wide reveal is y:24 → 0). */
-  y?: number;
-  /** Extra delay in seconds once the trigger fires. */
-  delay?: number;
   /**
    * When set, the wrapper's direct children animate in sequence with this
    * gap (seconds) instead of the wrapper moving as one block.
@@ -21,18 +17,26 @@ type Props = {
 };
 
 /**
+ * The site-wide entrance values (DESIGN.md §1.5), exported for the places
+ * that cannot use the component — nested targets, matchMedia gates — yet
+ * must stay on the same motion grammar.
+ */
+export const REVEAL_VARS = {
+  y: 24,
+  autoAlpha: 0,
+  duration: 0.6,
+  ease: "power2.out",
+} as const;
+
+/** Where the entrance fires: once, when the trigger's top clears 85%. */
+export const REVEAL_START = "top 85%";
+
+/**
  * The one scroll entrance of the site: y:24 / opacity:0 → 0.6s power2.out,
  * fired once at "top 85%". Content is always in the DOM (SSR/SEO safe) —
  * GSAP hides it only on the client just before the from-tween runs.
  */
-export function Reveal({
-  children,
-  as = "div",
-  className,
-  y = 24,
-  delay = 0,
-  stagger,
-}: Props) {
+export function Reveal({ children, as = "div", className, stagger }: Props) {
   const ref = useRef<HTMLElement>(null);
   // Pinned to one concrete tag rather than ElementType: @react-three/fiber
   // merges every three.js element into the global JSX.IntrinsicElements, so
@@ -49,16 +53,12 @@ export function Reveal({
       const targets: gsap.TweenTarget =
         stagger != null ? Array.from(el.children) : el;
       gsap.from(targets, {
-        y,
-        autoAlpha: 0,
-        duration: 0.6,
-        ease: "power2.out",
-        delay,
+        ...REVEAL_VARS,
         stagger: stagger ?? 0,
         // Leave no inline residue once landed, so hover tweens and Flip
         // reads elsewhere see clean elements.
         clearProps: "transform,opacity,visibility",
-        scrollTrigger: { trigger: el, start: "top 85%", once: true },
+        scrollTrigger: { trigger: el, start: REVEAL_START, once: true },
       });
     },
     { scope: ref }
