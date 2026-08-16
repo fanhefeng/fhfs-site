@@ -205,6 +205,41 @@ export const introNodes = pgTable("intro_nodes", {
 });
 
 /**
+ * The /resume page's header: who this is, one line of what they do, a few
+ * paragraphs of introduction, and how to reach them. A singleton — `key` is
+ * always "main" — kept as a keyed row rather than a locale-keyed pair because
+ * every field here is a short bilingual pair, not long prose.
+ */
+export const resumeProfiles = pgTable("resume_profiles", {
+  key: text().primaryKey(),
+  name: localized().notNull(),
+  tagline: localized().notNull(),
+  intro: jsonb().$type<{ zh: string[]; en: string[] }>().notNull(),
+  email: text(),
+  github: text(),
+  location: localized(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * One row per job on /resume. `period` is freeform bilingual text
+ * ("2021.06 – 至今" / "Jun 2021 – Present") rather than date columns — the
+ * same discipline as the timeline: state what is true, never invent a date.
+ */
+export const resumeExperiences = pgTable("resume_experiences", {
+  id: serial().primaryKey(),
+  key: text().notNull().unique(),
+  company: localized().notNull(),
+  role: localized().notNull(),
+  period: localized().notNull(),
+  url: text(),
+  bullets: jsonb().$type<{ zh: string[]; en: string[] }>().notNull(),
+  sort: integer().notNull().default(0),
+});
+
+/**
  * The sticker wall. `label` is bilingual but the two sides are often identical
  * — proper nouns like TypeScript read the same in both languages.
  */

@@ -12,6 +12,7 @@ export const SECTIONS = [
   { href: "/admin/works", label: "作品集", table: "works" },
   { href: "/admin/experiments", label: "实验", table: "experiments" },
   { href: "/admin/intro", label: "简历节点", table: "intro_nodes" },
+  { href: "/admin/resume", label: "简历页", table: "resume_experiences" },
   { href: "/admin/chips", label: "贴纸墙", table: "chips" },
   { href: "/admin/nav", label: "导航", table: "nav_items" },
 ] as const;
