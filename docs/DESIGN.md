@@ -178,7 +178,9 @@ bento grid（Apple keynote 式）：**分段控件筛选 All/Desktop/Tool/Game/W
 ### 2.7 404 `not-found.tsx`
 
 display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角**可剥离大贴纸彩蛋**（Draggable + clip-path 分割贴住/翘起区、投影随 lift 变软变大，撕开露一句话）。
-动效：404 数字 0.8s ScrambleText 解码（`chars:'0123456789'`——评审嫁接的参数）；P4 可选：文字吹散 canvas 粒子彩蛋（≤3000 粒 2D，按屏宽 1800/4500/9000 分档，移动端禁用）。
+动效：**404 数字本身即粒子彩蛋**（`components/notfound/ParticleLine`）——canvas 点阵先散后聚、指针靠近吹散、弹簧回位（≤3000 粒 2D，采样步长按屏宽分档）。原 ScrambleText 解码由此取代（ScrambleText 仍服务 Blog 标题）：两者都是「解码成型」的叙事，叠在同一个数字上只会互相打架。
+实现约束：数字始终以真实 DOM 输出，触屏 / reduced-motion / JS 未落地 / 文字换行一律退回纯排印；canvas 采样该元素自身的计算字体与盒子，接管时零位移；粒子静止即停循环（§5.3「静止停在最后一帧、零持续开销」），仅指针接近、resize、切主题唤醒。
+标定：收敛时长由 `settleTime` 单参数决定——离散弹簧的状态矩阵行列式恒为 friction，欠阻尼区内位移包络每帧衰减 √friction，与 ease 无关；ease 只管过冲幅度。
 
 ## 3. 组件处置清单
 
