@@ -481,6 +481,101 @@ export async function deleteWork(form: FormData): Promise<void> {
   invalidate(TAGS.works);
 }
 
+// ---------------------------------------------------------------------------
+// Resume
+// ---------------------------------------------------------------------------
+
+/** One row, key "main" — the /resume header edits as a single form. */
+export async function saveResumeProfile(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  await requireAdmin();
+
+  const name = localized(form, "name");
+  if (!name.zh && !name.en) return { error: "名字至少填一种语言。" };
+  name.zh ||= name.en;
+  name.en ||= name.zh;
+
+  const location = localized(form, "location");
+  const row = {
+    key: "main",
+    name,
+    tagline: localized(form, "tagline"),
+    intro: {
+      zh: String(form.get("intro.zh") ?? "").split("\n").map((p) => p.trim()).filter(Boolean),
+      en: String(form.get("intro.en") ?? "").split("\n").map((p) => p.trim()).filter(Boolean),
+    },
+    email: str(form, "email") || null,
+    github: str(form, "github") || null,
+    location: location.zh || location.en ? location : null,
+  };
+
+  await db
+    .insert(schema.resumeProfiles)
+    .values(row)
+    .onConflictDoUpdate({
+      target: schema.resumeProfiles.key,
+      set: { ...row, updatedAt: new Date() },
+    });
+
+  invalidate(TAGS.resume);
+  return { ok: true };
+}
+
+export async function saveResumeExperience(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  await requireAdmin();
+
+  const key = str(form, "key");
+  if (!validKey(key)) return KEY_ERROR;
+
+  const company = localized(form, "company");
+  if (!company.zh && !company.en) return { error: "公司名至少填一种语言。" };
+  company.zh ||= company.en;
+  company.en ||= company.zh;
+
+  // Freeform on purpose — "2021.06 – 至今" is a statement, a date column
+  // would be an invention. Same discipline as the timeline.
+  const period = localized(form, "period");
+  if (!period.zh && !period.en) return { error: "时间段至少填一种语言。" };
+  period.zh ||= period.en;
+  period.en ||= period.zh;
+
+  const row = {
+    key,
+    company,
+    role: localized(form, "role"),
+    period,
+    url: str(form, "url") || null,
+    bullets: {
+      zh: String(form.get("bullets.zh") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
+      en: String(form.get("bullets.en") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
+    },
+    sort: Number(form.get("sort") ?? 0),
+  };
+
+  await db
+    .insert(schema.resumeExperiences)
+    .values(row)
+    .onConflictDoUpdate({ target: schema.resumeExperiences.key, set: row });
+
+  invalidate(TAGS.resume);
+  return { ok: true };
+}
+
+export async function deleteResumeExperience(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db
+    .delete(schema.resumeExperiences)
+    .where(eq(schema.resumeExperiences.key, key));
+  invalidate(TAGS.resume);
+}
+
 export async function saveIntroNode(
   _prev: ActionState,
   form: FormData

@@ -74,6 +74,14 @@ const data = {
     .select()
     .from(schema.introNodes)
     .orderBy(asc(schema.introNodes.sort), asc(schema.introNodes.key)),
+  resumeProfiles: await db
+    .select()
+    .from(schema.resumeProfiles)
+    .orderBy(asc(schema.resumeProfiles.key)),
+  resumeExperiences: await db
+    .select()
+    .from(schema.resumeExperiences)
+    .orderBy(asc(schema.resumeExperiences.sort), asc(schema.resumeExperiences.key)),
   chips: await db
     .select()
     .from(schema.chips)

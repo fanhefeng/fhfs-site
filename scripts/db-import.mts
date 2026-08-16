@@ -60,6 +60,8 @@ const keyed = [
   [schema.works, data.works],
   [schema.experiments, data.experiments],
   [schema.introNodes, data.introNodes],
+  [schema.resumeProfiles, data.resumeProfiles],
+  [schema.resumeExperiences, data.resumeExperiences],
 ] as const;
 
 for (const [table, rows] of keyed) {

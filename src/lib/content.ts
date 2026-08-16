@@ -10,6 +10,8 @@ import {
   introNodes,
   navItems,
   posts,
+  resumeExperiences,
+  resumeProfiles,
   timelineEntries,
   works,
   type Localized,
@@ -51,6 +53,7 @@ export const TAGS = {
   experiments: "experiments",
   intro: "intro",
   nav: "nav",
+  resume: "resume",
 } as const;
 
 const cacheOptions = (...tags: string[]) => ({
@@ -456,6 +459,63 @@ export const getIntroNodes = unstable_cache(
       .orderBy(asc(introNodes.sort)),
   ["intro-nodes"],
   cacheOptions(TAGS.intro)
+);
+
+export type ResumeProfile = {
+  name: Localized;
+  tagline: Localized;
+  intro: { zh: string[]; en: string[] };
+  email: string | null;
+  github: string | null;
+  location: Localized | null;
+};
+
+export type ResumeExperience = {
+  key: string;
+  company: Localized;
+  role: Localized;
+  period: Localized;
+  url: string | null;
+  bullets: { zh: string[]; en: string[] };
+};
+
+/** The /resume header. Null until the profile is first saved in /admin —
+ *  the page renders its quiet empty state rather than inventing a person. */
+export const getResumeProfile = unstable_cache(
+  async (): Promise<ResumeProfile | null> => {
+    const [row] = await db
+      .select({
+        name: resumeProfiles.name,
+        tagline: resumeProfiles.tagline,
+        intro: resumeProfiles.intro,
+        email: resumeProfiles.email,
+        github: resumeProfiles.github,
+        location: resumeProfiles.location,
+      })
+      .from(resumeProfiles)
+      .where(eq(resumeProfiles.key, "main"))
+      .limit(1);
+    return row ?? null;
+  },
+  ["resume-profile"],
+  cacheOptions(TAGS.resume)
+);
+
+export const getResumeExperiences = unstable_cache(
+  async (): Promise<ResumeExperience[]> =>
+    db
+      .select({
+        key: resumeExperiences.key,
+        company: resumeExperiences.company,
+        role: resumeExperiences.role,
+        period: resumeExperiences.period,
+        url: resumeExperiences.url,
+        bullets: resumeExperiences.bullets,
+      })
+      .from(resumeExperiences)
+      .orderBy(asc(resumeExperiences.sort), asc(resumeExperiences.key)),
+  ["resume-experiences"],
+  cacheOptions(TAGS.resume)
 );
 
 /**
