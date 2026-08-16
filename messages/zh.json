@@ -8,7 +8,9 @@
     "about": "关于",
     "portfolio": "作品",
     "software": "软件",
-    "intro": "自我介绍"
+    "lab": "实验室",
+    "intro": "自我介绍",
+    "resume": "简历"
   },
   "home": {
     "issueLabel": "安静的一期 · 2026",
@@ -29,7 +31,10 @@
     "aboutTitle": "关于",
     "aboutLead1": "我是 fhf，从山西河津出发，如今在青岛。",
     "aboutLead2": "写代码，也写字，慢慢攒下一架子小软件。",
-    "aboutLink": "认识一下"
+    "aboutLink": "认识一下",
+    "nowTitle": "近况",
+    "nowBadge": "此刻",
+    "contactTitle": "找到我"
   },
   "blog": {
     "title": "文章",
@@ -84,6 +89,13 @@
     "linkWriting": "读点文章",
     "resumeRegion": "文字版简历（3D 内容的等价文本）"
   },
+  "resume": {
+    "title": "简历",
+    "subtitle": "正式的一页：我是谁，做过什么。",
+    "experienceTitle": "工作经历",
+    "locationLabel": "所在地",
+    "empty": "简历内容正在整理中，稍后回来看看。"
+  },
   "portfolio": {
     "kicker": "画廊 · 手艺",
     "title": "作品画廊",
@@ -111,6 +123,52 @@
     "emptyTitle": "正在布展",
     "empty": "正在布展——这面墙很快会挂上东西。",
     "emptyCta": "先去看看软件"
+  },
+  "lab": {
+    "kicker": "动效实验室",
+    "title": "实验室",
+    "subtitle": "三则滚动驱动的练习。滚动条在这里不是导航，是播放头。",
+    "indexAria": "动效实验列表",
+    "open": "进去看看",
+    "back": "回实验室",
+    "backToIndex": "← 实验室",
+    "hint": "向下滚动",
+    "reducedMotion": "你的系统偏好是减弱动效，这里直接呈现终态。",
+    "items": {
+      "scrollVideo": {
+        "name": "滚动即播放",
+        "tagline": "GSAP ScrollTrigger + Canvas",
+        "summary": "页面里没有一个 video 标签。每一帧都是一张图，滚动多少，就画到第几帧。",
+        "note": "90 帧序列，滚动进度映射成帧号；往回滚就是往回画，不存在倒放卡顿。",
+        "captionOne": "逐帧，不是播放",
+        "captionOneBody": "滚动进度映射成帧号，canvas 只负责把那一帧画出来。",
+        "captionTwo": "反向滚动也跟手",
+        "captionTwoBody": "没有播放时间轴，往回滚就是往回画。",
+        "loading": "正在解码帧序列"
+      },
+      "dissolve": {
+        "name": "溶解转场",
+        "tagline": "Three.js 着色器 + ScrollTrigger",
+        "summary": "一张图被「标量场加阈值」逐步吃掉，锋面是有机的团块而不是一条直线。",
+        "note": "垂直梯度做主导，低频 fbm 把边缘揉碎，高频碎点补细节。阈值随滚动扫过整屏。",
+        "headline": "边界不是一条线",
+        "body": "溶解的锋面由噪声场决定，所以它像纸被水洇开，而不是像幕布被拉开。",
+        "tail": "往回滚，它会原样长回去。",
+        "fallback": "当前环境没有可用的 WebGL，这里展示静态构图。"
+      },
+      "meltingText": {
+        "name": "融化式文字",
+        "tagline": "SVG 滤镜 + 逐字 stagger",
+        "summary": "文字先糊成一团黏连的液体，再融化收敛成清晰字形。",
+        "note": "高斯模糊把字边缘晕开，alpha 阈值把超过三成不透明度的部分推成实心——相邻两个字晕到一起，就融成了一坨。",
+        "sampleOne": "融化显现",
+        "sampleTwo": "Melting Type",
+        "sampleThree": "滚动即显影。",
+        "labelLoad": "挂载即播",
+        "labelInView": "进视口触发",
+        "labelScrub": "绑定滚动条"
+      }
+    }
   },
   "software": {
     "kicker": "自研软件",

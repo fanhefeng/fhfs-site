@@ -15,6 +15,8 @@ type Props = {
   items: WritingItem[];
   title: string;
   viewAllLabel: string;
+  /** Section number in the issue's running order — "01", "02", … */
+  index?: string;
 };
 
 /**
@@ -26,7 +28,7 @@ type Props = {
  * Server component on purpose — the only client code here is the shared
  * Reveal wrapper, so the list itself ships no JavaScript.
  */
-export function RecentWriting({ items, title, viewAllLabel }: Props) {
+export function RecentWriting({ items, title, viewAllLabel, index }: Props) {
   if (items.length === 0) return null;
 
   return (
@@ -36,6 +38,7 @@ export function RecentWriting({ items, title, viewAllLabel }: Props) {
         title={title}
         href="/blog"
         viewAllLabel={viewAllLabel}
+        index={index}
       />
 
       <Reveal as="ul" stagger={0.06}>

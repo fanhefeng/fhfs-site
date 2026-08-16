@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { gsap, useGSAP, Draggable, EASE } from "@/lib/gsap";
 import { Magnetic } from "@/components/fx/Magnetic";
+import { ParticleLine } from "@/components/notfound/ParticleLine";
 
 /**
  * Fold geometry for the peel-off sticker.
@@ -56,31 +57,10 @@ type Props = {
  * those clicks up.
  */
 export function NotFoundStage({ blocks, sticker }: Props) {
-  const numberRef = useRef<HTMLDivElement>(null);
   const stickerRef = useRef<HTMLDivElement>(null);
   /** Imperative handle shared with the button — set once GSAP is wired. */
   const peelApi = useRef<((to?: number) => void) | null>(null);
   const [peeled, setPeeled] = useState(false);
-
-  /* The number decodes itself: 0.8s of digits settling into 404 — the one
-   * scramble on the page, and the only place digits ever churn. */
-  useGSAP(
-    () => {
-      const el = numberRef.current;
-      if (!el) return;
-      gsap.to(el, {
-        duration: 0.8,
-        ease: "none",
-        scrambleText: {
-          text: "404",
-          chars: "0123456789",
-          speed: 0.6,
-          revealDelay: 0.15,
-        },
-      });
-    },
-    { scope: numberRef }
-  );
 
   /* The corner sticker: drag it off (pointer or touch) or activate the
    * corner button. Only clip-path + opacity change — no layout, no
@@ -184,15 +164,19 @@ export function NotFoundStage({ blocks, sticker }: Props) {
   return (
     <main className="flex flex-1 flex-col justify-center px-6 py-24 sm:py-32">
       <div className="mx-auto w-full max-w-[680px]">
-        {/* Decorative — the accessible name of this page is the h1 below. */}
-        <div
-          ref={numberRef}
-          aria-hidden="true"
+        {/* The number pulls itself together out of dots, then comes apart
+            again under the cursor. Decorative — the accessible name of this
+            page is the h1 below — and it degrades to plain type on touch,
+            under reduced motion, and before its JS lands.
+
+            The margin is negative against its own padding: the padding is
+            breathing room for the scatter to happen in, not layout. */}
+        <ParticleLine
+          text="404"
           lang="en"
-          className="font-display text-display leading-none text-fg"
-        >
-          404
-        </div>
+          decorative
+          className="-m-6 p-6 font-display text-display leading-none text-fg"
+        />
 
         {/* One column per language: an unmatched URL can't tell us which one
             the reader wants, so both stay on offer. */}

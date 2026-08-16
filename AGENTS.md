@@ -1,8 +1,67 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
 <!-- END:nextjs-agent-rules -->
+
+# Commands
+
+```bash
+pnpm check        # tsc --noEmit + oxlint — the gate; run before calling work done
+pnpm dev          # dev server
+pnpm build        # prerenders from the DB — DATABASE_URL required, fails loudly without
+pnpm db:generate  # after editing src/db/schema.ts, then:
+pnpm db:migrate
+pnpm db:check     # print what's actually in each table
+pnpm db:export    # write DB back to backup/
+pnpm db:import    # restore from backup/ (upsert by key; save once in /admin after to flush caches)
+```
+
+There is no test suite. `pnpm lint` runs oxlint through vite-plus (`vp lint`);
+this machine's Node and global JS CLIs are managed by `vp`, not npm/nvm.
+
+# Architecture
+
+- **Routing**: public pages live under `src/app/[locale]/` (locales `zh`/`en`,
+  default `zh`, `localePrefix: "always"`). `/admin` sits *outside* the locale
+  tree and is a browser-based editor for all content; admin sessions are
+  jose-signed JWTs.
+- **`src/proxy.ts` is the middleware** (Next 16's name for it). It must handle
+  `/admin` and return *before* the next-intl middleware runs, or `/admin` gets
+  locale-redirected to a route that doesn't exist. Its session check is
+  deliberately optimistic — the real authorization boundary is
+  `requireAdmin()` at the top of every Server Action.
+- **Writes**: every admin write lives in `src/app/admin/actions.ts`, starts
+  with `requireAdmin()`, and ends with `updateTag` — never `revalidateTag`,
+  which would serve the stale copy to the very person who just pressed save.
+- **Database**: Neon Postgres over the HTTP driver (`src/db/index.ts`) — no
+  multi-statement transactions, and the schema is designed so none are needed
+  (tags are array columns, saves are single upserts). Schema in
+  `src/db/schema.ts`, migrations via drizzle-kit.
+- **Animation**: all GSAP plugins are registered once in `src/lib/gsap.ts` —
+  import `gsap` and plugins from there, never from `"gsap"` directly. Eases
+  come from its `EASE` token table; `prefersReducedMotion` gates only the
+  short no-stop-button list documented there. Lenis inertial scrolling shares
+  GSAP's clock (`gsap.ticker` drives `lenis.raf`).
+- **3D**: `/intro` uses @react-three/fiber + drei; the `/about` workbench is
+  imperative three.js.
+- **Design source of truth**: `docs/DESIGN.md` — §5 (工程规则) is required
+  reading before implementation work; `docs/INTRO3D.md` covers the `/intro`
+  scene.
+
+Two scroll gotchas that cost real debugging time (details in README.md):
+
+- `html` must keep `scrollbar-gutter: stable`, or ScrollTrigger pins measured
+  while the intro overlay locks `overflow` leave the page 15px horizontally
+  scrollable.
+- Taking over the wheel locally needs Lenis's own `data-lenis-prevent-wheel`
+  attribute, enabled only while actually captured — `preventDefault()` alone
+  does nothing, because Lenis's window-level listener never checks
+  `defaultPrevented`.
 
 # Content lives in Postgres
 

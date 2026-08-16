@@ -1,0 +1,8 @@
+{
+  "frameCount": 90,
+  "pattern": "frame_%d.jpg",
+  "padding": 4,
+  "fps": 15,
+  "width": 720,
+  "note": "Every 2nd frame of the 30fps/720px capture — halved on purpose; at scrub speed the drop is invisible and the payload stays ~1.2MB."
+}

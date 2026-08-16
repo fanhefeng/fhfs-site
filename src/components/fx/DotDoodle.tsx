@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { GLYPH_GRID, glyphFor } from "@/lib/dotGlyphs";
+import { parseColor, type Rgb } from "@/lib/canvasColor";
 import { prefersReducedMotion } from "@/lib/gsap";
 
 /** Gap between two glyph fields, in grid cells. Tighter than it looks: the
@@ -107,40 +108,6 @@ const smoothstep = (t: number) => t * t * (3 - 2 * t);
 /** The rebound above. May briefly exceed 1 — callers clamp what they use it for. */
 const dampedSettle = (t: number) =>
   t <= 0 ? 0 : t >= 1 ? 1 : 1 - Math.exp(-5.5 * t) * Math.cos(5.2 * t);
-
-type Rgb = [number, number, number];
-
-/**
- * Reads `#rgb`, `#rrggbb` and `rgb()/rgba()` — the two shapes the theme tokens
- * actually take (hex in the stylesheet, `rgb()` once resolved through
- * `getComputedStyle`). Alpha is dropped: every dot carries its own.
- */
-function parseColor(input: string, fallback: Rgb): Rgb {
-  const value = input.trim();
-  if (!value) return fallback;
-
-  if (value.startsWith("#")) {
-    const hex = value.slice(1);
-    if (hex.length === 3) {
-      const n = Number.parseInt(hex, 16);
-      if (Number.isNaN(n)) return fallback;
-      const r = (n >> 8) & 0xf;
-      const g = (n >> 4) & 0xf;
-      const b = n & 0xf;
-      return [r * 17, g * 17, b * 17];
-    }
-    if (hex.length >= 6) {
-      const n = Number.parseInt(hex.slice(0, 6), 16);
-      if (Number.isNaN(n)) return fallback;
-      return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
-    }
-    return fallback;
-  }
-
-  const nums = value.match(/-?\d*\.?\d+/g);
-  if (!nums || nums.length < 3) return fallback;
-  return [Number(nums[0]), Number(nums[1]), Number(nums[2])];
-}
 
 type Palette = { ink: Rgb; accents: Rgb[] };
 

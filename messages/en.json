@@ -8,7 +8,9 @@
     "about": "About",
     "portfolio": "Craft",
     "software": "Software",
-    "intro": "Intro"
+    "lab": "Lab",
+    "intro": "Intro",
+    "resume": "Resume"
   },
   "home": {
     "issueLabel": "The Quiet Issue · 2026",
@@ -29,7 +31,10 @@
     "aboutTitle": "About",
     "aboutLead1": "I'm fhf — from Hejin, Shanxi, now settled in Qingdao.",
     "aboutLead2": "I write code and I write; a small shelf of software has piled up along the way.",
-    "aboutLink": "More about me"
+    "aboutLink": "More about me",
+    "nowTitle": "Recently",
+    "nowBadge": "Now",
+    "contactTitle": "Elsewhere"
   },
   "blog": {
     "title": "Writing",
@@ -84,6 +89,13 @@
     "linkWriting": "Read something",
     "resumeRegion": "Résumé in text — the same content as the 3D scene"
   },
+  "resume": {
+    "title": "Resume",
+    "subtitle": "The formal page: who I am and what I've done.",
+    "experienceTitle": "Work Experience",
+    "locationLabel": "Location",
+    "empty": "The resume is still being put together — check back soon."
+  },
   "portfolio": {
     "kicker": "Gallery · Craft",
     "title": "Craft",
@@ -111,6 +123,52 @@
     "emptyTitle": "Installation in progress",
     "empty": "Installation in progress — this wall fills up soon.",
     "emptyCta": "Browse the software first"
+  },
+  "lab": {
+    "kicker": "Motion lab",
+    "title": "Lab",
+    "subtitle": "Three studies in scroll. Here the scrollbar is not navigation — it is the playhead.",
+    "indexAria": "Motion experiments",
+    "open": "Open",
+    "back": "Back to the lab",
+    "backToIndex": "← Lab",
+    "hint": "Scroll",
+    "reducedMotion": "Your system asks for reduced motion, so this renders its final state directly.",
+    "items": {
+      "scrollVideo": {
+        "name": "Scroll as playhead",
+        "tagline": "GSAP ScrollTrigger + Canvas",
+        "summary": "Not one video tag on the page. Every frame is an image; scroll far enough and it draws that frame.",
+        "note": "A 90-frame sequence with scroll progress mapped to a frame number. Scrolling back just draws backwards — there is no reverse-playback stutter.",
+        "captionOne": "Frames, not playback",
+        "captionOneBody": "Scroll progress becomes a frame number; the canvas only paints that frame.",
+        "captionTwo": "Backwards feels the same",
+        "captionTwoBody": "With no playback timeline, scrolling up simply draws in reverse.",
+        "loading": "Decoding the frame sequence"
+      },
+      "dissolve": {
+        "name": "Dissolve",
+        "tagline": "Three.js shader + ScrollTrigger",
+        "summary": "An image eaten away by a scalar field and a threshold, so the front breaks into organic clumps instead of a straight edge.",
+        "note": "A vertical gradient leads, low-frequency fbm crumbles the edge, high-frequency speckle adds grain. The threshold sweeps the screen as you scroll.",
+        "headline": "An edge is not a line",
+        "body": "The dissolve front is driven by a noise field, so it reads like paper wicking water rather than a curtain being drawn.",
+        "tail": "Scroll back and it grows in again.",
+        "fallback": "No WebGL available here, so this falls back to the static composition."
+      },
+      "meltingText": {
+        "name": "Melting type",
+        "tagline": "SVG filter + per-character stagger",
+        "summary": "Letters congeal into one sticky liquid, then melt down into clean glyphs.",
+        "note": "A gaussian blur bleeds each glyph outward and an alpha threshold pushes anything past 30% opacity back to solid — where two blurred neighbours overlap, they fuse.",
+        "sampleOne": "Melt it",
+        "sampleTwo": "Melting Type",
+        "sampleThree": "Scroll to reveal.",
+        "labelLoad": "On mount",
+        "labelInView": "On enter",
+        "labelScrub": "Tied to scroll"
+      }
+    }
   },
   "software": {
     "kicker": "Software",
