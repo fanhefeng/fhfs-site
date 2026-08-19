@@ -32,6 +32,22 @@ const DESKTOP = "(min-width: 768px)";
 const GLYPH_DURATION = 0.35;
 
 /**
+ * Edge glint geometry. The light parks just *outside* the top rim and rides
+ * low over the surface, and only its x follows the pointer.
+ *
+ * fePointLight has no distance falloff — all a point on the ring gets to
+ * decide by is the angle between the light and its own surface normal. On the
+ * long flat runs that normal tilts straight out of the capsule, so a light
+ * placed inside it (the old y, which tracked the pointer) leaves the top and
+ * bottom edges facing away from their own light: they never lit at all, and
+ * the only thing that ever caught anything was the pair of end caps, whose
+ * normals splay sideways. That is the "two brackets blinking" the effect used
+ * to read as. Lighting from above the edge instead gives one hotspot that
+ * slides along the whole rim, which is the torch the design asks for.
+ */
+const GLINT = { y: -8, z: 14, exponent: 20 } as const;
+
+/**
  * The dynamic-island masthead (after the JoRMPLg pattern): a floating
  * glass-thick capsule, top center. Collapsed it holds only the wordmark and
  * the burger; on desktop a click stretches it open with back.out(2) and the
@@ -214,20 +230,30 @@ export function Header({ links, menuLinks }: Props) {
       mm.add(
         "(hover: hover) and (pointer: fine)",
         () => {
-          const onEnter = () => {
+          // One tween reused for every move, rather than a fresh gsap.to per
+          // pointermove event. quickTo cannot address `attr.x` directly, so it
+          // drives a plain object and writes the attribute on update.
+          const pos = { x: -200 };
+          const xTo = gsap.quickTo(pos, "x", {
+            duration: 0.25,
+            ease: "power2.out",
+            onUpdate: () => light.setAttribute("x", String(pos.x)),
+          });
+          // Event-driven read; fePointLight's x lives in the ring's own user
+          // space, so the island rect maps clientX directly. y stays at
+          // GLINT.y — see the constant.
+          const localX = (e: PointerEvent) =>
+            e.clientX - island.getBoundingClientRect().left;
+
+          const onEnter = (e: PointerEvent) => {
+            // Land lit under the pointer. Easing in from wherever the last
+            // exit left the light is what made the glint swipe across the
+            // capsule on every re-entry.
+            pos.x = localX(e);
+            light.setAttribute("x", String(pos.x));
             gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
           };
-          const onMove = (e: PointerEvent) => {
-            // Event-driven read; fePointLight x/y live in the ring's own
-            // user space, so the island rect maps clientX/Y directly.
-            const r = island.getBoundingClientRect();
-            gsap.to(light, {
-              attr: { x: e.clientX - r.left, y: e.clientY - r.top },
-              duration: 0.25,
-              ease: "power2.out",
-              overwrite: "auto",
-            });
-          };
+          const onMove = (e: PointerEvent) => xTo(localX(e));
           const onLeave = () => {
             gsap.to(ring, { opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" });
           };
@@ -316,10 +342,10 @@ export function Header({ links, menuLinks }: Props) {
         {/* Specular-lighting filter for the edge glint. */}
         <GlintDefs
           id="isl-glint"
-          exponent={36}
+          exponent={GLINT.exponent}
           x={-200}
-          y={-200}
-          z={70}
+          y={GLINT.y}
+          z={GLINT.z}
           lightRef={lightRef}
         />
 
