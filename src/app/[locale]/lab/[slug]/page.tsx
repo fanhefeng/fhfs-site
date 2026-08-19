@@ -9,8 +9,9 @@ import { LAB_ENTRIES, labEntry } from "@/components/lab/entries";
 import { ScrollVideoDemo } from "@/components/lab/ScrollVideoDemo";
 import { DissolveDemo } from "@/components/lab/DissolveDemo";
 import { MeltingTextDemo } from "@/components/lab/MeltingTextDemo";
+import { GroveDemo } from "@/components/lab/GroveDemo";
 
-/** Three fixed studies — the whole set is known at build time. */
+/** A fixed set of studies — the whole list is known at build time. */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -98,6 +99,20 @@ export default async function LabDemoPage({
           labelLoad={t(`${ns}.labelLoad`)}
           labelInView={t(`${ns}.labelInView`)}
           labelScrub={t(`${ns}.labelScrub`)}
+        />
+      )}
+
+      {entry.slug === "grove" && (
+        <GroveDemo
+          accent={entry.accent}
+          hint={t("hint")}
+          headline={t(`${ns}.headline`)}
+          body={t(`${ns}.body`)}
+          tail={t(`${ns}.tail`)}
+          fallbackNote={t(`${ns}.fallback`)}
+          stageScan={t(`${ns}.stageScan`)}
+          stageGrow={t(`${ns}.stageGrow`)}
+          stageSettle={t(`${ns}.stageSettle`)}
         />
       )}
 

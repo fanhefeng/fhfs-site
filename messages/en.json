@@ -127,7 +127,7 @@
   "lab": {
     "kicker": "Motion lab",
     "title": "Lab",
-    "subtitle": "Three studies in scroll. Here the scrollbar is not navigation — it is the playhead.",
+    "subtitle": "Four studies in scroll. Here the scrollbar is not navigation — it is the playhead.",
     "indexAria": "Motion experiments",
     "open": "Open",
     "back": "Back to the lab",
@@ -167,6 +167,19 @@
         "labelLoad": "On mount",
         "labelInView": "On enter",
         "labelScrub": "Tied to scroll"
+      },
+      "grove": {
+        "name": "Grown, not modelled",
+        "tagline": "Three.js instancing + procedural geometry",
+        "summary": "A moss-covered root with no model file behind it: swept tubes, a cushion that follows the light, ferns and flower sprays, and nearly two hundred thousand instanced blades.",
+        "note": "Nothing in the scene runs on a clock. How far the survey front has travelled, how brightly the cage rides it, how long the moss has grown, when the flowers open and where the butterfly is are all pure functions of scroll position — which is also why a parked scene costs nothing at all. The one live input is the pointer, and it is positional rather than temporal: it parts the fur where it passes, and costs not a single frame once the hand is still.",
+        "headline": "It is grown, not drawn",
+        "body": "One seed settles the whole landscape: where the root bends, which flank the moss takes, which hollow a fern comes up in, where every single blade stands. Reload and it grows back identical.",
+        "tail": "Run the pointer through the moss. Scroll back and it un-grows.",
+        "fallback": "No WebGL available here, so this falls back to the static composition.",
+        "stageScan": "01 · Survey",
+        "stageGrow": "02 · Growth",
+        "stageSettle": "03 · Settle"
       }
     }
   },
