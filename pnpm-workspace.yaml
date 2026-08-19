@@ -1,3 +1,14 @@
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# Every dependency with an install script has to get a verdict here, or pnpm 11
+# fails the install outright (ERR_PNPM_IGNORED_BUILDS) instead of warning. It
+# never came up locally because this machine's global pnpm config carries
+# `dangerouslyAllowAllBuilds: true`; CI has no such config, so the deploy is
+# where it surfaces. `allowBuilds` replaces pnpm 10's onlyBuiltDependencies /
+# ignoredBuiltDependencies pair — pnpm 11 ignores those two keys.
+allowBuilds:
+  # Native binaries these ship as optional deps; their scripts just wire them up.
+  "@parcel/watcher": true
+  "@swc/core": true
+  esbuild: true
+  # Unused here — nothing needs their postinstall to run.
+  sharp: false
+  unrs-resolver: false
