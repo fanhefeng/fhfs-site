@@ -12,7 +12,7 @@ export const generateMetadata = sectionMetadata("grove", "/grove");
 /* Four glyphs for the dock, drawn rather than imported: at 14u they are a
    dozen path commands each, and a sprite sheet for that is a request. */
 const GLYPHS: Record<string, React.ReactNode> = {
-  home: (
+  grove: (
     <svg viewBox="0 0 16 16">
       <path d="M8 14V9" />
       <path d="M8 9c0-2.4 1.7-4.3 4-4.3.2 2.6-1.6 4.6-4 4.3Z" />
@@ -58,8 +58,10 @@ export default async function GrovePage({ params }: PageProps<"/[locale]/grove">
   const [posts, apps] = await Promise.all([getPosts(locale), getApps()]);
   const latest = posts[0];
 
+  /* The dock says where you are, so this page is in it and marked. The mark
+     tile is the way back to the site proper, exactly as the logo is. */
   const items: DockItem[] = [
-    { href: "/", label: nav("home"), glyph: GLYPHS.home, active: true },
+    { href: "/grove", label: nav("grove"), glyph: GLYPHS.grove, active: true },
     { href: "/blog", label: nav("blog"), glyph: GLYPHS.writing },
     { href: "/software", label: nav("software"), glyph: GLYPHS.software },
     { href: "/lab", label: nav("lab"), glyph: GLYPHS.lab },

@@ -911,6 +911,17 @@
       "sort": 0
     },
     {
+      "href": "/grove",
+      "labelKey": "grove",
+      "surfaces": [
+        "header",
+        "footer",
+        "fullnav",
+        "sitemap"
+      ],
+      "sort": 1
+    },
+    {
       "href": "/blog",
       "labelKey": "blog",
       "surfaces": [
@@ -919,7 +930,7 @@
         "fullnav",
         "sitemap"
       ],
-      "sort": 1
+      "sort": 2
     },
     {
       "href": "/about",
@@ -930,7 +941,7 @@
         "fullnav",
         "sitemap"
       ],
-      "sort": 2
+      "sort": 3
     },
     {
       "href": "/intro",
@@ -938,7 +949,7 @@
       "surfaces": [
         "sitemap"
       ],
-      "sort": 3
+      "sort": 4
     },
     {
       "href": "/portfolio",
@@ -949,7 +960,7 @@
         "fullnav",
         "sitemap"
       ],
-      "sort": 4
+      "sort": 5
     },
     {
       "href": "/software",
@@ -960,7 +971,7 @@
         "fullnav",
         "sitemap"
       ],
-      "sort": 5
+      "sort": 6
     },
     {
       "href": "/lab",
@@ -970,7 +981,7 @@
         "fullnav",
         "sitemap"
       ],
-      "sort": 6
+      "sort": 7
     },
     {
       "href": "/resume",
@@ -981,7 +992,7 @@
         "fullnav",
         "sitemap"
       ],
-      "sort": 7
+      "sort": 8
     }
   ],
   "copyBlocks": [
