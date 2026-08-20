@@ -197,6 +197,31 @@
       }
     }
   },
+  "grove": {
+    "title": "Grove",
+    "subtitle": "A full screen of procedurally grown moss, and a few lines standing in front of it.",
+    "ghost": "FHF",
+    "headline1": "Notes, software,",
+    "headline2": "and a light left on.",
+    "lede": "From Hejin in Shanxi, now settled in Qingdao. I write code and I write; a small shelf of software has piled up along the way.",
+    "cta": "See the work",
+    "play": "Come closer",
+    "statPosts": "Written",
+    "statPostsValue": "{count, plural, one {# piece} other {# pieces}}",
+    "statApps": "Software",
+    "statAppsValue": "{count, plural, one {# app} other {# apps}}",
+    "cardLabLabel": "Motion lab",
+    "cardLabTitle": "Grown, not modelled.",
+    "cardLabAlt": "A still of the moss root this page renders for itself",
+    "cardLabLink": "Open: grown, not modelled",
+    "cardPostLabel": "Recently",
+    "cardPostFallback": "Nothing written yet",
+    "cardPostAlt": "A dirt track running through a pine forest",
+    "cardPostLink": "Read this",
+    "scroll": "Discover",
+    "dockAria": "Primary",
+    "markLabel": "fhf — home"
+  },
   "software": {
     "kicker": "Software",
     "title": "Software",

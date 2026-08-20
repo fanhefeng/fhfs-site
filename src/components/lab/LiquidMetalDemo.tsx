@@ -19,7 +19,7 @@ import {
   DISTURB,
   RIPPLE_LIFE,
   RIPPLE_SLOTS,
-} from "@/lib/lab/liquidMetal";
+} from "@/lib/grove/liquidMetal";
 
 type Props = {
   accent: string;

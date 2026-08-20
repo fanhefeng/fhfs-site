@@ -197,6 +197,31 @@
       }
     }
   },
+  "grove": {
+    "title": "林间",
+    "subtitle": "一整屏程序化生成的苔藓树根，和站在它前面的几行字。",
+    "ghost": "FHF",
+    "headline1": "写字，做软件，",
+    "headline2": "留一盏亮着的灯。",
+    "lede": "从山西河津出发，如今在青岛。写代码，也写字，慢慢攒下一架子小软件。",
+    "cta": "去看作品",
+    "play": "走近这张脸",
+    "statPosts": "写下的",
+    "statPostsValue": "{count} 篇",
+    "statApps": "自研软件",
+    "statAppsValue": "{count} 个",
+    "cardLabLabel": "动效实验室",
+    "cardLabTitle": "长出来的，不是建模的。",
+    "cardLabAlt": "这一页自己渲染的苔藓树根静帧",
+    "cardLabLink": "打开：长出来的，不是建模的",
+    "cardPostLabel": "最近写的",
+    "cardPostFallback": "还没有文章",
+    "cardPostAlt": "一条穿过针叶林的土路",
+    "cardPostLink": "读这篇",
+    "scroll": "Discover",
+    "dockAria": "主导航",
+    "markLabel": "fhf — 回首页"
+  },
   "software": {
     "kicker": "自研软件",
     "title": "软件",
