@@ -127,7 +127,7 @@
   "lab": {
     "kicker": "Motion lab",
     "title": "Lab",
-    "subtitle": "Four studies in scroll. Here the scrollbar is not navigation — it is the playhead.",
+    "subtitle": "Five studies in scroll. Here the scrollbar is not navigation — it is the playhead.",
     "indexAria": "Motion experiments",
     "open": "Open",
     "back": "Back to the lab",
@@ -180,6 +180,20 @@
         "stageScan": "01 · Survey",
         "stageGrow": "02 · Growth",
         "stageSettle": "03 · Settle"
+      },
+      "liquidMetal": {
+        "name": "A button, computed all the way down",
+        "tagline": "A WebGL2 dispersion shader in five passes",
+        "summary": "No gradient, no texture, no image behind it. A scalar field is painted through a soft plateau, sampled at a slightly different height for every wavelength — which is where the rainbow edge comes from.",
+        "note": "Here the scrollbar is not a timeline but a way through the pipeline: act one is the bare dispersion field, razor-etched; act two pours the softening blur over it and lights the travelling rim; act three adds the bloom and the contrast curve that put the metal back. The button stays live the whole way down — hover it, hold it, tab to it. The clock only turns while you are touching it, or while it is still settling.",
+        "headline": "Solved, not drawn",
+        "body": "Fringe width falls out as dispersion over the magnitude of the field's gradient. So one shader gives razor-thin rainbow lines where the field is pinched, and broad navy-to-cyan washes where it is not.",
+        "tail": "Hold it down. Watch the crease run round the rim as you let go.",
+        "fallback": "No WebGL2 available here, so this falls back to the button alone.",
+        "label": "Hold it down",
+        "stageField": "01 · Field",
+        "stageMolten": "02 · Molten",
+        "stageBloom": "03 · Bloom"
       }
     }
   },
