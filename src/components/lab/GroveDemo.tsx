@@ -575,6 +575,49 @@ void main(){
 }
 `;
 
+/**
+ * The trail the pointer lifts off the moss.
+ *
+ * Each grain carries its own origin, velocity and birth stamp, so the CPU only
+ * writes when one is respawned out of the ring — the flight itself is
+ * integrated here, the same way the ambient pollen is. Which also means the
+ * whole emitter costs one uniform write per frame however many grains are up.
+ */
+const SPRAY_VERT = /* glsl */ `
+attribute vec3 aVel;
+attribute float aBirth;
+attribute vec2 aRnd;
+uniform float uNow, uSize, uScale, uLife;
+varying float vA;
+void main(){
+  float age = uNow - aBirth;
+  if (age < 0.0 || age > uLife) {
+    vA = 0.0;
+    gl_PointSize = 0.0;
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);   // off the clip volume entirely
+    return;
+  }
+  float u = age / uLife;
+  /* drag on the launch velocity, a slow lift, and a little wander */
+  vec3 p = position + aVel * age * (1.0 - 0.34 * u)
+         + vec3(sin(aRnd.y * 6.28 + age * 2.6) * 0.115 * u, 0.245 * age, 0.0);
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  gl_PointSize = uSize * aRnd.x * (uScale / max(-mv.z, 0.001)) * (0.45 + 0.55 * (1.0 - u));
+  vA = smoothstep(0.0, 0.09, u) * (1.0 - smoothstep(0.40, 1.0, u));
+  gl_Position = projectionMatrix * mv;
+}
+`;
+
+const SPRAY_FRAG = /* glsl */ `
+precision highp float;
+uniform sampler2D uMap;
+varying float vA;
+void main(){
+  vec4 t = texture2D(uMap, gl_PointCoord);
+  gl_FragColor = vec4(t.rgb, t.a * vA * 0.85);
+}
+`;
+
 /* ────────────────────────────────────────────────────────────────────────
    butterfly
    ──────────────────────────────────────────────────────────────────────── */
@@ -617,12 +660,15 @@ void main(){
      chartreuse square on, deep green at a glance. That swing is what reads as
      diffraction rather than as paint.
 
-     Kept well under 1. Running the albedo past 1 as HDR into ACES belongs to
-     a sunset; against this forest floor the same numbers clip straight to a
-     flat chartreuse and the green never arrives. */
+     Kept well under 1, and lower again than the study this came from. That
+     one framed the animal at a few dozen pixels, where a clipped wing still
+     reads as a wing; here the camera ends up close enough that the whole
+     pattern is on show, and at the brighter albedo the border, the veins and
+     the lunules all clip to the same flat chartreuse — a bow tie rather than
+     a butterfly. Leaving ACES the headroom is what lets them arrive. */
   float facing = abs(dot(N, V));
-  vec3 face = vec3(0.330, 0.560, 0.042);
-  vec3 edge = vec3(0.062, 0.190, 0.014);
+  vec3 face = vec3(0.150, 0.255, 0.019);
+  vec3 edge = vec3(0.028, 0.086, 0.006);
   vec3 wing = mix(edge, face, pow(facing, 0.65));
   wing *= 0.62 + 0.72 * smoothstep(0.02, 0.46, s) * (1.0 - 0.34 * smoothstep(0.45, 1.0, u));
 
@@ -1290,18 +1336,20 @@ export function GroveDemo({
       });
       scene.add(nearBuilt.group);
 
-      /* The ridge is washed into lit air rather than into the backdrop, and
-         the tone it goes to is deliberately a couple of stops *brighter* than
-         the CSS behind it: mixing distance toward the background colour is
-         how a far object turns into a hole in the picture, and mixing it
-         toward lit haze is how it turns into something a long way off.
-         The darks lift here too, which they must not do on the near root —
-         at that range it is what air actually does. */
+      /* The ridge is washed into lit air rather than into the backdrop: mixing
+         distance toward the background colour is how a far object turns into a
+         hole in the picture, and mixing it toward lit haze is how it turns
+         into something a long way off. The darks lift here too, which they must
+         not do on the near root — at that range it is what air actually does. */
       const farBuilt = assemble(far, {
-        hazeCol: [0.052, 0.062, 0.044],
-        haze: 0.18,
-        fog: 0.46,
-        hazeLift: 0.85,
+        // A shade under the tone the reference washes its ridge to. That page
+        // sits the ridge inside a light pool with cards over it; here it is
+        // bare against the stage, and at the reference's value it comes
+        // forward as a pale mound instead of receding.
+        hazeCol: [0.088, 0.098, 0.072],
+        haze: 0.16,
+        fog: 0.26,
+        hazeLift: 0.9,
         boxH: far.boxH,
         mouseR: 0.001,
         // Both ends gone well before the tube's own caps, over a long feather.
@@ -1376,6 +1424,74 @@ export function GroveDemo({
       scene.add(moteField);
       geometries.push(moteGeo);
       materials.push(moteMat);
+
+      /* ---- the pointer's pollen trail ---- */
+      const SPRAY_N = 620;
+      const SPRAY_LIFE = 1.6;
+      const sprayPos = new Float32Array(SPRAY_N * 3);
+      const sprayVel = new Float32Array(SPRAY_N * 3);
+      const sprayBirth = new Float32Array(SPRAY_N).fill(-999);
+      const sprayRnd = new Float32Array(SPRAY_N * 2);
+      const sprayGeo = new THREE.BufferGeometry();
+      sprayGeo.setAttribute("position", new THREE.BufferAttribute(sprayPos, 3));
+      sprayGeo.setAttribute("aVel", new THREE.BufferAttribute(sprayVel, 3));
+      sprayGeo.setAttribute("aBirth", new THREE.BufferAttribute(sprayBirth, 1));
+      sprayGeo.setAttribute("aRnd", new THREE.BufferAttribute(sprayRnd, 2));
+      const sprayUniforms = {
+        uNow: { value: 0 },
+        uMap: { value: moteMap },
+        uSize: { value: 0.075 },
+        uScale: moteUniforms.uScale,
+        uLife: { value: SPRAY_LIFE },
+      };
+      const sprayMat = new THREE.ShaderMaterial({
+        uniforms: sprayUniforms,
+        vertexShader: SPRAY_VERT,
+        fragmentShader: SPRAY_FRAG,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending,
+      });
+      const sprayField = new THREE.Points(sprayGeo, sprayMat);
+      sprayField.frustumCulled = false;
+      sprayField.renderOrder = 7;
+      scene.add(sprayField);
+      geometries.push(sprayGeo);
+      materials.push(sprayMat);
+
+      let sprayHead = 0;
+      let sprayDirty = false;
+      /** The live clock. It only advances while something is actually alive. */
+      let now = 0;
+      let lastBirth = -999;
+
+      const spawnGrain = (p: THREE.Vector3) => {
+        const i = sprayHead;
+        sprayHead = (sprayHead + 1) % SPRAY_N;
+        const o = i * 3;
+        sprayPos[o] = p.x + (Math.random() - 0.5) * 0.16;
+        sprayPos[o + 1] = p.y + (Math.random() - 0.5) * 0.16;
+        sprayPos[o + 2] = p.z + (Math.random() - 0.5) * 0.48;
+        sprayVel[o] = (Math.random() - 0.5) * 0.4;
+        sprayVel[o + 1] = 0.012 + Math.random() * 0.33;
+        sprayVel[o + 2] = (Math.random() - 0.5) * 0.28;
+        sprayBirth[i] = now;
+        sprayRnd[i * 2] = 0.5 + Math.random() * 0.65;
+        sprayRnd[i * 2 + 1] = Math.random();
+        sprayDirty = true;
+        lastBirth = now;
+      };
+
+      const flushGrains = () => {
+        if (!sprayDirty) return;
+        const at = sprayGeo.attributes;
+        at.position.needsUpdate = true;
+        at.aVel.needsUpdate = true;
+        at.aBirth.needsUpdate = true;
+        at.aRnd.needsUpdate = true;
+        sprayDirty = false;
+      };
 
       /* ---- butterfly ---- */
       const wingMap = wingTexture();
@@ -1458,7 +1574,7 @@ export function GroveDemo({
         butterfly.add(club);
       }
 
-      butterfly.scale.setScalar(0.3);
+      butterfly.scale.setScalar(0.21);
       butterfly.renderOrder = 5;
       butterfly.traverse((o) => {
         o.frustumCulled = false;
@@ -1490,7 +1606,7 @@ export function GroveDemo({
         farBuilt.group.scale.setScalar(FAR_SCALE);
         farBuilt.group.position.set(
           -FAR_MID_X * FAR_SCALE,
-          -0.42 * halfH - FAR_TOP * FAR_SCALE,
+          -0.58 * halfH - FAR_TOP * FAR_SCALE,
           -FAR_DEPTH
         );
         // The front has to sweep the ridge as well as the root in front of it,
@@ -1518,7 +1634,37 @@ export function GroveDemo({
       };
       resize();
 
-      const target = new THREE.Vector3(0, -0.3, 0);
+      /* ---- pointer state ----
+         Declared up here because `apply` reads it, and `apply` runs once
+         before any of the listeners below are attached. */
+      const raycaster = new THREE.Raycaster();
+      const crownPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const ndc = new THREE.Vector2();
+      const hitWorld = new THREE.Vector3();
+      const escape = new THREE.Vector3();
+      const toBug = new THREE.Vector3();
+      const AWAY = new THREE.Vector3(9999, 9999, 9999);
+      const mouseTarget = new THREE.Vector3().copy(AWAY);
+      const mouseNow = nearBuilt.uniforms.uMouse.value;
+      let hovering = false;
+
+      /* The pointer's other two jobs, both eased on the live clock: the whole
+         composition leans with it, and the butterfly is wary of it. */
+      const par = new THREE.Vector2();
+      const parTarget = new THREE.Vector2();
+      let spook = 0;
+      let spookTarget = 0;
+      /** Stamped on the live clock, so a sleeping loop still wakes on a move. */
+      let lastMove = 0;
+
+      /* Act one frames the whole root, because a survey of a form you cannot
+         see the ends of is not a survey. Act three ends at roughly the crop
+         the reference holds throughout — close enough that the fur resolves
+         into single blades, which is the only framing at which planting a
+         hundred and seventy thousand of them means anything. */
+      const WIDE = new THREE.Vector3(0, -0.3, 0);
+      const CLOSE = near.perch.clone().add(new THREE.Vector3(0.55, -0.5, 0));
+      const target = new THREE.Vector3();
       const approach = new THREE.Vector3();
       const flightPos = new THREE.Vector3();
       const flightPrev = new THREE.Vector3();
@@ -1586,13 +1732,23 @@ export function GroveDemo({
           copyRef.current.style.opacity = fade.toFixed(3);
         }
         const dolly = THREE.MathUtils.smoothstep(clamped, 0.5, 1);
-        const dist = THREE.MathUtils.lerp(fitDistance(1.18), fitDistance(0.9), dolly);
+        target.lerpVectors(WIDE, CLOSE, dolly);
+        const dist = THREE.MathUtils.lerp(fitDistance(1.05), fitDistance(0.36), dolly);
+        /* Parallax. The offsets are fractions of the camera's own distance
+           rather than fixed world units, so the lean is the same on screen at
+           the wide framing and at the close one — at a constant offset it
+           barely registers across the frame at the start and swings the whole
+           picture by the end. */
+        const px = -par.x * dist * 0.0186;
+        const py = par.y * dist * 0.0114;
         camera.position.set(
-          Math.sin(-0.24 * dolly) * dist,
-          target.y + 0.9 + 1.1 * dolly,
+          Math.sin(-0.24 * dolly) * dist + px,
+          target.y + 0.9 + 0.5 * dolly + py,
           Math.cos(-0.24 * dolly) * dist
         );
-        camera.lookAt(target.x, target.y + 0.5 * dolly, target.z);
+        camera.lookAt(target.x + px * 0.42, target.y + 0.28 * dolly + py * 0.42, target.z);
+        nearBuilt.group.rotation.set(par.y * 0.026, par.x * 0.055, 0);
+        farBuilt.group.rotation.y = par.x * 0.03;
 
         const land = THREE.MathUtils.smoothstep(clamped, 0.6, 0.97);
         butterfly.visible = land > 0.001;
@@ -1617,39 +1773,55 @@ export function GroveDemo({
           const settle = THREE.MathUtils.smoothstep(land, 0.78, 1);
           butterfly.quaternion.copy(flightQ).slerp(landQ, settle);
 
-          // Wings beat hard on the way in and settle to a slow display once
-          // the feet are down.
-          const flap = clamped * 150;
+          /* A perched insect will not stay put. Once the feet are down the
+             pointer can spook it: it leans away from the hand, lifts, and beats
+             harder — and it does that on the live clock rather than on the
+             scrollbar, because an animal that only reacts while you are
+             scrolling is not reacting to you at all. */
+          if (spook > 0.002 && mouseNow.x < 999) {
+            escape.set(butterfly.position.x - mouseNow.x, 0, butterfly.position.z - mouseNow.z);
+            if (escape.lengthSq() < 1e-6) escape.set(1, 0, 0);
+            escape.normalize();
+            butterfly.position.addScaledVector(escape, spook * settle * 0.5);
+            butterfly.position.y += spook * settle * 0.34;
+          }
+
+          // Wings beat hard on the way in, settle to a slow display once the
+          // feet are down, and flare open as the hand closes in.
+          const flap = clamped * 150 + now * (1.7 + 46 * spook) * settle;
           const raw = Math.sin(flap);
           const shaped = Math.sign(raw) * Math.pow(Math.abs(raw), 0.72);
-          const phi =
-            THREE.MathUtils.lerp(20 + 48 * shaped, 15 + 7 * shaped, settle) * THREE.MathUtils.DEG2RAD;
+          const flyPhi = 20 + 48 * shaped;
+          const restPhi = 15 + 7 * shaped + spook * 30;
+          const phi = THREE.MathUtils.lerp(flyPhi, restPhi, settle) * THREE.MathUtils.DEG2RAD;
           foreR.rotation.z = phi;
           foreL.rotation.z = -phi;
           hindR.rotation.z = phi * 0.95 - 0.03;
           hindL.rotation.z = -(phi * 0.95 - 0.03);
-          const flapVel = Math.cos(flap) * 8.6 * (1 - 0.9 * settle);
+          const flapVel = Math.cos(flap) * 8.6 * (1 - 0.9 * settle * (1 - spook));
           bendFore.value = -flapVel * 0.01;
           bendHind.value = -flapVel * 0.013;
 
-          butterfly.position.y += Math.sin(flap - 0.9) * 0.022 * (1 - settle);
-          butterfly.scale.setScalar(0.3 * (0.78 + 0.22 * land));
+          butterfly.position.y += Math.sin(flap - 0.9) * 0.022 * (1 - settle * (1 - spook));
+          butterfly.scale.setScalar(0.21 * (0.78 + 0.22 * land));
         }
       };
       applyRef.current = apply;
       apply(phase.current.value);
 
       /* ---- the pointer parts the moss ----
-         Positional, not temporal: a move costs one frame, a still hand costs
-         nothing, and the settle below converges and then stops rather than
-         idling (DESIGN.md §5.3). */
-      const raycaster = new THREE.Raycaster();
-      const crownPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-      const ndc = new THREE.Vector2();
-      const hit = new THREE.Vector3();
-      const AWAY = new THREE.Vector3(9999, 9999, 9999);
-      const mouseTarget = new THREE.Vector3().copy(AWAY);
-      const mouseNow = nearBuilt.uniforms.uMouse.value;
+         The influence point is carried in the near root's LOCAL space, because
+         that is the space the blades are planted in — and the group now leans
+         with the parallax, so the world hit has to be pushed back through that
+         transform every frame rather than copied once. */
+      const toLocalMouse = () => {
+        if (!hovering) {
+          mouseTarget.copy(AWAY);
+          return;
+        }
+        mouseTarget.copy(hitWorld);
+        nearBuilt.group.worldToLocal(mouseTarget);
+      };
 
       const settleMouse = () => {
         if (mouseTarget.x > 999) {
@@ -1669,16 +1841,62 @@ export function GroveDemo({
         return true;
       };
 
+      /* Emission by DISTANCE rather than by time, spread along the segment the
+         pointer covered since the last frame: a fast sweep lays a trail instead
+         of stacking a clump wherever the cursor happened to land, and a hand
+         that has stopped trickles instead of pumping. */
+      const sprayLast = new THREE.Vector3(9999, 0, 0);
+      const sprayStep = new THREE.Vector3();
+      let sprayIdle = 0;
+
+      const emitSpray = (dt: number, moving: boolean) => {
+        // The trickle is for a pointer creeping too slowly to trip the distance
+        // test, not for one that has been put down. Letting a parked cursor go
+        // on shedding a grain every 55ms keeps the live layer awake for ever —
+        // which is exactly the cost this study is built to avoid.
+        if (!hovering || mouseTarget.x > 999 || !moving) {
+          sprayLast.x = 9999; // re-entering should not lay a streak across the frame
+          return;
+        }
+        if (sprayLast.x > 9000) {
+          sprayLast.copy(mouseTarget);
+          return;
+        }
+        const n = Math.min(14, Math.floor(mouseTarget.distanceTo(sprayLast) / 0.037));
+        for (let k = 1; k <= n; k++) {
+          sprayStep.lerpVectors(sprayLast, mouseTarget, k / n);
+          spawnGrain(sprayStep);
+        }
+        if (n > 0) {
+          sprayLast.copy(mouseTarget);
+          sprayIdle = 0;
+        } else {
+          sprayIdle += dt;
+          if (sprayIdle > 0.055) {
+            spawnGrain(mouseTarget);
+            sprayIdle = 0;
+          }
+        }
+        flushGrains();
+      };
+
       const onPointerMove = (e: PointerEvent) => {
+        if (e.pointerType === "touch") return;
         const r = canvas.getBoundingClientRect();
         ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        parTarget.set(ndc.x, -ndc.y);
+        camera.updateMatrixWorld();
         raycaster.setFromCamera(ndc, camera);
-        if (raycaster.ray.intersectPlane(crownPlane, hit)) mouseTarget.copy(hit);
-        else mouseTarget.copy(AWAY);
+        hovering = !!raycaster.ray.intersectPlane(crownPlane, hitWorld);
+        toLocalMouse();
+        lastMove = now;
         dirtyRef.current = true;
       };
       const onPointerLeave = () => {
+        hovering = false;
+        parTarget.set(0, 0);
         mouseTarget.copy(AWAY);
+        lastMove = now;
         dirtyRef.current = true;
       };
       canvas.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -1698,10 +1916,77 @@ export function GroveDemo({
       };
       document.addEventListener("visibilitychange", onVisibility);
 
-      // One clock for the whole site: gsap.ticker already drives Lenis, and a
-      // second rAF loop here would fight it for frames.
-      const tick = () => {
+      /* One clock for the whole site: gsap.ticker already drives Lenis, and a
+         second rAF loop here would fight it for frames.
+
+         The live layer — parallax, the pollen trail, the butterfly's nerve —
+         runs only while there is something left for it to do: a hand over the
+         stage, grains still in the air, a lean still easing home, or a startled
+         insect still calming down. Every one of those is finite, so the loop
+         drains itself and the scene goes back to costing nothing, which is the
+         standing rule for the canvas layers here (DESIGN.md §5.3). What it is
+         not is a scene idling at 60fps to sway grass nobody is looking at. */
+      const tick = (_time: number, deltaMs: number) => {
         if (disposed || !visible) return;
+        const dt = Math.min(deltaMs / 1000, 0.05);
+
+        /* Liveness is about what is still CHANGING, not about where the hand
+           happens to be resting. Keying it on hover instead looks identical and
+           costs a permanent 60fps for as long as a motionless cursor sits over
+           the stage — measured, and the reason this reads the way it does.
+           Every term here is finite: grains expire, the lean reaches its target,
+           the startle eases out, and the grace window closes. */
+        const grainsAlive = now < lastBirth + SPRAY_LIFE;
+        const leaning = Math.abs(par.x - parTarget.x) > 2e-4 || Math.abs(par.y - parTarget.y) > 2e-4;
+        const startling = Math.abs(spook - spookTarget) > 1e-3;
+        const justMoved = now - lastMove < 0.25;
+        if (grainsAlive || leaning || startling || justMoved) {
+          now += dt;
+          sprayUniforms.uNow.value = now;
+
+          // Frame-rate independent easing, so the lean lands the same on a
+          // 60Hz panel and a 144Hz one.
+          const k = 1 - Math.pow(0.04, dt);
+          par.x += (parTarget.x - par.x) * k;
+          par.y += (parTarget.y - par.y) * k;
+          // Geometric easing approaches but never arrives; snap inside the
+          // threshold the liveness test uses, or the loop has no last frame.
+          if (Math.abs(par.x - parTarget.x) <= 2e-4) par.x = parTarget.x;
+          if (Math.abs(par.y - parTarget.y) <= 2e-4) par.y = parTarget.y;
+
+          // The parallax moves the group, so the influence point has to be
+          // re-derived before anything reads it.
+          toLocalMouse();
+          emitSpray(dt, justMoved);
+
+          /* How close is the hand, and from where. z is weighted down because
+             the pointer is resolved on one plane and the butterfly is not on
+             it; what matters is whether the cursor is over the animal on
+             screen. Snaps on, lets go slowly — a startled insect does not calm
+             instantly. */
+          spookTarget = 0;
+          if (hovering && mouseNow.x < 999 && butterfly.visible) {
+            /* Measured against where the flight path PUTS it, not against
+               where the startle has already pushed it to. Reading the
+               displaced position feeds the offset back into its own input: the
+               animal shies away, is therefore further from the hand, relaxes,
+               drifts back, and shies again — a loop with no fixed point, which
+               also means the live layer never gets a last frame. */
+            toBug.set(
+              mouseNow.x - flightPos.x,
+              mouseNow.y - flightPos.y,
+              (mouseNow.z - flightPos.z) * 0.3
+            );
+            spookTarget = Math.min(1, Math.max(0, 1 - toBug.length() / 0.62));
+            spookTarget *= spookTarget;
+          }
+          spook += (spookTarget - spook) * (1 - Math.pow(spookTarget > spook ? 1e-7 : 0.22, dt));
+          if (Math.abs(spook - spookTarget) < 1e-3) spook = spookTarget;
+
+          apply(phase.current.value);
+          dirtyRef.current = true;
+        }
+
         if (settleMouse()) dirtyRef.current = true;
         if (!dirtyRef.current) return;
         dirtyRef.current = false;
@@ -1842,8 +2127,16 @@ const CSS = `
   height: 100svh;
   overflow: hidden;
   border-block: 1px solid var(--line);
-  /* Also the backdrop when WebGL is unavailable, so the copy stays legible. */
-  background: #2c3129;
+  /* Also the backdrop when WebGL is unavailable, so the copy stays legible.
+     A mid grey-green rather than the near-black this started on: every colour
+     in these shaders was solved against lit forest air, and dropping that air
+     onto a dark stage takes the moss with it — the greens lose their hue and
+     the whole render silts up into one murky mid-tone. The two pools are the
+     light on the floor and the shade in the far corner. */
+  background:
+    radial-gradient(64% 52% at 27% 84%, rgba(232, 238, 222, 0.086) 0%, rgba(232, 238, 222, 0) 72%),
+    radial-gradient(70% 60% at 92% 8%, rgba(24, 28, 20, 0.1) 0%, rgba(24, 28, 20, 0) 68%),
+    #4a4d44;
 }
 .gv-canvas { display: block; width: 100%; height: 100%; }
 .gv-canvas[data-degraded] { visibility: hidden; }
