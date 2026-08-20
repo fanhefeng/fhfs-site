@@ -10,6 +10,7 @@ import { ScrollVideoDemo } from "@/components/lab/ScrollVideoDemo";
 import { DissolveDemo } from "@/components/lab/DissolveDemo";
 import { MeltingTextDemo } from "@/components/lab/MeltingTextDemo";
 import { GroveDemo } from "@/components/lab/GroveDemo";
+import { LiquidMetalDemo } from "@/components/lab/LiquidMetalDemo";
 
 /** A fixed set of studies — the whole list is known at build time. */
 export const dynamicParams = false;
@@ -113,6 +114,21 @@ export default async function LabDemoPage({
           stageScan={t(`${ns}.stageScan`)}
           stageGrow={t(`${ns}.stageGrow`)}
           stageSettle={t(`${ns}.stageSettle`)}
+        />
+      )}
+
+      {entry.slug === "liquid-metal" && (
+        <LiquidMetalDemo
+          accent={entry.accent}
+          hint={t("hint")}
+          headline={t(`${ns}.headline`)}
+          body={t(`${ns}.body`)}
+          tail={t(`${ns}.tail`)}
+          fallbackNote={t(`${ns}.fallback`)}
+          label={t(`${ns}.label`)}
+          stageField={t(`${ns}.stageField`)}
+          stageMolten={t(`${ns}.stageMolten`)}
+          stageBloom={t(`${ns}.stageBloom`)}
         />
       )}
 
