@@ -417,20 +417,20 @@ body:has(.gh-hero) { overflow-x: hidden; }
    clip-path. Once the intro has run the clip is dropped entirely — a live
    clip-path opens a stacking context, which would trap the floating knob under
    the moss. */
-[data-grove-js] .gh-hero .mask { clip-path: inset(100% 0 0 0 round var(--mr, 0px)); }
-[data-grove-js] .gh-hero[data-ready] .mask { clip-path: inset(0 0 0 0 round var(--mr, 0px)); transition: clip-path 1.05s var(--gh-ease-out) var(--d, 0ms); }
-[data-grove-js] .gh-hero .mask-circle { clip-path: circle(0% at 50% 50%); }
-[data-grove-js] .gh-hero[data-ready] .mask-circle { clip-path: circle(76% at 50% 50%); transition: clip-path 1.1s var(--gh-ease-out) var(--d, 0ms); }
-[data-grove-js] .gh-hero .fade { opacity: 0; }
-[data-grove-js] .gh-hero[data-ready] .fade { opacity: 1; transition: opacity 1.3s var(--gh-ease) var(--d, 0ms); }
+[data-js] .gh-hero .mask { clip-path: inset(100% 0 0 0 round var(--mr, 0px)); }
+[data-js] .gh-hero[data-ready] .mask { clip-path: inset(0 0 0 0 round var(--mr, 0px)); transition: clip-path 1.05s var(--gh-ease-out) var(--d, 0ms); }
+[data-js] .gh-hero .mask-circle { clip-path: circle(0% at 50% 50%); }
+[data-js] .gh-hero[data-ready] .mask-circle { clip-path: circle(76% at 50% 50%); transition: clip-path 1.1s var(--gh-ease-out) var(--d, 0ms); }
+[data-js] .gh-hero .fade { opacity: 0; }
+[data-js] .gh-hero[data-ready] .fade { opacity: 1; transition: opacity 1.3s var(--gh-ease) var(--d, 0ms); }
 .gh-hero[data-done] .mask, .gh-hero[data-done] .mask-circle { clip-path: none; transition: none; }
 
 /* the dock drops in tile by tile; the capsule itself only fades, because a
    clip on it would cut the pills off as they magnify past its edge */
-[data-grove-js] .gh-dock { opacity: 0; }
-[data-grove-js] .gh-hero[data-ready] .gh-dock { opacity: 1; transition: opacity 0.8s var(--gh-ease) 80ms; }
-[data-grove-js] .gh-dock-item { clip-path: inset(0 0 105% 0); }
-[data-grove-js] .gh-hero[data-ready] .gh-dock-item {
+[data-js] .gh-dock { opacity: 0; }
+[data-js] .gh-hero[data-ready] .gh-dock { opacity: 1; transition: opacity 0.8s var(--gh-ease) 80ms; }
+[data-js] .gh-dock-item { clip-path: inset(0 0 105% 0); }
+[data-js] .gh-hero[data-ready] .gh-dock-item {
   clip-path: inset(0 0 -30% 0);
   transition: clip-path 0.9s var(--gh-ease-out) var(--d, 0ms),
               color 0.18s var(--gh-ease), border-color 0.2s var(--gh-ease), background 0.2s var(--gh-ease);
@@ -439,8 +439,8 @@ body:has(.gh-hero) { overflow-x: hidden; }
 
 /* A short rise under a fade rather than a full-height wipe: with nothing
    cropping it, a 105% travel would start line one on top of line two. */
-[data-grove-js] .gh-headline span i { opacity: 0; transform: translateY(calc(16 * var(--gh-u))); }
-[data-grove-js] .gh-hero[data-ready] .gh-headline span i {
+[data-js] .gh-headline span i { opacity: 0; transform: translateY(calc(16 * var(--gh-u))); }
+[data-js] .gh-hero[data-ready] .gh-headline span i {
   opacity: 1; transform: none;
   transition: opacity 1.05s var(--gh-ease) var(--d, 0ms), transform 1.25s var(--gh-ease-out) var(--d, 0ms);
 }
@@ -448,11 +448,11 @@ body:has(.gh-hero) { overflow-x: hidden; }
 /* Each plate resolves like a low-bandwidth transmission: a stepped clip
    exposes the photograph while sampled pixel-dots gather along the advancing
    edge (the dots themselves are painted by canvas). */
-[data-grove-js] .gh-media { clip-path: inset(0 100% 0 0 round calc(25 * var(--gh-u))); }
-[data-grove-js] .gh-hero[data-ready] .gh-card--a .gh-media { animation: gh-cut 1.45s steps(12, end) 0.92s both; }
-[data-grove-js] .gh-hero[data-ready] .gh-card--b .gh-media { animation: gh-cut 1.45s steps(12, end) 1.08s both; }
-[data-grove-js] .gh-hero[data-ready] .gh-card--a .gh-portal::after { animation: gh-scan 1.45s steps(12, end) 0.92s both; }
-[data-grove-js] .gh-hero[data-ready] .gh-card--b .gh-portal::after { animation: gh-scan 1.45s steps(12, end) 1.08s both; }
+[data-js] .gh-media { clip-path: inset(0 100% 0 0 round calc(25 * var(--gh-u))); }
+[data-js] .gh-hero[data-ready] .gh-card--a .gh-media { animation: gh-cut 1.45s steps(12, end) 0.92s both; }
+[data-js] .gh-hero[data-ready] .gh-card--b .gh-media { animation: gh-cut 1.45s steps(12, end) 1.08s both; }
+[data-js] .gh-hero[data-ready] .gh-card--a .gh-portal::after { animation: gh-scan 1.45s steps(12, end) 0.92s both; }
+[data-js] .gh-hero[data-ready] .gh-card--b .gh-portal::after { animation: gh-scan 1.45s steps(12, end) 1.08s both; }
 .gh-hero[data-done] .gh-media { clip-path: none; animation: none; }
 @keyframes gh-cut {
   from { clip-path: inset(0 100% 0 0 round calc(25 * var(--gh-u))); }
@@ -489,17 +489,17 @@ body:has(.gh-hero) { overflow-x: hidden; }
 .gh-knob:focus-visible { outline-color: rgba(28,34,22,0.9); }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-grove-js] .gh-hero .mask,
-  [data-grove-js] .gh-hero .mask-circle,
-  [data-grove-js] .gh-hero .fade,
-  [data-grove-js] .gh-hero .gh-scene,
-  [data-grove-js] .gh-hero .gh-dock,
-  [data-grove-js] .gh-hero .gh-dock-item,
-  [data-grove-js] .gh-hero .gh-headline span i {
+  [data-js] .gh-hero .mask,
+  [data-js] .gh-hero .mask-circle,
+  [data-js] .gh-hero .fade,
+  [data-js] .gh-hero .gh-scene,
+  [data-js] .gh-hero .gh-dock,
+  [data-js] .gh-hero .gh-dock-item,
+  [data-js] .gh-hero .gh-headline span i {
     opacity: 1 !important; clip-path: none !important; transform: none !important; transition: none !important;
   }
   .gh-hero .par { transform: none !important; }
-  [data-grove-js] .gh-hero .gh-media { clip-path: none !important; animation: none !important; transform: none !important; }
+  [data-js] .gh-hero .gh-media { clip-path: none !important; animation: none !important; transform: none !important; }
   .gh-pixel, .gh-portal::after { display: none !important; }
   .gh-media img { transform: none !important; transition: none !important; }
   .gh-track::after { animation: none; }

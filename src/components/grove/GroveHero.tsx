@@ -137,9 +137,9 @@ export function GroveHero({ ghost, headline, lede, cta, play, stats, cards, scro
   return (
     <>
       <style href="grove-hero" precedence="medium">{GROVE_CSS}</style>
-      {/* Sets the pre-intro state only when scripting is on, so a page without
-          it renders finished rather than clipped away to nothing. */}
-      <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.dataset.groveJs=""' }} />
+      {/* The pre-intro states in GROVE_CSS are gated on `html[data-js]`, which
+          the layout's boot script stamps before first paint — see themeInit.ts
+          for why that flag cannot be set from here. */}
 
       <section ref={heroRef} className="gh-hero" data-ready={ready || undefined} data-done={done || undefined}>
         <GroveScene heroRef={heroRef} stageRef={stageRef} onReady={onReady} />
