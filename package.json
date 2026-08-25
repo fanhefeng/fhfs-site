@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "lint": "oxlint -c .oxlintrc.json src scripts next.config.ts drizzle.config.ts",
     "test": "vitest run",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
