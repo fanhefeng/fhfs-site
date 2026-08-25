@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { Draggable, gsap, useGSAP, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/gsap";
+// Registers InertiaPlugin alongside — the flick needs it.
+import { Draggable } from "@/lib/gsap-extras";
 import { AppCard } from "@/components/cards/AppCard";
 import type { SoftwareApp } from "./appMeta";
 

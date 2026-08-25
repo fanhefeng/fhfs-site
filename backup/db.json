@@ -1,123 +1,93 @@
 {
   "posts": [
     {
-      "slug": "hello-club",
-      "locale": "zh",
-      "title": "开张：欢迎光临我的深夜小馆",
-      "date": "2026-07-24",
-      "summary": "为什么我给自己的个人网站选了《爱乐之城》结尾那块霓虹招牌的味道。",
-      "tags": [
-        "随想",
-        "网站"
-      ],
-      "draft": false,
-      "bodyMd": "\n《爱乐之城》的结尾，Mia 推门走进那家爵士俱乐部，墙上挂着她多年前替 Sebastian 画的招牌——**Seb's**，霓虹灯管一亮，整个故事都亮了。\n\n我想要的个人网站，就是那种感觉：\n\n- 夜色是深蓝的，不是纯黑；\n- 灯是暖的，字是发光的；\n- 音乐不吵，但一直在。\n\n## 这里会有什么\n\n我会在这里写随笔、放作品、列出我做过的软件。就当这是我的小酒馆，你随时可以推门进来坐坐。\n\n```ts\nconst club = {\n  name: \"Seb's\",\n  openAt: \"midnight\",\n  music: \"jazz\",\n};\n```\n\n欢迎光临。\n",
-      "bodyHtml": "<p>《爱乐之城》的结尾，Mia 推门走进那家爵士俱乐部，墙上挂着她多年前替 Sebastian 画的招牌——<strong>Seb's</strong>，霓虹灯管一亮，整个故事都亮了。</p>\n<p>我想要的个人网站，就是那种感觉：</p>\n<ul>\n<li>夜色是深蓝的，不是纯黑；</li>\n<li>灯是暖的，字是发光的；</li>\n<li>音乐不吵，但一直在。</li>\n</ul>\n<h2 id=\"这里会有什么\"><a href=\"#这里会有什么\">这里会有什么</a></h2>\n<p>我会在这里写随笔、放作品、列出我做过的软件。就当这是我的小酒馆，你随时可以推门进来坐坐。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"ts\" data-theme=\"github-light tokyo-night\"><code data-language=\"ts\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> club</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#73DACA\">  name</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">Seb's</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#73DACA\">  openAt</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">midnight</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#73DACA\">  music</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">jazz</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span></code></pre></figure>\n<p>欢迎光临。</p>",
-      "readingMinutes": 1
-    },
-    {
-      "slug": "hello-club",
-      "locale": "en",
-      "title": "Grand Opening: Welcome to My After-Hours Club",
-      "date": "2026-07-24",
-      "summary": "Why I styled my personal site after the neon sign at the end of La La Land.",
-      "tags": [
-        "notes",
-        "website"
-      ],
-      "draft": false,
-      "bodyMd": "\nAt the end of *La La Land*, Mia walks into that jazz club and sees the sign she once drew for Sebastian — **Seb's** — glowing in neon. The whole story lights up with it.\n\nThat's the feeling I wanted for my personal site:\n\n- The night is deep blue, not pure black;\n- The lights are warm, the letters glow;\n- The music is quiet, but always on.\n\n## What you'll find here\n\nEssays, works, and the software I've built. Think of it as my little club — push the door open anytime.\n\n```ts\nconst club = {\n  name: \"Seb's\",\n  openAt: \"midnight\",\n  music: \"jazz\",\n};\n```\n\nWelcome in.\n",
-      "bodyHtml": "<p>At the end of <em>La La Land</em>, Mia walks into that jazz club and sees the sign she once drew for Sebastian — <strong>Seb's</strong> — glowing in neon. The whole story lights up with it.</p>\n<p>That's the feeling I wanted for my personal site:</p>\n<ul>\n<li>The night is deep blue, not pure black;</li>\n<li>The lights are warm, the letters glow;</li>\n<li>The music is quiet, but always on.</li>\n</ul>\n<h2 id=\"what-youll-find-here\"><a href=\"#what-youll-find-here\">What you'll find here</a></h2>\n<p>Essays, works, and the software I've built. Think of it as my little club — push the door open anytime.</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"ts\" data-theme=\"github-light tokyo-night\"><code data-language=\"ts\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> club</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#73DACA\">  name</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">Seb's</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#73DACA\">  openAt</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">midnight</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#73DACA\">  music</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">jazz</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span></code></pre></figure>\n<p>Welcome in.</p>",
-      "readingMinutes": 1
-    },
-    {
       "slug": "note-digital-monk",
       "locale": "zh",
       "title": "数字僧侣",
       "date": "2024-10-23",
-      "summary": "关于程序员的一首小诗",
+      "summary": "写给程序员的一首小诗——日夜敲打咒语的人，既是创造者，也被造物所役。",
       "tags": [
         "诗",
         "手札"
       ],
       "draft": false,
-      "bodyMd": "\n> 现代社会的数字僧侣\n>\n> 日夜敲打着神秘咒语\n>\n> 祈求 bug 神灵的宽恕\n>\n> 他们用咖啡因驱动大脑\n>\n> 用披萨填充胃部\n>\n> 在键盘上编织着虚拟世界的经纬\n>\n> 既是创造者\n>\n> 也是被创造物奴役的奴隶\n>\n> 创造\n>\n> 压榨\n>\n> 异化\n\n*——数字时代的炼金术士*\n",
-      "bodyHtml": "<blockquote>\n<p>现代社会的数字僧侣</p>\n<p>日夜敲打着神秘咒语</p>\n<p>祈求 bug 神灵的宽恕</p>\n<p>他们用咖啡因驱动大脑</p>\n<p>用披萨填充胃部</p>\n<p>在键盘上编织着虚拟世界的经纬</p>\n<p>既是创造者</p>\n<p>也是被创造物奴役的奴隶</p>\n<p>创造</p>\n<p>压榨</p>\n<p>异化</p>\n</blockquote>\n<p><em>——数字时代的炼金术士</em></p>",
+      "bodyMd": "\n这是写给程序员的一首小诗。写代码的人多少有些像修行者：日课般的敲击，反复祈求的宽恕，以及被自己造出的东西反过来规训。诗不给结论，只把这种状态放在纸上。\n\n> 现代社会的数字僧侣\n>\n> 日夜敲打着神秘咒语\n>\n> 祈求 bug 神灵的宽恕\n>\n> 他们用咖啡因驱动大脑\n>\n> 用披萨填充胃部\n>\n> 在键盘上编织着虚拟世界的经纬\n>\n> 既是创造者\n>\n> 也是被创造物奴役的奴隶\n>\n> 创造\n>\n> 压榨\n>\n> 异化\n\n*——数字时代的炼金术士*\n",
+      "bodyHtml": "<p>这是写给程序员的一首小诗。写代码的人多少有些像修行者：日课般的敲击，反复祈求的宽恕，以及被自己造出的东西反过来规训。诗不给结论，只把这种状态放在纸上。</p>\n<blockquote>\n<p>现代社会的数字僧侣</p>\n<p>日夜敲打着神秘咒语</p>\n<p>祈求 bug 神灵的宽恕</p>\n<p>他们用咖啡因驱动大脑</p>\n<p>用披萨填充胃部</p>\n<p>在键盘上编织着虚拟世界的经纬</p>\n<p>既是创造者</p>\n<p>也是被创造物奴役的奴隶</p>\n<p>创造</p>\n<p>压榨</p>\n<p>异化</p>\n</blockquote>\n<p><em>——数字时代的炼金术士</em></p>",
       "readingMinutes": 1
     },
     {
       "slug": "note-js-clone-path-format",
       "locale": "zh",
-      "title": "JS 手札三则：deepClone、path 与千分位",
+      "title": "深克隆、path 与千分位：JavaScript 三则",
       "date": "2024-12-03",
-      "summary": "三个随手记下的技术点：用 WeakMap 防循环引用的深度克隆、path.join 与 path.resolve 的区别、正则实现千分位分隔。",
+      "summary": "三件小事，各值一段笔记：用 WeakMap 挡住循环引用的深克隆，path.join 与 path.resolve 的分野，以及一个只匹配「位置」的千分位正则。",
       "tags": [
         "前端",
         "手札"
       ],
       "draft": false,
-      "bodyMd": "\n## 深度克隆\n\n用 `WeakMap` 记录已克隆过的对象，防止循环引用导致的无限递归；同时对 `Date`、`RegExp` 等特殊对象单独处理。\n\n```javascript\nfunction deepClone(obj, hash = new WeakMap()) {\n  if (obj === null) return null;\n  if (typeof obj !== \"object\") return obj;\n  if (obj instanceof Date) return new Date(obj);\n  if (obj instanceof RegExp) return new RegExp(obj);\n  if (hash.has(obj)) return hash.get(obj);\n  let cloneObj = new obj.constructor();\n  hash.set(obj, cloneObj);\n  for (let key in obj) {\n    if (obj.hasOwnProperty(key)) {\n      cloneObj[key] = deepClone(obj[key], hash);\n    }\n  }\n  return cloneObj;\n}\n```\n\n## Node 中的 `path.join` 与 `path.resolve`\n\n两者都会使用平台特定的分隔符（如 Linux 下是 `/`，Windows 下是 `\\`）将所有给定的路径片段连接在一起，然后规范化结果路径。注意 `path.join` 生成的结果只是一段相对路径片段，并不一定是绝对路径。\n\n### `path.join`\n\n`path.join` 就是简单把路径拼在一起，`./xx` 与 `/xx` 是等价的，都代表在后面多拼一个 `/xx`。`.` 代表当前，拼接时忽略，如 `path.join('.', '/folder')` 其实还是 folder。但遇到 `..` 就需要跟 `cd ..` 一样回到上一级了。\n\n```javascript\nconsole.log('1:', path.join('folder1', 'folder2', 'folder3')); // 1: folder1/folder2/folder3\nconsole.log('2:', path.join('folder1', './folder2', '/folder3')); // 2: folder1/folder2/folder3\nconsole.log('3:', path.join('folder1', '/folder2', '../../folder3')); // 3: folder3\n\n/*\n  path.join('folder1', '/folder2', '../../folder3');\n  第一步：拼接 folder1, 此时路径为 folder1\n  第二步：再拼 folder2，此时路径为 folder1/folder2\n  第三步：cd .. 回到上一级，此时路径为 folder1；再 cd .. 回到上一级，此时路径为 .；再拼接 folder3，最后结果为 folder3\n*/\n```\n\n### `path.resolve`\n\n`path.resolve` 将路径或路径片段的序列解析为绝对路径。\n\n> `path.resolve` 的原理是：从左到右，每遇到一个路径片段，就把它和之前的路径片段拼接起来，最终得到一个绝对路径。如果路径片段是 `/` 开头，则直接替换为根目录。\n\n所以只需要记住：`path.resolve` 会从左到右，每遇到一个参数，就像执行一次 `cd` 目录操作一样。\n\n```javascript\n// 假设此时路径为 /Users/user/project\nconsole.log(__dirname); // /Users/user/project\npath.resolve(\"folder1\", \"folder2\", \"folder3\"); // /Users/user/project/folder1/folder2/folder3\npath.resolve(\"folder1\", \"./folder2\", \"folder3\"); // /Users/user/project/folder1/folder2/folder3\npath.resolve(\"folder1\", \"./folder2\", \"/folder3\"); // /folder3\n/*\n  path.resolve(\"folder1\", \"./folder2\", \"/folder3\");\n  第一步：cd folder1 # 进入当前目录的 folder1 文件夹，此时结果为 /Users/user/project/folder1\n  第二步：cd ./folder2 # 进入当前目录的 folder2 文件夹，此时结果为 /Users/user/project/folder1/folder2\n  第三步：cd /folder3 # 注意，cd / 实际是回到根目录了，此时结果为 /folder3\n*/\n```\n\n## 正则实现千分位分隔\n\n把一个不含分隔符的长数字字符串，在其千位数字前添加 `.` 作为分隔符：如把 `\"1000000000000\"` 转化成 `\"1.000.000.000.000\"` 的形式。\n\n```javascript\n// 正则匹配方法\nconst str = \"100000000000\";\n// 定义正则表达式\n// 正向前瞻断言 (?=...) 不消耗字符，仅检查位置条件\n// (\\B) 非单词边界，确保不在首位添加分隔符\n// (\\d{3}) 匹配三个连续数字\n// +$ 表示匹配一连串的三个数字直到字符串末尾\nconst reg = /(?=(\\B)(\\d{3})+$)/g;\nconst res = str.replace(reg, \".\");\n```\n",
-      "bodyHtml": "<h2 id=\"深度克隆\"><a href=\"#深度克隆\">深度克隆</a></h2>\n<p>用 <code>WeakMap</code> 记录已克隆过的对象，防止循环引用导致的无限递归；同时对 <code>Date</code>、<code>RegExp</code> 等特殊对象单独处理。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">function</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> deepClone</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> hash</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> WeakMap</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">())</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ===</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> null</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> null</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> !==</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">object</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> instanceof</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> Date</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> Date</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> instanceof</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> RegExp</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> RegExp</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">has</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">get</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">  let</span><span style=\"--shiki-light:#24292E;--shiki-dark:#BB9AF7\"> cloneObj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">constructor</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">()</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">  hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">set</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> cloneObj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  for</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">let</span><span style=\"--shiki-light:#24292E;--shiki-dark:#BB9AF7\"> key</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> in</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">    if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">hasOwnProperty</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">      cloneObj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">[</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">] </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">=</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> deepClone</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">[</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">]</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">    }</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">  }</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">  return</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> cloneObj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span></span></code></pre></figure>\n<h2 id=\"node-中的-pathjoin-与-pathresolve\"><a href=\"#node-中的-pathjoin-与-pathresolve\">Node 中的 <code>path.join</code> 与 <code>path.resolve</code></a></h2>\n<p>两者都会使用平台特定的分隔符（如 Linux 下是 <code>/</code>，Windows 下是 <code>\\</code>）将所有给定的路径片段连接在一起，然后规范化结果路径。注意 <code>path.join</code> 生成的结果只是一段相对路径片段，并不一定是绝对路径。</p>\n<h3 id=\"pathjoin\"><a href=\"#pathjoin\"><code>path.join</code></a></h3>\n<p><code>path.join</code> 就是简单把路径拼在一起，<code>./xx</code> 与 <code>/xx</code> 是等价的，都代表在后面多拼一个 <code>/xx</code>。<code>.</code> 代表当前，拼接时忽略，如 <code>path.join('.', '/folder')</code> 其实还是 folder。但遇到 <code>..</code> 就需要跟 <code>cd ..</code> 一样回到上一级了。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">1:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">join</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">))</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // 1: folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">2:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">join</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">./folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">/folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">))</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // 2: folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">3:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">join</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">/folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">../../folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">))</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // 3: folder3</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">/*</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  path.join('folder1', '/folder2', '../../folder3');</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第一步：拼接 folder1, 此时路径为 folder1</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第二步：再拼 folder2，此时路径为 folder1/folder2</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第三步：cd .. 回到上一级，此时路径为 folder1；再 cd .. 回到上一级，此时路径为 .；再拼接 folder3，最后结果为 folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">*/</span></span></code></pre></figure>\n<h3 id=\"pathresolve\"><a href=\"#pathresolve\"><code>path.resolve</code></a></h3>\n<p><code>path.resolve</code> 将路径或路径片段的序列解析为绝对路径。</p>\n<blockquote>\n<p><code>path.resolve</code> 的原理是：从左到右，每遇到一个路径片段，就把它和之前的路径片段拼接起来，最终得到一个绝对路径。如果路径片段是 <code>/</code> 开头，则直接替换为根目录。</p>\n</blockquote>\n<p>所以只需要记住：<code>path.resolve</code> 会从左到右，每遇到一个参数，就像执行一次 <code>cd</code> 目录操作一样。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 假设此时路径为 /Users/user/project</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">__dirname</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /Users/user/project</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /Users/user/project/folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">./folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /Users/user/project/folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">./folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">/folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">/*</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  path.resolve(\"folder1\", \"./folder2\", \"/folder3\");</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第一步：cd folder1 # 进入当前目录的 folder1 文件夹，此时结果为 /Users/user/project/folder1</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第二步：cd ./folder2 # 进入当前目录的 folder2 文件夹，此时结果为 /Users/user/project/folder1/folder2</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第三步：cd /folder3 # 注意，cd / 实际是回到根目录了，此时结果为 /folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">*/</span></span></code></pre></figure>\n<h2 id=\"正则实现千分位分隔\"><a href=\"#正则实现千分位分隔\">正则实现千分位分隔</a></h2>\n<p>把一个不含分隔符的长数字字符串，在其千位数字前添加 <code>.</code> 作为分隔符：如把 <code>\"1000000000000\"</code> 转化成 <code>\"1.000.000.000.000\"</code> 的形式。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 正则匹配方法</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> str</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">100000000000</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 定义正则表达式</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 正向前瞻断言 (?=...) 不消耗字符，仅检查位置条件</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// (\\B) 非单词边界，确保不在首位添加分隔符</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// (\\d{3}) 匹配三个连续数字</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// +$ 表示匹配一连串的三个数字直到字符串末尾</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> reg</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> /</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">(?=(</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\\B</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">)(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\">\\d</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">{3}</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">)</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">+</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">$</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">)</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">/</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">g</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> res</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> str</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">replace</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">reg</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">.</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span></code></pre></figure>",
-      "readingMinutes": 1
+      "bodyMd": "\n这三则彼此并不相关，只是都小到不值得单独成文，又都曾在某个时刻让我停下来查过一次。记在一起，下次就不必再查。\n\n## 深度克隆\n\n深克隆的难点不在递归本身，而在两处细节：循环引用会让朴素的递归无限展开；`Date`、`RegExp` 这类特殊对象也不能按普通对象逐键复制。前者用一个 `WeakMap` 记住「已经克隆过的对象」即可——再次遇到时直接返回之前的副本；后者单独判断、单独构造。\n\n```javascript\nfunction deepClone(obj, hash = new WeakMap()) {\n  if (obj === null) return null;\n  if (typeof obj !== \"object\") return obj;\n  if (obj instanceof Date) return new Date(obj);\n  if (obj instanceof RegExp) return new RegExp(obj);\n  if (hash.has(obj)) return hash.get(obj);\n  let cloneObj = new obj.constructor();\n  hash.set(obj, cloneObj);\n  for (let key in obj) {\n    if (obj.hasOwnProperty(key)) {\n      cloneObj[key] = deepClone(obj[key], hash);\n    }\n  }\n  return cloneObj;\n}\n```\n\n## Node 中的 `path.join` 与 `path.resolve`\n\n两者都会使用平台特定的分隔符（Linux 下是 `/`，Windows 下是 `\\`）把给定的路径片段连接起来，再对结果做规范化。区别在于：`path.join` 得到的只是一段拼接后的路径片段，并不一定是绝对路径。\n\n### `path.join`\n\n`path.join` 只做拼接。片段里的 `./xx` 与 `/xx` 是等价的，都表示在后面多接一段 `/xx`；单独的 `.` 代表当前位置，拼接时被忽略，所以 `path.join('.', '/folder')` 的结果仍是 `folder`。唯一需要留神的是 `..`——它和 `cd ..` 一样，会回到上一级。\n\n```javascript\nconsole.log('1:', path.join('folder1', 'folder2', 'folder3')); // 1: folder1/folder2/folder3\nconsole.log('2:', path.join('folder1', './folder2', '/folder3')); // 2: folder1/folder2/folder3\nconsole.log('3:', path.join('folder1', '/folder2', '../../folder3')); // 3: folder3\n\n/*\n  path.join('folder1', '/folder2', '../../folder3');\n  第一步：拼接 folder1，此时路径为 folder1\n  第二步：再拼 folder2，此时路径为 folder1/folder2\n  第三步：cd .. 回到上一级，此时路径为 folder1；再 cd .. 回到上一级，此时路径为 .；再拼接 folder3，最后结果为 folder3\n*/\n```\n\n### `path.resolve`\n\n`path.resolve` 把一串路径片段解析为绝对路径。\n\n> 它的原理是：从左到右，每遇到一个路径片段，就把它和之前的路径拼接起来，最终得到一个绝对路径；若某个片段以 `/` 开头，则直接替换为根目录。\n\n所以只需记住一句话：`path.resolve` 从左到右，每遇到一个参数，就像执行了一次 `cd`。\n\n```javascript\n// 假设此时路径为 /Users/user/project\nconsole.log(__dirname); // /Users/user/project\npath.resolve(\"folder1\", \"folder2\", \"folder3\"); // /Users/user/project/folder1/folder2/folder3\npath.resolve(\"folder1\", \"./folder2\", \"folder3\"); // /Users/user/project/folder1/folder2/folder3\npath.resolve(\"folder1\", \"./folder2\", \"/folder3\"); // /folder3\n/*\n  path.resolve(\"folder1\", \"./folder2\", \"/folder3\");\n  第一步：cd folder1 # 进入当前目录的 folder1 文件夹，此时结果为 /Users/user/project/folder1\n  第二步：cd ./folder2 # 进入当前目录的 folder2 文件夹，此时结果为 /Users/user/project/folder1/folder2\n  第三步：cd /folder3 # 注意，cd / 实际是回到根目录了，此时结果为 /folder3\n*/\n```\n\n## 正则实现千分位分隔\n\n把一个不含分隔符的长数字字符串，在每个千位数字前加上 `.` 作为分隔符：例如把 `\"1000000000000\"` 变成 `\"1.000.000.000.000\"`。\n\n```javascript\n// 正则匹配方法\nconst str = \"100000000000\";\n// 定义正则表达式\n// 正向前瞻断言 (?=...) 不消耗字符，仅检查位置条件\n// (\\B) 非单词边界，确保不在首位添加分隔符\n// (\\d{3}) 匹配三个连续数字\n// +$ 表示匹配一连串的三个数字直到字符串末尾\nconst reg = /(?=(\\B)(\\d{3})+$)/g;\nconst res = str.replace(reg, \".\");\n```\n\n整个正则只有一个前瞻断言，不消耗任何字符，匹配到的是「位置」而不是内容——所以 `replace` 实际做的，是在这些位置上逐一插入分隔符。\n",
+      "bodyHtml": "<p>这三则彼此并不相关，只是都小到不值得单独成文，又都曾在某个时刻让我停下来查过一次。记在一起，下次就不必再查。</p>\n<h2 id=\"深度克隆\"><a href=\"#深度克隆\">深度克隆</a></h2>\n<p>深克隆的难点不在递归本身，而在两处细节：循环引用会让朴素的递归无限展开；<code>Date</code>、<code>RegExp</code> 这类特殊对象也不能按普通对象逐键复制。前者用一个 <code>WeakMap</code> 记住「已经克隆过的对象」即可——再次遇到时直接返回之前的副本；后者单独判断、单独构造。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">function</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> deepClone</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> hash</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> WeakMap</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">())</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ===</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> null</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> null</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> !==</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">object</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> instanceof</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> Date</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> Date</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> instanceof</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> RegExp</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> RegExp</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">has</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">get</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">  let</span><span style=\"--shiki-light:#24292E;--shiki-dark:#BB9AF7\"> cloneObj</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">constructor</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">()</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">  hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">set</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> cloneObj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">  for</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">let</span><span style=\"--shiki-light:#24292E;--shiki-dark:#BB9AF7\"> key</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> in</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">    if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">hasOwnProperty</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">      cloneObj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">[</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">] </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">=</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> deepClone</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">obj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">[</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">]</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> hash</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">    }</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">  }</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">  return</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> cloneObj</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span></span></code></pre></figure>\n<h2 id=\"node-中的-pathjoin-与-pathresolve\"><a href=\"#node-中的-pathjoin-与-pathresolve\">Node 中的 <code>path.join</code> 与 <code>path.resolve</code></a></h2>\n<p>两者都会使用平台特定的分隔符（Linux 下是 <code>/</code>，Windows 下是 <code>\\</code>）把给定的路径片段连接起来，再对结果做规范化。区别在于：<code>path.join</code> 得到的只是一段拼接后的路径片段，并不一定是绝对路径。</p>\n<h3 id=\"pathjoin\"><a href=\"#pathjoin\"><code>path.join</code></a></h3>\n<p><code>path.join</code> 只做拼接。片段里的 <code>./xx</code> 与 <code>/xx</code> 是等价的，都表示在后面多接一段 <code>/xx</code>；单独的 <code>.</code> 代表当前位置，拼接时被忽略，所以 <code>path.join('.', '/folder')</code> 的结果仍是 <code>folder</code>。唯一需要留神的是 <code>..</code>——它和 <code>cd ..</code> 一样，会回到上一级。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">1:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">join</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">))</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // 1: folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">2:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">join</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">./folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">/folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">))</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // 2: folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">3:</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">join</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">/folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> '</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">../../folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">'</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">))</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // 3: folder3</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">/*</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  path.join('folder1', '/folder2', '../../folder3');</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第一步：拼接 folder1，此时路径为 folder1</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第二步：再拼 folder2，此时路径为 folder1/folder2</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第三步：cd .. 回到上一级，此时路径为 folder1；再 cd .. 回到上一级，此时路径为 .；再拼接 folder3，最后结果为 folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">*/</span></span></code></pre></figure>\n<h3 id=\"pathresolve\"><a href=\"#pathresolve\"><code>path.resolve</code></a></h3>\n<p><code>path.resolve</code> 把一串路径片段解析为绝对路径。</p>\n<blockquote>\n<p>它的原理是：从左到右，每遇到一个路径片段，就把它和之前的路径拼接起来，最终得到一个绝对路径；若某个片段以 <code>/</code> 开头，则直接替换为根目录。</p>\n</blockquote>\n<p>所以只需记住一句话：<code>path.resolve</code> 从左到右，每遇到一个参数，就像执行了一次 <code>cd</code>。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 假设此时路径为 /Users/user/project</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">console</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">__dirname</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /Users/user/project</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /Users/user/project/folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">./folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /Users/user/project/folder1/folder2/folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">path</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">folder1</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">./folder2</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">/folder3</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // /folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">/*</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  path.resolve(\"folder1\", \"./folder2\", \"/folder3\");</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第一步：cd folder1 # 进入当前目录的 folder1 文件夹，此时结果为 /Users/user/project/folder1</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第二步：cd ./folder2 # 进入当前目录的 folder2 文件夹，此时结果为 /Users/user/project/folder1/folder2</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">  第三步：cd /folder3 # 注意，cd / 实际是回到根目录了，此时结果为 /folder3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">*/</span></span></code></pre></figure>\n<h2 id=\"正则实现千分位分隔\"><a href=\"#正则实现千分位分隔\">正则实现千分位分隔</a></h2>\n<p>把一个不含分隔符的长数字字符串，在每个千位数字前加上 <code>.</code> 作为分隔符：例如把 <code>\"1000000000000\"</code> 变成 <code>\"1.000.000.000.000\"</code>。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 正则匹配方法</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> str</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">100000000000</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 定义正则表达式</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 正向前瞻断言 (?=...) 不消耗字符，仅检查位置条件</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// (\\B) 非单词边界，确保不在首位添加分隔符</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// (\\d{3}) 匹配三个连续数字</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// +$ 表示匹配一连串的三个数字直到字符串末尾</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> reg</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> /</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">(?=(</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\\B</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">)(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\">\\d</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">{3}</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">)</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">+</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">$</span><span style=\"--shiki-light:#032F62;--shiki-dark:#F7768E\">)</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">/</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">g</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">const</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> res</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> str</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">replace</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">reg</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">.</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span></code></pre></figure>\n<p>整个正则只有一个前瞻断言，不消耗任何字符，匹配到的是「位置」而不是内容——所以 <code>replace</code> 实际做的，是在这些位置上逐一插入分隔符。</p>",
+      "readingMinutes": 2
     },
     {
       "slug": "note-macos-hostname",
       "locale": "zh",
-      "title": "macOS 主机名与 scutil 小抄",
+      "title": "一台 Mac 的三个名字",
       "date": "2024-12-20",
-      "summary": "ComputerName、HostName、LocalHostName 三种主机名的区别与设置方法，附 scutil 常用命令与 Finder 显示隐藏文件的小抄。",
+      "summary": "ComputerName、HostName、LocalHostName 各自回答的是谁的提问；附 scutil 常用命令与 Finder 隐藏文件的开关。",
       "tags": [
         "macOS",
         "手札"
       ],
       "draft": false,
-      "bodyMd": "\n## 三种主机名的区别与设置\n\n### ComputerName：计算机名称\n\n用户可识别名称，相当于设备的「身份标识」，方便你辨认 Mac 设备。在进行 AirDrop 共享文件或其他共享操作时，其他人会以这个名字看到你的电脑。\n\n用户自定义，例如「张三的 MacBook Pro」。\n\n在 `macOS Sequoia Version 15.1.1` 中，可以通过 `System Settings ▸ General ▸ About ▸ Name` 来设置。\n\n```bash\nscutil --get ComputerName\nscutil --set ComputerName \"张三的 MacBook Pro\"\n```\n\n### HostName：主机名称\n\n主机名用于在系统上标识一台机器。它和 IP 地址的区别是：hostname 在系统层面标识一台机器，IP 地址则在 TCP/IP 网络中唯一标识一台机器。联系到实际生活，主机名相当于一间房子的主人名，而 IP 地址相当于小区内这间房子的门牌号。随着互联网的发展，hostname 的定义也演化为 FQDN（Fully Qualified Domain Name，完全限定域名），用于绝对且唯一地标识接入互联网的每一台计算机。\n\n打开终端，每行提示符里 `@` 后面出现的名字就是主机名；`@` 前面则是管理员名称——也就是电脑初始化时设置的管理员名称、开机时头像下面显示的名称，可在「系统偏好设置 ▸ 用户与群组」中修改。所以终端中每个命令行显示的名称为：`管理员名称@主机名`。\n\nmacOS 会按以下顺序确定 HostName，直到获取到为止：\n\n1. 从 `/etc/hostconfig` 文件中读取\n2. 从系统配置项 `/Library/Preferences/SystemConfiguration/preferences.plist` 中的 `System ▸ System ▸ HostName` 读取\n3. 由本机 IP 地址的反向 DNS 查询获取\n4. 从系统配置项 `/Library/Preferences/SystemConfiguration/preferences.plist` 中的 `System ▸ Network ▸ HostNames ▸ LocalHostName` 读取\n5. 如果以上方法都没获取到，就为默认的 `localhost`\n\n```bash\nhostname\nscutil --get HostName\nscutil --set HostName \"zhangsan-macbook-pro\"\n```\n\n### LocalHostName：Bonjour 名称\n\n本地主机名，本地网络上的电脑可以通过这个名字访问你的电脑。\n\n在 `macOS Sequoia Version 15.1.1` 中，可以通过 `System Settings ▸ General ▸ Sharing ▸ Local hostname` 来设置。\n\n```bash\nscutil --get LocalHostName\nscutil --set LocalHostName \"zhangsan-macbook-pro\"\n```\n\n## scutil 常用命令\n\n`scutil` 是个可动态访问 macOS 系统信息的交互式工具。\n\n```bash\nscutil --help\n```\n\n查看 DNS 配置：\n\n```bash\nscutil --dns\n```\n\n查看代理配置：\n\n```bash\nscutil --proxy\n```\n\n查看网络配置：\n\n```bash\nscutil --nwi\n```\n\n## Finder 显示隐藏文件\n\n显示所有文件：\n\n```bash\ndefaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder\n```\n\n不显示系统隐藏文件：\n\n```bash\ndefaults write com.apple.finder AppleShowAllFiles -bool false; killall Finder\n```\n",
-      "bodyHtml": "<h2 id=\"三种主机名的区别与设置\"><a href=\"#三种主机名的区别与设置\">三种主机名的区别与设置</a></h2>\n<h3 id=\"computername计算机名称\"><a href=\"#computername计算机名称\">ComputerName：计算机名称</a></h3>\n<p>用户可识别名称，相当于设备的「身份标识」，方便你辨认 Mac 设备。在进行 AirDrop 共享文件或其他共享操作时，其他人会以这个名字看到你的电脑。</p>\n<p>用户自定义，例如「张三的 MacBook Pro」。</p>\n<p>在 <code>macOS Sequoia Version 15.1.1</code> 中，可以通过 <code>System Settings ▸ General ▸ About ▸ Name</code> 来设置。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --get</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> ComputerName</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --set</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> ComputerName</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">张三的 MacBook Pro</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span></span></code></pre></figure>\n<h3 id=\"hostname主机名称\"><a href=\"#hostname主机名称\">HostName：主机名称</a></h3>\n<p>主机名用于在系统上标识一台机器。它和 IP 地址的区别是：hostname 在系统层面标识一台机器，IP 地址则在 TCP/IP 网络中唯一标识一台机器。联系到实际生活，主机名相当于一间房子的主人名，而 IP 地址相当于小区内这间房子的门牌号。随着互联网的发展，hostname 的定义也演化为 FQDN（Fully Qualified Domain Name，完全限定域名），用于绝对且唯一地标识接入互联网的每一台计算机。</p>\n<p>打开终端，每行提示符里 <code>@</code> 后面出现的名字就是主机名；<code>@</code> 前面则是管理员名称——也就是电脑初始化时设置的管理员名称、开机时头像下面显示的名称，可在「系统偏好设置 ▸ 用户与群组」中修改。所以终端中每个命令行显示的名称为：<code>管理员名称@主机名</code>。</p>\n<p>macOS 会按以下顺序确定 HostName，直到获取到为止：</p>\n<ol>\n<li>从 <code>/etc/hostconfig</code> 文件中读取</li>\n<li>从系统配置项 <code>/Library/Preferences/SystemConfiguration/preferences.plist</code> 中的 <code>System ▸ System ▸ HostName</code> 读取</li>\n<li>由本机 IP 地址的反向 DNS 查询获取</li>\n<li>从系统配置项 <code>/Library/Preferences/SystemConfiguration/preferences.plist</code> 中的 <code>System ▸ Network ▸ HostNames ▸ LocalHostName</code> 读取</li>\n<li>如果以上方法都没获取到，就为默认的 <code>localhost</code></li>\n</ol>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">hostname</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --get</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> HostName</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --set</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> HostName</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">zhangsan-macbook-pro</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span></span></code></pre></figure>\n<h3 id=\"localhostnamebonjour-名称\"><a href=\"#localhostnamebonjour-名称\">LocalHostName：Bonjour 名称</a></h3>\n<p>本地主机名，本地网络上的电脑可以通过这个名字访问你的电脑。</p>\n<p>在 <code>macOS Sequoia Version 15.1.1</code> 中，可以通过 <code>System Settings ▸ General ▸ Sharing ▸ Local hostname</code> 来设置。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --get</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> LocalHostName</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --set</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> LocalHostName</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">zhangsan-macbook-pro</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span></span></code></pre></figure>\n<h2 id=\"scutil-常用命令\"><a href=\"#scutil-常用命令\">scutil 常用命令</a></h2>\n<p><code>scutil</code> 是个可动态访问 macOS 系统信息的交互式工具。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --help</span></span></code></pre></figure>\n<p>查看 DNS 配置：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --dns</span></span></code></pre></figure>\n<p>查看代理配置：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --proxy</span></span></code></pre></figure>\n<p>查看网络配置：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --nwi</span></span></code></pre></figure>\n<h2 id=\"finder-显示隐藏文件\"><a href=\"#finder-显示隐藏文件\">Finder 显示隐藏文件</a></h2>\n<p>显示所有文件：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">defaults</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> write</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> com.apple.finder</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> AppleShowAllFiles</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> -bool</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> true</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> killall</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> Finder</span></span></code></pre></figure>\n<p>不显示系统隐藏文件：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">defaults</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> write</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> com.apple.finder</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> AppleShowAllFiles</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> -bool</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> false</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> killall</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> Finder</span></span></code></pre></figure>",
+      "bodyMd": "\n一台 Mac 其实有三个名字，各自面向不同的提问者：AirDrop 里的邻居、终端里的提示符、局域网里的 Bonjour。它们可以相同，但并不是同一回事。\n\n## 三种主机名\n\n### ComputerName：计算机名称\n\n面向人的名字，相当于设备的「身份标识」，用来在一群设备里认出自己的 Mac。AirDrop 共享文件或其他共享操作时，别人看到的就是它。\n\n由用户自定义，例如「张三的 MacBook Pro」。\n\n在 `macOS Sequoia Version 15.1.1` 中，可通过 `System Settings ▸ General ▸ About ▸ Name` 设置。\n\n```bash\nscutil --get ComputerName\nscutil --set ComputerName \"张三的 MacBook Pro\"\n```\n\n### HostName：主机名称\n\n主机名用于在系统上标识一台机器。它与 IP 地址的分工是：hostname 在系统层面标识一台机器，IP 地址则在 TCP/IP 网络中唯一标识一台机器——好比主机名是这间房子主人的姓名，IP 地址是它在小区里的门牌号。随着互联网的发展，hostname 的定义也演化为 FQDN（Fully Qualified Domain Name，完全限定域名），用于绝对且唯一地标识接入互联网的每一台计算机。\n\n打开终端，提示符里 `@` 后面的名字就是主机名；`@` 前面是管理员名称——即电脑初始化时设置的管理员名称、开机时头像下方显示的那个名字，可在「系统偏好设置 ▸ 用户与群组」中修改。所以终端每行提示符的格式是：`管理员名称@主机名`。\n\nmacOS 按以下顺序确定 HostName，直到取到为止：\n\n1. 从 `/etc/hostconfig` 文件中读取\n2. 从系统配置项 `/Library/Preferences/SystemConfiguration/preferences.plist` 中的 `System ▸ System ▸ HostName` 读取\n3. 由本机 IP 地址的反向 DNS 查询获取\n4. 从系统配置项 `/Library/Preferences/SystemConfiguration/preferences.plist` 中的 `System ▸ Network ▸ HostNames ▸ LocalHostName` 读取\n5. 如果以上方法都没获取到，就为默认的 `localhost`\n\n```bash\nhostname\nscutil --get HostName\nscutil --set HostName \"zhangsan-macbook-pro\"\n```\n\n### LocalHostName：Bonjour 名称\n\n本地主机名。同一本地网络里的其他电脑，可以通过这个名字访问你的电脑。\n\n在 `macOS Sequoia Version 15.1.1` 中，可通过 `System Settings ▸ General ▸ Sharing ▸ Local hostname` 设置。\n\n```bash\nscutil --get LocalHostName\nscutil --set LocalHostName \"zhangsan-macbook-pro\"\n```\n\n## scutil 常用命令\n\n`scutil` 是一个可动态访问 macOS 系统信息的交互式工具。\n\n```bash\nscutil --help\n```\n\n查看 DNS 配置：\n\n```bash\nscutil --dns\n```\n\n查看代理配置：\n\n```bash\nscutil --proxy\n```\n\n查看网络配置：\n\n```bash\nscutil --nwi\n```\n\n## Finder 显示隐藏文件\n\n与主机名无关，只是同一时期记在同一页上的两行命令。\n\n显示所有文件：\n\n```bash\ndefaults write com.apple.finder AppleShowAllFiles -bool true; killall Finder\n```\n\n不显示系统隐藏文件：\n\n```bash\ndefaults write com.apple.finder AppleShowAllFiles -bool false; killall Finder\n```\n",
+      "bodyHtml": "<p>一台 Mac 其实有三个名字，各自面向不同的提问者：AirDrop 里的邻居、终端里的提示符、局域网里的 Bonjour。它们可以相同，但并不是同一回事。</p>\n<h2 id=\"三种主机名\"><a href=\"#三种主机名\">三种主机名</a></h2>\n<h3 id=\"computername计算机名称\"><a href=\"#computername计算机名称\">ComputerName：计算机名称</a></h3>\n<p>面向人的名字，相当于设备的「身份标识」，用来在一群设备里认出自己的 Mac。AirDrop 共享文件或其他共享操作时，别人看到的就是它。</p>\n<p>由用户自定义，例如「张三的 MacBook Pro」。</p>\n<p>在 <code>macOS Sequoia Version 15.1.1</code> 中，可通过 <code>System Settings ▸ General ▸ About ▸ Name</code> 设置。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --get</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> ComputerName</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --set</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> ComputerName</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">张三的 MacBook Pro</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span></span></code></pre></figure>\n<h3 id=\"hostname主机名称\"><a href=\"#hostname主机名称\">HostName：主机名称</a></h3>\n<p>主机名用于在系统上标识一台机器。它与 IP 地址的分工是：hostname 在系统层面标识一台机器，IP 地址则在 TCP/IP 网络中唯一标识一台机器——好比主机名是这间房子主人的姓名，IP 地址是它在小区里的门牌号。随着互联网的发展，hostname 的定义也演化为 FQDN（Fully Qualified Domain Name，完全限定域名），用于绝对且唯一地标识接入互联网的每一台计算机。</p>\n<p>打开终端，提示符里 <code>@</code> 后面的名字就是主机名；<code>@</code> 前面是管理员名称——即电脑初始化时设置的管理员名称、开机时头像下方显示的那个名字，可在「系统偏好设置 ▸ 用户与群组」中修改。所以终端每行提示符的格式是：<code>管理员名称@主机名</code>。</p>\n<p>macOS 按以下顺序确定 HostName，直到取到为止：</p>\n<ol>\n<li>从 <code>/etc/hostconfig</code> 文件中读取</li>\n<li>从系统配置项 <code>/Library/Preferences/SystemConfiguration/preferences.plist</code> 中的 <code>System ▸ System ▸ HostName</code> 读取</li>\n<li>由本机 IP 地址的反向 DNS 查询获取</li>\n<li>从系统配置项 <code>/Library/Preferences/SystemConfiguration/preferences.plist</code> 中的 <code>System ▸ Network ▸ HostNames ▸ LocalHostName</code> 读取</li>\n<li>如果以上方法都没获取到，就为默认的 <code>localhost</code></li>\n</ol>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">hostname</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --get</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> HostName</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --set</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> HostName</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">zhangsan-macbook-pro</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span></span></code></pre></figure>\n<h3 id=\"localhostnamebonjour-名称\"><a href=\"#localhostnamebonjour-名称\">LocalHostName：Bonjour 名称</a></h3>\n<p>本地主机名。同一本地网络里的其他电脑，可以通过这个名字访问你的电脑。</p>\n<p>在 <code>macOS Sequoia Version 15.1.1</code> 中，可通过 <code>System Settings ▸ General ▸ Sharing ▸ Local hostname</code> 设置。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --get</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> LocalHostName</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --set</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> LocalHostName</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">zhangsan-macbook-pro</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span></span></code></pre></figure>\n<h2 id=\"scutil-常用命令\"><a href=\"#scutil-常用命令\">scutil 常用命令</a></h2>\n<p><code>scutil</code> 是一个可动态访问 macOS 系统信息的交互式工具。</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --help</span></span></code></pre></figure>\n<p>查看 DNS 配置：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --dns</span></span></code></pre></figure>\n<p>查看代理配置：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --proxy</span></span></code></pre></figure>\n<p>查看网络配置：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">scutil</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> --nwi</span></span></code></pre></figure>\n<h2 id=\"finder-显示隐藏文件\"><a href=\"#finder-显示隐藏文件\">Finder 显示隐藏文件</a></h2>\n<p>与主机名无关，只是同一时期记在同一页上的两行命令。</p>\n<p>显示所有文件：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">defaults</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> write</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> com.apple.finder</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> AppleShowAllFiles</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> -bool</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> true</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> killall</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> Finder</span></span></code></pre></figure>\n<p>不显示系统隐藏文件：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"bash\" data-theme=\"github-light tokyo-night\"><code data-language=\"bash\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\">defaults</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> write</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> com.apple.finder</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> AppleShowAllFiles</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#E0AF68\"> -bool</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> false</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#C0CAF5\"> killall</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\"> Finder</span></span></code></pre></figure>",
       "readingMinutes": 2
     },
     {
       "slug": "note-osi-model",
       "locale": "zh",
-      "title": "OSI 七层模型手札",
+      "title": "OSI 七层模型：从报文到比特流",
       "date": "2024-09-22",
-      "summary": "从应用层到物理层，梳理 OSI 七层模型的各层职责与 PDU 逐层封装的过程。",
+      "summary": "从应用层到物理层，七层各司何职；一段报文如何在下行途中被逐层加上端口、IP 与 MAC，最终化作线路上的比特。",
       "tags": [
         "网络",
         "手札"
       ],
       "draft": false,
-      "bodyMd": "\nOSI 模型，即开放式通信系统互联参考模型（Open System Interconnection Reference Model），是国际标准化组织（ISO）提出的一个试图使各种计算机在世界范围内互连为网络的标准框架，简称 OSI。\n\n## 模型结构\n\nOSI 划分的七个层次由高到低依次为：Application（应用层）、Presentation（表示层）、Session（会话层）、Transport（传输层）、Network（网络层）、DataLink（数据链路层）和 Physical（物理层）。其中应用层、表示层和会话层可以合并视为「应用层」，剩余各层则可视为「数据流动层」。\n\n## PDU 与逐层封装\n\nOSI 参考模型中规定数据为协议数据单元（PDU），通常在该层的 PDU 前面增加一个字母前缀，标识它属于哪一层：\n\n- **Application** 应用层协议数据单元（APDU）\n- **Presentation** 表示层协议数据单元（PPDU）\n- **Session** 会话层协议数据单元（SPDU）\n- **Transport** 传输层——段（Segment），端口号，服务进程到服务进程。报文来到传输层加上端口号封装成段：报文 + 源端口 + 目标端口 = 段\n- **Network** 网络层——数据包（Packet），IP 地址，端到端。段来到网络层加上 IP 地址封装成包：段 + 源 IP + 目标 IP = 包\n- **DataLink** 数据链路层——帧（Frame），MAC 地址，跳到跳。包来到数据链路层加上 MAC 地址封装成帧：包 + 源 MAC + 目标 MAC（广播）= 帧\n- **Physical** 物理层——比特流（Bit）\n\n> 在网络通信中，通过传输本层的 PDU 到对方的对等层来实现通信。如会话层通过传送会话层协议数据单元（SPDU）和对等的会话层进行通信。从逻辑上讲，对等层间的通信是两个设备的同一层直接通信；而物理上，每一层都只与自己相邻的上下两层直接通信，下层通过服务访问点为上一层提供服务。接收数据时，数据自下而上传输；发送数据时，数据自上而下传输。\n\n## 各层功能\n\n### 应用层\n\n为应用程序或用户请求提供各种服务。它是 OSI 参考模型的最高层，也是最靠近用户的一层，为计算机用户、各种应用程序以及网络提供接口，也为用户直接提供各种网络服务。如 HTTP、FTP、SMTP、POP3、DNS 等。\n\n> 应用层直接面向用户，用户的通信内容要由应用进程解决，这就要求应用层采用不同的应用协议来解决不同类型的应用要求，并且保证这些不同类型的应用所采用的低层通信协议是一致的。应用层中包含了若干独立的用户通用服务协议模块，为网络用户之间的通信提供专用的程序服务。需要注意：应用层并不是应用程序，而是为应用程序提供服务。\n\n### 表示层\n\n处理数据格式，如编码、加密、压缩等。\n\n> 表示层为在应用过程之间传送的信息提供表示方法的服务。表示层以下各层主要完成从源端到目的端可靠的数据传送，而表示层更关心所传送数据的语法和语义。其主要功能是处理两个通信系统中交换信息的表示方式，包括数据格式变换、数据加密与解密、数据压缩与解压等。在网络带宽一定的前提下，数据压缩得越小传输速率就越快，所以数据压缩与解压被视为掌握网络传输速率的关键因素；数据加密服务则是重要的网络安全要素，确保数据的安全传输。表示层为应用层提供的服务包括：语法转换、语法选择和联接管理。\n\n### 会话层\n\n建立、管理和终止会话，如 SSL、TLS、DAP 等。\n\n> 会话层的主要功能是负责维护两个节点之间的传输联接，确保点到点传输不中断，以及管理数据交换等。会话层在应用进程中建立、管理和终止会话，还可以通过对话控制来决定使用全双工通信或半双工通信，并通过自身协议对请求与应答进行协调。它主要管理不同主机上不同进程的通信内容，从而确保用户之间无论是建立对话还是释放会话连接，都能最大程度保证数据交换的及时性和规范性。\n\n### 传输层\n\n提供端到端的可靠传输，如 TCP、UDP 等。\n\n> 传输层是网络体系结构中高低层之间衔接的一个接口层，也是整个体系协议的核心。它主要为用户提供 End-to-End（端到端）服务，处理数据报错误、数据包次序等传输问题。传输层向高层屏蔽了下层数据通信的细节，使用户完全不用考虑物理层、数据链路层和网络层工作的详细情况。它使用网络层提供的网络联接服务，依据系统需求可以选择面向联接或面向无联接的数据传输服务。\n\n### 网络层\n\n负责数据包的路由和转发，如 IP 协议。\n\n> 网络层主要为数据在节点之间传输创建逻辑链路，通过路由选择算法为分组选择最佳路径，从而实现拥塞控制、网络互联等功能。它负责把分组从源网络传输到目标网络的路由选择工作——互联网是多个网络组成的集合，正是借助网络层的路由选择功能，多个网络之间的联接才得以畅通。网络层提供面向联接和面向无联接两种服务：前者是可靠的联接服务，数据交换前必须先建立联接，以虚电路服务的方式实现；后者是一种不可靠但灵活迅速的服务，以数据报服务的方式实现，不能防止报文的丢失、重发或失序。\n\n### 数据链路层\n\n负责数据帧的传输和错误检测，如以太网协议、网卡、交换机等。\n\n> 数据链路层在通信实体间建立数据链路联接，传输的基本单位为「帧」，并为网络层提供差错控制和流量控制服务。它由 MAC（介质访问控制子层）和 LLC（逻辑链路控制子层）组成：MAC 子层的主要任务是规定如何在物理线路上传输帧；LLC 子层对同一条网络链路上设备之间的通信进行管理，负责逻辑上识别不同协议类型并对其进行封装——接收网络协议的分组数据并添加控制信息，把分组传送到目标设备。\n\n### 物理层\n\n负责比特流的传输和接收，如光纤、电缆、中继器、集线器等。\n\n> 物理层是参考模型的最底层，主要定义了系统的电气、机械、过程和功能标准，如电压、物理数据速率、最大传输距离、物理联接器等特性。它利用传输介质为数据链路层提供物理联接，负责数据流的物理传输工作。物理层传输的基本单位是比特流，即 0 和 1，也就是最基本的电信号或光信号。\n",
-      "bodyHtml": "<p>OSI 模型，即开放式通信系统互联参考模型（Open System Interconnection Reference Model），是国际标准化组织（ISO）提出的一个试图使各种计算机在世界范围内互连为网络的标准框架，简称 OSI。</p>\n<h2 id=\"模型结构\"><a href=\"#模型结构\">模型结构</a></h2>\n<p>OSI 划分的七个层次由高到低依次为：Application（应用层）、Presentation（表示层）、Session（会话层）、Transport（传输层）、Network（网络层）、DataLink（数据链路层）和 Physical（物理层）。其中应用层、表示层和会话层可以合并视为「应用层」，剩余各层则可视为「数据流动层」。</p>\n<h2 id=\"pdu-与逐层封装\"><a href=\"#pdu-与逐层封装\">PDU 与逐层封装</a></h2>\n<p>OSI 参考模型中规定数据为协议数据单元（PDU），通常在该层的 PDU 前面增加一个字母前缀，标识它属于哪一层：</p>\n<ul>\n<li><strong>Application</strong> 应用层协议数据单元（APDU）</li>\n<li><strong>Presentation</strong> 表示层协议数据单元（PPDU）</li>\n<li><strong>Session</strong> 会话层协议数据单元（SPDU）</li>\n<li><strong>Transport</strong> 传输层——段（Segment），端口号，服务进程到服务进程。报文来到传输层加上端口号封装成段：报文 + 源端口 + 目标端口 = 段</li>\n<li><strong>Network</strong> 网络层——数据包（Packet），IP 地址，端到端。段来到网络层加上 IP 地址封装成包：段 + 源 IP + 目标 IP = 包</li>\n<li><strong>DataLink</strong> 数据链路层——帧（Frame），MAC 地址，跳到跳。包来到数据链路层加上 MAC 地址封装成帧：包 + 源 MAC + 目标 MAC（广播）= 帧</li>\n<li><strong>Physical</strong> 物理层——比特流（Bit）</li>\n</ul>\n<blockquote>\n<p>在网络通信中，通过传输本层的 PDU 到对方的对等层来实现通信。如会话层通过传送会话层协议数据单元（SPDU）和对等的会话层进行通信。从逻辑上讲，对等层间的通信是两个设备的同一层直接通信；而物理上，每一层都只与自己相邻的上下两层直接通信，下层通过服务访问点为上一层提供服务。接收数据时，数据自下而上传输；发送数据时，数据自上而下传输。</p>\n</blockquote>\n<h2 id=\"各层功能\"><a href=\"#各层功能\">各层功能</a></h2>\n<h3 id=\"应用层\"><a href=\"#应用层\">应用层</a></h3>\n<p>为应用程序或用户请求提供各种服务。它是 OSI 参考模型的最高层，也是最靠近用户的一层，为计算机用户、各种应用程序以及网络提供接口，也为用户直接提供各种网络服务。如 HTTP、FTP、SMTP、POP3、DNS 等。</p>\n<blockquote>\n<p>应用层直接面向用户，用户的通信内容要由应用进程解决，这就要求应用层采用不同的应用协议来解决不同类型的应用要求，并且保证这些不同类型的应用所采用的低层通信协议是一致的。应用层中包含了若干独立的用户通用服务协议模块，为网络用户之间的通信提供专用的程序服务。需要注意：应用层并不是应用程序，而是为应用程序提供服务。</p>\n</blockquote>\n<h3 id=\"表示层\"><a href=\"#表示层\">表示层</a></h3>\n<p>处理数据格式，如编码、加密、压缩等。</p>\n<blockquote>\n<p>表示层为在应用过程之间传送的信息提供表示方法的服务。表示层以下各层主要完成从源端到目的端可靠的数据传送，而表示层更关心所传送数据的语法和语义。其主要功能是处理两个通信系统中交换信息的表示方式，包括数据格式变换、数据加密与解密、数据压缩与解压等。在网络带宽一定的前提下，数据压缩得越小传输速率就越快，所以数据压缩与解压被视为掌握网络传输速率的关键因素；数据加密服务则是重要的网络安全要素，确保数据的安全传输。表示层为应用层提供的服务包括：语法转换、语法选择和联接管理。</p>\n</blockquote>\n<h3 id=\"会话层\"><a href=\"#会话层\">会话层</a></h3>\n<p>建立、管理和终止会话，如 SSL、TLS、DAP 等。</p>\n<blockquote>\n<p>会话层的主要功能是负责维护两个节点之间的传输联接，确保点到点传输不中断，以及管理数据交换等。会话层在应用进程中建立、管理和终止会话，还可以通过对话控制来决定使用全双工通信或半双工通信，并通过自身协议对请求与应答进行协调。它主要管理不同主机上不同进程的通信内容，从而确保用户之间无论是建立对话还是释放会话连接，都能最大程度保证数据交换的及时性和规范性。</p>\n</blockquote>\n<h3 id=\"传输层\"><a href=\"#传输层\">传输层</a></h3>\n<p>提供端到端的可靠传输，如 TCP、UDP 等。</p>\n<blockquote>\n<p>传输层是网络体系结构中高低层之间衔接的一个接口层，也是整个体系协议的核心。它主要为用户提供 End-to-End（端到端）服务，处理数据报错误、数据包次序等传输问题。传输层向高层屏蔽了下层数据通信的细节，使用户完全不用考虑物理层、数据链路层和网络层工作的详细情况。它使用网络层提供的网络联接服务，依据系统需求可以选择面向联接或面向无联接的数据传输服务。</p>\n</blockquote>\n<h3 id=\"网络层\"><a href=\"#网络层\">网络层</a></h3>\n<p>负责数据包的路由和转发，如 IP 协议。</p>\n<blockquote>\n<p>网络层主要为数据在节点之间传输创建逻辑链路，通过路由选择算法为分组选择最佳路径，从而实现拥塞控制、网络互联等功能。它负责把分组从源网络传输到目标网络的路由选择工作——互联网是多个网络组成的集合，正是借助网络层的路由选择功能，多个网络之间的联接才得以畅通。网络层提供面向联接和面向无联接两种服务：前者是可靠的联接服务，数据交换前必须先建立联接，以虚电路服务的方式实现；后者是一种不可靠但灵活迅速的服务，以数据报服务的方式实现，不能防止报文的丢失、重发或失序。</p>\n</blockquote>\n<h3 id=\"数据链路层\"><a href=\"#数据链路层\">数据链路层</a></h3>\n<p>负责数据帧的传输和错误检测，如以太网协议、网卡、交换机等。</p>\n<blockquote>\n<p>数据链路层在通信实体间建立数据链路联接，传输的基本单位为「帧」，并为网络层提供差错控制和流量控制服务。它由 MAC（介质访问控制子层）和 LLC（逻辑链路控制子层）组成：MAC 子层的主要任务是规定如何在物理线路上传输帧；LLC 子层对同一条网络链路上设备之间的通信进行管理，负责逻辑上识别不同协议类型并对其进行封装——接收网络协议的分组数据并添加控制信息，把分组传送到目标设备。</p>\n</blockquote>\n<h3 id=\"物理层\"><a href=\"#物理层\">物理层</a></h3>\n<p>负责比特流的传输和接收，如光纤、电缆、中继器、集线器等。</p>\n<blockquote>\n<p>物理层是参考模型的最底层，主要定义了系统的电气、机械、过程和功能标准，如电压、物理数据速率、最大传输距离、物理联接器等特性。它利用传输介质为数据链路层提供物理联接，负责数据流的物理传输工作。物理层传输的基本单位是比特流，即 0 和 1，也就是最基本的电信号或光信号。</p>\n</blockquote>",
-      "readingMinutes": 5
+      "bodyMd": "\nOSI 模型，即开放式通信系统互联参考模型（Open System Interconnection Reference Model），是国际标准化组织（ISO）提出的一个标准框架，目的是让各种计算机在世界范围内互连为网络，简称 OSI。\n\n## 模型结构\n\nOSI 划分的七个层次由高到低依次为：Application（应用层）、Presentation（表示层）、Session（会话层）、Transport（传输层）、Network（网络层）、DataLink（数据链路层）和 Physical（物理层）。其中应用层、表示层和会话层可以合并视为「应用层」，其余各层则可视为「数据流动层」。\n\n## PDU 与逐层封装\n\nOSI 参考模型把各层处理的数据统称为协议数据单元（PDU），通常在 PDU 前加一个字母前缀，标识它属于哪一层：\n\n- **Application** 应用层协议数据单元（APDU）\n- **Presentation** 表示层协议数据单元（PPDU）\n- **Session** 会话层协议数据单元（SPDU）\n- **Transport** 传输层——段（Segment），端口号，服务进程到服务进程。报文来到传输层加上端口号封装成段：报文 + 源端口 + 目标端口 = 段\n- **Network** 网络层——数据包（Packet），IP 地址，端到端。段来到网络层加上 IP 地址封装成包：段 + 源 IP + 目标 IP = 包\n- **DataLink** 数据链路层——帧（Frame），MAC 地址，跳到跳。包来到数据链路层加上 MAC 地址封装成帧：包 + 源 MAC + 目标 MAC（广播）= 帧\n- **Physical** 物理层——比特流（Bit）\n\n> 在网络通信中，通过把本层的 PDU 传送到对方的对等层来实现通信。例如会话层通过传送会话层协议数据单元（SPDU）与对等的会话层通信。从逻辑上讲，对等层间的通信是两个设备的同一层直接对话；而物理上，每一层都只与自己相邻的上下两层直接通信，下层通过服务访问点为上一层提供服务。接收数据时，数据自下而上传输；发送数据时，数据自上而下传输。\n\n自上而下看，封装就是一个不断「加头」的过程：报文加端口成段，段加 IP 成包，包加 MAC 成帧，帧最终化作线路上的比特。接收方则自下而上，逐层拆开。\n\n## 各层功能\n\n### 应用层\n\n为应用程序或用户请求提供各种服务。它是 OSI 参考模型的最高层，也是最靠近用户的一层，为计算机用户、各种应用程序以及网络提供接口，也为用户直接提供各种网络服务，如 HTTP、FTP、SMTP、POP3、DNS 等。\n\n> 应用层直接面向用户，用户的通信内容要由应用进程解决，这就要求应用层采用不同的应用协议来解决不同类型的应用要求，并且保证这些不同类型的应用所采用的低层通信协议是一致的。应用层中包含了若干独立的用户通用服务协议模块，为网络用户之间的通信提供专用的程序服务。需要注意：应用层并不是应用程序，而是为应用程序提供服务。\n\n### 表示层\n\n处理数据格式，如编码、加密、压缩等。\n\n> 表示层为在应用过程之间传送的信息提供表示方法的服务。表示层以下各层主要完成从源端到目的端可靠的数据传送，而表示层更关心所传送数据的语法和语义。其主要功能是处理两个通信系统中交换信息的表示方式，包括数据格式变换、数据加密与解密、数据压缩与解压等。在网络带宽一定的前提下，数据压缩得越小传输速率就越快，所以数据压缩与解压被视为掌握网络传输速率的关键因素；数据加密服务则是重要的网络安全要素，确保数据的安全传输。表示层为应用层提供的服务包括：语法转换、语法选择和连接管理。\n\n### 会话层\n\n建立、管理和终止会话，如 SSL、TLS、DAP 等。\n\n> 会话层的主要功能是负责维护两个节点之间的传输连接，确保点到点传输不中断，以及管理数据交换等。会话层在应用进程中建立、管理和终止会话，还可以通过对话控制来决定使用全双工通信或半双工通信，并通过自身协议对请求与应答进行协调。它主要管理不同主机上不同进程的通信内容，从而确保用户之间无论是建立对话还是释放会话连接，都能最大程度保证数据交换的及时性和规范性。\n\n### 传输层\n\n提供端到端的可靠传输，如 TCP、UDP 等。\n\n> 传输层是网络体系结构中高低层之间衔接的一个接口层，也是整个体系协议的核心。它主要为用户提供 End-to-End（端到端）服务，处理数据报错误、数据包次序等传输问题。传输层向高层屏蔽了下层数据通信的细节，使用户完全不用考虑物理层、数据链路层和网络层工作的详细情况。它使用网络层提供的网络连接服务，依据系统需求可以选择面向连接或面向无连接的数据传输服务。\n\n### 网络层\n\n负责数据包的路由和转发，如 IP 协议。\n\n> 网络层主要为数据在节点之间传输创建逻辑链路，通过路由选择算法为分组选择最佳路径，从而实现拥塞控制、网络互联等功能。它负责把分组从源网络传输到目标网络的路由选择工作——互联网是多个网络组成的集合，正是借助网络层的路由选择功能，多个网络之间的连接才得以畅通。网络层提供面向连接和面向无连接两种服务：前者是可靠的连接服务，数据交换前必须先建立连接，以虚电路服务的方式实现；后者是一种不可靠但灵活迅速的服务，以数据报服务的方式实现，不能防止报文的丢失、重发或失序。\n\n### 数据链路层\n\n负责数据帧的传输和错误检测，如以太网协议、网卡、交换机等。\n\n> 数据链路层在通信实体间建立数据链路连接，传输的基本单位为「帧」，并为网络层提供差错控制和流量控制服务。它由 MAC（介质访问控制子层）和 LLC（逻辑链路控制子层）组成：MAC 子层的主要任务是规定如何在物理线路上传输帧；LLC 子层对同一条网络链路上设备之间的通信进行管理，负责逻辑上识别不同协议类型并对其进行封装——接收网络协议的分组数据并添加控制信息，把分组传送到目标设备。\n\n### 物理层\n\n负责比特流的传输和接收，如光纤、电缆、中继器、集线器等。\n\n> 物理层是参考模型的最底层，主要定义了系统的电气、机械、过程和功能标准，如电压、物理数据速率、最大传输距离、物理连接器等特性。它利用传输介质为数据链路层提供物理连接，负责数据流的物理传输工作。物理层传输的基本单位是比特流，即 0 和 1，也就是最基本的电信号或光信号。\n",
+      "bodyHtml": "<p>OSI 模型，即开放式通信系统互联参考模型（Open System Interconnection Reference Model），是国际标准化组织（ISO）提出的一个标准框架，目的是让各种计算机在世界范围内互连为网络，简称 OSI。</p>\n<h2 id=\"模型结构\"><a href=\"#模型结构\">模型结构</a></h2>\n<p>OSI 划分的七个层次由高到低依次为：Application（应用层）、Presentation（表示层）、Session（会话层）、Transport（传输层）、Network（网络层）、DataLink（数据链路层）和 Physical（物理层）。其中应用层、表示层和会话层可以合并视为「应用层」，其余各层则可视为「数据流动层」。</p>\n<h2 id=\"pdu-与逐层封装\"><a href=\"#pdu-与逐层封装\">PDU 与逐层封装</a></h2>\n<p>OSI 参考模型把各层处理的数据统称为协议数据单元（PDU），通常在 PDU 前加一个字母前缀，标识它属于哪一层：</p>\n<ul>\n<li><strong>Application</strong> 应用层协议数据单元（APDU）</li>\n<li><strong>Presentation</strong> 表示层协议数据单元（PPDU）</li>\n<li><strong>Session</strong> 会话层协议数据单元（SPDU）</li>\n<li><strong>Transport</strong> 传输层——段（Segment），端口号，服务进程到服务进程。报文来到传输层加上端口号封装成段：报文 + 源端口 + 目标端口 = 段</li>\n<li><strong>Network</strong> 网络层——数据包（Packet），IP 地址，端到端。段来到网络层加上 IP 地址封装成包：段 + 源 IP + 目标 IP = 包</li>\n<li><strong>DataLink</strong> 数据链路层——帧（Frame），MAC 地址，跳到跳。包来到数据链路层加上 MAC 地址封装成帧：包 + 源 MAC + 目标 MAC（广播）= 帧</li>\n<li><strong>Physical</strong> 物理层——比特流（Bit）</li>\n</ul>\n<blockquote>\n<p>在网络通信中，通过把本层的 PDU 传送到对方的对等层来实现通信。例如会话层通过传送会话层协议数据单元（SPDU）与对等的会话层通信。从逻辑上讲，对等层间的通信是两个设备的同一层直接对话；而物理上，每一层都只与自己相邻的上下两层直接通信，下层通过服务访问点为上一层提供服务。接收数据时，数据自下而上传输；发送数据时，数据自上而下传输。</p>\n</blockquote>\n<p>自上而下看，封装就是一个不断「加头」的过程：报文加端口成段，段加 IP 成包，包加 MAC 成帧，帧最终化作线路上的比特。接收方则自下而上，逐层拆开。</p>\n<h2 id=\"各层功能\"><a href=\"#各层功能\">各层功能</a></h2>\n<h3 id=\"应用层\"><a href=\"#应用层\">应用层</a></h3>\n<p>为应用程序或用户请求提供各种服务。它是 OSI 参考模型的最高层，也是最靠近用户的一层，为计算机用户、各种应用程序以及网络提供接口，也为用户直接提供各种网络服务，如 HTTP、FTP、SMTP、POP3、DNS 等。</p>\n<blockquote>\n<p>应用层直接面向用户，用户的通信内容要由应用进程解决，这就要求应用层采用不同的应用协议来解决不同类型的应用要求，并且保证这些不同类型的应用所采用的低层通信协议是一致的。应用层中包含了若干独立的用户通用服务协议模块，为网络用户之间的通信提供专用的程序服务。需要注意：应用层并不是应用程序，而是为应用程序提供服务。</p>\n</blockquote>\n<h3 id=\"表示层\"><a href=\"#表示层\">表示层</a></h3>\n<p>处理数据格式，如编码、加密、压缩等。</p>\n<blockquote>\n<p>表示层为在应用过程之间传送的信息提供表示方法的服务。表示层以下各层主要完成从源端到目的端可靠的数据传送，而表示层更关心所传送数据的语法和语义。其主要功能是处理两个通信系统中交换信息的表示方式，包括数据格式变换、数据加密与解密、数据压缩与解压等。在网络带宽一定的前提下，数据压缩得越小传输速率就越快，所以数据压缩与解压被视为掌握网络传输速率的关键因素；数据加密服务则是重要的网络安全要素，确保数据的安全传输。表示层为应用层提供的服务包括：语法转换、语法选择和连接管理。</p>\n</blockquote>\n<h3 id=\"会话层\"><a href=\"#会话层\">会话层</a></h3>\n<p>建立、管理和终止会话，如 SSL、TLS、DAP 等。</p>\n<blockquote>\n<p>会话层的主要功能是负责维护两个节点之间的传输连接，确保点到点传输不中断，以及管理数据交换等。会话层在应用进程中建立、管理和终止会话，还可以通过对话控制来决定使用全双工通信或半双工通信，并通过自身协议对请求与应答进行协调。它主要管理不同主机上不同进程的通信内容，从而确保用户之间无论是建立对话还是释放会话连接，都能最大程度保证数据交换的及时性和规范性。</p>\n</blockquote>\n<h3 id=\"传输层\"><a href=\"#传输层\">传输层</a></h3>\n<p>提供端到端的可靠传输，如 TCP、UDP 等。</p>\n<blockquote>\n<p>传输层是网络体系结构中高低层之间衔接的一个接口层，也是整个体系协议的核心。它主要为用户提供 End-to-End（端到端）服务，处理数据报错误、数据包次序等传输问题。传输层向高层屏蔽了下层数据通信的细节，使用户完全不用考虑物理层、数据链路层和网络层工作的详细情况。它使用网络层提供的网络连接服务，依据系统需求可以选择面向连接或面向无连接的数据传输服务。</p>\n</blockquote>\n<h3 id=\"网络层\"><a href=\"#网络层\">网络层</a></h3>\n<p>负责数据包的路由和转发，如 IP 协议。</p>\n<blockquote>\n<p>网络层主要为数据在节点之间传输创建逻辑链路，通过路由选择算法为分组选择最佳路径，从而实现拥塞控制、网络互联等功能。它负责把分组从源网络传输到目标网络的路由选择工作——互联网是多个网络组成的集合，正是借助网络层的路由选择功能，多个网络之间的连接才得以畅通。网络层提供面向连接和面向无连接两种服务：前者是可靠的连接服务，数据交换前必须先建立连接，以虚电路服务的方式实现；后者是一种不可靠但灵活迅速的服务，以数据报服务的方式实现，不能防止报文的丢失、重发或失序。</p>\n</blockquote>\n<h3 id=\"数据链路层\"><a href=\"#数据链路层\">数据链路层</a></h3>\n<p>负责数据帧的传输和错误检测，如以太网协议、网卡、交换机等。</p>\n<blockquote>\n<p>数据链路层在通信实体间建立数据链路连接，传输的基本单位为「帧」，并为网络层提供差错控制和流量控制服务。它由 MAC（介质访问控制子层）和 LLC（逻辑链路控制子层）组成：MAC 子层的主要任务是规定如何在物理线路上传输帧；LLC 子层对同一条网络链路上设备之间的通信进行管理，负责逻辑上识别不同协议类型并对其进行封装——接收网络协议的分组数据并添加控制信息，把分组传送到目标设备。</p>\n</blockquote>\n<h3 id=\"物理层\"><a href=\"#物理层\">物理层</a></h3>\n<p>负责比特流的传输和接收，如光纤、电缆、中继器、集线器等。</p>\n<blockquote>\n<p>物理层是参考模型的最底层，主要定义了系统的电气、机械、过程和功能标准，如电压、物理数据速率、最大传输距离、物理连接器等特性。它利用传输介质为数据链路层提供物理连接，负责数据流的物理传输工作。物理层传输的基本单位是比特流，即 0 和 1，也就是最基本的电信号或光信号。</p>\n</blockquote>",
+      "readingMinutes": 6
     },
     {
       "slug": "note-resume-skill",
       "locale": "zh",
-      "title": "简历怎么写：引导面试官的艺术",
+      "title": "简历是一份长期维护的文档",
       "date": "2024-11-05",
-      "summary": "简历不是找工作前突击包装出来的，而是长期积累、持续迭代的产物——顺便聊聊如何在简历里给面试官挖好「陷阱」。",
+      "summary": "好简历不是求职前突击包装出来的，而是多年积累后的凝练；顺便说说怎样在简历里给面试官留好线索。",
       "tags": [
         "分享",
         "手札"
       ],
       "draft": false,
-      "bodyMd": "\n## 核心思想\n\n> 千万不要等到找工作前才开始准备简历！\n\n好的简历不是一两天就能包装出来的，而是通过个人长期以来的积累，不断发掘并改进自己的不足，经过多个版本的持续优化后才凝练而成的。简历就像你的人生工作档案一样需要实时更新，把你在工作和学习中的难点、亮点和成就记录下来。\n\n> 写简历要有**和珅精神**、**舔狗精神**，要把对方想象成**皇上**、**上帝**、**爸爸**、**女朋友**。**_（面试中切忌有这种心态，面试双方是平等的，要不卑不亢）_**\n\n- 最基本的就是不能有错别字，不能有语病，保证语句通顺、语义明确，而且要体现专业性，尽量少写废话、大白话。\n- 要**设身处地地**、**处心积虑地**为对方着想，如何让对方看着舒服，包括页面如何排版、字体大小如何设置等。\n- 简历内容要想方设法吸引对方，让对方对你产生好奇，或是让对方眼前一亮，甚至有拍案叫绝的感觉。如果实在没有亮点，就把自己做过的事情尽量写得详尽出彩。\n\n> 学会在简历中引导面试官。\n\n其实面试官也很发愁问什么问题，所以大部分面试官都会根据你简历中提到的项目经历去提问，试图了解你的专业技术能力以及发现问题和解决问题的方式。\n\n所以我们要尽可能地在简历中去引导面试官。比如把我们想让面试官问的一些关键字加粗，或者用一些引导性的语句，让面试官对你某个项目或者某段经历产生好奇，让面试官掉进你准备好的**陷阱**中，这样往往会有奇效。**_（当然要提前准备好如何回答你引导的问题，别让陷阱把自己困住了）_**\n\n> 定制化简历。\n\n学会根据公司的 JD（Job Description）来定制简历，结合公司的需求来写，这样才更有针对性，更容易被录取。在简历中，面试官更关注的是你在项目中负责什么、做了什么、怎么通过技术和设计能力去解决问题的。至于项目本身的介绍，用一两句话直击核心就好，重点在于交代和你工作有关的内容，其余的可以在面试中展开介绍。\n\n> 不要以为你知道的就是大家都知道的，从自我意识的圈子中跳脱出来。\n\n有时候我们在一个圈子里干久了，就会觉得某些事情大家都知道，不值得写进简历。其实不然，很多时候你认为很简单的东西别人都不了解，所以要学会从自我意识中跳脱出来，站在对方的角度去思考问题。\n\n> 万能公式：为解决 xx 问题，使用 xx 技术实现了 xx，达到了怎样的效果。\n\n## 简历的组成部分\n\n### 个人信息\n\n姓名、性别、年龄、联系电话、电子邮箱、现居住地、求职意向。\n\n### 教育背景\n\n学校名称、专业、学历、在校时间。\n\n### 工作经历\n\n公司名称、职位、工作时间、工作内容。\n\n### 项目经验\n\n项目名称、项目时间、项目描述、项目职责。\n\n- 项目介绍的占比不要太多，把重心放在你在项目中负责什么、做了什么、怎么通过技术去解决问题。\n- 尽量不要写业务相似的项目，最好能让各个项目之间形成互补，体现你的全面性、完整性和职业连贯性。\n\n### 自我评价（个人优势）\n\n为什么是你，不是别人？\n\n不要只说自己哪里强，而是要举一些事例和数据。例如：我学习能力强。**_曾通过官方文档，自学了 xxx 技术。_**\n\n### 技能证书（选填）\n\n掌握的技能、考取的证书。\n\n## 面试心态与面试技巧\n\n面试是一个双向选择的过程，面试双方是平等的。\n\n面试要多从对方的角度考虑：假如你是面试官，是否能给你留下一个好的印象？什么样的表现能让你心里打出一个 pass？\n\n大家都知道面试不易，招人也不易。其实面试官的需求很简单，大部分面试官都是想招一个这样的人：\n\n- 看起来人还不错，比较好相处。说好听点叫志同道合、愿景一致，符合公司企业文化。\n- 沟通表达能力不错，逻辑条理清晰。这是所有工作的必备技能。\n- 能满足岗位需求，有相关的经验，最好一来就能上手干活，降低培养成本。\n- 学习能力、思维能力过关，能解决疑难杂症并与时俱进。\n- 其他方面能给公司带来提升，输入新鲜血液。\n",
-      "bodyHtml": "<h2 id=\"核心思想\"><a href=\"#核心思想\">核心思想</a></h2>\n<blockquote>\n<p>千万不要等到找工作前才开始准备简历！</p>\n</blockquote>\n<p>好的简历不是一两天就能包装出来的，而是通过个人长期以来的积累，不断发掘并改进自己的不足，经过多个版本的持续优化后才凝练而成的。简历就像你的人生工作档案一样需要实时更新，把你在工作和学习中的难点、亮点和成就记录下来。</p>\n<blockquote>\n<p>写简历要有<strong>和珅精神</strong>、<strong>舔狗精神</strong>，要把对方想象成<strong>皇上</strong>、<strong>上帝</strong>、<strong>爸爸</strong>、<strong>女朋友</strong>。<strong><em>（面试中切忌有这种心态，面试双方是平等的，要不卑不亢）</em></strong></p>\n</blockquote>\n<ul>\n<li>最基本的就是不能有错别字，不能有语病，保证语句通顺、语义明确，而且要体现专业性，尽量少写废话、大白话。</li>\n<li>要<strong>设身处地地</strong>、<strong>处心积虑地</strong>为对方着想，如何让对方看着舒服，包括页面如何排版、字体大小如何设置等。</li>\n<li>简历内容要想方设法吸引对方，让对方对你产生好奇，或是让对方眼前一亮，甚至有拍案叫绝的感觉。如果实在没有亮点，就把自己做过的事情尽量写得详尽出彩。</li>\n</ul>\n<blockquote>\n<p>学会在简历中引导面试官。</p>\n</blockquote>\n<p>其实面试官也很发愁问什么问题，所以大部分面试官都会根据你简历中提到的项目经历去提问，试图了解你的专业技术能力以及发现问题和解决问题的方式。</p>\n<p>所以我们要尽可能地在简历中去引导面试官。比如把我们想让面试官问的一些关键字加粗，或者用一些引导性的语句，让面试官对你某个项目或者某段经历产生好奇，让面试官掉进你准备好的<strong>陷阱</strong>中，这样往往会有奇效。<strong><em>（当然要提前准备好如何回答你引导的问题，别让陷阱把自己困住了）</em></strong></p>\n<blockquote>\n<p>定制化简历。</p>\n</blockquote>\n<p>学会根据公司的 JD（Job Description）来定制简历，结合公司的需求来写，这样才更有针对性，更容易被录取。在简历中，面试官更关注的是你在项目中负责什么、做了什么、怎么通过技术和设计能力去解决问题的。至于项目本身的介绍，用一两句话直击核心就好，重点在于交代和你工作有关的内容，其余的可以在面试中展开介绍。</p>\n<blockquote>\n<p>不要以为你知道的就是大家都知道的，从自我意识的圈子中跳脱出来。</p>\n</blockquote>\n<p>有时候我们在一个圈子里干久了，就会觉得某些事情大家都知道，不值得写进简历。其实不然，很多时候你认为很简单的东西别人都不了解，所以要学会从自我意识中跳脱出来，站在对方的角度去思考问题。</p>\n<blockquote>\n<p>万能公式：为解决 xx 问题，使用 xx 技术实现了 xx，达到了怎样的效果。</p>\n</blockquote>\n<h2 id=\"简历的组成部分\"><a href=\"#简历的组成部分\">简历的组成部分</a></h2>\n<h3 id=\"个人信息\"><a href=\"#个人信息\">个人信息</a></h3>\n<p>姓名、性别、年龄、联系电话、电子邮箱、现居住地、求职意向。</p>\n<h3 id=\"教育背景\"><a href=\"#教育背景\">教育背景</a></h3>\n<p>学校名称、专业、学历、在校时间。</p>\n<h3 id=\"工作经历\"><a href=\"#工作经历\">工作经历</a></h3>\n<p>公司名称、职位、工作时间、工作内容。</p>\n<h3 id=\"项目经验\"><a href=\"#项目经验\">项目经验</a></h3>\n<p>项目名称、项目时间、项目描述、项目职责。</p>\n<ul>\n<li>项目介绍的占比不要太多，把重心放在你在项目中负责什么、做了什么、怎么通过技术去解决问题。</li>\n<li>尽量不要写业务相似的项目，最好能让各个项目之间形成互补，体现你的全面性、完整性和职业连贯性。</li>\n</ul>\n<h3 id=\"自我评价个人优势\"><a href=\"#自我评价个人优势\">自我评价（个人优势）</a></h3>\n<p>为什么是你，不是别人？</p>\n<p>不要只说自己哪里强，而是要举一些事例和数据。例如：我学习能力强。<strong><em>曾通过官方文档，自学了 xxx 技术。</em></strong></p>\n<h3 id=\"技能证书选填\"><a href=\"#技能证书选填\">技能证书（选填）</a></h3>\n<p>掌握的技能、考取的证书。</p>\n<h2 id=\"面试心态与面试技巧\"><a href=\"#面试心态与面试技巧\">面试心态与面试技巧</a></h2>\n<p>面试是一个双向选择的过程，面试双方是平等的。</p>\n<p>面试要多从对方的角度考虑：假如你是面试官，是否能给你留下一个好的印象？什么样的表现能让你心里打出一个 pass？</p>\n<p>大家都知道面试不易，招人也不易。其实面试官的需求很简单，大部分面试官都是想招一个这样的人：</p>\n<ul>\n<li>看起来人还不错，比较好相处。说好听点叫志同道合、愿景一致，符合公司企业文化。</li>\n<li>沟通表达能力不错，逻辑条理清晰。这是所有工作的必备技能。</li>\n<li>能满足岗位需求，有相关的经验，最好一来就能上手干活，降低培养成本。</li>\n<li>学习能力、思维能力过关，能解决疑难杂症并与时俱进。</li>\n<li>其他方面能给公司带来提升，输入新鲜血液。</li>\n</ul>",
-      "readingMinutes": 4
+      "bodyMd": "\n## 核心思想\n\n### 不要等到找工作前才开始准备简历\n\n好的简历不是一两天能包装出来的。它来自长期的积累：不断发掘并改进自己的不足，经过多个版本的持续优化，最后才凝练成一页纸。把简历当作自己的工作档案，实时更新——把工作与学习中的难点、亮点和成就随手记下来，而不是等到需要时再去回忆。\n\n### 为读它的人着想\n\n写简历时不妨有几分和珅式的殷勤：把读它的人当作需要被取悦的对象，处处为对方着想。**（但这种心态只限于写简历。到了面试桌上，双方是平等的，要不卑不亢。）**\n\n- 最基本的是不能有错别字、不能有语病，语句通顺、语义明确，并体现专业性；少写废话和大白话。\n- 设身处地、处心积虑地为对方考虑：如何让对方读得舒服，包括页面排版、字体大小这类细节。\n- 内容要想方设法吸引对方，让对方产生好奇，眼前一亮，甚至拍案叫绝。若实在没有亮点，就把做过的事情尽量写得详尽出彩。\n\n### 学会在简历中引导面试官\n\n面试官其实也发愁问什么。大多数面试官会顺着你简历里的项目经历提问，借此了解你的专业技术能力，以及你发现问题、解决问题的方式。\n\n所以要尽可能在简历中引导面试官：把希望被问到的关键字加粗，或用一些引导性的语句，让面试官对某个项目、某段经历产生好奇，走进你预先准备好的「陷阱」——这样往往有奇效。**（当然，要提前准备好如何回答你引导出的问题，别让陷阱困住自己。）**\n\n### 定制化简历\n\n根据公司的 JD（Job Description）定制简历，结合公司的需求来写，才更有针对性、更容易被录取。面试官更关注的是你在项目中负责什么、做了什么、怎样通过技术和设计能力解决问题；至于项目本身的介绍，一两句话直击核心即可，重点交代与你工作相关的部分，其余留到面试中展开。\n\n### 跳出自我意识的圈子\n\n不要以为你知道的就是大家都知道的。在一个圈子里待久了，会觉得某些事情人人皆知，不值得写进简历。其实不然：很多你认为简单的东西，别人并不了解。要学会从自我意识中跳脱出来，站在对方的角度思考。\n\n### 万能公式\n\n> 为解决 xx 问题，使用 xx 技术实现了 xx，达到了怎样的效果。\n\n## 简历的组成部分\n\n### 个人信息\n\n姓名、性别、年龄、联系电话、电子邮箱、现居住地、求职意向。\n\n### 教育背景\n\n学校名称、专业、学历、在校时间。\n\n### 工作经历\n\n公司名称、职位、工作时间、工作内容。\n\n### 项目经验\n\n项目名称、项目时间、项目描述、项目职责。\n\n- 项目介绍的占比不要太多，把重心放在你在项目中负责什么、做了什么、怎样通过技术解决问题。\n- 尽量不要写业务相似的项目，最好能让各个项目之间形成互补，体现你的全面性、完整性和职业连贯性。\n\n### 自我评价（个人优势）\n\n回答一个问题：为什么是你，而不是别人？\n\n不要只说自己哪里强，要举事例和数据。例如「我学习能力强」，后面应当跟上：**_曾通过官方文档，自学了 xxx 技术。_**\n\n### 技能证书（选填）\n\n掌握的技能、考取的证书。\n\n## 面试心态与技巧\n\n面试是一个双向选择的过程，双方是平等的。\n\n多从对方的角度考虑：假如你是面试官，眼前这个人能否给你留下好印象？什么样的表现会让你心里打出一个 pass？\n\n面试不易，招人也不易。面试官的需求其实很简单，大多数人想招的是这样一个人：\n\n- 看起来人不错，比较好相处。说得好听些叫志同道合、愿景一致，符合公司的企业文化。\n- 沟通表达能力不错，逻辑条理清晰。这是所有工作的必备技能。\n- 能满足岗位需求，有相关经验，最好一来就能上手干活，降低培养成本。\n- 学习能力、思维能力过关，能解决疑难杂症并与时俱进。\n- 其他方面能给公司带来提升，输入新鲜血液。\n",
+      "bodyHtml": "<h2 id=\"核心思想\"><a href=\"#核心思想\">核心思想</a></h2>\n<h3 id=\"不要等到找工作前才开始准备简历\"><a href=\"#不要等到找工作前才开始准备简历\">不要等到找工作前才开始准备简历</a></h3>\n<p>好的简历不是一两天能包装出来的。它来自长期的积累：不断发掘并改进自己的不足，经过多个版本的持续优化，最后才凝练成一页纸。把简历当作自己的工作档案，实时更新——把工作与学习中的难点、亮点和成就随手记下来，而不是等到需要时再去回忆。</p>\n<h3 id=\"为读它的人着想\"><a href=\"#为读它的人着想\">为读它的人着想</a></h3>\n<p>写简历时不妨有几分和珅式的殷勤：把读它的人当作需要被取悦的对象，处处为对方着想。<strong>（但这种心态只限于写简历。到了面试桌上，双方是平等的，要不卑不亢。）</strong></p>\n<ul>\n<li>最基本的是不能有错别字、不能有语病，语句通顺、语义明确，并体现专业性；少写废话和大白话。</li>\n<li>设身处地、处心积虑地为对方考虑：如何让对方读得舒服，包括页面排版、字体大小这类细节。</li>\n<li>内容要想方设法吸引对方，让对方产生好奇，眼前一亮，甚至拍案叫绝。若实在没有亮点，就把做过的事情尽量写得详尽出彩。</li>\n</ul>\n<h3 id=\"学会在简历中引导面试官\"><a href=\"#学会在简历中引导面试官\">学会在简历中引导面试官</a></h3>\n<p>面试官其实也发愁问什么。大多数面试官会顺着你简历里的项目经历提问，借此了解你的专业技术能力，以及你发现问题、解决问题的方式。</p>\n<p>所以要尽可能在简历中引导面试官：把希望被问到的关键字加粗，或用一些引导性的语句，让面试官对某个项目、某段经历产生好奇，走进你预先准备好的「陷阱」——这样往往有奇效。<strong>（当然，要提前准备好如何回答你引导出的问题，别让陷阱困住自己。）</strong></p>\n<h3 id=\"定制化简历\"><a href=\"#定制化简历\">定制化简历</a></h3>\n<p>根据公司的 JD（Job Description）定制简历，结合公司的需求来写，才更有针对性、更容易被录取。面试官更关注的是你在项目中负责什么、做了什么、怎样通过技术和设计能力解决问题；至于项目本身的介绍，一两句话直击核心即可，重点交代与你工作相关的部分，其余留到面试中展开。</p>\n<h3 id=\"跳出自我意识的圈子\"><a href=\"#跳出自我意识的圈子\">跳出自我意识的圈子</a></h3>\n<p>不要以为你知道的就是大家都知道的。在一个圈子里待久了，会觉得某些事情人人皆知，不值得写进简历。其实不然：很多你认为简单的东西，别人并不了解。要学会从自我意识中跳脱出来，站在对方的角度思考。</p>\n<h3 id=\"万能公式\"><a href=\"#万能公式\">万能公式</a></h3>\n<blockquote>\n<p>为解决 xx 问题，使用 xx 技术实现了 xx，达到了怎样的效果。</p>\n</blockquote>\n<h2 id=\"简历的组成部分\"><a href=\"#简历的组成部分\">简历的组成部分</a></h2>\n<h3 id=\"个人信息\"><a href=\"#个人信息\">个人信息</a></h3>\n<p>姓名、性别、年龄、联系电话、电子邮箱、现居住地、求职意向。</p>\n<h3 id=\"教育背景\"><a href=\"#教育背景\">教育背景</a></h3>\n<p>学校名称、专业、学历、在校时间。</p>\n<h3 id=\"工作经历\"><a href=\"#工作经历\">工作经历</a></h3>\n<p>公司名称、职位、工作时间、工作内容。</p>\n<h3 id=\"项目经验\"><a href=\"#项目经验\">项目经验</a></h3>\n<p>项目名称、项目时间、项目描述、项目职责。</p>\n<ul>\n<li>项目介绍的占比不要太多，把重心放在你在项目中负责什么、做了什么、怎样通过技术解决问题。</li>\n<li>尽量不要写业务相似的项目，最好能让各个项目之间形成互补，体现你的全面性、完整性和职业连贯性。</li>\n</ul>\n<h3 id=\"自我评价个人优势\"><a href=\"#自我评价个人优势\">自我评价（个人优势）</a></h3>\n<p>回答一个问题：为什么是你，而不是别人？</p>\n<p>不要只说自己哪里强，要举事例和数据。例如「我学习能力强」，后面应当跟上：<strong><em>曾通过官方文档，自学了 xxx 技术。</em></strong></p>\n<h3 id=\"技能证书选填\"><a href=\"#技能证书选填\">技能证书（选填）</a></h3>\n<p>掌握的技能、考取的证书。</p>\n<h2 id=\"面试心态与技巧\"><a href=\"#面试心态与技巧\">面试心态与技巧</a></h2>\n<p>面试是一个双向选择的过程，双方是平等的。</p>\n<p>多从对方的角度考虑：假如你是面试官，眼前这个人能否给你留下好印象？什么样的表现会让你心里打出一个 pass？</p>\n<p>面试不易，招人也不易。面试官的需求其实很简单，大多数人想招的是这样一个人：</p>\n<ul>\n<li>看起来人不错，比较好相处。说得好听些叫志同道合、愿景一致，符合公司的企业文化。</li>\n<li>沟通表达能力不错，逻辑条理清晰。这是所有工作的必备技能。</li>\n<li>能满足岗位需求，有相关经验，最好一来就能上手干活，降低培养成本。</li>\n<li>学习能力、思维能力过关，能解决疑难杂症并与时俱进。</li>\n<li>其他方面能给公司带来提升，输入新鲜血液。</li>\n</ul>",
+      "readingMinutes": 3
     },
     {
       "slug": "on-side-projects",
       "locale": "zh",
       "title": "副业项目是即兴演奏",
       "date": "2026-07-20",
-      "summary": "写软件和演爵士有一点很像：你得先把标准曲目练熟，才配得上即兴。",
+      "summary": "台上的即兴听起来随心所欲，背后是多年的音阶与练习曲；副业项目也一样——先把标准曲目练熟，才配得上即兴。",
       "tags": [
         "随想",
         "开发"
       ],
       "draft": false,
-      "bodyMd": "\n爵士乐手在台上看起来随心所欲，其实每一段即兴背后都是几千小时的音阶练习。\n\n副业项目也是一样。真正让人上头的不是「点子」，而是把一个小东西从能跑到好用的那段过程——那是属于自己的独奏时间。\n\n## 我的三条经验\n\n1. 先发布，再完美；\n2. 给每个项目起个好名字，认真做一块「招牌」；\n3. 允许烂尾，烂尾也是练习。\n",
-      "bodyHtml": "<p>爵士乐手在台上看起来随心所欲，其实每一段即兴背后都是几千小时的音阶练习。</p>\n<p>副业项目也是一样。真正让人上头的不是「点子」，而是把一个小东西从能跑到好用的那段过程——那是属于自己的独奏时间。</p>\n<h2 id=\"我的三条经验\"><a href=\"#我的三条经验\">我的三条经验</a></h2>\n<ol>\n<li>先发布，再完美；</li>\n<li>给每个项目起个好名字，认真做一块「招牌」；</li>\n<li>允许烂尾，烂尾也是练习。</li>\n</ol>",
+      "bodyMd": "\n小时候学琴，最不耐烦的是音阶。老师让我一遍遍拉三个八度的 G 大调，再拉开塞和克莱采尔的练习曲，曲子却迟迟不给。那时候不明白，为什么不能直接去拉那些好听的东西。\n\n后来才懂。古典的小提琴手很少即兴，但协奏曲里的华彩段，本来就是留给演奏者自由发挥的地方——而能在那里放开手脚的人，无一例外都把音阶拉到了不必去想的程度。爵士乐手更是如此：台上随心所欲的每一句，背后都是几千小时的标准曲目。\n\n副业项目于我就是这样一段华彩。白天的工作是乐谱，需求、排期、评审，每一个音都写好了；晚上的个人项目没有谱，可以随便试一个新框架、一种奇怪的交互、一个没人要的小工具。真正让人上头的从来不是那个「点子」，而是把一个小东西从能跑到好用的那段过程——那是属于自己的独奏时间。\n\n但即兴不是乱来。九年的前端工作就是我的音阶：请求怎么走、渲染怎么排、状态怎么流，这些练到不必去想，夜里才有余裕去想别的。基本功没练好的即兴，只是噪音。\n\n几条经验，写给自己：\n\n1. 先发布，再完美。台上没有人会等你把每个音都练好。\n2. 给每个项目起个好名字，认真做一块「招牌」。曲子也得有名字，才会被人记住。\n3. 允许烂尾。一段没拉完的练习曲，也已经进了手指的记忆。\n",
+      "bodyHtml": "<p>小时候学琴，最不耐烦的是音阶。老师让我一遍遍拉三个八度的 G 大调，再拉开塞和克莱采尔的练习曲，曲子却迟迟不给。那时候不明白，为什么不能直接去拉那些好听的东西。</p>\n<p>后来才懂。古典的小提琴手很少即兴，但协奏曲里的华彩段，本来就是留给演奏者自由发挥的地方——而能在那里放开手脚的人，无一例外都把音阶拉到了不必去想的程度。爵士乐手更是如此：台上随心所欲的每一句，背后都是几千小时的标准曲目。</p>\n<p>副业项目于我就是这样一段华彩。白天的工作是乐谱，需求、排期、评审，每一个音都写好了；晚上的个人项目没有谱，可以随便试一个新框架、一种奇怪的交互、一个没人要的小工具。真正让人上头的从来不是那个「点子」，而是把一个小东西从能跑到好用的那段过程——那是属于自己的独奏时间。</p>\n<p>但即兴不是乱来。九年的前端工作就是我的音阶：请求怎么走、渲染怎么排、状态怎么流，这些练到不必去想，夜里才有余裕去想别的。基本功没练好的即兴，只是噪音。</p>\n<p>几条经验，写给自己：</p>\n<ol>\n<li>先发布，再完美。台上没有人会等你把每个音都练好。</li>\n<li>给每个项目起个好名字，认真做一块「招牌」。曲子也得有名字，才会被人记住。</li>\n<li>允许烂尾。一段没拉完的练习曲，也已经进了手指的记忆。</li>\n</ol>",
       "readingMinutes": 1
     }
   ],
@@ -125,65 +95,50 @@
     {
       "locale": "zh",
       "title": "关于我",
-      "bodyMd": "\n> 互联网的妆容师\n>\n> 用代码描绘数字世界的面孔\n>\n> 他们是虚拟舞台的木偶师\n>\n> 操纵着用户体验的丝线\n>\n> 在像素的海洋中航行\n>\n> 为冰冷的数据穿上温暖的外衣\n>\n> ——写给「前端」的一首自作小诗\n\n你好，我是这家「小馆」的主人。白天写代码，晚上也写代码，偶尔写字。\n\n我喜欢做小而美的工具，喜欢老电影和爵士乐。这个网站是我的自留地：想法放在博客里，作品挂在墙上，软件摆在柜台上——喜欢什么自取。\n",
-      "bodyHtml": "<blockquote>\n<p>互联网的妆容师</p>\n<p>用代码描绘数字世界的面孔</p>\n<p>他们是虚拟舞台的木偶师</p>\n<p>操纵着用户体验的丝线</p>\n<p>在像素的海洋中航行</p>\n<p>为冰冷的数据穿上温暖的外衣</p>\n<p>——写给「前端」的一首自作小诗</p>\n</blockquote>\n<p>你好，我是这家「小馆」的主人。白天写代码，晚上也写代码，偶尔写字。</p>\n<p>我喜欢做小而美的工具，喜欢老电影和爵士乐。这个网站是我的自留地：想法放在博客里，作品挂在墙上，软件摆在柜台上——喜欢什么自取。</p>"
+      "bodyMd": "\n你好，我是 fhf，一个前端 developer，写了九年代码。\n\n从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。白天的工作是把需求变成人能用的界面；夜里属于自己的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。\n\n工作之外，我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。\n\n这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。\n",
+      "bodyHtml": "<p>你好，我是 fhf，一个前端 developer，写了九年代码。</p>\n<p>从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。白天的工作是把需求变成人能用的界面；夜里属于自己的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。</p>\n<p>工作之外，我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。</p>\n<p>这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。</p>"
     },
     {
       "locale": "en",
       "title": "About",
-      "bodyMd": "\nHi, I run this little club. I write code by day, code by night, and words in between.\n\nI like building small, well-crafted tools, old movies, and jazz. This site is my corner of the internet: thoughts go in the blog, works hang on the wall, software sits on the counter — help yourself.\n",
-      "bodyHtml": "<p>Hi, I run this little club. I write code by day, code by night, and words in between.</p>\n<p>I like building small, well-crafted tools, old movies, and jazz. This site is my corner of the internet: thoughts go in the blog, works hang on the wall, software sits on the counter — help yourself.</p>"
+      "bodyMd": "\nHi, I'm fhf — a front-end developer, nine years of code so far.\n\nI set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. The day job is turning requirements into interfaces people can use; the evenings are for small software of my own — most of it written for myself first, and named only later.\n\nOutside of work there is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.\n\nThis site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.\n",
+      "bodyHtml": "<p>Hi, I'm fhf — a front-end developer, nine years of code so far.</p>\n<p>I set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. The day job is turning requirements into interfaces people can use; the evenings are for small software of my own — most of it written for myself first, and named only later.</p>\n<p>Outside of work there is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.</p>\n<p>This site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.</p>"
     }
   ],
   "timelineEntries": [
     {
-      "key": "v5-1-quiet-issue",
+      "key": "v5-1-xiangqi",
       "version": "5.1",
-      "date": "2026-07-31",
+      "date": "2026-08-10",
       "dateLabel": null,
       "title": {
-        "en": "This site v2 — The Quiet Issue",
-        "zh": "本站 v2 ·《The Quiet Issue》"
+        "en": "Chinese chess, in the browser",
+        "zh": "把中国象棋搬进浏览器"
       },
       "note": {
-        "en": "Rebuilt the after-hours jazz club into a quiet magazine — warm paper, glass demoted to an overlay material, one lamp left on.",
-        "zh": "把深夜爵士俱乐部重做成一本安静的杂志：暖白纸底、玻璃降级为悬浮层、全站只留一盏灯。"
+        "en": "xiangqi-3d: rules, AI and rendering kept apart; pieces, textures and animation all generated at runtime — not one external asset.",
+        "zh": "xiangqi-3d：规则、AI、渲染三层分开；棋子、纹理、动画全部在运行时由代码生成，没有一个外部素材。"
       },
       "sort": 1
     },
     {
-      "key": "v5-0-neon-club",
+      "key": "v5-0-this-site",
       "version": "5.0",
-      "date": "2026-07-24",
+      "date": "2026-07-31",
       "dateLabel": null,
       "title": {
-        "en": "This site v1 — the neon jazz club",
-        "zh": "本站 v1 · 霓虹爵士版"
+        "en": "This site — The Quiet Issue",
+        "zh": "本站 ·《The Quiet Issue》"
       },
       "note": {
-        "en": "Built this bilingual site from scratch with Next.js 16 and GSAP; the first cut opened as a late-night club.",
-        "zh": "用 Next.js 16 + GSAP 从零搭起这个双语站，第一版把它开成了一间深夜俱乐部。"
+        "en": "A bilingual site built from scratch on Next.js 16, GSAP and three.js: writing, software and a lab, all of it in a database and edited from the browser.",
+        "zh": "Next.js 16 + GSAP + three.js 从零搭起的双语站：文章、软件、实验室，内容全在数据库里，浏览器里就能编辑。"
       },
       "sort": 2
     },
     {
-      "key": "v4-5-two-in-a-day",
-      "version": "4.5",
-      "date": "2026-07-20",
-      "dateLabel": null,
-      "title": {
-        "en": "Two repos in one day",
-        "zh": "一天里开了两个仓库"
-      },
-      "note": {
-        "en": "File Tidy tidies your Downloads with one command; Keyboard Piano turns the keyboard into an instrument. One tool, one toy.",
-        "zh": "File Tidy 用一条命令收拾干净下载目录，Keyboard Piano 让键盘变成一台琴——工具和玩具各一个。"
-      },
-      "sort": 3
-    },
-    {
-      "key": "v4-2-desktop-summer",
-      "version": "4.2",
+      "key": "v4-0-desktop-summer",
+      "version": "4.0",
       "date": "2026-06-03",
       "dateLabel": null,
       "title": {
@@ -191,29 +146,29 @@
         "zh": "一个夏天，三个桌面端"
       },
       "note": {
-        "en": "Portreaper hunts zombies squatting on ports, Lumitext is a custom-text macOS screensaver, Photo Browser reads your photos locally first.",
-        "zh": "Portreaper 清理占着端口不放的僵尸进程，Lumitext 是 macOS 自定义文字屏保，Photo Browser 本地优先地翻照片。"
+        "en": "Portreaper hunts zombies squatting on ports, Lumitext is a text screensaver for macOS, Photo Browser reads your photos locally first — Tauri 2, Swift and Rust, each where it fits.",
+        "zh": "Portreaper 清理占着端口的僵尸进程，Lumitext 是 macOS 的文字屏保，Photo Browser 本地优先地翻照片——Tauri 2、Swift 与 Rust 各在各的位置上。"
       },
-      "sort": 4
+      "sort": 3
     },
     {
-      "key": "v4-0-portfolio",
-      "version": "4.0",
+      "key": "v3-0-portfolio",
+      "version": "3.0",
       "date": "2024-12-23",
       "dateLabel": null,
       "title": {
         "en": "The first portfolio",
-        "zh": "第一版个人作品集"
+        "zh": "第一版作品集"
       },
       "note": {
-        "en": "fhf-portfolio — the first time the work got a page of its own. The 3D desk on this page is the one survivor from it.",
-        "zh": "fhf-portfolio：第一次把做过的东西摆成一个页面。本页那台 3D 工作台就是从那儿留下来的。"
+        "en": "fhf-portfolio — the first time the work got a page of its own. Its 3D desk now lives in the lab.",
+        "zh": "fhf-portfolio：第一次把做过的东西摆成一个页面。那台 3D 工作台，如今住在实验室里。"
       },
-      "sort": 5
+      "sort": 4
     },
     {
-      "key": "v3-5-first-note",
-      "version": "3.5",
+      "key": "v2-0-first-note",
+      "version": "2.0",
       "date": "2024-09-22",
       "dateLabel": null,
       "title": {
@@ -224,44 +179,11 @@
         "en": "The first public note was on the seven OSI layers. Ever since: understand something, leave a paragraph behind.",
         "zh": "第一篇公开笔记是 OSI 七层模型。从此看懂一件事，就留一段字。"
       },
-      "sort": 6
+      "sort": 5
     },
     {
-      "key": "v3-0-first-repo",
-      "version": "3.0",
-      "date": "2023-05-14",
-      "dateLabel": null,
-      "title": {
-        "en": "The first public repo",
-        "zh": "第一个公开仓库"
-      },
-      "note": {
-        "en": "A little repo called `buttons`, full of button styles. Going public always starts somewhere small.",
-        "zh": "一个叫 buttons 的小仓库，装着一堆按钮样式。公开的第一步总是从小处迈出去的。"
-      },
-      "sort": 7
-    },
-    {
-      "key": "v2-5-todo-first-job",
-      "version": "2.5",
-      "date": null,
-      "dateLabel": {
-        "en": "TBD",
-        "zh": "待填"
-      },
-      "title": {
-        "en": "(TODO: the year the job started)",
-        "zh": "（待填：入行的那一年）"
-      },
-      "note": {
-        "en": "(TODO: first job, first team, first time code shipped to someone else — one sentence is enough.)",
-        "zh": "（待填：第一份工作、第一个团队、第一次把代码交给别人用——一句话就够。）"
-      },
-      "sort": 8
-    },
-    {
-      "key": "v2-0-github",
-      "version": "2.0",
+      "key": "v1-0-github",
+      "version": "1.0",
       "date": "2017-05-19",
       "dateLabel": null,
       "title": {
@@ -272,25 +194,7 @@
         "en": "Signed up for GitHub. Every version above leaves its shadow on that commit graph.",
         "zh": "注册 GitHub。往后所有版本号，都能在那条提交曲线上找到影子。"
       },
-      "sort": 9
-    },
-    {
-      "key": "v1-0-todo-origin",
-      "version": "1.0",
-      "date": null,
-      "dateLabel": {
-        "en": "TBD",
-        "zh": "待填"
-      },
-      "title": {
-        "en": "(TODO: the very first machine)",
-        "zh": "（待填：最初的那台机器）"
-      },
-      "note": {
-        "en": "(TODO: where it began — the first computer, the first line of code, the first time this felt interesting.)",
-        "zh": "（待填：从哪里开始的——第一台电脑、第一行代码、第一次觉得这件事有意思。）"
-      },
-      "sort": 10
+      "sort": 6
     }
   ],
   "apps": [
@@ -307,6 +211,7 @@
       },
       "category": "desktop",
       "website": "https://fanhefeng.github.io/portreaper/",
+      "repo": "fanhefeng/portreaper",
       "platforms": [
         "macOS",
         "Windows"
@@ -328,6 +233,7 @@
       },
       "category": "desktop",
       "website": "https://fanhefeng.github.io/photo-browser/",
+      "repo": "fanhefeng/photo-browser",
       "platforms": [
         "macOS"
       ],
@@ -348,6 +254,7 @@
       },
       "category": "desktop",
       "website": "https://github.com/fanhefeng/lumitext",
+      "repo": "fanhefeng/lumitext",
       "platforms": [
         "macOS"
       ],
@@ -368,6 +275,7 @@
       },
       "category": "tool",
       "website": "https://github.com/fanhefeng/file-tidy",
+      "repo": "fanhefeng/file-tidy",
       "platforms": [
         "CLI",
         "Raycast"
@@ -389,6 +297,7 @@
       },
       "category": "game",
       "website": "https://fanhefeng.github.io/keyboard-piano/",
+      "repo": "fanhefeng/keyboard-piano",
       "platforms": [
         "Web"
       ],
@@ -409,6 +318,7 @@
       },
       "category": "website",
       "website": "https://fhf-links.vercel.app",
+      "repo": "fanhefeng/link-verse",
       "platforms": [
         "Web"
       ],
@@ -508,23 +418,23 @@
         "zh": "01 — 主业"
       },
       "title": {
-        "en": "Front-end engineering",
-        "zh": "前端工程"
+        "en": "Nine years of front-end",
+        "zh": "前端，九年"
       },
       "period": null,
       "body": {
-        "en": "React / Next.js / TypeScript. This site is the exhibit: bilingual routing, a content pipeline and a motion system, all written by hand.",
-        "zh": "React / Next.js / TypeScript。这个站点本身就是现场：双语路由、内容管线、动效系统，都是手写的。"
+        "en": "From requirement to release, turning ideas into interfaces people can use. This site is the exhibit: bilingual routing, a content pipeline and a motion system, all written by hand.",
+        "zh": "从需求到上线，把想法做成人能用的界面。这个站点就是现场：双语路由、内容管线、动效系统，都是手写的。"
       },
       "bullets": {
         "en": [
-          "A zh/en site on App Router + next-intl",
-          "Posts are MDX, compiled at build time",
+          "React / Next.js / TypeScript",
+          "Desktop apps in Tauri 2 + Rust, and some Swift",
           "One token set, colour semantics down to components"
         ],
         "zh": [
-          "App Router + next-intl 的中英双语站",
-          "文章用 MDX，构建期编译成组件",
+          "React / Next.js / TypeScript",
+          "桌面端用 Tauri 2 + Rust，也写 Swift",
           "一套 token 从颜色语义一路贯到组件"
         ]
       },
@@ -533,171 +443,153 @@
       "sort": 0
     },
     {
-      "key": "webgl",
+      "key": "violin",
       "kicker": {
-        "en": "02 — the craft",
-        "zh": "02 — 手艺"
+        "en": "02 — since childhood",
+        "zh": "02 — 从小学的"
       },
       "title": {
-        "en": "3D and graphics",
-        "zh": "3D 与图形"
+        "en": "The violin",
+        "zh": "小提琴"
       },
       "period": null,
       "body": {
-        "en": "Three.js and React Three Fiber. The web should not be all rectangles — the face you are looking at is the argument.",
-        "zh": "Three.js 与 React Three Fiber。相信网页不该只有矩形——你现在看到的这张脸就是证据。"
+        "en": "Started as a child and never stopped. What the scales taught me is what code teaches: get the basics past thinking, and there is room to improvise.",
+        "zh": "从小学琴，拉到现在。音阶教会我的事，和写代码是同一件：基本功练到不必去想，才有余裕即兴。"
       },
       "bullets": {
         "en": [
-          "Scroll-driven 3D narrative",
-          "Runtime decals and procedural textures",
-          "The trade-offs of 3D on a phone"
+          "Music is a daily thing, not a line on a form"
         ],
         "zh": [
-          "滚动驱动的 3D 叙事",
-          "运行时贴花与程序化纹理",
-          "移动端 3D 的取舍"
+          "音乐是日常，不是爱好栏里的一项"
         ]
       },
-      "stickerLabel": "3D / WEBGL",
-      "stickerIcon": "🧊",
+      "stickerLabel": "VIOLIN",
+      "stickerIcon": "🎻",
       "sort": 1
     },
     {
-      "key": "design",
+      "key": "games",
       "kicker": {
-        "en": "03 — half a designer",
-        "zh": "03 — 半个设计师"
+        "en": "03 — player one",
+        "zh": "03 — 玩家一号"
       },
       "title": {
-        "en": "Design systems",
-        "zh": "设计系统"
+        "en": "Games",
+        "zh": "游戏"
       },
       "period": null,
       "body": {
-        "en": "I can draw it myself, and argue with a designer about it. Colour semantics through to glass tiers, one token set all the way down.",
-        "zh": "能自己出图，也能跟设计师吵架。全站从颜色语义到玻璃层级，都是一套 token 管到底。"
+        "en": "Dota 2 and Overwatch on permanent rotation; It Takes Two saved for a friend. Games taught me tempo and teamwork — and to queue again after a loss.",
+        "zh": "Dota 2 与守望先锋是常驻名单，双人成行是留给朋友的。游戏教会我的是节奏和配合——以及输了也要再来一把。"
       },
       "bullets": {
         "en": [
-          "Three tiers: primitive → semantic → component",
-          "Light and dark, switched like opening and closing a gallery"
+          "Dota 2 · Overwatch · It Takes Two"
         ],
         "zh": [
-          "三层 token：原始值 → 语义 → 组件",
-          "亮暗双主题，切换是一次开馆与闭馆"
+          "Dota 2 · 守望先锋 · 双人成行"
         ]
       },
-      "stickerLabel": "DESIGN",
-      "stickerIcon": "🎨",
+      "stickerLabel": "PLAYER 1",
+      "stickerIcon": "🎮",
       "sort": 2
     },
     {
-      "key": "ai",
+      "key": "film",
       "kicker": {
-        "en": "04 — what I'm on now",
-        "zh": "04 — 现在在做的"
+        "en": "04 — the screen",
+        "zh": "04 — 银幕"
       },
       "title": {
-        "en": "Building with AI",
-        "zh": "AI 应用开发"
+        "en": "Film and music",
+        "zh": "电影与音乐"
       },
       "period": null,
       "body": {
-        "en": "Putting models into real work, not demos. The head you are looking at came out of a single photograph — stylised, then rebuilt in 3D.",
-        "zh": "把大模型接进真实的活儿里，而不是做 Demo。你正在看的这颗头，就是一张照片经过风格化和单图重建生成的。"
-      },
-      "bullets": {
-        "en": [
-          "Image-to-image stylisation, single-image reconstruction",
-          "Prompts kept like code, re-runnable"
-        ],
-        "zh": [
-          "图生图风格化 + 单图三维重建",
-          "提示词当代码管，随时可复跑"
-        ]
-      },
-      "stickerLabel": "AI",
-      "stickerIcon": "🤖",
-      "sort": 3
-    },
-    {
-      "key": "ship",
-      "kicker": {
-        "en": "05 — how I work",
-        "zh": "05 — 工作方式"
-      },
-      "title": {
-        "en": "Shipping beats perfect",
-        "zh": "交付大于完美"
-      },
-      "period": null,
-      "body": {
-        "en": "Ship it, then iterate. One version goes out; the rest is the next version's problem.",
-        "zh": "先上线，再迭代。做完一版就发出去，剩下的交给下一版。"
-      },
-      "bullets": {
-        "en": [
-          "Every change records its why",
-          "Anything repeatable becomes a script"
-        ],
-        "zh": [
-          "每次改动都留下「为什么」",
-          "能自动化的都写成脚本"
-        ]
-      },
-      "stickerLabel": "SHIP IT",
-      "stickerIcon": "🚀",
-      "sort": 4
-    },
-    {
-      "key": "oss",
-      "kicker": {
-        "en": "06 — spare hours",
-        "zh": "06 — 业余时间"
-      },
-      "title": {
-        "en": "Open source",
-        "zh": "开源"
-      },
-      "period": null,
-      "body": {
-        "en": "Whatever can be public sits on GitHub. Small tools written for myself; now and then someone else finds a use.",
-        "zh": "能公开的都放在 GitHub 上。写给自己用的小工具，偶尔也有别人用得上。"
-      },
-      "bullets": {
-        "en": [
-          "Small and sharp over popular"
-        ],
-        "zh": [
-          "小而美优先，不追 star 数"
-        ]
-      },
-      "stickerLabel": "OSS",
-      "stickerIcon": "📦",
-      "sort": 5
-    },
-    {
-      "key": "slow",
-      "kicker": {
-        "en": "07 — the human bit",
-        "zh": "07 — 人味"
-      },
-      "title": {
-        "en": "Slowly",
-        "zh": "慢慢来"
-      },
-      "period": null,
-      "body": {
-        "en": "Write slowly, build slowly, never rush. A light left on is enough.",
-        "zh": "慢慢写，慢慢做，不着急。留一盏亮着的灯，就够了。"
+        "en": "A lot of films, a lot of music. Good work of any kind shares one thing: restraint, and letting go exactly where it should. I look for the same thing in an interface.",
+        "zh": "看很多电影，听很多音乐。好的作品都有同一种东西：克制，以及在该放的地方放开。做界面时，我也在找它。"
       },
       "bullets": {
         "en": [],
         "zh": []
       },
-      "stickerLabel": "SLOW",
-      "stickerIcon": "🕯️",
+      "stickerLabel": "CINEMA",
+      "stickerIcon": "🎬",
+      "sort": 3
+    },
+    {
+      "key": "court",
+      "kicker": {
+        "en": "05 — the court",
+        "zh": "05 — 球场"
+      },
+      "title": {
+        "en": "Basketball and table tennis",
+        "zh": "篮球与乒乓"
+      },
+      "period": null,
+      "body": {
+        "en": "Basketball for the teamwork, table tennis for the reflexes. When I have sat too long, I go and play.",
+        "zh": "篮球靠配合，乒乓靠反应。坐久了，就去打一场。"
+      },
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "stickerLabel": "GAME ON",
+      "stickerIcon": "🏀",
+      "sort": 4
+    },
+    {
+      "key": "road",
+      "kicker": {
+        "en": "06 — on the road",
+        "zh": "06 — 在路上"
+      },
+      "title": {
+        "en": "Travel and the table",
+        "zh": "旅行与桌游"
+      },
+      "period": null,
+      "body": {
+        "en": "Trips taken on short notice, and long nights around a table — Werewolf, Sanguosha; reading people beats reading cards.",
+        "zh": "喜欢说走就走的旅行，也喜欢一桌人的夜晚——狼人杀、三国杀，看人比看牌有意思。"
+      },
+      "bullets": {
+        "en": [
+          "Hejin, Shanxi → Beijing → Qingdao → Shanghai"
+        ],
+        "zh": [
+          "山西河津 → 北京 → 青岛 → 上海"
+        ]
+      },
+      "stickerLabel": "WANDER",
+      "stickerIcon": "🧭",
+      "sort": 5
+    },
+    {
+      "key": "curious",
+      "kicker": {
+        "en": "07 — the ground note",
+        "zh": "07 — 底色"
+      },
+      "title": {
+        "en": "Curious about the world",
+        "zh": "对世界好奇"
+      },
+      "period": null,
+      "body": {
+        "en": "All of the above is really one thing: a standing curiosity about the world. The light stays on for whatever there is still to see.",
+        "zh": "以上所有，其实是同一件事：对世界始终好奇。留一盏灯，是为了那些还想看看的东西。"
+      },
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "stickerLabel": "CURIOUS",
+      "stickerIcon": "✨",
       "sort": 6
     }
   ],
@@ -709,83 +601,28 @@
         "zh": "fhf"
       },
       "tagline": {
-        "en": "engineer · writer · maker of small software",
-        "zh": "工程师 · 写字的人 · 做软件的人"
+        "en": "developer",
+        "zh": "developer"
       },
       "intro": {
         "en": [
-          "[Placeholder] First paragraph: who you are, what you do, years of experience.",
-          "[Placeholder] Second paragraph: your strongest areas and representative work.",
-          "[Placeholder] Third paragraph: you outside of work — interests, side quests."
+          "fhf, front-end developer, nine years in. From requirement to release I have built more interfaces than I can remember; this site is the most recent one.",
+          "Off the clock: violin since childhood and still playing; music, film and games — Dota 2, Overwatch and It Takes Two on permanent rotation; basketball and table tennis; Werewolf and Sanguosha nights; travel whenever possible; and a standing curiosity about the world."
         ],
         "zh": [
-          "【占位】这里是自我介绍的第一段：一句话概括你是谁、做什么、几年经验。",
-          "【占位】第二段：你最拿手的方向、代表性的工作或项目。",
-          "【占位】第三段：工作之外的你——兴趣、正在折腾的事。"
+          "fhf，前端 developer，九年经验。从需求到上线，写过的界面比记得住的多；这个站点是最近的一件。",
+          "工作之外：从小学小提琴，至今还拉；热爱音乐、电影和游戏——Dota 2、守望先锋、双人成行是常驻名单；打篮球和乒乓球，玩狼人杀和三国杀，喜欢旅行，对世界始终好奇。"
         ]
       },
-      "email": null,
+      "email": "fanhefeng901121@gmail.com",
       "github": "fanhefeng",
       "location": {
-        "en": "Qingdao",
-        "zh": "青岛"
+        "en": "Shanghai",
+        "zh": "上海"
       }
     }
   ],
-  "resumeExperiences": [
-    {
-      "key": "placeholder-current",
-      "company": {
-        "en": "[Placeholder] Current company",
-        "zh": "【占位】当前公司"
-      },
-      "role": {
-        "en": "[Placeholder] Role",
-        "zh": "【占位】职位"
-      },
-      "period": {
-        "en": "20XX – Present",
-        "zh": "20XX.XX – 至今"
-      },
-      "url": null,
-      "bullets": {
-        "en": [
-          "[Placeholder] What you did — start with a verb, name the outcome.",
-          "[Placeholder] One point per line, two to four lines works best."
-        ],
-        "zh": [
-          "【占位】做了什么：用动词开头，带上具体的产出。",
-          "【占位】一条一个重点，两到四条为宜。"
-        ]
-      },
-      "sort": 0
-    },
-    {
-      "key": "placeholder-previous",
-      "company": {
-        "en": "[Placeholder] Previous company",
-        "zh": "【占位】上一家公司"
-      },
-      "role": {
-        "en": "[Placeholder] Role",
-        "zh": "【占位】职位"
-      },
-      "period": {
-        "en": "20XX – 20XX",
-        "zh": "20XX.XX – 20XX.XX"
-      },
-      "url": null,
-      "bullets": {
-        "en": [
-          "[Placeholder] The one thing from this job worth telling."
-        ],
-        "zh": [
-          "【占位】这段经历里最值得说的一件事。"
-        ]
-      },
-      "sort": 1
-    }
-  ],
+  "resumeExperiences": [],
   "chips": [
     {
       "label": {
@@ -813,91 +650,163 @@
     },
     {
       "label": {
-        "en": "GSAP",
-        "zh": "GSAP"
-      },
-      "tone": "accent",
-      "sort": 3
-    },
-    {
-      "label": {
         "en": "Three.js",
         "zh": "Three.js"
       },
       "tone": "paper",
+      "sort": 3
+    },
+    {
+      "label": {
+        "en": "GSAP",
+        "zh": "GSAP"
+      },
+      "tone": "accent",
       "sort": 4
     },
     {
       "label": {
-        "en": "Tailwind",
-        "zh": "Tailwind"
+        "en": "Tauri",
+        "zh": "Tauri"
       },
       "tone": "paper",
       "sort": 5
     },
     {
       "label": {
-        "en": "Electron",
-        "zh": "Electron"
+        "en": "Rust",
+        "zh": "Rust"
       },
-      "tone": "ink",
+      "tone": "paper",
       "sort": 6
     },
     {
       "label": {
-        "en": "Node.js",
-        "zh": "Node.js"
+        "en": "Swift",
+        "zh": "Swift"
       },
       "tone": "paper",
       "sort": 7
     },
     {
       "label": {
-        "en": "MDX",
-        "zh": "MDX"
+        "en": "Violin",
+        "zh": "小提琴"
       },
-      "tone": "paper",
+      "tone": "accent",
       "sort": 8
     },
     {
       "label": {
-        "en": "Type",
-        "zh": "字体"
+        "en": "Film",
+        "zh": "电影"
       },
-      "tone": "accent",
+      "tone": "paper",
       "sort": 9
     },
     {
       "label": {
-        "en": "Piano",
-        "zh": "钢琴"
+        "en": "Music",
+        "zh": "音乐"
       },
       "tone": "paper",
       "sort": 10
     },
     {
       "label": {
-        "en": "Photos",
-        "zh": "照片"
+        "en": "Dota 2",
+        "zh": "Dota 2"
       },
-      "tone": "paper",
+      "tone": "ink",
       "sort": 11
     },
     {
       "label": {
-        "en": "Poetry",
-        "zh": "诗"
+        "en": "Overwatch",
+        "zh": "守望先锋"
+      },
+      "tone": "paper",
+      "sort": 12
+    },
+    {
+      "label": {
+        "en": "It Takes Two",
+        "zh": "双人成行"
+      },
+      "tone": "paper",
+      "sort": 13
+    },
+    {
+      "label": {
+        "en": "Basketball",
+        "zh": "篮球"
+      },
+      "tone": "paper",
+      "sort": 14
+    },
+    {
+      "label": {
+        "en": "Table tennis",
+        "zh": "乒乓球"
+      },
+      "tone": "paper",
+      "sort": 15
+    },
+    {
+      "label": {
+        "en": "Werewolf",
+        "zh": "狼人杀"
       },
       "tone": "ink",
-      "sort": 12
+      "sort": 16
+    },
+    {
+      "label": {
+        "en": "Sanguosha",
+        "zh": "三国杀"
+      },
+      "tone": "paper",
+      "sort": 17
+    },
+    {
+      "label": {
+        "en": "Travel",
+        "zh": "旅行"
+      },
+      "tone": "accent",
+      "sort": 18
+    },
+    {
+      "label": {
+        "en": "Hejin",
+        "zh": "河津"
+      },
+      "tone": "ink",
+      "sort": 19
+    },
+    {
+      "label": {
+        "en": "Beijing",
+        "zh": "北京"
+      },
+      "tone": "paper",
+      "sort": 20
     },
     {
       "label": {
         "en": "Qingdao",
         "zh": "青岛"
       },
+      "tone": "paper",
+      "sort": 21
+    },
+    {
+      "label": {
+        "en": "Shanghai",
+        "zh": "上海"
+      },
       "tone": "accent",
-      "sort": 13
+      "sort": 22
     }
   ],
   "navItems": [
@@ -911,8 +820,8 @@
       "sort": 0
     },
     {
-      "href": "/grove",
-      "labelKey": "grove",
+      "href": "/blog",
+      "labelKey": "blog",
       "surfaces": [
         "header",
         "footer",
@@ -922,8 +831,8 @@
       "sort": 1
     },
     {
-      "href": "/blog",
-      "labelKey": "blog",
+      "href": "/software",
+      "labelKey": "software",
       "surfaces": [
         "header",
         "footer",
@@ -944,9 +853,12 @@
       "sort": 3
     },
     {
-      "href": "/intro",
-      "labelKey": "intro",
+      "href": "/lab",
+      "labelKey": "lab",
       "surfaces": [
+        "header",
+        "footer",
+        "fullnav",
         "sitemap"
       ],
       "sort": 4
@@ -955,7 +867,6 @@
       "href": "/portfolio",
       "labelKey": "portfolio",
       "surfaces": [
-        "header",
         "footer",
         "fullnav",
         "sitemap"
@@ -963,10 +874,9 @@
       "sort": 5
     },
     {
-      "href": "/software",
-      "labelKey": "software",
+      "href": "/resume",
+      "labelKey": "resume",
       "surfaces": [
-        "header",
         "footer",
         "fullnav",
         "sitemap"
@@ -974,25 +884,12 @@
       "sort": 6
     },
     {
-      "href": "/lab",
-      "labelKey": "lab",
+      "href": "/intro",
+      "labelKey": "intro",
       "surfaces": [
-        "header",
-        "fullnav",
         "sitemap"
       ],
       "sort": 7
-    },
-    {
-      "href": "/resume",
-      "labelKey": "resume",
-      "surfaces": [
-        "header",
-        "footer",
-        "fullnav",
-        "sitemap"
-      ],
-      "sort": 8
     }
   ],
   "copyBlocks": [
@@ -1004,8 +901,8 @@
     },
     {
       "key": "about.colophon",
-      "zh": "写于青岛 · 当地时间 {time}",
-      "en": "Written in Qingdao · local time {time}",
+      "zh": "写于上海 · 当地时间 {time}",
+      "en": "Written in Shanghai · local time {time}",
       "note": null
     },
     {
@@ -1022,14 +919,14 @@
     },
     {
       "key": "about.keywords",
-      "zh": "工程师 · 写字的人 · 做软件的人",
-      "en": "engineer · writer · maker of small software",
+      "zh": "developer · 拉琴的人 · 对世界好奇",
+      "en": "developer · violinist at home · curious about the world",
       "note": null
     },
     {
       "key": "about.lead",
-      "zh": "写代码的人，也是写字的人。",
-      "en": "An engineer who writes; a writer who ships.",
+      "zh": "九年前端，一个对世界始终好奇的 developer。",
+      "en": "Nine years of front-end; a developer who never stopped being curious.",
       "note": null
     },
     {
@@ -1094,26 +991,116 @@
     },
     {
       "key": "footer.timePrefix",
-      "zh": "青岛 · ",
+      "zh": "上海 · ",
       "en": "",
       "note": "Word-order pair with footer.timeSuffix: Chinese puts the city before the clock, English after. Edit the two together."
     },
     {
       "key": "footer.timeSuffix",
       "zh": "",
-      "en": " in Qingdao",
+      "en": " in Shanghai",
       "note": "See footer.timePrefix."
     },
     {
+      "key": "grove.cardLabLabel",
+      "zh": "动效实验室",
+      "en": "Motion lab",
+      "note": null
+    },
+    {
+      "key": "grove.cardLabLink",
+      "zh": "打开：长出来的，不是建模的",
+      "en": "Open: grown, not modelled",
+      "note": null
+    },
+    {
+      "key": "grove.cardLabTitle",
+      "zh": "长出来的，不是建模的。",
+      "en": "Grown, not modelled.",
+      "note": null
+    },
+    {
+      "key": "grove.cardPostFallback",
+      "zh": "还没有文章",
+      "en": "Nothing written yet",
+      "note": null
+    },
+    {
+      "key": "grove.cardPostLabel",
+      "zh": "最近写的",
+      "en": "Recently",
+      "note": null
+    },
+    {
+      "key": "grove.cardPostLink",
+      "zh": "读这篇",
+      "en": "Read this",
+      "note": null
+    },
+    {
+      "key": "grove.cta",
+      "zh": "去看作品",
+      "en": "See the work",
+      "note": null
+    },
+    {
+      "key": "grove.ghost",
+      "zh": "FHF",
+      "en": "FHF",
+      "note": "The huge ghosted word behind the composition. Latin only — it is set at ~600px."
+    },
+    {
+      "key": "grove.headline1",
+      "zh": "以代码为弓，",
+      "en": "Code for a bow,",
+      "note": "The first line of the manifesto standing in front of the moss on the home page. Keep it short — it is set very large."
+    },
+    {
+      "key": "grove.headline2",
+      "zh": "向世界拉一曲好奇。",
+      "en": "the world for a song.",
+      "note": "Second line of the manifesto."
+    },
+    {
+      "key": "grove.lede",
+      "zh": "河津出生，北京、青岛走过，如今在上海。九年前端，从小拉小提琴，对世界始终好奇。",
+      "en": "Born in Hejin, Shanxi; Beijing and Qingdao along the way; Shanghai now. Nine years of front-end, a violin since childhood, and a standing curiosity about the world.",
+      "note": null
+    },
+    {
+      "key": "grove.play",
+      "zh": "走近这张脸",
+      "en": "Come closer",
+      "note": null
+    },
+    {
+      "key": "grove.scroll",
+      "zh": "往下翻",
+      "en": "Discover",
+      "note": null
+    },
+    {
+      "key": "grove.statApps",
+      "zh": "自研软件",
+      "en": "Software",
+      "note": null
+    },
+    {
+      "key": "grove.statPosts",
+      "zh": "写下的",
+      "en": "Written",
+      "note": null
+    },
+    {
       "key": "home.aboutLead1",
-      "zh": "我是 fhf，从山西河津出发，如今在青岛。",
-      "en": "I'm fhf — from Hejin, Shanxi, now settled in Qingdao.",
+      "zh": "我是 fhf，山西河津人，北京、青岛走过，如今在上海。",
+      "en": "I'm fhf — from Hejin, Shanxi, by way of Beijing and Qingdao, now in Shanghai.",
       "note": null
     },
     {
       "key": "home.aboutLead2",
-      "zh": "写代码，也写字，慢慢攒下一架子小软件。",
-      "en": "I write code and I write; a small shelf of software has piled up along the way.",
+      "zh": "白天写前端，夜里拉琴、打游戏、看电影；一架子小软件，是好奇心攒下来的。",
+      "en": "Front-end by day; violin, games and films by night. The shelf of small software is what curiosity left behind.",
       "note": null
     },
     {
@@ -1129,45 +1116,15 @@
       "note": null
     },
     {
+      "key": "home.contactTitle",
+      "zh": "找到我",
+      "en": "Elsewhere",
+      "note": null
+    },
+    {
       "key": "home.featuredWorks",
       "zh": "自研软件",
       "en": "Software I make",
-      "note": null
-    },
-    {
-      "key": "home.heroCta",
-      "zh": "开始读",
-      "en": "Start reading",
-      "note": null
-    },
-    {
-      "key": "home.heroKineticWord",
-      "zh": "light",
-      "en": "light",
-      "note": "Must appear verbatim inside heroLine1, heroLine2 or heroSub — HomeHero looks for it to attach the light-up animation. No match, no animation."
-    },
-    {
-      "key": "home.heroLine1",
-      "zh": "写字，做软件，",
-      "en": "Notes, software,",
-      "note": null
-    },
-    {
-      "key": "home.heroLine2",
-      "zh": "留一盏亮着的灯。",
-      "en": "and a light left on.",
-      "note": null
-    },
-    {
-      "key": "home.heroSub",
-      "zh": "Notes, software, and a light left on.",
-      "en": "写字，做软件，留一盏灯。",
-      "note": "Deliberately in the other language from the two hero lines above it."
-    },
-    {
-      "key": "home.issueLabel",
-      "zh": "安静的一期 · 2026",
-      "en": "The Quiet Issue · 2026",
       "note": null
     },
     {
@@ -1177,15 +1134,27 @@
       "note": null
     },
     {
+      "key": "home.nowBadge",
+      "zh": "此刻",
+      "en": "Now",
+      "note": null
+    },
+    {
+      "key": "home.nowTitle",
+      "zh": "近况",
+      "en": "Recently",
+      "note": null
+    },
+    {
       "key": "home.slogan",
-      "zh": "慢慢写，慢慢做，不着急。",
-      "en": "Write slowly, build slowly, never rush.",
+      "zh": "慢一点，世界会开口说话。",
+      "en": "Slow down, and the world starts to speak.",
       "note": null
     },
     {
       "key": "home.sloganEcho",
-      "zh": "Write slowly, build slowly, never rush.",
-      "en": "慢慢写，慢慢做，不着急。",
+      "zh": "Slow down, and the world starts to speak.",
+      "en": "慢一点，世界会开口说话。",
       "note": "Always the echo of home.slogan in the other language."
     },
     {
@@ -1214,8 +1183,8 @@
     },
     {
       "key": "intro.meta",
-      "zh": "FRONTEND · 3D · AI",
-      "en": "FRONTEND · 3D · AI",
+      "zh": "FRONTEND · VIOLIN · CURIOUS",
+      "en": "FRONTEND · VIOLIN · CURIOUS",
       "note": null
     },
     {
@@ -1232,8 +1201,8 @@
     },
     {
       "key": "intro.role",
-      "zh": "工程师 · 写字的人 · 做软件的人",
-      "en": "engineer · writer · maker of small software",
+      "zh": "developer · 拉琴的人 · 对世界好奇",
+      "en": "developer · violinist at home · curious about the world",
       "note": null
     },
     {
@@ -1258,6 +1227,270 @@
       "key": "intro.title",
       "zh": "另一种自我介绍",
       "en": "Another introduction",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.body",
+      "zh": "溶解的锋面由噪声场决定，所以它像纸被水洇开，而不是像幕布被拉开。",
+      "en": "The dissolve front is driven by a noise field, so it reads like paper wicking water rather than a curtain being drawn.",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.headline",
+      "zh": "边界不是一条线",
+      "en": "An edge is not a line",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.name",
+      "zh": "溶解转场",
+      "en": "Dissolve",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.note",
+      "zh": "垂直梯度做主导，低频 fbm 把边缘揉碎，高频碎点补细节。阈值随滚动扫过整屏。这一则已经用在了作品页的封面上。",
+      "en": "A vertical gradient leads, low-frequency fbm crumbles the edge, high-frequency speckle adds grain. The threshold sweeps the screen as you scroll. This study is now the cover of the portfolio.",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.summary",
+      "zh": "一张图被「标量场加阈值」逐步吃掉，锋面是有机的团块而不是一条直线。",
+      "en": "An image eaten away by a scalar field and a threshold, so the front breaks into organic clumps instead of a straight edge.",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.tagline",
+      "zh": "Three.js 着色器 + ScrollTrigger",
+      "en": "Three.js shader + ScrollTrigger",
+      "note": null
+    },
+    {
+      "key": "lab.items.dissolve.tail",
+      "zh": "往回滚，它会原样长回去。",
+      "en": "Scroll back and it grows in again.",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.body",
+      "zh": "一个种子决定整片景观：树根往哪弯、苔藓占哪一侧、蕨叶从哪个坑里冒出来、每一根草站在什么位置。刷新一次，它一模一样地再长一遍。",
+      "en": "One seed settles the whole landscape: where the root bends, which flank the moss takes, which hollow a fern comes up in, where every single blade stands. Reload and it grows back identical.",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.headline",
+      "zh": "它是长出来的",
+      "en": "It is grown, not drawn",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.name",
+      "zh": "长出来的，不是建模的",
+      "en": "Grown, not modelled",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.note",
+      "zh": "场景本身没有任何东西跑在时钟上：勘测锋面推到哪、线框笼子亮到什么程度、苔藓长到多长、花什么时候开、蝴蝶飞到哪，全都是滚动位置的纯函数。指针是唯一的活输入——画面随它倾斜，苔藓被它拨开，它划过时会从绒毛里带起一道花粉，凑近落脚的蝴蝶还会把它惊得振翅。这一层只在确实还有东西在变的时候才跑：花粉会落尽，倾斜会归位，受惊会平复；都跑完它就自己停了，停下的场景是真的一帧都不画。这一则现在就是首页的封面。",
+      "en": "Nothing in the scene itself runs on a clock: how far the survey front has travelled, how brightly the cage rides it, how long the moss has grown, when the flowers open and where the butterfly is are all pure functions of scroll position. The pointer is the one live input — the whole composition leans with it, the fur parts under it, a trail of pollen comes up out of the moss where it passes, and coming too close to the perched butterfly startles it into beating its wings. That layer runs only while something is still actually changing: the pollen falls out, the lean comes home, the startle wears off. When all three are done it stops, and a parked scene draws not one frame. This study is now the cover of the home page.",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.summary",
+      "zh": "一条长满苔藓的树根，背后没有任何模型文件：扫掠出来的管、随光生长的苔藓垫、蕨叶与花序，和近二十万根实例化草叶。",
+      "en": "A moss-covered root with no model file behind it: swept tubes, a cushion that follows the light, ferns and flower sprays, and nearly two hundred thousand instanced blades.",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.tagline",
+      "zh": "Three.js 实例化 + 程序化几何",
+      "en": "Three.js instancing + procedural geometry",
+      "note": null
+    },
+    {
+      "key": "lab.items.grove.tail",
+      "zh": "用指针拨一拨苔藓。往回滚，它会缩回去。",
+      "en": "Run the pointer through the moss. Scroll back and it un-grows.",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.body",
+      "zh": "彩虹边的宽度等于色散除以场的梯度模。所以同一个着色器，在场被挤压的地方给出发丝般的虹线，在场舒展的地方给出大片的靛蓝到青的晕染。",
+      "en": "Fringe width falls out as dispersion over the magnitude of the field's gradient. So one shader gives razor-thin rainbow lines where the field is pinched, and broad navy-to-cyan washes where it is not.",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.headline",
+      "zh": "它不是画的，是解出来的",
+      "en": "Solved, not drawn",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.name",
+      "zh": "一颗按钮，全是算出来的",
+      "en": "A button, computed all the way down",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.note",
+      "zh": "滚动条在这里不推时间轴，它拆管线：第一幕是裸的色散场，蚀刻般锐利；第二幕把软化模糊浇上去、点亮那圈游走的描边；第三幕接上 bloom 和对比曲线，金属才回来。按钮全程是活的——悬停、按住、Tab 过去都行。时钟只在你碰它或者它还没停稳的时候才走。首页封面上的两颗按钮，就是它。",
+      "en": "Here the scrollbar is not a timeline but a way through the pipeline: act one is the bare dispersion field, razor-etched; act two pours the softening blur over it and lights the travelling rim; act three adds the bloom and the contrast curve that put the metal back. The button stays live the whole way down — hover it, hold it, tab to it. The clock only turns while you are touching it, or while it is still settling. The two controls on the home page's cover are this button.",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.summary",
+      "zh": "没有渐变、没有贴图、没有底图。一个标量场穿过一条软平台，每个波长采样的高度略有不同——彩虹边就是这么来的。",
+      "en": "No gradient, no texture, no image behind it. A scalar field is painted through a soft plateau, sampled at a slightly different height for every wavelength — which is where the rainbow edge comes from.",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.tagline",
+      "zh": "WebGL2 色散着色器 + 五趟管线",
+      "en": "A WebGL2 dispersion shader in five passes",
+      "note": null
+    },
+    {
+      "key": "lab.items.liquidMetal.tail",
+      "zh": "按住它。松手时看那道折痕跑过描边。",
+      "en": "Hold it down. Watch the crease run round the rim as you let go.",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.name",
+      "zh": "融化式文字",
+      "en": "Melting type",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.note",
+      "zh": "高斯模糊把字边缘晕开，alpha 阈值把超过三成不透明度的部分推成实心——相邻两个字晕到一起，就融成了一坨。",
+      "en": "A gaussian blur bleeds each glyph outward and an alpha threshold pushes anything past 30% opacity back to solid — where two blurred neighbours overlap, they fuse.",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.sampleOne",
+      "zh": "融化显现",
+      "en": "Melt it",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.sampleThree",
+      "zh": "滚动即显影。",
+      "en": "Scroll to reveal.",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.sampleTwo",
+      "zh": "Melting Type",
+      "en": "Melting Type",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.summary",
+      "zh": "文字先糊成一团黏连的液体，再融化收敛成清晰字形。",
+      "en": "Letters congeal into one sticky liquid, then melt down into clean glyphs.",
+      "note": null
+    },
+    {
+      "key": "lab.items.meltingText.tagline",
+      "zh": "SVG 滤镜 + 逐字 stagger",
+      "en": "SVG filter + per-character stagger",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.captionOne",
+      "zh": "逐帧，不是播放",
+      "en": "Frames, not playback",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.captionOneBody",
+      "zh": "滚动进度映射成帧号，canvas 只负责把那一帧画出来。",
+      "en": "Scroll progress becomes a frame number; the canvas only paints that frame.",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.captionTwo",
+      "zh": "反向滚动也跟手",
+      "en": "Backwards feels the same",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.captionTwoBody",
+      "zh": "没有播放时间轴，往回滚就是往回画。",
+      "en": "With no playback timeline, scrolling up simply draws in reverse.",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.name",
+      "zh": "滚动即播放",
+      "en": "Scroll as playhead",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.note",
+      "zh": "90 帧序列，滚动进度映射成帧号；往回滚就是往回画，不存在倒放卡顿。",
+      "en": "A 90-frame sequence with scroll progress mapped to a frame number. Scrolling back just draws backwards — there is no reverse-playback stutter.",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.summary",
+      "zh": "页面里没有一个 video 标签。每一帧都是一张图，滚动多少，就画到第几帧。",
+      "en": "Not one video tag on the page. Every frame is an image; scroll far enough and it draws that frame.",
+      "note": null
+    },
+    {
+      "key": "lab.items.scrollVideo.tagline",
+      "zh": "GSAP ScrollTrigger + Canvas",
+      "en": "GSAP ScrollTrigger + Canvas",
+      "note": null
+    },
+    {
+      "key": "lab.items.workstation.credit",
+      "zh": "“Gaming Desktop PC” by Yolala1232 · Sketchfab · CC-BY-4.0",
+      "en": "“Gaming Desktop PC” by Yolala1232 · Sketchfab · CC-BY-4.0",
+      "note": null
+    },
+    {
+      "key": "lab.items.workstation.name",
+      "zh": "一台可以拖着转的工作台",
+      "en": "A desk you can spin",
+      "note": null
+    },
+    {
+      "key": "lab.items.workstation.note",
+      "zh": "模型原始 8.5 MB，经 gltf-transform（Draco + 1024px WebP）压到 1.1 MB，Draco 解码器自托管。进入视口才加载；空闲时降到 30 fps 采样，拖拽时全速；Save-Data 下直接跳过。滚轮只在工位正上方那一带接管缩放，其余地方照常滚页面。",
+      "en": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual.",
+      "note": null
+    },
+    {
+      "key": "lab.items.workstation.summary",
+      "zh": "旧作品集里留下的 3D 工位：入场时转过来面对你，屏幕会呼吸，拖一下会带着惯性滑行。",
+      "en": "The 3D desk left over from the old portfolio: it swings round to face you on entry, its screens breathe, and a drag leaves it coasting on inertia.",
+      "note": null
+    },
+    {
+      "key": "lab.items.workstation.tagline",
+      "zh": "three.js + Draggable 惯性",
+      "en": "three.js + inertial drag",
+      "note": null
+    },
+    {
+      "key": "lab.kicker",
+      "zh": "动效实验室",
+      "en": "Motion lab",
+      "note": null
+    },
+    {
+      "key": "lab.subtitle",
+      "zh": "六则练习。滚动条在这里不是导航，是播放头。",
+      "en": "Six studies. Here the scrollbar is not navigation — it is the playhead.",
+      "note": null
+    },
+    {
+      "key": "lab.title",
+      "zh": "实验室",
+      "en": "Lab",
       "note": null
     },
     {
@@ -1288,6 +1521,18 @@
       "key": "portfolio.experimentsTitle",
       "zh": "实验",
       "en": "Experiments",
+      "note": null
+    },
+    {
+      "key": "portfolio.heroFallback",
+      "zh": "当前环境没有可用的 WebGL，这里展示照片本身。",
+      "en": "No WebGL available here — showing the photograph as it is.",
+      "note": null
+    },
+    {
+      "key": "portfolio.heroTail",
+      "zh": "往下滚，灯留到最后",
+      "en": "Scroll — the lamp stays till the end",
       "note": null
     },
     {
@@ -1334,14 +1579,14 @@
     },
     {
       "key": "portfolio.scrollHint",
-      "zh": "继续滚动，走近展品",
-      "en": "Keep scrolling to step closer",
+      "zh": "向下滚动",
+      "en": "Scroll",
       "note": null
     },
     {
       "key": "portfolio.subtitle",
-      "zh": "截图、实验，和一些关于手感的练习。",
-      "en": "Screens, experiments, and studies in feel.",
+      "zh": "一盏灯，几件软件，和一些关于手感的练习。",
+      "en": "One lamp, a few pieces of software, and some studies in feel.",
       "note": null
     },
     {
@@ -1360,6 +1605,30 @@
       "key": "portfolio.worksTitle",
       "zh": "在展作品",
       "en": "On view",
+      "note": null
+    },
+    {
+      "key": "resume.empty",
+      "zh": "简历内容正在整理中，稍后回来看看。",
+      "en": "The resume is still being put together — check back soon.",
+      "note": null
+    },
+    {
+      "key": "resume.experienceTitle",
+      "zh": "工作经历",
+      "en": "Work Experience",
+      "note": null
+    },
+    {
+      "key": "resume.subtitle",
+      "zh": "正式的一页：我是谁，做过什么。",
+      "en": "The formal page: who I am and what I've done.",
+      "note": null
+    },
+    {
+      "key": "resume.title",
+      "zh": "简历",
+      "en": "Resume",
       "note": null
     },
     {
@@ -1388,8 +1657,8 @@
     },
     {
       "key": "software.subtitle",
-      "zh": "自己做的应用和工具，欢迎取用。",
-      "en": "Apps and tools I've made — help yourself.",
+      "zh": "自己做的应用和工具，欢迎取用。版本号直接读自 GitHub 的最新发布。",
+      "en": "Apps and tools I've made — help yourself. Version numbers are read straight from each repo's latest GitHub release.",
       "note": null
     },
     {

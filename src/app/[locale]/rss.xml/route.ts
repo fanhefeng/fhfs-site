@@ -19,6 +19,7 @@ export async function GET(
     ? locale
     : routing.defaultLocale;
 
+  const self = `${site.url}/${l}/rss.xml`;
   const feed = new Feed({
     title: site.title[l],
     description: site.description[l],
@@ -27,9 +28,18 @@ export async function GET(
     language: htmlLang(l),
     copyright: `© ${new Date().getFullYear()} ${site.author}`,
     author: { name: site.author },
+    // Both spellings of the same thing: `feed` is what rss2() reads for the
+    // `<atom:link rel="self">` validators ask for, `feedLinks` is the
+    // documented field.
+    feed: self,
+    feedLinks: { rss: self },
   });
 
   for (const post of await getPosts(l)) {
+    // The list falls back to the other language for a post this locale lacks;
+    // a feed is a claim about what was published *in* this language, so those
+    // stay out rather than appearing twice across the two feeds.
+    if (post.isFallback) continue;
     feed.addItem({
       title: post.title,
       id: `${site.url}/${l}/blog/${post.slug}`,

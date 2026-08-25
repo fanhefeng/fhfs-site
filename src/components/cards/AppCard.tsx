@@ -83,12 +83,14 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
               </span>
             </Sticker>
             <div className="min-w-0">
-              <h3
+              {/* h2, not h3: on /software the gallery sits directly under the
+                  page's h1, with no section heading between them. */}
+              <h2
                 lang="en"
                 className={`vibrancy ${feature ? "text-title" : "text-heading"} truncate`}
               >
                 {app.name}
-              </h3>
+              </h2>
               <p className="truncate text-caption text-fg-secondary">{app.tagline}</p>
             </div>
           </div>
@@ -102,8 +104,14 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
           </p>
 
           <div className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pt-2">
-            {app.platforms.length > 0 ? (
+            {app.version || app.platforms.length > 0 ? (
               <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+                {/* The version is the repo's latest GitHub release — it keeps
+                    itself current, so it is never typed here. */}
+                {app.version ? (
+                  <span className="normal-case text-accent">{app.version}</span>
+                ) : null}
+                {app.version && app.platforms.length > 0 ? " · " : null}
                 {app.platforms.join(" · ")}
               </p>
             ) : (

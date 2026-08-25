@@ -30,12 +30,15 @@ const TABLES = [
   "chips",
   "nav_items",
   "copy_blocks",
+  "resume_profiles",
+  "resume_experiences",
+  "login_attempts",
 ];
 
 console.log("row counts");
 for (const t of TABLES) {
   const [{ n }] = await rows(`select count(*)::int as n from ${t}`);
-  console.log(`  ${t.padEnd(18)}${n}`);
+  console.log(`  ${t.padEnd(20)}${n}`);
 }
 
 console.log("\ntimeline (sort order, newest first)");

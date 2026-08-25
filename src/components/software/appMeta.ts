@@ -36,6 +36,8 @@ export type SoftwareApp = {
   hue: number;
   /** Which `software.*` message labels the outbound link. */
   cta: "download" | "play" | "open";
+  /** "v0.12.0" — the repo's latest GitHub release, when it has one. */
+  version?: string;
 };
 
 /**

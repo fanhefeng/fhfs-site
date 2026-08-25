@@ -11,7 +11,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Commands
 
 ```bash
-pnpm check        # tsc --noEmit + oxlint — the gate; run before calling work done
+pnpm check        # tsc --noEmit + oxlint + vitest — the gate; run before calling work done
+pnpm test         # vitest over src/lib pure functions only (src/lib/__tests__)
 pnpm dev          # dev server
 pnpm build        # prerenders from the DB — DATABASE_URL required, fails loudly without
 pnpm db:generate  # after editing src/db/schema.ts, then:
@@ -21,8 +22,16 @@ pnpm db:export    # write DB back to backup/
 pnpm db:import    # restore from backup/ (upsert by key; save once in /admin after to flush caches)
 ```
 
-There is no test suite. `pnpm lint` runs oxlint through vite-plus (`vp lint`);
-this machine's Node and global JS CLIs are managed by `vp`, not npm/nvm.
+Tests cover only pure functions in `src/lib`; there is no component or e2e
+suite. `pnpm lint` runs the project-local oxlint (`.oxlintrc.json`) over
+`src`, `scripts` and the config files; CI (`.github/workflows/check.yml`) runs
+`pnpm check` on Node 24 (`.node-version`, `engines`). This machine's Node and
+global JS CLIs are managed by `vp`, not npm/nvm.
+
+The one read from outside the database is `src/lib/github.ts`: each app's
+version badge is its repo's latest GitHub release, cached through `fetch`
+(`next: { revalidate: 3600 }`), so pages that show one regenerate hourly.
+Failures resolve to `null` and the badge is simply absent.
 
 # Architecture
 

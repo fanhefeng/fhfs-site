@@ -8,7 +8,7 @@ import { getAbout, getChips, getTimeline } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
-import { Workstation } from "@/components/about/Workstation";
+import { ManifestoBand } from "@/components/home/ManifestoBand";
 import { StickerWall } from "@/components/about/StickerWall";
 import { Changelog, type ChangelogEntry } from "@/components/about/Changelog";
 import { Colophon } from "@/components/about/Colophon";
@@ -16,10 +16,13 @@ import { Colophon } from "@/components/about/Colophon";
 export const generateMetadata = sectionMetadata("about", "/about");
 
 /**
- * About — the narrow column (720px): a name, the desk, the essay, a wall of
+ * About — a name, the slogan crossing the screen, the essay, a wall of
  * stickers you can throw around, and a life numbered like software.
  * Everything interactive lives in its own client component; this file stays
- * a Server Component that only reads content and localizes it.
+ * a Server Component that only reads content and localizes it. The band is
+ * the site's one pinned section — it used to open the home page, and moved
+ * here when the grove took the cover. The 3D desk that used to sit under the
+ * name is a lab study now (/lab/workstation).
  */
 export default async function AboutPage({
   params,
@@ -54,9 +57,11 @@ export default async function AboutPage({
     };
   });
 
+  const column = "mx-auto w-full max-w-[720px] px-6";
+
   return (
-    <main className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-24 pt-24 sm:pt-32">
-      <header>
+    <main id="main" className="flex-1 pb-24">
+      <header className={`${column} pt-24 sm:pt-32`}>
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("title")}
         </p>
@@ -64,8 +69,6 @@ export default async function AboutPage({
             point at it. The heading still *is* the name for anything that
             reads the page — the canvas is decoration layered over it. */}
         <h1 className="mt-5">
-          {/* Taller than the display-sm it replaces: a field of sparse dots
-              carries less visual weight than solid type at the same height. */}
           <DotDoodle text={site.author} className="h-[clamp(3rem,13vw,5rem)]" />
           <span className="sr-only">{site.author}</span>
         </h1>
@@ -77,8 +80,7 @@ export default async function AboutPage({
         </p>
 
         {/* The same person, told the other way round — a head you scroll
-            around instead of a column you read. Kept to a quiet line here so
-            the essay below stays the main act. */}
+            around instead of a column you read. */}
         <Link
           href="/intro"
           className="hit-ext mt-7 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
@@ -90,28 +92,29 @@ export default async function AboutPage({
         </Link>
       </header>
 
-      {/* The 3D desk, kept from the old portfolio. Loads only when scrolled
-          near. */}
-      <Workstation hint={t("deskHint")} className="mt-16" />
+      {/* Full-bleed: the band writes its own 100vw stage on desktop. */}
+      <ManifestoBand />
 
-      {about && <Mdx html={about.html} />}
+      <div className={column}>
+        {about && <Mdx html={about.html} />}
 
-      <StickerWall
-        chips={chips}
-        title={t("stickersTitle")}
-        hint={t("stickersHint")}
-        ariaLabel={t("stickersAria")}
-        className="mt-20"
-      />
+        <StickerWall
+          chips={chips}
+          title={t("stickersTitle")}
+          hint={t("stickersHint")}
+          ariaLabel={t("stickersAria")}
+          className="mt-20"
+        />
 
-      <Changelog
-        entries={entries}
-        title={t("changelogTitle")}
-        ariaLabel={t("changelogAria")}
-        className="mt-24"
-      />
+        <Changelog
+          entries={entries}
+          title={t("changelogTitle")}
+          ariaLabel={t("changelogAria")}
+          className="mt-24"
+        />
 
-      <Colophon className="mt-24" />
+        <Colophon className="mt-24" />
+      </div>
     </main>
   );
 }

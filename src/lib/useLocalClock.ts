@@ -2,14 +2,18 @@
 
 import { useEffect, useState } from "react";
 
+/** Where the author is — the zone the footer clock and the About colophon
+ *  keep. Shanghai now; the copy that names the city lives in messages. */
+export const HOME_TIME_ZONE = "Asia/Shanghai";
+
 /**
- * "HH:mm in Qingdao" — the wall clock the footer and the About colophon
- * share. Formats wall time for Asia/Shanghai regardless of the visitor's
- * zone and re-renders on the minute (first tick aligned to the next :00 so
- * it never drifts a minute behind). Returns null until mounted, so SSR and
- * hydration agree — render a placeholder for it.
+ * "HH:mm" in the author's time zone — the wall clock the footer and the
+ * About colophon share. Formats wall time for `HOME_TIME_ZONE` regardless of
+ * the visitor's zone and re-renders on the minute (first tick aligned to the
+ * next :00 so it never drifts a minute behind). Returns null until mounted,
+ * so SSR and hydration agree — render a placeholder for it.
  */
-export function useQingdaoTime(): string | null {
+export function useLocalClock(): string | null {
   const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,7 +21,7 @@ export function useQingdaoTime(): string | null {
       hour: "2-digit",
       minute: "2-digit",
       hourCycle: "h23",
-      timeZone: "Asia/Shanghai",
+      timeZone: HOME_TIME_ZONE,
     });
     const update = () => setTime(fmt.format(new Date()));
     update();

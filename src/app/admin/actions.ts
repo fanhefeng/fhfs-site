@@ -62,9 +62,36 @@ const validKey = (key: string) => /^[a-z0-9][a-z0-9-]*$/.test(key);
 const KEY_ERROR = { error: "key 只能用小写字母、数字和连字符。" };
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const DATE_ERROR = { error: "日期要写成 YYYY-MM-DD。" };
+const DATE_ERROR = { error: "日期要写成 YYYY-MM-DD，而且得是真实存在的一天。" };
+
+/** The regex is happy with 2026-02-30; the round trip through `Date` is not
+ *  (a date-only ISO string parses as UTC, so it comes back unchanged). */
+const validDate = (value: string) => {
+  if (!DATE_RE.test(value)) return false;
+  const time = Date.parse(value);
+  return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === value;
+};
 
 export type ActionState = { error?: string; ok?: boolean };
+
+/**
+ * `Number(form.get("sort") ?? 0)` looked safe and was not: `Number("abc")` is
+ * NaN and `Number("1e400")` is Infinity, and either reaches the integer column
+ * as a database error rather than a form one. Empty means `fallback`; anything
+ * else has to be a whole number.
+ */
+function intField<Fallback extends number | null>(
+  form: FormData,
+  key: string,
+  label: string,
+  fallback: Fallback
+): { ok: true; value: number | Fallback } | { ok: false; error: string } {
+  const text = str(form, key);
+  if (!text) return { ok: true, value: fallback };
+  const n = Number(text);
+  if (!Number.isInteger(n)) return { ok: false, error: `${label}要填整数。` };
+  return { ok: true, value: n };
+}
 
 // ---------------------------------------------------------------------------
 // Posts
@@ -87,7 +114,7 @@ export async function savePost(
   if (!str(form, "title")) return { error: "标题不能为空。" };
 
   const date = str(form, "date");
-  if (!DATE_RE.test(date)) return DATE_ERROR;
+  if (!validDate(date)) return DATE_ERROR;
 
   const row = {
     slug,
@@ -106,18 +133,32 @@ export async function savePost(
     readingMinutes: readingMinutes(bodyMd),
   };
 
-  await db
-    .insert(schema.posts)
-    .values(row)
-    .onConflictDoUpdate({
-      target: [schema.posts.slug, schema.posts.locale],
-      set: { ...row, updatedAt: new Date() },
-    });
+  const isNew = Boolean(form.get("isNew"));
+  if (isNew) {
+    // A new post must not land on an existing one: the upsert below would
+    // silently replace whatever was there, with no way to notice.
+    const inserted = await db
+      .insert(schema.posts)
+      .values(row)
+      .onConflictDoNothing({ target: [schema.posts.slug, schema.posts.locale] })
+      .returning({ id: schema.posts.id });
+    if (!inserted.length) {
+      return { error: `slug 已存在：${locale} 下已经有「${slug}」了，换一个或去编辑原文。` };
+    }
+  } else {
+    await db
+      .insert(schema.posts)
+      .values(row)
+      .onConflictDoUpdate({
+        target: [schema.posts.slug, schema.posts.locale],
+        set: { ...row, updatedAt: new Date() },
+      });
+  }
 
   invalidate(TAGS.posts);
   // A first save leaves the "new post" page behind: its props are a blank
   // draft, and React resets the form to props once the action completes.
-  if (form.get("isNew")) redirect(`/admin/posts/${slug}/${locale}`);
+  if (isNew) redirect(`/admin/posts/${slug}/${locale}`);
   return { ok: true };
 }
 
@@ -210,9 +251,14 @@ export async function saveCopy(
   // One statement, not sixty-seven. The HTTP driver spends a round trip per
   // query, so updating each row separately turned a save into a wait long
   // enough to wonder whether the button had worked.
-  const values = rows.map(
-    ({ key }) => sql`(${key}, ${raw(form, `${key}.zh`)}, ${raw(form, `${key}.en`)})`
-  );
+  //
+  // Only rows the form actually carries: a key added to the table after the
+  // page was opened would otherwise be overwritten with two empty strings.
+  const values = rows
+    .filter(({ key }) => form.has(`${key}.zh`) && form.has(`${key}.en`))
+    .map(
+      ({ key }) => sql`(${key}, ${raw(form, `${key}.zh`)}, ${raw(form, `${key}.en`)})`
+    );
   if (values.length) {
     await db.execute(sql`
       UPDATE copy_blocks AS c
@@ -248,7 +294,9 @@ export async function saveTimelineEntry(
   if (!date && !hasLabel) {
     return { error: "日期和占位文字至少要填一个——这一栏不编造日期。" };
   }
-  if (date && !DATE_RE.test(date)) return DATE_ERROR;
+  if (date && !validDate(date)) return DATE_ERROR;
+  const sort = intField(form, "sort", "排序", 0);
+  if (!sort.ok) return sort;
 
   const row = {
     key,
@@ -257,7 +305,7 @@ export async function saveTimelineEntry(
     dateLabel: hasLabel ? dateLabel : null,
     title: localized(form, "title"),
     note: localized(form, "note"),
-    sort: Number(form.get("sort") ?? 0),
+    sort: sort.value,
   };
 
   await db
@@ -283,6 +331,18 @@ export async function saveApp(
     return { error: "分类只能是 desktop / tool / game / website。" };
   }
 
+  // "owner/name" — src/lib/github.ts builds an API URL out of it, so it has
+  // to be exactly two path segments and nothing that could escape them.
+  const repo = str(form, "repo") || null;
+  if (repo && !/^[\w.-]+\/[\w.-]+$/.test(repo)) {
+    return { error: "仓库要写成 owner/name，比如 fanhefeng/fhfs-site。" };
+  }
+
+  const hue = intField(form, "hue", "色相", null);
+  if (!hue.ok) return hue;
+  const sort = intField(form, "sort", "排序", 0);
+  if (!sort.ok) return sort;
+
   const row = {
     key,
     name: str(form, "name"),
@@ -290,22 +350,44 @@ export async function saveApp(
     description: localized(form, "description"),
     category: category as "desktop" | "tool" | "game" | "website",
     website: str(form, "website"),
+    repo,
     platforms: str(form, "platforms")
       .split(",")
       .map((p) => p.trim())
       .filter(Boolean),
     accent: str(form, "accent") || null,
-    hue: form.get("hue") ? Number(form.get("hue")) : null,
-    sort: Number(form.get("sort") ?? 0),
+    hue: hue.value,
+    sort: sort.value,
   };
 
-  await db
-    .insert(schema.apps)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.apps.key, set: row });
+  if (form.get("isNew")) {
+    // Same guard as a new post: the "new app" form must not overwrite one
+    // that already has this key.
+    const inserted = await db
+      .insert(schema.apps)
+      .values(row)
+      .onConflictDoNothing({ target: schema.apps.key })
+      .returning({ id: schema.apps.id });
+    if (!inserted.length) {
+      return { error: `key 已存在：已经有「${key}」了，换一个或去编辑原来那条。` };
+    }
+  } else {
+    await db
+      .insert(schema.apps)
+      .values(row)
+      .onConflictDoUpdate({ target: schema.apps.key, set: row });
+  }
 
   invalidate(TAGS.apps);
   return { ok: true };
+}
+
+export async function deleteApp(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db.delete(schema.apps).where(eq(schema.apps.key, key));
+  invalidate(TAGS.apps);
 }
 
 export async function saveExperiment(
@@ -321,6 +403,8 @@ export async function saveExperiment(
   if (!["live", "wip", "planned"].includes(status)) {
     return { error: "状态只能是 live / wip / planned。" };
   }
+  const sort = intField(form, "sort", "排序", 0);
+  if (!sort.ok) return sort;
 
   const row = {
     key,
@@ -330,7 +414,7 @@ export async function saveExperiment(
     accent: str(form, "accent") || null,
     href: str(form, "href") || null,
     demo: str(form, "demo") || null,
-    sort: Number(form.get("sort") ?? 0),
+    sort: sort.value,
   };
 
   await db
@@ -444,16 +528,19 @@ export async function saveWork(
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
-  const year = Number(form.get("year"));
-  if (!Number.isInteger(year) || year < 1990 || year > 2100) {
+  const year = intField(form, "year", "年份", null);
+  if (!year.ok) return year;
+  if (year.value === null || year.value < 1990 || year.value > 2100) {
     return { error: "年份填个四位数。" };
   }
+  const sort = intField(form, "sort", "排序", 0);
+  if (!sort.ok) return sort;
 
   const row = {
     key,
     title: localized(form, "title"),
     description: localized(form, "description"),
-    year,
+    year: year.value,
     cover: str(form, "cover") || null,
     url: str(form, "url") || null,
     tags: str(form, "tags")
@@ -461,7 +548,7 @@ export async function saveWork(
       .map((tag) => tag.trim())
       .filter(Boolean),
     accent: str(form, "accent") || null,
-    sort: Number(form.get("sort") ?? 0),
+    sort: sort.value,
   };
 
   await db
@@ -543,6 +630,8 @@ export async function saveResumeExperience(
   if (!period.zh && !period.en) return { error: "时间段至少填一种语言。" };
   period.zh ||= period.en;
   period.en ||= period.zh;
+  const sort = intField(form, "sort", "排序", 0);
+  if (!sort.ok) return sort;
 
   const row = {
     key,
@@ -554,7 +643,7 @@ export async function saveResumeExperience(
       zh: String(form.get("bullets.zh") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
       en: String(form.get("bullets.en") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
     },
-    sort: Number(form.get("sort") ?? 0),
+    sort: sort.value,
   };
 
   await db
@@ -586,6 +675,9 @@ export async function saveIntroNode(
   if (!validKey(key)) return KEY_ERROR;
 
   const period = localized(form, "period");
+  const sort = intField(form, "sort", "排序", 0);
+  if (!sort.ok) return sort;
+
   const row = {
     key,
     kicker: localized(form, "kicker"),
@@ -598,7 +690,7 @@ export async function saveIntroNode(
     },
     stickerLabel: str(form, "stickerLabel"),
     stickerIcon: str(form, "stickerIcon"),
-    sort: Number(form.get("sort") ?? 0),
+    sort: sort.value,
   };
 
   await db

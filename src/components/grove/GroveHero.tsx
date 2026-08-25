@@ -26,9 +26,15 @@ type Props = {
   play: { label: string; href: string };
   stats: [{ label: string; value: string }, { label: string; value: string }];
   cards: [GroveCard, GroveCard];
-  scrollLabel: string;
+  /** The small "Discover" line at the foot of the composition. A `#hash`
+   *  href scrolls within the page; anything else is a route. */
+  scroll: { label: string; href: string };
   dock: { ariaLabel: string; markLabel: string; markHref: string; items: DockItem[] };
 };
+
+/** Body attribute the site header reads to know the hero has been scrolled
+ *  past — see the header rule at the top of hero.css.ts. */
+const HEADER_ATTR = "groveHeader";
 
 /**
  * The grove: one composition, laid out on a 1600 × 880 stage and lit by a
@@ -40,13 +46,34 @@ type Props = {
  * a document. Below 900px it becomes a single column and the moss becomes a
  * band between the copy and the cards.
  */
-export function GroveHero({ ghost, headline, lede, cta, play, stats, cards, scrollLabel, dock }: Props) {
+export function GroveHero({ ghost, headline, lede, cta, play, stats, cards, scroll, dock }: Props) {
   const heroRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [done, setDone] = useState(false);
 
   const onReady = useCallback(() => setReady(true), []);
+
+  // The dock is the navigation while the hero fills the screen; the glass
+  // island takes over once most of the hero has gone by. One observer, one
+  // body attribute — the CSS does the rest.
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const past = entry.intersectionRatio < 0.2;
+        if (past) document.body.dataset[HEADER_ATTR] = "visible";
+        else delete document.body.dataset[HEADER_ATTR];
+      },
+      { threshold: [0, 0.2, 0.4] }
+    );
+    io.observe(hero);
+    return () => {
+      io.disconnect();
+      delete document.body.dataset[HEADER_ATTR];
+    };
+  }, []);
 
   /** The dock and the two controls ask the scene for a puff of pollen. */
   const burst = useCallback((x: number, y: number) => {
@@ -114,7 +141,7 @@ export function GroveHero({ ghost, headline, lede, cta, play, stats, cards, scro
           it renders finished rather than clipped away to nothing. */}
       <script dangerouslySetInnerHTML={{ __html: 'document.documentElement.dataset.groveJs=""' }} />
 
-      <main ref={heroRef} className="gh-hero" data-ready={ready || undefined} data-done={done || undefined}>
+      <section ref={heroRef} className="gh-hero" data-ready={ready || undefined} data-done={done || undefined}>
         <GroveScene heroRef={heroRef} stageRef={stageRef} onReady={onReady} />
 
         <NavDock
@@ -237,12 +264,19 @@ export function GroveHero({ ghost, headline, lede, cta, play, stats, cards, scro
             style={{ "--d": "880ms", "--pd": 22, "--pr": 2.4 } as React.CSSProperties}
           />
 
-          <Link className="gh-scroll mask par" style={{ "--d": "1040ms", "--pd": 9 } as React.CSSProperties} href="/blog">
-            {scrollLabel}
-            <span className="gh-track" />
-          </Link>
+          {scroll.href.startsWith("#") ? (
+            <a className="gh-scroll mask par" style={{ "--d": "1040ms", "--pd": 9 } as React.CSSProperties} href={scroll.href} data-no-transition>
+              {scroll.label}
+              <span className="gh-track" />
+            </a>
+          ) : (
+            <Link className="gh-scroll mask par" style={{ "--d": "1040ms", "--pd": 9 } as React.CSSProperties} href={scroll.href}>
+              {scroll.label}
+              <span className="gh-track" />
+            </Link>
+          )}
         </div>
-      </main>
+      </section>
     </>
   );
 }

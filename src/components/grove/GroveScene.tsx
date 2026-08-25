@@ -98,6 +98,13 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
     }
 
     let disposed = false;
+    /* The render gate. A frame is drawn when something on screen can have
+       changed; the loop below decides most of that from its own state, and
+       the events that change the picture without going through that state
+       (resize, a burst, the tab coming back) raise this flag instead. Declared
+       up here because layout() — the first of those — runs before the loop
+       exists. */
+    let needsRender = true;
     const narrow = window.matchMedia("(max-width: 900px)");
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
     const small = narrow.matches || window.innerWidth * window.innerHeight < 620_000;
@@ -781,6 +788,7 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       sprayUniforms.uSize.value = Math.max(2.6, 4.4 * u * cover);
 
       solveLandQ();
+      needsRender = true;
     };
     layout();
 
@@ -848,6 +856,7 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       nearBuilt.group.worldToLocal(burstAt);
       for (let i = 0; i < 52; i++) spawnGrain(burstAt, 2.5);
       flushGrains();
+      needsRender = true;
     };
     // The dock's pills ask for this by event, so nothing has to be threaded
     // through half the component tree to reach the emitter.
@@ -866,10 +875,12 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       // back into the canvas's own box or the moss parts in the wrong place.
       const r = hero.getBoundingClientRect();
       ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      needsRender = true;
     };
     const onPointerLeave = () => {
       pointer.x = pointer.y = 0;
       ndc.x = 10;
+      needsRender = true;
     };
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerleave", onPointerLeave);
@@ -881,15 +892,42 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
     let scanning = false;
     let onScreen = true;
     let visible = !document.hidden;
-    const onVisibility = () => { visible = !document.hidden; };
+    // Coming back from a hidden tab or from off screen: the canvas has kept
+    // its last frame, but be safe and draw once rather than trust it.
+    const onVisibility = () => { visible = !document.hidden; needsRender = true; };
     document.addEventListener("visibilitychange", onVisibility);
-    const io = new IntersectionObserver((entries) => { onScreen = entries.some((en) => en.isIntersecting); }, { rootMargin: "10% 0px" });
+    const io = new IntersectionObserver((entries) => { onScreen = entries.some((en) => en.isIntersecting); needsRender = true; }, { rootMargin: "10% 0px" });
     io.observe(hero);
 
     const wires: THREE.LineSegments[] = [nearBuilt.wire, farBuilt.wire];
 
+    /* The parallax eases toward the pointer at 5.5% a frame and never quite
+       arrives; below this (in NDC — 1e-4 is 0.0026px of camera travel at the
+       26px scale) it is treated as arrived. */
+    const SETTLED = 1e-4;
+
+    /* When a frame is drawn.
+       On this page the clock *is* motion: the wind in the shaders runs on
+       `uPhase`, the root breathes on `clock`, the butterfly flies its circuit
+       and the pollen drifts, so any frame that advances the clock has changed
+       the picture and is drawn — the flag changes nothing there. The clock
+       only stands still under prefers-reduced-motion, and then the picture
+       changes only while: the survey pulse is still crossing (never, under
+       calm, but the check is cheap), the parallax is still settling toward
+       the pointer, or an event has raised `needsRender` (layout, a burst, a
+       pointer move or leave, the tab or the hero coming back into view).
+       Everything else — a settled pointer over a still scene — draws nothing
+       (DESIGN.md §5.3: a still canvas layer costs nothing). The state updates
+       below still run every frame; only the draw is gated, so nothing is
+       left half-advanced. When in doubt, it is dirty. */
     const frame = (_time: number, deltaMs: number) => {
       if (disposed || !visible || !onScreen) return;
+      const dirty =
+        needsRender ||
+        !calm.matches ||
+        scanning ||
+        Math.abs(pointer.x - smooth.x) > SETTLED ||
+        Math.abs(pointer.y - smooth.y) > SETTLED;
       const dt = Math.min(deltaMs / 1000, 0.05);
       if (!calm.matches) clock += dt;
       shared.uPhase.value = clock;
@@ -934,6 +972,8 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       updateMouse(dt);
       if (!calm.matches) emitSpray(dt);
 
+      if (!dirty) return;
+      needsRender = false;
       renderer.render(scene, camera);
     };
 

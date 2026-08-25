@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { useQingdaoTime } from "@/lib/useQingdaoTime";
+import { useLocalClock } from "@/lib/useLocalClock";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { PeelSticker } from "@/components/ui/PeelSticker";
 
@@ -12,7 +12,7 @@ export type NavLink = { href: string; labelKey: string };
 
 /**
  * The quietest place on the site: a single-line colophon strip. Small
- * wordmark, the four sections, RSS/GitHub, the Qingdao clock, and a copy of
+ * wordmark, the four sections, RSS/GitHub, the author's local clock, and a copy of
  * the light switch — all static, no entrance animation, nothing scrolls or
  * glows. The one indulgence is the tear-off sticker in the corner hiding
  * the email address. (The old ASCII-canvas finale, giant sign name and
@@ -22,7 +22,7 @@ export function Footer({ items }: { items: NavLink[] }) {
   const t = useTranslations("footer");
   const tNav = useTranslations("nav");
   const locale = useLocale();
-  const time = useQingdaoTime();
+  const time = useLocalClock();
 
   const linkClass =
     "hit-ext inline-block py-1 text-fg-secondary no-underline transition-colors hover:text-fg focus-visible:text-fg";

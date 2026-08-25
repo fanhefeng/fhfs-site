@@ -688,7 +688,7 @@ export function LiquidMetalDemo({
         <div ref={stickyRef} className="lm-sticky">
           <div ref={padRef} className="lm-pad">
             <div className="lm-plate" aria-hidden="true" />
-            <canvas ref={canvasRef} className="lm-canvas" data-degraded={degraded || undefined} />
+            <canvas ref={canvasRef} className="lm-canvas" data-degraded={degraded || undefined} aria-hidden="true" />
             <button ref={buttonRef} className="lm-btn" type="button">
               <svg className="lm-ico" viewBox="0 0 115 115" aria-hidden="true">
                 <g stroke="currentColor" strokeWidth="11" strokeLinecap="round">

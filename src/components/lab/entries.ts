@@ -1,17 +1,23 @@
 /**
- * The lab's table of contents. Five scroll studies, each on its own route.
+ * The lab's table of contents. Six studies, each on its own route.
  *
  * Slug and message key are kept separate on purpose: the URL wants kebab-case
  * and next-intl namespaces want a plain identifier, and pinning them to one
  * table is what stops the two from drifting apart the way the craft log's ids
  * once did.
  */
-export type LabSlug = "scroll-video" | "dissolve" | "melting-text" | "grove" | "liquid-metal";
+export type LabSlug =
+  | "scroll-video"
+  | "dissolve"
+  | "melting-text"
+  | "grove"
+  | "liquid-metal"
+  | "workstation";
 
 export type LabEntry = {
   slug: LabSlug;
   /** Key under the `lab.items` message namespace. */
-  key: "scrollVideo" | "dissolve" | "meltingText" | "grove" | "liquidMetal";
+  key: "scrollVideo" | "dissolve" | "meltingText" | "grove" | "liquidMetal" | "workstation";
   /** Index number printed beside the name, editorial-style. */
   ordinal: string;
   /** Dot + rule colour, from the muted gallery hues used across the site. */
@@ -24,6 +30,9 @@ export const LAB_ENTRIES: LabEntry[] = [
   { slug: "melting-text", key: "meltingText", ordinal: "03", accent: "#6b5ba8" },
   { slug: "grove", key: "grove", ordinal: "04", accent: "#4a5d3a" },
   { slug: "liquid-metal", key: "liquidMetal", ordinal: "05", accent: "#8a93a8" },
+  // The 3D desk from the old portfolio — it lived on /about until the page
+  // slimmed down; a draggable, inertial three.js piece is a study by nature.
+  { slug: "workstation", key: "workstation", ordinal: "06", accent: "#b45309" },
 ];
 
 export const labEntry = (slug: string): LabEntry | undefined =>

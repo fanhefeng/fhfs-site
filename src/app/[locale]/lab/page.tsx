@@ -23,7 +23,7 @@ export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
   const t = await getTranslations("lab");
 
   return (
-    <main className="mx-auto w-full max-w-[680px] flex-1 px-6 pb-24 pt-24">
+    <main id="main" className="mx-auto w-full max-w-[680px] flex-1 px-6 pb-24 pt-24">
       <header>
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("kicker")}

@@ -5,29 +5,16 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { CustomEase } from "gsap/CustomEase";
-import { CustomWiggle } from "gsap/CustomWiggle";
 import { Flip } from "gsap/Flip";
-import { Draggable } from "gsap/Draggable";
-import { InertiaPlugin } from "gsap/InertiaPlugin";
-import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
-import { ExpoScaleEase } from "gsap/EasePack";
 
-// Single registration point — import gsap from here in all fx components.
-// CustomWiggle depends on CustomEase, so keep CustomEase registered first.
-// ExpoScaleEase makes `expoScale(from,to)` parseable — the bento scrub on
-// /portfolio needs it so a zoom reads as constant-speed.
-gsap.registerPlugin(
-  useGSAP,
-  ScrollTrigger,
-  SplitText,
-  CustomEase,
-  CustomWiggle,
-  Flip,
-  Draggable,
-  InertiaPlugin,
-  ScrambleTextPlugin,
-  ExpoScaleEase
-);
+// The registration point for what the shell itself needs — import gsap from
+// here in every fx component. Only the plugins that are on every page get
+// registered here: the Header's Flip, Reveal's ScrollTrigger, the headline
+// SplitText, and CustomEase because the others build on it. Draggable,
+// InertiaPlugin, ScrambleTextPlugin, CustomWiggle and the EasePack eases are
+// each used by one or two leaf components and live in `./gsap-extras`, so
+// the pages that never drag, scramble or wiggle do not ship them.
+gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, CustomEase, Flip);
 
 // Site-wide spring language: critically damped by default (no overshoot).
 // Components only override deliberately, via the EASE table below.
@@ -68,7 +55,6 @@ export const prefersReducedMotion = (): boolean =>
 export const isFinePointer = (): boolean =>
   window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-// CustomEase/CustomWiggle, InertiaPlugin and ScrambleTextPlugin are not
-// re-exported: registration alone makes their string forms ("wiggle(…)",
-// `inertia:`, `scrambleText:`) parseable, and no component imports the classes.
-export { gsap, useGSAP, ScrollTrigger, SplitText, Flip, Draggable, ExpoScaleEase };
+// CustomEase is not re-exported: registration alone makes its string form
+// parseable, and no component imports the class.
+export { gsap, useGSAP, ScrollTrigger, SplitText, Flip };

@@ -38,15 +38,18 @@ const mono = Geist_Mono({
   preload: false,
 });
 
+/* One variable file each instead of one static file per weight: the CJK
+ * fallbacks were three and two requests, now one and one, and any weight the
+ * type scale asks for is covered rather than snapped to the nearest cut. */
 const sansSC = Noto_Sans_SC({
-  weight: ["400", "500", "600"],
+  weight: "variable",
   variable: "--font-noto-sans-sc",
   display: "swap",
   preload: false,
 });
 
 const serifSC = Noto_Serif_SC({
-  weight: ["400", "600"],
+  weight: "variable",
   variable: "--font-noto-serif-sc",
   display: "swap",
   preload: false,

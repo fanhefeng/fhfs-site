@@ -99,7 +99,7 @@ const data = {
 // Serial ids and timestamps are restatements of the data, not part of it —
 // leaving them out keeps the diff to what someone actually changed.
 const strip = <T extends Record<string, unknown>>(rows: T[]) =>
-  rows.map(({ id, createdAt, updatedAt, ...rest }) => rest);
+  rows.map(({ id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest }) => rest);
 
 await rm(OUT, { recursive: true, force: true });
 await mkdir(path.join(OUT, "posts"), { recursive: true });

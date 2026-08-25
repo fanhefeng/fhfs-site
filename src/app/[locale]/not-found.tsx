@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { NotFoundStage } from "@/components/notfound/NotFoundStage";
 import { htmlLang } from "@/i18n/routing";
+import { site } from "@/config/site";
 
 /**
  * The `notFound()` boundary inside a locale.
@@ -22,8 +23,13 @@ export default function NotFoundPage() {
   const prefix = `/${locale}`;
 
   return (
-    <NotFoundStage
-      blocks={[
+    <>
+      {/* A not-found boundary cannot export metadata, so the tab would keep
+          the layout's site title. React 19 hoists a <title> rendered here into
+          <head> instead. */}
+      <title>{`${t("title")} | ${site.signName}`}</title>
+      <NotFoundStage
+        blocks={[
         {
           lang: htmlLang(locale),
           title: t("title"),
@@ -31,15 +37,16 @@ export default function NotFoundPage() {
           homeHref: prefix,
           homeLabel: t("backHome"),
           blogHref: `${prefix}/blog`,
-          blogLabel: t("readInstead"),
-        },
-      ]}
-      sticker={{
-        lang: htmlLang(locale),
-        hint: t("stickerHint"),
-        aria: t("stickerAria"),
-        secret: t("stickerSecret"),
-      }}
-    />
+            blogLabel: t("readInstead"),
+          },
+        ]}
+        sticker={{
+          lang: htmlLang(locale),
+          hint: t("stickerHint"),
+          aria: t("stickerAria"),
+          secret: t("stickerSecret"),
+        }}
+      />
+    </>
   );
 }
