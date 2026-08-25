@@ -26,7 +26,7 @@ export default async function ResumePage({
   const experiences = await getResumeExperiences();
 
   return (
-    <main className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-24 pt-24 sm:pt-32 print:pb-8 print:pt-8">
+    <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-24 pt-24 sm:pt-32 print:pb-8 print:pt-8">
       <header>
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("title")}

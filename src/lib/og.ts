@@ -13,8 +13,8 @@
 export const OG = {
   paper: "#FAF9F6",
   ink: "#1A1A1A",
-  inkSecondary: "rgba(26,26,26,0.62)",
-  inkTertiary: "rgba(26,26,26,0.40)",
+  inkSecondary: "rgba(26,26,26,0.72)",
+  inkTertiary: "rgba(26,26,26,0.60)",
   /** The single accent: amber. */
   accent: "#B45309",
 } as const;

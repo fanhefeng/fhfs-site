@@ -1,13 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useQingdaoTime } from "@/lib/useQingdaoTime";
+import { useLocalClock } from "@/lib/useLocalClock";
 
 /** The page's last line: where and when it was written. No motion — only
  *  the clock ticks, once a minute. */
 export function Colophon({ className }: { className?: string }) {
   const t = useTranslations("about");
-  const time = useQingdaoTime();
+  const time = useLocalClock();
 
   return (
     <p

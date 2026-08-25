@@ -30,7 +30,7 @@
   /* Both tiers clear 4.5:1 on paper: tertiary carries dates, counts and
    * captions at 11-12px, so hierarchy comes from size, not from fading out. */
   --fg-secondary: rgba(26, 26, 26, 0.72);
-  --fg-tertiary: rgba(26, 26, 26, 0.6);
+  --fg-tertiary: rgba(26, 26, 26, 0.62);
   /* The one accent: amber. ≥4.5:1 on paper, used for link underlines,
    * current-state markers and the lit lamp. */
   --accent: #b45309;
@@ -93,7 +93,7 @@
   --surface-raised: #1a1a1f;
   --fg: rgba(255, 255, 255, 0.92);
   --fg-secondary: rgba(255, 255, 255, 0.68);
-  --fg-tertiary: rgba(255, 255, 255, 0.45);
+  --fg-tertiary: rgba(255, 255, 255, 0.47);
   /* The same amber, opened up two stops: #b45309 only reaches 3.8:1 against
    * #0e0e11, which fails for the link and current-state text it carries. */
   --accent: #d97706;

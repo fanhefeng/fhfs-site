@@ -8,17 +8,16 @@ export const site = {
   signName: "fhf",
   title: { zh: "fhf — 安静的个人杂志", en: "fhf — The Quiet Issue" },
   description: {
-    zh: "fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文章、自研软件与动效实验。",
-    en: "The personal site of fhf — a quiet magazine and private gallery of essays, self-built software, and motion experiments.",
+    zh: "fhf 的个人网站：一个对世界好奇的前端 developer——文章、自研软件与动效实验，留一盏灯。",
+    en: "The personal site of fhf — a front-end developer curious about the world: essays, self-built software and motion studies, with one light left on.",
   },
   /** Production origin, used for metadata/sitemap/RSS. Update after binding a domain. */
   url: "https://fhfs-site.vercel.app",
   author: "fhf",
   social: {
     github: "https://github.com/fanhefeng",
-    /** Revealed under the tear-off sticker in the footer.
-     *  TODO(user): fill in a real public address — left empty on purpose so
-     *  the sticker can render a graceful fallback instead of a fake email. */
-    email: "",
+    /** Revealed under the tear-off sticker in the footer, listed on /resume
+     *  and in the home page's contact row. */
+    email: "fanhefeng901121@gmail.com",
   },
 } as const;

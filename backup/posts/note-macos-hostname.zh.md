@@ -1,23 +1,24 @@
 ---
-title: macOS 主机名与 scutil 小抄
+title: 一台 Mac 的三个名字
 date: 2024-12-20
 tags:
   - macOS
   - 手札
-summary: ComputerName、HostName、LocalHostName 三种主机名的区别与设置方法，附 scutil 常用命令与 Finder
-  显示隐藏文件的小抄。
+summary: ComputerName、HostName、LocalHostName 各自回答的是谁的提问；附 scutil 常用命令与 Finder 隐藏文件的开关。
 ---
 
 
-## 三种主机名的区别与设置
+一台 Mac 其实有三个名字，各自面向不同的提问者：AirDrop 里的邻居、终端里的提示符、局域网里的 Bonjour。它们可以相同，但并不是同一回事。
+
+## 三种主机名
 
 ### ComputerName：计算机名称
 
-用户可识别名称，相当于设备的「身份标识」，方便你辨认 Mac 设备。在进行 AirDrop 共享文件或其他共享操作时，其他人会以这个名字看到你的电脑。
+面向人的名字，相当于设备的「身份标识」，用来在一群设备里认出自己的 Mac。AirDrop 共享文件或其他共享操作时，别人看到的就是它。
 
-用户自定义，例如「张三的 MacBook Pro」。
+由用户自定义，例如「张三的 MacBook Pro」。
 
-在 `macOS Sequoia Version 15.1.1` 中，可以通过 `System Settings ▸ General ▸ About ▸ Name` 来设置。
+在 `macOS Sequoia Version 15.1.1` 中，可通过 `System Settings ▸ General ▸ About ▸ Name` 设置。
 
 ```bash
 scutil --get ComputerName
@@ -26,11 +27,11 @@ scutil --set ComputerName "张三的 MacBook Pro"
 
 ### HostName：主机名称
 
-主机名用于在系统上标识一台机器。它和 IP 地址的区别是：hostname 在系统层面标识一台机器，IP 地址则在 TCP/IP 网络中唯一标识一台机器。联系到实际生活，主机名相当于一间房子的主人名，而 IP 地址相当于小区内这间房子的门牌号。随着互联网的发展，hostname 的定义也演化为 FQDN（Fully Qualified Domain Name，完全限定域名），用于绝对且唯一地标识接入互联网的每一台计算机。
+主机名用于在系统上标识一台机器。它与 IP 地址的分工是：hostname 在系统层面标识一台机器，IP 地址则在 TCP/IP 网络中唯一标识一台机器——好比主机名是这间房子主人的姓名，IP 地址是它在小区里的门牌号。随着互联网的发展，hostname 的定义也演化为 FQDN（Fully Qualified Domain Name，完全限定域名），用于绝对且唯一地标识接入互联网的每一台计算机。
 
-打开终端，每行提示符里 `@` 后面出现的名字就是主机名；`@` 前面则是管理员名称——也就是电脑初始化时设置的管理员名称、开机时头像下面显示的名称，可在「系统偏好设置 ▸ 用户与群组」中修改。所以终端中每个命令行显示的名称为：`管理员名称@主机名`。
+打开终端，提示符里 `@` 后面的名字就是主机名；`@` 前面是管理员名称——即电脑初始化时设置的管理员名称、开机时头像下方显示的那个名字，可在「系统偏好设置 ▸ 用户与群组」中修改。所以终端每行提示符的格式是：`管理员名称@主机名`。
 
-macOS 会按以下顺序确定 HostName，直到获取到为止：
+macOS 按以下顺序确定 HostName，直到取到为止：
 
 1. 从 `/etc/hostconfig` 文件中读取
 2. 从系统配置项 `/Library/Preferences/SystemConfiguration/preferences.plist` 中的 `System ▸ System ▸ HostName` 读取
@@ -46,9 +47,9 @@ scutil --set HostName "zhangsan-macbook-pro"
 
 ### LocalHostName：Bonjour 名称
 
-本地主机名，本地网络上的电脑可以通过这个名字访问你的电脑。
+本地主机名。同一本地网络里的其他电脑，可以通过这个名字访问你的电脑。
 
-在 `macOS Sequoia Version 15.1.1` 中，可以通过 `System Settings ▸ General ▸ Sharing ▸ Local hostname` 来设置。
+在 `macOS Sequoia Version 15.1.1` 中，可通过 `System Settings ▸ General ▸ Sharing ▸ Local hostname` 设置。
 
 ```bash
 scutil --get LocalHostName
@@ -57,7 +58,7 @@ scutil --set LocalHostName "zhangsan-macbook-pro"
 
 ## scutil 常用命令
 
-`scutil` 是个可动态访问 macOS 系统信息的交互式工具。
+`scutil` 是一个可动态访问 macOS 系统信息的交互式工具。
 
 ```bash
 scutil --help
@@ -82,6 +83,8 @@ scutil --nwi
 ```
 
 ## Finder 显示隐藏文件
+
+与主机名无关，只是同一时期记在同一页上的两行命令。
 
 显示所有文件：
 

@@ -529,7 +529,13 @@ export function Workstation({ hint, className }: Props) {
         ref={containerRef}
         className="relative left-1/2 h-[360px] w-screen -translate-x-1/2 cursor-grab touch-pan-y active:cursor-grabbing md:h-[460px]"
       >
-        <canvas ref={canvasRef} className="h-full w-full" />
+        {/* To assistive tech the scene is one picture named by its caption.
+            The role goes on the canvas, not the stage: everything under a
+            role="img" is presentational, and the model credit below is a
+            real link that has to stay reachable. A canvas cannot be an <img>,
+            hence the lint override. */}
+        {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role */}
+        <canvas ref={canvasRef} role="img" aria-label={hint} className="h-full w-full" />
         {/* Minimal loading state: a gold ring that quietly spins until the
             model lands, then fades away.
 

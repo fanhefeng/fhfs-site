@@ -188,7 +188,7 @@ export function ScrollVideoDemo({
 
       <div ref={stageRef} className="sv-stage">
         <div ref={stickyRef} className="sv-sticky">
-          <canvas ref={canvasRef} className="sv-canvas" />
+          <canvas ref={canvasRef} className="sv-canvas" aria-hidden="true" />
 
           {!ready && (
             <div className="sv-loader">

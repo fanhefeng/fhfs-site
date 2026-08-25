@@ -1,13 +1,27 @@
 {
   "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "unicorn", "oxc"],
+  "plugins": ["react", "typescript", "unicorn", "oxc", "nextjs", "jsx-a11y"],
   "categories": {
     "correctness": "error"
   },
   "rules": {
     "eslint/no-console": ["warn", { "allow": ["warn", "error"] }],
     "react/exhaustive-deps": "error",
-    "react/rules-of-hooks": "error"
+    "react/rules-of-hooks": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/set-state-in-effect": "off",
+    "react/refs": "off",
+    "react/immutability": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-noninteractive-tabindex": "off",
+    "jsx-a11y/no-autofocus": "off"
   },
+  "overrides": [
+    {
+      "files": ["scripts/**"],
+      "rules": { "eslint/no-console": "off" }
+    }
+  ],
   "ignorePatterns": [".next", "tools", "public"]
 }

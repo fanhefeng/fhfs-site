@@ -1166,7 +1166,7 @@ export function GroveDemo({
 
       <div ref={stageRef} className="gv-stage" data-degraded={degraded || undefined}>
         <div ref={stickyRef} className="gv-sticky">
-          <canvas ref={canvasRef} className="gv-canvas" data-degraded={degraded || undefined} />
+          <canvas ref={canvasRef} className="gv-canvas" data-degraded={degraded || undefined} aria-hidden="true" />
 
           <div ref={copyRef} className="gv-copy">
             <h2 className="gv-headline">{headline}</h2>

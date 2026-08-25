@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { fontVariables } from "../fonts";
 import { THEME_INIT_SCRIPT } from "../themeInit";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getNavItems } from "@/lib/content";
+import { feedTypes } from "@/lib/seo";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuroraLayer } from "@/components/fx/AuroraLayer";
@@ -50,6 +51,15 @@ export async function generateMetadata({
     metadataBase: new URL(site.url),
     title: { default: site.title[l], template: `%s | ${site.signName}` },
     description: site.description[l],
+    // A page that sets `alternates` replaces this object rather than merging
+    // into it, which is why `localeAlternates()` in lib/seo.ts carries the
+    // same feed link — this copy is for the pages that set none.
+    alternates: { types: feedTypes(l) },
+    openGraph: {
+      type: "website",
+      siteName: site.signName,
+      locale: l === "zh" ? "zh_CN" : "en_US",
+    },
   };
 }
 
@@ -59,6 +69,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     notFound();
   }
   setRequestLocale(locale);
+  const t = await getTranslations("layout");
 
   // One nav table, three surfaces. These used to be three constants that had
   // already drifted apart: /intro only ever reached the sitemap, and home only
@@ -113,6 +124,16 @@ export default async function LocaleLayout({ children, params }: Props) {
           <ProgressHud />
           <AuroraLayer />
           <GrainLayer />
+          {/* First tab stop on every page: a keyboard reader gets past the
+              island and the menu in one press. Every page's <main> carries
+              id="main"; a hash jump is one of the clicks RouteTransition
+              deliberately leaves to the browser. */}
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-surface-raised focus:px-4 focus:py-2 focus:font-mono focus:text-meta focus:uppercase focus:tracking-meta focus:text-fg focus:shadow-lg focus:outline-2 focus:outline-accent"
+          >
+            {t("skipToContent")}
+          </a>
           <Header links={headerLinks} menuLinks={menuLinks} />
           {children}
           <Footer items={footerLinks} />

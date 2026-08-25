@@ -3,6 +3,7 @@ import {
   boolean,
   check,
   date,
+  index,
   integer,
   jsonb,
   pgEnum,
@@ -140,6 +141,10 @@ export const apps = pgTable("apps", {
   description: localized().notNull(),
   category: appCategoryEnum().notNull(),
   website: text().notNull(),
+  // "owner/name" on GitHub. The version shown beside an app is read from
+  // this repo's latest release at render time (src/lib/github.ts), so a new
+  // release updates the site without anyone retyping a number here.
+  repo: text(),
   platforms: text().array().notNull().default(sql`'{}'`),
   accent: text(),
   hue: integer(),
@@ -300,8 +305,14 @@ export const copyBlocks = pgTable("copy_blocks", {
 // ---------------------------------------------------------------------------
 
 /** Login throttling. An in-memory counter would not survive serverless. */
-export const loginAttempts = pgTable("login_attempts", {
-  id: serial().primaryKey(),
-  ip: text().notNull(),
-  at: timestamp({ withTimezone: true }).notNull().defaultNow(),
-});
+export const loginAttempts = pgTable(
+  "login_attempts",
+  {
+    id: serial().primaryKey(),
+    ip: text().notNull(),
+    at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  // Every login counts this address's rows inside the window; without the
+  // index that is a full scan of a table that only ever grows between logins.
+  (t) => [index("login_attempts_ip_at").on(t.ip, t.at)]
+);

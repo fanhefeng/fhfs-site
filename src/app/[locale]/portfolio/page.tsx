@@ -2,43 +2,54 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
 import { getApps, getExperiments, getWorks } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
-import { BentoHero, type BentoItem } from "@/components/portfolio/BentoHero";
+import { DissolveHero } from "@/components/portfolio/DissolveHero";
 import { CraftList, type CraftEntry } from "@/components/portfolio/CraftList";
-import { appMonogram } from "@/components/software/appMeta";
+import { DeviceShowcase } from "@/components/software/DeviceShowcase";
+import { toSoftwareApp } from "@/components/software/appMeta";
+import { Reveal } from "@/components/fx/Reveal";
 
 export const generateMetadata = sectionMetadata("portfolio", "/portfolio");
 
 /**
- * Fallback cover tints, for an app saved without an accent of its own. There
- * are no screenshots in the repo, so a cover is colour + monogram + name —
- * deliberately editorial rather than a fake device mockup. Muted gallery
- * hues: every one of them reads on paper and after hours.
- *
- * The per-app colour used to live here as a lookup table keyed by file name,
- * while the software page derived a different one from list position — so the
- * same app wore two colours depending on which page you were on. It is one
- * stored column now.
+ * Fallback cover tints, for a work saved without an accent of its own —
+ * muted gallery hues that read on paper and after hours.
  */
 const ACCENT_CYCLE = ["#b45309", "#3e6d93", "#6b5ba8", "#4c7a5b", "#a8465f", "#2f6f72"];
 
 /** Fallback dot colour for an experiment saved without one. */
 const CRAFT_ACCENT = "#4c7a5b";
 
+/**
+ * The cover of the portfolio. A photograph of a lamp left on in a dark room
+ * (Sixteen Miles Out, Unsplash License) — the site's own line, taken
+ * literally — that scrolling dissolves into the page.
+ */
+const COVER = "/portfolio/lamp.jpg";
+
+/**
+ * Craft — three acts. The cover: a photograph that scrolling turns into the
+ * page (the lab's dissolve, brought home). Then the apps framed on a Mac and
+ * an iPhone, one channel at a time. Then the craft log: one line per motion
+ * study built into this site. Works hang between the first two acts once
+ * there are any; until then that wall is simply not there.
+ */
 export default async function PortfolioPage({ params }: PageProps<"/[locale]/portfolio">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("portfolio");
+  const ts = await getTranslations("software");
 
-  const works = await getWorks();
+  const [works, experiments, apps] = await Promise.all([
+    getWorks(),
+    getExperiments(),
+    getApps(),
+  ]);
 
-  // Name, sentence, status and colour arrive as one record now — the craft log
-  // used to be a constant here plus two message keys per language.
-  const craft: CraftEntry[] = (await getExperiments()).map((entry) => ({
+  const craft: CraftEntry[] = experiments.map((entry) => ({
     id: entry.key,
     name: entry.name[locale],
     description: entry.description[locale],
@@ -48,55 +59,23 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
     demo: entry.demo === "liquid-lens" ? "liquid-lens" : undefined,
   }));
 
-  // The collage reuses the software data — one wall, two ways in.
-  const covers: BentoItem[] = (await getApps()).map((app, i) => {
-    return {
-      id: app.key,
-      name: app.name,
-      kicker: app.platforms[0] ?? app.category,
-      monogram: appMonogram(app.name),
-      accent: app.accent ?? ACCENT_CYCLE[i % ACCENT_CYCLE.length],
-      href: "/software",
-      label: t("coverLabel", { name: app.name }),
-    };
-  });
+  const softwareApps = apps.map((app, i) => toSoftwareApp(app, i, locale));
 
   return (
-    <main className="flex-1 pb-24">
-      <header className="mx-auto w-full max-w-[680px] px-6 pt-24 pb-8">
-        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          {t("kicker")}
-        </p>
-        <h1 className="mt-3 text-display-sm">{t("title")}</h1>
-        <p className="mt-4 text-body text-fg-secondary">{t("subtitle")}</p>
-      </header>
-
-      <BentoHero
-        items={covers}
-        ariaLabel={t("galleryAria")}
+    <main id="main" className="flex-1 pb-24">
+      <DissolveHero
+        src={COVER}
+        alt={t("coverAlt")}
+        kicker={t("kicker")}
+        headline={t("title")}
+        body={t("subtitle")}
+        tail={t("heroTail")}
         hint={t("scrollHint")}
+        fallbackNote={t("heroFallback")}
       />
 
-      {works.length === 0 ? (
-        /* Nothing in the works collection yet: say so plainly and point at
-           the wall that *is* hung. */
-        <section className="mx-auto w-full max-w-[680px] px-6 pt-10">
-          <div className="rounded-panel glass-thick p-8 text-center">
-            <h2 className="text-title vibrancy">{t("emptyTitle")}</h2>
-            <p className="mx-auto mt-3 max-w-[46ch] text-body text-fg-secondary">
-              {t("empty")}
-            </p>
-            <Link
-              href="/software"
-              className="hit-ext mt-6 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
-            >
-              {t("emptyCta")}
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </section>
-      ) : (
-        <section className="mx-auto w-full max-w-5xl px-6 pt-10">
+      {works.length > 0 && (
+        <Reveal as="section" className="mx-auto w-full max-w-5xl px-6 pt-24">
           <h2 className="text-title">{t("worksTitle")}</h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {works.map((work, i) => (
@@ -108,10 +87,20 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
               />
             ))}
           </div>
-        </section>
+        </Reveal>
       )}
 
-      <div className="mx-auto w-full max-w-[680px] px-6 pt-20">
+      {softwareApps.length > 0 && (
+        <Reveal as="section" className="mx-auto w-full max-w-5xl px-6 pt-24">
+          <div className="mb-8 max-w-[42rem]">
+            <h2 className="text-title text-fg">{ts("deviceTitle")}</h2>
+            <p className="mt-3 text-body text-fg-secondary">{ts("deviceSub")}</p>
+          </div>
+          <DeviceShowcase apps={softwareApps} />
+        </Reveal>
+      )}
+
+      <div className="mx-auto w-full max-w-[680px] px-6 pt-24">
         <CraftList
           entries={craft}
           title={t("experimentsTitle")}

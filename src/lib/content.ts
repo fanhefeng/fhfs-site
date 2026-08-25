@@ -114,6 +114,8 @@ export type App = {
   description: Localized;
   category: "desktop" | "tool" | "game" | "website";
   website: string;
+  /** GitHub "owner/name", when the app has a public repo. */
+  repo: string | null;
   platforms: string[];
   accent: string | null;
   hue: number | null;
@@ -359,6 +361,7 @@ export const getApps = unstable_cache(
         description: apps.description,
         category: apps.category,
         website: apps.website,
+        repo: apps.repo,
         platforms: apps.platforms,
         accent: apps.accent,
         hue: apps.hue,
@@ -579,19 +582,25 @@ export type NavItem = { href: string; labelKey: string; surfaces: string[] };
  */
 export type NavSurface = "header" | "footer" | "fullnav" | "sitemap";
 
-/** One list, filtered per surface — Header, Footer, FullNav and the sitemap. */
-export const getNavItems = unstable_cache(
-  async (surface: NavSurface): Promise<NavItem[]> => {
-    const rows = await db
+/** The whole nav table, in display order — one cache entry rather than one
+ *  per surface, since the layout asks for three surfaces on every render. */
+export const getAllNavItems = unstable_cache(
+  async (): Promise<NavItem[]> =>
+    db
       .select({
         href: navItems.href,
         labelKey: navItems.labelKey,
         surfaces: navItems.surfaces,
       })
       .from(navItems)
-      .orderBy(asc(navItems.sort));
-    return rows.filter((row) => row.surfaces.includes(surface));
-  },
+      .orderBy(asc(navItems.sort)),
   ["nav-items"],
   cacheOptions(TAGS.nav)
 );
+
+/** One list, filtered per surface — Header, Footer, FullNav and the sitemap.
+ *  Not cached itself: it only filters the cached list above. */
+export async function getNavItems(surface: NavSurface): Promise<NavItem[]> {
+  const rows = await getAllNavItems();
+  return rows.filter((row) => row.surfaces.includes(surface));
+}

@@ -8,11 +8,22 @@
  * the whole picture scales; nothing reflows.
  */
 export const GROVE_CSS = `
-/* This page brings its own chrome, so the site's header and footer stand down
-   for it. Scoped through :has() rather than a layout of its own, because the
-   locale layout is the root layout — there is no level above it to opt out at. */
-body:has(.gh-hero) > header,
-body:has(.gh-hero) > footer { display: none; }
+/* The hero brings its own chrome — the dock — so the site's header stands
+   down while the hero is on screen and comes back once the reader has
+   scrolled past it (GroveHero flips the body attribute from an
+   IntersectionObserver). Scoped through :has() rather than a layout of its
+   own, because the locale layout is the root layout — there is no level above
+   it to opt out at. The footer stays: the hero is the cover of a page that
+   goes on below it, not a page of its own. */
+body:has(.gh-hero) > header {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease-out, visibility 0.35s;
+}
+body[data-grove-header="visible"] > header {
+  opacity: 1;
+  visibility: visible;
+}
 body:has(.gh-hero) { overflow-x: hidden; }
 
 .gh-hero {

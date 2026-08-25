@@ -9,6 +9,27 @@
 > content-collections 已移除，`dynamicParams = false` 也全部删掉——新文章要能不重新
 > 部署就访问。下文凡提到内容文件、content-collections、全静态策略的段落，读作历史。
 > 现状见 README「内容存在哪」。
+>
+> **2026-08-25 修订（简化 + 实验室效果回流站内）**，覆盖下文与之相悖的段落：
+> - 首页封面是 **grove**（`/lab/grove` 的程序化苔藓场景，`GroveHero`）：宣言站在苔藓前，
+>   自带 dock；滚过 hero 后灵动岛顶栏才出现（`hero.css.ts` 的 `data-grove-header`）。
+>   原 `HomeHero`（插电亮灯机关）与独立的 `/grove` 页已退役，`/grove` 308 到首页。
+> - **横向 pin 标语段（`ManifestoBand`）搬到 `/about`**，位于引子与正文之间；仍是全站唯一 pin。
+> - `/portfolio` 的 bento scrub（`BentoHero`，vYMzKZx）**删除**——用户明确不要「滚动放大」。
+>   封面改为 `DissolveHero`：一张暗室台灯的照片（Unsplash，Sixteen Miles Out）随滚动溶解成
+>   当前主题的纸色（复用 `/lab/dissolve` 的标量场阈值着色器，纸色跟随 `fhfs:theme`）。
+>   「上机看看」设备框段从 `/software` 搬到这里；`/software` 只剩 bento。
+> - `/about` 的 3D 工作台搬到 `/lab/workstation`（第六则研究）；`/lab/[slug]` 各研究改为
+>   `next/dynamic` 按路由拆包（`LabStudy`）。
+> - 主导航只留 文章 / 软件 / 关于 / 实验室；作品、简历进页脚与全屏菜单，/intro 仍只在 sitemap。
+> - 软件版本号不再手写：`apps.repo` 列 + `src/lib/github.ts` 读 GitHub 最新 release
+>   （`fetch` 缓存 1h，失败即不显示）。
+> - 贴纸/履历/简历/about/文案全部换成用户本人的信息（上海、河津、北京、青岛；小提琴、游戏、
+>   电影、球场、旅行、好奇心）；/intro 七枚贴纸主题随之改为 FRONTEND / VIOLIN / PLAYER 1 /
+>   CINEMA / GAME ON / WANDER / CURIOUS（`stickers.ts` 的角度未动，只换 id/label/icon）。
+> - 字体：Noto Sans/Serif SC 改 `weight: "variable"`（每页少 ~100 KB gz 的 `@font-face`）。
+>   GSAP：核心只注册 ScrollTrigger/SplitText/Flip/CustomEase；Draggable/Inertia/ScrambleText/
+>   CustomWiggle/ExpoScale 在 `src/lib/gsap-extras.ts`，谁用谁引。
 
 ## 0. 核心概念
 
@@ -85,7 +106,7 @@ export const EASE = {
 - materialize（面板出现）：`--panel-blur 20→0`（@property 注册）+ `scale .96→1`，0.4s，仅入退场瞬时 tween backdrop-filter。
 - 开灯/主题切换：**1.2s `cubic-bezier(.42,0,.58,1)`**，包 `document.startViewTransition`，≥300ms 防亮度跳变。
 - press 反馈基类：`a, button { active: scale-[0.97], 100ms ease-out, touch-action: manipulation }`。
-- hover tween 硬规则 `overwrite: 'auto'`；插件注册：ScrollTrigger / SplitText / Flip / Draggable + InertiaPlugin / **ScrambleTextPlugin（补注册）** / CustomEase + CustomWiggle。
+- hover tween 硬规则 `overwrite: 'auto'`；插件注册分两层：`src/lib/gsap.ts` 只注册全站都要的 ScrollTrigger / SplitText / Flip / CustomEase；Draggable + InertiaPlugin / ScrambleTextPlugin / CustomWiggle / ExpoScaleEase 在 `src/lib/gsap-extras.ts`，只由用到它们的组件引入（贴纸墙、移动端软件横滑、404、文章标题）。
 - **全站单一动效版本，不再按 `prefers-reduced-motion` 分档**（2026-08-04 决策，取代原「每个动效组件内建 reduce 分支」的规则）。
   原因是实测的误伤面：Windows 上该信号写作「显示动画」，被「轻松使用」开关、**性能选项 →「调整为最佳性能」**、节电模式任意一个关掉都会置为 `reduce`。这批访客从未表达过「少一点动效」，却拿到一个残缺版本且无从察觉——`/intro` 直接退化成纯文字简历，而这张脸就是那一页的全部内容。
   这条规则覆盖**所有**表达方式，包括 Tailwind 的 `motion-reduce:` 变体——它编译出来就是 `@media (prefers-reduced-motion: reduce)`。首次执行时漏掉了这一类（只 grep 了 `prefers-reduced-motion` 字面量），复查时补删 9 处；以后加动效不要再引入。

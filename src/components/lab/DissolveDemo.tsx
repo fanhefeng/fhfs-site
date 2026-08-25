@@ -367,7 +367,7 @@ export function DissolveDemo({
 
       <div ref={stageRef} className="dz-stage">
         <div ref={stickyRef} className="dz-sticky">
-          <canvas ref={canvasRef} className="dz-canvas" data-degraded={degraded || undefined} />
+          <canvas ref={canvasRef} className="dz-canvas" data-degraded={degraded || undefined} aria-hidden="true" />
 
           <div ref={copyRef} className="dz-copy">
             <h2 className="dz-headline">{headline}</h2>

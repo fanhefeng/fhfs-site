@@ -89,7 +89,9 @@ export const GLASSES = {
 /**
  * Seven stickers, in the order the camera visits them. Every angle here was
  * placed by hand in `?edit=1` and exported — see `docs/INTRO3D.md` before
- * touching a number.
+ * touching a number. The ids join the `intro_nodes` rows; the labels are what
+ * the owner is made of — the work, the violin, the games, the films, the
+ * courts, the road, and the curiosity under all of it.
  */
 export const INTRO_STICKERS: IntroSticker[] = [
   {
@@ -104,9 +106,9 @@ export const INTRO_STICKERS: IntroSticker[] = [
     distance: 2.0,
   },
   {
-    id: "webgl",
-    label: "3D / WEBGL",
-    icon: "🧊",
+    id: "violin",
+    label: "VIOLIN",
+    icon: "🎻",
     shape: "badge",
     colors: { bg: "#4DA3FF", ink: "#FFFFFF" },
     dir: { theta: 13, phi: 31 },
@@ -115,9 +117,9 @@ export const INTRO_STICKERS: IntroSticker[] = [
     distance: 2.0,
   },
   {
-    id: "design",
-    label: "DESIGN",
-    icon: "🎨",
+    id: "games",
+    label: "PLAYER 1",
+    icon: "🎮",
     shape: "circle",
     colors: { bg: "#FF7A3D", ink: "#FFFFFF" },
     dir: { theta: -28, phi: -22 },
@@ -126,9 +128,9 @@ export const INTRO_STICKERS: IntroSticker[] = [
     distance: 1.95,
   },
   {
-    id: "ai",
-    label: "AI",
-    icon: "🤖",
+    id: "film",
+    label: "CINEMA",
+    icon: "🎬",
     shape: "badge",
     colors: { bg: "#A78BFA", ink: "#FFFFFF" },
     dir: { theta: 24, phi: -17 },
@@ -137,9 +139,9 @@ export const INTRO_STICKERS: IntroSticker[] = [
     distance: 1.95,
   },
   {
-    id: "ship",
-    label: "SHIP IT",
-    icon: "🚀",
+    id: "court",
+    label: "GAME ON",
+    icon: "🏀",
     shape: "banner",
     colors: { bg: "#FF5A5F", ink: "#FFFFFF" },
     dir: { theta: -4, phi: -34 },
@@ -148,9 +150,9 @@ export const INTRO_STICKERS: IntroSticker[] = [
     distance: 2.05,
   },
   {
-    id: "oss",
-    label: "OSS",
-    icon: "📦",
+    id: "road",
+    label: "WANDER",
+    icon: "🧭",
     shape: "circle",
     colors: { bg: "#3DDC97", ink: "#0F2E22" },
     dir: { theta: 31, phi: -9 },
@@ -159,9 +161,9 @@ export const INTRO_STICKERS: IntroSticker[] = [
     distance: 1.9,
   },
   {
-    id: "slow",
-    label: "SLOW",
-    icon: "🕯️",
+    id: "curious",
+    label: "CURIOUS",
+    icon: "✨",
     shape: "circle",
     colors: { bg: "#F4F1EA", ink: "#3B2A1F" },
     dir: { theta: -26, phi: -11 },

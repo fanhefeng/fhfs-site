@@ -6,7 +6,7 @@ import {
   getTranslations,
   getFormatter,
 } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { getAdjacentPosts, getAllSlugs, getPost } from "@/lib/content";
 import { HAS_CJK } from "@/lib/reading";
@@ -29,15 +29,42 @@ export async function generateStaticParams() {
   return (await getAllSlugs()).map((slug) => ({ slug }));
 }
 
+/**
+ * The locales that have their own version of a post. `getPost` never misses
+ * for a slug that exists in *some* language — it hands back the other
+ * language with `isFallback` set — so "exists" has to be read off that flag,
+ * one lookup per locale (all cached).
+ */
+async function availableLocales(slug: string): Promise<Locale[]> {
+  const checks = await Promise.all(
+    routing.locales.map(async (locale) => {
+      const post = await getPost(slug, locale);
+      return post && !post.isFallback ? locale : null;
+    })
+  );
+  return checks.filter((locale): locale is Locale => locale !== null);
+}
+
 export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const post = await getPost(slug, locale);
   if (!post) return {};
+  // A fallback render is the other language's article under this prefix: its
+  // canonical is that article, and hreflang lists only the languages that
+  // really exist, or crawlers would index the same text twice.
+  const alternates = localeAlternates(
+    `/blog/${slug}`,
+    locale,
+    await availableLocales(slug)
+  );
+  if (post.isFallback) {
+    alternates.canonical = `${site.url}/${post.locale}/blog/${slug}`;
+  }
   return {
     title: post.title,
     description: post.summary,
-    alternates: localeAlternates(`/blog/${slug}`, locale),
+    alternates,
   };
 }
 
@@ -100,7 +127,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
   return (
     <>
       <TopScrim />
-      <main className="mx-auto w-full max-w-[68ch] flex-1 px-6 pb-28 pt-32 md:pt-40">
+      <main id="main" className="mx-auto w-full max-w-[68ch] flex-1 px-6 pb-28 pt-32 md:pt-40">
         <JsonLd
           data={{
             "@context": "https://schema.org",
@@ -112,9 +139,17 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
             url: `${site.url}/${locale}/blog/${post.slug}`,
           }}
         />
-        <article>
+        {/* A fallback article is the other language's text under this
+            locale's <html lang>: the article says so itself, for screen
+            readers' pronunciation and for the crawler's language detection.
+            The notice inside stays in the page's own language, hence its own
+            lang below. */}
+        <article lang={post.isFallback ? htmlLang(post.locale) : undefined}>
           <header className="mb-12">
-            <p className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            <p
+              lang={post.isFallback ? htmlLang(locale) : undefined}
+              className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
+            >
               <time dateTime={post.date}>
                 {format.dateTime(new Date(post.date), {
                   year: "numeric",
@@ -145,7 +180,10 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
           </header>
 
           {post.isFallback && (
-            <p className="glass-thin vibrancy mb-10 rounded-card px-4 py-3 text-caption">
+            <p
+              lang={htmlLang(locale)}
+              className="glass-thin vibrancy mb-10 rounded-card px-4 py-3 text-caption"
+            >
               {t("fallbackNotice")}
             </p>
           )}

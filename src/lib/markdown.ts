@@ -7,6 +7,60 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeStringify from "rehype-stringify";
 
+/** The slice of a hast node this file looks at — enough to walk it and read
+ *  its attributes, without reaching for a types package for two fields. */
+type HastNode = {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+};
+
+const URL_ATTRIBUTES = ["href", "src"] as const;
+const SAFE_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
+/** What a browser reads as a scheme: letters, then digits/`+.-`, then `:`. */
+const SCHEME = /^([a-z][a-z0-9+.-]*):/;
+
+/**
+ * Relative paths, anchors and the four protocols above pass; anything else
+ * with a scheme — `javascript:`, `data:`, `vbscript:` — does not. Browsers
+ * skip ASCII whitespace and control characters when reading a scheme, so
+ * `java\nscript:` runs; they are stripped before looking, not just trimmed.
+ */
+function isSafeUrl(value: string): boolean {
+  const url = Array.from(value)
+    .filter((ch) => ch.charCodeAt(0) > 0x20)
+    .join("")
+    .toLowerCase();
+  const scheme = SCHEME.exec(url);
+  return !scheme || SAFE_PROTOCOLS.has(`${scheme[1]}:`);
+}
+
+/**
+ * Drops `href`/`src` attributes that carry a dangerous protocol.
+ *
+ * remark-rehype percent-encodes link targets but does not police their
+ * scheme, and the output goes into the page unescaped. The author is the
+ * only one who writes here — this is a belt for the day that is not true.
+ */
+function rehypeSafeUrls() {
+  return (tree: HastNode) => {
+    const walk = (node: HastNode) => {
+      if (node.type === "element" && node.properties) {
+        for (const name of URL_ATTRIBUTES) {
+          const value = node.properties[name];
+          if (value == null || value === false) continue;
+          if (typeof value !== "string" || !isSafeUrl(value)) {
+            delete node.properties[name];
+          }
+        }
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
 /**
  * Markdown → HTML, run once when a post is saved rather than on every render.
  *
@@ -29,6 +83,7 @@ const pipeline = unified()
   .use(remarkParse)
   .use(remarkGfm)
   .use(remarkRehype)
+  .use(rehypeSafeUrls)
   .use(rehypeSlug)
   .use(rehypeAutolinkHeadings, { behavior: "wrap" })
   .use(rehypePrettyCode, {
