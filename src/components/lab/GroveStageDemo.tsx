@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { gsap } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { GroveScene } from "@/components/grove/GroveScene";
-import { GroveCard, GroveKnob, type GroveCardData } from "@/components/grove/GroveCard";
+import { GroveCard, type GroveCardData } from "@/components/grove/GroveCard";
 import { APPROACH_CSS } from "@/components/grove/approach.css";
 
 type Props = {
@@ -136,7 +136,6 @@ export function GroveStageDemo({ accent, hint, fallbackNote, cards }: Props) {
                 b could not climb past the canvas. */}
             <div ref={stageRef} className="ga-stage">
               <GroveCard slot="a" {...cards[0]} />
-              <GroveKnob href={cards[0].href} linkLabel={cards[0].linkLabel} />
               <GroveCard slot="b" {...cards[1]} />
             </div>
             <GroveScene heroRef={sceneRef} stageRef={stageRef} onReady={onReady} />
@@ -203,8 +202,7 @@ const CSS = `
     top: calc(-400 * var(--ga-u));
     margin-top: 0;
   }
-  .gs .ga-card--a,
-  .gs .ga-knob-float { display: block; }
+  .gs .ga-card--a { display: block; }
 
   .gs .ga-card--a {
     left: calc(34 / 760 * 100%);
@@ -226,16 +224,16 @@ const CSS = `
     width: calc(224 * var(--ga-u));
     height: calc(218 * var(--ga-u));
   }
-  /* The knob keeps its corner: the card's lower right, 20u in. */
-  .gs .ga-knob-float {
-    left: calc(644 / 760 * 100%);
-    top: calc(1218 * var(--ga-u));
+  /* The knob goes on the corner the root does not reach. Here that is not
+     the plate's: the near arch's foot comes down over the whole right half of
+     the card, plate included, so the fitting sits at the upper left, in the
+     clear paper above the label. */
+  .gs .ga-card--a .ga-knob {
     width: calc(58 * var(--ga-u));
     height: calc(58 * var(--ga-u));
-  }
-  .gs .ga-knob-float .ga-knob {
-    width: calc(58 * var(--ga-u));
-    height: calc(58 * var(--ga-u));
+    right: auto;
+    left: calc(20 * var(--ga-u));
+    top: calc(20 * var(--ga-u));
   }
 
   .gs .ga-card--b {

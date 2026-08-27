@@ -151,15 +151,16 @@ body[data-grove-live] header .glass-thick {
      the window instead of along its bottom edge.
 
      The second term is the flat-frame floor. The cards are laid out on the
-     stage (card a's top at 200u), and the flatter the viewport the less of
+     stage (card a's top at 160u), and the flatter the viewport the less of
      the stage's head is on screen, until on a 2:1 frame the card's top edge
      is the frame's. So the hang gives way as soon as it would put card a
-     closer than 70px to the top — the moss and the pair come down together,
-     the composition intact. At 16:10 and 16:9 the first term wins and
-     nothing changes. */
+     closer than 84px to the top (the island ends at 67px, and the card's
+     upper left corner stands right beside it) — the moss and the pair come
+     down together, the composition intact. At 16:10 the first term wins and
+     nothing changes; a laptop's 16:9-ish viewport is already on the floor. */
   margin-top: max(
     calc(-593 * (100vw / 1600)),
-    calc(70px - 50svh - 200 * (100vw / 1600))
+    calc(84px - 50svh - 160 * (100vw / 1600))
   );
   pointer-events: none;
 }
@@ -194,14 +195,15 @@ body[data-grove-live] header .glass-thick {
    Card a carries no z-index at all, on purpose: z-index auto keeps it out of a
    stacking context of its own, so it paints under the canvas and the root
    drapes over its shoulder. Card b sits at z 3 — over the canvas and over the
-   caption's floor, under the paper wash. The knob for card a therefore cannot
-   live inside it (it would go under the moss with the rest of the card), so it
-   is rendered as its own layer at the same corner.
+   caption's floor, under the paper wash. Card a's knob goes under the moss
+   with the rest of the card, and that is right: a control floating in front
+   of the trunk, belonging to a sheet behind it, was the one thing in the
+   composition that contradicted itself. It sits on the corner of the card the
+   trunk never reaches.
 
    Horizontal placement is a percentage of the stage, vertical is in units —
    see the note on --ga-u. */
-.ga-card,
-.ga-knob-float {
+.ga-card {
   position: absolute;
   opacity: var(--ga-card, 0);
   /* hidden, not just transparent: a card that has not arrived yet must not
@@ -212,8 +214,7 @@ body[data-grove-live] header .glass-thick {
      ever a compositor job. */
   will-change: transform, opacity;
 }
-.ga-card > *,
-.ga-knob-float > * { pointer-events: var(--ga-card-hit, none); }
+.ga-card > * { pointer-events: var(--ga-card-hit, none); }
 
 .ga-card {
   background: var(--ga-paper);
@@ -226,32 +227,29 @@ body[data-grove-live] header .glass-thick {
   box-shadow: 0 calc(38 * var(--ga-u)) calc(84 * var(--ga-u)) rgba(16, 21, 13, 0.36);
 }
 
-/* The original placement, to the unit. The pair stands on one diagonal with
-   their corners all but touching (a's lower right at 1220 × 505, b's upper
-   left at 1237 × 482), and the standing trunk runs between them: it climbs
-   across card a's lower right quadrant — over the corner, under the title —
-   and card b stands in front of its foot with moss showing on three sides.
-   That is the whole depth cue, and it is the *pair* that carries it: two
-   sheets of the same paper at the same size, one root apart, so the eye has
-   something to measure the distance against. The knob for card a floats at
-   the same corner (1142 × 427, the 20u inset the other card's knob has) and
-   rides over the trunk that covers the corner it belongs to.
+/* The pair stands on one diagonal, the standing trunk between them: it climbs
+   across card a's lower right corner and card b stands in front of its foot
+   with moss showing on three sides. That is the whole depth cue, and it is
+   the *pair* that carries it: two sheets of the same paper at the same size,
+   one root apart, so the eye has something to measure the distance against.
 
-   These are the first composition's numbers and they hold here unchanged,
-   because the roots are placed on the stage in these same coordinates
-   (GroveScene's boxes, geometry.ts's control points) and the stage is what
-   the cards are laid out on: hang the stage anywhere and the trunk crosses
-   the card at the same place. What the approach's hang changes is only where
-   the whole group sits in the frame — see .ga-stage. Checked against the
-   first composition on the same 1440 × 900 frame, and on 16:9 and 2:1.
+   Card b keeps the first composition's place (1237 × 482). Card a stood at
+   890 × 200 there, which put the trunk's edge on the last characters of its
+   title; it has moved up and left (860 × 160) so that what the trunk covers
+   is the empty corner below the title and nothing that has to be read. The
+   roots are placed on the stage in these same coordinates (GroveScene's
+   boxes, geometry.ts's control points) and the stage is what the cards are
+   laid out on, so hang the stage anywhere and the trunk crosses the card at
+   the same place; what the approach's hang changes is only where the whole
+   group sits in the frame — see .ga-stage.
 
    The pointer parallax turns the root group (GroveScene, ±0.055rad), which
    slides the trunk's crossing by a few tens of pixels either way — the reason
-   the corner is set that far under it rather than just touching. */
+   the title is given that much room rather than just clearing the edge. */
 .ga-card--a {
-  left: calc(890 / 1600 * 100%);
+  left: calc(860 / 1600 * 100%);
   width: calc(330 / 1600 * 100%);
-  top: calc(200 * var(--ga-u));
+  top: calc(160 * var(--ga-u));
   height: calc(305 * var(--ga-u));
 }
 .ga-card--b {
@@ -358,16 +356,11 @@ body[data-grove-live] header .glass-thick {
     transparent);
 }
 
-/* Card a's bottom-right corner, offset by the same 20u the other card's knob
-   sits at — so both read as the same fitting, one of them simply lifted out of
-   its card to stay above the moss. */
-.ga-knob-float {
-  z-index: 3;
-  left: calc(1142 / 1600 * 100%);
-  top: calc(427 * var(--ga-u));
-  width: calc(58 * var(--ga-u));
-  height: calc(58 * var(--ga-u));
-}
+/* One fitting on both cards, on the outer corner of each photograph: card b's
+   plate is at its foot, so lower right; card a's is at its head, so upper
+   right — the same 26u in, mirrored with the rest of the card. Card a's is
+   the corner the trunk never reaches, which is what lets the knob stay in
+   the card rather than float in front of the moss. */
 .ga-knob {
   position: absolute;
   display: grid;
@@ -379,7 +372,12 @@ body[data-grove-live] header .glass-thick {
   box-shadow: 0 calc(6 * var(--ga-u)) calc(16 * var(--ga-u)) rgba(16, 21, 13, 0.18);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s var(--ga-ease);
 }
-.ga-knob-float .ga-knob { inset: 0; }
+.ga-card--a .ga-knob {
+  right: calc(26 * var(--ga-u));
+  top: calc(26 * var(--ga-u));
+  width: calc(54 * var(--ga-u));
+  height: calc(54 * var(--ga-u));
+}
 .ga-card--b .ga-knob {
   right: calc(26 * var(--ga-u));
   bottom: calc(26 * var(--ga-u));
@@ -404,8 +402,7 @@ body[data-grove-live] header .glass-thick {
    degrees); the difference between the two cards' values is the depth between
    them. The same transform carries the rise the card comes up on, so the two
    never fight over the property. */
-.ga-card,
-.ga-knob-float {
+.ga-card {
   transform:
     perspective(1400px)
     translate3d(
@@ -415,10 +412,8 @@ body[data-grove-live] header .glass-thick {
     rotateY(calc(var(--px, 0) * var(--pr, 0) * 1deg))
     rotateX(calc(var(--py, 0) * var(--pr, 0) * -0.7deg));
 }
-/* Card a and its knob share a plane, or the knob would slide off the corner
-   it belongs to. Card b is nearer, so it rides further and turns more. */
-.ga-card--a,
-.ga-knob-float { --pd: 10; --pr: 2.2; }
+/* Card b is nearer, so it rides further and turns more. */
+.ga-card--a { --pd: 10; --pr: 2.2; }
 .ga-card--b { --pd: 22; --pr: 2.4; }
 
 /* Flat frames need no rule of their own: the stage's hang (see .ga-stage)
@@ -427,7 +422,6 @@ body[data-grove-live] header .glass-thick {
 
 @media (prefers-reduced-motion: reduce) {
   .ga-card,
-  .ga-knob-float,
   .ga-plate-media { transform: none !important; }
   .ga-plate-media { clip-path: none !important; }
   .ga-plate::after { display: none; }
@@ -527,8 +521,7 @@ body[data-grove-live] header .glass-thick {
      seen between them. So the one that survives is the one the caption does not
      already say (the caption is the lab card, in words), and it stands in
      front, over the crest. */
-  .ga-card--a,
-  .ga-knob-float { display: none; }
+  .ga-card--a { display: none; }
 
   .ga-card { border-radius: calc(40 * var(--ga-u)); }
   .ga-card--b {

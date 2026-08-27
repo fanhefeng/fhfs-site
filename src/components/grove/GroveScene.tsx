@@ -816,11 +816,20 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       const isNarrow = narrow.matches;
       const s = stage.getBoundingClientRect();
       const h = hero.getBoundingClientRect();
-      const u = s.width / (isNarrow ? 760 : 1600);
-      const ox = s.left - h.left;
-      const oy = s.top - h.top;
+      // Both rects arrive through whatever transform an ancestor is wearing.
+      // On the home page that is the approach's push-in: the whole scene
+      // stands at scale 1.16 until the window has opened, and this runs at
+      // mount, long before it has. W and H are untransformed, so the ratio
+      // is that scale, and dividing it out is what keeps one stage unit equal
+      // to one CSS pixel at z = 0 — the promise the cards are laid out on.
+      // Without it the roots came out 16% too big and shifted toward the
+      // corners, and the trunk that was placed to cross card a never did.
+      const zoom = h.width / W || 1;
+      const u = s.width / zoom / (isNarrow ? 760 : 1600);
+      const ox = (s.left - h.left) / zoom;
+      const oy = (s.top - h.top) / zoom;
       // wider than the stage: grow the roots to cover, pinned at a landmark
-      const cover = Math.max(1, W / s.width);
+      const cover = Math.max(1, (W * zoom) / s.width);
 
       const A = isNarrow ? ARCH_N : ARCH;
       const F = isNarrow ? FAR_N : FAR;
