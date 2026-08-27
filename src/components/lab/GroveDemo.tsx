@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { releaseRenderer } from "@/lib/three/release";
 import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
 
 type Props = {
@@ -1090,7 +1091,7 @@ export function GroveDemo({
         for (const m of materials) m.dispose();
         for (const t of textures) t.dispose();
         barkPlates.dispose();
-        renderer.dispose();
+        releaseRenderer(renderer);
       };
     };
 

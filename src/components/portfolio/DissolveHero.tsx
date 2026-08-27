@@ -6,6 +6,7 @@ import Image from "next/image";
 import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { releaseRenderer } from "@/lib/three/release";
 
 type Props = {
   /** The photograph. Loaded as a texture, so keep it a plain JPEG. */
@@ -318,7 +319,7 @@ export function DissolveHero({
       uniforms.uTex.value?.dispose();
       geometry.dispose();
       material.dispose();
-      renderer.dispose();
+      releaseRenderer(renderer);
     };
   }, [src]);
 

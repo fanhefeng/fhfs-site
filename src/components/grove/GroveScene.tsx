@@ -4,6 +4,7 @@ import { useEffect, useRef, type RefObject } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { releaseRenderer } from "@/lib/three/release";
 import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
 import { bakeBarkPlates } from "@/lib/grove/bark";
 import {
@@ -1149,7 +1150,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       for (const m of materials) m.dispose();
       for (const t of textures) t.dispose();
       barkPlates.dispose();
-      renderer.dispose();
+      releaseRenderer(renderer);
     };
     // The scene is built once for the life of the page; the refs are stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps

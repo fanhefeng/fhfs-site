@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { releaseRenderer } from "@/lib/three/release";
 
 type Props = {
   accent: string;
@@ -298,7 +299,7 @@ export function DissolveDemo({
       uniforms.uTex.value?.dispose();
       geometry.dispose();
       material.dispose();
-      renderer.dispose();
+      releaseRenderer(renderer);
     };
   }, []);
 

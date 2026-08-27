@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger, EASE, prefersReducedMotion } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { releaseRenderer } from "@/lib/three/release";
 import { splitText } from "@/lib/splitText";
 import { LENS_VERT, LENS_FRAG, LENS_DURATION, slideIndexAt, bandCentre } from "@/lib/lensSlider";
 
@@ -225,7 +226,7 @@ export function LensSliderDemo({
       for (const t of textures) t.dispose();
       geometry.dispose();
       material.dispose();
-      renderer.dispose();
+      releaseRenderer(renderer);
     };
   }, [slides, count]);
 
