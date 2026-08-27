@@ -354,7 +354,7 @@ export function Header({ links, menuLinks }: Props) {
             the screen. */}
         <div
           aria-hidden="true"
-          className={`absolute inset-x-0 top-0 h-24 transition-opacity duration-500 ${
+          className={`hd-scrim absolute inset-x-0 top-0 h-24 transition-opacity duration-500 ${
             scrolled && !navOpen ? "opacity-100" : "opacity-0"
           }`}
           style={{

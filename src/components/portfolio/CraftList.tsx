@@ -15,7 +15,8 @@ export type CraftEntry = {
   status: CraftStatus;
   /** Dot + hover rule colour. */
   accent: string;
-  /** External write-up or source demo, when there is one. */
+  /** Write-up or demo, when there is one. A path opens in place; anything
+   *  else is treated as external and opens in a new tab. */
   href?: string;
   /** Entries that carry an inline demo below the line. */
   demo?: "liquid-lens";
@@ -41,6 +42,7 @@ type Props = {
  */
 export function CraftList({ entries, title, subtitle, lensLinkHref }: Props) {
   const t = useTranslations("portfolio");
+  const tl = useTranslations("lab");
 
   return (
     <section className="craft-section">
@@ -64,17 +66,25 @@ export function CraftList({ entries, title, subtitle, lensLinkHref }: Props) {
               </span>
             </div>
             <p className="craft-desc">{entry.description}</p>
-            {entry.href && (
-              <a
-                className="craft-link hit-ext"
-                href={entry.href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("openDemo")}
-                <span aria-hidden="true"> ↗</span>
-              </a>
-            )}
+            {entry.href &&
+              (entry.href.startsWith("/") ? (
+                // Same-origin: no new tab, and RouteTransition gets to draw
+                // the curtain the way it does for every other in-site link.
+                <a className="craft-link hit-ext" href={entry.href}>
+                  {tl("open")}
+                  <span aria-hidden="true"> →</span>
+                </a>
+              ) : (
+                <a
+                  className="craft-link hit-ext"
+                  href={entry.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t("openDemo")}
+                  <span aria-hidden="true"> ↗</span>
+                </a>
+              ))}
             {entry.demo === "liquid-lens" && (
               <LiquidLens
                 heading={t("lens.heading")}

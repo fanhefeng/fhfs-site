@@ -32,12 +32,10 @@
     "contactTitle": "Elsewhere"
   },
   "grove": {
-    "ghost": "FHF",
     "headline1": "Code for a bow,",
     "headline2": "the world for a song.",
     "lede": "Born in Hejin, Shanxi; Beijing and Qingdao along the way; Shanghai now. Nine years of front-end, a violin since childhood, and a standing curiosity about the world.",
     "cta": "See the work",
-    "play": "Come closer",
     "statPosts": "Written",
     "statPostsValue": "{count, plural, one {# piece} other {# pieces}}",
     "statApps": "Software",
@@ -50,9 +48,11 @@
     "cardPostFallback": "Nothing written yet",
     "cardPostAlt": "A dirt track running through a pine forest",
     "cardPostLink": "Read this",
-    "scroll": "Discover",
-    "dockAria": "Primary",
-    "markLabel": "fhf — back to top"
+    "metaPlaceLabel": "Based in",
+    "metaPlace": "Shanghai",
+    "metaCraftLabel": "Front-end",
+    "metaCraft": "Nine years",
+    "approachLink": "Open the study"
   },
   "blog": {
     "title": "Writing",

@@ -372,6 +372,9 @@ body {
   border-radius: 50%;
   filter: blur(100px);
   opacity: var(--aurora-opacity);
+  /* The home page's grove fades this out while its canvas is live
+   * (approach.css.ts, body[data-grove-live]). */
+  transition: opacity 0.6s ease-out;
   will-change: transform;
 }
 .aurora-blob--warm {

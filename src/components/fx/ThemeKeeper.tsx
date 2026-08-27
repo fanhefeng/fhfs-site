@@ -44,7 +44,8 @@ function resolve(): "light" | "dark" {
 }
 
 /**
- * Keeps `data-theme` on <html> true after React re-renders the root layout.
+ * Keeps `data-theme` and `data-js` on <html> true after React re-renders the
+ * root layout.
  *
  * The attribute is owned by the pre-paint script in the layout and by the
  * toggles (LightSwitch, RadialFab) — deliberately not rendered as JSX, since
@@ -62,6 +63,12 @@ export function ThemeKeeper() {
     const root = document.documentElement;
     const theme = resolve();
     if (root.dataset.theme !== theme) root.dataset.theme = theme;
+
+    // The same wipe takes `data-js` with it — the "scripting is on" flag the
+    // pre-paint script stamps. Nothing else writes that one back, so after a
+    // locale switch every page whose CSS keys a pre-intro state off `[data-js]`
+    // rendered finished instead of animating in.
+    if (!root.hasAttribute("data-js")) root.dataset.js = "";
   });
 
   return null;

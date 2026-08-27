@@ -7,6 +7,7 @@ import { sectionMetadata } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
 import { DissolveHero } from "@/components/portfolio/DissolveHero";
 import { CraftList, type CraftEntry } from "@/components/portfolio/CraftList";
+import { LAB_ENTRIES } from "@/components/lab/entries";
 import { DeviceShowcase } from "@/components/software/DeviceShowcase";
 import { toSoftwareApp } from "@/components/software/appMeta";
 import { Reveal } from "@/components/fx/Reveal";
@@ -42,6 +43,7 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
   setRequestLocale(locale);
   const t = await getTranslations("portfolio");
   const ts = await getTranslations("software");
+  const tl = await getTranslations("lab");
 
   const [works, experiments, apps] = await Promise.all([
     getWorks(),
@@ -49,15 +51,33 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
     getApps(),
   ]);
 
-  const craft: CraftEntry[] = experiments.map((entry) => ({
-    id: entry.key,
-    name: entry.name[locale],
-    description: entry.description[locale],
-    status: entry.status,
-    accent: entry.accent ?? CRAFT_ACCENT,
-    href: entry.href ?? undefined,
-    demo: entry.demo === "liquid-lens" ? "liquid-lens" : undefined,
-  }));
+  /* The craft log, and what it falls back to.
+   *
+   * With the `experiments` table empty this page used to render a heading over
+   * nothing — a title, a subtitle, and a screen of paper. The honest fallback
+   * is not a placeholder: the motion studies this site actually contains are
+   * the six in the lab, described in their own words in `messages`, so the log
+   * reads off that table until someone curates a different one. Nothing here
+   * is invented; every line links to the study it describes. */
+  const craft: CraftEntry[] =
+    experiments.length > 0
+      ? experiments.map((entry) => ({
+          id: entry.key,
+          name: entry.name[locale],
+          description: entry.description[locale],
+          status: entry.status,
+          accent: entry.accent ?? CRAFT_ACCENT,
+          href: entry.href ?? undefined,
+          demo: entry.demo === "liquid-lens" ? "liquid-lens" : undefined,
+        }))
+      : LAB_ENTRIES.map((entry) => ({
+          id: entry.slug,
+          name: tl(`items.${entry.key}.name`),
+          description: tl(`items.${entry.key}.summary`),
+          status: "live" as const,
+          accent: entry.accent,
+          href: `/${locale}/lab/${entry.slug}`,
+        }));
 
   const softwareApps = apps.map((app, i) => toSoftwareApp(app, i, locale));
 
@@ -74,9 +94,9 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
         fallbackNote={t("heroFallback")}
       />
 
-      {works.length > 0 && (
-        <Reveal as="section" className="mx-auto w-full max-w-5xl px-6 pt-24">
-          <h2 className="text-title">{t("worksTitle")}</h2>
+      <Reveal as="section" className="mx-auto w-full max-w-5xl px-6 pt-24">
+        <h2 className="text-title">{t("worksTitle")}</h2>
+        {works.length > 0 ? (
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {works.map((work, i) => (
               <WorkCard
@@ -87,8 +107,22 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
               />
             ))}
           </div>
-        </Reveal>
-      )}
+        ) : (
+          /* Nothing hung on this wall yet. Say so, and point at the shelf that
+             does have things on it — an empty grid with no explanation reads
+             as a page that failed to load. */
+          <div className="glass-thin mt-8 rounded-card p-8">
+            <h3 className="text-heading text-fg">{t("emptyTitle")}</h3>
+            <p className="mt-2 max-w-[52ch] text-body text-fg-secondary">{t("empty")}</p>
+            <a
+              href={`/${locale}/software`}
+              className="mt-5 inline-block font-mono text-meta uppercase tracking-meta text-fg-secondary underline decoration-accent/55 underline-offset-4 transition-colors hover:text-accent"
+            >
+              {t("emptyCta")}
+            </a>
+          </div>
+        )}
+      </Reveal>
 
       {softwareApps.length > 0 && (
         <Reveal as="section" className="mx-auto w-full max-w-5xl px-6 pt-24">

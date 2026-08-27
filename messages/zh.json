@@ -32,12 +32,10 @@
     "contactTitle": "找到我"
   },
   "grove": {
-    "ghost": "FHF",
     "headline1": "以代码为弓，",
     "headline2": "向世界拉一曲好奇。",
     "lede": "河津出生，北京、青岛走过，如今在上海。九年前端，从小拉小提琴，对世界始终好奇。",
     "cta": "去看作品",
-    "play": "走近这张脸",
     "statPosts": "写下的",
     "statPostsValue": "{count} 篇",
     "statApps": "自研软件",
@@ -50,9 +48,11 @@
     "cardPostFallback": "还没有文章",
     "cardPostAlt": "一条穿过针叶林的土路",
     "cardPostLink": "读这篇",
-    "scroll": "往下翻",
-    "dockAria": "主导航",
-    "markLabel": "fhf — 回到页首"
+    "metaPlaceLabel": "现居",
+    "metaPlace": "上海",
+    "metaCraftLabel": "前端",
+    "metaCraft": "九年",
+    "approachLink": "打开这则研究"
   },
   "blog": {
     "title": "文章",
