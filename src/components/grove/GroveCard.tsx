@@ -33,9 +33,12 @@ const Sprout = () => (
  * card cannot be behind a photograph of a grove, only behind a grove that is
  * still being drawn.
  *
- * The knob is rendered separately (see `GroveKnob`) because card `a` cannot
- * carry a z-index of its own without lifting the whole card out from under the
- * canvas — the same trick the first version of this composition used.
+ * Each card carries its own knob, on the corner of its photograph. The first
+ * version of this composition floated card a's knob out of the card so it
+ * could sit *over* the trunk that covers the card's lower corner — and that is
+ * exactly what read wrong: a control in front of the moss belonging to a sheet
+ * behind it. Now the knob stays with its card, and the trunk is left to cross
+ * the corner it does not sit on.
  */
 export function GroveCard({ slot, label, title, href, src, alt, linkLabel }: Props) {
   const plate = (
@@ -54,31 +57,15 @@ export function GroveCard({ slot, label, title, href, src, alt, linkLabel }: Pro
     <article className={`ga-card ga-card--${slot}`}>
       {/* The lab card reads plate → label → title, the field note the other way
           up. Same frame, mirrored — which is also what keeps each card's
-          photograph on the side of it the moss is not covering. */}
+          photograph on the side of it the moss is not covering, and its knob
+          on the photograph's outer corner. */}
       {slot === "a" && plate}
       <p className="ga-card-label">{label}</p>
       <p className="ga-card-title">{title}</p>
       {slot === "b" && plate}
-      {slot === "b" && (
-        <a className="ga-knob" href={href} aria-label={linkLabel}>
-          <Sprout />
-        </a>
-      )}
-    </article>
-  );
-}
-
-/**
- * Card `a`'s knob, rendered outside the card so it can sit in front of the
- * moss the card itself is behind. It shares the card's parallax plane, so it
- * stays glued to the corner it belongs to.
- */
-export function GroveKnob({ href, linkLabel }: { href: string; linkLabel: string }) {
-  return (
-    <span className="ga-knob-float">
       <a className="ga-knob" href={href} aria-label={linkLabel}>
         <Sprout />
       </a>
-    </span>
+    </article>
   );
 }

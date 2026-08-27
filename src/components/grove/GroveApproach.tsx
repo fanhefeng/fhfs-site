@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { GroveScene } from "./GroveScene";
 import { PaperDissolve } from "./PaperDissolve";
-import { GroveCard, GroveKnob, type GroveCardData } from "./GroveCard";
+import { GroveCard, type GroveCardData } from "./GroveCard";
 import { APPROACH_CSS } from "./approach.css";
 
 type Props = {
@@ -222,7 +222,6 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
                   card b could not climb past the canvas. */}
               <div ref={stageRef} className="ga-stage">
                 <GroveCard slot="a" {...cards[0]} />
-                <GroveKnob href={cards[0].href} linkLabel={cards[0].linkLabel} />
                 <GroveCard slot="b" {...cards[1]} />
               </div>
               <GroveScene heroRef={sceneRef} stageRef={stageRef} coveredRef={coveredRef} onReady={onReady} />
