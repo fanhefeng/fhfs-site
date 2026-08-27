@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { NotFoundStage } from "@/components/notfound/NotFoundStage";
 import { routing, htmlLang } from "@/i18n/routing";
-import { THEME_INIT_SCRIPT } from "./themeInit";
+import { ThemeInitScript } from "./ThemeInitScript";
 import { site } from "@/config/site";
 import zh from "../../messages/zh.json";
 import en from "../../messages/en.json";
@@ -55,7 +55,7 @@ export default function GlobalNotFound() {
             the lights off should not get a white page thrown at them just
             because they mistyped a URL. No ThemeKeeper needed — nothing
             re-renders this document on the client. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <ThemeInitScript />
         <NotFoundStage
           blocks={blocks}
           sticker={{

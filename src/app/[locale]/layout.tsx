@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { fontVariables } from "../fonts";
-import { THEME_INIT_SCRIPT } from "../themeInit";
+import { ThemeInitScript } from "../ThemeInitScript";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getNavItems } from "@/lib/content";
@@ -94,28 +94,10 @@ export default async function LocaleLayout({ children, params }: Props) {
       className={`${fontVariables} h-full antialiased`}
     >
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
-        {/* Apply the saved theme before first paint — the script itself lives
-            in themeInit.ts, shared with the global 404's document.
-
-            Must stay a raw <script>. next/script defers even
-            beforeInteractive through the self.__next_s queue: measured here,
-            that lands the theme 15ms *after* first paint (a white flash for
-            dark-mode readers), where this inline tag lands 8ms before it.
-
-            React 19 logs "Encountered a script tag while rendering" on every
-            locale switch, since that re-renders this layout on the client.
-            Measured: 1 in `next dev`, 0 in a production build — it is a
-            development warning. It is also accurate and harmless here: the
-            script only ever needs to run for the initial document, and
-            ThemeKeeper below covers every later re-render.
-
-            Alternatives, all measured and all worse: next/script (theme lands
-            15ms after first paint), moving this into <head> (same warning,
-            and Next asks you not to hand-write <head>), hoisting the document
-            to a top-level app/layout.tsx (loses the per-locale <html lang> in
-            the SSR output), dropping the script for ThemeKeeper alone (first
-            paint flashes for anyone whose choice differs from their OS). */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/* Apply the saved theme before first paint — why this is an inline
+            script wrapped in a div, and not next/script, is written out in
+            ThemeInitScript.tsx. ThemeKeeper below owns every later change. */}
+        <ThemeInitScript />
         <NextIntlClientProvider>
           <ThemeKeeper />
           <SmoothScroll />

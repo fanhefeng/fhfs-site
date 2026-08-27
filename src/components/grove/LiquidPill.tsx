@@ -6,6 +6,7 @@ import {
   VERT, FRAG_SCENE, FRAG_RIM, FRAG_DOWN, FRAG_BLUR, FRAG_COMP,
   FIELD, FIELD_ORDER, RIM, RIM_ORDER, COMPOSITE, DISTURB, RIPPLE_LIFE, RIPPLE_SLOTS,
 } from "@/lib/grove/liquidMetal";
+import { PILL_CSS } from "./pill.css";
 
 /**
  * How much of the pipeline is switched on.
@@ -510,6 +511,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
 
   return (
     <span ref={padRef} className={`lp-pad${className ? ` ${className}` : ""}`} style={style}>
+      {/* The control carries its own geometry — it is no longer the grove's
+          guest. React dedupes by href, so several pills on a page cost one
+          stylesheet. */}
+      <style href="liquid-pill" precedence="medium">{PILL_CSS}</style>
       {inner}
       {href ? (
         <a ref={btnRef as RefObject<HTMLAnchorElement>} className="lp-btn" href={href} aria-label={label}>

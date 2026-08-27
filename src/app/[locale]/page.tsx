@@ -9,8 +9,8 @@ import { site } from "@/config/site";
 import { getPosts, getApps, getTimeline } from "@/lib/content";
 import { getLatestReleases } from "@/lib/github";
 import { toSoftwareApp } from "@/components/software/appMeta";
-import { GroveHero } from "@/components/grove/GroveHero";
-import type { DockItem } from "@/components/grove/NavDock";
+import { Opening, type OpeningMeta } from "@/components/home/Opening";
+import { GroveApproach } from "@/components/grove/GroveApproach";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
 import {
@@ -30,44 +30,15 @@ const POST_COUNT = 4;
 const APP_COUNT = 6;
 const NOW_COUNT = 3;
 
-/* Glyphs for the dock, drawn rather than imported: at 14u they are a dozen
-   path commands each, and a sprite sheet for that is a request. */
-const GLYPHS: Record<string, React.ReactNode> = {
-  writing: (
-    <svg viewBox="0 0 16 16">
-      <path d="M4 2.4h5.3L12 5.1v8.5H4z" />
-      <path d="M9.2 2.4V5h2.7" />
-      <path d="M6 8.4h4M6 10.8h2.8" />
-    </svg>
-  ),
-  software: (
-    <svg viewBox="0 0 16 16">
-      <path d="M2.6 3.6h10.8v7.2H2.6z" />
-      <path d="M5.6 13.4h4.8" />
-      <path d="m6.4 6.2 1.6 1.6-1.6 1.6" />
-    </svg>
-  ),
-  about: (
-    <svg viewBox="0 0 16 16">
-      <circle cx="8" cy="5.4" r="2.6" />
-      <path d="M3.2 13.4c.6-2.6 2.3-3.9 4.8-3.9s4.2 1.3 4.8 3.9" />
-    </svg>
-  ),
-  lab: (
-    <svg viewBox="0 0 16 16">
-      <path d="M1.6 12.4c2.4-3.4 4.3-5.1 5.7-5.1 2 0 3 3.6 5 3.6 1.1 0 1.9-.5 2.4-1.4" />
-      <path d="M4.3 6.2C5.5 4.4 6.6 3.5 7.6 3.5c1.5 0 2.2 2.4 3.7 2.4" />
-    </svg>
-  ),
-};
-
 /**
- * The cover of the issue is the grove: a full-viewport composition grown by
- * the lab, with the manifesto standing in front of it and its own dock for
- * navigation. Below it the magazine proper — recent writing, the software
- * shelf, a closing note — at the 680px measure. Everything on the cover is
- * real: the counts come from the database, the two cards point at the newest
- * thing written and at the study the moss came out of.
+ * The cover of the issue, in three movements.
+ *
+ * First paper: the manifesto alone on a full screen, the site's one primary
+ * control under it, and a mono line of facts the database can vouch for.
+ * Then the approach — a window the scrollbar opens onto the grove, and the
+ * paper of the issue coming back down over it. Then the issue itself at the
+ * 680px measure: what was written, what was built, and where to find the
+ * person who did it.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
@@ -77,7 +48,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const t = await getTranslations("home");
   const th = await getTranslations("grove");
   const ts = await getTranslations("software");
-  const nav = await getTranslations("nav");
 
   const [allPosts, allApps, timeline] = await Promise.all([
     getPosts(locale),
@@ -86,6 +56,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   ]);
   const releases = await getLatestReleases(allApps.map((app) => app.repo));
 
+  /** The plate in front of the moss is whatever was written last. */
   const latest = allPosts[0];
 
   const posts: WritingItem[] = allPosts.slice(0, POST_COUNT).map((post) => ({
@@ -130,13 +101,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       : []),
   ];
 
-  /* The dock says where you are: the mark is this page, the four items are
-     the site's main sections in the header's order. */
-  const dockItems: DockItem[] = [
-    { href: "/blog", label: nav("blog"), glyph: GLYPHS.writing },
-    { href: "/software", label: nav("software"), glyph: GLYPHS.software },
-    { href: "/about", label: nav("about"), glyph: GLYPHS.about },
-    { href: "/lab", label: nav("lab"), glyph: GLYPHS.lab },
+  /* The counts on the masthead are the same two the stat pair used to carry,
+     read off the database rather than typed. */
+  const meta: OpeningMeta[] = [
+    { label: th("metaPlaceLabel"), value: th("metaPlace") },
+    { label: th("metaCraftLabel"), value: th("metaCraft") },
+    { label: th("statPosts"), value: th("statPostsValue", { count: allPosts.length }) },
+    { label: th("statApps"), value: th("statAppsValue", { count: allApps.length }) },
   ];
 
   return (
@@ -152,21 +123,22 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         }}
       />
 
-      <GroveHero
-        ghost={th("ghost")}
+      <Opening
         headline={[th("headline1"), th("headline2")]}
         lede={th("lede")}
-        cta={{ label: th("cta"), href: "/portfolio" }}
-        play={{ label: th("play"), href: "/intro" }}
-        stats={[
-          { label: th("statPosts"), value: th("statPostsValue", { count: allPosts.length }) },
-          { label: th("statApps"), value: th("statAppsValue", { count: allApps.length }) },
-        ]}
+        cta={{ label: th("cta"), href: `/${locale}/portfolio` }}
+        meta={meta}
+      />
+
+      <GroveApproach
+        kicker={th("cardLabLabel")}
+        title={th("cardLabTitle")}
+        link={{ label: th("approachLink"), href: `/${locale}/lab/grove` }}
         cards={[
           {
             label: th("cardLabLabel"),
             title: th("cardLabTitle"),
-            href: "/lab/grove",
+            href: `/${locale}/lab/grove`,
             src: "/grove/moss-plate.webp",
             alt: th("cardLabAlt"),
             linkLabel: th("cardLabLink"),
@@ -174,25 +146,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           {
             label: th("cardPostLabel"),
             title: latest?.title ?? th("cardPostFallback"),
-            href: latest ? `/blog/${latest.slug}` : "/blog",
+            href: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
             src: "/lab/dissolve/forest.jpg",
             alt: th("cardPostAlt"),
             linkLabel: th("cardPostLink"),
           },
         ]}
-        scroll={{ label: th("scroll"), href: "#issue" }}
-        dock={{
-          ariaLabel: th("dockAria"),
-          markLabel: th("markLabel"),
-          markHref: "/",
-          items: dockItems,
-        }}
       />
 
       {/* The issue itself, at the 680px measure. */}
       <div
         id="issue"
-        className="mx-auto flex w-full max-w-[680px] scroll-mt-24 flex-col gap-20 px-6 pt-20 pb-24 md:gap-24 md:pt-28 md:pb-32"
+        className="mx-auto flex w-full max-w-[680px] scroll-mt-24 flex-col gap-20 px-6 pt-24 pb-24 md:gap-24 md:pt-32 md:pb-32"
       >
         <RecentWriting
           items={posts}
