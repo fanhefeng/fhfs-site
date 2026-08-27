@@ -26,6 +26,14 @@ const UP = new THREE.Vector3(0, 1, 0);
 export const BOX_W = 10;
 
 /**
+ * The bark grain's v coordinate runs 0..vScale along each limb, and the crest
+ * carries the largest vScale of any limb. The bark plates (`lib/grove/bark.ts`)
+ * are baked over exactly this range, so a limb given more repeats than this
+ * would run off the end of the plate and read clamped edge texels.
+ */
+export const BARK_V_MAX = 30;
+
+/**
  * Box proportions, kept at the ratios the control points were traced against.
  * Rounding either to a flat 2 shears every measured point by a couple of
  * percent — small on the crest, and enough at the arch to open a gap where its
@@ -866,7 +874,7 @@ function buildNearLimbs(): Limb[] {
       {
         segs: 300,
         radial: 26,
-        vScale: 30,
+        vScale: BARK_V_MAX,
         band: [0.575, 0.59, 0.63, 0.68, 0.695, 0.615, 0.58, 0.48, 0.55, 0.55, 0.52],
         sink: 0.5,
       }

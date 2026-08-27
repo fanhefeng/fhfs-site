@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
+import { bakeBarkPlates } from "@/lib/grove/bark";
 import {
   BARK_VERT, BARK_FRAG,
   GRASS_VERT, GRASS_FRAG,
@@ -23,6 +24,10 @@ type Props = {
   heroRef: RefObject<HTMLElement | null>;
   /** The 1600 × 880 composition the moss is pinned to. */
   stageRef: RefObject<HTMLElement | null>;
+  /** True while something opaque is lying over the whole canvas — the paper
+   *  wash at the end of the approach. Read every frame; a covered scene draws
+   *  nothing, the way an off-screen one draws nothing. */
+  coveredRef?: RefObject<boolean>;
   /** Set once the page's entrance has been kicked off. */
   onReady?: () => void;
 };
@@ -44,6 +49,40 @@ const DIST = 1400;
 
 /** How long the survey front takes to cross the frame, in seconds. */
 const SCAN_DUR = 3.4;
+
+/**
+ * Frame pacing. gsap's ticker fires at the display's own rate — 120Hz on a
+ * ProMotion panel — and nothing here moves fast enough to want it: the fur
+ * sways, the pollen drifts, and the quickest thing in the frame is a wingbeat
+ * at nine or ten a second. Drawing every tick on such a panel simply doubles
+ * the GPU's work for a picture nobody can tell apart, and the fan noise that
+ * goes with it. So: sixty at most, and thirty once the window has lost focus —
+ * the hero is still showing, someone is just working in the window beside it.
+ *
+ * Thirty, too, once the reader has been still for a couple of seconds. What
+ * was measured (Chrome, Apple GPU, the moss at rest): the drawing itself is
+ * the smaller part of a frame's bill, and the larger part is the same size
+ * whatever is drawn — presenting a full-viewport canvas and recompositing the
+ * page over it. The one lever on that is how many frames are asked for, and
+ * a reader who is not moving the pointer or the page is watching pollen
+ * drift, which thirty a second carries. The first move brings sixty back
+ * before the frame it lands on: the fur parts under the pointer, the
+ * butterfly is startled, and those want the rate.
+ */
+const FPS_FOCUSED = 60;
+const FPS_BLURRED = 30;
+const FPS_IDLE = 30;
+/** How long without pointer, wheel or key input counts as being still. */
+const IDLE_AFTER_MS = 2500;
+
+/**
+ * The fill budget, in drawn pixels. The pixel ratio is solved from this rather
+ * than pinned: at a flat 2× a full-viewport hero on a 16" laptop is six
+ * million pixels, and the fur is soft enough that ~1.4× reads the same.
+ * Phones stay under it at their own cap; a 5K display lands a little under 1×
+ * rather than at the sixteen million it would otherwise ask for.
+ */
+const PIXEL_BUDGET = 2_800_000;
 
 /**
  * Each root is modelled in its own box, and the box is placed on the stage.
@@ -75,7 +114,7 @@ const sstep = (a: number, b: number, x: number) => {
  * pointer, and the pollen drifts. It is gated on the hero actually being on
  * screen, so scrolling past it or switching tabs stops it dead.
  */
-export function GroveScene({ heroRef, stageRef, onReady }: Props) {
+export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -113,7 +152,7 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
     // a second time on the way to the canvas.
     renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2));
+    // The pixel ratio is set in layout(), where the canvas's size is known.
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, 1, 10, 8000);
@@ -171,6 +210,10 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       uMouseR: { value: air.mouseR },
     });
 
+    // The bark's own picture, baked once — the single biggest saving in the
+    // scene, see lib/grove/bark.ts.
+    const barkPlates = bakeBarkPlates(renderer, small);
+
     const flowerMap = flowerTexture();
     const moteMap = radialTexture(64, [
       [0, "rgba(255,255,255,1)"],
@@ -185,6 +228,9 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       uniforms: ReturnType<typeof groupUniforms>;
       wire: THREE.LineSegments;
       box: Box;
+      /** The opaque meshes and the discard-free copy of each one's material,
+       *  swapped in once the survey is over — see SETTLED_DISCARD_GLSL. */
+      settled: { mesh: THREE.Mesh; material: THREE.ShaderMaterial }[];
     };
 
     const assemble = (grove: ReturnType<typeof buildGrove>, air: Air, order: number): Built => {
@@ -194,22 +240,40 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       // fade is a sliver at the far end and skipping the depth buffer would put
       // the ridge's own far flank in front of its near one.
       const soft = !!air.mask;
+      const settled: Built["settled"] = [];
+
+      /* An opaque material and, for the root that never fades, its settled
+         twin: same everything, discards compiled out. The blending root keeps
+         its discards — a blended pile gets no hidden-surface removal anyway,
+         and its ends really do fade to nothing. */
+      const opaque = (params: THREE.ShaderMaterialParameters, mesh: (m: THREE.ShaderMaterial) => THREE.Mesh) => {
+        const live = new THREE.ShaderMaterial({ ...params, transparent: soft, depthWrite: true, side: THREE.DoubleSide });
+        const m = mesh(live);
+        materials.push(live);
+        if (!soft) {
+          const calm = new THREE.ShaderMaterial({
+            ...params, transparent: false, depthWrite: true, side: THREE.DoubleSide,
+            defines: { SETTLED: 1 },
+          });
+          materials.push(calm);
+          settled.push({ mesh: m, material: calm });
+        }
+        return m;
+      };
 
       const barkGeo = new THREE.BufferGeometry();
       barkGeo.setAttribute("position", new THREE.BufferAttribute(grove.bark.position, 3));
       barkGeo.setAttribute("normal", new THREE.BufferAttribute(grove.bark.normal, 3));
       barkGeo.setAttribute("aInfo", new THREE.BufferAttribute(grove.bark.info, 3));
       barkGeo.setIndex(new THREE.BufferAttribute(grove.bark.index, 1));
-      const barkMat = new THREE.ShaderMaterial({
-        uniforms, vertexShader: BARK_VERT, fragmentShader: BARK_FRAG,
-        transparent: soft, depthWrite: true, side: THREE.DoubleSide,
-      });
-      const bark = new THREE.Mesh(barkGeo, barkMat);
+      const bark = opaque(
+        { uniforms: { ...uniforms, ...barkPlates.uniforms }, vertexShader: BARK_VERT, fragmentShader: BARK_FRAG },
+        (m) => new THREE.Mesh(barkGeo, m)
+      );
       bark.frustumCulled = false;
       bark.renderOrder = order;
       group.add(bark);
       geometries.push(barkGeo);
-      materials.push(barkMat);
 
       /* fur: four rungs pinched to a point, instanced */
       const bladeGeo = new THREE.InstancedBufferGeometry();
@@ -239,16 +303,14 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       bladeGeo.setAttribute("aRandom", new THREE.InstancedBufferAttribute(grove.blades.random, 4));
       bladeGeo.setAttribute("aClump", new THREE.InstancedBufferAttribute(grove.blades.clump, 1));
       bladeGeo.instanceCount = grove.blades.count;
-      const grassMat = new THREE.ShaderMaterial({
-        uniforms, vertexShader: GRASS_VERT, fragmentShader: GRASS_FRAG,
-        transparent: soft, depthWrite: true, side: THREE.DoubleSide,
-      });
-      const grass = new THREE.Mesh(bladeGeo, grassMat);
+      const grass = opaque(
+        { uniforms, vertexShader: GRASS_VERT, fragmentShader: GRASS_FRAG },
+        (m) => new THREE.Mesh(bladeGeo, m)
+      );
       grass.frustumCulled = false;
       grass.renderOrder = order + 0.1;
       group.add(grass);
       geometries.push(bladeGeo);
-      materials.push(grassMat);
 
       /* ferns */
       if (grove.ferns.count > 0) {
@@ -261,16 +323,14 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
         fernGeo.setAttribute("aQuat", new THREE.InstancedBufferAttribute(grove.ferns.quat, 4));
         fernGeo.setAttribute("aRandom", new THREE.InstancedBufferAttribute(grove.ferns.random, 2));
         fernGeo.instanceCount = grove.ferns.count;
-        const fernMat = new THREE.ShaderMaterial({
-          uniforms, vertexShader: FERN_VERT, fragmentShader: FERN_FRAG,
-          transparent: soft, depthWrite: true, side: THREE.DoubleSide,
-        });
-        const fern = new THREE.Mesh(fernGeo, fernMat);
+        const fern = opaque(
+          { uniforms, vertexShader: FERN_VERT, fragmentShader: FERN_FRAG },
+          (m) => new THREE.Mesh(fernGeo, m)
+        );
         fern.frustumCulled = false;
         fern.renderOrder = order + 0.2;
         group.add(fern);
         geometries.push(fernGeo);
-        materials.push(fernMat);
       }
 
       /* flowers */
@@ -318,7 +378,7 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       materials.push(wireMat);
 
       scene.add(group);
-      return { group, uniforms, wire, box: air.box };
+      return { group, uniforms, wire, box: air.box, settled };
     };
 
     const near = buildGrove({
@@ -742,6 +802,11 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
       W = hero.clientWidth;
       H = hero.clientHeight;
       if (!W || !H) return;
+      const dpr = Math.max(
+        1,
+        Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2, Math.sqrt(PIXEL_BUDGET / (W * H)))
+      );
+      renderer.setPixelRatio(dpr);
       renderer.setSize(W, H, false);
       camera.fov = (2 * Math.atan(H / 2 / DIST) * 180) / Math.PI;
       camera.aspect = W / H;
@@ -866,7 +931,15 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
     };
     hero.addEventListener("grove:burst", onBurst as EventListener);
 
+    /* The last time the reader did anything — see FPS_IDLE. */
+    let lastInput = performance.now();
+    const markInput = () => { lastInput = performance.now(); };
+    for (const type of ["wheel", "scroll", "keydown", "touchstart", "touchmove", "pointerdown"] as const) {
+      window.addEventListener(type, markInput, { passive: true });
+    }
+
     const onPointerMove = (e: PointerEvent) => {
+      markInput();
       if (e.pointerType === "touch") return;
       pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
@@ -896,45 +969,123 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
     // its last frame, but be safe and draw once rather than trust it.
     const onVisibility = () => { visible = !document.hidden; needsRender = true; };
     document.addEventListener("visibilitychange", onVisibility);
+    // Focus only picks the frame rate; it never stops the loop.
+    let focused = document.hasFocus();
+    const onFocus = () => { focused = true; };
+    const onBlur = () => { focused = false; };
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
     const io = new IntersectionObserver((entries) => { onScreen = entries.some((en) => en.isIntersecting); needsRender = true; }, { rootMargin: "10% 0px" });
     io.observe(hero);
 
+    /* While the canvas is being drawn, the page says so. The site's ambient
+       layers — the paper grain (a blend-mode layer three viewports across) and
+       the header's backdrop blur — are cheap over a page that holds still and
+       are re-done on every one of these frames over a page that does not;
+       measured, they were a third of what a frame cost. approach.css.ts
+       stands them down while the flag is up. */
+    let live = false;
+    const setLive = (on: boolean) => {
+      if (on === live) return;
+      live = on;
+      if (on) document.body.dataset.groveLive = "1";
+      else delete document.body.dataset.groveLive;
+    };
+
     const wires: THREE.LineSegments[] = [nearBuilt.wire, farBuilt.wire];
 
-    /* The parallax eases toward the pointer at 5.5% a frame and never quite
-       arrives; below this (in NDC — 1e-4 is 0.0026px of camera travel at the
-       26px scale) it is treated as arrived. */
+    /* The survey is over: the cage goes, the front is parked past the far
+       corner so nothing is ever clipped by it again, and the near root's
+       materials are swapped for the copies without discards. */
+    const settled = [...nearBuilt.settled, ...farBuilt.settled];
+    const settle = () => {
+      shared.uWire.value = 0;
+      shared.uScanR.value = scanMax * 4;
+      for (const w of wires) {
+        w.parent?.remove(w);
+        w.geometry.dispose();
+        (w.material as THREE.Material).dispose();
+      }
+      wires.length = 0;
+      for (const s of settled) {
+        (s.mesh.material as THREE.Material).dispose();
+        s.mesh.material = s.material;
+      }
+      settled.length = 0;
+    };
+    /* The settled programs are compiled now, while the pulse is still
+       crossing, so the swap lands on programs the driver has long finished
+       linking — three only asks a program for its uniforms on first use, so
+       compile() itself does not wait for the link. It takes any Object3D, so a
+       stand-in group of meshes sharing the real geometries does it without
+       putting anything in the scene. Not compileAsync(): that one keeps
+       polling the materials after they are gone, which under StrictMode's
+       mount–unmount–mount they are. */
+    const precompileSettled = () => {
+      if (!settled.length) return;
+      const standIn = new THREE.Group();
+      for (const s of settled) standIn.add(new THREE.Mesh(s.mesh.geometry, s.material));
+      renderer.compile(standIn, camera, scene);
+    };
+
+    /* The parallax eases toward the pointer at 5.5% per sixtieth of a second
+       and never quite arrives; below this (in NDC — 1e-4 is 0.0026px of
+       camera travel at the 26px scale) it is treated as arrived. */
     const SETTLED = 1e-4;
+    /* Written per unit of time rather than per frame so that the moss and the
+       copy (GroveHero's own tick, same constant) agree at any refresh rate,
+       and at either of the two rates below. */
+    const ease = (dt: number) => 1 - Math.pow(1 - 0.055, dt * 60);
+
+    /* Milliseconds of ticker time since the last frame this loop ran. */
+    let pending = 0;
 
     /* When a frame is drawn.
-       On this page the clock *is* motion: the wind in the shaders runs on
-       `uPhase`, the root breathes on `clock`, the butterfly flies its circuit
-       and the pollen drifts, so any frame that advances the clock has changed
-       the picture and is drawn — the flag changes nothing there. The clock
-       only stands still under prefers-reduced-motion, and then the picture
-       changes only while: the survey pulse is still crossing (never, under
-       calm, but the check is cheap), the parallax is still settling toward
-       the pointer, or an event has raised `needsRender` (layout, a burst, a
-       pointer move or leave, the tab or the hero coming back into view).
-       Everything else — a settled pointer over a still scene — draws nothing
-       (DESIGN.md §5.3: a still canvas layer costs nothing). The state updates
-       below still run every frame; only the draw is gated, so nothing is
-       left half-advanced. When in doubt, it is dirty. */
+       First the pacing: the loop runs at most FPS_FOCUSED times a second
+       (FPS_BLURRED with the window unfocused) and lets the other ticks fall
+       through, carrying their time forward in `pending` so the simulation
+       still advances by real elapsed time. The one-millisecond slack keeps a
+       16.7ms tick from landing on the wrong side of a 16.67ms budget and
+       halving the rate by accident.
+       Then what it draws. On this page the clock *is* motion: the wind in the
+       shaders runs on `uPhase`, the root breathes on `clock`, the butterfly
+       flies its circuit and the pollen drifts, so any frame that advances the
+       clock has changed the picture and is drawn — the flag changes nothing
+       there. The clock only stands still under prefers-reduced-motion, and
+       then the picture changes only while: the survey pulse is still crossing
+       (never, under calm, but the check is cheap), the parallax is still
+       settling toward the pointer, or an event has raised `needsRender`
+       (layout, a burst, a pointer move or leave, the tab or the hero coming
+       back into view). Everything else — a settled pointer over a still
+       scene — draws nothing (DESIGN.md §5.3: a still canvas layer costs
+       nothing). The state updates below run on every frame that passes the
+       pacing gate; only the draw is gated further, so nothing is left
+       half-advanced. When in doubt, it is dirty. */
     const frame = (_time: number, deltaMs: number) => {
-      if (disposed || !visible || !onScreen) return;
+      const active = !disposed && visible && onScreen && !coveredRef?.current;
+      setLive(active && !calm.matches);
+      if (!active) return;
+      pending += deltaMs;
+      const fps = !focused ? FPS_BLURRED
+        : scanning || performance.now() - lastInput < IDLE_AFTER_MS ? FPS_FOCUSED
+        : FPS_IDLE;
+      if (pending < 1000 / fps - 1) return;
+      const dt = Math.min(pending / 1000, 0.05);
+      pending = 0;
+
       const dirty =
         needsRender ||
         !calm.matches ||
         scanning ||
         Math.abs(pointer.x - smooth.x) > SETTLED ||
         Math.abs(pointer.y - smooth.y) > SETTLED;
-      const dt = Math.min(deltaMs / 1000, 0.05);
       if (!calm.matches) clock += dt;
       shared.uPhase.value = clock;
       sprayUniforms.uNow.value = clock;
 
-      smooth.x += (pointer.x - smooth.x) * 0.055;
-      smooth.y += (pointer.y - smooth.y) * 0.055;
+      const k = ease(dt);
+      smooth.x += (pointer.x - smooth.x) * k;
+      smooth.y += (pointer.y - smooth.y) * k;
 
       camera.position.x = -smooth.x * 26;
       camera.position.y = smooth.y * 16;
@@ -955,16 +1106,7 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
         shared.uWire.value = Math.min(1, e / 0.06) * (1 - sstep(0.72, 1, e));
         if (e >= 1) {
           scanning = false;
-          shared.uWire.value = 0;
-          // The survey is over: park the front past the far corner so nothing
-          // is ever clipped by it again, and drop the cage for good.
-          shared.uScanR.value = scanMax * 4;
-          for (const w of wires) {
-            w.parent?.remove(w);
-            w.geometry.dispose();
-            (w.material as THREE.Material).dispose();
-          }
-          wires.length = 0;
+          settle();
         }
       }
 
@@ -981,24 +1123,32 @@ export function GroveScene({ heroRef, stageRef, onReady }: Props) {
     // frames, so the scan would never advance and the hero would still be
     // empty when it was finally opened.
     if (!calm.matches && !document.hidden) { scanning = true; shared.uScanR.value = 0; }
-    else { shared.uScanR.value = scanMax * 4; shared.uWire.value = 0; }
+    else settle();
 
     renderer.render(scene, camera);
+    precompileSettled();
     gsap.ticker.add(frame);
     onReady?.();
 
     return () => {
       disposed = true;
       gsap.ticker.remove(frame);
+      setLive(false);
       io.disconnect();
       hero.removeEventListener("grove:burst", onBurst as EventListener);
+      for (const type of ["wheel", "scroll", "keydown", "touchstart", "touchmove", "pointerdown"] as const) {
+        window.removeEventListener(type, markInput);
+      }
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("resize", layout);
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
       for (const g of geometries) g.dispose();
       for (const m of materials) m.dispose();
       for (const t of textures) t.dispose();
+      barkPlates.dispose();
       renderer.dispose();
     };
     // The scene is built once for the life of the page; the refs are stable.

@@ -39,6 +39,7 @@ import {
   BODY_VERT,
   BODY_FRAG,
 } from "@/lib/grove/shaders";
+import { bakeBarkPlates } from "@/lib/grove/bark";
 
 import {
   flowerTexture,
@@ -160,6 +161,9 @@ export function GroveDemo({
       // rather than two that have to be kept in sync.
       renderer.setClearColor(0x000000, 0);
 
+      // The bark's own picture, baked once — see lib/grove/bark.ts.
+      const barkPlates = bakeBarkPlates(renderer, small);
+
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
 
@@ -259,7 +263,7 @@ export function GroveDemo({
         barkGeo.setAttribute("aInfo", new THREE.BufferAttribute(grove.bark.info, 3));
         barkGeo.setIndex(new THREE.BufferAttribute(grove.bark.index, 1));
         const barkMat = new THREE.ShaderMaterial({
-          uniforms,
+          uniforms: { ...uniforms, ...barkPlates.uniforms },
           vertexShader: BARK_VERT,
           fragmentShader: BARK_FRAG,
           transparent: soft,
@@ -1085,6 +1089,7 @@ export function GroveDemo({
         for (const g of geometries) g.dispose();
         for (const m of materials) m.dispose();
         for (const t of textures) t.dispose();
+        barkPlates.dispose();
         renderer.dispose();
       };
     };

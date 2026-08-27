@@ -136,6 +136,31 @@ float ridged(vec2 p){
   for(int i = 0; i < 4; i++){ s += a * (1.0 - abs(gnoise(p) * 2.0)); p = ROT * p * 2.11; a *= 0.5; }
   return s;
 }
+
+/* The same two, anti-aliased for baking. px is one output texel measured in
+   the noise's own units; an octave whose features are finer than about two
+   texels is faded out rather than sampled, because sampled it is not detail,
+   it is aliasing — sparkle frozen into the plate. gnoise puts roughly one
+   feature per two units, so the base octave sits at half a cycle per unit. */
+float octW(float px, float freq){ return 1.0 - smoothstep(0.25, 0.5, px * freq); }
+float gfbmAA(vec2 p, float px){
+  float a = 0.5, s = 0.0, f = 0.5;
+  for(int i = 0; i < 5; i++){
+    float w = octW(px, f);
+    if (w <= 0.0) break;
+    s += a * w * gnoise(p); p = ROT * p * 2.03; a *= 0.5; f *= 2.03;
+  }
+  return s;
+}
+float ridgedAA(vec2 p, float px){
+  float a = 0.5, s = 0.0, f = 0.5;
+  for(int i = 0; i < 4; i++){
+    float w = octW(px, f);
+    if (w <= 0.0) break;
+    s += a * w * (1.0 - abs(gnoise(p) * 2.0)); p = ROT * p * 2.11; a *= 0.5; f *= 2.11;
+  }
+  return s;
+}
 `;
 
 /**
@@ -172,8 +197,86 @@ vec4 finish(vec3 lit, float alpha){
 `;
 
 /* ────────────────────────────────────────────────────────────────────────
+   the bark plates
+   ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Everything about the bark that is a function of (u, v) alone — the relief,
+ * the grain, the mottle, the fissures and the lichen — baked once into two
+ * plates, so the fragment shader reads them back instead of evaluating some
+ * fifty gradient-noise lookups per pixel per frame. Measured on the hero at
+ * 60fps, that evaluation was two thirds of everything the scene asked of the
+ * GPU; the fur, all quarter-million blades of it, was a tenth of that.
+ *
+ * u is the mirrored coordinate around the limb (0..1), v runs 0..BARK_V_MAX
+ * along it, and the domain is the same barkDomain the live shader used, so
+ * the plate is the old picture, not a new one. Pass 0 writes relief, grain,
+ * mottle and fissures; pass 1 the lichen field. The relief is offset into
+ * 0..1 so the plate survives an 8-bit target where half-float is unavailable.
+ */
+export const BARK_BAKE_VERT = /* glsl */ `
+varying vec2 vUv;
+void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+`;
+
+export const BARK_BAKE_FRAG = /* glsl */ `
+precision highp float;
+uniform float uPass, uBarkV;
+/* one texel, in the units of the bark domain */
+uniform vec2 uTexel;
+varying vec2 vUv;
+${NOISE_GLSL}
+vec2 barkDomain(vec2 uv){ return vec2(uv.x * 7.0, uv.y * 0.62); }
+void main(){
+  vec2 q = barkDomain(vec2(vUv.x, vUv.y * uBarkV));
+  float px = max(uTexel.x, uTexel.y);
+  if (uPass > 0.5) {
+    float lich = gfbmAA(q * 0.62 + 31.0, px * 0.62) * 0.5 + 0.5;
+    gl_FragColor = vec4(lich, 0.0, 0.0, 1.0);
+    return;
+  }
+  vec2 w = vec2(gfbmAA(q * 0.5, px * 0.5), gfbmAA(q * 0.5 + 9.1, px * 0.5));
+  vec2 p = q + w * 0.60;                 // meander the fissures
+  float ridge = ridgedAA(p, px);
+  float plate = smoothstep(-0.25, 0.45, gfbmAA(q * 0.34, px * 0.34));
+  float crack = smoothstep(0.30, 0.86, ridgedAA(p * 1.9 + 4.0, px * 1.9));
+  float fine  = gfbmAA(p * 5.5, px * 5.5) * 0.5 + 0.5;
+  float h = (ridge - 0.5) * 1.85 * mix(0.35, 1.0, plate) - crack * 0.42 + fine * 0.20;
+  float grain  = gfbmAA(q * 1.25, px * 1.25) * 0.5 + 0.5;
+  float mottle = gfbmAA(q * 0.28 + 21.0, px * 0.28) * 0.5 + 0.5;
+  gl_FragColor = vec4((h + 1.5) / 3.0, grain, mottle, crack);
+}
+`;
+
+/* ────────────────────────────────────────────────────────────────────────
    bark + cushion
    ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * The two discards in the opaque materials — "not yet surveyed" and "faded
+ * to nothing" — are compiled out under `SETTLED`, which the hero defines on a
+ * second copy of each near-root material and swaps in once the survey is
+ * over. The reason is not the two comparisons. A fragment shader that can
+ * discard is one whose coverage the GPU cannot know until it has run, so a
+ * tile-based GPU (every Apple chip, most phones) has to shade every fragment
+ * of the pile — thirty-odd blades deep in places — instead of only the one
+ * that wins the depth test. With the discards gone the hidden ones are
+ * rejected before shading, and the quarter-million blades cost what the few
+ * you can actually see cost.
+ *
+ * Correct to compile out only because both tests are known constants for the
+ * settled near root: the front is parked past the far corner, and its `uCut`
+ * and mask are pushed out of reach, so `fade` is 1 everywhere.
+ */
+export const SETTLED_DISCARD_GLSL = /* glsl */ `
+#ifdef SETTLED
+#define SCAN_DISCARD(edge)
+#define FADE_DISCARD(fade)
+#else
+#define SCAN_DISCARD(edge) if ((edge) < 0.0) discard;
+#define FADE_DISCARD(fade) if ((fade) < 0.004) discard;
+#endif
+`;
 
 export const BARK_VERT = /* glsl */ `
 attribute vec3 aInfo;
@@ -197,25 +300,14 @@ export const BARK_FRAG = /* glsl */ `
 precision highp float;
 varying vec3 vN, vW, vInfo, vL;
 varying float vH;
+/* the baked plates — see BARK_BAKE_FRAG */
+uniform sampler2D uBark, uBarkLich;
+uniform float uBarkV;
 ${NOISE_GLSL}
 ${LIGHT_GLSL}
 ${SCAN_GLSL}
 ${OUTPUT_GLSL}
-
-/* Bark grain is strongly anisotropic — features run about ten times longer
-   along the limb than around it, so the domain is squashed in v first. */
-vec2 barkDomain(vec2 uv){ return vec2(uv.x * 7.0, uv.y * 0.62); }
-
-float barkHeight(vec2 uv){
-  vec2 q = barkDomain(uv);
-  vec2 w = vec2(gfbm(q * 0.5), gfbm(q * 0.5 + 9.1));
-  vec2 p = q + w * 0.60;                 // meander the fissures
-  float ridge = ridged(p);
-  float plate = smoothstep(-0.25, 0.45, gfbm(q * 0.34));
-  float crack = smoothstep(0.30, 0.86, ridged(p * 1.9 + 4.0));
-  float fine  = gfbm(p * 5.5) * 0.5 + 0.5;
-  return (ridge - 0.5) * 1.85 * mix(0.35, 1.0, plate) - crack * 0.42 + fine * 0.20;
-}
+${SETTLED_DISCARD_GLSL}
 
 /* Bump-map a surface that has no usable parameterisation, from screen-space
    derivatives of the height field. */
@@ -233,22 +325,27 @@ void main(){
      the shell a beat behind it, which is what makes the pass read as a survey
      of the branch rather than as a wipe uncovering a picture of one. */
   float edge = scanEdge(vW);
-  if (edge < 0.0) discard;
+  SCAN_DISCARD(edge)
   float fade = endFade(vL.x) * maskAt(vL, uBoxH);
-  if (fade < 0.004) discard;
+  FADE_DISCARD(fade)
 
   vec2 uv = vInfo.xy;
   float cap = vInfo.z;
   float m = smoothstep(0.05, 0.42, cap);
   vec3 N = normalize(vN);
 
-  float h = barkHeight(uv);
+  /* Bark grain is strongly anisotropic — features run about ten times longer
+     along the limb than around it. That squash, and every noise field built
+     on it, is in the plates; the mip chain does the anti-aliasing the live
+     evaluation never could. */
+  vec2 buv = vec2(uv.x, uv.y / uBarkV);
+  vec4 plate = texture2D(uBark, buv);
+  float h = plate.r * 3.0 - 1.5;
   N = bumped(N, vW, h, mix(0.26, 0.06, m));
 
-  vec2 q = barkDomain(uv);
-  float grain  = gfbm(q * 1.25) * 0.5 + 0.5;
-  float mottle = gfbm(q * 0.28 + 21.0) * 0.5 + 0.5;
-  float crack  = smoothstep(0.30, 0.86, ridged(q * 1.9 + 4.0));
+  float grain  = plate.g;
+  float mottle = plate.b;
+  float crack  = plate.a;
 
   /* Old wet-forest wood: silvered grey where the light rakes it, near-black
      in the splits, drifting slowly into a damp umber. */
@@ -264,7 +361,7 @@ void main(){
   vec3 col = mix(wood, moss, m);
 
   /* A pale lichen crust where bare wood faces up. */
-  float lich = smoothstep(0.56, 0.84, gfbm(q * 0.62 + 31.0) * 0.5 + 0.5);
+  float lich = smoothstep(0.56, 0.84, texture2D(uBarkLich, buv).r);
   lich *= (1.0 - m) * smoothstep(-0.10, 0.70, N.y) * smoothstep(0.15, 0.50, h);
   col = mix(col, vec3(0.162, 0.176, 0.132), lich * 0.78);
 
@@ -364,11 +461,12 @@ varying vec3 vN, vW, vL;
 ${LIGHT_GLSL}
 ${SCAN_GLSL}
 ${OUTPUT_GLSL}
+${SETTLED_DISCARD_GLSL}
 
 void main(){
-  if (scanEdge(vW) < 0.0) discard;
+  SCAN_DISCARD(scanEdge(vW))
   float fade = endFade(vL.x) * maskAt(vL, uBoxH);
-  if (fade < 0.004) discard;
+  FADE_DISCARD(fade)
 
   /* Linear-space colours. The channel ratios are solved backwards from a
      photographic reference rather than picked: real moss sits around hue 77°,
@@ -452,10 +550,11 @@ varying float vH, vTint;
 ${LIGHT_GLSL}
 ${SCAN_GLSL}
 ${OUTPUT_GLSL}
+${SETTLED_DISCARD_GLSL}
 void main(){
-  if (scanEdge(vW) < 0.0) discard;
+  SCAN_DISCARD(scanEdge(vW))
   float fade = endFade(vL.x) * maskAt(vL, uBoxH);
-  if (fade < 0.004) discard;
+  FADE_DISCARD(fade)
   vec3 N = normalize(vN);
   if (!gl_FrontFacing) N = -N;
   vec3 V = normalize(cameraPosition - vW);
