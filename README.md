@@ -92,6 +92,9 @@ pnpm db:studio   # 表格界面
   自托管于 `public/draco/`。
 - /portfolio 封面照片 `public/portfolio/lamp.jpg`：Sixteen Miles Out 摄，
   [Unsplash License](https://unsplash.com/license)（可商用、无需署名）。
+- /lab/lens-slider 的四张照片 `public/lab/lens/`（均为 Unsplash License，
+  经 Lorem Picsum 取得，1440px 宽重编码）：`river.jpg` Steve Carter、
+  `falls.jpg` Andrew Coelho、`sea.jpg` Anna Popović、`coffee.jpg` Karl Fredrickson。
 - 软件版本号：`apps.repo`（owner/name）+ `src/lib/github.ts` 读 GitHub 最新 release，
   `fetch` 缓存一小时；未登录配额 60 次/小时足够，设 `GITHUB_TOKEN` 可放宽。
 - /intro 的头像 `head.glb` 由单张照片重建（TRELLIS 风格化 v3），眼镜为程序
