@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import { prefersSaveData } from "@/lib/three/guards";
+import { releaseRenderer } from "@/lib/three/release";
 import { DRACO_DECODER_PATH } from "@/lib/three/draco";
 
 /* "Gaming Desktop PC" by Yolala1232 (sketchfab.com/Yolala1232), CC-BY-4.0 —
@@ -513,7 +514,7 @@ export function Workstation({ hint, className }: Props) {
       groundGeo.dispose();
       groundMat.dispose();
       groundTex.dispose();
-      renderer.dispose();
+      releaseRenderer(renderer);
     };
   }, []);
 
