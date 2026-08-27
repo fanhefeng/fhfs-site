@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
 import { LAB_ENTRIES, labEntry } from "@/components/lab/entries";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
+import { getPosts } from "@/lib/content";
 
 /** A fixed set of studies — the whole list is known at build time. */
 export const dynamicParams = false;
@@ -41,8 +42,21 @@ const STUDY_KEYS: Record<string, string[]> = {
   dissolve: ["headline", "body", "tail", "fallback"],
   meltingText: ["sampleOne", "sampleTwo", "sampleThree", "labelLoad", "labelInView", "labelScrub"],
   grove: ["headline", "body", "tail", "fallback", "stageScan", "stageGrow", "stageSettle"],
+  groveStage: ["pointerHint", "fallback"],
   liquidMetal: ["headline", "body", "tail", "fallback", "label", "stageField", "stageMolten", "stageBloom"],
   workstation: ["deskHint"],
+  lensSlider: [
+    "fallback",
+    "counterAria",
+    "prev",
+    "next",
+    ...["river", "falls", "sea", "coffee"].flatMap((name) => [
+      `${name}Alt`,
+      `${name}Title`,
+      `${name}Body`,
+      `${name}Meta`,
+    ]),
+  ],
 };
 
 /**
@@ -64,6 +78,25 @@ export default async function LabDemoPage({
   const text: StudyText = { hint: t("hint") };
   for (const key of STUDY_KEYS[entry.key] ?? []) {
     text[key] = t(`${ns}.${key}`);
+  }
+
+  // The two cards standing in the stage study are the home page's: the same
+  // copy, and the plate in front is whatever was written last.
+  if (entry.slug === "grove-stage") {
+    const tg = await getTranslations("grove");
+    const latest = (await getPosts(locale))[0];
+    Object.assign(text, {
+      cardALabel: tg("cardLabLabel"),
+      cardATitle: tg("cardLabTitle"),
+      cardAHref: `/${locale}/lab/grove`,
+      cardAAlt: tg("cardLabAlt"),
+      cardALink: tg("cardLabLink"),
+      cardBLabel: tg("cardPostLabel"),
+      cardBTitle: latest?.title ?? tg("cardPostFallback"),
+      cardBHref: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
+      cardBAlt: tg("cardPostAlt"),
+      cardBLink: tg("cardPostLink"),
+    });
   }
 
   return (

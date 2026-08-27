@@ -30,6 +30,10 @@ const MeltingTextDemo = dynamic(
 const GroveDemo = dynamic(() => import("./GroveDemo").then((m) => m.GroveDemo), {
   ssr: false,
 });
+const GroveStageDemo = dynamic(
+  () => import("./GroveStageDemo").then((m) => m.GroveStageDemo),
+  { ssr: false }
+);
 const LiquidMetalDemo = dynamic(
   () => import("./LiquidMetalDemo").then((m) => m.LiquidMetalDemo),
   { ssr: false }
@@ -38,6 +42,13 @@ const Workstation = dynamic(
   () => import("@/components/about/Workstation").then((m) => m.Workstation),
   { ssr: false }
 );
+const LensSliderDemo = dynamic(
+  () => import("./LensSliderDemo").then((m) => m.LensSliderDemo),
+  { ssr: false }
+);
+
+/** The four photographs the lens slides between, in order. */
+const LENS_SLIDES = ["river", "falls", "sea", "coffee"] as const;
 
 /** Every string a study can ask for, already translated by the page. */
 export type StudyText = Record<string, string>;
@@ -99,6 +110,32 @@ export function LabStudy({ slug, accent, text }: Props) {
           stageSettle={text.stageSettle}
         />
       );
+    case "grove-stage":
+      return (
+        <GroveStageDemo
+          accent={accent}
+          hint={text.pointerHint}
+          fallbackNote={text.fallback}
+          cards={[
+            {
+              label: text.cardALabel,
+              title: text.cardATitle,
+              href: text.cardAHref,
+              src: "/grove/moss-plate.webp",
+              alt: text.cardAAlt,
+              linkLabel: text.cardALink,
+            },
+            {
+              label: text.cardBLabel,
+              title: text.cardBTitle,
+              href: text.cardBHref,
+              src: "/lab/dissolve/forest.jpg",
+              alt: text.cardBAlt,
+              linkLabel: text.cardBLink,
+            },
+          ]}
+        />
+      );
     case "liquid-metal":
       return (
         <LiquidMetalDemo
@@ -116,5 +153,23 @@ export function LabStudy({ slug, accent, text }: Props) {
       );
     case "workstation":
       return <Workstation hint={text.deskHint} className="mx-auto w-full max-w-5xl px-6" />;
+    case "lens-slider":
+      return (
+        <LensSliderDemo
+          accent={accent}
+          hint={text.hint}
+          fallbackNote={text.fallback}
+          counterAria={text.counterAria}
+          prevLabel={text.prev}
+          nextLabel={text.next}
+          slides={LENS_SLIDES.map((name) => ({
+            src: `/lab/lens/${name}.jpg`,
+            alt: text[`${name}Alt`],
+            title: text[`${name}Title`],
+            body: text[`${name}Body`],
+            meta: text[`${name}Meta`],
+          }))}
+        />
+      );
   }
 }

@@ -145,7 +145,7 @@
   "lab": {
     "kicker": "Motion lab",
     "title": "Lab",
-    "subtitle": "Six studies. Here the scrollbar is not navigation — it is the playhead.",
+    "subtitle": "Eight studies. Here the scrollbar is not navigation — it is the playhead.",
     "indexAria": "Motion experiments",
     "open": "Open",
     "back": "Back to the lab",
@@ -199,6 +199,14 @@
         "stageGrow": "02 · Growth",
         "stageSettle": "03 · Settle"
       },
+      "groveStage": {
+        "name": "Two sheets of paper, one root apart",
+        "tagline": "DOM over and under a canvas",
+        "summary": "The same moss, two identical paper cards: one painted under the canvas with the root draped over its shoulder, one standing in front of it — at the reference composition's own coordinates.",
+        "note": "A card cannot stand behind a photograph of a grove, only behind a grove that is still being drawn. The whole trick is one rule: card a carries no z-index, so it paints under the canvas and the root crosses its lower right corner; card b sits at z 3. Card a's knob therefore cannot live inside it, and is rendered on its own, riding the moss. The pair stands where the reference composition put it on its 1600 × 880 grid — 890 × 200 and 1237 × 482, corner to corner on one diagonal — and it is the pair that carries the depth: two sheets of the same paper at the same size, one root apart. Split them to opposite corners and each still crosses the moss, but there is nothing left to compare. Under the pointer the two ride by different amounts, and that difference is the distance between them. The home page's approach uses the same coordinates.",
+        "pointerHint": "Move the pointer · each sheet rides its own depth",
+        "fallback": "No WebGL available here, so this is the two cards alone on an empty stage."
+      },
       "liquidMetal": {
         "name": "A button, computed all the way down",
         "tagline": "A WebGL2 dispersion shader in five passes",
@@ -220,6 +228,32 @@
         "note": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual.",
         "deskHint": "Drag to orbit · scroll to zoom · double-click to reset",
         "credit": "“Gaming Desktop PC” by Yolala1232 · Sketchfab · CC-BY-4.0"
+      },
+      "lensSlider": {
+        "name": "Lens slider",
+        "tagline": "Three.js shader + a lens for a transition",
+        "summary": "Four photographs. Turning the page is not a wipe but a lens growing out of the centre of the frame: the next picture sits inside it, pulled hardest at the rim, and only once the circle has swallowed the frame does the distortion let go.",
+        "note": "The shader takes two pictures and one progress. The circle's radius grows with it; inside, every pixel is pulled toward the centre by an amount that is its closeness to the rim raised to the fifth power, so only a narrow band hugging the edge magnifies and the middle stays flat. Past the half-diagonal the circle covers the frame, and the rest of the progress is that band relaxing. A ring of water ripples runs out from the rim and dies with the same curve — the one thing the original has that the breakdown left out. Each band of the scrollbar opens the lens onto the next picture; scroll back while it is still growing and it shrinks away again. After Oscar Pico's project slider (oscarpico.es), written from TTTISE's breakdown of it.",
+        "fallback": "No WebGL available here, so this falls back to a plain change of picture.",
+        "counterAria": "Current slide",
+        "prev": "Previous",
+        "next": "Next",
+        "riverAlt": "A river valley in fog, one person standing on a rock midstream",
+        "riverTitle": "The river in the fog",
+        "riverBody": "The water arrives first; the person, later.",
+        "riverMeta": "River · Fog · Alone",
+        "fallsAlt": "A waterfall dropping into a green valley in a forest after rain",
+        "fallsTitle": "Green, falling",
+        "fallsBody": "A waterfall is in no hurry. It is simply always there.",
+        "fallsMeta": "Falls · Forest · After rain",
+        "seaAlt": "The sea from above, foam turning over like pages",
+        "seaTitle": "The sea, turning a page",
+        "seaBody": "Every line of foam is the same sentence, read again.",
+        "seaMeta": "Sea · Foam · From above",
+        "coffeeAlt": "Pour-over coffee by a window in the morning, hot water circling down",
+        "coffeeTitle": "A slow kettle",
+        "coffeeBody": "Hot water walks down in circles, and the morning wakes.",
+        "coffeeMeta": "Pour-over · Morning · Glass"
       }
     }
   },
