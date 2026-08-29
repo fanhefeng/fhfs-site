@@ -54,7 +54,11 @@ export type OgFont = {
  */
 const FETCH_ATTEMPTS = 5;
 
-async function fetchWithRetry(url: string, label: string): Promise<Response> {
+async function fetchWithRetry(
+  url: string,
+  label: string,
+  accept: (response: Response) => Promise<boolean> = async () => true
+): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 0; attempt < FETCH_ATTEMPTS; attempt++) {
     if (attempt > 0) {
@@ -63,8 +67,13 @@ async function fetchWithRetry(url: string, label: string): Promise<Response> {
     }
     try {
       const response = await fetch(url);
-      if (response.ok) return response;
-      lastError = new Error(`${label}: HTTP ${response.status}`);
+      if (!response.ok) {
+        lastError = new Error(`${label}: HTTP ${response.status}`);
+      } else if (await accept(response)) {
+        return response;
+      } else {
+        lastError = new Error(`${label}: response is not a font file`);
+      }
     } catch (error) {
       lastError = error;
     }
@@ -92,8 +101,27 @@ async function loadGoogleFont(
     /src: url\((.+?)\) format\('(?:opentype|truetype)'\)/
   );
   if (!resource) throw new Error(`No TTF url for font ${family}`);
-  const response = await fetchWithRetry(resource[1], `font file ${family}`);
-  return response.arrayBuffer();
+  // A 200 with a truncated or non-font body (seen once as an HTML error page)
+  // blows up inside satori as a DataView RangeError, so the body is checked
+  // for a TrueType/OpenType magic number and counted as a failed attempt
+  // otherwise; the accepted body is captured here since a Response body can
+  // only be read once.
+  let data: ArrayBuffer | undefined;
+  await fetchWithRetry(resource[1], `font file ${family}`, async (response) => {
+    const buffer = await response.arrayBuffer();
+    if (!isSfnt(buffer)) return false;
+    data = buffer;
+    return true;
+  });
+  if (!data) throw new Error(`No font data for ${family}`);
+  return data;
+}
+
+/** TrueType (0x00010000 / "true") or CFF OpenType ("OTTO") header. */
+function isSfnt(buffer: ArrayBuffer): boolean {
+  if (buffer.byteLength < 12) return false;
+  const tag = new DataView(buffer).getUint32(0);
+  return tag === 0x00010000 || tag === 0x74727565 || tag === 0x4f54544f;
 }
 
 /** CJK + fullwidth punctuation — everything Nunito cannot draw. */
