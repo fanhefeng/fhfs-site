@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./yozai.css";
 
 /* ---------------------------------------------------------------------------
  * "The Quiet Issue" — gallery-editorial design system (Tailwind 4, CSS-first).
@@ -77,9 +78,11 @@
   --code-border: var(--line);
 
   /* Font stacks (runtime copies — @theme inline emits no :root vars).
-   * next/font variables are set on <html> by layout.tsx. CJK prefers the
-   * system PingFang/Songti first so the Noto webfonts stay a fallback. */
-  --font-stack-sans: var(--font-inter), "PingFang SC", var(--font-noto-sans-sc),
+   * next/font variables are set on <html> by layout.tsx. Sans CJK is the
+   * self-hosted rounded Yozai (yozai.css); system PingFang then Noto behind
+   * it for anything outside its GB2312 subset. Serif CJK still prefers the
+   * system Songti so Noto Serif stays a fallback. */
+  --font-stack-sans: var(--font-nunito), "Yozai", "PingFang SC", var(--font-noto-sans-sc),
     "Microsoft YaHei", ui-sans-serif, system-ui, sans-serif;
   --font-stack-serif: var(--font-instrument), "Songti SC", var(--font-noto-serif-sc),
     "Noto Serif CJK SC", Georgia, serif;

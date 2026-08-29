@@ -184,12 +184,12 @@
 
 ### 1.2 字体
 
-- EN display：**Inter Display**（`Inter` 可变字重）600–700，`clamp(2.5rem, 7vw, 6.5rem)`，`letter-spacing: -0.03em`，`line-height: 1.05`。
+- EN display：**Nunito**（可变字重，圆角末端，与中文圆体同调）600–700，`clamp(2.5rem, 7vw, 6.5rem)`，`letter-spacing: -0.03em`，`line-height: 1.05`。
 - 衬线点缀：**Instrument Serif** italic（引语/关键词，next/font/google 新增）。
-- 正文：Inter 400，16–18px / 1.7。
+- 正文：Nunito 400，16–18px / 1.7。
 - 元信息：**Geist Mono** 11–12px uppercase `tracking +0.08em`（版本号/日期/kicker）。
-- ZH：PingFang SC 系统栈优先，**Noto Sans SC** 400/500/600 兜底（`preload: false`）；中文标题不做负字距（tracking 0～+0.01em）；引语点缀沿用 Noto Serif SC。
-- **删除 Monoton / Poiret_One**。`lib/og.ts` 的 OG 字体同步换为 Inter + Noto Sans SC 子集。
+- ZH：**悠哉字体 Yozai**（圆体，OFL；`public/fonts/yozai/` 自托管，GB2312 子集 + cn-font-split 按 unicode-range 分片，400 / 500 两字重，500 面声明为 500–900 免合成粗体，`src/app/yozai.css`）优先，PingFang SC → **Noto Sans SC** 可变字重兜底（`preload: false`）；中文标题不做负字距（tracking 0～+0.01em）；引语点缀沿用 Noto Serif SC。
+- **删除 Monoton / Poiret_One**。`lib/og.ts` 的 OG 字体为 Nunito + Noto Sans SC 子集（Yozai 不在 Google Fonts 上，卡片仍用 Noto）。
 - CJK 字体 `display: swap`；CLS 目标 <0.05。
 
 ### 1.3 玻璃材质 · 三档制

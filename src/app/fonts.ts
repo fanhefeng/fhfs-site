@@ -1,5 +1,5 @@
 import {
-  Inter,
+  Nunito,
   Instrument_Serif,
   Geist_Mono,
   Noto_Sans_SC,
@@ -7,18 +7,19 @@ import {
 } from "next/font/google";
 
 /* Editorial type trio + CJK fallbacks. globals.css assembles the runtime
- * stacks from these variables (system PingFang/Songti take priority for CJK,
- * so the Noto webfonts stay non-preloaded fallbacks).
+ * stacks from these variables. Latin is Nunito — rounded terminals to sit
+ * beside the Yozai rounded CJK face (self-hosted, see yozai.css); Songti
+ * and the Noto webfonts remain the serif / last-resort fallbacks.
  *
  * Shared because `global-not-found` renders outside the [locale] root layout
  * and has to dress itself. */
-const sans = Inter({
+const sans = Nunito({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-nunito",
   display: "swap",
 });
 
-/* Preload is reserved for Inter, which sets the body copy. The other two
+/* Preload is reserved for Nunito, which sets the body copy. The other two
  * carry a handful of words each — an italic accent, a line of meta — and
  * preloading all three had the browser fetching four files up front and
  * reporting them unused. They still load, just without the head start. */
