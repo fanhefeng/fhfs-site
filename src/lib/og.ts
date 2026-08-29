@@ -30,11 +30,11 @@ export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_BG = `radial-gradient(ellipse 110% 85% at 6% -12%, rgba(180,83,9,0.16), transparent 62%), ${OG.paper}`;
 
 /**
- * Font stack for every text node in an OG image: Latin from Inter, CJK from
- * Noto Sans SC. Satori resolves per glyph and falls back family by family,
+ * Font stack for every text node in an OG image: Latin from Nunito, CJK from
+ * Noto Sans SC (Yozai is self-hosted, not on Google Fonts, so cards keep Noto). Satori resolves per glyph and falls back family by family,
  * then picks the nearest registered weight inside a family.
  */
-export const OG_FONT_FAMILY = "Inter, NotoSansSC";
+export const OG_FONT_FAMILY = "Nunito, NotoSansSC";
 
 type OgWeight = 400 | 500 | 600 | 700;
 
@@ -96,7 +96,7 @@ async function loadGoogleFont(
   return response.arrayBuffer();
 }
 
-/** CJK + fullwidth punctuation — everything Inter cannot draw. */
+/** CJK + fullwidth punctuation — everything Nunito cannot draw. */
 const CJK_RE =
   /[⺀-⿿　-〿㐀-䶿一-鿿豈-﫿︰-﹏＀-￯]/;
 
@@ -138,8 +138,8 @@ export async function loadOgFonts(
   };
 
   // Latin is always needed — the wordmark alone guarantees it.
-  push("Inter", "Inter", subset(displayText, false) || "fhf", 700);
-  push("Inter", "Inter", subset(bodyText, false) || "fhf", 400);
+  push("Nunito", "Nunito", subset(displayText, false) || "fhf", 700);
+  push("Nunito", "Nunito", subset(bodyText, false) || "fhf", 400);
 
   const displayCjk = subset(displayText, true);
   const bodyCjk = subset(bodyText, true);
