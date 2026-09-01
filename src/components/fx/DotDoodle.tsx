@@ -338,8 +338,11 @@ export function DotDoodle({ text, className }: Props) {
     // loops and the scroll hijack (see lib/gsap.ts): here the field holds
     // still and hover snaps between its two settled states.
     const still = prefersReducedMotion();
-    /** Past every intro delay — a fully materialized, settled field. */
-    const STILL_T = 20;
+    /** Past every intro delay (≤ ~1.4s plus the 0.7s ramp), but early in the
+     *  tints' own lives: the initial accents are born at −10…0s with lives of
+     *  7–16s, so by t=20 every one of them had expired — retired-and-respawned
+     *  at fade 0, a settled frame with no accent colour at all. */
+    const STILL_T = 2;
     const redraw = () => draw(still ? STILL_T : elapsed);
 
     const draw = (t: number) => {
