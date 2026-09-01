@@ -501,10 +501,15 @@ export async function saveNavItems(
     .filter((row) => row.href);
 
   // `//evil.com` also starts with "/" — a browser reads that as
-  // protocol-relative and the header would link off-site.
+  // protocol-relative and the header would link off-site. So does
+  // `/\evil.com`: URL parsing treats a backslash as a slash.
   for (const row of rows) {
-    if (!row.href.startsWith("/") || row.href.startsWith("//")) {
-      return { error: `路径要以单个 / 开头：${row.href}` };
+    if (
+      !row.href.startsWith("/") ||
+      row.href.startsWith("//") ||
+      row.href.includes("\\")
+    ) {
+      return { error: `路径要以单个 / 开头，且不能含反斜杠：${row.href}` };
     }
     if (!row.labelKey) {
       return { error: `${row.href} 缺少文案 key。` };
