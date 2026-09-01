@@ -1,0 +1,121 @@
+# yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
+#
+# CodeRabbit config for fhfs-site. Three jobs:
+#   1. Silence what CI already runs (`pnpm check` = tsc + oxlint + vitest).
+#   2. Turn off the default docstring pre-merge gate — an 80% docstring
+#      threshold is a library's standard, not a Next.js site's.
+#   3. Record the settled design decisions as path instructions, so reviews
+#      argue with new code instead of re-litigating old choices.
+
+language: zh-CN
+
+tone_instructions: "Be direct and specific. Skip praise. Cite the invariant a change breaks rather than restating what the code does."
+
+reviews:
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    base_branches:
+      - main
+
+  path_filters:
+    - "!pnpm-lock.yaml"
+    - "!backup/**"
+    - "!public/**"
+    - "!drizzle/meta/**"
+
+  path_instructions:
+    - path: "src/lib/content.ts"
+      instructions: |
+        Every read the site does lives here, cached with tags.
+        - `unstable_cache` keys on arguments, not closures: anything
+          request-variable (locale, slug, tag, surface) must arrive as a
+          parameter. Flag a getter that closes over one.
+        - Every getter declares tags via `cacheOptions(...)` and keeps
+          `revalidate: false`. A getter without tags can never be invalidated
+          from /admin.
+        - Every list ordering carries a deterministic tiebreaker (`sort` then
+          `key`/`id`) — several rows share sort=0, and equal sorts otherwise
+          reorder between deploys. Flag a new sort-only ordering.
+        - `loadCopyOverrides` builds null-prototype nodes and rejects
+          `__proto__`/`constructor`/`prototype` segments; its catch sits
+          OUTSIDE the cache so an error is never stored. Flag any weakening.
+
+    - path: "src/app/admin/**"
+      instructions: |
+        - Every server action starts with `requireAdmin()` and ends with
+          `updateTag` (not `revalidateTag`) — flag an action missing either.
+        - Admin pages read STRAIGHT from the tables on purpose: the workbench
+          shows what is stored right now, not what the cache says. Do not
+          suggest moving these reads into the cached getters.
+        - The admin UI is a single-user workbench, deliberately Chinese-only
+          with inline strings — do not flag missing i18n here. The bilingual
+          message layer is for the public site.
+        - Nav hrefs must start with a single "/" (never "//"), and label keys
+          must exist in the catalogues or copy_blocks before saving.
+
+    - path: "scripts/*.mts"
+      instructions: |
+        - db-import regenerates `bodyHtml` through `renderMarkdown` and never
+          persists the backup's own HTML. Flag any change that trusts backup
+          HTML again.
+        - admin-password never accepts the password as an argv argument
+          (shell history, `ps`). Flag any reintroduction.
+        - Keyless-table replacement (chips, nav_items, copy_blocks) travels
+          delete+insert in one `db.batch()` — a failed insert must not leave
+          the table empty.
+
+    - path: "src/components/**"
+      instructions: |
+        - Motion policy (DESIGN.md §1.5, src/lib/gsap.ts): only what has no
+          stop button — endless CSS/canvas loops, the scroll hijack, the
+          opening blackout — branches on prefers-reduced-motion. Entrances,
+          reveals and hover effects deliberately do not; do not flag them.
+        - Article HTML is rendered once at save time by `lib/markdown.ts`
+          (URL sanitizer, no `allowDangerousHtml`); `Mdx` stays a plain
+          container with `dangerouslySetInnerHTML`. Flag anything that adds a
+          second render path or feeds it non-pipeline HTML.
+
+  tools:
+    # `pnpm check` (tsc + oxlint + vitest) runs locally and in CI — a second
+    # report of the same findings is noise.
+    eslint:
+      enabled: false
+    oxc:
+      enabled: false
+    biome:
+      enabled: false
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: local
+  issues:
+    scope: local
+  pull_requests:
+    scope: local
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "**/CLAUDE.md"
+      - "AGENTS.md"
+      - "docs/DESIGN.md"
+
+code_generation:
+  docstrings:
+    language: zh-CN
