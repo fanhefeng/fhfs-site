@@ -338,11 +338,17 @@ export function DotDoodle({ text, className }: Props) {
     // loops and the scroll hijack (see lib/gsap.ts): here the field holds
     // still and hover snaps between its two settled states.
     const still = prefersReducedMotion();
-    /** Past every intro delay (≤ ~1.4s plus the 0.7s ramp), but early in the
-     *  tints' own lives: the initial accents are born at −10…0s with lives of
-     *  7–16s, so by t=20 every one of them had expired — retired-and-respawned
-     *  at fade 0, a settled frame with no accent colour at all. */
+    /** Past every intro delay (≤ ~1.4s plus the 0.7s ramp). The old value of
+     *  20 outlived every initial accent (born −10…0s, life 7–16s): each was
+     *  retired-and-respawned at fade 0, a settled frame with no colour. */
     const STILL_T = 2;
+    // A settled frame never advances, so hand it tints mid-life: none expired
+    // at STILL_T, every fade at 1 — the retire branch in draw() never fires.
+    if (still) {
+      for (const c of cells) {
+        if (c.accent) c.accent.born = STILL_T - c.accent.life / 2;
+      }
+    }
     const redraw = () => draw(still ? STILL_T : elapsed);
 
     const draw = (t: number) => {
