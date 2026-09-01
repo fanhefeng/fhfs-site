@@ -346,7 +346,10 @@ export const getTimeline = unstable_cache(
         note: timelineEntries.note,
       })
       .from(timelineEntries)
-      .orderBy(asc(timelineEntries.sort)),
+      // `sort` collides (several rows default to 0), so every list here orders
+      // by sort *and* a unique column — equal sorts otherwise reorder between
+      // deploys. Same pattern in each getter below.
+      .orderBy(asc(timelineEntries.sort), asc(timelineEntries.key)),
   ["timeline"],
   cacheOptions(TAGS.timeline)
 );
@@ -367,7 +370,7 @@ export const getApps = unstable_cache(
         hue: apps.hue,
       })
       .from(apps)
-      .orderBy(asc(apps.sort)),
+      .orderBy(asc(apps.sort), asc(apps.key)),
   ["apps"],
   cacheOptions(TAGS.apps)
 );
@@ -386,7 +389,7 @@ export const getWorks = unstable_cache(
         accent: works.accent,
       })
       .from(works)
-      .orderBy(asc(works.sort)),
+      .orderBy(asc(works.sort), asc(works.key)),
   ["works"],
   cacheOptions(TAGS.works)
 );
@@ -402,7 +405,7 @@ export const getChips = unstable_cache(
     db
       .select({ label: chips.label, tone: chips.tone })
       .from(chips)
-      .orderBy(asc(chips.sort)),
+      .orderBy(asc(chips.sort), asc(chips.id)),
   ["chips"],
   cacheOptions(TAGS.chips)
 );
@@ -430,7 +433,7 @@ export const getExperiments = unstable_cache(
         demo: experiments.demo,
       })
       .from(experiments)
-      .orderBy(asc(experiments.sort)),
+      .orderBy(asc(experiments.sort), asc(experiments.key)),
   ["experiments"],
   cacheOptions(TAGS.experiments)
 );
@@ -459,7 +462,7 @@ export const getIntroNodes = unstable_cache(
         bullets: introNodes.bullets,
       })
       .from(introNodes)
-      .orderBy(asc(introNodes.sort)),
+      .orderBy(asc(introNodes.sort), asc(introNodes.key)),
   ["intro-nodes"],
   cacheOptions(TAGS.intro)
 );
@@ -535,13 +538,22 @@ const loadCopyOverrides = unstable_cache(
       .select({ key: copyBlocks.key, zh: copyBlocks.zh, en: copyBlocks.en })
       .from(copyBlocks);
 
-    const out: Record<string, unknown> = {};
+    // Null-prototype nodes plus a segment blacklist. The keys come out of a
+    // table, and a `__proto__` segment would otherwise walk this loop straight
+    // onto Object.prototype — and `merge()` in i18n/request.ts assigns these
+    // keys onto plain objects, where `__proto__` is a setter.
+    const out: Record<string, unknown> = Object.create(null);
+    const unsafe = new Set(["__proto__", "constructor", "prototype"]);
     for (const row of rows) {
       const path = row.key.split(".");
+      if (path.some((segment) => !segment || unsafe.has(segment))) {
+        console.error(`copy override skipped, unsafe key: ${row.key}`);
+        continue;
+      }
       let node = out;
       for (const segment of path.slice(0, -1)) {
         if (typeof node[segment] !== "object" || node[segment] === null) {
-          node[segment] = {};
+          node[segment] = Object.create(null);
         }
         node = node[segment] as Record<string, unknown>;
       }
@@ -593,7 +605,7 @@ export const getAllNavItems = unstable_cache(
         surfaces: navItems.surfaces,
       })
       .from(navItems)
-      .orderBy(asc(navItems.sort)),
+      .orderBy(asc(navItems.sort), asc(navItems.id)),
   ["nav-items"],
   cacheOptions(TAGS.nav)
 );

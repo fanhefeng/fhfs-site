@@ -500,12 +500,40 @@ export async function saveNavItems(
     }))
     .filter((row) => row.href);
 
+  // `//evil.com` also starts with "/" — a browser reads that as
+  // protocol-relative and the header would link off-site.
   for (const row of rows) {
-    if (!row.href.startsWith("/")) {
-      return { error: `路径要以 / 开头：${row.href}` };
+    if (!row.href.startsWith("/") || row.href.startsWith("//")) {
+      return { error: `路径要以单个 / 开头：${row.href}` };
     }
     if (!row.labelKey) {
       return { error: `${row.href} 缺少文案 key。` };
+    }
+  }
+
+  // A label key that neither the catalogues nor copy_blocks knows renders as
+  // raw "nav.xxx" in the header of every page — refuse it here instead.
+  // `Object.hasOwn`, not `in`: "constructor" is `in` every object.
+  const [zhNav, enNav] = await Promise.all(
+    (["zh", "en"] as const).map((locale) =>
+      import(`../../../messages/${locale}.json`).then(
+        (m) => (m.default as { nav?: Record<string, unknown> }).nav ?? {}
+      )
+    )
+  );
+  const overrides = new Set(
+    (
+      await db.select({ key: schema.copyBlocks.key }).from(schema.copyBlocks)
+    ).map((row) => row.key)
+  );
+  for (const row of rows) {
+    const known =
+      (Object.hasOwn(zhNav, row.labelKey) && Object.hasOwn(enNav, row.labelKey)) ||
+      overrides.has(`nav.${row.labelKey}`);
+    if (!known) {
+      return {
+        error: `文案 key 不存在：nav.${row.labelKey} 在语言文件和站点文案里都找不到。`,
+      };
     }
   }
 

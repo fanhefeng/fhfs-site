@@ -17,6 +17,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "../src/db/schema";
+import { renderMarkdown } from "../src/lib/markdown";
 
 try {
   process.loadEnvFile(".env.local");
@@ -35,22 +36,28 @@ const data = JSON.parse(
 ) as Record<string, any[]>;
 
 for (const row of data.posts ?? []) {
+  // The backup's own bodyHtml is ignored: HTML is always this pipeline's
+  // output (same contract as savePost), so a hand-edited backup cannot put
+  // markup in the database that the sanitizing renderer never produced.
+  const value = { ...row, bodyHtml: await renderMarkdown(row.bodyMd) };
   await db
     .insert(schema.posts)
-    .values(row)
+    .values(value)
     .onConflictDoUpdate({
       target: [schema.posts.slug, schema.posts.locale],
-      set: { ...row, updatedAt: new Date() },
+      set: { ...value, updatedAt: new Date() },
     });
 }
 
 for (const row of data.abouts ?? []) {
+  // Same contract as posts: never the backup's own HTML.
+  const value = { ...row, bodyHtml: await renderMarkdown(row.bodyMd) };
   await db
     .insert(schema.abouts)
-    .values(row)
+    .values(value)
     .onConflictDoUpdate({
       target: schema.abouts.locale,
-      set: { ...row, updatedAt: new Date() },
+      set: { ...value, updatedAt: new Date() },
     });
 }
 
