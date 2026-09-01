@@ -27,7 +27,13 @@ function readPassword(): Promise<string> {
       let data = "";
       stdin.setEncoding("utf8");
       stdin.on("data", (chunk) => (data += chunk));
-      stdin.on("end", () => resolve(data.split("\n")[0] ?? ""));
+      // Only the line ending comes off. Anything else — leading or trailing
+      // spaces included — is part of the password: the login form hands the
+      // field to verifyPassword untrimmed, so trimming here would mint a hash
+      // no typed password can ever match.
+      stdin.on("end", () =>
+        resolve((data.split("\n")[0] ?? "").replace(/\r$/, ""))
+      );
     });
   }
   process.stderr.write("要哈希的密码（留空自动生成，输入不回显）: ");
@@ -62,7 +68,7 @@ function readPassword(): Promise<string> {
   });
 }
 
-const given = (await readPassword()).trim();
+const given = await readPassword();
 const password = given || randomBytes(12).toString("base64url");
 
 console.log(`ADMIN_PASSWORD_HASH='${hashPassword(password)}'`);
