@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { prefersSaveData } from "@/lib/three/guards";
+import { watchContextLoss } from "@/lib/webgl";
 import {
   VERT,
   FRAG_SCENE,
@@ -88,6 +89,8 @@ export function LiquidMetalDemo({
 
   const [live, setLive] = useState(false);
   const [degraded, setDegraded] = useState(false);
+  /** Bumped when a lost context comes back, so the effect rebuilds on it. */
+  const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -100,6 +103,8 @@ export function LiquidMetalDemo({
       return;
     }
 
+    const ctx = watchContextLoss(canvas, () => setEpoch((n) => n + 1));
+
     const gl = canvas.getContext("webgl2", {
       alpha: true,
       antialias: false,
@@ -108,7 +113,7 @@ export function LiquidMetalDemo({
     });
     if (!gl) {
       setDegraded(true);
-      return;
+      return ctx.dispose;
     }
 
     let disposed = false;
@@ -159,7 +164,7 @@ export function LiquidMetalDemo({
       pComp = build(FRAG_COMP);
     } catch {
       setDegraded(true);
-      return;
+      return ctx.dispose;
     }
 
     const vao = gl.createVertexArray()!;
@@ -552,7 +557,7 @@ export function LiquidMetalDemo({
        snaps inside its own threshold rather than approaching one for ever,
        which is what gives the loop a last frame at all. */
     const tick = (_time: number, deltaMs: number) => {
-      if (disposed || !visible) return;
+      if (disposed || !visible || ctx.lost) return;
       const dt = Math.min(deltaMs / 1000, 1 / 20);
 
       // asymmetric ease: quick to bloom, a touch quicker to die
@@ -621,21 +626,25 @@ export function LiquidMetalDemo({
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
       document.removeEventListener("visibilitychange", onVisibility);
-      for (const t of targets) {
-        gl.deleteTexture(t.tex);
-        gl.deleteFramebuffer(t.fbo);
+      ctx.dispose();
+      // After a loss every handle went with the context; nothing to delete.
+      if (!ctx.lost) {
+        for (const t of targets) {
+          gl.deleteTexture(t.tex);
+          gl.deleteFramebuffer(t.fbo);
+        }
+        for (const p of programs) gl.deleteProgram(p);
+        for (const s of shaders) gl.deleteShader(s);
+        gl.deleteBuffer(vbo);
+        gl.deleteVertexArray(vao);
       }
-      for (const p of programs) gl.deleteProgram(p);
-      for (const s of shaders) gl.deleteShader(s);
-      gl.deleteBuffer(vbo);
-      gl.deleteVertexArray(vao);
       // Deliberately NOT loseContext(). A canvas hands back the same context
       // object every time it is asked, and a lost one stays lost — so under
       // StrictMode's mount/unmount/mount the second pass would pick up a dead
       // context and the study would render nothing, in development only.
       // Deleting the resources is what actually frees them.
     };
-  }, []);
+  }, [epoch]);
 
   useGSAP(
     () => {

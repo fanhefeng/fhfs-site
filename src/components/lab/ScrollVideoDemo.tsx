@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { ScrollVideo } from "@/lib/scrollVideo";
+// Bundled rather than fetched: it is a few hundred bytes that used to cost a
+// round trip before the first frame could even be asked for.
+import manifest from "../../../public/lab/scroll-video/manifest.json";
 
 type Props = {
   accent: string;
@@ -13,12 +16,6 @@ type Props = {
   captionOneBody: string;
   captionTwo: string;
   captionTwoBody: string;
-};
-
-type Manifest = {
-  frameCount: number;
-  pattern: string;
-  padding?: number;
 };
 
 const BASE = "/lab/scroll-video";
@@ -54,55 +51,48 @@ export function ScrollVideoDemo({
   const [progress, setProgress] = useState(0);
   const [failed, setFailed] = useState(false);
 
-  // Load the manifest, then the frames. Kept out of useGSAP: it is async work
-  // with its own teardown, and the scroll wiring must not run until the first
-  // pass has landed.
+  // Load the frames. Kept out of useGSAP: it is async work with its own
+  // teardown, and the scroll wiring must not run until the first pass has
+  // landed.
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     let cancelled = false;
-    let player: ScrollVideo | null = null;
 
-    void (async () => {
-      try {
-        const res = await fetch(`${BASE}/manifest.json`);
-        if (!res.ok) throw new Error(`manifest: HTTP ${res.status}`);
-        const manifest: Manifest = await res.json();
+    const player = new ScrollVideo({
+      canvas,
+      frameCount: manifest.frameCount,
+      src: (n) =>
+        `${BASE}/frames/${manifest.pattern.replace(
+          "%d",
+          String(n).padStart(manifest.padding, "0")
+        )}`,
+      warmupStep: WARMUP_STEP,
+      onProgress: (loaded, total) => {
         if (cancelled) return;
+        // Track the sparse first pass, not the full download — the reader
+        // is allowed to scroll long before every frame is in.
+        const warmupTotal = Math.ceil(total / WARMUP_STEP);
+        setProgress(Math.min(loaded / warmupTotal, 1));
+      },
+    });
+    playerRef.current = player;
+    setFrameCount(manifest.frameCount);
 
-        const pad = manifest.padding ?? 4;
-        player = new ScrollVideo({
-          canvas,
-          frameCount: manifest.frameCount,
-          src: (n) =>
-            `${BASE}/frames/${manifest.pattern.replace(
-              "%d",
-              String(n).padStart(pad, "0")
-            )}`,
-          warmupStep: WARMUP_STEP,
-          onProgress: (loaded, total) => {
-            if (cancelled) return;
-            // Track the sparse first pass, not the full download — the reader
-            // is allowed to scroll long before every frame is in.
-            const warmupTotal = Math.ceil(total / WARMUP_STEP);
-            setProgress(Math.min(loaded / warmupTotal, 1));
-          },
-        });
-        playerRef.current = player;
-        setFrameCount(manifest.frameCount);
-
-        await player.load();
+    player
+      .load()
+      .then(() => {
         if (cancelled) return;
         setReady(true);
         ScrollTrigger.refresh();
-      } catch {
+      })
+      .catch(() => {
         if (!cancelled) setFailed(true);
-      }
-    })();
+      });
 
     return () => {
       cancelled = true;
-      player?.destroy();
+      player.destroy();
       playerRef.current = null;
     };
   }, []);

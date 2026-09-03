@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { gsap } from "@/lib/gsap";
+import { watchContextLoss } from "@/lib/webgl";
 import {
   VERT, FRAG_SCENE, FRAG_RIM, FRAG_DOWN, FRAG_BLUR, FRAG_COMP,
   FIELD, FIELD_ORDER, RIM, RIM_ORDER, COMPOSITE, DISTURB, RIPPLE_LIFE, RIPPLE_SLOTS,
@@ -91,6 +92,8 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const btnRef = useRef<HTMLElement>(null);
   const fallbackMix = useRef<LiquidMix>({ ...FULL_MIX, base: base ?? FULL_MIX.base });
+  /** Bumped when a lost context comes back, so the effect rebuilds on it. */
+  const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -98,10 +101,15 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     const btn = btnRef.current;
     if (!canvas || !padEl || !btn) return;
 
+    // This is the site's one primary control, and a backgrounded mobile tab
+    // is where a context is most often taken away — without this the label
+    // stays and the metal under it is gone for the rest of the visit.
+    const ctx = watchContextLoss(canvas, () => setEpoch((n) => n + 1));
+
     const gl = canvas.getContext("webgl2", {
       alpha: true, antialias: false, premultipliedAlpha: true, powerPreference: "high-performance",
     });
-    if (!gl) return;
+    if (!gl) return ctx.dispose;
 
     let disposed = false;
     fallbackMix.current.base = base ?? FULL_MIX.base;
@@ -145,7 +153,7 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       pBlur = build(FRAG_BLUR);
       pComp = build(FRAG_COMP);
     } catch {
-      return;
+      return ctx.dispose;
     }
 
     const vao = gl.createVertexArray()!;
@@ -432,7 +440,7 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
        Every easing snaps inside its own threshold rather than approaching one
        for ever, which is what gives the loop a last frame at all. */
     const tick = (_t: number, deltaMs: number) => {
-      if (disposed || !visible) return;
+      if (disposed || !visible || ctx.lost) return;
       const dt = Math.min(deltaMs / 1000, 1 / 20);
 
       const hk = hoverTarget > hover ? 1 - Math.pow(0.0012, dt) : 1 - Math.pow(0.00012, dt);
@@ -489,17 +497,21 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onUp);
       document.removeEventListener("visibilitychange", onVisibility);
-      for (const t of targets) { gl.deleteTexture(t.tex); gl.deleteFramebuffer(t.fbo); }
-      for (const p of programs) gl.deleteProgram(p);
-      for (const s of shaders) gl.deleteShader(s);
-      gl.deleteBuffer(vbo);
-      gl.deleteVertexArray(vao);
+      ctx.dispose();
+      // After a loss every handle went with the context; nothing to delete.
+      if (!ctx.lost) {
+        for (const t of targets) { gl.deleteTexture(t.tex); gl.deleteFramebuffer(t.fbo); }
+        for (const p of programs) gl.deleteProgram(p);
+        for (const s of shaders) gl.deleteShader(s);
+        gl.deleteBuffer(vbo);
+        gl.deleteVertexArray(vao);
+      }
       // Deliberately NOT loseContext(). A canvas hands back the same context
       // object every time it is asked, and a lost one stays lost — so under
       // StrictMode's mount/unmount/mount the second pass would pick up a dead
       // context and render nothing, in development only.
     };
-  }, [mixRef, onPress, base]);
+  }, [mixRef, onPress, base, epoch]);
 
   const style = { "--lp-h": height, "--lp-pad": `calc(${pad} * var(--lp-h))` } as React.CSSProperties;
   const inner = (

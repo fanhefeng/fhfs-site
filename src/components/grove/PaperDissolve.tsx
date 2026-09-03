@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { gsap } from "@/lib/gsap";
 import { hasWebGL } from "@/lib/three/guards";
+import { compileProgram, FULLSCREEN_VERT, watchContextLoss } from "@/lib/webgl";
 
 type Props = {
   /** 0 = nothing painted, 1 = the whole frame turned to paper. Read every
@@ -21,13 +22,6 @@ const PAPER = {
   light: [0.980, 0.976, 0.965],
   dark: [0.055, 0.055, 0.067],
 } as const;
-
-const VERT = /* glsl */ `#version 300 es
-void main(){
-  /* one oversized triangle, no buffers */
-  vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
-  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
-}`;
 
 /**
  * The lab's dissolve, inverted into a paper *overlay*.
@@ -96,21 +90,6 @@ void main(){
   fragColor = vec4(paper, 1.0 - mask);
 }`;
 
-const compile = (gl: WebGL2RenderingContext, type: number, src: string) => {
-  const sh = gl.createShader(type);
-  if (!sh) return null;
-  gl.shaderSource(sh, src);
-  gl.compileShader(sh);
-  if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("[PaperDissolve] shader failed:", gl.getShaderInfoLog(sh));
-    }
-    gl.deleteShader(sh);
-    return null;
-  }
-  return sh;
-};
-
 /**
  * A paper wash that eats the frame beneath it along an organic front.
  *
@@ -121,30 +100,26 @@ const compile = (gl: WebGL2RenderingContext, type: number, src: string) => {
  */
 export function PaperDissolve({ progressRef, className }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  /** Bumped when a lost context comes back, so the effect rebuilds on it. */
+  const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !hasWebGL()) return;
 
+    // Watched before the context is asked for, so a loss during setup is
+    // seen too; every early exit below hands the watch's dispose back as
+    // the cleanup.
+    const ctx = watchContextLoss(canvas, () => setEpoch((n) => n + 1));
+
     // premultipliedAlpha stays at its default (true): the blend below writes
     // `paper * alpha` into the framebuffer, which is a premultiplied colour,
     // and telling the compositor otherwise makes it multiply by alpha twice.
     const gl = canvas.getContext("webgl2", { alpha: true, antialias: false });
-    if (!gl) return;
+    if (!gl) return ctx.dispose;
 
-    const vs = compile(gl, gl.VERTEX_SHADER, VERT);
-    const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return;
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
-    gl.deleteShader(vs);
-    gl.deleteShader(fs);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      gl.deleteProgram(prog);
-      return;
-    }
+    const prog = compileProgram(gl, FULLSCREEN_VERT, FRAG, "PaperDissolve");
+    if (!prog) return ctx.dispose;
     gl.useProgram(prog);
 
     const uRes = gl.getUniformLocation(prog, "uRes");
@@ -198,13 +173,16 @@ export function PaperDissolve({ progressRef, className }: Props) {
        blend over the live scene beneath it, on every frame that scene draws.
        So while there is no paper to show, the layer is taken out of the
        picture altogether rather than left transparent in it. */
-    let shown = true;
+    // Read off the element rather than assumed: a rebuild after a context
+    // loss inherits whatever the previous run left on the style.
+    let shown = canvas.style.visibility !== "hidden";
     const show = (on: boolean) => {
       if (on === shown) return;
       shown = on;
       canvas.style.visibility = on ? "" : "hidden";
     };
     const frame = (_t: number, deltaMs: number) => {
+      if (ctx.lost) return;
       const p = progressRef.current ?? 0;
       // Fully transparent and staying there: nothing to draw, and no clock to
       // advance either — a parked front does not shimmer.
@@ -228,16 +206,18 @@ export function PaperDissolve({ progressRef, className }: Props) {
 
     return () => {
       gsap.ticker.remove(frame);
+      ctx.dispose();
       window.removeEventListener("resize", resize);
       window.removeEventListener("fhfs:theme", applyTheme);
-      gl.deleteProgram(prog);
+      // After a loss the program went with the context; nothing to delete.
+      if (!ctx.lost) gl.deleteProgram(prog);
       // Deliberately NOT loseContext(). A canvas hands back the same context
       // object every time it is asked and a lost one stays lost, so under
       // StrictMode's mount/unmount/mount the second pass would compile against
       // a dead context and paint nothing — in development only, which is
       // exactly where it is hardest to spot. Same reasoning as LiquidPill.
     };
-  }, [progressRef]);
+  }, [progressRef, epoch]);
 
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }
