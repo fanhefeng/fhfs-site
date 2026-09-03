@@ -13,6 +13,7 @@ const IMMUTABLE_PATHS = [
   "/draco/:path*",
   "/grove/:path*",
   "/lab/dissolve/:path*",
+  "/lab/neon/:path*",
   "/portfolio/:path*",
 ];
 

@@ -1,5 +1,5 @@
 /**
- * The lab's table of contents. Eight studies, each on its own route.
+ * The lab's table of contents. Nine studies, each on its own route.
  *
  * Slug and message key are kept separate on purpose: the URL wants kebab-case
  * and next-intl namespaces want a plain identifier, and pinning them to one
@@ -14,7 +14,8 @@ export type LabSlug =
   | "grove-stage"
   | "liquid-metal"
   | "workstation"
-  | "lens-slider";
+  | "lens-slider"
+  | "neon";
 
 export type LabEntry = {
   slug: LabSlug;
@@ -27,7 +28,8 @@ export type LabEntry = {
     | "groveStage"
     | "liquidMetal"
     | "workstation"
-    | "lensSlider";
+    | "lensSlider"
+    | "neon";
   /** Index number printed beside the name, editorial-style. */
   ordinal: string;
   /** Dot + rule colour, from the muted gallery hues used across the site. */
@@ -49,6 +51,10 @@ export const LAB_ENTRIES: LabEntry[] = [
   // Four photographs and a lens: the next picture arrives inside a growing
   // circle of glass, magnified at the rim, then settles flat.
   { slug: "lens-slider", key: "lensSlider", ordinal: "08", accent: "#5b7f8a" },
+  // The neon over the door of Seb's, re-lettered: brick painted once by a
+  // canvas, a brush face traced by its outline in four layers of stroke, and
+  // a fixed score of flickers to light it. The music sits under the sign.
+  { slug: "neon", key: "neon", ordinal: "09", accent: "#3f5fd6" },
 ];
 
 export const labEntry = (slug: string): LabEntry | undefined =>
