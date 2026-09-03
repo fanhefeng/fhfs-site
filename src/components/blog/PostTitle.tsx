@@ -35,17 +35,33 @@ export function PostTitle({
       if (HAS_CJK.test(title)) {
         // SplitText's `mask: "lines"` brings its own clip wrappers: the line
         // slides out from behind a clip, implying it was always there.
-        const split = SplitText.create(el, { type: "lines", mask: "lines" });
-        gsap.from(split.lines, {
-          yPercent: 110,
-          duration: 0.7,
-          stagger: 0.08,
-          ease: EASE.default,
-          overwrite: "auto",
+        //
+        // `autoSplit` because the lines are measured in whatever font is on
+        // screen right now, and for a Chinese title that is usually not the
+        // final one: Yozai is served in unicode-range slices with `display:
+        // swap`, so the slices this headline needs are still in flight when
+        // this runs. Lines cut against the fallback face break in different
+        // places once Yozai lands. With autoSplit the split listens for the
+        // font to finish (and for the width to change), re-splits, and
+        // rebuilds the animation from `onSplit` at the time it had reached —
+        // which is why the tween is created there and returned, not here.
+        const split = SplitText.create(el, {
+          type: "lines",
+          mask: "lines",
+          autoSplit: true,
+          onSplit: (self) =>
+            gsap.from(self.lines, {
+              yPercent: 110,
+              duration: 0.7,
+              stagger: 0.08,
+              ease: EASE.default,
+              overwrite: "auto",
+            }),
         });
         // useGSAP runs this inside a gsap.context, so a returned function is
         // the context's cleanup — but only `revertOnUpdate` below makes it run
-        // on a title change rather than just at unmount.
+        // on a title change rather than just at unmount. revert() also drops
+        // the autoSplit listeners.
         return () => split.revert();
       }
 
