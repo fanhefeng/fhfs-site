@@ -16,8 +16,8 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
 - **/software** —— keynote 式 bento 展柜，分类筛选用 Flip 重排；版本号读自各仓库
   的 GitHub 最新 release。
 - **/about** —— 点阵名字画布、横穿屏幕的标语（全站唯一 pin）、贴纸墙、版本履历。
-- **/lab** —— 六则动效研究：滚动帧序列、溶解、融化文字、苔藓树根、色散按钮、
-  可拖拽的 3D 工作台。每则按路由单独拆包。
+- **/lab** —— 九则动效研究：滚动帧序列、溶解、融化文字、苔藓树根、苔藓里的两张纸卡、
+  色散按钮、可拖拽的 3D 工作台、镜头畸变滑块、Seb's 式的霓虹招牌。每则按路由单独拆包。
 - **/intro** —— R3F 的 3D 头像：滚动带镜头绕头飞行，每张贴纸停一站，
   即一份滚动叙事的简历（`docs/INTRO3D.md`）。
 - **/resume** —— 正式的一页简历，内容全在库里。
@@ -95,6 +95,14 @@ pnpm db:studio   # 表格界面
 - /lab/lens-slider 的四张照片 `public/lab/lens/`（均为 Unsplash License，
   经 Lorem Picsum 取得，1440px 宽重编码）：`river.jpg` Steve Carter、
   `falls.jpg` Andrew Coelho、`sea.jpg` Anna Popović、`coffee.jpg` Karl Fredrickson。
+- /lab/neon 的招牌照《爱乐之城》（2016）里 Seb's 门口那块霓虹描的：圆环、横杠、音符、S 的
+  轮廓量自 Wikimedia Commons 上 Espandero 对着电影描摹的矢量 `File:Seb's.svg`（CC BY-SA 4.0，
+  页面上有署名），F 由原版的 E 去掉底横而来、H 是照它的笔画新造的，不用字体；砖墙是 canvas 画的。音乐经 Spotify iFrame API 嵌入官方
+  播放器（Mia & Sebastian's Theme，Justin Hurwitz），未登录 Spotify 的访客只能听 30 秒试听；
+  Spotify 到不了时（大陆网络会重置到 open.spotify.com 的连接）退回网易云音乐官方外链播放器，
+  放 Hurwitz 2026 年的十周年重录版（曲目 3420987569，匿名可播；原声带版本在网易云需 VIP）。
+  六张剧照 `public/lab/neon/`（1800px JPEG）取自 TMDB 收录的片方宣传剧照，
+  © 2016 Summit Entertainment / Lionsgate，仅作个人致敬之用，页面上有署名。
 - 软件版本号：`apps.repo`（owner/name）+ `src/lib/github.ts` 读 GitHub 最新 release，
   `fetch` 缓存一小时；未登录配额 60 次/小时足够，设 `GITHUB_TOKEN` 可放宽。
 - /intro 的头像 `head.glb` 由单张照片重建（TRELLIS 风格化 v3），眼镜为程序

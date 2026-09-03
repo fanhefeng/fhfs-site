@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { LabSlug } from "./entries";
+import { NEON_STILLS } from "./neonStills";
 
 /**
  * One study per route, and only that study's code.
@@ -46,6 +47,10 @@ const LensSliderDemo = dynamic(
   () => import("./LensSliderDemo").then((m) => m.LensSliderDemo),
   { ssr: false }
 );
+// The one study that is DOM through and through — a canvas for the bricks,
+// but the sign is SVG and the player an iframe — so it keeps its SSR pass:
+// the page reads whole before its chunk lands, and the wall paints over.
+const NeonSignDemo = dynamic(() => import("./NeonSignDemo").then((m) => m.NeonSignDemo));
 
 /** The four photographs the lens slides between, in order. */
 const LENS_SLIDES = ["river", "falls", "sea", "coffee"] as const;
@@ -168,6 +173,34 @@ export function LabStudy({ slug, accent, text }: Props) {
             title: text[`${name}Title`],
             body: text[`${name}Body`],
             meta: text[`${name}Meta`],
+          }))}
+        />
+      );
+    case "neon":
+      return (
+        <NeonSignDemo
+          welcome={text.welcome}
+          signOn={text.signOn}
+          signOff={text.signOff}
+          toggleHint={text.toggleHint}
+          tonight={text.tonight}
+          trackTitle={text.trackTitle}
+          trackArtist={text.trackArtist}
+          fallbackTrackArtist={text.fallbackTrackArtist}
+          fallbackHint={text.fallbackHint}
+          playerTitle={text.playerTitle}
+          galleryKicker={text.galleryKicker}
+          galleryTitle={text.galleryTitle}
+          galleryLede={text.galleryLede}
+          credit={text.credit}
+          stills={NEON_STILLS.map((still) => ({
+            src: `/lab/neon/${still.file}.jpg`,
+            width: still.width,
+            height: still.height,
+            span: still.span,
+            alt: text[`${still.id}Alt`],
+            title: text[`${still.id}Title`],
+            meta: text[`${still.id}Meta`],
           }))}
         />
       );

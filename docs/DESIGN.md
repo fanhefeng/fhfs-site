@@ -151,6 +151,79 @@
 >   1440 × 900 / 1440 × 810 / 1920 × 1080 / 2:1 / 390 × 844 各截图核对过，标题在指针三个
 >   极端位置都没被碰到。
 
+> **2026-09-03 补记（第九则研究：欢迎来到 fhf's）**：
+> - `/lab/neon`（`components/lab/NeonSignDemo.tsx`）：用户点名要的《爱乐之城》一角——Seb's
+>   门口那块蓝色霓虹，字换成 fhf's，配 Spotify 嵌入的《Mia & Sebastian's Theme》。§0 里
+>   「霓虹时代只留下灯」的判断没有变：这是实验室里一则**致敬**，不是俱乐部主题回潮，
+>   所以它是一整页全黑的舞台（100svh、自带砖墙），不进纸白的任何一页。
+> - 招牌没有位图，也**没有字体**（2026-09-04 按原版重画）：字形取自 Wikimedia Commons 上
+>   Espandero 对着电影原版描摹的矢量 `File:Seb's.svg`（CC BY-SA 4.0，页脚 credit 有署名）。
+>   在无头 Chrome 里对那份 SVG 做了几何测量（`getPointAtLength` 采样 + 最小二乘拟合圆）：
+>   圆环圆心 (401, 595)、半径 323、管宽 15.6；字母管宽 12.7、cap ≈ 343，字母**直立**、
+>   基线向右上爬 9.5°；圆环在右上 −60°…−30° 之间断开让音符的杆穿出，左弧到 155° 就停，
+>   右弧从 −30° 顺时针绕到 135° 后折回成横杠（一根管子，`ARC_R_BAR`），横杠自由端在 S
+>   下面 (616, 738)。S 与音符直接用描摹的外轮廓；原版没有 F 和 H：F = E 去掉底横（E 的
+>   轮廓走到左下角，竖笔用横臂末端的圆角收口，再接回 E 自己的中横与顶横，保留中横向左
+>   探出竖笔的那一截），H = 两根竖笔 + 一道 E 中横那么重的横梁，横向边缘沿用同一斜度
+>   （圆角多边形，顶点写死）。音符为了让开第二个 F 的顶横上抬了 60，杆相应截短 50，
+>   露出圆环的高度与原版相当。整幅 SVG 直接用描摹图的坐标（`viewBox="0 150 802 802"`），
+>   不再有 `skewX` / `rotate` / `scale`。用户先后否掉了字体描边（Kaushan Script）、直角
+>   多边形、自由手绘三版，要的是「精确还原电影原版」——再改字形改路径，别回头找字体。
+>   **管子是滤镜从实心字形上找出来的**（`NeonFilter`）：`feMorphology` erode 13 后与
+>   `SourceAlpha` 相减得到等宽的描边带，erode 3.7 与 8.9 相减得到居中的白芯，带再
+>   dilate + blur 出 glow 与 halo，`feMerge` 四层——一份形状，一套滤镜，就是霓虹作坊沿字边
+>   弯管的做法，也是原版 SEB'S 双线描边的来历；圆环与横杠是 14 宽的描边路径，erode 13
+>   把它整根吃掉，剩下的带就是整根管。同一份形状再过 `#nb-dark` 得到白天熄着的玻璃管。
+>   每段（左弧 / 右弧+横杠 / 音符 / 四个字母）各自一个滤镜实例，滤镜区域按段的 bbox 给
+>   百分比，闪烁只改段的 `opacity`。
+> - **HTML in Canvas 不用于这一页**（2026-09-04 评估）：那是 Chromium 的提案（`<canvas
+>   layoutsubtree>` + 子元素 `drawable` + `paint` 事件 + `ctx.drawElementImage()` /
+>   WebGL `texElementSubImage2D`），2026-09 仍只在 Chrome 148–151 的 origin trial 里，
+>   Safari / Firefox 无；明文规定跨域 `<iframe>` 画不进去——Spotify 播放器正是跨域；而这一页
+>   的招牌是 SVG 滤镜、砖墙是画一次的 canvas，没有需要 shader 后处理的 HTML。将来若要给
+>   WELCOME TO 或剧照做玻璃反光一类效果，可作为渐进增强接入，但要过§1.5 的空转循环关。
+> - **音乐的退路**（2026-09-04）：这条网络对 `open.spotify.com` 是 TLS 重置（大陆常态），iFrame
+>   API 脚本 `onerror`、退回的普通 iframe 也一样空白——于是原来的「退回 Spotify iframe」改成
+>   退回**网易云音乐官方外链播放器**（`music.163.com/outchain/player?type=2&id=3420987569`，
+>   Hurwitz 2026 十周年重录版，`player/url` 接口确认匿名给 128k；原声带版本 fee=1 需 VIP，
+>   匿名拿不到 url）。触发条件：脚本 `onerror`，或 `SPOTIFY_TIMEOUT` 12s 内没等到 API（丢包
+>   型阻断会让脚本挂一分钟）。外链播放器没有控制接口，所以它跟着总闸**挂载/卸载**（灯灭即停），
+>   `auto=` 只在每次上电时决定一次——上电前 document 上有过 `pointerdown`/`keydown`（浏览器
+>   此时才允许出声）就 `auto=1`，纯靠滚动点亮的第一次是 `auto=0` 等读者按播放；`fallbackSrc`
+>   固定在 state 里，手势晚到不改 URL，否则会在读者听着的时候重载。样式上 iframe 86 高居中在
+>   152 的盒子里，`filter: invert(0.9) hue-rotate(180deg)` 把它的浅色主题翻成深色（封面也会
+>   反色，接受）。文案 `fallbackTrackArtist`/`fallbackHint` 说明换了录音、要按一下播放。
+>   **不下载/自托管商业录音**：Spotify 流有 DRM，且公开站点自动播放该录音属未授权分发，
+>   用户两次问过，两次都是这个答复。
+>   砖墙由 canvas 一次性画完（逐块色相/明度、上沿高光、下沿阴影、噪点、首屏暗角，第二屏
+>   以下整体压暗；resize 才重画）。
+> - 点亮是一份写死的闪烁谱（`score()`：每段「保持 n 秒、亮度 v」的序列），圆环→横杠→
+>   逐字→音符，末尾两次回抖，2.7s 后停稳且不再重绘；砖上的蓝光是一层 `mix-blend-mode:
+>   screen` 的径向渐变，透明度跟着谱走，停稳后是静止层——按§1.5「推近段的性能账」的
+>   判据，静止页面上它免费。招牌是这家店的**总闸**（`aria-pressed`）：关灯 0.06s 一暗、
+>   音乐同时暂停；再开重放整份谱、音乐接着放。亮着时指针悬停让随机一根管子闪一下
+>   （`isFinePointer` 门控）。**没有空转循环**：不扩§1.5 的例外名单。
+> - 音乐走 Spotify **iFrame API**（`open.spotify.com/embed/iframe-api/v1`，脚本只在这一页
+>   按需插入；`createController` 会替换掉传入的元素，所以给它一个 React 之外临时建的
+>   div）。用户要求自动播放：谱走完（`main.onComplete`）即 `play()`；浏览器拒绝时（访客
+>   尚未与站点交互）靠 document 捕获阶段的第一次 `pointerdown`/`keydown` 再试；读者自己
+>   按了暂停就不再抢（`userPaused`），拨一次开关才重来。**循环**：曲子（或 30s 试听）
+>   放完时 `playback_update` 不报 paused，只是停在最后一毫秒且仍标 playing，而且播放器
+>   一旦进入自己的结束态就弹「Get Spotify」推广层并无视 `restart()`——所以按进度判定、
+>   提前 1.5s（更新约每秒一条）`restart()`，实测 28.6s 处回 0 接上第二轮、无推广层。
+>   API 对象只经 `onSpotifyIframeApiReady` 回调到达一次，存到 `window.__spotifyIframeApi`
+>   复用：二次挂载（站内往返、dev 的 Fast Refresh）若再插一遍脚本，回调永远不会再来。
+>   编排 effect 卸载时把 `poweredRef` 复位：StrictMode 的双跑里第一趟的 ScrollTrigger 已经
+>   把开关拨上，第二趟不复位就永远不亮。脚本加载失败退回普通 iframe。未登录 Spotify 的
+>   访客只有 30s 试听，Spotify 端的限制，绕不过。`next.config.ts` 的 `X-Frame-Options:
+>   DENY` 管的是别人嵌我们，不影响我们嵌 Spotify。
+> - 招牌下面沿着同一面墙挂六张剧照（`neonStills.ts`，`public/lab/neon/`，已列入
+>   `IMMUTABLE_PATHS`）：六列网格，Seb's 弹琴那张占四列，旁边 Griffith Park 那张裁成 5:6
+>   竖幅与它齐高（`tall`），尾声琴键路占整行 21:9；黑色卡纸框 + 顶沿一线蓝色反光，
+>   `Reveal` 依次浮现；≤899px 两列（竖幅回 16:9），≤559px 一列。
+> - 这一则的 `LabStudy` 动态导入**保留 SSR**（其余八则都 `ssr: false`）：它没有 three.js，
+>   无 JS 时页面也能读到 WELCOME TO、剧照和暗着的招牌。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：
