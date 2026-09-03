@@ -92,12 +92,21 @@ export function OvertureLight() {
       } catch {
         seen = true;
       }
-      // Reduce-motion: an opaque full-viewport blackout that locks the page and
-      // blurs away anything the visitor tabs to is the one entrance worth
-      // skipping outright. The key is spent on the way past, because HomeHero
-      // reads it to learn the relay is not coming — otherwise the cover would
-      // sit at opacity 0 waiting out the 8s safety timeout.
-      if (prefersReducedMotion()) {
+      /** Development only: `?overture` on the URL replays the ritual on every
+       *  load, never spends the session key, and hangs GSDevTools off the
+       *  timeline so a 0.9s once-per-session sequence can be scrubbed instead
+       *  of caught on the fly. Production ignores the parameter entirely. */
+      const debug =
+        process.env.NODE_ENV !== "production" &&
+        new URLSearchParams(window.location.search).has("overture");
+      if (debug) {
+        seen = false;
+      } else if (prefersReducedMotion()) {
+        // Reduce-motion: an opaque full-viewport blackout that locks the page
+        // and blurs away anything the visitor tabs to is the one entrance
+        // worth skipping outright. The key is spent on the way past, because
+        // HomeHero reads it to learn the relay is not coming — otherwise the
+        // cover would sit at opacity 0 waiting out the 8s safety timeout.
         markSeen();
         seen = true;
       }
@@ -187,6 +196,10 @@ export function OvertureLight() {
           unlock();
           window.removeEventListener("keydown", onKeyDown);
           window.removeEventListener("focusin", onFocusIn);
+          // Under ?overture the overlay stays mounted (at alpha 0, so inert)
+          // and the timeline stays alive for the scrubber; nothing is
+          // remembered from a debugging session.
+          if (debug) return;
           markSeen();
           setPhase("done");
         }, END_AT);
@@ -198,20 +211,37 @@ export function OvertureLight() {
       // Wall-clock net: if the ticker stalls mid-play, the page must not sit
       // locked behind an opaque overlay with no timeline left to finish it.
       // Jumping to the end fires the terminal callback — unlock included —
-      // and a timeline that finished normally is already at 1.
-      const failsafe = window.setTimeout(() => {
-        const active = tlRef.current;
-        if (active && active.progress() < 1) active.progress(1);
-      }, (END_AT + 3) * 1000);
+      // and a timeline that finished normally is already at 1. Not armed
+      // while scrubbing under ?overture, where sitting mid-play is the point.
+      const failsafe = debug
+        ? undefined
+        : window.setTimeout(() => {
+            const active = tlRef.current;
+            if (active && active.progress() < 1) active.progress(1);
+          }, (END_AT + 3) * 1000);
+
+      // The scrubber, loaded on demand so it never reaches a production
+      // bundle. `alive` guards the import landing after an unmount.
+      let alive = true;
+      let devtools: { kill(): void } | null = null;
+      if (debug) {
+        void import("gsap/GSDevTools").then(({ GSDevTools }) => {
+          if (!alive) return;
+          gsap.registerPlugin(GSDevTools);
+          devtools = GSDevTools.create({ animation: tl });
+        });
+      }
 
       // Restore scroll even if we unmount mid-play (route change).
       return () => {
+        alive = false;
+        devtools?.kill();
         window.clearTimeout(failsafe);
         unlock();
         cancelAnimationFrame(shownFrame);
         window.removeEventListener("keydown", onKeyDown);
         window.removeEventListener("focusin", onFocusIn);
-        if (shown) markSeen();
+        if (shown && !debug) markSeen();
       };
     },
     { scope: container }
