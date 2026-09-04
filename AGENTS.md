@@ -58,6 +58,13 @@ Failures resolve to `null` and the badge is simply absent.
   GSAP's clock (`gsap.ticker` drives `lenis.raf`).
 - **3D**: `/intro` uses @react-three/fiber + drei; the `/about` workbench is
   imperative three.js.
+- **Front door and music**: the home page opens with `NeonSplash` once per
+  session, on a hard landing only — decided before first paint by the inline
+  script in `src/lib/splash.ts` (`<html data-splash>`), which is also what
+  `OvertureLight` and `Opening` consult. The background music is one hidden
+  player in the layout (`components/fx/Jukebox.tsx`) driven by the store in
+  `src/lib/jukebox.ts`; the signs (splash, `/lab/neon`, the island's note)
+  only write `wanted`. The sign's drawing lives in `src/components/neon/`.
 - **Design source of truth**: `docs/DESIGN.md` — §5 (工程规则) is required
   reading before implementation work; `docs/INTRO3D.md` covers the `/intro`
   scene.

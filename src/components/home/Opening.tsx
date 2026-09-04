@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { LiquidPill } from "@/components/grove/LiquidPill";
 import { OVERTURE_DONE_EVENT, OVERTURE_SEEN_KEY } from "@/components/fx/OvertureLight";
+import { splashDue } from "@/lib/splash";
 
 export type OpeningMeta = { label: string; value: string };
 
@@ -51,6 +52,10 @@ const CSS = `
  * has already been spent this session, otherwise on its done event. The 2s
  * fallback is the same safety net the rest of the site keeps — a curtain that
  * never lifts must not take the masthead down with it.
+ *
+ * Behind the front door (NeonSplash) there is no net: the door opens when the
+ * reader chooses, minutes later if they like, and the masthead is behind an
+ * opaque wall until then — rising early would only mean arriving settled.
  */
 function useEntrance() {
   const [entered, setEntered] = useState(false);
@@ -61,13 +66,13 @@ function useEntrance() {
     } catch {
       seen = true;
     }
-    if (seen) {
+    if (seen && !splashDue()) {
       const raf = requestAnimationFrame(() => setEntered(true));
       return () => cancelAnimationFrame(raf);
     }
     const done = () => setEntered(true);
     window.addEventListener(OVERTURE_DONE_EVENT, done);
-    const t = setTimeout(done, 2000);
+    const t = splashDue() ? undefined : setTimeout(done, 2000);
     return () => {
       window.removeEventListener(OVERTURE_DONE_EVENT, done);
       clearTimeout(t);

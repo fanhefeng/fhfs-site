@@ -48,8 +48,8 @@ const LensSliderDemo = dynamic(
   { ssr: false }
 );
 // The one study that is DOM through and through — a canvas for the bricks,
-// but the sign is SVG and the player an iframe — so it keeps its SSR pass:
-// the page reads whole before its chunk lands, and the wall paints over.
+// but the sign is SVG — so it keeps its SSR pass: the page reads whole
+// before its chunk lands, and the wall paints over.
 const NeonSignDemo = dynamic(() => import("./NeonSignDemo").then((m) => m.NeonSignDemo));
 
 /** The four photographs the lens slides between, in order. */
@@ -187,8 +187,6 @@ export function LabStudy({ slug, accent, text }: Props) {
           trackTitle={text.trackTitle}
           trackArtist={text.trackArtist}
           fallbackTrackArtist={text.fallbackTrackArtist}
-          fallbackHint={text.fallbackHint}
-          playerTitle={text.playerTitle}
           galleryKicker={text.galleryKicker}
           galleryTitle={text.galleryTitle}
           galleryLede={text.galleryLede}
