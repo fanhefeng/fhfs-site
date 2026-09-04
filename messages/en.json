@@ -15,6 +15,19 @@
     "intro": "Intro",
     "resume": "Resume"
   },
+  "splash": {
+    "label": "Welcome to fhf's",
+    "welcome": "Welcome to",
+    "signOn": "Switch the sign on",
+    "signOff": "Switch the sign off",
+    "toggleHint": "Click the sign · lights and music, off and on together",
+    "enter": "Come in",
+    "enterHint": "or press Enter · scrolling works too",
+    "tonight": "Tonight · on the stand",
+    "trackTitle": "Mia & Sebastian's Theme",
+    "trackArtist": "Justin Hurwitz · La La Land OST (2016)",
+    "fallbackTrackArtist": "Justin Hurwitz · 10th Anniversary Version (2026) · NetEase Cloud Music"
+  },
   "home": {
     "slogan": "Slow down, and the world starts to speak.",
     "sloganEcho": "慢一点，世界会开口说话。",
@@ -259,7 +272,7 @@
         "name": "Welcome to fhf's",
         "tagline": "SVG lettering traced from the film's sign + a filter for the tube + a GSAP flicker score",
         "summary": "A brick wall, a blue neon sign, Mia & Sebastian's Theme, and a few stills on the wall. The sign is drawn stroke by stroke after the one over the door of Seb's in La La Land, with the name swapped for mine.",
-        "note": "There is no font, on the sign in the film or here: the lettering follows a vector traced stroke by stroke from the film and published on Wikimedia Commons (Seb's.svg, Espandero, CC BY-SA 4.0). The ring's centre and radius, the angles of its two breaks — at the top right where the note's stem leaves it, and at the lower left — the ends of the bar, and the whole outlines of the S and the note are measured straight off it. The original has no F or H: the F is its E without the foot, the stem closed with the same rounded end as the arms, keeping even the little stub of the middle arm that pokes out past the stem; the H is two stems joined by a bar as heavy as the E's middle arm, its edges on the same tilt. The letters stand upright on a baseline that climbs 9.5° to the right; the ring's left arc simply stops at the lower left, while the right arc runs round the bottom and folds back up into the bar — one tube. What is drawn is the solid letter; the tube is found by a filter: feMorphology erodes the shape inward by thirteen units and subtracting that from the original leaves a band of constant width hugging the outline — exactly what a neon shop does, bending tube along the edge of painted lettering. The white core is eroded out of the same band, the halo is the band dilated and blurred, and the four layers merge back into one. The bricks are painted once by a canvas: every brick its own hue and lightness, a hairline of light along its top, a shadow under it, grain over the lot; after that not one frame is painted. Lighting up is not a fade but a fixed score of blinks: the ring stutters first, the bar follows, then the letters one at a time, each hesitating in its own way, until it holds. The sign is the bar's main switch: lights off, music stops; lights on, it plays again and the music comes back. The music runs through Spotify's iFrame API and is asked to play the moment the sign holds steady; if the browser refuses (you have not clicked anything on this site yet), your first click on the page tries again. Without a Spotify login it is a 30-second preview, restarted when it ends. Where Spotify cannot be reached at all (the script errors, or says nothing for 12 seconds), the player becomes NetEase Cloud Music's own embed of Hurwitz's 2026 tenth-anniversary re-recording: it has no remote, so it can only be mounted and unmounted with the switch, and the first time you press play yourself. Further along the wall hang a few stills from the film's nights.",
+        "note": "There is no font, on the sign in the film or here: the lettering follows a vector traced stroke by stroke from the film and published on Wikimedia Commons (Seb's.svg, Espandero, CC BY-SA 4.0). The ring's centre and radius, the angles of its two breaks — at the top right where the note's stem leaves it, and at the lower left — the ends of the bar, and the whole outlines of the S and the note are measured straight off it. The original has no F or H: the F is its E without the foot, the stem closed with the same rounded end as the arms, keeping even the little stub of the middle arm that pokes out past the stem; the H is two stems joined by a bar as heavy as the E's middle arm, its edges on the same tilt. The letters stand upright on a baseline that climbs 9.5° to the right; the ring's left arc simply stops at the lower left, while the right arc runs round the bottom and folds back up into the bar — one tube. What is drawn is the solid letter; the tube is found by a filter: feMorphology erodes the shape inward by thirteen units and subtracting that from the original leaves a band of constant width hugging the outline — exactly what a neon shop does, bending tube along the edge of painted lettering. The white core is eroded out of the same band, the halo is the band dilated and blurred, and the four layers merge back into one. The bricks are painted once by a canvas: every brick its own hue and lightness, a hairline of light along its top, a shadow under it, grain over the lot; after that not one frame is painted. Lighting up is not a fade but a fixed score of blinks: the ring stutters first, the bar follows, then the letters one at a time, each hesitating in its own way, until it holds. The sign is the bar's main switch: lights off, music stops; lights on, it plays again and the music comes back. The same sign now hangs over the site's front door: landing on the cover you meet it first, and the way in is through the ring — the letters go dark, the ring holds, the paper shows through it and the wall pushes past you. The music is the site's background music, its player hidden in the layout behind the wall: it runs through Spotify's iFrame API and is asked to play the moment the sign holds steady; if the browser refuses (you have not clicked anything on this site yet), your first click on the page tries again; once inside, the note on the island is its switch. Without a Spotify login it is a 30-second preview, restarted when it ends. Where Spotify cannot be reached at all (the script errors, or says nothing for 12 seconds), the player behind the wall becomes NetEase Cloud Music's own embed of Hurwitz's 2026 tenth-anniversary re-recording: it has no remote, so it can only be mounted and unmounted with the switch, and it makes no sound until you have clicked somewhere on the page. Further along the wall hang a few stills from the film's nights.",
         "welcome": "Welcome to",
         "signOn": "Switch the sign on",
         "signOff": "Switch the sign off",
@@ -268,8 +281,6 @@
         "trackTitle": "Mia & Sebastian's Theme",
         "trackArtist": "Justin Hurwitz · La La Land OST (2016)",
         "fallbackTrackArtist": "Justin Hurwitz · 10th Anniversary Version (2026) · NetEase Cloud Music",
-        "fallbackHint": "Spotify cannot be reached from this network, so this is the same theme in Hurwitz's 10th-anniversary re-recording, from NetEase Cloud Music. This player cannot hear the sign's switch: once the lights are on, press play.",
-        "playerTitle": "Player: Mia & Sebastian's Theme",
         "galleryKicker": "Stills · La La Land · 2016",
         "galleryTitle": "A few hung on the wall",
         "galleryLede": "All from the film's nights: a piano, a lamp, the stars, and a road that never ends.",
@@ -335,7 +346,10 @@
     "lightSwitch": "Lights on / after hours",
     "lightsOn": "Lights on",
     "lightsOff": "After hours",
-    "loaderAria": "Turning on the lights"
+    "loaderAria": "Turning on the lights",
+    "musicPlay": "Play the background music",
+    "musicPause": "Stop the background music",
+    "musicTitle": "Background music: Mia & Sebastian's Theme"
   },
   "notFound": {
     "title": "Not in this issue",

@@ -17,6 +17,7 @@ import { SmoothScroll } from "@/components/fx/SmoothScroll";
 import { RouteTransition } from "@/components/fx/RouteTransition";
 import { OvertureLight } from "@/components/fx/OvertureLight";
 import { ProgressHud } from "@/components/fx/ProgressHud";
+import { Jukebox } from "@/components/fx/Jukebox";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -104,6 +105,9 @@ export default async function LocaleLayout({ children, params }: Props) {
           <RouteTransition />
           <OvertureLight />
           <ProgressHud />
+          {/* The background music's player, behind every page: the signs
+              (front door, /lab/neon, the note on the island) only switch it. */}
+          <Jukebox />
           <AuroraLayer />
           <GrainLayer />
           {/* First tab stop on every page: a keyboard reader gets past the

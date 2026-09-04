@@ -8,6 +8,7 @@ import { gsap, useGSAP, Flip } from "@/lib/gsap";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
+import { JukeboxSwitch } from "@/components/fx/JukeboxSwitch";
 import { FullNav } from "./FullNav";
 import type { NavLink } from "./Footer";
 
@@ -437,6 +438,10 @@ export function Header({ links, menuLinks }: Props) {
                 <LightSwitch className="isl-item relative z-[1]" />
               </div>
             </div>
+
+            {/* The note off the front door's sign: the background music's
+                switch, in the island's collapsed state on every page. */}
+            <JukeboxSwitch className="relative z-[1]" />
 
             <button
               ref={burgerRef}

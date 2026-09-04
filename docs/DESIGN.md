@@ -224,6 +224,48 @@
 > - 这一则的 `LabStudy` 动态导入**保留 SSR**（其余八则都 `ssr: false`）：它没有 three.js，
 >   无 JS 时页面也能读到 WELCOME TO、剧照和暗着的招牌。
 
+> **2026-09-04 补记（大门：招牌成了站点的启动页，音乐成了背景音乐）**，覆盖上面与之相悖的句子：
+> - **招牌抽成共享模块** `components/neon/`：`NeonSignArt.tsx`（字形、滤镜、`score()` 与
+>   点亮/熄灭两份谱、`RING` 圆环几何）、`wall.ts`（砖墙 `paintWall` + `layoutWall` +
+>   `.nb-stage/.nb-wall/.nb-spill` 样式）。挂在三处：`/lab/neon`（`NeonSignDemo`）、首页大门
+>   （`components/home/NeonSplash.tsx`）、灵动岛上的音符（`components/fx/JukeboxSwitch.tsx`，
+>   只取音符那一段，同一套 `NeonFilter`）。滤镜 id 按实例加前缀，同页可挂两块。
+> - **大门（`NeonSplash`）**：只在**硬着陆首页**时出现、每 session 一次。判定由页面自带的
+>   inline script（`lib/splash.ts` 的 `SPLASH_INIT_SCRIPT`，走 ThemeInitScript 那种 innerHTML
+>   包壳）在首绘前写到 `<html data-splash="due"|"seen">`；CSS 按它隐藏（`seen`、以及无 JS 时
+>   `html:not([data-js])`），所以回访者看不到墙闪一下，站内导航回首页的人根本不会撞上门
+>   （inline script 在软导航时不会执行，属性不是 `due` 组件就直接 `null`）。开发期 `?splash`
+>   每次都开门、不记 key。门是 `fixed` 全屏（z 96，压过灵动岛 80、路由帘 95），渲染在 `<main>`
+>   **旁边**而不是里面——RouteTransition 揭幕时会给 `<main>` 加 transform，会把 fixed 层钉住。
+>   门开着时按 lenis 契约锁滚动，`focusin` 守卫把跑到墙后面的焦点拉回「推门进去」。
+> - **大门与开灯仪式的握手**：门就是首页的开场。`OvertureLight` 看到 `splashDue()` 直接站到
+>   一边（既不派 done 事件也不写 key）；`Opening.useEntrance` 在门未开时**不设 2s 安全超时**
+>   （masthead 反正在不透明的墙后面）；读者推门时由门派 `fhfs:overture-done`、写
+>   `fhfs-splash-seen` 与 `fhfs-overture-seen` 两把 key、把 `data-splash` 改成 `seen`。
+> - **进门的效果：穿过圆环**。总长约 1.75s，一条 GSAP 时间线：0–0.25s 文字淡出；字母与横杠
+>   各闪两下熄灭，圆环与音符**保持亮着**（门亮着才看得见门，开关关着也会为此点亮环）；
+>   0.3–0.75s **虹膜**——墙上以圆环圆心为中心开一个洞，半径 0 → 环内径，纸白从环里透出来；
+>   0.8s 派 done 事件让 masthead 开始升起；0.75–1.75s **推进**——整面墙以圆心为 transform-origin
+>   `scale(1 → S)`，`S = 最远视口角到圆心的距离 / 环内径 × 1.06 + 0.1`，管子的内沿扫过最后一个
+>   角就卸载。洞用 `mask-image: radial-gradient(...)` 开在 `.ns-stage` 自己的坐标系里，所以推进
+>   阶段**只有一个 transform 在动**（`will-change: transform`，合成器完成，滤镜不重栅格化），
+>   洞跟着环一起长；只有虹膜那 0.45s 在改 mask 半径（`--ns-hole`）。圆心/内径按 `RING`
+>   从 svg 的 `getBoundingClientRect` 现算，含指针视差的偏移。按钮、Enter/Space/Escape/↓/PageDown、
+>   招牌停稳后的滚轮下滚或上滑手势都能推门。1440×900 明暗两主题、390×844 都截图核过。
+> - **音乐成了全站背景音乐**：播放器从招牌下面撤走，改成挂在 locale layout 里的
+>   `components/fx/Jukebox.tsx`（`opacity: 0` 的固定角落盒，`inert`；留在视口内是因为 Chrome
+>   会节流滚出视口的跨域 iframe 的计时器，播放器的缓冲靠它们），跨路由不断。状态在
+>   `lib/jukebox.ts` 的外部 store（`useSyncExternalStore`，无 provider）：招牌写 `wanted`，
+>   播放器读它、回报 `playing`/`fallback`；`gestured` 由播放器在 document 捕获阶段记下。
+>   Spotify 脚本**只在第一次有人要音乐时**才加载（`armed` 单向闩），之后跟着 `wanted`
+>   play/resume/pause；网易云退路同前，但只在 `wanted && gestured` 时带 `auto=1` 挂载。
+>   三处开关同一个 store：大门与 `/lab/neon` 的招牌（灯与音乐一起）、进站后灵动岛上的音符
+>   （亮 = 想放，暗 = 停；点亮走三步小闪烁）。招牌反向也跟 store：`useEffect([wanted])` 里
+>   比较的是 `jukebox().wanted` **而不是渲染拿到的 `wanted`**——ScrollTrigger 在 layout effect
+>   里就把招牌点亮了，被动 effect 那一趟看到的还是旧值，照旧值行事会把灯立刻关回去
+>   （实测踩过）。`/lab/neon` 的 `fallbackHint`/`playerTitle` 文案随播放器一起删除。
+> - 大门不进 §1.5 的 reduce-motion 例外名单：它不循环、由读者自己推开，等同一个模态页。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：

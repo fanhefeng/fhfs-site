@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { splashDue } from "@/lib/splash";
 
 /** Handshake contract: once the ritual ends — or is skipped — the done event
  * fires so the hero can start its own entrance, and the session key stops
@@ -69,6 +70,16 @@ export function OvertureLight() {
         setPhase("done");
         window.dispatchEvent(new Event(OVERTURE_DONE_EVENT));
       };
+
+      // The cover has its own door (NeonSplash): on a hard landing there the
+      // neon is the opening ritual, and it fires the done event and spends
+      // the key itself when the reader walks in. The lamp stands down
+      // without doing either — the masthead is waiting on the door, not on
+      // us, and a key spent here would tell it not to wait at all.
+      if (splashDue()) {
+        setPhase("done");
+        return;
+      }
 
       /** Once shown — or deliberately skipped — the overture is spent for this
        *  session. Recording it in the timeline's last frame alone is not

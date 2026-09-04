@@ -97,8 +97,11 @@ pnpm db:studio   # 表格界面
   `falls.jpg` Andrew Coelho、`sea.jpg` Anna Popović、`coffee.jpg` Karl Fredrickson。
 - /lab/neon 的招牌照《爱乐之城》（2016）里 Seb's 门口那块霓虹描的：圆环、横杠、音符、S 的
   轮廓量自 Wikimedia Commons 上 Espandero 对着电影描摹的矢量 `File:Seb's.svg`（CC BY-SA 4.0，
-  页面上有署名），F 由原版的 E 去掉底横而来、H 是照它的笔画新造的，不用字体；砖墙是 canvas 画的。音乐经 Spotify iFrame API 嵌入官方
-  播放器（Mia & Sebastian's Theme，Justin Hurwitz），未登录 Spotify 的访客只能听 30 秒试听；
+  页面上有署名），F 由原版的 E 去掉底横而来、H 是照它的笔画新造的，不用字体；砖墙是 canvas 画的。
+  同一块招牌也是首页的大门（`components/home/NeonSplash.tsx`，硬着陆时每 session 一次，
+  推门是从圆环里穿过去）。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
+  `lib/jukebox.ts` 是它的 store），经 Spotify iFrame API 放官方曲目（Mia & Sebastian's Theme，
+  Justin Hurwitz），未登录 Spotify 的访客只能听 30 秒试听；开关是招牌本身和灵动岛上的音符。
   Spotify 到不了时（大陆网络会重置到 open.spotify.com 的连接）退回网易云音乐官方外链播放器，
   放 Hurwitz 2026 年的十周年重录版（曲目 3420987569，匿名可播；原声带版本在网易云需 VIP）。
   六张剧照 `public/lab/neon/`（1800px JPEG）取自 TMDB 收录的片方宣传剧照，

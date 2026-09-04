@@ -67,8 +67,6 @@ const STUDY_KEYS: Record<string, string[]> = {
     "trackTitle",
     "trackArtist",
     "fallbackTrackArtist",
-    "fallbackHint",
-    "playerTitle",
     "galleryKicker",
     "galleryTitle",
     "galleryLede",

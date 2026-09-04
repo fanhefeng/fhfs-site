@@ -10,6 +10,7 @@ import { getPosts, getApps, getTimeline } from "@/lib/content";
 import { getLatestReleases } from "@/lib/github";
 import { toSoftwareApp } from "@/components/software/appMeta";
 import { Opening, type OpeningMeta } from "@/components/home/Opening";
+import { NeonSplash } from "@/components/home/NeonSplash";
 import { GroveApproach } from "@/components/grove/GroveApproach";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
@@ -48,6 +49,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const t = await getTranslations("home");
   const th = await getTranslations("grove");
   const ts = await getTranslations("software");
+  const td = await getTranslations("splash");
 
   const [allPosts, allApps, timeline] = await Promise.all([
     getPosts(locale),
@@ -111,6 +113,24 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   ];
 
   return (
+    <>
+      {/* The front door, once per session on a hard landing: the neon over
+          the door of fhf's, and the way in through its ring. A sibling of
+          <main>, not a child — RouteTransition scales <main> on a reveal,
+          and a transformed ancestor would pin this fixed wall to it. */}
+      <NeonSplash
+        label={td("label")}
+        welcome={td("welcome")}
+        signOn={td("signOn")}
+        signOff={td("signOff")}
+        toggleHint={td("toggleHint")}
+        enter={td("enter")}
+        enterHint={td("enterHint")}
+        tonight={td("tonight")}
+        trackTitle={td("trackTitle")}
+        trackArtist={td("trackArtist")}
+        fallbackTrackArtist={td("fallbackTrackArtist")}
+      />
     <main id="main" className="flex-1">
       <JsonLd
         data={{
@@ -185,5 +205,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         />
       </div>
     </main>
+    </>
   );
 }
