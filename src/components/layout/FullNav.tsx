@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, type RefObject } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { isActivePath } from "@/lib/nav";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
@@ -315,8 +316,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
           className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-1 px-8 pt-24"
         >
           {links.map((item, i) => {
-            const active =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            const active = isActivePath(pathname, item.href);
             return (
               <Link
                 key={item.href}

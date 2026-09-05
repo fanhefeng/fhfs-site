@@ -27,7 +27,7 @@ const SCHEME = /^([a-z][a-z0-9+.-]*):/;
  * skip ASCII whitespace and control characters when reading a scheme, so
  * `java\nscript:` runs; they are stripped before looking, not just trimmed.
  */
-function isSafeUrl(value: string): boolean {
+export function isSafeUrl(value: string): boolean {
   const url = Array.from(value)
     .filter((ch) => ch.charCodeAt(0) > 0x20)
     .join("")

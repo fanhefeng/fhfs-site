@@ -4,19 +4,10 @@
  *
  *   pnpm db:check
  */
-import { drizzle } from "drizzle-orm/neon-http";
 import { sql } from "drizzle-orm";
+import { connect } from "./connect.mjs";
 
-try {
-  process.loadEnvFile(".env.local");
-} catch {
-  // Already in the environment.
-}
-
-const url = process.env.DATABASE_URL;
-if (!url) throw new Error("DATABASE_URL must be set");
-
-const db = drizzle(url);
+const db = connect();
 const rows = async (text: string) => (await db.execute(sql.raw(text))).rows as any[];
 
 const TABLES = [

@@ -20,7 +20,8 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
   色散按钮、可拖拽的 3D 工作台、镜头畸变滑块、Seb's 式的霓虹招牌。每则按路由单独拆包。
 - **/intro** —— R3F 的 3D 头像：滚动带镜头绕头飞行，每张贴纸停一站，
   即一份滚动叙事的简历（`docs/INTRO3D.md`）。
-- **/resume** —— 正式的一页简历，内容全在库里。
+- **/resume** —— 正式的一页简历：左栏编号标签、右栏概述 / 技能 / 经历 / 开源 / 教育，
+  「打印 / 存为 PDF」走浏览器打印样式；内容全在库里，公开版本已脱敏。
 - **/admin** —— 浏览器里的编辑部：文章、文案、列表全部可编辑，保存即生效。
 
 ## 技术栈
@@ -71,7 +72,7 @@ pnpm db:migrate      # 应用迁移
 ```bash
 pnpm db:check    # 打印库里各表的真实内容
 pnpm db:export   # 导出到 backup/（db.json + 文章的 markdown 副本）
-pnpm db:import   # 从 backup/ 恢复（按键 upsert，导入后在 /admin 保存一次刷缓存）
+pnpm db:import   # 从 backup/ 恢复（按键 upsert、每表一个 batch，导入后在 /admin 保存一次刷缓存）
 pnpm db:studio   # 表格界面
 ```
 

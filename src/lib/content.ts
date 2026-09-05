@@ -15,6 +15,9 @@ import {
   timelineEntries,
   works,
   type Localized,
+  type LocalizedLines,
+  type ResumeProject,
+  type SkillGroup,
 } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
 
@@ -182,7 +185,7 @@ export const getPost = unstable_cache(
     const [row] = await db
       .select({ ...summaryColumns, html: posts.bodyHtml })
       .from(posts)
-      .where(and(eq(posts.slug, slug), eq(posts.draft, false)))
+      .where(and(eq(posts.slug, slug), publishedOnly))
       .orderBy(localeFirst(locale), asc(posts.id))
       .limit(1);
 
@@ -198,11 +201,31 @@ export const getAllSlugs = unstable_cache(
     const rows = await db
       .selectDistinct({ slug: posts.slug })
       .from(posts)
-      .where(eq(posts.draft, false))
+      .where(publishedOnly)
       .orderBy(posts.slug);
     return rows.map((row) => row.slug);
   },
   ["all-slugs"],
+  cacheOptions(TAGS.posts)
+);
+
+/**
+ * The languages a slug was actually written in, with each edition's date.
+ *
+ * The sitemap, the article's hreflang and the OG card all need to know which
+ * locales really have a version — `getPost` never misses for a slug that
+ * exists in *some* language, so "exists" has to be read off the table. They
+ * used to ask `getPost` once per locale and throw the body away; this is the
+ * same question without the 28 KB answer.
+ */
+export const getPostEditions = unstable_cache(
+  async (slug: string): Promise<{ locale: Locale; date: string }[]> =>
+    db
+      .select({ locale: posts.locale, date: posts.date })
+      .from(posts)
+      .where(and(eq(posts.slug, slug), publishedOnly))
+      .orderBy(asc(posts.locale)),
+  ["post-editions"],
   cacheOptions(TAGS.posts)
 );
 
@@ -305,30 +328,22 @@ export const getPostsByTag = unstable_cache(
 // Everything else
 // ---------------------------------------------------------------------------
 
+const aboutColumns = {
+  locale: abouts.locale,
+  title: abouts.title,
+  html: abouts.bodyHtml,
+};
+
 export const getAbout = unstable_cache(
   async (locale: Locale): Promise<About | null> => {
+    // Same fallback the posts get: this language first, else the other one
+    // rather than nothing. One query — two rows at most.
     const [row] = await db
-      .select({
-        locale: abouts.locale,
-        title: abouts.title,
-        html: abouts.bodyHtml,
-      })
+      .select(aboutColumns)
       .from(abouts)
-      .where(eq(abouts.locale, locale))
+      .orderBy(sql`(${abouts.locale} = ${locale}) desc`, asc(abouts.locale))
       .limit(1);
-    if (row) return row;
-
-    // Same fallback the posts get: show the other language rather than nothing.
-    const [any] = await db
-      .select({
-        locale: abouts.locale,
-        title: abouts.title,
-        html: abouts.bodyHtml,
-      })
-      .from(abouts)
-      .orderBy(asc(abouts.locale))
-      .limit(1);
-    return any ?? null;
+    return row ?? null;
   },
   ["about"],
   cacheOptions(TAGS.about)
@@ -470,10 +485,19 @@ export const getIntroNodes = unstable_cache(
 export type ResumeProfile = {
   name: Localized;
   tagline: Localized;
-  intro: { zh: string[]; en: string[] };
+  intro: LocalizedLines;
+  highlights: LocalizedLines;
+  skills: { zh: SkillGroup[]; en: SkillGroup[] };
+  projects: LocalizedLines;
+  education: LocalizedLines;
   email: string | null;
   github: string | null;
+  website: string | null;
   location: Localized | null;
+  note: Localized | null;
+  /** When the profile was last saved, as an ISO string — the cache stores
+   *  JSON, so a Date would come back as one anyway. The page prints it. */
+  updatedAt: string;
 };
 
 export type ResumeExperience = {
@@ -482,11 +506,14 @@ export type ResumeExperience = {
   role: Localized;
   period: Localized;
   url: string | null;
-  bullets: { zh: string[]; en: string[] };
+  summary: Localized | null;
+  bullets: LocalizedLines;
+  projects: { zh: ResumeProject[]; en: ResumeProject[] };
 };
 
-/** The /resume header. Null until the profile is first saved in /admin —
- *  the page renders its quiet empty state rather than inventing a person. */
+/** Everything on /resume apart from the jobs. Null until the profile is
+ *  first saved in /admin — the page renders its quiet empty state rather
+ *  than inventing a person. */
 export const getResumeProfile = unstable_cache(
   async (): Promise<ResumeProfile | null> => {
     const [row] = await db
@@ -494,14 +521,21 @@ export const getResumeProfile = unstable_cache(
         name: resumeProfiles.name,
         tagline: resumeProfiles.tagline,
         intro: resumeProfiles.intro,
+        highlights: resumeProfiles.highlights,
+        skills: resumeProfiles.skills,
+        projects: resumeProfiles.projects,
+        education: resumeProfiles.education,
         email: resumeProfiles.email,
         github: resumeProfiles.github,
+        website: resumeProfiles.website,
         location: resumeProfiles.location,
+        note: resumeProfiles.note,
+        updatedAt: resumeProfiles.updatedAt,
       })
       .from(resumeProfiles)
       .where(eq(resumeProfiles.key, "main"))
       .limit(1);
-    return row ?? null;
+    return row ? { ...row, updatedAt: row.updatedAt.toISOString() } : null;
   },
   ["resume-profile"],
   cacheOptions(TAGS.resume)
@@ -516,7 +550,9 @@ export const getResumeExperiences = unstable_cache(
         role: resumeExperiences.role,
         period: resumeExperiences.period,
         url: resumeExperiences.url,
+        summary: resumeExperiences.summary,
         bullets: resumeExperiences.bullets,
+        projects: resumeExperiences.projects,
       })
       .from(resumeExperiences)
       .orderBy(asc(resumeExperiences.sort), asc(resumeExperiences.key)),

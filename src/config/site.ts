@@ -14,6 +14,10 @@ export const site = {
   /** Production origin, used for metadata/sitemap/RSS. Update after binding a domain. */
   url: "https://fhfs-site.vercel.app",
   author: "fhf",
+  /** Where the author is: the zone the footer clock keeps, and the one every
+   *  page formats dates in — so a prerender on a UTC build machine prints the
+   *  same day and month a render at home would. */
+  timeZone: "Asia/Shanghai",
   social: {
     github: "https://github.com/fanhefeng",
     /** Revealed under the tear-off sticker in the footer, listed on /resume

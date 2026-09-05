@@ -45,8 +45,26 @@ export const chipToneEnum = pgEnum("chip_tone", ["paper", "ink", "accent"]);
 /** Every bilingual short field is this shape — the old `localeSchema`. */
 export type Localized = { zh: string; en: string };
 
+/** A bilingual list of lines: paragraphs, bullets, one item per string. */
+export type LocalizedLines = { zh: string[]; en: string[] };
+
+/** One row of the résumé's skills table: a heading and what falls under it. */
+export type SkillGroup = { name: string; items: string };
+
+/** A project inside a job on the résumé. `period` is freeform text or absent,
+ *  for the same reason `resume_experiences.period` is. */
+export type ResumeProject = {
+  title: string;
+  period: string | null;
+  bullets: string[];
+};
+
 const localized = (name?: string) =>
   name ? jsonb(name).$type<Localized>() : jsonb().$type<Localized>();
+
+/** The empty value of every bilingual list column added after the table
+ *  existed — a default so the migration can fill the rows already there. */
+const EMPTY_LINES = sql`'{"zh":[],"en":[]}'::jsonb`;
 
 // ---------------------------------------------------------------------------
 // Long prose
@@ -210,19 +228,40 @@ export const introNodes = pgTable("intro_nodes", {
 });
 
 /**
- * The /resume page's header: who this is, one line of what they do, a few
- * paragraphs of introduction, and how to reach them. A singleton — `key` is
- * always "main" — kept as a keyed row rather than a locale-keyed pair because
- * every field here is a short bilingual pair, not long prose.
+ * The /resume page apart from the jobs: who this is, one line of what they
+ * do, the summary and its bullet points, the skills table, open-source work
+ * and education, and how to reach them. A singleton — `key` is always "main"
+ * — kept as a keyed row rather than a locale-keyed pair because every field
+ * here is a short bilingual pair or list, not long prose.
+ *
+ * Bullets and skill items may carry `**strong**` and `` `code` `` inline —
+ * the one bit of markup the page honours (src/lib/resume.ts). Nothing is
+ * rendered as HTML.
  */
 export const resumeProfiles = pgTable("resume_profiles", {
   key: text().primaryKey(),
   name: localized().notNull(),
   tagline: localized().notNull(),
-  intro: jsonb().$type<{ zh: string[]; en: string[] }>().notNull(),
+  /** Summary paragraphs. */
+  intro: jsonb().$type<LocalizedLines>().notNull(),
+  /** Bullets under the summary — the claims with numbers in them. */
+  highlights: jsonb().$type<LocalizedLines>().notNull().default(EMPTY_LINES),
+  skills: jsonb()
+    .$type<{ zh: SkillGroup[]; en: SkillGroup[] }>()
+    .notNull()
+    .default(EMPTY_LINES),
+  /** Open source and side projects, one bullet each. */
+  projects: jsonb().$type<LocalizedLines>().notNull().default(EMPTY_LINES),
+  /** One line per degree. */
+  education: jsonb().$type<LocalizedLines>().notNull().default(EMPTY_LINES),
   email: text(),
   github: text(),
+  /** A links page (Linktree or the like), as a full URL. */
+  website: text(),
   location: localized(),
+  /** One line beside the contact details — an aside in the author's voice
+   *  ("offers welcome"), kept out of the summary so it can change alone. */
+  note: localized(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -232,6 +271,9 @@ export const resumeProfiles = pgTable("resume_profiles", {
  * One row per job on /resume. `period` is freeform bilingual text
  * ("2021.06 – 至今" / "Jun 2021 – Present") rather than date columns — the
  * same discipline as the timeline: state what is true, never invent a date.
+ *
+ * `bullets` are the job's own points; `projects` groups further points under
+ * a named project, which is how most of the jobs read. Either may be empty.
  */
 export const resumeExperiences = pgTable("resume_experiences", {
   id: serial().primaryKey(),
@@ -240,7 +282,13 @@ export const resumeExperiences = pgTable("resume_experiences", {
   role: localized().notNull(),
   period: localized().notNull(),
   url: text(),
-  bullets: jsonb().$type<{ zh: string[]; en: string[] }>().notNull(),
+  /** One line under the heading — what the team or company is. */
+  summary: localized(),
+  bullets: jsonb().$type<LocalizedLines>().notNull(),
+  projects: jsonb()
+    .$type<{ zh: ResumeProject[]; en: ResumeProject[] }>()
+    .notNull()
+    .default(EMPTY_LINES),
   sort: integer().notNull().default(0),
 });
 

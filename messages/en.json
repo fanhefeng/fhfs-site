@@ -122,8 +122,19 @@
   "resume": {
     "title": "Resume",
     "subtitle": "The formal page: who I am and what I've done.",
-    "experienceTitle": "Work Experience",
-    "locationLabel": "Location",
+    "summaryTitle": "Summary",
+    "skillsTitle": "Skills",
+    "experienceTitle": "Experience",
+    "projectsTitle": "Open source & projects",
+    "educationTitle": "Education",
+    "locationLabel": "Based in",
+    "githubLabel": "GitHub",
+    "emailLabel": "Email",
+    "linksLabel": "Links",
+    "print": "Print / save as PDF",
+    "printAria": "Print this page, or save it as a PDF from the print dialog",
+    "updated": "Updated {date}",
+    "introLink": "Meet me the other way round",
     "empty": "The resume is still being put together — check back soon."
   },
   "portfolio": {
@@ -350,6 +361,13 @@
     "musicPlay": "Play the background music",
     "musicPause": "Stop the background music",
     "musicTitle": "Background music: Mia & Sebastian's Theme"
+  },
+  "error": {
+    "kicker": "Printing error",
+    "title": "This page did not make it to print",
+    "description": "Nothing you did — something went wrong on our side. Trying again usually works; if not, come back in a little while.",
+    "retry": "Try again",
+    "backHome": "Back home"
   },
   "notFound": {
     "title": "Not in this issue",

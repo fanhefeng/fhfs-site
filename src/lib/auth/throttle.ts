@@ -16,32 +16,32 @@ const MAX_ATTEMPTS = 8;
 const windowStart = () => new Date(Date.now() - WINDOW_MINUTES * 60_000);
 
 /**
- * Records one attempt and, while it is here, drops everyone's expired rows —
- * between successful logins the table otherwise only ever grows.
+ * Records one attempt and says whether this address has now made more of
+ * them in the window than it is allowed. The eighth attempt is the last one
+ * allowed; the ninth sees nine rows and is refused.
  *
- * Two statements rather than one transaction: the HTTP driver has none, and
- * nothing here needs one. A prune that fails leaves rows the next attempt
- * will prune.
- */
-export async function recordAttempt(ip: string): Promise<void> {
-  await db.insert(loginAttempts).values({ ip });
-  await db.delete(loginAttempts).where(lt(loginAttempts.at, windowStart()));
-}
-
-/**
- * True once this address has more attempts in the window than it is allowed.
+ * Three statements in one `db.batch()` — a single HTTP request, run as one
+ * transaction: the insert, a prune of everyone's expired rows (between
+ * successful logins the table otherwise only ever grows), and the count.
+ * Recording first and counting second is deliberate: counting first let a
+ * burst of concurrent requests all read the same number and all get through.
  *
- * Call it *after* `recordAttempt`, so the count includes the attempt being
- * judged. Counting first and inserting second let a burst of concurrent
- * requests all read the same count and all get through. The eighth attempt
- * is the last one allowed; the ninth sees nine rows and is refused.
+ * The insert is the one write on this site that is not idempotent, so a
+ * connection-level retry (src/db/index.ts) that re-sends a batch whose reply
+ * was lost can count one attempt twice. That only ever throttles *sooner*, and
+ * a retry that lands twice at the login form is itself a rare event; the day
+ * it matters, give attempts a client-generated id and `onConflictDoNothing`.
  */
-export async function isThrottled(ip: string): Promise<boolean> {
-  const [row] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(loginAttempts)
-    .where(and(eq(loginAttempts.ip, ip), gte(loginAttempts.at, windowStart())));
-  return (row?.count ?? 0) > MAX_ATTEMPTS;
+export async function recordAttempt(ip: string): Promise<{ throttled: boolean }> {
+  const [, , [row]] = await db.batch([
+    db.insert(loginAttempts).values({ ip }),
+    db.delete(loginAttempts).where(lt(loginAttempts.at, windowStart())),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(loginAttempts)
+      .where(and(eq(loginAttempts.ip, ip), gte(loginAttempts.at, windowStart()))),
+  ]);
+  return { throttled: (row?.count ?? 0) > MAX_ATTEMPTS };
 }
 
 /**

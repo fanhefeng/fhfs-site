@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
+import { watchContextLoss } from "@/lib/webgl";
 import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
 
 type Props = {
@@ -120,6 +121,8 @@ export function GroveDemo({
 
   const [live, setLive] = useState(false);
   const [degraded, setDegraded] = useState(false);
+  /** Bumped when a lost context comes back, so the effect rebuilds on it. */
+  const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -130,6 +133,12 @@ export function GroveDemo({
       setDegraded(true);
       return;
     }
+
+    // three survives a lost context on its own, but the bark plates are
+    // render targets baked once at build time (lib/grove/bark.ts), and a
+    // restored context hands them back empty — so the whole scene is rebuilt
+    // rather than redrawn, the same way the raw-WebGL layers do it.
+    const ctx = watchContextLoss(canvas, () => setEpoch((n) => n + 1));
 
     let disposed = false;
     let teardown: (() => void) | null = null;
@@ -1111,10 +1120,11 @@ export function GroveDemo({
 
     return () => {
       disposed = true;
+      ctx.dispose();
       io.disconnect();
       teardown?.();
     };
-  }, []);
+  }, [epoch]);
 
   useGSAP(
     () => {

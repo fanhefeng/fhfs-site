@@ -79,11 +79,17 @@ export function LensSliderDemo({
 
   const [mode, setMode] = useState<Mode>("loading");
   const count = slides.length;
+  /** The pictures alone, as one string: the lens is keyed on this rather
+   *  than on `slides`, which the page rebuilds on every render — the
+   *  copy can change (a locale switch) without the renderer being torn down
+   *  and four textures fetched again. */
+  const srcKey = slides.map((slide) => slide.src).join("\n");
 
   /* ---- the lens ---- */
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || count < 2) return;
+    const srcs = srcKey.split("\n");
+    if (!canvas || srcs.length < 2) return;
 
     if (prefersSaveData() || !hasWebGL()) {
       setMode("degraded");
@@ -151,6 +157,13 @@ export function LensSliderDemo({
       if (visible) dirtyRef.current = true;
     };
     document.addEventListener("visibilitychange", onVisibility);
+    // three rebuilds its own state when the context comes back and uploads
+    // the textures again on the next draw — but nothing asks for that draw,
+    // so the restored canvas would sit blank until the next scroll.
+    const onRestored = () => {
+      dirtyRef.current = true;
+    };
+    canvas.addEventListener("webglcontextrestored", onRestored);
 
     let disposed = false;
     const textures: THREE.Texture[] = [];
@@ -187,10 +200,10 @@ export function LensSliderDemo({
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
     Promise.all(
-      slides.map(
-        (slide) =>
+      srcs.map(
+        (src) =>
           new Promise<THREE.Texture>((resolve, reject) => {
-            loader.load(slide.src, resolve, undefined, reject);
+            loader.load(src, resolve, undefined, reject);
           })
       )
     ).then(
@@ -223,12 +236,13 @@ export function LensSliderDemo({
       gsap.ticker.remove(tick);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       for (const t of textures) t.dispose();
       geometry.dispose();
       material.dispose();
       releaseRenderer(renderer);
     };
-  }, [slides, count]);
+  }, [srcKey]);
 
   /* ---- the choreography: scroll → slide, and the copy that rides each lens ---- */
   useGSAP(

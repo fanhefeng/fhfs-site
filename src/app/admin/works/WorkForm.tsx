@@ -32,6 +32,9 @@ export function WorkForm({
   return (
     <>
       <form action={formAction} className="space-y-5">
+        {/* Tells saveWork to refuse a key that already exists rather than
+            overwrite the work that has it. */}
+        {isNew && <input type="hidden" name="isNew" value="1" />}
         <div className="grid gap-5 sm:grid-cols-[1fr_7rem_7rem]">
           <label className="space-y-1.5">
             <span className={labelClass}>key</span>

@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { site } from "@/config/site";
 
 /** Where the author is — the zone the footer clock and the About colophon
- *  keep. Shanghai now; the copy that names the city lives in messages. */
-export const HOME_TIME_ZONE = "Asia/Shanghai";
+ *  keep, and the one next-intl formats every date in (src/i18n/request.ts).
+ *  Shanghai now; the copy that names the city lives in messages. */
+export const HOME_TIME_ZONE = site.timeZone;
 
 /**
  * "HH:mm" in the author's time zone — the wall clock the footer and the

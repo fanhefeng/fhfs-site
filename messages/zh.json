@@ -122,8 +122,19 @@
   "resume": {
     "title": "简历",
     "subtitle": "正式的一页：我是谁，做过什么。",
+    "summaryTitle": "概述",
+    "skillsTitle": "专业技能",
     "experienceTitle": "工作经历",
+    "projectsTitle": "开源与项目",
+    "educationTitle": "教育背景",
     "locationLabel": "所在地",
+    "githubLabel": "GitHub",
+    "emailLabel": "邮箱",
+    "linksLabel": "链接",
+    "print": "打印 / 存为 PDF",
+    "printAria": "打印这一页，或在打印对话框里保存为 PDF",
+    "updated": "更新于 {date}",
+    "introLink": "换一种方式认识我",
     "empty": "简历内容正在整理中，稍后回来看看。"
   },
   "portfolio": {
@@ -350,6 +361,13 @@
     "musicPlay": "放背景音乐",
     "musicPause": "停掉背景音乐",
     "musicTitle": "背景音乐：Mia & Sebastian's Theme"
+  },
+  "error": {
+    "kicker": "印刷事故",
+    "title": "这一页没能印出来",
+    "description": "不是你的问题，是我们这边出了岔子。再试一次通常就好；要是还不行，过一会儿再来。",
+    "retry": "再试一次",
+    "backHome": "回首页"
   },
   "notFound": {
     "title": "这一页不在本期里",
