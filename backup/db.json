@@ -1268,6 +1268,7 @@
       "href": "/resume",
       "labelKey": "resume",
       "surfaces": [
+        "header",
         "footer",
         "fullnav",
         "sitemap"
