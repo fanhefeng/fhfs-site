@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
+import { watchContextLoss } from "@/lib/webgl";
 import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
 import { bakeBarkPlates } from "@/lib/grove/bark";
 import {
@@ -117,6 +118,8 @@ const sstep = (a: number, b: number, x: number) => {
  */
 export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  /** Bumped when a lost context comes back, so the effect rebuilds on it. */
+  const [epoch, setEpoch] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -129,10 +132,18 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       return;
     }
 
+    // three survives a lost context on its own, but the bark plates are
+    // render targets baked once at build time (lib/grove/bark.ts), and a
+    // restored context hands them back empty — so the whole scene is rebuilt
+    // rather than redrawn, the same way the raw-WebGL layers do it. Watched
+    // before the renderer is asked for, so a loss during setup is seen too.
+    const ctx = watchContextLoss(canvas, () => setEpoch((n) => n + 1));
+
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
     } catch {
+      ctx.dispose();
       onReady?.();
       return;
     }
@@ -966,7 +977,11 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       needsRender = true;
     };
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    window.addEventListener("pointerleave", onPointerLeave);
+    // On `document`, not `window`: pointerleave does not bubble, and when the
+    // pointer exits the viewport it is dispatched to body, html and document
+    // — never to window, where this used to sit and never fired, leaving the
+    // moss parted and the lean held wherever the pointer left.
+    document.addEventListener("pointerleave", onPointerLeave);
     window.addEventListener("resize", layout);
 
     /* ---- the loop ---- */
@@ -1142,6 +1157,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
 
     return () => {
       disposed = true;
+      ctx.dispose();
       gsap.ticker.remove(frame);
       setLive(false);
       io.disconnect();
@@ -1150,7 +1166,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
         window.removeEventListener(type, markInput);
       }
       window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerleave", onPointerLeave);
+      document.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("resize", layout);
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("focus", onFocus);
@@ -1161,9 +1177,10 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       barkPlates.dispose();
       releaseRenderer(renderer);
     };
-    // The scene is built once for the life of the page; the refs are stable.
+    // The scene is built once per GL context; the refs are stable, and only
+    // a restored context (`epoch`) asks for it again.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [epoch]);
 
   return <canvas ref={canvasRef} className="gh-scene" aria-hidden="true" />;
 }

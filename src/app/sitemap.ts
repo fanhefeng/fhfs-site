@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { localeLanguages } from "@/lib/seo";
-import { getAllSlugs, getAllTags, getNavItems, getPost } from "@/lib/content";
+import { getAllSlugs, getAllTags, getNavItems, getPostEditions } from "@/lib/content";
 import { LAB_ENTRIES } from "@/components/lab/entries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -49,18 +49,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // original, and its hreflang would claim a translation that does not exist.
   const slugs = await getAllSlugs();
   for (const slug of slugs) {
-    const versions = await Promise.all(
-      routing.locales.map(async (locale) => ({
-        locale,
-        post: await getPost(slug, locale),
-      }))
-    );
-    const real = versions.filter(({ post }) => post && !post.isFallback);
-    const available: Locale[] = real.map(({ locale }) => locale);
-    for (const { locale, post } of real) {
+    const editions = await getPostEditions(slug);
+    const available: Locale[] = editions.map(({ locale }) => locale);
+    for (const { locale, date } of editions) {
       entries.push({
         url: `${site.url}/${locale}/blog/${slug}`,
-        lastModified: post ? new Date(post.date) : undefined,
+        lastModified: new Date(date),
         alternates: { languages: localeLanguages(`/blog/${slug}`, available) },
       });
     }

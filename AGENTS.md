@@ -19,11 +19,13 @@ pnpm db:generate  # after editing src/db/schema.ts, then:
 pnpm db:migrate
 pnpm db:check     # print what's actually in each table
 pnpm db:export    # write DB back to backup/
-pnpm db:import    # restore from backup/ (upsert by key; save once in /admin after to flush caches)
+pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/dev/cache/fetch-cache` + restart does the same)
 ```
 
 Tests cover only pure functions in `src/lib`; there is no component or e2e
-suite. `pnpm lint` runs the project-local oxlint (`.oxlintrc.json`) over
+suite. The scripts share `scripts/connect.mts` (env, unpooled URL, the same
+connection-level retry as the site, with more patient delays); a new script
+calls `connect()` rather than building its own handle. `pnpm lint` runs the project-local oxlint (`.oxlintrc.json`) over
 `src`, `scripts` and the config files; CI (`.github/workflows/check.yml`) runs
 `pnpm check` on Node 24 (`.node-version`, `engines`). This machine's Node and
 global JS CLIs are managed by `vp`, not npm/nvm.
@@ -45,12 +47,27 @@ Failures resolve to `null` and the badge is simply absent.
   deliberately optimistic — the real authorization boundary is
   `requireAdmin()` at the top of every Server Action.
 - **Writes**: every admin write lives in `src/app/admin/actions.ts`, starts
-  with `requireAdmin()`, and ends with `updateTag` — never `revalidateTag`,
+  with a session check, and ends with `updateTag` — never `revalidateTag`,
   which would serve the stale copy to the very person who just pressed save.
+  An action that reports to a form checks with `adminSession()` and returns
+  `SESSION_EXPIRED` (a throw would unmount the editor with its unsaved text);
+  the delete actions keep the throwing `requireAdmin()`. Field parsing and
+  validation (`validKey`, `validDate`, `validLink`, …) live in
+  `src/lib/forms.ts`, where they are unit-tested — add a rule there, not
+  inline. The "new" forms send `isNew`, and the action then refuses an
+  existing key instead of upserting over it.
+- **Error boundaries**: `src/app/[locale]/error.tsx` (a page failing at
+  request time — a cold database on an uncached path), `src/app/global-error.tsx`
+  (the layout itself), `src/app/admin/error.tsx`. Keep them dependency-free;
+  they must not be able to fail the way the page did.
 - **Database**: Neon Postgres over the HTTP driver (`src/db/index.ts`) — no
   multi-statement transactions, and the schema is designed so none are needed
   (tags are array columns, saves are single upserts). Schema in
-  `src/db/schema.ts`, migrations via drizzle-kit.
+  `src/db/schema.ts`, migrations via drizzle-kit. The driver's `fetch` is
+  wrapped in `src/db/index.ts` to retry a *connection-level* failure (the
+  `fetch failed` a proxied network throws now and then); that is only safe
+  because every statement is idempotent — keep writes as keyed upserts or
+  deletes, never a plain insert into a serial-keyed table.
 - **Animation**: all GSAP plugins are registered once in `src/lib/gsap.ts` —
   import `gsap` and plugins from there, never from `"gsap"` directly. Eases
   come from its `EASE` token table; `prefersReducedMotion` gates only the

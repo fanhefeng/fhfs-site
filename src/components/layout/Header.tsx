@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { gsap, useGSAP, Flip } from "@/lib/gsap";
+import { isActivePath } from "@/lib/nav";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
@@ -416,7 +417,7 @@ export function Header({ links, menuLinks }: Props) {
                     className="invisible absolute top-0 left-0 rounded-full bg-fg/[0.05] opacity-0 dark:bg-white/10"
                   />
                   {links.map((item) => {
-                    const active = pathname.startsWith(item.href);
+                    const active = isActivePath(pathname, item.href);
                     return (
                       <Link
                         key={item.href}

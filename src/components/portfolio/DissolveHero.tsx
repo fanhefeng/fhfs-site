@@ -262,6 +262,13 @@ export function DissolveHero({
       if (visible) dirtyRef.current = true;
     };
     document.addEventListener("visibilitychange", onVisibility);
+    // three rebuilds its own state when the context comes back and uploads
+    // the photograph again on the next draw — but nothing asks for that
+    // draw, so the restored canvas would sit blank until the next scroll.
+    const onRestored = () => {
+      dirtyRef.current = true;
+    };
+    canvas.addEventListener("webglcontextrestored", onRestored);
 
     let disposed = false;
 
@@ -316,6 +323,7 @@ export function DissolveHero({
       window.removeEventListener("resize", onResize);
       window.removeEventListener("fhfs:theme", applyTheme);
       document.removeEventListener("visibilitychange", onVisibility);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       uniforms.uTex.value?.dispose();
       geometry.dispose();
       material.dispose();

@@ -6,9 +6,14 @@ import {
   getTranslations,
   getFormatter,
 } from "next-intl/server";
-import { routing, htmlLang, type Locale } from "@/i18n/routing";
+import { routing, htmlLang } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
-import { getAdjacentPosts, getAllSlugs, getPost } from "@/lib/content";
+import {
+  getAdjacentPosts,
+  getAllSlugs,
+  getPost,
+  getPostEditions,
+} from "@/lib/content";
 import { HAS_CJK } from "@/lib/reading";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
@@ -29,22 +34,6 @@ export async function generateStaticParams() {
   return (await getAllSlugs()).map((slug) => ({ slug }));
 }
 
-/**
- * The locales that have their own version of a post. `getPost` never misses
- * for a slug that exists in *some* language — it hands back the other
- * language with `isFallback` set — so "exists" has to be read off that flag,
- * one lookup per locale (all cached).
- */
-async function availableLocales(slug: string): Promise<Locale[]> {
-  const checks = await Promise.all(
-    routing.locales.map(async (locale) => {
-      const post = await getPost(slug, locale);
-      return post && !post.isFallback ? locale : null;
-    })
-  );
-  return checks.filter((locale): locale is Locale => locale !== null);
-}
-
 export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
@@ -52,11 +41,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[sl
   if (!post) return {};
   // A fallback render is the other language's article under this prefix: its
   // canonical is that article, and hreflang lists only the languages that
-  // really exist, or crawlers would index the same text twice.
+  // really exist (`getPostEditions`), or crawlers would index the same text
+  // twice.
   const alternates = localeAlternates(
     `/blog/${slug}`,
     locale,
-    await availableLocales(slug)
+    (await getPostEditions(slug)).map((edition) => edition.locale)
   );
   if (post.isFallback) {
     alternates.canonical = `${site.url}/${post.locale}/blog/${slug}`;

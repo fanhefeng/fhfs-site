@@ -236,6 +236,13 @@ export function DissolveDemo({
       if (visible) dirtyRef.current = true;
     };
     document.addEventListener("visibilitychange", onVisibility);
+    // three rebuilds its own state when the context comes back and uploads
+    // the texture again on the next draw — but nothing asks for that draw,
+    // so the restored canvas would sit blank until the next scroll.
+    const onRestored = () => {
+      dirtyRef.current = true;
+    };
+    canvas.addEventListener("webglcontextrestored", onRestored);
 
     let disposed = false;
 
@@ -296,6 +303,7 @@ export function DissolveDemo({
       gsap.ticker.remove(tick);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       uniforms.uTex.value?.dispose();
       geometry.dispose();
       material.dispose();

@@ -22,21 +22,12 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { drizzle } from "drizzle-orm/neon-http";
 import { asc } from "drizzle-orm";
 import { stringify as toYaml } from "yaml";
 import * as schema from "../src/db/schema";
+import { connect } from "./connect.mjs";
 
-try {
-  process.loadEnvFile(".env.local");
-} catch {
-  // Already in the environment.
-}
-
-const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
-if (!url) throw new Error("DATABASE_URL_UNPOOLED or DATABASE_URL must be set");
-
-const db = drizzle(url, { schema });
+const db = connect();
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "backup");
 

@@ -31,6 +31,10 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  /** The "copied" confirmation's timer — one at a time, and none after
+   *  unmount. */
+  const copiedTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(copiedTimer.current), []);
 
   /* --- actions ---------------------------------------------------------- */
 
@@ -43,7 +47,8 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
       }
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
+      window.clearTimeout(copiedTimer.current);
+      copiedTimer.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
       /* Cancelled share / denied clipboard — nothing to recover from. */
     }

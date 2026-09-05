@@ -5,9 +5,24 @@ import { redirect } from "next/navigation";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { requireAdmin } from "@/lib/auth/session";
+import { adminSession, requireAdmin } from "@/lib/auth/session";
+import {
+  intField,
+  list,
+  localized,
+  localizedLines,
+  parseLocale,
+  raw,
+  str,
+  validDate,
+  validGithubUser,
+  validKey,
+  validLink,
+  validPath,
+} from "@/lib/forms";
 import { renderMarkdown } from "@/lib/markdown";
 import { readingMinutes } from "@/lib/reading";
+import { parseProjects, parseSkillLines } from "@/lib/resume";
 import { TAGS } from "@/lib/content";
 
 /**
@@ -15,14 +30,22 @@ import { TAGS } from "@/lib/content";
  *
  * Two rules hold across all of them.
  *
- * `requireAdmin()` comes first, always. The proxy's check is optimistic and,
- * more to the point, Server Actions are not routes — this file could be moved
- * or the matcher edited and the proxy would simply stop covering it, with
- * nothing failing loudly.
+ * The session check comes first, always. The proxy's check is optimistic
+ * and, more to the point, Server Actions are not routes — this file could be
+ * moved or the matcher edited and the proxy would simply stop covering it,
+ * with nothing failing loudly. An action that reports to a form checks with
+ * `adminSession()` and returns `SESSION_EXPIRED`, so an editor whose eight
+ * hours ran out mid-article gets a line beside the save button and keeps the
+ * text; a throw would have unmounted the form. The delete actions have no
+ * form state to report to and nothing typed to lose, so they keep the
+ * throwing `requireAdmin()`.
  *
  * `updateTag` comes last, and it is `updateTag` rather than `revalidateTag`.
  * The latter serves the stale copy while it refetches, so the person who just
  * pressed save would be the one person still looking at the old text.
+ *
+ * How a field is read — what counts as a key, a date, a link — lives in
+ * `src/lib/forms.ts`, where it is tested.
  */
 
 function invalidate(...tags: string[]) {
@@ -33,65 +56,21 @@ function invalidate(...tags: string[]) {
   for (const tag of tags) updateTag(tag);
 }
 
-const str = (form: FormData, key: string) => String(form.get(key) ?? "").trim();
-
-/**
- * Verbatim, including leading and trailing spaces.
- *
- * Copy has to be read this way. `footer.timePrefix` is `"青岛 · "` and
- * `timeSuffix` is `" in Qingdao"` — the two of them bracket a clock, and which
- * side the city sits on differs by language. Trimming them silently closes the
- * gap, and nothing downstream notices: the markup still renders, HTML collapses
- * the whitespace, and the line just reads slightly wrong forever.
- */
-const raw = (form: FormData, key: string) => String(form.get(key) ?? "");
-
-/** Narrows to the locale union — excluding literals off `string` does not. */
-const parseLocale = (value: string): "zh" | "en" | null =>
-  value === "zh" || value === "en" ? value : null;
-
-const localized = (form: FormData, key: string) => ({
-  zh: str(form, `${key}.zh`),
-  en: str(form, `${key}.en`),
-});
-
-/** Shared by every keyed table — an empty key would upsert a "" row forever.
- *  Post slugs obey the same grammar (they become URLs), with their own
- *  error text. */
-const validKey = (key: string) => /^[a-z0-9][a-z0-9-]*$/.test(key);
-const KEY_ERROR = { error: "key 只能用小写字母、数字和连字符。" };
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const DATE_ERROR = { error: "日期要写成 YYYY-MM-DD，而且得是真实存在的一天。" };
-
-/** The regex is happy with 2026-02-30; the round trip through `Date` is not
- *  (a date-only ISO string parses as UTC, so it comes back unchanged). */
-const validDate = (value: string) => {
-  if (!DATE_RE.test(value)) return false;
-  const time = Date.parse(value);
-  return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === value;
-};
-
 export type ActionState = { error?: string; ok?: boolean };
 
-/**
- * `Number(form.get("sort") ?? 0)` looked safe and was not: `Number("abc")` is
- * NaN and `Number("1e400")` is Infinity, and either reaches the integer column
- * as a database error rather than a form one. Empty means `fallback`; anything
- * else has to be a whole number.
- */
-function intField<Fallback extends number | null>(
-  form: FormData,
-  key: string,
-  label: string,
-  fallback: Fallback
-): { ok: true; value: number | Fallback } | { ok: false; error: string } {
-  const text = str(form, key);
-  if (!text) return { ok: true, value: fallback };
-  const n = Number(text);
-  if (!Number.isInteger(n)) return { ok: false, error: `${label}要填整数。` };
-  return { ok: true, value: n };
-}
+const SESSION_EXPIRED: ActionState = {
+  error: "登录已过期。这一页的内容还在——在新标签页重新登录，回来再按一次保存。",
+};
+const KEY_ERROR: ActionState = { error: "key 只能用小写字母、数字和连字符。" };
+const DATE_ERROR: ActionState = {
+  error: "日期要写成 YYYY-MM-DD，而且得是真实存在的一天。",
+};
+const linkError = (label: string): ActionState => ({
+  error: `${label}要写完整的 http(s):// 地址，或以单个 / 开头的站内路径。`,
+});
+const existsError = (key: string): ActionState => ({
+  error: `key 已存在：已经有「${key}」了，换一个或去编辑原来那条。`,
+});
 
 // ---------------------------------------------------------------------------
 // Posts
@@ -101,7 +80,7 @@ export async function savePost(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const slug = str(form, "slug");
   const locale = parseLocale(str(form, "locale"));
@@ -122,10 +101,7 @@ export async function savePost(
     title: str(form, "title"),
     date,
     summary: str(form, "summary"),
-    tags: str(form, "tags")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
+    tags: list(form, "tags"),
     draft: form.get("draft") === "on",
     bodyMd,
     // Rendered once, here, rather than on every read.
@@ -183,7 +159,7 @@ export async function saveAbout(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const locale = parseLocale(str(form, "locale"));
   if (!locale) return { error: "语言只能是 zh 或 en。" };
@@ -220,7 +196,7 @@ export async function saveCopy(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const rows = await db
     .select({ key: schema.copyBlocks.key })
@@ -280,7 +256,7 @@ export async function saveTimelineEntry(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
@@ -321,7 +297,7 @@ export async function saveApp(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
@@ -330,6 +306,10 @@ export async function saveApp(
   if (!["desktop", "tool", "game", "website"].includes(category)) {
     return { error: "分类只能是 desktop / tool / game / website。" };
   }
+
+  // Rendered as the card's outbound link on three pages.
+  const website = str(form, "website");
+  if (!validLink(website)) return linkError("网址");
 
   // "owner/name" — src/lib/github.ts builds an API URL out of it, so it has
   // to be exactly two path segments and nothing that could escape them.
@@ -349,12 +329,9 @@ export async function saveApp(
     tagline: localized(form, "tagline"),
     description: localized(form, "description"),
     category: category as "desktop" | "tool" | "game" | "website",
-    website: str(form, "website"),
+    website,
     repo,
-    platforms: str(form, "platforms")
-      .split(",")
-      .map((p) => p.trim())
-      .filter(Boolean),
+    platforms: list(form, "platforms"),
     accent: str(form, "accent") || null,
     hue: hue.value,
     sort: sort.value,
@@ -368,9 +345,7 @@ export async function saveApp(
       .values(row)
       .onConflictDoNothing({ target: schema.apps.key })
       .returning({ id: schema.apps.id });
-    if (!inserted.length) {
-      return { error: `key 已存在：已经有「${key}」了，换一个或去编辑原来那条。` };
-    }
+    if (!inserted.length) return existsError(key);
   } else {
     await db
       .insert(schema.apps)
@@ -394,7 +369,7 @@ export async function saveExperiment(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
@@ -403,6 +378,8 @@ export async function saveExperiment(
   if (!["live", "wip", "planned"].includes(status)) {
     return { error: "状态只能是 live / wip / planned。" };
   }
+  const href = str(form, "href") || null;
+  if (href && !validLink(href)) return linkError("外链");
   const sort = intField(form, "sort", "排序", 0);
   if (!sort.ok) return sort;
 
@@ -412,7 +389,7 @@ export async function saveExperiment(
     description: localized(form, "description"),
     status: status as "live" | "wip" | "planned",
     accent: str(form, "accent") || null,
-    href: str(form, "href") || null,
+    href,
     demo: str(form, "demo") || null,
     sort: sort.value,
   };
@@ -448,7 +425,7 @@ export async function saveChips(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const rows = collectRows(form, "chip")
     .map((i, index) => ({
@@ -487,7 +464,7 @@ export async function saveNavItems(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const rows = collectRows(form, "nav")
     .map((i, index) => ({
@@ -500,15 +477,11 @@ export async function saveNavItems(
     }))
     .filter((row) => row.href);
 
-  // `//evil.com` also starts with "/" — a browser reads that as
-  // protocol-relative and the header would link off-site. So does
-  // `/\evil.com`: URL parsing treats a backslash as a slash.
+  // The nav is this site's own pages, so a full URL is refused here where a
+  // link field elsewhere would take one — see `validPath` for why `//` and
+  // a backslash are not paths.
   for (const row of rows) {
-    if (
-      !row.href.startsWith("/") ||
-      row.href.startsWith("//") ||
-      row.href.includes("\\")
-    ) {
+    if (!validPath(row.href)) {
       return { error: `路径要以单个 / 开头，且不能含反斜杠：${row.href}` };
     }
     if (!row.labelKey) {
@@ -557,7 +530,7 @@ export async function saveWork(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
@@ -568,26 +541,37 @@ export async function saveWork(
   }
   const sort = intField(form, "sort", "排序", 0);
   if (!sort.ok) return sort;
+  const url = str(form, "url") || null;
+  if (url && !validLink(url)) return linkError("链接");
+  const cover = str(form, "cover") || null;
+  if (cover && !validLink(cover)) return linkError("封面路径");
 
   const row = {
     key,
     title: localized(form, "title"),
     description: localized(form, "description"),
     year: year.value,
-    cover: str(form, "cover") || null,
-    url: str(form, "url") || null,
-    tags: str(form, "tags")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
+    cover,
+    url,
+    tags: list(form, "tags"),
     accent: str(form, "accent") || null,
     sort: sort.value,
   };
 
-  await db
-    .insert(schema.works)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.works.key, set: row });
+  if (form.get("isNew")) {
+    // The "new work" form must not overwrite one that already has this key.
+    const inserted = await db
+      .insert(schema.works)
+      .values(row)
+      .onConflictDoNothing({ target: schema.works.key })
+      .returning({ id: schema.works.id });
+    if (!inserted.length) return existsError(key);
+  } else {
+    await db
+      .insert(schema.works)
+      .values(row)
+      .onConflictDoUpdate({ target: schema.works.key, set: row });
+  }
 
   invalidate(TAGS.works);
   return { ok: true };
@@ -605,12 +589,12 @@ export async function deleteWork(form: FormData): Promise<void> {
 // Resume
 // ---------------------------------------------------------------------------
 
-/** One row, key "main" — the /resume header edits as a single form. */
+/** One row, key "main" — everything on /resume but the jobs, as one form. */
 export async function saveResumeProfile(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const name = localized(form, "name");
   if (!name.zh && !name.en) return { error: "名字至少填一种语言。" };
@@ -618,17 +602,33 @@ export async function saveResumeProfile(
   name.en ||= name.zh;
 
   const location = localized(form, "location");
+  const note = localized(form, "note");
+  // Both rendered as hrefs on /resume: the links page verbatim, the GitHub
+  // name spliced into a github.com path.
+  const website = str(form, "website") || null;
+  if (website && !validLink(website)) return linkError("链接页");
+  const github = str(form, "github") || null;
+  if (github && !validGithubUser(github)) {
+    return { error: "GitHub 用户名只能用字母、数字和连字符，不带 @ 和网址。" };
+  }
   const row = {
     key: "main",
     name,
     tagline: localized(form, "tagline"),
-    intro: {
-      zh: String(form.get("intro.zh") ?? "").split("\n").map((p) => p.trim()).filter(Boolean),
-      en: String(form.get("intro.en") ?? "").split("\n").map((p) => p.trim()).filter(Boolean),
+    intro: localizedLines(form, "intro"),
+    highlights: localizedLines(form, "highlights"),
+    // `name | items` per line — the grammar is in src/lib/resume.ts.
+    skills: {
+      zh: parseSkillLines(raw(form, "skills.zh")),
+      en: parseSkillLines(raw(form, "skills.en")),
     },
+    projects: localizedLines(form, "projects"),
+    education: localizedLines(form, "education"),
     email: str(form, "email") || null,
-    github: str(form, "github") || null,
+    github,
+    website,
     location: location.zh || location.en ? location : null,
+    note: note.zh || note.en ? note : null,
   };
 
   await db
@@ -647,7 +647,7 @@ export async function saveResumeExperience(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
@@ -665,24 +665,43 @@ export async function saveResumeExperience(
   period.en ||= period.zh;
   const sort = intField(form, "sort", "排序", 0);
   if (!sort.ok) return sort;
+  const url = str(form, "url") || null;
+  if (url && !validLink(url)) return linkError("链接");
 
+  // `# title | period` headings with their bullets beneath — parsed here so
+  // a stray line is a form error the author sees, not a project with no name.
+  const zhProjects = parseProjects(raw(form, "projects.zh"));
+  if (zhProjects.error !== null) return { error: `zh 项目：${zhProjects.error}` };
+  const enProjects = parseProjects(raw(form, "projects.en"));
+  if (enProjects.error !== null) return { error: `en 项目：${enProjects.error}` };
+
+  const summary = localized(form, "summary");
   const row = {
     key,
     company,
     role: localized(form, "role"),
     period,
-    url: str(form, "url") || null,
-    bullets: {
-      zh: String(form.get("bullets.zh") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
-      en: String(form.get("bullets.en") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
-    },
+    url,
+    summary: summary.zh || summary.en ? summary : null,
+    bullets: localizedLines(form, "bullets"),
+    projects: { zh: zhProjects.projects, en: enProjects.projects },
     sort: sort.value,
   };
 
-  await db
-    .insert(schema.resumeExperiences)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.resumeExperiences.key, set: row });
+  if (form.get("isNew")) {
+    // The "new experience" form must not overwrite a job that has this key.
+    const inserted = await db
+      .insert(schema.resumeExperiences)
+      .values(row)
+      .onConflictDoNothing({ target: schema.resumeExperiences.key })
+      .returning({ id: schema.resumeExperiences.id });
+    if (!inserted.length) return existsError(key);
+  } else {
+    await db
+      .insert(schema.resumeExperiences)
+      .values(row)
+      .onConflictDoUpdate({ target: schema.resumeExperiences.key, set: row });
+  }
 
   invalidate(TAGS.resume);
   return { ok: true };
@@ -702,7 +721,7 @@ export async function saveIntroNode(
   _prev: ActionState,
   form: FormData
 ): Promise<ActionState> {
-  await requireAdmin();
+  if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
@@ -717,10 +736,7 @@ export async function saveIntroNode(
     title: localized(form, "title"),
     period: period.zh || period.en ? period : null,
     body: localized(form, "body"),
-    bullets: {
-      zh: String(form.get("bullets.zh") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
-      en: String(form.get("bullets.en") ?? "").split("\n").map((b) => b.trim()).filter(Boolean),
-    },
+    bullets: localizedLines(form, "bullets"),
     stickerLabel: str(form, "stickerLabel"),
     stickerIcon: str(form, "stickerIcon"),
     sort: sort.value,

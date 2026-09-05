@@ -42,12 +42,30 @@ export async function clearSessionCookie(): Promise<void> {
  * The real check, to be called at the top of every Server Action before it
  * touches anything. Throws rather than redirects so that forgetting to handle
  * the result cannot silently continue.
+ *
+ * For an action that reports back to a form, use `adminSession()` below
+ * instead: a throw here reaches the client as a render error, and React
+ * unmounts the form to show the error boundary — with the text the editor
+ * had typed. A session that expired mid-edit should cost a second login, not
+ * an article.
  */
 export async function requireAdmin(): Promise<Session> {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const session = await readSession(token);
+  const session = await adminSession();
   if (!session) throw new Error("Not authenticated");
   return session;
+}
+
+/**
+ * The same check as a value: the session, or null once it has expired. The
+ * form-reporting actions in `app/admin/actions.ts` start with
+ * `if (!(await adminSession())) return SESSION_EXPIRED;` and hand the editor
+ * a message beside the save button, keeping the form — and its contents — on
+ * screen. Never call it without reading the result; that is what
+ * `requireAdmin()` is for.
+ */
+export async function adminSession(): Promise<Session | null> {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  return readSession(token);
 }
 
 /**
@@ -57,8 +75,7 @@ export async function requireAdmin(): Promise<Session> {
  * login form, not an error page.
  */
 export async function requireAdminPage(): Promise<Session> {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  const session = await readSession(token);
+  const session = await adminSession();
   if (!session) redirect("/admin/login");
   return session;
 }

@@ -1,29 +1,9 @@
 import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
+import { site } from "@/config/site";
 import { getCopyOverrides } from "@/lib/content";
+import { merge, type Messages } from "@/lib/messages";
 import { routing } from "./routing";
-
-type Messages = Record<string, unknown>;
-
-/**
- * Overlays `override` onto `base`, one key at a time. Only plain objects
- * recurse; a string in the override replaces whatever was there.
- */
-function merge(base: Messages, override: Messages): Messages {
-  const out: Messages = { ...base };
-  for (const [key, value] of Object.entries(override)) {
-    const existing = out[key];
-    out[key] =
-      isPlainObject(existing) && isPlainObject(value)
-        ? merge(existing, value)
-        : value;
-  }
-  return out;
-}
-
-function isPlainObject(value: unknown): value is Messages {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 /**
  * Messages are read in two layers.
@@ -51,5 +31,13 @@ export default getRequestConfig(async ({ requestLocale }) => {
     getCopyOverrides(locale),
   ]);
 
-  return { locale, messages: merge(catalogue, overrides) };
+  // The zone `getFormatter().dateTime` formats in — a post's date, the
+  // résumé's "updated" month. Pinned so the value does not depend on where
+  // the page happened to be rendered; without it next-intl falls back to
+  // the machine's zone and says so on every render in development.
+  return {
+    locale,
+    timeZone: site.timeZone,
+    messages: merge(catalogue, overrides),
+  };
 });

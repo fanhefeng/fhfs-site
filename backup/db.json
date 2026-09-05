@@ -601,28 +601,419 @@
         "zh": "fhf"
       },
       "tagline": {
-        "en": "developer",
-        "zh": "developer"
+        "en": "Senior front-end engineer · nine years",
+        "zh": "资深前端工程师 · 九年"
       },
       "intro": {
         "en": [
-          "fhf, front-end developer, nine years in. From requirement to release I have built more interfaces than I can remember; this site is the most recent one.",
-          "Off the clock: violin since childhood and still playing; music, film and games — Dota 2, Overwatch and It Takes Two on permanent rotation; basketball and table tennis; Werewolf and Sanguosha nights; travel whenever possible; and a standing curiosity about the world."
+          "Nine years in front-end, six of them on React and TypeScript as the main stack. I have shipped web apps, mobile H5 and Electron desktop clients, and built Node BFF layers on my own. On the business side: enterprise order, settlement and financial-reconciliation systems; over the past year, front-ends for Web3 social and crypto-media products. Consumer and B2B, both delivered."
         ],
         "zh": [
-          "fhf，前端 developer，九年经验。从需求到上线，写过的界面比记得住的多；这个站点是最近的一件。",
-          "工作之外：从小学小提琴，至今还拉；热爱音乐、电影和游戏——Dota 2、守望先锋、双人成行是常驻名单；打篮球和乒乓球，玩狼人杀和三国杀，喜欢旅行，对世界始终好奇。"
+          "9 年前端开发经验，其中 6 年以 React + TypeScript 为主力栈。交付过 Web 应用、移动端 H5 与 Electron 桌面端，也独立搭过 Node BFF 层。业务上做过企业侧的订单、结算与财务对账系统，近一年在 Web3 社交与加密财经产品上做前端；To C 与 To B 的产品都交付过。"
         ]
       },
-      "email": "fanhefeng901121@gmail.com",
+      "highlights": {
+        "en": [
+          "**Components and design systems.** From design mocks to a reusable component layer: Radix primitives with Tailwind design tokens, so keyboard reachability and ARIA semantics come from the primitive and theming lives in one place. Authored a merged component-compatibility fix for Element Plus.",
+          "**Performance by default.** Electron cold start **−60%** and jank rate **−50%**; e-commerce load time **−50%**; classroom platform first paint **−40%**. Metrics get a definition before they get optimised, and are reported from real users rather than a single machine.",
+          "**Tests and CI.** Pure logic — money math, state transitions — is unit-tested without exception (**446+ cases**); interaction paths go through Testing Library; lint, typecheck and tests gate every merge.",
+          "**Full-stack delivery.** Built an enterprise portal from scratch on React 19 + TanStack Start, with a BFF in front of every upstream API and request and response shapes validated by zod schemas shared across both sides; SSO, permission isolation and SSE streaming included.",
+          "**Web3 front-end.** ethers.js / wagmi, EIP-1193 wallet connection, EIP-712 signing, contract calls and on-chain event subscription. 3rd place, AI track, ETH Beijing Hackathon 2025."
+        ],
+        "zh": [
+          "**组件与设计系统**：从设计稿到可复用组件体系的完整交付。组件层基于 Radix 原语 + Tailwind 设计令牌，键盘可达与 ARIA 语义由原语保证，主题切换收敛在令牌一处；为 Element Plus 提交过组件兼容性修复 PR（已合并）。",
+          "**性能是默认要求**：Electron 启动提速 **60%**、卡顿率下降 **50%**；电商平台加载时间下降 **50%**；教学平台首屏缩短 **40%**。指标先定义口径再优化，埋点上报而非单机跑分。",
+          "**测试与 CI**：金额计算、状态迁移等纯逻辑强制单测（累计 **446+ 用例**），交互层用 Testing Library 覆盖关键路径；lint、类型检查与测试不过不合并。",
+          "**全栈交付**：以 React 19 + TanStack Start 从零搭建企业级门户，BFF 统一代理上游接口，出入参由前后端共用的 zod schema 校验；SSO 单点登录、权限隔离与 SSE 流式一并完成。",
+          "**Web3 前端**：ethers.js / wagmi、EIP-1193 钱包连接、EIP-712 签名、合约调用与链上事件监听；ETH Beijing Hackathon 2025 AI 赛道第三名。"
+        ]
+      },
+      "skills": {
+        "en": [
+          {
+            "name": "React & TypeScript",
+            "items": "React 19 (Hooks, Suspense, the server/client component split), TypeScript (type architecture, generics and conditional types, type-safe API layers), TanStack Query / Router / Start, Zustand, Next.js App Router, Vue 3, Vite"
+          },
+          {
+            "name": "UI & design systems",
+            "items": "Tailwind CSS 4, shadcn/ui on Radix primitives, Ant Design, Element Plus, design tokens and theming (dark mode, i18n), Figma-to-code fidelity, responsive and mobile layout, keyboard reachability and ARIA semantics, `prefers-reduced-motion`, iOS Safari compatibility"
+          },
+          {
+            "name": "Performance & quality",
+            "items": "First-paint optimisation, route-level code splitting, lazy loading and prefetch, bundle analysis, long-task and dropped-frame triage, virtual scrolling, Core Web Vitals (LCP / INP / CLS), Vitest + Testing Library, ESLint, CI gates"
+          },
+          {
+            "name": "Web3",
+            "items": "ethers.js, wagmi + RainbowKit, WalletConnect, EIP-1193, EIP-712, contract calls and ABI decoding, on-chain event subscription, dApp integration"
+          },
+          {
+            "name": "Server & tooling",
+            "items": "Node.js BFF, SSE streaming, WebSocket, end-to-end zod contracts, REST / OpenAPI / webhook integration, Electron main process and IPC, micro-frontends, WordPress theme development, Docker deployment, CI/CD, pnpm"
+          },
+          {
+            "name": "Domains",
+            "items": "Trading settlement, orders, financial reconciliation, reporting, RBAC, internationalisation (languages, time zones, currencies)"
+          }
+        ],
+        "zh": [
+          {
+            "name": "React & TS",
+            "items": "React 19（Hooks、Suspense、Server / Client 组件分界）、TypeScript（类型架构、泛型与条件类型、类型安全的 API 层）、TanStack Query / Router / Start、Zustand、Next.js App Router、Vue 3、Vite"
+          },
+          {
+            "name": "UI 与设计系统",
+            "items": "Tailwind CSS 4、shadcn/ui（Radix 原语）、Ant Design、Element Plus、设计令牌与主题化（明暗 / 多语言）、Figma 稿还原、响应式与移动端适配、键盘可达与 ARIA 语义、`prefers-reduced-motion`、iOS Safari 兼容"
+          },
+          {
+            "name": "性能与质量",
+            "items": "首屏优化、路由级代码分割、懒加载与预取、bundle 分析、长任务与掉帧治理、虚拟滚动、Core Web Vitals（LCP / INP / CLS）、Vitest + Testing Library、ESLint、CI 卡点"
+          },
+          {
+            "name": "Web3",
+            "items": "ethers.js、wagmi + RainbowKit、WalletConnect、EIP-1193、EIP-712、合约调用与 ABI 解析、链上事件监听、dApp 接入"
+          },
+          {
+            "name": "服务端与工程",
+            "items": "Node.js BFF、SSE 流式、WebSocket、zod 端到端契约、REST / OpenAPI / Webhook 对接、Electron 主进程与 IPC、微前端、WordPress 主题开发、Docker 部署、CI/CD、pnpm"
+          },
+          {
+            "name": "业务领域",
+            "items": "交易结算、订单、财务对账、报表、RBAC 权限体系、国际化（多语言 / 多时区 / 多币种）"
+          }
+        ]
+      },
+      "projects": {
+        "en": [
+          "**Element Plus** — authored a component-compatibility fix, merged upstream.",
+          "**Crypto Note** — **3rd place**, AI track, ETH Beijing Hackathon 2025. A decentralised note-taking app built from scratch on React + ethers.js; I owned wallet connection, transaction signing, contract reads and writes, and on-chain event subscription.",
+          "**Raycast** — added pinyin search to the Apple Notes extension."
+        ],
+        "zh": [
+          "**Element Plus** — 提交组件兼容性修复 PR，已合并。",
+          "**Crypto Note** — ETH Beijing Hackathon 2025 AI 赛道**第三名**。React + ethers.js 从零构建的去中心化笔记应用，独立完成钱包连接、交易签名、合约读写与链上事件订阅。",
+          "**Raycast** — 为 Apple Notes 扩展新增拼音搜索。"
+        ]
+      },
+      "education": {
+        "en": [
+          "Bachelor's degree · Sep 2009 – Jul 2013"
+        ],
+        "zh": [
+          "本科 · 2009.09 – 2013.07"
+        ]
+      },
+      "email": null,
       "github": "fanhefeng",
+      "website": "https://linktr.ee/fhf1121",
       "location": {
         "en": "Shanghai",
         "zh": "上海"
+      },
+      "note": {
+        "en": "JDs and offers welcome",
+        "zh": "欢迎老板砸 JD / offer"
       }
     }
   ],
-  "resumeExperiences": [],
+  "resumeExperiences": [
+    {
+      "key": "digital-tech-2025",
+      "company": {
+        "en": "Digital-technology arm of a state-owned construction group",
+        "zh": "某央企旗下数字科技公司"
+      },
+      "role": {
+        "en": "Senior Front-end Engineer",
+        "zh": "资深前端工程师"
+      },
+      "period": {
+        "en": "Jan 2025 – Present",
+        "zh": "2025.01 – 至今"
+      },
+      "url": null,
+      "summary": null,
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "projects": {
+        "en": [
+          {
+            "title": "Enterprise AI assistant portal (front-end + BFF, delivered solo)",
+            "period": null,
+            "bullets": [
+              "Built from scratch on **React 19 + TanStack Start + Tailwind 4**, wrapping the upstream AI agent service (FastAPI / OpenAPI 3.1) into one portal — chat, knowledge base and internal apps — for the group's employees.",
+              "**SSE streaming chat engine.** Several upstream streaming protocols unified into one `ChatStreamEvent` union type; `EventSource` cannot carry custom headers, so frames are parsed off `fetch` + `ReadableStream`, with reconnects resuming from Last-Event-ID; rendering flushes per animation frame instead of a setState per token, so long answers never drop frames.",
+              "Designed the **Node BFF layer** — the browser talks only to it. The API contract is pinned in **zod schemas shared by both sides**, so a changed field surfaces at typecheck and at runtime. Also delivered SSO sign-on with permission isolation, and chunked document upload with real progress for the knowledge base.",
+              "Set the engineering baseline myself: money math and state transitions under mandatory unit tests, **446+ Vitest cases**; lint, typecheck and tests each gate the merge on CI — a one-person project has no peer review, so automation stands in. Also contributed to the front-ends of several internal AI applications."
+            ]
+          }
+        ],
+        "zh": [
+          {
+            "title": "企业 AI 助手门户（前端 + BFF，独立交付）",
+            "period": null,
+            "bullets": [
+              "以 **React 19 + TanStack Start + Tailwind 4** 从零搭建，把后端 AI Agent 服务（FastAPI / OpenAPI 3.1）收敛为覆盖会话、知识库与智能应用的统一门户，面向集团内部员工。",
+              "**SSE 流式会话引擎**：把上游几种流式协议统一为一个 `ChatStreamEvent` 联合类型；`EventSource` 无法自定义请求头，改用 `fetch` + `ReadableStream` 解析帧，断线按 Last-Event-ID 续传；渲染按帧批量刷新而非逐 token 触发 setState，长回答不掉帧。",
+              "搭建 **Node BFF 层**，浏览器只与 BFF 交互；接口契约用 **zod schema** 固化并前后端共用，字段变更在类型检查与运行时校验中即时暴露。接入 SSO 单点登录与权限隔离，实现知识库文档分片上传与真实进度展示。",
+              "工程基线自己定：金额计算与状态迁移强制单测，**Vitest 累计 446+ 用例**；CI 上 lint、类型检查与测试任一不过即不允许合并——一个人开发没有同侪评审，靠自动化兜底。另参与多个内部 AI 应用的前端迭代。"
+            ]
+          }
+        ]
+      },
+      "sort": 0
+    },
+    {
+      "key": "web3-studio-2026",
+      "company": {
+        "en": "Web3 product team for overseas markets",
+        "zh": "海外 Web3 产品技术团队"
+      },
+      "role": {
+        "en": "Front-end Engineer (remote)",
+        "zh": "前端工程师（远程）"
+      },
+      "period": {
+        "en": "Jan 2026 – Present",
+        "zh": "2026.01 – 至今"
+      },
+      "url": null,
+      "summary": {
+        "en": "A team building Web3 products for overseas markets; front-end delivery on three products in turn.",
+        "zh": "面向海外市场的 Web3 产品团队，先后参与三个产品的前端交付。"
+      },
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "projects": {
+        "en": [
+          {
+            "title": "Web3 social messaging app",
+            "period": "Jan 2026 – Jun 2026",
+            "bullets": [
+              "Owned the marketing site's compliance pages (privacy policy, terms, account deletion, open-source notice) and app download entry points (App Store / Google Play / APK) on **Next.js + React 19 + Tailwind 4 + shadcn/ui**.",
+              "Built the **Electron desktop foundation** (Electron 33 + React 19 + TanStack Router + Zustand): a multi-module shell, third-party apps hosted in WebContentsView and bridged through a JSAPI, deep links, tray and auto-update; `nodeIntegration` off, `contextIsolation` on, IPC arguments validated in the main process.",
+              "Wrote the Android test cases and the per-release test reports."
+            ]
+          },
+          {
+            "title": "Multi-chain Web3 social platform",
+            "period": "May 2026 – Jul 2026",
+            "bullets": [
+              "Sole owner of the marketing site (**Next.js 16 App Router + React 19 + Tailwind 4**, on Vercel): landing page, announcements, download and legal pages; four-locale client-side i18n (zh-CN / zh-TW / ko / en) with the Chinese dictionary typed as the shape every other locale must match.",
+              "Scroll animation hand-rolled on IntersectionObserver + rAF and honouring `prefers-reduced-motion`; compatible down to iOS 15 Safari.",
+              "Kept download channels and release announcements in step with a fast app release cadence, 10+ releases; also built a Tencent Cloud IM / TRTC usage monitor with daily Lark reports (Node.js)."
+            ]
+          },
+          {
+            "title": "Web3 + AI financial news media",
+            "period": "Jul 2026 – Present",
+            "bullets": [
+              "A multi-language news site built on automated collection, AI processing, editorial review and multi-channel distribution. As the main developer I own the front-end theme and part of the admin side: home, newsflash, articles, columns, events, funding, markets and wiki — **20+ page templates** in **five languages** (en / zh / ja / ko / vi), with per-locale routing and copy.",
+              "**Real-time newsflash push**: a Node.js WebSocket service with a front-end subscriber that falls back to polling when push is unavailable.",
+              "**Configurable home-page layout**: editor's picks, navigation, sidebars and content blocks are arranged by drag-and-drop in the admin and resolved live on the front-end, so a change of line-up needs no release.",
+              "Columnist writing desk and reader account pages (writing, drafts, review, activity) with nonce and ownership checks on every write; Docker + Caddy deployment and versioned packaging scripts."
+            ]
+          }
+        ],
+        "zh": [
+          {
+            "title": "Web3 社交 IM App",
+            "period": "2026.01 – 2026.06",
+            "bullets": [
+              "负责官网（**Next.js + React 19 + Tailwind 4 + shadcn/ui**）的合规页面（隐私政策、服务条款、账号注销、开源声明）与 App 下载入口（App Store / Google Play / APK）。",
+              "搭建 **Electron 桌面端底座**（Electron 33 + React 19 + TanStack Router + Zustand）：多模块壳、以 WebContentsView 承载第三方应用并通过 JSAPI 通信、deep link、托盘与自动更新；关闭 `nodeIntegration`、开启 `contextIsolation`，IPC 参数在主进程校验。",
+              "编写 Android 端测试用例并输出版本测试报告。"
+            ]
+          },
+          {
+            "title": "多链 Web3 社交平台",
+            "period": "2026.05 – 2026.07",
+            "bullets": [
+              "独立负责官网（**Next.js 16 App Router + React 19 + Tailwind 4**，部署于 Vercel）：落地页、公告、下载页与法务页面；四语言（简中 / 繁中 / 韩 / 英）客户端 i18n，字典类型以中文为基准约束其余语言。",
+              "滚动动效以 IntersectionObserver + rAF 手写，遵循 `prefers-reduced-motion`；兼容至 iOS 15 Safari。",
+              "配合 App 高频发版维护下载渠道与版本公告，累计 10+ 个版本；另实现腾讯云 IM / TRTC 用量监控与 Lark 日报工具（Node.js）。"
+            ]
+          },
+          {
+            "title": "Web3 + AI 财经资讯媒体",
+            "period": "2026.07 – 至今",
+            "bullets": [
+              "「自动采集 + AI 处理 + 编辑审核 + 多端分发」的多语言资讯站，作为主要开发者负责前台主题与部分后台功能：首页、快讯、文章、专栏、活动、融资、行情、百科等 **20+ 页面模板**，**五语言**（en / zh / ja / ko / vi）路由与文案。",
+              "**实时快讯推送**：Node.js WebSocket 服务 + 前台订阅，推送不可用时自动退回轮询。",
+              "**首页编排配置化**：主编推荐、导航、侧栏与板块均在后台拖动配置、前台实时解析，调整栏目不需要发版。",
+              "专栏作者前台工作台与读者个人中心（写作、草稿、审核、动态），写操作走 nonce + 归属校验；Docker + Caddy 部署与版本化打包脚本。"
+            ]
+          }
+        ]
+      },
+      "sort": 1
+    },
+    {
+      "key": "appliance-group-2023",
+      "company": {
+        "en": "A leading home-appliance group",
+        "zh": "某头部家电集团"
+      },
+      "role": {
+        "en": "Senior Front-end Engineer",
+        "zh": "资深前端工程师"
+      },
+      "period": {
+        "en": "Jan 2023 – Dec 2024",
+        "zh": "2023.01 – 2024.12"
+      },
+      "url": null,
+      "summary": null,
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "projects": {
+        "en": [
+          {
+            "title": "One-stop enterprise collaboration platform (Electron desktop)",
+            "period": null,
+            "bullets": [
+              "Led the desktop architecture rework: **cold start −60%, jank rate −50%** (measured from process launch to first interaction and as the share of long tasks on the main thread, reported by our own instrumentation against the pre-rework baseline) — deferred synchronous main-process init, a slimmer preload, route-level chunks and virtualised long lists.",
+              "Built a **unified API service layer and its CMS**; an IPC publish/subscribe bus carried cross-module communication and enabled per-module hot updates. Delivered internationalisation covering copy, time zones and layout direction.",
+              "Security baseline: `nodeIntegration` off, `contextIsolation` on, preload exposing an allowlist through `contextBridge`, IPC arguments validated in the main process."
+            ]
+          },
+          {
+            "title": "Cross-border e-commerce platform and admin console",
+            "period": null,
+            "bullets": [
+              "Owned the front-end of the core commerce path — **catalogue, orders, settlement** — and its admin console; re-architected the platform as **micro-frontends** so each business module ships and rolls back on its own.",
+              "Reworked the critical rendering path (slimmer first-paint assets, lazy images and lists, merged requests): **overall load time down 50%**. Unified the build pipeline and code standards, lifting team delivery throughput by 20%+."
+            ]
+          }
+        ],
+        "zh": [
+          {
+            "title": "一站式企业协作平台（Electron 桌面端）",
+            "period": null,
+            "bullets": [
+              "主导桌面端架构重构，**启动速度提升 60%，卡顿率下降 50%**（口径为进程拉起到首屏可交互、主线程长任务占比，自埋点上报对照重构前基线）：主进程同步初始化后移、preload 瘦身、路由级分包与长列表虚拟滚动。",
+              "搭建**统一 API 服务层与配套 CMS**，以 IPC 发布订阅实现跨模块通信，支持模块级热更新；实现覆盖文案、时区与布局方向的多语言国际化。",
+              "安全基线：关闭 `nodeIntegration`、开启 `contextIsolation`，preload 以 `contextBridge` 白名单式暴露方法，IPC 参数在主进程校验。"
+            ]
+          },
+          {
+            "title": "海外电商平台及后台管理系统",
+            "period": null,
+            "bullets": [
+              "负责**商品、订单与结算**核心交易流程的前端及后台管理系统；以**微前端**重构平台架构，各业务模块独立发布、独立回滚。",
+              "优化关键渲染路径（首屏资源瘦身、图片与列表懒加载、接口合并）后**整体加载时间下降 50%**；统一构建流程与代码规范，团队交付效率提升 20%+。"
+            ]
+          }
+        ]
+      },
+      "sort": 2
+    },
+    {
+      "key": "edtech-2020",
+      "company": {
+        "en": "An education-technology company (Beijing)",
+        "zh": "某教育科技公司（北京）"
+      },
+      "role": {
+        "en": "Front-end Engineer → Senior Front-end Engineer",
+        "zh": "前端开发工程师 → 高级前端工程师"
+      },
+      "period": {
+        "en": "Mar 2020 – Dec 2022",
+        "zh": "2020.03 – 2022.12"
+      },
+      "url": null,
+      "summary": null,
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "projects": {
+        "en": [
+          {
+            "title": "Enterprise order and financial management system",
+            "period": null,
+            "bullets": [
+              "Owned the front-end architecture and core features: RBAC, order management, financial report export and reconciliation of discrepancies. Money never touches floating point — one money component formats by currency precision; report export moved to asynchronous server-side generation with client polling, ending the browser freezes of assembling full datasets on the client.",
+              "Integrated the **Yonyou** financial system for automatic data sync in place of manual reconciliation, building the account-mapping, sync status and log, and failed-document retry screens; optimised state with **Pinia + on-demand loading** — **30%+ less redundant code, 20% faster builds**."
+            ]
+          },
+          {
+            "title": "K-12 smart classroom platform",
+            "period": null,
+            "bullets": [
+              "Built the front-end across the pre-, in- and post-class flow; Webpack dynamic chunking, CDN caching and lazy loading cut **first paint by 40%**."
+            ]
+          }
+        ],
+        "zh": [
+          {
+            "title": "企业订单与财务管理系统",
+            "period": null,
+            "bullets": [
+              "负责前端架构与核心功能，覆盖 RBAC 权限、订单管理、财务报表导出与对账差异处理。金额全链路不经浮点，统一走金额组件按币种精度格式化；报表导出改为后端异步生成 + 前端轮询下载，解决全量数据在前端拼装导致的浏览器卡死。",
+              "对接**用友财务系统**实现数据自动同步替代人工对账，负责科目映射配置、同步状态与日志、失败单据重试等管理界面；以 **Pinia + 按需加载**优化状态管理，**冗余代码减少 30%+，构建速度提升 20%**。"
+            ]
+          },
+          {
+            "title": "K12 智慧课堂平台",
+            "period": null,
+            "bullets": [
+              "承担课前、课中、课后完整流程的前端开发；通过 Webpack 动态拆包、CDN 缓存与懒加载，**首屏加载时间缩短 40%**。"
+            ]
+          }
+        ]
+      },
+      "sort": 3
+    },
+    {
+      "key": "aviation-2017",
+      "company": {
+        "en": "A civil-aviation IT company",
+        "zh": "某民航信息科技公司"
+      },
+      "role": {
+        "en": "Front-end Engineer",
+        "zh": "前端开发工程师"
+      },
+      "period": {
+        "en": "Mar 2017 – Dec 2019",
+        "zh": "2017.03 – 2019.12"
+      },
+      "url": null,
+      "summary": null,
+      "bullets": {
+        "en": [],
+        "zh": []
+      },
+      "projects": {
+        "en": [
+          {
+            "title": "Official civil-aviation travel platform (H5)",
+            "period": null,
+            "bullets": [
+              "Built the flight-status, travel-service and check-in H5 pages with responsive layout across devices, and resolved cross-browser and in-app WebView compatibility issues; rebuilt SEO through prerendering, sitemaps, canonical tags and structured data — **indexed core pages up 100%**."
+            ]
+          }
+        ],
+        "zh": [
+          {
+            "title": "民航官方出行平台 H5",
+            "period": null,
+            "bullets": [
+              "负责航班动态、出行服务与值机等 H5 页面，完成多端适配与响应式布局，处理跨浏览器与移动端 WebView 兼容问题；通过预渲染、sitemap、canonical 与结构化数据重构 SEO，**核心页面收录量提升 100%**。"
+            ]
+          }
+        ]
+      },
+      "sort": 4
+    }
+  ],
   "chips": [
     {
       "label": {
@@ -1616,7 +2007,7 @@
     {
       "key": "resume.experienceTitle",
       "zh": "工作经历",
-      "en": "Work Experience",
+      "en": "Experience",
       "note": null
     },
     {

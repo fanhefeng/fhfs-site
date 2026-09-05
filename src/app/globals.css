@@ -687,14 +687,78 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Print: GSAP entrance tweens leave below-the-fold content at inline
- * opacity 0 / hidden until scrolled to — paper never scrolls, so undo them.
+ * Print: only the page's <main> goes on paper.
+ *
+ * Everything else the layout mounts beside it — the island, the footer, the
+ * glow and grain, the route curtain, the overture, the music box — is either
+ * chrome or a fixed overlay, and a fixed overlay prints on *every* page.
+ * That used to happen: the opacity reset below (needed because GSAP
+ * entrance tweens leave below-the-fold content at inline opacity 0 until
+ * scrolled to, and paper never scrolls) also resurrected every overlay GSAP
+ * had hidden the same way, and the résumé came out under a grey veil with
+ * the loader's wordmark in the middle of each sheet. So the reset is scoped
+ * to <main>, and nothing outside it is printed at all.
+ *
+ * The rest is what makes /resume's print button an export: the tokens go
+ * to ink on white in either theme (the dark selector has to be named, or it
+ * out-specifies the light one) and the type steps down to résumé sizes.
+ * The size rules are unlayered, so they win over the layered utilities they
+ * override without any `!important`.
  * ------------------------------------------------------------------------- */
 @media print {
-  [style*="opacity"],
-  [style*="visibility"] {
+  body > :not(main):not(:has(main)) {
+    display: none !important;
+  }
+
+  main [style*="opacity"],
+  main [style*="visibility"] {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 14mm 15mm;
+  }
+
+  :root,
+  :root[data-theme="dark"] {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-raised: #ffffff;
+    --fg: #111111;
+    --fg-secondary: #333333;
+    --fg-tertiary: #555555;
+    --accent: #8a4a10;
+    --line: #d4d4d4;
+  }
+
+  [data-resume] .text-display-sm {
+    font-size: 22pt;
+  }
+  [data-resume] .text-title {
+    font-size: 13pt;
+  }
+  [data-resume] .text-heading {
+    font-size: 12pt;
+  }
+  [data-resume] .text-body {
+    font-size: 10pt;
+    line-height: 1.45;
+  }
+  [data-resume] .text-caption {
+    font-size: 9pt;
+    line-height: 1.45;
+  }
+  [data-resume] .text-meta {
+    font-size: 7.5pt;
+  }
+  [data-resume] a {
+    color: inherit;
+    text-decoration: none;
+  }
+  [data-resume] :is(h2, h3, h4) {
+    break-after: avoid;
   }
 }
