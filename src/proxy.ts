@@ -25,6 +25,17 @@ const intlProxy = createMiddleware(routing);
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // A path carrying a broken escape sequence — `/blog/tags/100%`, `/%zz` —
+  // throws while the router is matching it, and the visitor gets a bare
+  // "Internal Server Error": the site reporting a fault of its own for a
+  // request that was malformed before it arrived. The proxy sees the path
+  // first, so it is answered here for what it is.
+  try {
+    decodeURIComponent(pathname);
+  } catch {
+    return new NextResponse("Bad Request", { status: 400 });
+  }
+
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (pathname === "/admin/login") return NextResponse.next();
 
