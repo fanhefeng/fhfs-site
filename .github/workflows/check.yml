@@ -9,12 +9,22 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # v5 and up run on Node 24 and need a runner of at least v2.327.1;
+      # GitHub's hosted runners are well past that. v7 refuses to check a fork
+      # PR out under `pull_request_target` / `workflow_run` — neither trigger
+      # is used here, and `pull_request` is the one that was already safe.
+      - uses: actions/checkout@v7
 
-      # Reads the pnpm version from package.json's `packageManager`.
-      - uses: pnpm/action-setup@v4
+      # Before setup-node, so that its `cache: pnpm` has a pnpm to ask for the
+      # store path. The version is left to `packageManager` in package.json
+      # (pnpm 11.20.0) — which v6 accepts precisely because that is pnpm 11 or
+      # newer; an older declaration there would have to be spelled out here.
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      # `cache: pnpm` is explicit on purpose. v5 started caching by itself when
+      # package.json names a packageManager and v6 narrowed that to npm only —
+      # neither reaches a workflow that says which cache it wants.
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .node-version
           cache: pnpm
