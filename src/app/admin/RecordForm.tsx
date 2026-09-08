@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import type { ActionState } from "./actions";
-import { inputClass, labelClass } from "./AdminChrome";
+import { inputClass, labelClass } from "./styles";
 import { SaveControls } from "./SaveControls";
 
 export type Field =

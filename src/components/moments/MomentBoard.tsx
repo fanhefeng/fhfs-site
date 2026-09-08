@@ -7,19 +7,24 @@ import { groupByYear } from "@/lib/byYear";
 import { collections, FOLD_LINES, shouldFold, type BoardMoment } from "@/lib/moments";
 import { Reveal } from "@/components/fx/Reveal";
 
-/** How many lines come out per "more" — a screen or three, not the lot. */
-const PAGE = 40;
-
 /**
  * The board itself: a QQ 空间 of a list, kept to the magazine's paper. Every
- * line is in the DOM from the server (the page is read without JavaScript);
- * what the client adds is the notebook filter, the paging, and the fold on
- * the long ones. Filtering resets the paging — a filter is a new reading.
+ * line is in the DOM from the server, and that is the point — the page is
+ * readable with no JavaScript at all, and a crawler sees all of it. What the
+ * client adds is the notebook filter and the fold on the long ones, both of
+ * which only ever hide what is already there.
+ *
+ * There used to be a "show 40 more" button here, and it broke that promise
+ * quietly: the first render is a server render, so `shown` started at 40 and
+ * the prerendered HTML carried forty of two hundred and forty-two lines. The
+ * remaining two hundred existed only behind a click that needs JavaScript to
+ * do anything. Two hundred short strings are not worth a paginator — the whole
+ * board is a few tens of kilobytes, once, on a page whose entire subject is
+ * that it is long.
  */
 export function MomentBoard({ items }: { items: BoardMoment[] }) {
   const t = useTranslations("moments");
   const [notebook, setNotebook] = useState<string | null>(null);
-  const [shown, setShown] = useState(PAGE);
   const [open, setOpen] = useState<Set<string>>(() => new Set());
 
   const notebooks = useMemo(() => collections(items), [items]);
@@ -27,14 +32,9 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
     () => (notebook ? items.filter((item) => item.collection === notebook) : items),
     [items, notebook]
   );
-  const visible = filtered.slice(0, shown);
-  const groups = groupByYear(visible, (item) => item.year);
-  const remaining = filtered.length - visible.length;
+  const groups = groupByYear(filtered, (item) => item.year);
 
-  const pick = (name: string | null) => {
-    setNotebook(name);
-    setShown(PAGE);
-  };
+  const pick = (name: string | null) => setNotebook(name);
   const toggle = (key: string) =>
     setOpen((prev) => {
       const next = new Set(prev);
@@ -87,18 +87,6 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
         </section>
       ))}
 
-      {remaining > 0 && (
-        <p className="mt-12 text-center">
-          <button
-            type="button"
-            onClick={() => setShown((n) => n + PAGE)}
-            className="hit-ext inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
-          >
-            {t("more", { count: Math.min(remaining, PAGE) })}
-            <span aria-hidden="true">↓</span>
-          </button>
-        </p>
-      )}
     </>
   );
 }

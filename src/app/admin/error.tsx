@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { buttonClass } from "./AdminChrome";
+import { buttonClass } from "./styles";
 
 /**
  * The admin's error boundary.

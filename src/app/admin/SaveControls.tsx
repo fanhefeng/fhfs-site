@@ -1,7 +1,7 @@
 "use client";
 
 import type { ActionState } from "./actions";
-import { buttonClass } from "./AdminChrome";
+import { buttonClass } from "./styles";
 
 /**
  * The submit button and the error/saved lines every admin form ends with.
