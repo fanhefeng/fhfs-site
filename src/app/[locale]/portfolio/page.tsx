@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { getApps, getExperiments, getWorks } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { WorkCard } from "@/components/cards/WorkCard";
@@ -53,12 +54,12 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
 
   /* The craft log, and what it falls back to.
    *
-   * With the `experiments` table empty this page used to render a heading over
-   * nothing — a title, a subtitle, and a screen of paper. The honest fallback
-   * is not a placeholder: the motion studies this site actually contains are
-   * the six in the lab, described in their own words in `messages`, so the log
-   * reads off that table until someone curates a different one. Nothing here
-   * is invented; every line links to the study it describes. */
+   * An empty `experiments` table would leave a heading over nothing — a title,
+   * a subtitle, and a screen of paper. The honest fallback is not a
+   * placeholder: the motion studies this site actually contains are the ones
+   * in the lab, described in their own words in `messages`, so the log reads
+   * off `LAB_ENTRIES` until someone curates a different list. Nothing here is
+   * invented; every line links to the study it describes. */
   const craft: CraftEntry[] =
     experiments.length > 0
       ? experiments.map((entry) => ({
@@ -114,12 +115,12 @@ export default async function PortfolioPage({ params }: PageProps<"/[locale]/por
           <div className="glass-thin mt-8 rounded-card p-8">
             <h3 className="text-heading text-fg">{t("emptyTitle")}</h3>
             <p className="mt-2 max-w-[52ch] text-body text-fg-secondary">{t("empty")}</p>
-            <a
-              href={`/${locale}/software`}
+            <Link
+              href="/software"
               className="mt-5 inline-block font-mono text-meta uppercase tracking-meta text-fg-secondary underline decoration-accent/55 underline-offset-4 transition-colors hover:text-accent"
             >
               {t("emptyCta")}
-            </a>
+            </Link>
           </div>
         )}
       </Reveal>

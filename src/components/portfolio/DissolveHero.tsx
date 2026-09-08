@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import * as THREE from "three";
+// Types only — the runtime module is fetched inside the effect below, so
+// three.js stays out of this page's initial payload.
+import type * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
@@ -23,10 +25,12 @@ type Props = {
 };
 
 /** The two papers the picture can dissolve into — the site's section
- *  background in each theme (globals.css `--surface`). */
-const PAPER = {
-  light: new THREE.Color(0.949, 0.941, 0.918),
-  dark: new THREE.Color(0.078, 0.078, 0.09),
+ *  background in each theme (globals.css `--surface`), as linear RGB. Plain
+ *  numbers rather than `THREE.Color`s: a colour built at module scope would
+ *  drag three.js back into the page's first payload for two constants. */
+const PAPER: Record<"light" | "dark", [number, number, number]> = {
+  light: [0.949, 0.941, 0.918],
+  dark: [0.078, 0.078, 0.09],
 };
 
 const VERT = /* glsl */ `
@@ -186,148 +190,176 @@ export function DissolveHero({
       return;
     }
 
-    let renderer: THREE.WebGLRenderer;
-    try {
-      renderer = new THREE.WebGLRenderer({
-        canvas,
-        antialias: false,
-        alpha: false,
-        powerPreference: "high-performance",
-        stencil: false,
-        depth: false,
+    /* three.js is 195 KB gz, and everything it does here is decoration over a
+       photograph the page has already rendered: the poster, the copy and the
+       whole layout are in the SSR output, and `degraded` is a first-class
+       state. So the library is fetched from inside the effect rather than
+       imported at the top — the hero paints on the server, and the dissolve
+       arrives when it arrives. (`next/dynamic` would have been the wrong tool:
+       it would have taken the poster out of the server render too.) */
+    let cancelled = false;
+    let teardown: (() => void) | undefined;
+
+    void import("three").then((three) => {
+      if (cancelled) return;
+
+      let renderer: THREE.WebGLRenderer;
+      try {
+        renderer = new three.WebGLRenderer({
+          canvas,
+          antialias: false,
+          alpha: false,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: false,
+        });
+      } catch {
+        setDegraded(true);
+        return;
+      }
+
+      const paper = {
+        light: new three.Color(...PAPER.light),
+        dark: new three.Color(...PAPER.dark),
+      };
+      const scene = new three.Scene();
+      const camera = new three.Camera();
+      const uniforms = {
+        uTex: { value: null as THREE.Texture | null },
+        uTexSize: { value: new three.Vector2(1, 1) },
+        uRes: { value: new three.Vector2(1, 1) },
+        uProgress: { value: 0 },
+        uTime: { value: 0 },
+        uNoiseScale: { value: 2.6 },
+        uNoiseAmp: { value: 0.62 },
+        uSoft: { value: 0.004 },
+        uPaper: { value: paper.light.clone() },
+        uDark: { value: 0 },
+      };
+
+      const applyTheme = () => {
+        const theme = currentTheme();
+        uniforms.uPaper.value.copy(paper[theme]);
+        uniforms.uDark.value = theme === "dark" ? 1 : 0;
+        renderer.setClearColor(paper[theme], 1);
+        dirtyRef.current = true;
+      };
+      applyTheme();
+      // The site's theme contract: LightSwitch dispatches this after flipping
+      // data-theme (DESIGN.md §1.6).
+      window.addEventListener("fhfs:theme", applyTheme);
+
+      const material = new three.ShaderMaterial({
+        vertexShader: VERT,
+        fragmentShader: FRAG,
+        uniforms,
+        depthTest: false,
+        depthWrite: false,
       });
-    } catch {
-      setDegraded(true);
-      return;
-    }
+      const geometry = new three.PlaneGeometry(2, 2);
+      scene.add(new three.Mesh(geometry, material));
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
-    const uniforms = {
-      uTex: { value: null as THREE.Texture | null },
-      uTexSize: { value: new THREE.Vector2(1, 1) },
-      uRes: { value: new THREE.Vector2(1, 1) },
-      uProgress: { value: 0 },
-      uTime: { value: 0 },
-      uNoiseScale: { value: 2.6 },
-      uNoiseAmp: { value: 0.62 },
-      uSoft: { value: 0.004 },
-      uPaper: { value: PAPER.light.clone() },
-      uDark: { value: 0 },
-    };
-
-    const applyTheme = () => {
-      const theme = currentTheme();
-      uniforms.uPaper.value.copy(PAPER[theme]);
-      uniforms.uDark.value = theme === "dark" ? 1 : 0;
-      renderer.setClearColor(PAPER[theme], 1);
-      dirtyRef.current = true;
-    };
-    applyTheme();
-    // The site's theme contract: LightSwitch dispatches this after flipping
-    // data-theme (DESIGN.md §1.6).
-    window.addEventListener("fhfs:theme", applyTheme);
-
-    const material = new THREE.ShaderMaterial({
-      vertexShader: VERT,
-      fragmentShader: FRAG,
-      uniforms,
-      depthTest: false,
-      depthWrite: false,
-    });
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    scene.add(new THREE.Mesh(geometry, material));
-
-    const resize = () => {
-      const el = stickyRef.current;
-      const w = el?.clientWidth || window.innerWidth;
-      const h = el?.clientHeight || window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, w * h > 2_600_000 ? 1.5 : 2);
-      renderer.setPixelRatio(dpr);
-      renderer.setSize(w, h, false);
-      uniforms.uRes.value.set(w * dpr, h * dpr);
-      dirtyRef.current = true;
-    };
-    resize();
-
-    const onResize = () => {
+      const resize = () => {
+        const el = stickyRef.current;
+        const w = el?.clientWidth || window.innerWidth;
+        const h = el?.clientHeight || window.innerHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, w * h > 2_600_000 ? 1.5 : 2);
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(w, h, false);
+        uniforms.uRes.value.set(w * dpr, h * dpr);
+        dirtyRef.current = true;
+      };
       resize();
-      ScrollTrigger.refresh();
-    };
-    window.addEventListener("resize", onResize, { passive: true });
 
-    let visible = true;
-    const onVisibility = () => {
-      visible = !document.hidden;
-      if (visible) dirtyRef.current = true;
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    // three rebuilds its own state when the context comes back and uploads
-    // the photograph again on the next draw — but nothing asks for that
-    // draw, so the restored canvas would sit blank until the next scroll.
-    const onRestored = () => {
-      dirtyRef.current = true;
-    };
-    canvas.addEventListener("webglcontextrestored", onRestored);
-
-    let disposed = false;
-
-    // One clock for the whole site: gsap.ticker already drives Lenis.
-    const tick = (_time: number, delta: number) => {
-      if (disposed || !visible) return;
-
-      const sp = Math.min(Math.max(sweep.current.value, 0), 1);
-      // Capped so the lamp's band along the top always frames the page.
-      const next = sp * 0.82;
-      if (next !== uniforms.uProgress.value) {
-        uniforms.uProgress.value = next;
-        dirtyRef.current = true;
-      }
-
-      if (!dirtyRef.current) return;
-      dirtyRef.current = false;
-      uniforms.uTime.value += delta * 0.001;
-      renderer.render(scene, camera);
-    };
-
-    const loader = new THREE.TextureLoader();
-    loader.setCrossOrigin("anonymous");
-    loader.load(
-      src,
-      (texture) => {
-        if (disposed) {
-          texture.dispose();
-          return;
-        }
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.minFilter = texture.magFilter = THREE.LinearFilter;
-        texture.generateMipmaps = false;
-        texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-        uniforms.uTex.value = texture;
-        uniforms.uTexSize.value.set(texture.image.width, texture.image.height);
-        dirtyRef.current = true;
-        renderer.render(scene, camera);
-        gsap.ticker.add(tick);
-        setLive(true);
+      const onResize = () => {
+        resize();
         ScrollTrigger.refresh();
-      },
-      undefined,
-      () => {
-        if (!disposed) setDegraded(true);
-      }
-    );
+      };
+      window.addEventListener("resize", onResize, { passive: true });
 
+      let visible = true;
+      const onVisibility = () => {
+        visible = !document.hidden;
+        if (visible) dirtyRef.current = true;
+      };
+      document.addEventListener("visibilitychange", onVisibility);
+      // three rebuilds its own state when the context comes back and uploads
+      // the photograph again on the next draw — but nothing asks for that
+      // draw, so the restored canvas would sit blank until the next scroll.
+      const onRestored = () => {
+        dirtyRef.current = true;
+      };
+      canvas.addEventListener("webglcontextrestored", onRestored);
+
+      let disposed = false;
+
+      // One clock for the whole site: gsap.ticker already drives Lenis.
+      const tick = (_time: number, delta: number) => {
+        if (disposed || !visible) return;
+
+        const sp = Math.min(Math.max(sweep.current.value, 0), 1);
+        // Capped so the lamp's band along the top always frames the page.
+        const next = sp * 0.82;
+        if (next !== uniforms.uProgress.value) {
+          uniforms.uProgress.value = next;
+          dirtyRef.current = true;
+        }
+
+        if (!dirtyRef.current) return;
+        dirtyRef.current = false;
+        uniforms.uTime.value += delta * 0.001;
+        renderer.render(scene, camera);
+      };
+
+      const loader = new three.TextureLoader();
+      loader.setCrossOrigin("anonymous");
+      loader.load(
+        src,
+        (texture) => {
+          if (disposed) {
+            texture.dispose();
+            return;
+          }
+          texture.colorSpace = three.SRGBColorSpace;
+          texture.minFilter = texture.magFilter = three.LinearFilter;
+          texture.generateMipmaps = false;
+          texture.wrapS = texture.wrapT = three.ClampToEdgeWrapping;
+          uniforms.uTex.value = texture;
+          uniforms.uTexSize.value.set(texture.image.width, texture.image.height);
+          dirtyRef.current = true;
+          renderer.render(scene, camera);
+          gsap.ticker.add(tick);
+          setLive(true);
+          ScrollTrigger.refresh();
+        },
+        undefined,
+        () => {
+          if (!disposed) setDegraded(true);
+        }
+      );
+
+      teardown = () => {
+        disposed = true;
+        gsap.ticker.remove(tick);
+        window.removeEventListener("resize", onResize);
+        window.removeEventListener("fhfs:theme", applyTheme);
+        document.removeEventListener("visibilitychange", onVisibility);
+        canvas.removeEventListener("webglcontextrestored", onRestored);
+        uniforms.uTex.value?.dispose();
+        geometry.dispose();
+        material.dispose();
+        releaseRenderer(renderer);
+      };
+    });
+
+    /* Two cases, one cleanup. Unmounted after the scene was built: `teardown`
+       exists and runs. Unmounted while three was still in flight: `cancelled`
+       is what the callback checks the moment it resolves, so nothing is ever
+       built to tear down. (The callback's own body is synchronous, so it can
+       never be cancelled halfway through.) */
     return () => {
-      disposed = true;
-      gsap.ticker.remove(tick);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("fhfs:theme", applyTheme);
-      document.removeEventListener("visibilitychange", onVisibility);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-      uniforms.uTex.value?.dispose();
-      geometry.dispose();
-      material.dispose();
-      releaseRenderer(renderer);
+      cancelled = true;
+      teardown?.();
     };
   }, [src]);
 

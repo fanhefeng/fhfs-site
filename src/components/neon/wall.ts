@@ -36,7 +36,7 @@ function noise(): HTMLCanvasElement {
  * under its bottom, grain over the lot and the corners falling into dark.
  * Deterministic — the same wall every visit — and painted once per resize.
  */
-export function paintWall(canvas: HTMLCanvasElement, w: number, h: number) {
+function paintWall(canvas: HTMLCanvasElement, w: number, h: number) {
   const budget = Math.sqrt(WALL_PIXELS / (w * h));
   const dpr = Math.min(window.devicePixelRatio || 1, 2, Math.max(1, budget));
   canvas.width = Math.round(w * dpr);

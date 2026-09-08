@@ -3,17 +3,14 @@
 import { useEffect, useState } from "react";
 import { site } from "@/config/site";
 
-/** Where the author is — the zone the footer clock and the About colophon
- *  keep, and the one next-intl formats every date in (src/i18n/request.ts).
- *  Shanghai now; the copy that names the city lives in messages. */
-export const HOME_TIME_ZONE = site.timeZone;
-
 /**
- * "HH:mm" in the author's time zone — the wall clock the footer and the
- * About colophon share. Formats wall time for `HOME_TIME_ZONE` regardless of
+ * "HH:mm" in the author's time zone — the wall clock the footer and the About
+ * colophon share. The zone is `site.timeZone`, the same one next-intl formats
+ * every date in (`src/i18n/request.ts`), read straight from the config rather
+ * than re-exported under a second name. Formats wall time there regardless of
  * the visitor's zone and re-renders on the minute (first tick aligned to the
- * next :00 so it never drifts a minute behind). Returns null until mounted,
- * so SSR and hydration agree — render a placeholder for it.
+ * next :00 so it never drifts a minute behind). Returns null until mounted, so
+ * SSR and hydration agree — render a placeholder for it.
  */
 export function useLocalClock(): string | null {
   const [time, setTime] = useState<string | null>(null);
@@ -23,7 +20,7 @@ export function useLocalClock(): string | null {
       hour: "2-digit",
       minute: "2-digit",
       hourCycle: "h23",
-      timeZone: HOME_TIME_ZONE,
+      timeZone: site.timeZone,
     });
     const update = () => setTime(fmt.format(new Date()));
     update();

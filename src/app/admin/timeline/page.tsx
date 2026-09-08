@@ -4,8 +4,8 @@ import { timelineEntries } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { saveTimelineEntry } from "../actions";
-import type { Field } from "../RecordForm";
+import { deleteTimelineEntry, saveTimelineEntry } from "../actions";
+import type { Field, RecordData } from "../RecordForm";
 
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
@@ -22,7 +22,19 @@ export default async function TimelinePage() {
   const rows = await db
     .select()
     .from(timelineEntries)
-    .orderBy(asc(timelineEntries.sort));
+    .orderBy(asc(timelineEntries.sort), asc(timelineEntries.key));
+
+  // Sort ascends newest-first, so a new entry lands at the bottom — the
+  // oldest slot — and is moved up by hand if it belongs higher.
+  const blank: RecordData = {
+    key: "",
+    version: "",
+    date: "",
+    dateLabel: { zh: "", en: "" },
+    title: { zh: "", en: "" },
+    note: { zh: "", en: "" },
+    sort: (rows.at(-1)?.sort ?? -1) + 1,
+  };
 
   return (
     <AdminChrome title="版本履历">
@@ -31,6 +43,7 @@ export default async function TimelinePage() {
       </p>
       <RecordList
         action={saveTimelineEntry}
+        deleteAction={deleteTimelineEntry}
         fields={FIELDS}
         rows={rows.map((row) => ({
           id: row.key,
@@ -38,6 +51,8 @@ export default async function TimelinePage() {
           meta: row.date ?? row.dateLabel?.zh ?? "待填",
           data: row,
         }))}
+        blank={blank}
+        blankLabel="新条目"
       />
     </AdminChrome>
   );

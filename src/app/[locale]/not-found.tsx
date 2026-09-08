@@ -30,13 +30,13 @@ export default function NotFoundPage() {
       <title>{`${t("title")} | ${site.signName}`}</title>
       <NotFoundStage
         blocks={[
-        {
-          lang: htmlLang(locale),
-          title: t("title"),
-          description: t("description"),
-          homeHref: prefix,
-          homeLabel: t("backHome"),
-          blogHref: `${prefix}/blog`,
+          {
+            lang: htmlLang(locale),
+            title: t("title"),
+            description: t("description"),
+            homeHref: prefix,
+            homeLabel: t("backHome"),
+            blogHref: `${prefix}/blog`,
             blogLabel: t("readInstead"),
           },
         ]}

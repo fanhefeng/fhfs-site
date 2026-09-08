@@ -5,13 +5,11 @@ import { useTranslations } from "next-intl";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { splashDue } from "@/lib/splash";
-
-/** Handshake contract: once the ritual ends — or is skipped — the done event
- * fires so the hero can start its own entrance, and the session key stops
- * replays. Exported so HomeHero speaks the same strings — a drifted copy
- * fails silently (the hero just waits out its safety timeout). */
-export const OVERTURE_SEEN_KEY = "fhfs-overture-seen";
-export const OVERTURE_DONE_EVENT = "fhfs:overture-done";
+import {
+  announceOvertureDone,
+  markOvertureSeen,
+  overtureSeen,
+} from "@/lib/overture";
 
 /** Where the lamp hangs — cord length, glow flood and circle reveal all
  * share this origin so the light reads as one source. */
@@ -68,7 +66,7 @@ export function OvertureLight() {
 
       const finishInstant = () => {
         setPhase("done");
-        window.dispatchEvent(new Event(OVERTURE_DONE_EVENT));
+        announceOvertureDone();
       };
 
       // The cover has its own door (NeonSplash): on a hard landing there the
@@ -81,28 +79,14 @@ export function OvertureLight() {
         return;
       }
 
-      /** Once shown — or deliberately skipped — the overture is spent for this
-       *  session. Recording it in the timeline's last frame alone is not
-       *  enough: a context revert (the [locale] layout remounts on a locale
-       *  switch) skips the terminal callback, and the next mount then replays
-       *  the whole opaque blackout, scroll lock included. Blocked storage never
-       *  reaches here — an overture that was never shown stays owed. */
-      const markSeen = () => {
-        try {
-          sessionStorage.setItem(OVERTURE_SEEN_KEY, "1");
-        } catch {
-          /* Replaying the overture beats crashing the page. */
-        }
-      };
+      /* Once shown — or deliberately skipped — the overture is spent for this
+         session (`markOvertureSeen`). Recording it in the timeline's last
+         frame alone is not enough: a context revert (the [locale] layout
+         remounts on a locale switch) skips the terminal callback, and the next
+         mount then replays the whole opaque blackout, scroll lock included.
 
-      // Blocked storage (private mode, cookie policy) must not strand the
-      // page behind the curtain — treat a throw as "already seen".
-      let seen = true;
-      try {
-        seen = !!sessionStorage.getItem(OVERTURE_SEEN_KEY);
-      } catch {
-        seen = true;
-      }
+         `overtureSeen()` reads a throw as "seen" — see lib/overture. */
+      let seen = overtureSeen();
       /** Development only: `?overture` on the URL replays the ritual on every
        *  load, never spends the session key, and hangs GSDevTools off the
        *  timeline so a 0.9s once-per-session sequence can be scrubbed instead
@@ -116,9 +100,10 @@ export function OvertureLight() {
         // Reduce-motion: an opaque full-viewport blackout that locks the page
         // and blurs away anything the visitor tabs to is the one entrance
         // worth skipping outright. The key is spent on the way past, because
-        // HomeHero reads it to learn the relay is not coming — otherwise the
-        // cover would sit at opacity 0 waiting out the 8s safety timeout.
-        markSeen();
+        // the masthead (`components/home/Opening`) reads it to learn the relay
+        // is not coming — otherwise the cover would sit at opacity 0 waiting
+        // out its safety timeout.
+        markOvertureSeen();
         seen = true;
       }
       if (seen) {
@@ -196,7 +181,7 @@ export function OvertureLight() {
         // 4. Relay: hand over before the last of the warm tint melts, so
         //    the masthead starts rising under the fading light.
         .add(() => {
-          window.dispatchEvent(new Event(OVERTURE_DONE_EVENT));
+          announceOvertureDone();
         }, DONE_AT)
         .to(
           overlay,
@@ -211,7 +196,7 @@ export function OvertureLight() {
           // and the timeline stays alive for the scrubber; nothing is
           // remembered from a debugging session.
           if (debug) return;
-          markSeen();
+          markOvertureSeen();
           setPhase("done");
         }, END_AT);
 
@@ -252,7 +237,7 @@ export function OvertureLight() {
         cancelAnimationFrame(shownFrame);
         window.removeEventListener("keydown", onKeyDown);
         window.removeEventListener("focusin", onFocusIn);
-        if (shown && !debug) markSeen();
+        if (shown && !debug) markOvertureSeen();
       };
     },
     { scope: container }

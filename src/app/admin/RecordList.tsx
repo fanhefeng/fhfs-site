@@ -17,9 +17,9 @@ type ListRow = {
 /**
  * A list where each row opens into its own form.
  *
- * These tables are short — ten timeline entries, six apps, five experiments —
- * so a separate route per record would mean a page load to change a word.
- * Everything is on the page already; opening a row just reveals it.
+ * These tables hold a handful of rows each, so a separate route per record
+ * would mean a page load to change a word. Everything is on the page already;
+ * opening a row just reveals it.
  *
  * Rows arrive with their labels already composed. A server component may hand
  * a Server Action across this boundary but not an ordinary function, so

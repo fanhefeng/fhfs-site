@@ -4,8 +4,8 @@ import { experiments } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { saveExperiment } from "../actions";
-import type { Field } from "../RecordForm";
+import { deleteExperiment, saveExperiment } from "../actions";
+import type { Field, RecordData } from "../RecordForm";
 
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
@@ -28,16 +28,29 @@ export default async function ExperimentsPage() {
   const rows = await db
     .select()
     .from(experiments)
-    .orderBy(asc(experiments.sort));
+    .orderBy(asc(experiments.sort), asc(experiments.key));
+
+  const blank: RecordData = {
+    key: "",
+    name: { zh: "", en: "" },
+    description: { zh: "", en: "" },
+    status: "live",
+    accent: "",
+    href: "",
+    demo: "",
+    sort: (rows.at(-1)?.sort ?? -1) + 1,
+  };
 
   return (
     <AdminChrome title="实验">
       <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
         状态要说实话：<code>live</code> 是真的在跑，<code>planned</code> 是还没做。
-        不是这里实现的就填外链指回出处。
+        不是这里实现的就填外链指回出处。效果从站上撤掉了，这里也要跟着撤——
+        删掉，或者至少把状态改掉。
       </p>
       <RecordList
         action={saveExperiment}
+        deleteAction={deleteExperiment}
         fields={FIELDS}
         rows={rows.map((row) => ({
           id: row.key,
@@ -45,6 +58,8 @@ export default async function ExperimentsPage() {
           meta: row.status,
           data: row,
         }))}
+        blank={blank}
+        blankLabel="新实验"
       />
     </AdminChrome>
   );
