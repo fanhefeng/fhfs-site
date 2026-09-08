@@ -350,6 +350,14 @@ export function DissolveHero({
         material.dispose();
         releaseRenderer(renderer);
       };
+    }).catch(() => {
+      // The chunk never arrived — offline, a cache miss on a flaky network, a
+      // deploy that moved it. `degraded` is a first-class state here, so the
+      // page falls back to the poster and its note, the same as it does when
+      // the renderer or the texture is the thing that failed. Without this the
+      // hero would sit on the poster with no note and leave an unhandled
+      // rejection behind it.
+      if (!cancelled) setDegraded(true);
     });
 
     /* Two cases, one cleanup. Unmounted after the scene was built: `teardown`

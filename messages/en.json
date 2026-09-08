@@ -103,6 +103,7 @@
     "clearFilter": "Clear filter",
     "empty": "No posts yet — this page is still blank.",
     "fallbackNotice": "This one hasn't been translated yet — here's the Chinese original.",
+    "feedFallbackTag": "(in Chinese)",
     "backToList": "Back to the index",
     "prevPost": "Previous",
     "nextPost": "Next",
@@ -349,7 +350,6 @@
     "yearAria": "Moments from {year}",
     "expand": "Read it all",
     "collapse": "Fold",
-    "more": "{count} more",
     "empty": "Nothing said yet.",
     "langNotice": "These lines were written in Chinese, and stay that way — there is no English version of a moment."
   },

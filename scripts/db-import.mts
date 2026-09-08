@@ -166,9 +166,18 @@ const replaced = [
 ] as const;
 
 for (const [table, rows] of replaced) {
+  const name = (table as any)[Symbol.for("drizzle:Name")];
+  // A key the backup does not carry is not an empty table. Reading it as one
+  // deletes rows the backup never claimed to describe — and an empty
+  // nav_items is a site with no header. `[]` still means "replace with
+  // nothing"; only a missing key is left alone.
+  if (!rows) {
+    console.log(`  ${String(name).padEnd(20)}not in backup, left as it is`);
+    continue;
+  }
   const statements: BatchItem<"pg">[] = [db.delete(table as any)];
-  if (rows?.length) statements.push(db.insert(table as any).values(rows));
-  await batch((table as any)[Symbol.for("drizzle:Name")], statements);
+  if (rows.length) statements.push(db.insert(table as any).values(rows));
+  await batch(name, statements);
 }
 
 console.log("restored");

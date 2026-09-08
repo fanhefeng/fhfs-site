@@ -45,7 +45,10 @@ function readPassword(): Promise<string> {
     const onData = (chunk: string) => {
       for (const ch of chunk) {
         if (ch === "\u0003") {
-          // Ctrl-C
+          // Ctrl-C. Raw mode has to come off first: exiting under it leaves
+          // the shell with no echo and no line editing, and the reader is
+          // then typing blind into a terminal this script broke.
+          stdin.setRawMode(false);
           process.stderr.write("\n");
           process.exit(130);
         }

@@ -78,10 +78,7 @@ export function AdminChrome({
   );
 }
 
-/** Shared field styling, so the forms stay consistent without a component. */
-export const inputClass =
-  "w-full rounded-card border border-line bg-surface px-3 py-2 text-body text-fg outline-none focus-visible:border-accent";
-export const labelClass =
-  "block font-mono text-meta uppercase tracking-meta text-fg-tertiary";
-export const buttonClass =
-  "min-h-11 rounded-card bg-fg px-5 text-caption text-bg transition-opacity disabled:opacity-50";
+/* The shared field styling the forms use lives in `./styles` — a module with
+   no imports at all. It used to sit here, and this file's `import * as schema`
+   followed it into the client bundle of every admin page; the note at the top
+   of that file says what that cost. */

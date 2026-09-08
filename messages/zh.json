@@ -103,6 +103,7 @@
     "clearFilter": "清除筛选",
     "empty": "还没有文章，这一页先空着。",
     "fallbackNotice": "这篇还没有中文版，以下是英文原文。",
+    "feedFallbackTag": "（英文原文）",
     "backToList": "返回目录",
     "prevPost": "上一篇",
     "nextPost": "下一篇",
@@ -349,7 +350,6 @@
     "yearAria": "{year} 年的说说",
     "expand": "展开全文",
     "collapse": "收起",
-    "more": "再看 {count} 条",
     "empty": "还没有说说。",
     "langNotice": ""
   },
