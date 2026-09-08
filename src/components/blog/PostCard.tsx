@@ -1,25 +1,8 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { PostSummary } from "@/lib/content";
+import { groupByYear, yearOfDate } from "@/lib/byYear";
 import { Reveal } from "@/components/fx/Reveal";
-
-/**
- * Posts bucketed by publication year, newest year first, each bucket keeping
- * the incoming (date-descending) order. The year comes from the ISO string
- * rather than a Date, so the grouping never drifts with the server timezone.
- */
-function groupPostsByYear(
-  posts: PostSummary[]
-): { year: string; posts: PostSummary[] }[] {
-  const groups: { year: string; posts: PostSummary[] }[] = [];
-  for (const post of posts) {
-    const year = post.date.slice(0, 4);
-    const last = groups.at(-1);
-    if (last?.year === year) last.posts.push(post);
-    else groups.push({ year, posts: [post] });
-  }
-  return groups;
-}
 
 /** The year-bucketed index — /blog and every tag page render this list. */
 export function YearIndex({
@@ -29,7 +12,7 @@ export function YearIndex({
   posts: PostSummary[];
   yearAria: (year: string) => string;
 }) {
-  return groupPostsByYear(posts).map(({ year, posts: yearPosts }) => (
+  return groupByYear(posts, yearOfDate).map(({ year, items: yearPosts }) => (
     <section key={year} aria-label={yearAria(year)} className="mb-14 last:mb-0">
       <h2 className="mb-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
         {year}

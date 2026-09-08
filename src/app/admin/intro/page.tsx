@@ -4,8 +4,8 @@ import { introNodes } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { saveIntroNode } from "../actions";
-import type { Field } from "../RecordForm";
+import { deleteIntroNode, saveIntroNode } from "../actions";
+import type { Field, RecordData } from "../RecordForm";
 
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
@@ -23,7 +23,22 @@ const FIELDS: Field[] = [
 
 export default async function IntroPage() {
   await requireAdminPage();
-  const rows = await db.select().from(introNodes).orderBy(asc(introNodes.sort));
+  const rows = await db
+    .select()
+    .from(introNodes)
+    .orderBy(asc(introNodes.sort), asc(introNodes.key));
+
+  const blank: RecordData = {
+    key: "",
+    kicker: { zh: "", en: "" },
+    title: { zh: "", en: "" },
+    period: { zh: "", en: "" },
+    body: { zh: "", en: "" },
+    bullets: { zh: [], en: [] },
+    stickerLabel: "",
+    stickerIcon: "",
+    sort: (rows.at(-1)?.sort ?? -1) + 1,
+  };
 
   return (
     <AdminChrome title="简历节点">
@@ -34,6 +49,7 @@ export default async function IntroPage() {
       </p>
       <RecordList
         action={saveIntroNode}
+        deleteAction={deleteIntroNode}
         fields={FIELDS}
         rows={rows.map((row) => ({
           id: row.key,
@@ -41,6 +57,8 @@ export default async function IntroPage() {
           meta: row.stickerLabel,
           data: row,
         }))}
+        blank={blank}
+        blankLabel="新节点"
       />
     </AdminChrome>
   );

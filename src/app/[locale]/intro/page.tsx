@@ -54,8 +54,9 @@ export default async function IntroPage({
     ];
   });
 
-  // The email is deliberately empty in site config until there is a real
-  // public address, so it is left out rather than faked.
+  // Three ways on from the head, and no email: the address is on /resume and
+  // under the footer's sticker, where a reader who wants it goes looking. A
+  // fourth link here would be one more thing to read at the end of a story.
   const links: IntroLink[] = [
     { label: "GitHub", href: site.social.github, external: true },
     { label: t("linkAbout"), href: `/${locale}/about` },

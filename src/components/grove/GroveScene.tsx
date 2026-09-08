@@ -1058,8 +1058,8 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
        camera travel at the 26px scale) it is treated as arrived. */
     const SETTLED = 1e-4;
     /* Written per unit of time rather than per frame so that the moss and the
-       copy (GroveHero's own tick, same constant) agree at any refresh rate,
-       and at either of the two rates below. */
+       cards agree at any refresh rate, and at either of the two rates below —
+       `GroveApproach`'s pointer tick eases by the same 0.055 per sixtieth. */
     const ease = (dt: number) => 1 - Math.pow(1 - 0.055, dt * 60);
 
     /* Milliseconds of ticker time since the last frame this loop ran. */

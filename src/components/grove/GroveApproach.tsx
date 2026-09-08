@@ -1,11 +1,27 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
-import { GroveScene } from "./GroveScene";
 import { PaperDissolve } from "./PaperDissolve";
 import { GroveCard, type GroveCardData } from "./GroveCard";
 import { APPROACH_CSS } from "./approach.css";
+
+/**
+ * The moss is the only thing on the cover that needs three.js, and it is two
+ * screens down behind a window the scrollbar opens. Imported statically it
+ * landed in the home route's chunk group — 211 KB gz of WebGL blocking a page
+ * whose first screen is a paragraph of text. `next/dynamic` gives it a chunk
+ * of its own, fetched while the reader is still reading the masthead.
+ *
+ * `ssr: false` costs nothing here: the scene is a canvas, it renders nothing
+ * server-side either way, and `data-ready` on `.ga-scene` already gates the
+ * fade-in on the scene reporting for duty.
+ */
+const GroveScene = dynamic(
+  () => import("./GroveScene").then((m) => m.GroveScene),
+  { ssr: false }
+);
 
 type Props = {
   /** Small mono line above the caption — which study this is. */

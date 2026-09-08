@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fontVariables } from "../fonts";
+import { ThemeInitScript } from "../ThemeInitScript";
 import "../globals.css";
 
 /**
@@ -32,8 +33,20 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className={`${fontVariables} h-full antialiased`}>
-      <body className="min-h-dvh bg-bg text-fg">{children}</body>
+    <html
+      lang="zh-CN"
+      suppressHydrationWarning
+      className={`${fontVariables} h-full antialiased`}
+    >
+      <body className="min-h-dvh bg-bg text-fg">
+        {/* The workbench is painted in the same `--bg`/`--fg` tokens the site
+            is, and without this it resolved them light whatever the editor
+            had chosen — a paper-white page thrown at someone who came here
+            from a dark one. No ThemeKeeper: nothing re-renders <html> on the
+            client here, and there is no switch to follow. */}
+        <ThemeInitScript />
+        {children}
+      </body>
     </html>
   );
 }

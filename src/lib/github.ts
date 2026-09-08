@@ -47,8 +47,9 @@ async function getJson<T>(path: string): Promise<T | null> {
   }
 }
 
-/** A repo's latest release, falling back to its newest tag; null if neither. */
-export async function getLatestRelease(repo: string | null): Promise<Release | null> {
+/** A repo's latest release, falling back to its newest tag; null if neither.
+ *  Every caller wants several at once, so only the plural is exported. */
+async function getLatestRelease(repo: string | null): Promise<Release | null> {
   if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
 
   const release = await getJson<{ tag_name: string; html_url: string }>(

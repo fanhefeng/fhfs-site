@@ -6,7 +6,7 @@
 
 export type Messages = Record<string, unknown>;
 
-export function isPlainObject(value: unknown): value is Messages {
+function isPlainObject(value: unknown): value is Messages {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
