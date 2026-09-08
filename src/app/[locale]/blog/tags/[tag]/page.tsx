@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { feedTypes } from "@/lib/seo";
 import { getAllTags, getPostsByTag } from "@/lib/content";
+import { decodeSegment } from "@/lib/routeParam";
 import { YearIndex } from "@/components/blog/PostCard";
 import { Reveal } from "@/components/fx/Reveal";
 
@@ -15,9 +16,10 @@ import { Reveal } from "@/components/fx/Reveal";
  * post written later is rendered on first request instead — hence no
  * `dynamicParams = false`; a tag nobody uses still 404s from `notFound()`.
  *
- * `params.tag` arrives already URL-decoded (the route matcher runs
- * `decodeURIComponent` on every dynamic segment), so a Chinese tag reads as
- * itself here and only the *outgoing* URL below needs encoding.
+ * `generateStaticParams` hands the tag over as it is written; Next escapes it
+ * into the path itself. What comes *back* through `params` is that escape
+ * sequence, which is why both functions below decode before doing anything
+ * with it (`lib/routeParam` says what that cost before it was noticed).
  */
 export async function generateStaticParams() {
   // Tags can differ per locale; union across locales.
@@ -29,8 +31,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/blog/tags/[tag]">): Promise<Metadata> {
-  const { locale, tag } = await params;
+  const { locale, tag: encoded } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
+  const tag = decodeSegment(encoded);
   const t = await getTranslations({ locale, namespace: "blog" });
   const posts = await getPostsByTag(tag, locale);
   return {
@@ -51,9 +54,10 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/blog/tag
  * more than one tap away.
  */
 export default async function TagPage({ params }: PageProps<"/[locale]/blog/tags/[tag]">) {
-  const { locale, tag } = await params;
+  const { locale, tag: encoded } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const tag = decodeSegment(encoded);
   const t = await getTranslations("blog");
   const posts = await getPostsByTag(tag, locale);
   if (posts.length === 0) notFound();
