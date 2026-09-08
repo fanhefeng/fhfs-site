@@ -31,12 +31,6 @@ type Props = {
   welcome: string;
   signOn: string;
   signOff: string;
-  toggleHint: string;
-  tonight: string;
-  trackTitle: string;
-  trackArtist: string;
-  /** The artist line when the stand-in recording is what plays. */
-  fallbackTrackArtist: string;
   galleryKicker: string;
   galleryTitle: string;
   galleryLede: string;
@@ -54,17 +48,13 @@ type Props = {
  * is a fixed score of blinks, after which nothing is repainted. The sign is
  * the bar's switch: lights and music together — and the music is the site's
  * background music, played by the jukebox behind every page (`lib/jukebox`),
- * so there is no player under the sign, only the bill for tonight.
+ * so there is no player under the sign, and nothing written under it either:
+ * the sign is the whole first screen.
  */
 export function NeonSignDemo({
   welcome,
   signOn,
   signOff,
-  toggleHint,
-  tonight,
-  trackTitle,
-  trackArtist,
-  fallbackTrackArtist,
   galleryKicker,
   galleryTitle,
   galleryLede,
@@ -81,7 +71,7 @@ export function NeonSignDemo({
 
   const [powered, setPowered] = useState(false);
   const poweredRef = useRef(false);
-  const { wanted, fallback } = useJukebox();
+  const { wanted } = useJukebox();
   /** Set by the choreography; the switch calls it. */
   const toggleRef = useRef<(() => void) | null>(null);
   const stutterRef = useRef<(() => void) | null>(null);
@@ -270,16 +260,6 @@ export function NeonSignDemo({
             >
               <NeonSignArt id="nb" svgRef={svgRef} className="nb-sign" />
             </button>
-
-            <p className="nb-hint">{toggleHint}</p>
-          </div>
-
-          <div className="nb-foot">
-            <p className="nb-kicker">{tonight}</p>
-            <p className="nb-track">
-              <span className="nb-track-title">{trackTitle}</span>
-              <span className="nb-track-artist">{fallback ? fallbackTrackArtist : trackArtist}</span>
-            </p>
           </div>
         </div>
 
@@ -339,7 +319,6 @@ body[data-neon-immersed] .hd-scrim { opacity: 0; }
   z-index: 2;
   min-height: 100svh;
   display: grid;
-  grid-template-rows: 1fr auto;
 }
 
 .nb-body {
@@ -348,7 +327,7 @@ body[data-neon-immersed] .hd-scrim { opacity: 0; }
   align-items: center;
   justify-content: center;
   gap: clamp(0.5rem, 1.6vh, 1rem);
-  padding: clamp(3.5rem, 8vh, 5rem) 1.5rem 0.25rem;
+  padding: clamp(3.5rem, 8vh, 5rem) 1.5rem clamp(2rem, 6vh, 4rem);
 }
 
 /* The channel letters over the sign: warm, lit from inside, a little haze. */
@@ -387,30 +366,14 @@ body[data-neon-immersed] .hd-scrim { opacity: 0; }
 
 .nb-sign {
   display: block;
-  /* Sized so that on a laptop the welcome, the sign and the bill share one
-     screen; the room simply grows when they cannot. */
+  /* Sized so that on a laptop the welcome and the sign share one screen;
+     the room simply grows when they cannot. */
   width: min(56vh, 82vw, 560px);
   aspect-ratio: 1;
   height: auto;
   overflow: visible;
 }
 
-.nb-hint {
-  margin: 0.25rem 0 0;
-  font-family: var(--font-stack-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(243, 241, 234, 0.42);
-}
-
-.nb-foot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem clamp(1.25rem, 3.5vh, 2.25rem);
-}
 .nb-kicker {
   margin: 0;
   font-family: var(--font-stack-mono);
@@ -419,18 +382,6 @@ body[data-neon-immersed] .hd-scrim { opacity: 0; }
   text-transform: uppercase;
   color: rgba(243, 241, 234, 0.55);
 }
-.nb-track {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.25rem 0.75rem;
-  text-align: center;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-.nb-track-title { color: rgba(243, 241, 234, 0.88); }
-.nb-track-artist { color: rgba(243, 241, 234, 0.5); }
 
 /* ---- the stills, further along the wall ---- */
 .nb-gallery {

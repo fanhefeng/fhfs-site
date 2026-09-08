@@ -6,7 +6,8 @@ import { fontVariables } from "../fonts";
 import { ThemeInitScript } from "../ThemeInitScript";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getNavItems } from "@/lib/content";
+import { getAllNavItems, getNavItems, type NavItem } from "@/lib/content";
+import type { NavLink } from "@/lib/nav";
 import { feedTypes } from "@/lib/seo";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -74,12 +75,25 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   // One nav table, three surfaces. These used to be three constants that had
   // already drifted apart: /intro only ever reached the sitemap, and home only
-  // ever reached the full-screen menu.
-  const [headerLinks, footerLinks, menuLinks] = await Promise.all([
-    getNavItems("header"),
-    getNavItems("footer"),
-    getNavItems("fullnav"),
-  ]);
+  // ever reached the full-screen menu. A row is a "door" when it is on the
+  // header surface — the menu hangs the rest of its group under it.
+  const toLink = (row: NavItem): NavLink => ({
+    href: row.href,
+    labelKey: row.labelKey,
+    group: row.group,
+    door: row.surfaces.includes("header"),
+  });
+  // The whole table too: which rows hang under which door is a matter of
+  // group, not of which surfaces a row happens to be ticked for, so the
+  // island reads it off the full list rather than the menu's.
+  const [headerLinks, footerLinks, menuLinks, allLinks] = (
+    await Promise.all([
+      getNavItems("header"),
+      getNavItems("footer"),
+      getNavItems("fullnav"),
+      getAllNavItems(),
+    ])
+  ).map((rows) => rows.map(toLink));
 
   return (
     // No data-theme here on purpose. React only touches attributes it
@@ -120,7 +134,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           >
             {t("skipToContent")}
           </a>
-          <Header links={headerLinks} menuLinks={menuLinks} />
+          <Header links={headerLinks} menuLinks={menuLinks} allLinks={allLinks} />
           {children}
           <Footer items={footerLinks} />
         </NextIntlClientProvider>

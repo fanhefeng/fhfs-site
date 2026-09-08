@@ -15,6 +15,8 @@ const IMMUTABLE_PATHS = [
   "/lab/dissolve/:path*",
   "/lab/neon/:path*",
   "/portfolio/:path*",
+  "/idols/:path*",
+  "/odyssey/:path*",
 ];
 
 const nextConfig: NextConfig = {

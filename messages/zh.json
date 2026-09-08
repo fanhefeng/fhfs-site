@@ -12,21 +12,46 @@
     "portfolio": "作品",
     "software": "软件",
     "lab": "实验室",
-    "intro": "自我介绍",
-    "resume": "简历"
+    "intro": "3D 自我介绍",
+    "resume": "简历",
+    "moments": "说说",
+    "secrets": "秘密",
+    "idols": "偶像",
+    "odyssey": "大话西游",
+    "life": "生活",
+    "groupIssue": "正刊",
+    "groupRooms": "房间",
+    "groupMe": "作者"
+  },
+  "tracks": {
+    "theme": {
+      "title": "Mia & Sebastian's Theme",
+      "artist": "Justin Hurwitz · 《爱乐之城》原声（2016）",
+      "fallbackArtist": "Justin Hurwitz · 十周年重录版（2026）· 网易云音乐"
+    },
+    "unknown": {
+      "title": "你不知道的事",
+      "artist": "王力宏 · 电影《恋爱通告》主题曲（2010）",
+      "fallbackArtist": "钢琴版 · 网易云音乐（原唱王力宏，原版在那里要会员才能听）"
+    },
+    "secret": {
+      "title": "不能说的秘密",
+      "artist": "周杰伦 · 电影《不能说的秘密》主题曲（2007）",
+      "fallbackArtist": "钢琴版 · 网易云音乐（原唱周杰伦，原版在那里听不到）"
+    },
+    "odyssey": {
+      "title": "一生所爱",
+      "artist": "卢冠廷 · 电影《大话西游之大圣娶亲》片尾曲（1995）",
+      "fallbackArtist": "钢琴版 · 网易云音乐（原唱卢冠廷，原版在那里要会员才能听）"
+    }
   },
   "splash": {
     "label": "欢迎来到 fhf's",
     "welcome": "Welcome to",
     "signOn": "打开招牌",
     "signOff": "关掉招牌",
-    "toggleHint": "点一下招牌 · 灯和音乐一起关，一起开",
     "enter": "推门进去",
-    "enterHint": "或者按 Enter · 往下滚也行",
-    "tonight": "今晚 · 台上放的是",
-    "trackTitle": "Mia & Sebastian's Theme",
-    "trackArtist": "Justin Hurwitz · 《爱乐之城》原声（2016）",
-    "fallbackTrackArtist": "Justin Hurwitz · 十周年重录版（2026）· 网易云音乐"
+    "enterHint": "或者按 Enter · 往下滚也行"
   },
   "home": {
     "slogan": "慢一点，世界会开口说话。",
@@ -45,8 +70,8 @@
     "contactTitle": "找到我"
   },
   "grove": {
-    "headline1": "以代码为弓，",
-    "headline2": "向世界拉一曲好奇。",
+    "headline1": "科技改变世界",
+    "headline2": "",
     "lede": "河津出生，北京、青岛走过，如今在上海。九年前端，从小拉小提琴，对世界始终好奇。",
     "cta": "去看作品",
     "statPosts": "写下的",
@@ -103,7 +128,9 @@
     "changelogDot": "发布日期 {date}",
     "colophon": "写于上海 · 当地时间 {time}",
     "introTitle": "换一种方式认识我",
-    "introLink": "走近这张脸"
+    "introLink": "走近这张脸",
+    "resumeTitle": "正式的一页",
+    "resumeLink": "看简历"
   },
   "intro": {
     "title": "另一种自我介绍",
@@ -170,12 +197,10 @@
     "kicker": "动效实验室",
     "title": "实验室",
     "subtitle": "九则练习。滚动条在这里不是导航，是播放头。",
-    "indexAria": "动效实验列表",
     "open": "进去看看",
     "back": "回实验室",
     "backToIndex": "← 实验室",
     "hint": "向下滚动",
-    "reducedMotion": "你的系统偏好是减弱动效，这里直接呈现终态。",
     "items": {
       "scrollVideo": {
         "name": "滚动即播放",
@@ -287,11 +312,6 @@
         "welcome": "Welcome to",
         "signOn": "打开招牌",
         "signOff": "关掉招牌",
-        "toggleHint": "点一下招牌 · 灯和音乐一起关，一起开",
-        "tonight": "今晚 · 台上放的是",
-        "trackTitle": "Mia & Sebastian's Theme",
-        "trackArtist": "Justin Hurwitz · 《爱乐之城》原声（2016）",
-        "fallbackTrackArtist": "Justin Hurwitz · 十周年重录版（2026）· 网易云音乐",
         "galleryKicker": "剧照 · La La Land · 2016",
         "galleryTitle": "墙上挂着的几张",
         "galleryLede": "都是夜里的那几幕：琴、灯、星星，和一条走不完的路。",
@@ -316,6 +336,175 @@
         "keysAlt": "白色的世界里，一条由钢琴键铺成的弯路通向远处的一盏路灯，两人在路的尽头"
       }
     }
+  },
+  "moments": {
+    "kicker": "说说 · 一言片语",
+    "title": "多的是你不知道的事",
+    "subtitle": "像从前的 QQ 空间：几行字，一个时间，不多说。早年的都写在一言 App 的两本文集里，如今搬到这儿；往后的，就直接写在这里。",
+    "count": "{count} 条",
+    "filterAll": "全部",
+    "filterAria": "按文集筛选",
+    "original": "原创",
+    "quoted": "摘录",
+    "yearAria": "{year} 年的说说",
+    "expand": "展开全文",
+    "collapse": "收起",
+    "more": "再看 {count} 条",
+    "empty": "还没有说说。",
+    "langNotice": ""
+  },
+  "secrets": {
+    "kicker": "随笔 · 播客",
+    "title": "不能说的秘密",
+    "subtitle": "不属于手札的那些：写下来的随笔，和录下来的播客。",
+    "count": "{count} 篇",
+    "kindEssay": "随笔",
+    "kindPodcast": "播客",
+    "duration": "{minutes} 分钟",
+    "readingTime": "{minutes} 分钟",
+    "yearAria": "{year} 年的秘密",
+    "empty": "秘密还没说出口。这一页先空着，等第一篇。",
+    "fallbackNotice": "这篇还没有中文版，以下是英文原文。",
+    "listen": "收听这一期",
+    "audioUnsupported": "你的浏览器不支持内嵌播放，",
+    "audioOpen": "直接打开音频",
+    "backToList": "返回目录",
+    "prevPost": "上一篇",
+    "nextPost": "下一篇",
+    "postNavAria": "上一篇 / 下一篇"
+  },
+  "idols": {
+    "kicker": "偶像",
+    "title": "偶像",
+    "subtitle": "墙上挂着的人。第一位，科比。",
+    "open": "进去看看",
+    "backToIndex": "← 偶像",
+    "kobe": {
+      "name": "科比 · 布莱恩特",
+      "latin": "Kobe Bryant",
+      "years": "1978 – 2020",
+      "numbers": "8 · 24",
+      "kicker": "偶像 · 第一位",
+      "lede": "洛杉矶湖人二十年，两个号码，五座总冠军，一场 81 分。凌晨四点的洛杉矶，是他留给后来人的一句话。",
+      "statueKicker": "铜像 · Star Plaza · 2024",
+      "statueTitle": "指向天空的那根手指",
+      "statueBody": "2006 年 1 月 22 日，对猛龙，81 分。终场那一刻他右手指天。2024 年 2 月 8 日，湖人在 Crypto.com 球馆外立起这尊 19 英尺高的铜像，就是那个姿势，8 号球衣，底座刻着那场比赛的技术统计。这里这一尊是用代码搭出来的——不是雕塑家的原作，是照着那个姿势的一次致敬。",
+      "statueHint": "拖动 · 转着看",
+      "loading": "正在铸造",
+      "turnLeft": "向左转一点",
+      "turnRight": "向右转一点",
+      "statueFallback": "当前环境没有可用的 WebGL，这里以照片代替铜像。",
+      "statueQuote": "Leave the game better than you found it. And when it comes time for you to leave, leave a legend.",
+      "statueQuoteMeta": "刻在铜像底座上的话",
+      "statuePlaque": "81 · 2006.01.22 · vs TOR",
+      "galleryKicker": "照片 · 2005 – 2024",
+      "galleryTitle": "球场上，和球场外",
+      "galleryLede": "从 8 号到 24 号，从夏威夷的季前赛到瓦伦西亚的一面墙。",
+      "timelineKicker": "生涯 · 节点",
+      "timelineTitle": "从费城到洛杉矶",
+      "credit": "照片来自 Wikimedia Commons，各按其授权使用（作者与许可见每张图下）；铜像为程序化几何，仅作个人致敬之用。",
+      "photos": {
+        "hawaii8": { "title": "8 号", "meta": "夏威夷 · 季前赛 · 2005", "alt": "身穿 8 号紫金球衣的科比站在罚球线上准备出手" },
+        "hawaiiDunk": { "title": "挂在篮筐上", "meta": "夏威夷 · 季前赛 · 2005", "alt": "科比扣篮后双手挂在篮筐上" },
+        "drives2007": { "title": "突破", "meta": "华盛顿 · 2007", "alt": "科比运球突破奇才队的防守" },
+        "dunk2008": { "title": "起跳", "meta": "华盛顿 · 2008", "alt": "科比腾空即将扣篮" },
+        "beijing2008": { "title": "北京", "meta": "奥运会半决赛 · 2008", "alt": "科比身穿美国队球衣在北京奥运会半决赛中" },
+        "parade2009": { "title": "冠军游行", "meta": "迪士尼乐园 · 2009", "alt": "科比在迪士尼乐园的湖人夺冠庆祝游行中向人群挥手" },
+        "game2010": { "title": "24 号", "meta": "2010", "alt": "身穿 24 号球衣的科比在比赛中" },
+        "obama2010": { "title": "白宫来客", "meta": "华盛顿 · 2010", "alt": "2010 年总冠军湖人队与奥巴马总统在华盛顿的社区活动上" },
+        "london2012": { "title": "板凳上的笑", "meta": "美国队 · 2012", "alt": "科比坐在美国队替补席上笑着" },
+        "stage2013": { "title": "台上", "meta": "2013", "alt": "科比在一场活动的舞台上" },
+        "farewell2015": { "title": "最后一季", "meta": "华盛顿 · 2015", "alt": "告别赛季的科比身穿 24 号球衣在场上" },
+        "cabanyal2024": { "title": "墙上", "meta": "瓦伦西亚 · 2024", "alt": "瓦伦西亚 Cabanyal 街区一面画着科比的涂鸦墙" }
+      },
+      "timeline": {
+        "born": { "date": "1978.08.23", "title": "生于费城", "note": "父亲乔·布莱恩特也是 NBA 球员；童年有七年在意大利度过。" },
+        "draft": { "date": "1996.06", "title": "高中直接进入 NBA", "note": "首轮第 13 顺位被黄蜂选中，随即交易到湖人，17 岁。" },
+        "threepeat": { "date": "2000 – 2002", "title": "三连冠", "note": "与奥尼尔一起，湖人三年三座总冠军。" },
+        "eightyone": { "date": "2006.01.22", "title": "81 分", "note": "对多伦多猛龙，NBA 历史单场第二高分。" },
+        "mvp": { "date": "2008", "title": "常规赛 MVP · 北京金牌", "note": "生涯唯一一座 MVP；同年夏天随「救赎之队」在北京夺金。" },
+        "backtoback": { "date": "2009 – 2010", "title": "两连冠", "note": "两届总决赛 MVP；第五座总冠军。" },
+        "farewell": { "date": "2016.04.13", "title": "告别战 60 分", "note": "对爵士，生涯最后一场，60 分。" },
+        "retired": { "date": "2017.12.18", "title": "两件球衣同时退役", "note": "8 号与 24 号一起升上斯台普斯中心的穹顶。" },
+        "oscar": { "date": "2018.03.04", "title": "奥斯卡", "note": "《亲爱的篮球》获最佳动画短片。" },
+        "gone": { "date": "2020.01.26", "title": "离开", "note": "与女儿 Gianna 在卡拉巴萨斯的直升机事故中离世，41 岁。同年入选奈史密斯篮球名人堂。" },
+        "statue": { "date": "2024.02.08", "title": "铜像", "note": "8 号球衣、指天的手，立在 Crypto.com 球馆外的 Star Plaza。" }
+      }
+    }
+  },
+  "life": {
+    "kicker": "生活 · 屋子里的几个房间",
+    "title": "生活",
+    "subtitle": "杂志之外，屋子里的几个房间：说过的话，没说出口的，墙上挂着的人，看了很多遍的电影。每间进门换一张唱片。",
+    "none": "房间还没收拾出来。",
+    "record": "唱片 · {title}",
+    "countEntries": "{count} 条",
+    "countPieces": "{count} 篇",
+    "countIdols": "{count} 位",
+    "countStills": "{count} 张剧照",
+    "empty": "还没说出口",
+    "items": {
+      "moments": { "title": "多的是你不知道的事", "line": "说说板：几行字，一个时间，从 2017 年起。" },
+      "secrets": { "title": "不能说的秘密", "line": "随笔和播客，不属于手札的那些。" },
+      "idols": { "title": "偶像", "line": "墙上挂着的人。第一位，科比。" },
+      "odyssey": { "title": "大话西游", "line": "上下两部、三句台词、十二张剧照，和片尾那首《一生所爱》。" }
+    }
+  },
+  "odyssey": {
+    "kicker": "大话西游 · 1995",
+    "title": "大话西游",
+    "subtitle": "一部看了很多遍的电影：上下两部，几张剧照，记得的几句台词，和片尾那首《一生所爱》。",
+    "latin": "A Chinese Odyssey",
+    "meta": "刘镇伟 · 周星驰 · 朱茵 · 莫文蔚 · 1995",
+    "lede": "《月光宝盒》和《大圣娶亲》1995 年上映时没多少人看懂，几年后在大学宿舍和录像厅里被一遍遍重看，成了很多人心里最好的那部周星驰。至尊宝、紫霞、白晶晶、月光宝盒——还有片尾那首《一生所爱》，进了这一页就会响起。",
+    "filmsKicker": "上下两部",
+    "filmsTitle": "月光宝盒，与大圣娶亲",
+    "films": {
+      "box": {
+        "title": "大话西游之月光宝盒",
+        "meta": "1995.01.21 · 上部",
+        "note": "五百年后，孙悟空转世成了斧头帮的至尊宝。白晶晶、春三十娘、一只月光宝盒——他想救一个人，却一次次回到同一个夜晚。"
+      },
+      "cinderella": {
+        "title": "大话西游之大圣娶亲",
+        "meta": "1995.02.04 · 下部",
+        "note": "月光宝盒把他带回五百年前，他遇见了紫霞仙子。要救她，就得戴上金箍；戴上金箍，就不能再爱她。"
+      }
+    },
+    "linesKicker": "台词",
+    "linesTitle": "记得的那几句",
+    "lines": {
+      "love": {
+        "text": "曾经有一份真诚的爱情放在我面前，我没有珍惜，等我失去的时候我才后悔莫及，人世间最痛苦的事莫过于此。如果上天能够给我一个再来一次的机会，我会对那个女孩子说三个字：我爱你。如果非要在这份爱上加上一个期限，我希望是……一万年。",
+        "meta": "至尊宝 · 对紫霞"
+      },
+      "hero": {
+        "text": "我的意中人是个盖世英雄，有一天他会踩着七色云彩来娶我。我猜中了前头，可是我猜不着这结局。",
+        "meta": "紫霞"
+      },
+      "dog": {
+        "text": "你看那个人，好像一条狗啊。",
+        "meta": "紫霞 · 城楼上，片尾"
+      }
+    },
+    "stillsKicker": "剧照 · 1995",
+    "stillsTitle": "留在眼里的几幕",
+    "stillsLede": "沙漠、城楼、盘丝洞、一场婚礼，和那一次眨眼。",
+    "stills": {
+      "monkeyKing": { "title": "齐天大圣", "meta": "大圣娶亲 · 金色的天", "alt": "戴上金箍的孙悟空扛着金箍棒，站在金色的天空下" },
+      "wink": { "title": "那一次眨眼", "meta": "大圣娶亲 · 紫霞", "alt": "紫霞仙子对着镜头眨了一下眼" },
+      "desert": { "title": "沙漠", "meta": "大圣娶亲 · 沙丘上", "alt": "无边的沙漠里，两个人并肩坐在沙丘顶上" },
+      "reeds": { "title": "草丛", "meta": "月光宝盒 · 至尊宝", "alt": "至尊宝站在一片粉红色的草丛里回头看" },
+      "bride": { "title": "凤冠", "meta": "大圣娶亲 · 紫霞", "alt": "戴着凤冠、穿着红嫁衣的紫霞仙子" },
+      "wedding": { "title": "婚礼", "meta": "大圣娶亲 · 牛魔王的洞府", "alt": "一片红色的婚礼现场，紫霞、牛魔王和至尊宝站在一起" },
+      "jingjing": { "title": "白晶晶", "meta": "月光宝盒 · 沙漠", "alt": "沙漠里，至尊宝抱着倒在地上的白晶晶" },
+      "cave": { "title": "盘丝洞", "meta": "大圣娶亲 · 洞里", "alt": "至尊宝坐在盘丝洞里盘根错节的树根之间" },
+      "zixia": { "title": "紫霞", "meta": "大圣娶亲 · 举起的手", "alt": "紫霞仙子举起手，笑着看向镜头" },
+      "box": { "title": "月光宝盒", "meta": "月光宝盒 · 至尊宝", "alt": "至尊宝坐在地上，手里举着月光宝盒" },
+      "gate": { "title": "城门", "meta": "大圣娶亲 · 孙悟空", "alt": "戴着金箍的孙悟空扛着棒，站在城门前" },
+      "wall": { "title": "城楼上", "meta": "大圣娶亲 · 片尾", "alt": "城楼上，两个人相拥站着，远处是雪山" }
+    },
+    "credit": "剧照 © 1995 彩星电影公司 / 西安电影制片厂，取自 TMDB；《一生所爱》经 Spotify 播放官方录音，Spotify 到不了时退回网易云音乐上匿名可播的钢琴版。仅作个人致敬之用。"
   },
   "software": {
     "kicker": "自研软件",
@@ -360,7 +549,8 @@
     "loaderAria": "正在开灯",
     "musicPlay": "放背景音乐",
     "musicPause": "停掉背景音乐",
-    "musicTitle": "背景音乐：Mia & Sebastian's Theme"
+    "musicTitle": "背景音乐播放器",
+    "tonight": "今晚 · 台上放的是"
   },
   "error": {
     "kicker": "印刷事故",

@@ -41,6 +41,7 @@ export const experimentStatusEnum = pgEnum("experiment_status", [
   "planned",
 ]);
 export const chipToneEnum = pgEnum("chip_tone", ["paper", "ink", "accent"]);
+export const secretKindEnum = pgEnum("secret_kind", ["essay", "podcast"]);
 
 /** Every bilingual short field is this shape — the old `localeSchema`. */
 export type Localized = { zh: string; en: string };
@@ -110,6 +111,75 @@ export const abouts = pgTable("abouts", {
   title: text().notNull(),
   bodyMd: text("body_md").notNull(),
   bodyHtml: text("body_html").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * 《不能说的秘密》— the essays and podcast episodes that are not the tech
+ * notes on /blog. Same shape as `posts` on purpose (one row per locale, keyed
+ * by `(slug, locale)`, the read layer falling back across languages), plus
+ * what an episode needs: its `kind`, the audio it plays and how long it runs.
+ * An essay leaves `audio` null; a podcast may still carry a body — its notes.
+ */
+export const secrets = pgTable(
+  "secrets",
+  {
+    id: serial().primaryKey(),
+    slug: text().notNull(),
+    locale: localeEnum().notNull(),
+    kind: secretKindEnum().notNull().default("essay"),
+    title: text().notNull(),
+    date: date({ mode: "string" }).notNull(),
+    summary: text().notNull(),
+    /** The episode's audio file or stream, as a full URL or a site path. */
+    audio: text(),
+    /** The episode's length in minutes, when known. Essays leave it null. */
+    duration: integer(),
+    draft: boolean().notNull().default(false),
+    bodyMd: text("body_md").notNull(),
+    bodyHtml: text("body_html").notNull(),
+    readingMinutes: integer("reading_minutes").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique("secrets_slug_locale").on(t.slug, t.locale)]
+);
+
+/**
+ * 《多的是你不知道的事》— the board of short posts, the way a QQ 空间 kept
+ * them: a few lines, a timestamp, nothing else asked of it. Written in one
+ * language, on purpose: these are lines said in the moment, not copy to
+ * translate, so the page chrome is bilingual and the lines are what they are.
+ *
+ * The first 242 came over from the 一言 app (`source` = "yiyan"), where they
+ * sat in two notebooks — `collection` keeps the notebook's name. `original`
+ * and `attribution` are that app's own distinction: a line of one's own, or a
+ * line worth keeping and who said it.
+ */
+export const moments = pgTable("moments", {
+  id: serial().primaryKey(),
+  key: text().notNull().unique(),
+  content: text().notNull(),
+  // When it was said — an instant, not a day: a board like this shows the hour.
+  postedAt: timestamp("posted_at", { withTimezone: true }).notNull(),
+  collection: text(),
+  original: boolean().notNull().default(true),
+  /** Who said it, for a line that is not the author's own. */
+  attribution: text(),
+  /** Where the line came from: "yiyan" for the imported ones, null for the board's own. */
+  source: text(),
+  /** An optional one-word mood — the board's equivalent of a tag. */
+  mood: text(),
+  draft: boolean().notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -315,6 +385,11 @@ export const navItems = pgTable("nav_items", {
   labelKey: text("label_key").notNull(),
   surfaces: text().array().notNull().default(sql`'{}'`),
   sort: integer().notNull().default(0),
+  // Which wing of the site the link belongs to — `issue` / `rooms` / `me`
+  // (`src/lib/nav.ts`), or null for a row on its own. The footer clusters by
+  // it, the full-screen menu hangs a group's rows under its door, and /life
+  // lists the rooms. Column named `nav_group`: GROUP is a reserved word.
+  group: text("nav_group"),
 });
 
 /**

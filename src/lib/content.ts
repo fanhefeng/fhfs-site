@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   abouts,
@@ -8,10 +8,12 @@ import {
   copyBlocks,
   experiments,
   introNodes,
+  moments,
   navItems,
   posts,
   resumeExperiences,
   resumeProfiles,
+  secrets,
   timelineEntries,
   works,
   type Localized,
@@ -20,6 +22,7 @@ import {
   type SkillGroup,
 } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
+import { isNavGroup, type NavGroup } from "@/lib/nav";
 
 /**
  * Every read the site does, in one file.
@@ -57,6 +60,8 @@ export const TAGS = {
   intro: "intro",
   nav: "nav",
   resume: "resume",
+  moments: "moments",
+  secrets: "secrets",
 } as const;
 
 const cacheOptions = (...tags: string[]) => ({
@@ -322,6 +327,174 @@ export const getPostsByTag = unstable_cache(
   },
   ["posts-by-tag"],
   cacheOptions(TAGS.posts)
+);
+
+// ---------------------------------------------------------------------------
+// Secrets — 《不能说的秘密》, the essays and episodes
+// ---------------------------------------------------------------------------
+
+export type SecretKind = "essay" | "podcast";
+
+export type SecretSummary = {
+  slug: string;
+  locale: Locale;
+  kind: SecretKind;
+  title: string;
+  /** A calendar day, `YYYY-MM-DD`. */
+  date: string;
+  summary: string;
+  audio: string | null;
+  /** Minutes, for an episode; null when unknown or not an episode. */
+  duration: number | null;
+  readingMinutes: number;
+  isFallback: boolean;
+};
+
+export type Secret = SecretSummary & { html: string };
+
+const secretColumns = {
+  slug: secrets.slug,
+  locale: secrets.locale,
+  kind: secrets.kind,
+  title: secrets.title,
+  date: secrets.date,
+  summary: secrets.summary,
+  audio: secrets.audio,
+  duration: secrets.duration,
+  readingMinutes: secrets.readingMinutes,
+};
+
+/* The same three rules as the posts above: published rows only, one row per
+   slug preferring this locale, and a single-row variant of that preference. */
+const secretPublished = eq(secrets.draft, false);
+const secretIndexOrder = (locale: Locale) =>
+  [secrets.slug, sql`(${secrets.locale} = ${locale}) desc`, asc(secrets.id)] as const;
+const secretLocaleFirst = (locale: Locale) => sql`(${secrets.locale} = ${locale}) desc`;
+
+export const getSecrets = unstable_cache(
+  async (locale: Locale): Promise<SecretSummary[]> => {
+    const rows = await db
+      .selectDistinctOn([secrets.slug], secretColumns)
+      .from(secrets)
+      .where(secretPublished)
+      .orderBy(...secretIndexOrder(locale));
+    return byDateDesc(
+      rows.map((row) => ({ ...row, isFallback: row.locale !== locale }))
+    );
+  },
+  ["secrets-by-locale"],
+  cacheOptions(TAGS.secrets)
+);
+
+export const getSecret = unstable_cache(
+  async (slug: string, locale: Locale): Promise<Secret | null> => {
+    const [row] = await db
+      .select({ ...secretColumns, html: secrets.bodyHtml })
+      .from(secrets)
+      .where(and(eq(secrets.slug, slug), secretPublished))
+      .orderBy(secretLocaleFirst(locale), asc(secrets.id))
+      .limit(1);
+    if (!row) return null;
+    return { ...row, isFallback: row.locale !== locale };
+  },
+  ["secret"],
+  cacheOptions(TAGS.secrets)
+);
+
+export const getAllSecretSlugs = unstable_cache(
+  async (): Promise<string[]> => {
+    const rows = await db
+      .selectDistinct({ slug: secrets.slug })
+      .from(secrets)
+      .where(secretPublished)
+      .orderBy(secrets.slug);
+    return rows.map((row) => row.slug);
+  },
+  ["all-secret-slugs"],
+  cacheOptions(TAGS.secrets)
+);
+
+/** Which languages a secret was really written in — see `getPostEditions`. */
+export const getSecretEditions = unstable_cache(
+  async (slug: string): Promise<{ locale: Locale; date: string }[]> =>
+    db
+      .select({ locale: secrets.locale, date: secrets.date })
+      .from(secrets)
+      .where(and(eq(secrets.slug, slug), secretPublished))
+      .orderBy(asc(secrets.locale)),
+  ["secret-editions"],
+  cacheOptions(TAGS.secrets)
+);
+
+export const getAdjacentSecrets = unstable_cache(
+  async (
+    slug: string,
+    locale: Locale
+  ): Promise<{
+    older: { slug: string; title: string } | null;
+    newer: { slug: string; title: string } | null;
+  }> => {
+    const ordered = byDateDesc(
+      await db
+        .selectDistinctOn([secrets.slug], {
+          slug: secrets.slug,
+          title: secrets.title,
+          date: secrets.date,
+        })
+        .from(secrets)
+        .where(secretPublished)
+        .orderBy(...secretIndexOrder(locale))
+    );
+    const index = ordered.findIndex((row) => row.slug === slug);
+    if (index === -1) return { older: null, newer: null };
+    const pick = (row?: (typeof ordered)[number]) =>
+      row ? { slug: row.slug, title: row.title } : null;
+    return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
+  },
+  ["adjacent-secrets"],
+  cacheOptions(TAGS.secrets)
+);
+
+// ---------------------------------------------------------------------------
+// Moments — 《多的是你不知道的事》, the board
+// ---------------------------------------------------------------------------
+
+export type Moment = {
+  key: string;
+  content: string;
+  /** An ISO instant — the cache stores JSON, so a Date would come back as one anyway. */
+  postedAt: string;
+  collection: string | null;
+  original: boolean;
+  attribution: string | null;
+  source: string | null;
+  mood: string | null;
+};
+
+/** The whole board, newest first. One entry: the page filters and pages
+ *  through it on the client, and the home page takes the top of it. */
+export const getMoments = unstable_cache(
+  async (): Promise<Moment[]> => {
+    const rows = await db
+      .select({
+        key: moments.key,
+        content: moments.content,
+        postedAt: moments.postedAt,
+        collection: moments.collection,
+        original: moments.original,
+        attribution: moments.attribution,
+        source: moments.source,
+        mood: moments.mood,
+      })
+      .from(moments)
+      .where(eq(moments.draft, false))
+      // Two lines posted in the same second still need a fixed order — the
+      // key breaks the tie, same reason as every list below.
+      .orderBy(desc(moments.postedAt), asc(moments.key));
+    return rows.map((row) => ({ ...row, postedAt: row.postedAt.toISOString() }));
+  },
+  ["moments"],
+  cacheOptions(TAGS.moments)
 );
 
 // ---------------------------------------------------------------------------
@@ -622,7 +795,15 @@ export async function getCopyOverrides(
   }
 }
 
-export type NavItem = { href: string; labelKey: string; surfaces: string[] };
+export type NavItem = {
+  href: string;
+  labelKey: string;
+  surfaces: string[];
+  /** The wing the row belongs to (`src/lib/nav.ts`); a value the code does
+   *  not know is read as none, so a stray string in the column cannot break
+   *  a surface. */
+  group: NavGroup | null;
+};
 
 /**
  * Where a link is allowed to appear. A union rather than a string, because a
@@ -633,15 +814,18 @@ export type NavSurface = "header" | "footer" | "fullnav" | "sitemap";
 /** The whole nav table, in display order — one cache entry rather than one
  *  per surface, since the layout asks for three surfaces on every render. */
 export const getAllNavItems = unstable_cache(
-  async (): Promise<NavItem[]> =>
-    db
+  async (): Promise<NavItem[]> => {
+    const rows = await db
       .select({
         href: navItems.href,
         labelKey: navItems.labelKey,
         surfaces: navItems.surfaces,
+        group: navItems.group,
       })
       .from(navItems)
-      .orderBy(asc(navItems.sort), asc(navItems.id)),
+      .orderBy(asc(navItems.sort), asc(navItems.id));
+    return rows.map((row) => ({ ...row, group: isNavGroup(row.group) ? row.group : null }));
+  },
   ["nav-items"],
   cacheOptions(TAGS.nav)
 );

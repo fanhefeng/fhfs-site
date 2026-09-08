@@ -5,19 +5,23 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { gsap, useGSAP, Flip } from "@/lib/gsap";
-import { isActivePath } from "@/lib/nav";
+import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/nav";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
 import { JukeboxSwitch } from "@/components/fx/JukeboxSwitch";
 import { FullNav } from "./FullNav";
-import type { NavLink } from "./Footer";
 
 type Props = {
-  /** The desktop row's links. */
+  /** The desktop row's links: the doors. */
   links: NavLink[];
-  /** The full-screen menu's links — a longer list, home included. */
+  /** The full-screen menu's links — a longer list, home and the rooms
+   *  included. */
   menuLinks: NavLink[];
+  /** The whole table, so the tray knows which pages hang under which door
+   *  and 生活 lights while the reader is in a room — whatever surfaces the
+   *  room is ticked for. */
+  allLinks: NavLink[];
 };
 
 /** Hamburger line geometry: three resting rows and the two X diagonals. */
@@ -53,7 +57,8 @@ const GLINT = { y: -8, z: 14, exponent: 20 } as const;
  * The dynamic-island masthead (after the JoRMPLg pattern): a floating
  * glass-thick capsule, top center. Collapsed it holds only the wordmark and
  * the burger; on desktop a click stretches it open with back.out(2) and the
- * tray reveals the four nav links, the zh/en toggle and the light switch.
+ * tray reveals the nav table's header links, the zh/en toggle and the light
+ * switch.
  * Closing rides the same timeline backwards at 2.5x, with per-tween
  * easeReverse (GSAP 3.15) so the exit is crisp power easing, never a
  * replayed bounce. On mobile the burger opens the FullNav sheet instead.
@@ -63,10 +68,12 @@ const GLINT = { y: -8, z: 14, exponent: 20 } as const;
  * indicator under the aria-current page, and a scroll-edge scrim that fades
  * in under the island once the page scrolls (mask-image gradient).
  */
-export function Header({ links, menuLinks }: Props) {
+export function Header({ links, menuLinks, allLinks }: Props) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const locale = useLocale();
+  /** Which rows hang under each door — by group, off the whole table. */
+  const membersOf = new Map(attachMembers(allLinks).map((b) => [b.door.href, b.members]));
 
   /** Desktop island tray expanded. */
   const [expanded, setExpanded] = useState(false);
@@ -99,7 +106,9 @@ export function Header({ links, menuLinks }: Props) {
     const nav = navRowRef.current;
     const ind = indicatorRef.current;
     if (!nav || !ind) return;
-    const active = nav.querySelector<HTMLElement>('a[aria-current="page"]');
+    // "page" on the page's own door, "true" on the door of the room the
+    // reader is in — the capsule sits under either.
+    const active = nav.querySelector<HTMLElement>("a[aria-current]");
     if (!active) {
       gsap.to(ind, { autoAlpha: 0, duration: 0.15, overwrite: "auto" });
       return;
@@ -417,12 +426,14 @@ export function Header({ links, menuLinks }: Props) {
                     className="invisible absolute top-0 left-0 rounded-full bg-fg/[0.05] opacity-0 dark:bg-white/10"
                   />
                   {links.map((item) => {
-                    const active = isActivePath(pathname, item.href);
+                    const active = isActiveDoor(pathname, item, membersOf.get(item.href) ?? []);
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
-                        aria-current={active ? "page" : undefined}
+                        aria-current={
+                          isActivePath(pathname, item.href) ? "page" : active ? "true" : undefined
+                        }
                         // Collapse first, then RouteTransition takes over.
                         onClick={() => setExpanded(false)}
                         className={`isl-item relative z-[1] rounded-full px-2.5 py-2 text-[13px] font-medium tracking-[0.01em] transition-colors ${
@@ -484,5 +495,3 @@ export function Header({ links, menuLinks }: Props) {
     </>
   );
 }
-
-

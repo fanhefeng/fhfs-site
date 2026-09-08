@@ -79,17 +79,29 @@ export default async function AboutPage({
           {t("lead")}
         </p>
 
-        {/* The same person, told the other way round — a head you scroll
-            around instead of a column you read. */}
-        <Link
-          href="/intro"
-          className="hit-ext mt-7 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
-        >
-          <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-            {t("introTitle")}
-          </span>
-          {t("introLink")} →
-        </Link>
+        {/* The same person told two other ways: a head you scroll around
+            instead of a column you read, and the formal page. This header
+            is the author's front door — the nav hangs both under 关于. */}
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link
+            href="/intro"
+            className="hit-ext inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
+          >
+            <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+              {t("introTitle")}
+            </span>
+            {t("introLink")} →
+          </Link>
+          <Link
+            href="/resume"
+            className="hit-ext inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
+          >
+            <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+              {t("resumeTitle")}
+            </span>
+            {t("resumeLink")} →
+          </Link>
+        </div>
       </header>
 
       {/* Full-bleed: the band writes its own 100vw stage on desktop. */}

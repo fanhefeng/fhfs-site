@@ -3,25 +3,26 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { jukebox, reportGesture, reportPlayback, useJukebox } from "@/lib/jukebox";
+import { TRACKS, type TrackId } from "@/lib/tracks";
 
-/** Mia & Sebastian's Theme — Justin Hurwitz, La La Land (2016). */
-const TRACK_ID = "1Vk4yRsz0iBzDiZEoFMQyv";
-const TRACK_URI = `spotify:track:${TRACK_ID}`;
+/** Which records exist, and where — `lib/tracks`. The store says which is on. */
+const spotifyUri = (track: TrackId) => `spotify:track:${TRACKS[track].spotify}`;
 const PLAYER_W = 320;
 const PLAYER_H = 152;
 
 /**
  * The stand-in when Spotify cannot be reached at all (its host is reset from
  * some networks, mainland China's among them): NetEase Cloud Music's own
- * embed of Hurwitz's 10th-anniversary re-recording of the same theme — the
- * one version of it there that streams without a login. The embed has no
- * remote, so it is mounted with the music wanted and unmounted without, and
- * only ever mounted with autoplay once the reader has touched the page,
- * which is when a browser would allow it.
+ * embed of whatever version of the record streams there without a login —
+ * for the theme, Hurwitz's 10th-anniversary re-recording; for the two songs,
+ * a piano rendition (`lib/tracks` says which, and the room says so on the
+ * page). The embed has no remote, so it is mounted with the music wanted and
+ * unmounted without, and only ever mounted with autoplay once the reader has
+ * touched the page, which is when a browser would allow it.
  */
-const NETEASE_ID = "3420987569";
 const NETEASE_H = 86;
-const neteaseSrc = () => `https://music.163.com/outchain/player?type=2&id=${NETEASE_ID}&auto=1&height=66`;
+const neteaseSrc = (track: TrackId) =>
+  `https://music.163.com/outchain/player?type=2&id=${TRACKS[track].netease}&auto=1&height=66`;
 /** How long to wait for Spotify's script before giving up on it. */
 const SPOTIFY_TIMEOUT = 12_000;
 
@@ -37,6 +38,8 @@ type SpotifyController = {
   pause(): void;
   resume(): void;
   restart(): void;
+  /** Swaps the record without rebuilding the embed. */
+  loadUri(uri: string): void;
   destroy(): void;
   addListener(event: "ready", cb: () => void): void;
   addListener(event: "playback_update", cb: (e: PlaybackUpdate) => void): void;
@@ -96,6 +99,8 @@ type Deck = {
   started: boolean;
   /** A restart has been asked for and the position has not come back round yet. */
   restarting: boolean;
+  /** The record the embed was built with, or last told to load. */
+  track: TrackId;
 };
 
 /**
@@ -108,7 +113,8 @@ type Deck = {
  * then on it follows `wanted`: play or resume when it goes up, pause when it
  * goes down, and start the tune over when it runs out. If the browser
  * refuses the first play (the reader has not touched the site yet), the
- * first click or key anywhere tries again.
+ * first click or key anywhere tries again. It follows `track` too: a room
+ * that asks for its own record gets it through `loadUri`, from the top.
  *
  * The box stays inside the viewport on purpose: browsers throttle the timers
  * of a cross-origin frame that has scrolled out of view, and the player's
@@ -118,13 +124,20 @@ type Deck = {
 export function Jukebox() {
   const t = useTranslations("common");
   const hostRef = useRef<HTMLDivElement>(null);
-  const { wanted, fallback, gestured } = useJukebox();
+  const { wanted, fallback, gestured, track } = useJukebox();
   /** The stand-in's URL while it is mounted; a re-render must never reload it. */
   const [fallbackSrc, setFallbackSrc] = useState<string | null>(null);
   /** Spotify is being loaded or is loaded — a one-way latch. */
   const [armed, setArmed] = useState(false);
 
-  const deck = useRef<Deck>({ controller: null, ready: false, playing: false, started: false, restarting: false });
+  const deck = useRef<Deck>({
+    controller: null,
+    ready: false,
+    playing: false,
+    started: false,
+    restarting: false,
+    track: "theme",
+  });
 
   // Browsers only let a page make sound once the reader has touched it.
   useEffect(() => {
@@ -176,7 +189,10 @@ export function Jukebox() {
       (api) => {
         window.clearTimeout(timer);
         if (disposed || gaveUp) return;
-        api.createController(mount, { uri: TRACK_URI, width: PLAYER_W, height: PLAYER_H }, (controller) => {
+        // Built with whatever record is on right now — a reader who lands
+        // straight in a room gets that room's song, not the theme first.
+        d.track = jukebox().track;
+        api.createController(mount, { uri: spotifyUri(d.track), width: PLAYER_W, height: PLAYER_H }, (controller) => {
           if (disposed) {
             controller.destroy();
             return;
@@ -184,6 +200,12 @@ export function Jukebox() {
           d.controller = controller;
           controller.addListener("ready", () => {
             d.ready = true;
+            // The record may have changed while the embed was being built.
+            if (jukebox().track !== d.track) {
+              d.track = jukebox().track;
+              d.started = false;
+              controller.loadUri(spotifyUri(d.track));
+            }
             if (jukebox().wanted) controller.play();
           });
           controller.addListener("playback_update", (e) => {
@@ -229,6 +251,20 @@ export function Jukebox() {
     };
   }, [armed, fallback]);
 
+  // The record, for Spotify: a room asking for its own song swaps it in from
+  // the top. `loadUri` does not start playback by itself, so the switch
+  // below sees a stopped deck and plays it if the music is wanted.
+  useEffect(() => {
+    const d = deck.current;
+    if (!d.ready || !d.controller || d.track === track) return;
+    d.track = track;
+    d.started = false;
+    d.playing = false;
+    d.restarting = false;
+    d.controller.loadUri(spotifyUri(track));
+    if (jukebox().wanted) d.controller.play();
+  }, [track]);
+
   // The switch, for Spotify: resume or pause whatever is loaded.
   useEffect(() => {
     const d = deck.current;
@@ -243,13 +279,15 @@ export function Jukebox() {
 
   // The stand-in follows the switch: mounted with the music wanted, gone
   // without it — and mounted only once the page has been touched, or its
-  // autoplay would be refused and there is no remote to try again with.
+  // autoplay would be refused and there is no remote to try again with. A
+  // change of record is a change of URL, i.e. a remount: the embed has no
+  // other way to be told.
   useEffect(() => {
     if (!fallback) return;
     const up = wanted && gestured;
-    setFallbackSrc(up ? neteaseSrc() : null);
+    setFallbackSrc(up ? neteaseSrc(track) : null);
     reportPlayback({ playing: up });
-  }, [fallback, wanted, gestured]);
+  }, [fallback, wanted, gestured, track]);
 
   return (
     <div className="jukebox" aria-hidden="true" inert>

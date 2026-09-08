@@ -10,9 +10,14 @@ import { connect } from "./connect.mjs";
 const db = connect();
 const rows = async (text: string) => (await db.execute(sql.raw(text))).rows as any[];
 
+/** Every table in `src/db/schema.ts`. A table added there and forgotten here
+ *  is a table this command quietly says nothing about — which is the one
+ *  thing it exists not to do. */
 const TABLES = [
   "posts",
   "abouts",
+  "secrets",
+  "moments",
   "timeline_entries",
   "apps",
   "works",
@@ -66,8 +71,8 @@ for (const r of await rows(
 }
 
 console.log("\nnav_items");
-for (const r of await rows(`select href, surfaces from nav_items order by sort`)) {
-  console.log(`  ${String(r.href).padEnd(11)} ${r.surfaces.join(", ")}`);
+for (const r of await rows(`select href, surfaces, nav_group from nav_items order by sort`)) {
+  console.log(`  ${String(r.href).padEnd(11)} ${String(r.nav_group ?? "—").padEnd(6)} ${r.surfaces.join(", ")}`);
 }
 
 console.log("\ncopy_blocks (first line of each namespace)");

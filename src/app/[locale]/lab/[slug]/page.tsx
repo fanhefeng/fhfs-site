@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
 import { LAB_ENTRIES, labEntry } from "@/components/lab/entries";
+import { LENS_SLIDES } from "@/components/lab/lensSlides";
 import { NEON_STILLS } from "@/components/lab/neonStills";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
 import { getPosts } from "@/lib/content";
@@ -51,7 +52,7 @@ const STUDY_KEYS: Record<string, string[]> = {
     "counterAria",
     "prev",
     "next",
-    ...["river", "falls", "sea", "coffee"].flatMap((name) => [
+    ...LENS_SLIDES.flatMap((name) => [
       `${name}Alt`,
       `${name}Title`,
       `${name}Body`,
@@ -62,11 +63,6 @@ const STUDY_KEYS: Record<string, string[]> = {
     "welcome",
     "signOn",
     "signOff",
-    "toggleHint",
-    "tonight",
-    "trackTitle",
-    "trackArtist",
-    "fallbackTrackArtist",
     "galleryKicker",
     "galleryTitle",
     "galleryLede",

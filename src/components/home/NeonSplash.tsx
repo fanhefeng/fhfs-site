@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
-import { OVERTURE_DONE_EVENT, OVERTURE_SEEN_KEY } from "@/components/fx/OvertureLight";
+import { announceOvertureDone, markOvertureSeen } from "@/lib/overture";
 import { SPLASH_INIT_SCRIPT, SPLASH_SEEN_KEY, splashDebug, splashDue } from "@/lib/splash";
-import { stopMusic, useJukebox, wantMusic } from "@/lib/jukebox";
+import { stopMusic, wantMusic } from "@/lib/jukebox";
 import {
   NeonSignArt,
   RING,
@@ -24,14 +24,8 @@ type Props = {
   welcome: string;
   signOn: string;
   signOff: string;
-  toggleHint: string;
   enter: string;
   enterHint: string;
-  tonight: string;
-  trackTitle: string;
-  trackArtist: string;
-  /** The artist line when the stand-in recording is what plays. */
-  fallbackTrackArtist: string;
 };
 
 type Phase = "pending" | "up" | "done";
@@ -71,20 +65,14 @@ export function NeonSplash({
   welcome,
   signOn,
   signOff,
-  toggleHint,
   enter,
   enterHint,
-  tonight,
-  trackTitle,
-  trackArtist,
-  fallbackTrackArtist,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const wallRef = useRef<HTMLCanvasElement>(null);
   const spillRef = useRef<HTMLDivElement>(null);
   const welcomeRef = useRef<HTMLParagraphElement>(null);
-  const hintRef = useRef<HTMLParagraphElement>(null);
   const footRef = useRef<HTMLDivElement>(null);
   const switchRef = useRef<HTMLButtonElement>(null);
   const enterRef = useRef<HTMLButtonElement>(null);
@@ -93,7 +81,6 @@ export function NeonSplash({
   const [phase, setPhase] = useState<Phase>("pending");
   const [powered, setPowered] = useState(false);
   const poweredRef = useRef(false);
-  const { fallback } = useJukebox();
   /** Set by the choreography; the buttons call them. */
   const toggleRef = useRef<(() => void) | null>(null);
   const stutterRef = useRef<(() => void) | null>(null);
@@ -131,11 +118,10 @@ export function NeonSplash({
       const svg = svgRef.current;
       const spill = spillRef.current;
       const welcomeEl = welcomeRef.current;
-      const hintEl = hintRef.current;
       const foot = footRef.current;
       const sign = switchRef.current;
       const enterBtn = enterRef.current;
-      if (!root || !stage || !svg || !spill || !welcomeEl || !hintEl || !foot || !sign || !enterBtn || !contextSafe) {
+      if (!root || !stage || !svg || !spill || !welcomeEl || !foot || !sign || !enterBtn || !contextSafe) {
         return;
       }
 
@@ -244,12 +230,12 @@ export function NeonSplash({
         if (!debug) {
           try {
             sessionStorage.setItem(SPLASH_SEEN_KEY, "1");
-            // The opening ritual is not owed after the door: the masthead
-            // and the lamp both read this key.
-            sessionStorage.setItem(OVERTURE_SEEN_KEY, "1");
           } catch {
             /* Showing the door again beats crashing the page. */
           }
+          // The opening ritual is not owed after the door: the masthead and
+          // the lamp both read this key.
+          markOvertureSeen();
         }
         setPhase("done");
       };
@@ -295,7 +281,7 @@ export function NeonSplash({
 
         const tl = gsap.timeline({ onComplete: finish });
         exit = tl;
-        tl.to([welcomeEl, hintEl, foot], { autoAlpha: 0, duration: 0.25, ease: EASE.exit }, 0);
+        tl.to([welcomeEl, foot], { autoAlpha: 0, duration: 0.25, ease: EASE.exit }, 0);
         // The letters and the bar lose power; the ring and the note hold the door.
         letters.forEach((l, i) => score(tl, l, 0.05 + i * 0.04, [[0.04, 0], [0.03, 0.5], [0.04, 0]]));
         score(tl, bar, 0.12, [[0.05, 0], [0.04, 0.6], [0.04, 0]]);
@@ -303,7 +289,7 @@ export function NeonSplash({
         // The iris: paper shows through the ring.
         tl.to(p, { u: 1, duration: IRIS_FOR, ease: "power2.inOut", onUpdate: apply }, IRIS_AT);
         // Relay: the masthead starts rising as the ring begins to grow.
-        tl.add(() => window.dispatchEvent(new Event(OVERTURE_DONE_EVENT)), DONE_AT);
+        tl.add(announceOvertureDone, DONE_AT);
         // The push: through the door, the ring growing around the reader.
         tl.to(p, { s: S, duration: PUSH_FOR, ease: "power2.in", onUpdate: apply }, PUSH_AT);
       };
@@ -400,9 +386,6 @@ export function NeonSplash({
               >
                 <NeonSignArt id="ns" svgRef={svgRef} className="ns-sign" />
               </button>
-              <p ref={hintRef} className="ns-hint">
-                {toggleHint}
-              </p>
             </div>
 
             <div ref={footRef} className="ns-foot">
@@ -413,11 +396,6 @@ export function NeonSplash({
                 </span>
               </button>
               <p className="ns-enter-hint">{enterHint}</p>
-              <p className="ns-track">
-                <span className="ns-kicker">{tonight}</span>
-                <span className="ns-track-title">{trackTitle}</span>
-                <span className="ns-track-artist">{fallback ? fallbackTrackArtist : trackArtist}</span>
-              </p>
             </div>
           </div>
         </div>
@@ -517,15 +495,6 @@ html:not([data-js]) .ns { display: none; }
   overflow: visible;
 }
 
-.ns-hint {
-  margin: 0.25rem 0 0;
-  font-family: var(--font-stack-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(243, 241, 234, 0.42);
-}
-
 .ns-foot {
   display: flex;
   flex-direction: column;
@@ -582,29 +551,7 @@ html:not([data-js]) .ns { display: none; }
   color: rgba(243, 241, 234, 0.38);
 }
 
-.ns-track {
-  margin: 0.5rem 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: 0.25rem 0.75rem;
-  text-align: center;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-}
-.ns-kicker {
-  font-family: var(--font-stack-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(243, 241, 234, 0.5);
-}
-.ns-track-title { color: rgba(243, 241, 234, 0.85); }
-.ns-track-artist { color: rgba(243, 241, 234, 0.45); }
-
 @media (max-height: 640px) {
   .ns-enter-hint { display: none; }
-  .ns-track { display: none; }
 }
 `;

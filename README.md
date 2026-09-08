@@ -6,9 +6,10 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
 
 ## 版面
 
-- **首页** —— 封面是一整屏程序化生长的苔藓树根（实验室「长出来的，不是建模的」
-  的成品），宣言站在它前面，自带 dock；往下是近期文章、软件架子与一段关于。
-  开场点灯仪式仍每会话一次。
+- **首页** —— 三幕：硬着陆时先是那块霓虹大门（每 session 一次，推门从圆环里穿过去），
+  然后是一整屏纸上的宣言与站点唯一的主按钮；往下滚，滚动条开出一扇望进苔藓树根的窗
+  （实验室「长出来的，不是建模的」的成品，按需拆包加载），正刊的纸再盖回来；最后是
+  近期文章、软件架子与一段关于。没走大门的话，开场点灯仪式每会话一次。
 - **/blog** —— 目录页式索引：按年分组的纯文字行，日期右对齐；文章页单栏
   68ch，中文标题逐行揭示、拉丁标题解码进场。
 - **/portfolio** —— 一张暗室台灯的照片随滚动溶解成纸（实验室「溶解转场」的成品）
@@ -22,7 +23,19 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
   即一份滚动叙事的简历（`docs/INTRO3D.md`）。
 - **/resume** —— 正式的一页简历：左栏编号标签、右栏概述 / 技能 / 经历 / 开源 / 教育，
   「打印 / 存为 PDF」走浏览器打印样式；内容全在库里，公开版本已脱敏。
-- **/admin** —— 浏览器里的编辑部：文章、文案、列表全部可编辑，保存即生效。
+- **/moments** —— 《多的是你不知道的事》：QQ 空间式的说说板，几行字加一个时间，按年排、
+  按文集筛。头 242 条是从一言 App 搬来的两本文集（峰言疯语 / 默认文集），进这一页放
+  《你不知道的事》（王力宏）。
+- **/secrets** —— 《不能说的秘密》：不属于手札的随笔与播客，目录页 + 单篇页，播客带浏览器
+  原生播放器；进这一页放《不能说的秘密》（周杰伦），播客单篇不放。
+- **/idols** —— 偶像墙，第一位科比：一尊用代码搭的 81 分铜像（R3F，可拖着转）、十二张
+  Commons 授权照片、生涯节点。
+- **/odyssey** —— 《大话西游》：上下两部、记得的三句台词、十二张剧照；进这一页放片尾曲
+  《一生所爱》（卢冠廷）。
+- **/life** —— 「生活」：房间的目录。说说 / 偶像 / 大话西游 / 秘密（以及以后每一间）一行一间，
+  印条数和那间房的唱片；成员与顺序读导航表（`nav_items.nav_group = rooms`），配图与唱片在
+  `components/life/rooms.ts`。它是灵动岛上房间们唯一的门，自己不放唱片。
+- **/admin** —— 浏览器里的编辑部：文章、说说、秘密、文案、列表全部可编辑，保存即生效。
 
 ## 技术栈
 
@@ -32,7 +45,13 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
   注册；Draggable / Inertia / ScrambleText / CustomWiggle / ExpoScale 在
   `src/lib/gsap-extras.ts`，只由用到的组件引入）
 - Lenis 1.3 惯性滚动，与 GSAP 时钟统一（`gsap.ticker` 驱动 `lenis.raf`）
-- three.js：/intro 用 @react-three/fiber + drei，/about 工作台为命令式 three
+- three.js：/intro 用 @react-three/fiber + drei，/about 工作台为命令式 three。
+  `@react-three/fiber` 带一个 pnpm patch（`patches/`）：three r183 起 `THREE.Clock`
+  的构造函数会打弃用警告，而 fiber 9.x 每挂载一个 Canvas 就 `new THREE.Clock()` 一次
+  （pmndrs/react-three-fiber#3741，v10 才会换 `THREE.Timer`）。补丁用一份语义完全相同、
+  只去掉 `warn()` 的时钟类替换它——`Timer` 不能直接换，它要每帧 `update()`，fiber 9 的
+  循环不会调。fiber 升到修好的版本后删掉 `patches/` 与 `pnpm-workspace.yaml` 里的
+  `patchedDependencies` 即可。
 - Neon Postgres + Drizzle ORM；admin 会话是 jose 签的 JWT，登录按 IP 限流
 
 全站单一动效版本，`prefers-reduced-motion` 只关掉停不下来的那几处——三条
@@ -109,6 +128,26 @@ pnpm db:studio   # 表格界面
   © 2016 Summit Entertainment / Lionsgate，仅作个人致敬之用，页面上有署名。
 - 软件版本号：`apps.repo`（owner/name）+ `src/lib/github.ts` 读 GitHub 最新 release，
   `fetch` 缓存一小时；未登录配额 60 次/小时足够，设 `GITHUB_TOKEN` 可放宽。
+- /moments 的头 242 条说说来自用户在「一言 YAN」App（com.jhyan.yan，深圳宜言网络）里
+  的两本文集。App 没有导出功能：在安卓模拟器里登录后读它的本地数据库
+  `MY_TEXT_CARD_DBITEM` 表得到全文、发布时间（北京时间）、所属文集、是否原创与出处，
+  写进 `backup/db.json` 的 `moments` 后 `db:import`。`key` 为 `yiyan-<卡片 id>`，
+  `source` 标 `yiyan`。
+- 四首背景音乐都走 Spotify iFrame API（`src/lib/tracks.ts`），大陆网络到不了 Spotify 时
+  退回网易云外链播放器。《你不知道的事》与《不能说的秘密》在网易云上的原版分别要会员 /
+  根本没有，退路放的是匿名可播的钢琴翻奏（NewPiano 1998598395 / 酷客音乐 2160818134），
+  页面上如实标为「钢琴版」。同样不下载、不自托管任何商业录音。
+- /idols/kobe 的十二张照片取自 Wikimedia Commons（2005 – 2024），每张的作者与许可
+  （公有领域 / CC BY 2.0 / CC BY-SA 2.0、3.0 / CC0）列在 `src/components/idols/kobePhotos.ts`
+  并印在图下，链接回 Commons 的文件页；1600px 长边重编码放在 `public/idols/kobe/`。
+  铜像是程序化几何（胶囊体 + 球体，一种青铜材质），照的是 2024 年 Star Plaza 那尊
+  81 分雕像的姿势（8 号球衣、右手指天），不是它的扫描或复制。
+- /odyssey 的十二张剧照取自 TMDB 收录的两部《大话西游》（1995）的剧照（`月光宝盒` id 13345、
+  `大圣娶亲` id 21835），© 1995 彩星电影公司 / 西安电影制片厂，仅作个人致敬之用，页面上有
+  署名；1800px 宽重编码放在 `public/odyssey/`（三张原图只有 1280px，保持原尺寸），清单与
+  尺寸在 `src/components/odyssey/stills.ts`。音乐是《一生所爱》1995 年的原版录音
+  （Spotify `6zzVfWt16XAejBMA0mnDvg`），网易云上卢冠廷的各版都要会员，退路是匿名可播的
+  钢琴版（MappleZS 1998046134），页面上如实标为「钢琴版」。
 - /intro 的头像 `head.glb` 由单张照片重建（TRELLIS 风格化 v3），眼镜为程序
   几何补回——重建会把镜片糊成阴影（`docs/INTRO3D.md`）。
 

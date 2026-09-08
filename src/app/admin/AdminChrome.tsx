@@ -1,20 +1,27 @@
 import Link from "next/link";
+import * as schema from "@/db/schema";
 import { logout } from "./login/actions";
 
-/** The sections of the admin, in the order they matter. `table` is what the
- *  dashboard counts — kept here so adding a section is a one-line change. */
+/**
+ * The sections of the admin, in the order they matter. `table` is the drizzle
+ * table the dashboard counts — the table itself rather than its name, so the
+ * count is a normal query instead of a string spliced into `sql.raw`, and a
+ * renamed table is a type error here rather than a 500 on the dashboard.
+ */
 export const SECTIONS = [
-  { href: "/admin/posts", label: "文章", table: "posts" },
-  { href: "/admin/about", label: "关于页", table: "abouts" },
-  { href: "/admin/copy", label: "站点文案", table: "copy_blocks" },
-  { href: "/admin/timeline", label: "版本履历", table: "timeline_entries" },
-  { href: "/admin/apps", label: "软件", table: "apps" },
-  { href: "/admin/works", label: "作品集", table: "works" },
-  { href: "/admin/experiments", label: "实验", table: "experiments" },
-  { href: "/admin/intro", label: "简历节点", table: "intro_nodes" },
-  { href: "/admin/resume", label: "简历页", table: "resume_experiences" },
-  { href: "/admin/chips", label: "贴纸墙", table: "chips" },
-  { href: "/admin/nav", label: "导航", table: "nav_items" },
+  { href: "/admin/posts", label: "文章", table: schema.posts },
+  { href: "/admin/moments", label: "说说", table: schema.moments },
+  { href: "/admin/secrets", label: "秘密", table: schema.secrets },
+  { href: "/admin/about", label: "关于页", table: schema.abouts },
+  { href: "/admin/copy", label: "站点文案", table: schema.copyBlocks },
+  { href: "/admin/timeline", label: "版本履历", table: schema.timelineEntries },
+  { href: "/admin/apps", label: "软件", table: schema.apps },
+  { href: "/admin/works", label: "作品集", table: schema.works },
+  { href: "/admin/experiments", label: "实验", table: schema.experiments },
+  { href: "/admin/intro", label: "简历节点", table: schema.introNodes },
+  { href: "/admin/resume", label: "简历页", table: schema.resumeExperiences },
+  { href: "/admin/chips", label: "贴纸墙", table: schema.chips },
+  { href: "/admin/nav", label: "导航", table: schema.navItems },
 ] as const;
 
 /**

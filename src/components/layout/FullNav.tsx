@@ -1,15 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type RefObject } from "react";
+import { Fragment, useCallback, useEffect, useRef, type RefObject } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { isActivePath } from "@/lib/nav";
+import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/nav";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
-import type { NavLink } from "./Footer";
 
 
 export type FullNavProps = {
@@ -39,6 +38,10 @@ export type FullNavProps = {
  * Full-screen glass navigation (mobile-first). A glass-thick shade draws
  * down from the top with a light back.out(1.2) settle while the nav words
  * cascade up; behind it the page recedes (main scale .98 + 2px blur).
+ * Two levels: the doors (the rows on the header surface) as the numbered
+ * display words, and under each the rows of its group in small type — the
+ * rooms under 生活, the craft page under 软件, the 3D intro under 关于 —
+ * so a phone gets every page in one press without eleven display rows.
  * Closing is deliberately asymmetric — the whole sheet sinks and dissolves
  * into blur, built from to() tweens so a mid-flight toggle simply takes
  * over from wherever things are (raMQBVQ's clear() + rebuild pattern:
@@ -160,7 +163,9 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
         ).fromTo(
           items,
           { y: 28, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out", stagger: 0.06 },
+          // 0.04, not 0.06: the member rows are items too, and the tail of
+          // the cascade should not drag past a second.
+          { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out", stagger: 0.04 },
           0.18
         );
       } else {
@@ -176,11 +181,12 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
         );
       }
       settledClosedRef.current = false;
+      // Focus moves into the dialog as soon as the first word is visible —
+      // not before: the items start at autoAlpha 0 (visibility hidden), and
+      // focus() on a hidden link is a no-op that would leave focus on the
+      // burger outside the aria-modal dialog.
+      tl.add(() => root.querySelector<HTMLElement>("a[href]")?.focus({ preventScroll: true }), 0.3);
       tl.play(0);
-
-      // Focus moves into the dialog immediately so Escape/Tab work while
-      // the shade is still drawing down.
-      root.querySelector<HTMLElement>("a[href]")?.focus({ preventScroll: true });
     } else {
       // A route commit already tore the layer down instantly (see the pathname
       // effect below) and RouteTransition owns the screen from here. Replaying
@@ -243,7 +249,12 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
         : idx === -1 || idx === cycle.length - 1
           ? 0
           : idx + 1;
-      cycle[next].focus({ preventScroll: true });
+      const target = cycle[next];
+      // The nav is its own scroll box now: bring a row folded below the
+      // fold into view before focusing it, or the focus ring lands on a
+      // link nobody can see. The burger is outside the box — leave it be.
+      if (target !== trigger) target.scrollIntoView({ block: "nearest" });
+      target.focus({ preventScroll: true });
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -311,35 +322,79 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
           {t("close")}
         </button>
 
+        {/* min-h-0 + overflow: the sheet's own scroll, for a short phone —
+            body scrolling is locked while the sheet is up, and the stopped
+            Lenis would swallow the wheel too without `data-lenis-prevent`
+            (the repo's contract, see IntroResume). `safe` centring: a list
+            taller than the sheet starts at the top instead of losing its
+            first rows above the fold; scroll-padding keeps a row that Tab
+            scrolls up from stopping under the island. */}
         <nav
           aria-label={t("ariaLabel")}
-          className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-1 px-8 pt-24"
+          data-lenis-prevent
+          className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col justify-center-safe gap-1 overflow-y-auto overscroll-contain scroll-pt-20 px-8 pt-20"
         >
-          {links.map((item, i) => {
-            const active = isActivePath(pathname, item.href);
+          {attachMembers(links).map(({ door, members }, i) => {
+            // A door lights for its own pages and for the rooms behind it;
+            // the room itself lights in the small row, so both show. Same
+            // aria-current rule as the island: "page" here, "true" for the
+            // door of the room the reader is in.
+            const here = isActivePath(pathname, door.href);
+            const active = isActiveDoor(pathname, door, members);
+            const doorId = `fn-door-${i}`;
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-                onClick={() => {
-                  // Already on this page: nothing will navigate, so the
-                  // click just lowers the shade again.
-                  if (item.href === pathname) onClose();
-                }}
-                className="fn-item group flex min-h-12 w-full items-baseline gap-4 py-1"
-              >
-                <span className="font-mono text-[11px] tracking-meta text-fg-tertiary">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span
-                  className={`text-display-sm transition-colors ${
-                    active ? "text-accent" : "text-fg group-hover:text-accent"
-                  }`}
+              <Fragment key={door.href}>
+                <Link
+                  href={door.href}
+                  aria-current={here ? "page" : active ? "true" : undefined}
+                  onClick={() => {
+                    // Already on this page: nothing will navigate, so the
+                    // click just lowers the shade again.
+                    if (door.href === pathname) onClose();
+                  }}
+                  className="fn-item group flex min-h-11 w-full items-baseline gap-4 py-1"
                 >
-                  {t(item.labelKey)}
-                </span>
-              </Link>
+                  <span className="font-mono text-[11px] tracking-meta text-fg-tertiary">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    id={doorId}
+                    className={`text-display-sm transition-colors ${
+                      active ? "text-accent" : "text-fg group-hover:text-accent"
+                    }`}
+                  >
+                    {t(door.labelKey)}
+                  </span>
+                </Link>
+                {members.length > 0 && (
+                  <ul
+                    // Named after its door — these are the pages behind
+                    // 生活, not the whole 房间 wing.
+                    aria-labelledby={doorId}
+                    className="fn-item -mt-1 mb-1 flex flex-wrap gap-x-4 gap-y-0 pl-8"
+                  >
+                    {members.map((member) => {
+                      const current = isActivePath(pathname, member.href);
+                      return (
+                        <li key={member.href}>
+                          <Link
+                            href={member.href}
+                            aria-current={current ? "page" : undefined}
+                            onClick={() => {
+                              if (member.href === pathname) onClose();
+                            }}
+                            className={`hit-ext inline-flex min-h-8 items-center py-1 text-caption transition-colors ${
+                              current ? "text-accent" : "text-fg-secondary hover:text-accent"
+                            }`}
+                          >
+                            {t(member.labelKey)}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Fragment>
             );
           })}
         </nav>

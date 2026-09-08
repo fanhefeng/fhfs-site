@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { sql } from "drizzle-orm";
+import type { PgTable } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome, SECTIONS } from "./AdminChrome";
 
 /** Reads straight from the table, not through the cached getters — the point
  *  of this page is to show what is actually stored right now. */
-async function count(table: string): Promise<number> {
-  const result = await db.execute(
-    sql.raw(`select count(*)::int as n from ${table}`)
-  );
-  return (result.rows[0] as { n: number }).n;
+async function count(table: PgTable): Promise<number> {
+  const [row] = await db.select({ n: sql<number>`count(*)::int` }).from(table);
+  return row?.n ?? 0;
 }
 
 export default async function AdminHome() {

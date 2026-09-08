@@ -303,6 +303,113 @@
 >   离 768px 断点尚远），§2.0 的「4 个导航项」读作当时的数字。
 > - 导航表在库里（`nav_items.surfaces`），改动经 `/admin/nav` 或脚本 + `db:export`；这里只记决定。
 
+> **2026-09-07 补记（三个新栏目：说说 / 秘密 / 偶像，与「一个房间一张唱片」）**：
+> - **`/moments`《多的是你不知道的事》**（`components/moments/MomentBoard.tsx`）：QQ 空间式的
+>   说说板，收进纸白的杂志版式——680px 单栏、按年分组的 mono 年份、每条一个小圆头像 + 名字 +
+>   到分钟的时间、正文 `whitespace-pre-line`。文集筛选、每 40 条一页、超过 10 行或 360 字的
+>   折叠都在客户端；SSR 输出全部条目，无 JS 整页可读。表 `moments`：单语正文（说说是当时
+>   说的话，不翻译），`collection` / `original` / `attribution` / `source` 四列来自一言 App 的
+>   分类。用户的 242 条一言创作**并进这一栏而不是另开一栏**：它们本来就是 2017–2024 年间带时间
+>   的短句，正是这块板要放的东西；两本文集作为筛选保留，`source: yiyan` 让它们随时能被单独
+>   拿出来。往后的说说走 `/admin/moments`。
+> - **`/secrets`《不能说的秘密》**：posts 的孪生表 `secrets`（多 `kind` / `audio` / `duration`），
+>   目录页与单篇页照 /blog 的版式；播客单篇放浏览器原生 `<audio>`，不引播放器库。目前为空，
+>   页面显示空态而不编造内容。
+> - **`/idols` 与 `/idols/kobe`**：偶像墙的第一位。三幕：名字与号码；一尊**用代码搭的铜像**
+>   （`components/idols/KobeStatue.tsx`，R3F，胶囊体 + 球体，一种青铜 `MeshStandardMaterial`，
+>   `Environment` 内三块 Lightformer 现算环境贴图、不取 HDR 文件）；十二张 Commons 授权照片
+>   按原比例挂在 CSS columns 里；生涯节点。铜像照 2024 年 Star Plaza 那尊 81 分雕像的姿势，
+>   §5.3 的规矩照旧：`frameloop="demand"`，入场一次 GSAP 时间线（升起 + 转正，每 tick
+>   `invalidate()`），此后只有拖拽（细指针）与两枚箭头按钮（键盘 / 触屏，触屏上拖拽会吃掉
+>   页面滚动）才画帧；滚出视口 `frameloop="never"`；无 WebGL / Save-Data 退回照片。
+>   宽版心 1040px，只为铜像与照片墙，文字仍是 720px。
+> - **一个房间一张唱片**：`lib/jukebox` 的 store 多了 `track`（`lib/tracks.ts` 注册表：Spotify
+>   曲目 + 网易云退路）与 `silenced`。页面挂 `components/fx/RoomMusic` 即换上自己的唱片：
+>   Spotify 走 `loadUri`，网易云退路换 id 重挂。**是否自动开始放是读者的事**：已经在放就只换
+>   曲；读者从未按过「关」就替他放上；读者在站上任何一处关过音乐（`silenced`），房间就不出声，
+>   直到他自己再打开。房间自己开的音乐出门时自己关，进门时本来就在放的就留着，出门换回主题曲。
+>   播客单篇不挂 RoomMusic——两样声音一起放不是秘密，是噪音。
+> - **主导航**：文章 / 说说 / 软件 / 关于 / 实验室 / 简历 六项。说说进 header 是因为它一上线就有
+>   242 条真内容；秘密（空）与偶像进页脚、全屏菜单与 sitemap，秘密有了第一篇再议 header。
+
+> **2026-09-07 补记（第四个房间：《大话西游》；招牌下面不再写字；宣言换句）**：
+> - **`/odyssey`《大话西游》**（`app/[locale]/odyssey`，`components/odyssey/`）：用户点名要的电影
+>   房间。四幕：片名与班底；上下两部（`ODYSSEY_FILMS`，与 /idols/kobe 生涯节点同一种
+>   `9rem_1fr` 列表）；记得的三句台词（琥珀左边的引语块，衬线，只在英文下 italic——中文没有
+>   真斜体，不合成）；十二张剧照（`OdysseyStills`：六列墙，一张 span 4 配一张 5:6 竖裁的
+>   span 2，之后三张一行，收尾一张 21:9 通栏——构图照 /lab/neon 的剧照墙，材质照纸：无黑卡、
+>   无蓝色反光，就是全站那种圆角卡）。版心 1040px 只给剧照，文字仍 720px。
+>   剧照取自 TMDB（两部片各自的 backdrops），来源与许可记在 README；`focus` 字段只给两张
+>   裁过的（眨眼那张往左，城楼那张往右）。
+> - **音乐**：挂 `RoomMusic`，曲目 `odyssey` 注册在 `lib/tracks.ts`——Spotify 是 1995 年的
+>   原版录音；网易云上卢冠廷的各个版本都要会员（`player/url` 返回 -110），退路照另两首的
+>   规矩放匿名可播的钢琴版，标题旁如实写「钢琴版」。仍然不下载、不自托管。
+> - **导航**：进页脚、全屏菜单与 sitemap（`nav_items` sort 8，作品 / 简历 / intro 顺延），
+>   不进 header——和偶像同一个理由：一个房间一页内容，header 六项已经是灵动岛能容的上限。
+> - **招牌下面的两行字删了**：大门与 `/lab/neon` 的「点一下招牌 · 灯和音乐一起关，一起开」
+>   与「今晚 · 台上放的是 …」都去掉（用户明确不要）。招牌本身仍是总闸，`aria-label` 还在
+>   （打开 / 关掉招牌），只是不再用一行小字解释它；曲目信息在各房间的 `RoomMusic` 一行里
+>   还有，那里带着开关，读者能看见为什么换了歌、也能就地关掉。`NeonSignDemo` 的第一屏从
+>   `1fr auto` 两行变成一格，`nb-foot` / `nb-hint` / `nb-track*` 与 `ns-*` 对应样式一并删除；
+>   `splash.*` 与 `lab.items.neon.*` 里的五个 key（toggleHint / tonight / trackTitle /
+>   trackArtist / fallbackTrackArtist）从两份语言文件删掉，`STUDY_KEYS.neon` 同步。
+> - **首页宣言换句，且只剩一行**：「以代码为弓，/ 向世界拉一曲好奇。」用户否掉，先改成
+>   「先把世界看清楚，/ 再把它写成代码。」，用户又要参考米哈游「技术宅拯救世界」那种口号，
+>   最终定为**一句「科技改变世界」**（英文 Tech changes the world），不要第二行、不带标点。
+>   `Opening` 从此 `headline.filter(Boolean)`：第二行留空就是一行的宣言，不是一行空白——
+>   `grove.headline2` 在 `messages/*.json` 与 `copy_blocks` 里都置空但保留，往后要加回第二行
+>   在 /admin 填上即可。改在 `messages/*.json` 与库里 `copy_blocks` 两处（后者才是线上读到
+>   的那份），`backup/db.json` 已随 `db:export` 更新；线上要在 /admin 保存一次刷掉 `copy`
+>   标签的缓存才会换。
+
+> **2026-09-07 补记（导航分三翼：灵动岛只放门，房间收进「生活」）**，覆盖 09-06 / 09-07 两条
+> 补记里关于导航的句子：
+> - **起因**：用户说「很多页面我找不到入口」。核实下来是机制问题：桌面端只有灵动岛托盘和页脚
+>   两个面（汉堡在桌面端展开的是托盘，FullNav 只在 <768px 出现），所以没进 header 的页在桌面上
+>   只剩页脚一行 13px 小字；偶像 / 大话西游 / 秘密三页站内零链接，/intro 连页脚都没有；手机菜单
+>   11 项平铺在 667px 高的机型已溢出且不能滚。header 六项是上限而房间还会加，「再挤一格」不是解。
+>   四套方案（零代码重排 / 枢纽页 / 分组目录 / 访客动线）经三位评审（访客 / 美编 / 工程）打分，
+>   两位选枢纽页，一位选零代码；终审取枢纽页为骨架，嫁接其余方案的点子。
+> - **规则**：`nav_items` 多一列 `nav_group`（`issue` 正刊 / `rooms` 房间 / `me` 作者，或空），
+>   `src/lib/nav.ts` 是唯一解释它的地方。**门 = 同组里勾了 header 的行**；灵动岛只放门。
+>   页脚按组成簇、簇间一条与岛上同款的 hairline，组名只做 aria；FullNav 变两级——门是编号大字
+>   行，同组未勾 header 的行以小字挂在它前面最近的门下（`attachMembers`），无组或前面没有门的行
+>   自成一行（今天只有首页），所以后台填错也只会错位、不会消失；nav 列加 `overflow-y-auto` **并
+>   `data-lenis-prevent`**（菜单开着时 Lenis 处于 stop，会把没有这个属性的元素上的滚轮与触摸
+>   一律 preventDefault，样式上能滚、实际滚不动——评审实测过），Tab 循环先 `scrollIntoView` 再
+>   聚焦，焦点在首个字亮出来之后（0.3s）才进对话框（autoAlpha 0 的链接 focus 是空操作）。
+>   门的成员关系按 group 从整张表算（layout 多传一份 `allLinks` 给 Header），不看房间勾了哪些面。
+>   灵动岛在房间里点亮那扇门（`isActiveDoor`：本页用 `aria-current="page"`，门用 `"true"`，
+>   胶囊指示器认 `a[aria-current]`）。
+> - **表**：0 首页(无组) · 1 文章 · 2 软件 · 3 作品 · 4 实验室（正刊）· 5 **生活** · 6 说说 · 7 偶像 ·
+>   8 大话西游 · 9 秘密（房间，空的排最后）· 10 关于 · 11 3D 自我介绍 · 12 简历（作者）。
+>   header 六项：文章 / 软件 / 实验室 / 生活 / 关于 / 简历。**说说退出 header**（覆盖 09-07
+>   「一上线就有 242 条真内容」那句）：按站点自己的定义它就是一个房间，条数印在目录行上；桌面端
+>   多一跳，换来每一间房从「只在页脚」变成两跳。**/intro 进页脚与菜单**（覆盖 09-06「不占位」
+>   的页脚部分，header 部分照旧），标签改「3D 自我介绍 / 3D Intro」免得和「关于」并排打架。
+>   作品仍不进 header（works 空）。
+> - **`/life`「生活」**（`app/[locale]/life`）：房间的目录，720px 版心，一行一间——序号、房名
+>   （读 `life.items.<key>.title`，缺则退回 `nav.<key>`）、一句话、mono 元信息行（条数 + 「唱片 ·
+>   曲名」）、偶像行内列出每位偶像的子链接（/idols/kobe 从 header 出发仍是两步）、右侧 96px 缩略图。
+>   成员与顺序读 `nav_items`（group=rooms 且未勾 header），配图 / 唱片 / 颜色在
+>   `components/life/rooms.ts`，查不到就是素行——后台加一行即上目录，配图是可选的第二步。
+>   **不挂 RoomMusic**：走廊不是房间，主题曲照放。名字用「生活」而不用「房间」：访客一眼能懂，
+>   隐喻留给 kicker「屋子里的几个房间」。
+> - **关于页**升格为作者这一翼的门：头部并排两颗按钮，「走近这张脸 →」（/intro）与「看简历 →」
+>   （/resume）。
+> - **后台** `/admin/nav`：每行多一个分组下拉、↑ ↓ 换序钮（顺序仍 = 行序）；「+ 加一间房」默认
+>   group=rooms、勾 页脚 / 全屏菜单 / sitemap。分组只接受三个值之一或空。**部署顺序**：迁移 0008 →
+>   部署带 `nav.life` 的代码与 /life 页 → 后台存表（或脚本）→ `pnpm db:export`；
+>   `/admin/copy` 建不了新 key（只 UPDATE），所以 nav 标签必须先随代码上线。
+> - **两步核对（桌面 / 手机）**，往后加房间的验收项：/ 角标 1 / 1；/blog /software /lab /life
+>   /about /resume 1 / 1；/portfolio 首页主按钮或页脚 1、菜单 1；/moments /idols /odyssey /secrets
+>   页脚 1 或 生活→房间 2、菜单 1；/idols/kobe 生活行内 2、菜单 2；/intro 页脚 1 或 关于→按钮 2、
+>   菜单 1；/secrets/[slug] 目录→秘密→篇 3（有内容后目录行可列最近一篇，降到 2）。
+> - **首页不加「房间」一节**：封面是三幕加三节精心排过的节奏，顶栏「生活」一格已在每页常驻；
+>   房间多到五六间再议。
+> - 顺手清掉 `Header.tsx` / `Footer.tsx` 两处「四项导航」的旧注释；§2.0 的「4 个导航项」读作
+>   当时数字。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：
@@ -477,7 +584,7 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 
 ## 3. 组件处置清单
 
-**原样保留**：src/i18n/* + proxy.ts、content-collections.ts、lib/content.ts、lib/seo.ts、sitemap/robots/rss、JsonLd、SmoothScroll（lenis + `window.__lenis` 契约）、Magnetic（quickTo 校准，azmKBBJ）、lib/gsap.ts 注册点模式、layout.tsx 主题预置 script、全静态策略（generateStaticParams + dynamicParams=false）。
+**原样保留**：src/i18n/* + proxy.ts、lib/content.ts、lib/seo.ts、sitemap/robots/rss、JsonLd、SmoothScroll（lenis + `window.__lenis` 契约）、Magnetic（quickTo 校准，azmKBBJ）、lib/gsap.ts 注册点模式、layout.tsx 主题预置 script。（原文这里还列了 content-collections.ts 与「全静态策略 dynamicParams=false」——两者都已随内容迁库删除，见 §5.1。）
 
 **重写视觉、保留机制**：RouteTransition、CinematicLoader→OvertureLight、ProgressHud、FullNav、Footer、Header、PullCord→LightSwitch（三件套契约迁移）、Timeline→Changelog、Mdx/prose、PostCard/TagPill/AppCard/WorkCard、SectionTitle、not-found、两处 opengraph-image + lib/og.ts 视觉、icon.svg 新站标（简约 monogram）。
 
@@ -509,7 +616,11 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 - root layout 是 `src/app/[locale]/layout.tsx`，勿建顶层 layout；勿手写 `<head>`。
 - 勿给 html 加 CSS smooth-scroll（与 Lenis 冲突）。
 - `next lint` 已删除。
-- 全部动态路由：generateStaticParams + `dynamicParams = false`，保持纯静态输出。
+- 动态路由：`generateStaticParams` 预渲染构建时已知的那些，**不要**加
+  `dynamicParams = false`。Next 会把它 AND 到整条路由上，加在 `[locale]/layout.tsx`
+  就等于把每一层嵌套动态段都钉成「没预渲染就 404」——而内容在库里，两次部署之间会长
+  出新文章，必须能在首次请求时渲染。未知 slug 由页面里的 `notFound()` 兜底。
+  唯一的例外是 `/lab/[slug]`：那是一份写死在代码里的清单，它确实关掉了 dynamicParams。
 - 导航一律 `@/i18n/navigation` 的 Link/useRouter/usePathname（勿直接 next/link）。
 - 每个 page/generateMetadata：`hasLocale` 校验 + `setRequestLocale(locale)`；翻译用 `getTranslations`/`getFormatter`。
 - `'use client'` 只加在交互/GSAP 组件；页面文件保持 Server Component。
@@ -522,7 +633,10 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 - Loader 握手：sessionStorage `'fhfs-overture-seen'` + `'fhfs:overture-done'` 事件。
 - RouteTransition 捕获阶段拦截 `<a>`：外链/锚点/`data-no-transition`/modifier 键放行。
 - `html { scrollbar-gutter: stable; overflow-x: clip }` hack 保留（globals.css 有详注）。
-- 内容管线：blog/about 用 `.zh.mdx/.en.mdx` 后缀；works/apps/timeline 用 YAML 内嵌 `{zh,en}`；locale fallback + isFallback 提示条行为保留。
+- 内容管线：全部在 Neon Postgres 里，`src/lib/content.ts` 是唯一读取层（每个
+  getter 带缓存标签，写入侧 `updateTag`）。长文（posts / secrets / abouts）一语言一行、
+  按 `(slug, locale)` 建键；短字段是 `{zh,en}` 的 jsonb 列。locale fallback +
+  isFallback 提示条行为保留。**不要在这个文件之外读库，也不要留未缓存的读。**
 - OG 图构建期联网拉 Google Fonts（lib/og.ts）——换字体先本地跑通 build。
 
 ### 5.3 性能预算

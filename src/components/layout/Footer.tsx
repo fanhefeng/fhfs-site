@@ -1,22 +1,22 @@
 "use client";
 
+import { Fragment } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { useLocalClock } from "@/lib/useLocalClock";
+import { clusterNav, NAV_GROUP_LABEL_KEY, type NavLink } from "@/lib/nav";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { PeelSticker } from "@/components/ui/PeelSticker";
 
-/** A link in the site's one nav table, filtered to this surface. */
-export type NavLink = { href: string; labelKey: string };
-
 /**
  * The quietest place on the site: a single-line colophon strip. Small
- * wordmark, the four sections, RSS/GitHub, the author's local clock, and a copy of
- * the light switch — all static, no entrance animation, nothing scrolls or
+ * wordmark, the nav table's footer links in their three clusters (the issue,
+ * the rooms, the author — a hairline between them, the group's name only for
+ * assistive tech), RSS/GitHub, the author's local clock, and a copy of the
+ * light switch — all static, no entrance animation, nothing scrolls or
  * glows. The one indulgence is the tear-off sticker in the corner hiding
- * the email address. (The old ASCII-canvas finale, giant sign name and
- * model credit are retired.)
+ * the email address.
  */
 export function Footer({ items }: { items: NavLink[] }) {
   const t = useTranslations("footer");
@@ -52,10 +52,25 @@ export function Footer({ items }: { items: NavLink[] }) {
           aria-label={t("navAria")}
           className="flex flex-wrap items-center gap-x-5 gap-y-1"
         >
-          {items.map((item) => (
-            <Link key={item.href} href={item.href} className={linkClass}>
-              {tNav(item.labelKey)}
-            </Link>
+          {clusterNav(items).map((cluster, i) => (
+            // Keyed by position too: a group can recur after another one
+            // (a misordered table) and then names alone would collide.
+            <Fragment key={`${cluster.group ?? "none"}-${i}`}>
+              {/* The same hairline the island draws before its switches —
+                  at every width, or a phone sees one flat run of words. */}
+              {i > 0 && <span aria-hidden="true" className="h-3.5 w-px bg-line" />}
+              <span
+                role={cluster.group ? "group" : undefined}
+                aria-label={cluster.group ? tNav(NAV_GROUP_LABEL_KEY[cluster.group]) : undefined}
+                className="inline-flex flex-wrap items-center gap-x-5 gap-y-1"
+              >
+                {cluster.items.map((item) => (
+                  <Link key={item.href} href={item.href} className={linkClass}>
+                    {tNav(item.labelKey)}
+                  </Link>
+                ))}
+              </span>
+            </Fragment>
           ))}
         </nav>
 

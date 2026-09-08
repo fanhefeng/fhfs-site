@@ -2,15 +2,16 @@
 
 import dynamic from "next/dynamic";
 import type { LabSlug } from "./entries";
+import { LENS_SLIDES } from "./lensSlides";
 import { NEON_STILLS } from "./neonStills";
 
 /**
  * One study per route, and only that study's code.
  *
- * The page used to import all six demos statically and pick one at render
- * time — which is fine for React and useless for the bundler: a Server
- * Component's client imports all land in the route's chunk group whatever
- * the branches say, so /lab/melting-text shipped three.js. `next/dynamic`
+ * Importing every demo statically and picking one at render time is fine for
+ * React and useless for the bundler: a Server Component's client imports all
+ * land in the route's chunk group whatever the branches say, so
+ * /lab/melting-text would ship three.js. `next/dynamic`
  * with `ssr: false` (hence this client wrapper) gives each study its own
  * chunk, fetched when its route is opened. The demos are all canvas-driven,
  * so there is nothing lost to the missing SSR pass beyond the copy inside
@@ -51,9 +52,6 @@ const LensSliderDemo = dynamic(
 // but the sign is SVG — so it keeps its SSR pass: the page reads whole
 // before its chunk lands, and the wall paints over.
 const NeonSignDemo = dynamic(() => import("./NeonSignDemo").then((m) => m.NeonSignDemo));
-
-/** The four photographs the lens slides between, in order. */
-const LENS_SLIDES = ["river", "falls", "sea", "coffee"] as const;
 
 /** Every string a study can ask for, already translated by the page. */
 export type StudyText = Record<string, string>;
@@ -182,11 +180,6 @@ export function LabStudy({ slug, accent, text }: Props) {
           welcome={text.welcome}
           signOn={text.signOn}
           signOff={text.signOff}
-          toggleHint={text.toggleHint}
-          tonight={text.tonight}
-          trackTitle={text.trackTitle}
-          trackArtist={text.trackArtist}
-          fallbackTrackArtist={text.fallbackTrackArtist}
           galleryKicker={text.galleryKicker}
           galleryTitle={text.galleryTitle}
           galleryLede={text.galleryLede}

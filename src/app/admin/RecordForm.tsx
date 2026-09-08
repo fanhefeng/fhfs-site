@@ -15,6 +15,8 @@ export type Field =
       hint?: string;
     }
   | { name: string; label: string; kind: "number" }
+  /** A single-language textarea — for text that is what it is, not a translation pair. */
+  | { name: string; label: string; kind: "area"; rows?: number; hint?: string }
   | { name: string; label: string; kind: "select"; options: string[] }
   | { name: string; label: string; kind: "localized" }
   | { name: string; label: string; kind: "localizedArea"; rows?: number }
@@ -97,6 +99,23 @@ export function RecordForm({
                   ))}
                 </div>
               </div>
+            );
+          }
+
+          if (field.kind === "area") {
+            return (
+              <label key={field.name} className="block space-y-1.5">
+                <span className={labelClass}>{field.label}</span>
+                {field.hint && (
+                  <span className="block text-caption text-fg-tertiary">{field.hint}</span>
+                )}
+                <textarea
+                  name={field.name}
+                  defaultValue={value(field.name)}
+                  rows={field.rows ?? 6}
+                  className={`${inputClass} leading-relaxed`}
+                />
+              </label>
             );
           }
 
