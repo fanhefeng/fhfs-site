@@ -12,21 +12,46 @@
     "portfolio": "Craft",
     "software": "Software",
     "lab": "Lab",
-    "intro": "Intro",
-    "resume": "Resume"
+    "intro": "3D Intro",
+    "resume": "Resume",
+    "moments": "Moments",
+    "secrets": "Secrets",
+    "idols": "Idols",
+    "odyssey": "A Chinese Odyssey",
+    "life": "Life",
+    "groupIssue": "The issue",
+    "groupRooms": "The rooms",
+    "groupMe": "The author"
+  },
+  "tracks": {
+    "theme": {
+      "title": "Mia & Sebastian's Theme",
+      "artist": "Justin Hurwitz · La La Land OST (2016)",
+      "fallbackArtist": "Justin Hurwitz · 10th Anniversary Version (2026) · NetEase Cloud Music"
+    },
+    "unknown": {
+      "title": "你不知道的事 · All the Things You Never Knew",
+      "artist": "Leehom Wang · theme of Love in Disguise (2010)",
+      "fallbackArtist": "piano rendition · NetEase Cloud Music (the original there needs a subscription)"
+    },
+    "secret": {
+      "title": "不能說的秘密 · Secret",
+      "artist": "Jay Chou · theme of Secret (2007)",
+      "fallbackArtist": "piano rendition · NetEase Cloud Music (the original is not available there)"
+    },
+    "odyssey": {
+      "title": "一生所愛 · The Love of My Life",
+      "artist": "Lowell Lo · closing song of A Chinese Odyssey Part Two (1995)",
+      "fallbackArtist": "piano rendition · NetEase Cloud Music (the original there needs a subscription)"
+    }
   },
   "splash": {
     "label": "Welcome to fhf's",
     "welcome": "Welcome to",
     "signOn": "Switch the sign on",
     "signOff": "Switch the sign off",
-    "toggleHint": "Click the sign · lights and music, off and on together",
     "enter": "Come in",
-    "enterHint": "or press Enter · scrolling works too",
-    "tonight": "Tonight · on the stand",
-    "trackTitle": "Mia & Sebastian's Theme",
-    "trackArtist": "Justin Hurwitz · La La Land OST (2016)",
-    "fallbackTrackArtist": "Justin Hurwitz · 10th Anniversary Version (2026) · NetEase Cloud Music"
+    "enterHint": "or press Enter · scrolling works too"
   },
   "home": {
     "slogan": "Slow down, and the world starts to speak.",
@@ -45,8 +70,8 @@
     "contactTitle": "Elsewhere"
   },
   "grove": {
-    "headline1": "Code for a bow,",
-    "headline2": "the world for a song.",
+    "headline1": "Tech changes the world",
+    "headline2": "",
     "lede": "Born in Hejin, Shanxi; Beijing and Qingdao along the way; Shanghai now. Nine years of front-end, a violin since childhood, and a standing curiosity about the world.",
     "cta": "See the work",
     "statPosts": "Written",
@@ -103,7 +128,9 @@
     "changelogDot": "Released {date}",
     "colophon": "Written in Shanghai · local time {time}",
     "introTitle": "Meet me the other way round",
-    "introLink": "Come closer"
+    "introLink": "Come closer",
+    "resumeTitle": "The formal page",
+    "resumeLink": "The résumé"
   },
   "intro": {
     "title": "Another introduction",
@@ -170,12 +197,10 @@
     "kicker": "Motion lab",
     "title": "Lab",
     "subtitle": "Nine studies. Here the scrollbar is not navigation — it is the playhead.",
-    "indexAria": "Motion experiments",
     "open": "Open",
     "back": "Back to the lab",
     "backToIndex": "← Lab",
     "hint": "Scroll",
-    "reducedMotion": "Your system asks for reduced motion, so this renders its final state directly.",
     "items": {
       "scrollVideo": {
         "name": "Scroll as playhead",
@@ -287,11 +312,6 @@
         "welcome": "Welcome to",
         "signOn": "Switch the sign on",
         "signOff": "Switch the sign off",
-        "toggleHint": "Click the sign · lights and music, off and on together",
-        "tonight": "Tonight · on the stand",
-        "trackTitle": "Mia & Sebastian's Theme",
-        "trackArtist": "Justin Hurwitz · La La Land OST (2016)",
-        "fallbackTrackArtist": "Justin Hurwitz · 10th Anniversary Version (2026) · NetEase Cloud Music",
         "galleryKicker": "Stills · La La Land · 2016",
         "galleryTitle": "A few hung on the wall",
         "galleryLede": "All from the film's nights: a piano, a lamp, the stars, and a road that never ends.",
@@ -316,6 +336,175 @@
         "keysAlt": "In a white world, a winding road of piano keys leads to a distant streetlamp, the two of them at its end"
       }
     }
+  },
+  "moments": {
+    "kicker": "Moments · a line at a time",
+    "title": "All the Things You Never Knew",
+    "subtitle": "Like a QQ Zone of old: a few lines, a time, nothing more. The early ones were written in two notebooks in the 一言 app and moved here; the rest are written here directly.",
+    "count": "{count, plural, one {# moment} other {# moments}}",
+    "filterAll": "All",
+    "filterAria": "Filter by notebook",
+    "original": "Original",
+    "quoted": "Quoted",
+    "yearAria": "Moments from {year}",
+    "expand": "Read it all",
+    "collapse": "Fold",
+    "more": "{count} more",
+    "empty": "Nothing said yet.",
+    "langNotice": "These lines were written in Chinese, and stay that way — there is no English version of a moment."
+  },
+  "secrets": {
+    "kicker": "Essays · podcast",
+    "title": "Secret",
+    "subtitle": "What the notes are not: essays written down, and episodes recorded.",
+    "count": "{count, plural, one {# piece} other {# pieces}}",
+    "kindEssay": "Essay",
+    "kindPodcast": "Podcast",
+    "duration": "{minutes} min",
+    "readingTime": "{minutes} min read",
+    "yearAria": "Secrets from {year}",
+    "empty": "The secret has not been told yet — this page waits for the first one.",
+    "fallbackNotice": "This one hasn't been translated yet — here's the Chinese original.",
+    "listen": "Listen to this episode",
+    "audioUnsupported": "Your browser cannot play this inline — ",
+    "audioOpen": "open the audio directly",
+    "backToList": "Back to the index",
+    "prevPost": "Previous",
+    "nextPost": "Next",
+    "postNavAria": "Previous and next piece"
+  },
+  "idols": {
+    "kicker": "Idols",
+    "title": "Idols",
+    "subtitle": "The people on the wall. First, Kobe.",
+    "open": "Open",
+    "backToIndex": "← Idols",
+    "kobe": {
+      "name": "Kobe Bryant",
+      "latin": "Kobe Bean Bryant",
+      "years": "1978 – 2020",
+      "numbers": "8 · 24",
+      "kicker": "Idols · the first",
+      "lede": "Twenty years with the Lakers, two numbers, five championships, one night of 81. A Los Angeles at four in the morning is the line he left everyone after him.",
+      "statueKicker": "The statue · Star Plaza · 2024",
+      "statueTitle": "The finger pointed at the sky",
+      "statueBody": "January 22, 2006, against the Raptors: 81 points. At the buzzer he pointed his right hand at the sky. On February 8, 2024 the Lakers raised a 19-foot bronze outside Crypto.com Arena in exactly that pose — the number 8 jersey, the game's box score cut into the base. The one here is built in code: not the sculptor's work, but a homage after the same gesture.",
+      "statueHint": "Drag · turn it around",
+      "loading": "Casting",
+      "turnLeft": "Turn a little to the left",
+      "turnRight": "Turn a little to the right",
+      "statueFallback": "No WebGL available here, so a photograph stands in for the statue.",
+      "statueQuote": "Leave the game better than you found it. And when it comes time for you to leave, leave a legend.",
+      "statueQuoteMeta": "Cut into the base of the statue",
+      "statuePlaque": "81 · 2006.01.22 · vs TOR",
+      "galleryKicker": "Photographs · 2005 – 2024",
+      "galleryTitle": "On the court, and off it",
+      "galleryLede": "From number 8 to number 24, from a preseason night in Hawaii to a wall in Valencia.",
+      "timelineKicker": "Career · milestones",
+      "timelineTitle": "Philadelphia to Los Angeles",
+      "credit": "Photographs from Wikimedia Commons, each under its own licence (author and licence under every picture); the statue is procedural geometry, a personal homage only.",
+      "photos": {
+        "hawaii8": { "title": "Number 8", "meta": "Hawaii · preseason · 2005", "alt": "Kobe Bryant in the number 8 purple-and-gold jersey, set at the free-throw line" },
+        "hawaiiDunk": { "title": "Hanging on the rim", "meta": "Hawaii · preseason · 2005", "alt": "Kobe Bryant hanging from the rim with both hands after a dunk" },
+        "drives2007": { "title": "The drive", "meta": "Washington · 2007", "alt": "Kobe Bryant driving to the basket against the Wizards" },
+        "dunk2008": { "title": "Take-off", "meta": "Washington · 2008", "alt": "Kobe Bryant in the air, about to dunk" },
+        "beijing2008": { "title": "Beijing", "meta": "Olympic semifinal · 2008", "alt": "Kobe Bryant in a Team USA jersey during the Beijing Olympics semifinal" },
+        "parade2009": { "title": "Victory parade", "meta": "Disneyland · 2009", "alt": "Kobe Bryant waving to the crowd during the Lakers' championship parade at Disneyland" },
+        "game2010": { "title": "Number 24", "meta": "2010", "alt": "Kobe Bryant in the number 24 jersey during a game" },
+        "obama2010": { "title": "Visitors at the White House", "meta": "Washington · 2010", "alt": "The 2010 champion Lakers with President Obama at a community event in Washington" },
+        "london2012": { "title": "A smile on the bench", "meta": "Team USA · 2012", "alt": "Kobe Bryant smiling on the Team USA bench" },
+        "stage2013": { "title": "On stage", "meta": "2013", "alt": "Kobe Bryant on stage at an event" },
+        "farewell2015": { "title": "The last season", "meta": "Washington · 2015", "alt": "Kobe Bryant in the number 24 jersey during his farewell season" },
+        "cabanyal2024": { "title": "On the wall", "meta": "Valencia · 2024", "alt": "A mural of Kobe Bryant on a wall in the Cabanyal district of Valencia" }
+      },
+      "timeline": {
+        "born": { "date": "1978.08.23", "title": "Born in Philadelphia", "note": "His father Joe Bryant played in the NBA too; seven years of his childhood were spent in Italy." },
+        "draft": { "date": "1996.06", "title": "Straight from high school", "note": "Picked 13th by the Hornets and traded to the Lakers at once — at 17." },
+        "threepeat": { "date": "2000 – 2002", "title": "Three-peat", "note": "Three titles in three years, beside Shaquille O'Neal." },
+        "eightyone": { "date": "2006.01.22", "title": "81 points", "note": "Against the Toronto Raptors — the second-highest single game in NBA history." },
+        "mvp": { "date": "2008", "title": "MVP · gold in Beijing", "note": "His one regular-season MVP; that summer, gold with the Redeem Team." },
+        "backtoback": { "date": "2009 – 2010", "title": "Back to back", "note": "Finals MVP both times; the fifth championship." },
+        "farewell": { "date": "2016.04.13", "title": "60 in the last game", "note": "Against the Jazz, the final game of his career: 60 points." },
+        "retired": { "date": "2017.12.18", "title": "Two jerseys retired", "note": "8 and 24 went up into the rafters of Staples Center together." },
+        "oscar": { "date": "2018.03.04", "title": "An Oscar", "note": "Dear Basketball won Best Animated Short Film." },
+        "gone": { "date": "2020.01.26", "title": "Gone", "note": "Killed with his daughter Gianna in a helicopter crash in Calabasas, at 41. Elected to the Naismith Hall of Fame the same year." },
+        "statue": { "date": "2024.02.08", "title": "The statue", "note": "Number 8, a finger to the sky, on Star Plaza outside Crypto.com Arena." }
+      }
+    }
+  },
+  "life": {
+    "kicker": "Life · the rooms of the house",
+    "title": "Life",
+    "subtitle": "Past the issue, the rooms of the house: things said, things kept, the people on the wall, a film watched too many times. Each puts on its own record at the door.",
+    "none": "The rooms are not ready yet.",
+    "record": "Record · {title}",
+    "countEntries": "{count, plural, one {# moment} other {# moments}}",
+    "countPieces": "{count, plural, one {# piece} other {# pieces}}",
+    "countIdols": "{count} on the wall",
+    "countStills": "{count} stills",
+    "empty": "Nothing told yet",
+    "items": {
+      "moments": { "title": "All the Things You Never Knew", "line": "The board: a few lines and a time, since 2017." },
+      "secrets": { "title": "Secret", "line": "Essays and episodes — what the notes are not." },
+      "idols": { "title": "Idols", "line": "The people on the wall. First, Kobe." },
+      "odyssey": { "title": "A Chinese Odyssey", "line": "Two parts, three lines, twelve stills, and the song over the end credits." }
+    }
+  },
+  "odyssey": {
+    "kicker": "A Chinese Odyssey · 1995",
+    "title": "A Chinese Odyssey",
+    "subtitle": "A film watched many times over: two parts, a few stills, the lines I remember, and the song over the end credits.",
+    "latin": "大话西游",
+    "meta": "Jeffrey Lau · Stephen Chow · Athena Chu · Karen Mok · 1995",
+    "lede": "Pandora's Box and Cinderella baffled most people when they came out in 1995; a few years later they were watched over and over in university dorms and video halls, and became, for many, the best Stephen Chow there is. Joker, Zixia, Bai Jingjing, the Pandora's Box — and the song over the end credits, 一生所愛, which plays while you are on this page.",
+    "filmsKicker": "The two parts",
+    "filmsTitle": "Pandora's Box, and Cinderella",
+    "films": {
+      "box": {
+        "title": "A Chinese Odyssey Part One: Pandora's Box",
+        "meta": "1995.01.21 · Part one",
+        "note": "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. Bai Jingjing, Spider Woman, a box that turns back time — he wants to save one person, and keeps landing back in the same night."
+      },
+      "cinderella": {
+        "title": "A Chinese Odyssey Part Two: Cinderella",
+        "meta": "1995.02.04 · Part two",
+        "note": "The box carries him five hundred years back, where he meets the fairy Zixia. To save her he must put on the golden headband; with it on, he may never love her again."
+      }
+    },
+    "linesKicker": "Lines",
+    "linesTitle": "The ones I remember",
+    "lines": {
+      "love": {
+        "text": "Once there was a sincere love in front of me, and I did not treasure it. Only when I lost it did I regret — there is no greater pain in this world. If heaven gave me one more chance, I would say three words to that girl: I love you. And if a limit had to be put on that love, I would want it to be… ten thousand years.",
+        "meta": "Joker · to Zixia"
+      },
+      "hero": {
+        "text": "The one I love is a great hero. One day he will come for me on a cloud of seven colours. I guessed the beginning — but I could not guess the ending.",
+        "meta": "Zixia"
+      },
+      "dog": {
+        "text": "Look at that man. He looks like a dog.",
+        "meta": "Zixia · on the city wall, at the end"
+      }
+    },
+    "stillsKicker": "Stills · 1995",
+    "stillsTitle": "The scenes that stayed",
+    "stillsLede": "The desert, the city wall, the Spider Cave, a wedding, and that one wink.",
+    "stills": {
+      "monkeyKing": { "title": "The Monkey King", "meta": "Cinderella · a golden sky", "alt": "The Monkey King, headband on, with his staff across his shoulders under a golden sky" },
+      "wink": { "title": "That wink", "meta": "Cinderella · Zixia", "alt": "The fairy Zixia winking at the camera" },
+      "desert": { "title": "The desert", "meta": "Cinderella · on the dunes", "alt": "Two people sitting side by side on the crest of a dune in an endless desert" },
+      "reeds": { "title": "The reeds", "meta": "Pandora's Box · Joker", "alt": "Joker standing among pink reeds, looking back" },
+      "bride": { "title": "The phoenix crown", "meta": "Cinderella · Zixia", "alt": "The fairy Zixia in a phoenix crown and a red wedding dress" },
+      "wedding": { "title": "The wedding", "meta": "Cinderella · the Bull King's cave", "alt": "A wedding all in red — Zixia, the Bull King and Joker standing together" },
+      "jingjing": { "title": "Bai Jingjing", "meta": "Pandora's Box · the desert", "alt": "In the desert, Joker holding Bai Jingjing where she has fallen" },
+      "cave": { "title": "The Spider Cave", "meta": "Cinderella · inside", "alt": "Joker sitting among the tangled roots inside the Spider Cave" },
+      "zixia": { "title": "Zixia", "meta": "Cinderella · a raised hand", "alt": "The fairy Zixia raising a hand, smiling at the camera" },
+      "box": { "title": "Pandora's Box", "meta": "Pandora's Box · Joker", "alt": "Joker sitting on the ground, holding up the Pandora's Box" },
+      "gate": { "title": "The gate", "meta": "Cinderella · the Monkey King", "alt": "The Monkey King, headband on, staff across his shoulders in front of a city gate" },
+      "wall": { "title": "On the city wall", "meta": "Cinderella · the ending", "alt": "On the city wall, two people standing in an embrace, snow mountains in the distance" }
+    },
+    "credit": "Stills © 1995 Choi Sing Film / Xi'an Film Studio, via TMDB; 一生所愛 is played through Spotify's official recording, with an anonymously streamable piano rendition on NetEase Cloud Music where Spotify cannot be reached. A personal homage only."
   },
   "software": {
     "kicker": "Software",
@@ -360,7 +549,8 @@
     "loaderAria": "Turning on the lights",
     "musicPlay": "Play the background music",
     "musicPause": "Stop the background music",
-    "musicTitle": "Background music: Mia & Sebastian's Theme"
+    "musicTitle": "Background music player",
+    "tonight": "Tonight · on the stand"
   },
   "error": {
     "kicker": "Printing error",

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import { LiquidPill } from "@/components/grove/LiquidPill";
-import { OVERTURE_DONE_EVENT, OVERTURE_SEEN_KEY } from "@/components/fx/OvertureLight";
+import { OVERTURE_DONE_EVENT, overtureSeen } from "@/lib/overture";
 import { splashDue } from "@/lib/splash";
 
 export type OpeningMeta = { label: string; value: string };
@@ -60,12 +60,7 @@ const CSS = `
 function useEntrance() {
   const [entered, setEntered] = useState(false);
   useEffect(() => {
-    let seen = true;
-    try {
-      seen = !!sessionStorage.getItem(OVERTURE_SEEN_KEY);
-    } catch {
-      seen = true;
-    }
+    const seen = overtureSeen();
     if (seen && !splashDue()) {
       const raf = requestAnimationFrame(() => setEntered(true));
       return () => cancelAnimationFrame(raf);
@@ -122,7 +117,9 @@ export function Opening({ headline, lede, cta, meta }: Props) {
             zh ? "tracking-[0]" : "tracking-[-0.03em]"
           }`}
         >
-          {headline.map((line, i) => (
+          {/* A line left empty in the copy is not a blank line — the
+              manifesto is simply shorter. */}
+          {headline.filter(Boolean).map((line, i) => (
             <span key={line} className="op-line" style={{ "--d": `${i * 110}ms` } as React.CSSProperties}>
               <i>{line}</i>
             </span>

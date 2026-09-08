@@ -2,6 +2,7 @@ import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { navItems } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
+import { isNavGroup } from "@/lib/nav";
 import { AdminChrome } from "../AdminChrome";
 import { NavForm } from "./NavForm";
 
@@ -12,6 +13,7 @@ export default async function NavPage() {
       href: navItems.href,
       labelKey: navItems.labelKey,
       surfaces: navItems.surfaces,
+      group: navItems.group,
     })
     .from(navItems)
     .orderBy(asc(navItems.sort), asc(navItems.href));
@@ -23,7 +25,14 @@ export default async function NavPage() {
         <code> nav.&lt;key&gt;</code>——那些界面标签不在数据库里，加新条目要顺手在
         两个 JSON 里补上对应的词，否则显示出来的会是 key 本身。清空路径即删除。
       </p>
-      <NavForm items={rows} />
+      <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
+        分组决定页脚成簇、全屏菜单里挂在哪扇门下（门 = 同组里勾了顶栏的那一行）、
+        以及是否上 <code>/life</code> 这页目录：新房间一律选「房间」，勾 页脚 / 全屏菜单 /
+        sitemap，插在房间一段的末尾即可，顶栏不用动。
+      </p>
+      <NavForm
+        items={rows.map((row) => ({ ...row, group: isNavGroup(row.group) ? row.group : null }))}
+      />
     </AdminChrome>
   );
 }

@@ -87,6 +87,45 @@ await batch(
   )
 );
 
+// The secrets are posts in all but name: same derived columns, same key.
+const secrets = await Promise.all(
+  (data.secrets ?? []).map(async (row) => ({
+    ...row,
+    bodyHtml: await renderMarkdown(row.bodyMd),
+    readingMinutes: readingMinutes(row.bodyMd),
+  }))
+);
+await batch(
+  "secrets",
+  secrets.map((value) =>
+    db
+      .insert(schema.secrets)
+      .values(value)
+      .onConflictDoUpdate({
+        target: [schema.secrets.slug, schema.secrets.locale],
+        set: { ...value, updatedAt: new Date() },
+      })
+  )
+);
+
+// The board travels with its instants as ISO strings; the column wants Dates.
+const moments = (data.moments ?? []).map((row) => ({
+  ...row,
+  postedAt: new Date(row.postedAt),
+}));
+await batch(
+  "moments",
+  moments.map((value) =>
+    db
+      .insert(schema.moments)
+      .values(value)
+      .onConflictDoUpdate({
+        target: schema.moments.key,
+        set: { ...value, updatedAt: new Date() },
+      })
+  )
+);
+
 // Every table with a natural key that /admin can also delete from.
 const keyed = [
   [schema.timelineEntries, data.timelineEntries],

@@ -7,13 +7,16 @@ import { gsap, useGSAP } from "@/lib/gsap";
 type Props = {
   children: ReactNode;
   /** Wrapper element — keep it semantic (section/ul/…), default div. */
-  as?: "div" | "section" | "span" | "ul" | "ol" | "li" | "footer" | "aside";
+  as?: "div" | "section" | "span" | "ul" | "ol" | "li" | "header" | "footer" | "aside";
   className?: string;
   /**
    * When set, the wrapper's direct children animate in sequence with this
    * gap (seconds) instead of the wrapper moving as one block.
    */
   stagger?: number;
+  /** An explicit role — `role="list"` on a `ul`/`ol` whose bullets are
+   *  styled away, which WebKit would otherwise stop announcing as a list. */
+  role?: string;
 };
 
 /**
@@ -36,7 +39,7 @@ export const REVEAL_START = "top 85%";
  * fired once at "top 85%". Content is always in the DOM (SSR/SEO safe) —
  * GSAP hides it only on the client just before the from-tween runs.
  */
-export function Reveal({ children, as = "div", className, stagger }: Props) {
+export function Reveal({ children, as = "div", className, stagger, role }: Props) {
   const ref = useRef<HTMLElement>(null);
   // Pinned to one concrete tag rather than ElementType: @react-three/fiber
   // merges every three.js element into the global JSX.IntrinsicElements, so
@@ -65,7 +68,7 @@ export function Reveal({ children, as = "div", className, stagger }: Props) {
   );
 
   return (
-    <Tag ref={ref as Ref<HTMLDivElement>} className={className}>
+    <Tag ref={ref as Ref<HTMLDivElement>} className={className} role={role}>
       {children}
     </Tag>
   );

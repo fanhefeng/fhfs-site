@@ -50,6 +50,20 @@
       "when": 1788510115797,
       "tag": "0006_demonic_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788723216393,
+      "tag": "0007_fluffy_goblin_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788784702060,
+      "tag": "0008_striped_tiger_shark",
+      "breakpoints": true
     }
   ]
 }

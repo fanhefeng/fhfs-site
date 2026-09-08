@@ -45,6 +45,14 @@ const data = {
     .from(schema.posts)
     .orderBy(asc(schema.posts.slug), asc(schema.posts.locale)),
   abouts: await db.select().from(schema.abouts).orderBy(asc(schema.abouts.locale)),
+  secrets: await db
+    .select()
+    .from(schema.secrets)
+    .orderBy(asc(schema.secrets.slug), asc(schema.secrets.locale)),
+  moments: await db
+    .select()
+    .from(schema.moments)
+    .orderBy(asc(schema.moments.postedAt), asc(schema.moments.key)),
   timelineEntries: await db
     .select()
     .from(schema.timelineEntries)
@@ -118,6 +126,25 @@ for (const post of data.posts) {
   await writeFile(
     path.join(OUT, "posts", `${post.slug}.${post.locale}.md`),
     `---\n${frontmatter}---\n\n${post.bodyMd}`
+  );
+}
+
+/** The secrets likewise, in their own folder — a slug shared with a post
+ *  must not overwrite it. */
+await mkdir(path.join(OUT, "secrets"), { recursive: true });
+for (const secret of data.secrets) {
+  const frontmatter = toYaml({
+    title: secret.title,
+    kind: secret.kind,
+    date: secret.date,
+    summary: secret.summary,
+    ...(secret.audio ? { audio: secret.audio } : {}),
+    ...(secret.duration != null ? { duration: secret.duration } : {}),
+    ...(secret.draft ? { draft: true } : {}),
+  });
+  await writeFile(
+    path.join(OUT, "secrets", `${secret.slug}.${secret.locale}.md`),
+    `---\n${frontmatter}---\n\n${secret.bodyMd}`
   );
 }
 

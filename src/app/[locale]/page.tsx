@@ -123,88 +123,83 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         welcome={td("welcome")}
         signOn={td("signOn")}
         signOff={td("signOff")}
-        toggleHint={td("toggleHint")}
         enter={td("enter")}
         enterHint={td("enterHint")}
-        tonight={td("tonight")}
-        trackTitle={td("trackTitle")}
-        trackArtist={td("trackArtist")}
-        fallbackTrackArtist={td("fallbackTrackArtist")}
       />
-    <main id="main" className="flex-1">
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "Person",
-          name: site.author,
-          url: site.url,
-          sameAs: [site.social.github],
-          ...(site.social.email ? { email: site.social.email } : {}),
-        }}
-      />
-
-      <Opening
-        headline={[th("headline1"), th("headline2")]}
-        lede={th("lede")}
-        cta={{ label: th("cta"), href: `/${locale}/portfolio` }}
-        meta={meta}
-      />
-
-      <GroveApproach
-        kicker={th("cardLabLabel")}
-        title={th("cardLabTitle")}
-        link={{ label: th("approachLink"), href: `/${locale}/lab/grove` }}
-        cards={[
-          {
-            label: th("cardLabLabel"),
-            title: th("cardLabTitle"),
-            href: `/${locale}/lab/grove`,
-            src: "/grove/moss-plate.webp",
-            alt: th("cardLabAlt"),
-            linkLabel: th("cardLabLink"),
-          },
-          {
-            label: th("cardPostLabel"),
-            title: latest?.title ?? th("cardPostFallback"),
-            href: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
-            src: "/lab/dissolve/forest.jpg",
-            alt: th("cardPostAlt"),
-            linkLabel: th("cardPostLink"),
-          },
-        ]}
-      />
-
-      {/* The issue itself, at the 680px measure. */}
-      <div
-        id="issue"
-        className="mx-auto flex w-full max-w-[680px] scroll-mt-24 flex-col gap-20 px-6 pt-24 pb-24 md:gap-24 md:pt-32 md:pb-32"
-      >
-        <RecentWriting
-          items={posts}
-          title={t("latestPosts")}
-          viewAllLabel={t("viewAllPosts")}
-          index="01"
+      <main id="main" className="flex-1">
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Person",
+            name: site.author,
+            url: site.url,
+            sameAs: [site.social.github],
+            ...(site.social.email ? { email: site.social.email } : {}),
+          }}
         />
-        <MiniBento
-          items={apps}
-          title={t("featuredWorks")}
-          viewAllLabel={t("viewAllSoftware")}
-          index="02"
+  
+        <Opening
+          headline={[th("headline1"), th("headline2")]}
+          lede={th("lede")}
+          cta={{ label: th("cta"), href: `/${locale}/portfolio` }}
+          meta={meta}
         />
-        <AboutTeaser
-          title={t("aboutTitle")}
-          index="03"
-          lead1={t("aboutLead1")}
-          lead2={t("aboutLead2")}
-          linkLabel={t("aboutLink")}
-          nowItems={nowItems}
-          nowTitle={t("nowTitle")}
-          nowBadge={t("nowBadge")}
-          contactTitle={t("contactTitle")}
-          contacts={contacts}
+  
+        <GroveApproach
+          kicker={th("cardLabLabel")}
+          title={th("cardLabTitle")}
+          link={{ label: th("approachLink"), href: `/${locale}/lab/grove` }}
+          cards={[
+            {
+              label: th("cardLabLabel"),
+              title: th("cardLabTitle"),
+              href: `/${locale}/lab/grove`,
+              src: "/grove/moss-plate.webp",
+              alt: th("cardLabAlt"),
+              linkLabel: th("cardLabLink"),
+            },
+            {
+              label: th("cardPostLabel"),
+              title: latest?.title ?? th("cardPostFallback"),
+              href: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
+              src: "/lab/dissolve/forest.jpg",
+              alt: th("cardPostAlt"),
+              linkLabel: th("cardPostLink"),
+            },
+          ]}
         />
-      </div>
-    </main>
+  
+        {/* The issue itself, at the 680px measure. */}
+        <div
+          id="issue"
+          className="mx-auto flex w-full max-w-[680px] scroll-mt-24 flex-col gap-20 px-6 pt-24 pb-24 md:gap-24 md:pt-32 md:pb-32"
+        >
+          <RecentWriting
+            items={posts}
+            title={t("latestPosts")}
+            viewAllLabel={t("viewAllPosts")}
+            index="01"
+          />
+          <MiniBento
+            items={apps}
+            title={t("featuredWorks")}
+            viewAllLabel={t("viewAllSoftware")}
+            index="02"
+          />
+          <AboutTeaser
+            title={t("aboutTitle")}
+            index="03"
+            lead1={t("aboutLead1")}
+            lead2={t("aboutLead2")}
+            linkLabel={t("aboutLink")}
+            nowItems={nowItems}
+            nowTitle={t("nowTitle")}
+            nowBadge={t("nowBadge")}
+            contactTitle={t("contactTitle")}
+            contacts={contacts}
+          />
+        </div>
+      </main>
     </>
   );
 }

@@ -24,6 +24,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { readingMinutes } from "@/lib/reading";
 import { parseProjects, parseSkillLines } from "@/lib/resume";
 import { TAGS } from "@/lib/content";
+import { isNavGroup, NAV_GROUPS } from "@/lib/nav";
 
 /**
  * Every write the admin can make.
@@ -149,6 +150,180 @@ export async function deletePost(form: FormData): Promise<void> {
   // A deleted post's page is cached like any other — without this it would go
   // on being served from the edge.
   invalidate(TAGS.posts);
+}
+
+// ---------------------------------------------------------------------------
+// Secrets — 《不能说的秘密》, posts in all but name
+// ---------------------------------------------------------------------------
+
+export async function saveSecret(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  if (!(await adminSession())) return SESSION_EXPIRED;
+
+  const slug = str(form, "slug");
+  const locale = parseLocale(str(form, "locale"));
+  const bodyMd = String(form.get("bodyMd") ?? "");
+
+  if (!validKey(slug)) {
+    return { error: "slug 只能用小写字母、数字和连字符。" };
+  }
+  if (!locale) return { error: "语言只能是 zh 或 en。" };
+  if (!str(form, "title")) return { error: "标题不能为空。" };
+
+  const kindField = str(form, "kind");
+  if (kindField !== "essay" && kindField !== "podcast") {
+    return { error: "类型只能是 essay（随笔）或 podcast（播客）。" };
+  }
+  const kind: "essay" | "podcast" = kindField;
+  const date = str(form, "date");
+  if (!validDate(date)) return DATE_ERROR;
+
+  // Rendered as the <audio> src — the same belt every href wears.
+  const audio = str(form, "audio") || null;
+  if (audio && !validLink(audio)) return linkError("音频地址");
+  if (kind === "podcast" && !audio) {
+    return { error: "播客得有音频地址；没有的话先存成随笔。" };
+  }
+  const duration = intField(form, "duration", "时长", null);
+  if (!duration.ok) return duration;
+  if (duration.value !== null && duration.value <= 0) {
+    return { error: "时长要填正整数分钟。" };
+  }
+
+  const row = {
+    slug,
+    locale,
+    kind,
+    title: str(form, "title"),
+    date,
+    summary: str(form, "summary"),
+    audio,
+    duration: duration.value,
+    draft: form.get("draft") === "on",
+    bodyMd,
+    bodyHtml: await renderMarkdown(bodyMd),
+    readingMinutes: readingMinutes(bodyMd),
+  };
+
+  const isNew = Boolean(form.get("isNew"));
+  if (isNew) {
+    const inserted = await db
+      .insert(schema.secrets)
+      .values(row)
+      .onConflictDoNothing({ target: [schema.secrets.slug, schema.secrets.locale] })
+      .returning({ id: schema.secrets.id });
+    if (!inserted.length) {
+      return { error: `slug 已存在：${locale} 下已经有「${slug}」了，换一个或去编辑原文。` };
+    }
+  } else {
+    await db
+      .insert(schema.secrets)
+      .values(row)
+      .onConflictDoUpdate({
+        target: [schema.secrets.slug, schema.secrets.locale],
+        set: { ...row, updatedAt: new Date() },
+      });
+  }
+
+  invalidate(TAGS.secrets);
+  if (isNew) redirect(`/admin/secrets/${slug}/${locale}`);
+  return { ok: true };
+}
+
+export async function deleteSecret(form: FormData): Promise<void> {
+  await requireAdmin();
+  const slug = str(form, "slug");
+  const locale = parseLocale(str(form, "locale"));
+  if (!locale) return;
+  await db
+    .delete(schema.secrets)
+    .where(and(eq(schema.secrets.slug, slug), eq(schema.secrets.locale, locale)));
+  invalidate(TAGS.secrets);
+}
+
+// ---------------------------------------------------------------------------
+// Moments — 《多的是你不知道的事》, the board
+// ---------------------------------------------------------------------------
+
+/**
+ * A moment is stamped to the minute, in the site's zone: `2026-09-07 23:15`
+ * as the author would write it, stored as the instant that is.
+ */
+const MOMENT_TIME_RE = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})$/;
+
+function parseMomentTime(value: string): Date | null {
+  const match = MOMENT_TIME_RE.exec(value);
+  if (!match) return null;
+  const [, day, hour, minute] = match;
+  if (!validDate(day) || Number(hour) > 23 || Number(minute) > 59) return null;
+  // The site's zone is UTC+8 without daylight saving, so the offset is a constant.
+  return new Date(`${day}T${hour}:${minute}:00+08:00`);
+}
+
+export async function saveMoment(
+  _prev: ActionState,
+  form: FormData
+): Promise<ActionState> {
+  if (!(await adminSession())) return SESSION_EXPIRED;
+
+  const key = str(form, "key");
+  if (!validKey(key)) return KEY_ERROR;
+  const content = raw(form, "content").replace(/\r\n/g, "\n").trim();
+  if (!content) return { error: "正文不能为空。" };
+  const postedAt = parseMomentTime(str(form, "postedAt"));
+  if (!postedAt) {
+    return { error: "时间要写成 YYYY-MM-DD HH:mm（上海时间），而且得是真实存在的一刻。" };
+  }
+  const original = str(form, "original");
+  if (original !== "yes" && original !== "no") {
+    return { error: "原创只能选 yes 或 no。" };
+  }
+  const draft = str(form, "draft");
+  if (draft !== "no" && draft !== "yes") {
+    return { error: "草稿只能选 yes 或 no。" };
+  }
+
+  const row = {
+    key,
+    content,
+    postedAt,
+    collection: str(form, "collection") || null,
+    original: original === "yes",
+    attribution: str(form, "attribution") || null,
+    source: str(form, "source") || null,
+    mood: str(form, "mood") || null,
+    draft: draft === "yes",
+  };
+
+  if (form.get("isNew")) {
+    const inserted = await db
+      .insert(schema.moments)
+      .values(row)
+      .onConflictDoNothing({ target: schema.moments.key })
+      .returning({ id: schema.moments.id });
+    if (!inserted.length) return existsError(key);
+  } else {
+    await db
+      .insert(schema.moments)
+      .values(row)
+      .onConflictDoUpdate({
+        target: schema.moments.key,
+        set: { ...row, updatedAt: new Date() },
+      });
+  }
+
+  invalidate(TAGS.moments);
+  return { ok: true };
+}
+
+export async function deleteMoment(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db.delete(schema.moments).where(eq(schema.moments.key, key));
+  invalidate(TAGS.moments);
 }
 
 // ---------------------------------------------------------------------------
@@ -284,13 +459,32 @@ export async function saveTimelineEntry(
     sort: sort.value,
   };
 
-  await db
-    .insert(schema.timelineEntries)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.timelineEntries.key, set: row });
+  if (form.get("isNew")) {
+    const inserted = await db
+      .insert(schema.timelineEntries)
+      .values(row)
+      .onConflictDoNothing({ target: schema.timelineEntries.key })
+      .returning({ id: schema.timelineEntries.id });
+    if (!inserted.length) return existsError(key);
+  } else {
+    await db
+      .insert(schema.timelineEntries)
+      .values(row)
+      .onConflictDoUpdate({ target: schema.timelineEntries.key, set: row });
+  }
 
   invalidate(TAGS.timeline);
   return { ok: true };
+}
+
+export async function deleteTimelineEntry(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db
+    .delete(schema.timelineEntries)
+    .where(eq(schema.timelineEntries.key, key));
+  invalidate(TAGS.timeline);
 }
 
 export async function saveApp(
@@ -394,13 +588,30 @@ export async function saveExperiment(
     sort: sort.value,
   };
 
-  await db
-    .insert(schema.experiments)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.experiments.key, set: row });
+  if (form.get("isNew")) {
+    const inserted = await db
+      .insert(schema.experiments)
+      .values(row)
+      .onConflictDoNothing({ target: schema.experiments.key })
+      .returning({ id: schema.experiments.id });
+    if (!inserted.length) return existsError(key);
+  } else {
+    await db
+      .insert(schema.experiments)
+      .values(row)
+      .onConflictDoUpdate({ target: schema.experiments.key, set: row });
+  }
 
   invalidate(TAGS.experiments);
   return { ok: true };
+}
+
+export async function deleteExperiment(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db.delete(schema.experiments).where(eq(schema.experiments.key, key));
+  invalidate(TAGS.experiments);
 }
 
 /**
@@ -474,6 +685,7 @@ export async function saveNavItems(
         (surface) => form.get(`nav.${i}.surface.${surface}`) === "on"
       ),
       sort: index,
+      group: str(form, `nav.${i}.group`),
     }))
     .filter((row) => row.href);
 
@@ -486,6 +698,11 @@ export async function saveNavItems(
     }
     if (!row.labelKey) {
       return { error: `${row.href} 缺少文案 key。` };
+    }
+    // The wings are a closed list (`src/lib/nav.ts`): a group the surfaces
+    // would not recognise is refused rather than saved and silently ignored.
+    if (row.group && !isNavGroup(row.group)) {
+      return { error: `分组只能是 ${NAV_GROUPS.join(" / ")} 或留空：${row.href}` };
     }
   }
 
@@ -517,9 +734,10 @@ export async function saveNavItems(
 
   // Atomic for the same reason as saveChips — an empty nav_items is a site
   // with no header.
+  const values = rows.map((row) => ({ ...row, group: row.group || null }));
   const wipe = db.delete(schema.navItems);
   await db.batch(
-    rows.length ? [wipe, db.insert(schema.navItems).values(rows)] : [wipe]
+    values.length ? [wipe, db.insert(schema.navItems).values(values)] : [wipe]
   );
 
   invalidate(TAGS.nav);
@@ -742,11 +960,28 @@ export async function saveIntroNode(
     sort: sort.value,
   };
 
-  await db
-    .insert(schema.introNodes)
-    .values(row)
-    .onConflictDoUpdate({ target: schema.introNodes.key, set: row });
+  if (form.get("isNew")) {
+    const inserted = await db
+      .insert(schema.introNodes)
+      .values(row)
+      .onConflictDoNothing({ target: schema.introNodes.key })
+      .returning({ id: schema.introNodes.id });
+    if (!inserted.length) return existsError(key);
+  } else {
+    await db
+      .insert(schema.introNodes)
+      .values(row)
+      .onConflictDoUpdate({ target: schema.introNodes.key, set: row });
+  }
 
   invalidate(TAGS.intro);
   return { ok: true };
+}
+
+export async function deleteIntroNode(form: FormData): Promise<void> {
+  await requireAdmin();
+  const key = str(form, "key");
+  if (!key) return;
+  await db.delete(schema.introNodes).where(eq(schema.introNodes.key, key));
+  invalidate(TAGS.intro);
 }

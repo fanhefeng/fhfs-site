@@ -12,3 +12,5 @@ allowBuilds:
   # Unused here — nothing needs their postinstall to run.
   sharp: false
   unrs-resolver: false
+patchedDependencies:
+  '@react-three/fiber@9.7.0': patches/@react-three__fiber@9.7.0.patch
