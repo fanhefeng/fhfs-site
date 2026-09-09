@@ -71,7 +71,7 @@ export function stripFacing(i: number, pose: CurlPose): number {
  * `|cos|` because a strip edge-on to the reader is dark whichever side of the
  * paper is showing, and face-on is lit either way. Taking it at both edges
  * rather than once at the middle is what lets the shading run as a gradient
- * ACROSS each strip: with one value per strip the bend reads as sixteen flat
+ * ACROSS each strip: with one value per strip the bend reads as eighteen flat
  * facets, and the whole point of the chain was to not look like that.
  */
 export function stripLight(i: number, pose: CurlPose): { near: number; far: number } {
