@@ -16,6 +16,7 @@ import {
 } from "@/lib/grove/geometry";
 import { LENS_SLIDES } from "@/components/lab/lensSlides";
 import { NEON_STILLS } from "@/components/lab/neonStills";
+import { ODYSSEY_STILLS } from "@/components/odyssey/stills";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
 import { getPosts } from "@/lib/content";
 
@@ -77,6 +78,7 @@ const STUDY_KEYS: Record<string, string[]> = {
     ...GROVE_PALETTE_KEYS.map((k) => GROVE_PALETTES[k].label),
   ],
   groveStage: ["pointerHint", "fallback"],
+  album: ["hint", "prev", "next", "counterAria"],
   liquidMetal: ["headline", "body", "tail", "fallback", "label", "stageField", "stageMolten", "stageBloom"],
   workstation: ["deskHint"],
   lensSlider: [
@@ -141,6 +143,19 @@ export default async function LabDemoPage({
       cardBAlt: tg("cardPostAlt"),
       cardBLink: tg("cardPostLink"),
     });
+  }
+
+  // The album binds the 大话西游 room's stills, so it reads that room's copy —
+  // the same captions and, importantly, the same rights line. Duplicating a
+  // credit is how two copies of it end up disagreeing.
+  if (entry.slug === "album") {
+    const to = await getTranslations("odyssey");
+    for (const still of ODYSSEY_STILLS) {
+      text[`${still.id}Title`] = to(`stills.${still.id}.title`);
+      text[`${still.id}Meta`] = to(`stills.${still.id}.meta`);
+      text[`${still.id}Alt`] = to(`stills.${still.id}.alt`);
+    }
+    text.credit = to("credit");
   }
 
   /**
