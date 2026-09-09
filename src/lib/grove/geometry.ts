@@ -19,6 +19,19 @@ import * as THREE from "three";
  * reasoned about, without a WebGL context in the picture.
  */
 
+/**
+ * How many blades are planted, per root, by viewport.
+ *
+ * The shell under them is only ~20k vertices, so this number IS the build
+ * cost — and, since nothing here touches the renderer, it is also readable
+ * from the server, which is what lets the study's spec table quote it rather
+ * than repeat it in prose that would drift.
+ */
+export const BLADES_NEAR_WIDE = 175_000;
+export const BLADES_NEAR_SMALL = 46_000;
+export const BLADES_FAR_WIDE = 55_000;
+export const BLADES_FAR_SMALL = 13_000;
+
 const TAU = Math.PI * 2;
 const UP = new THREE.Vector3(0, 1, 0);
 

@@ -7,7 +7,15 @@ import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
 import { watchContextLoss } from "@/lib/webgl";
-import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
+import {
+  buildGrove,
+  buildMotes,
+  BOX_W,
+  BLADES_NEAR_WIDE,
+  BLADES_NEAR_SMALL,
+  BLADES_FAR_WIDE,
+  BLADES_FAR_SMALL,
+} from "@/lib/grove/geometry";
 
 type Props = {
   accent: string;
@@ -74,12 +82,6 @@ import {
 
 /** Scratch colour for the dress tween, so a 60fps interpolation allocates none. */
 const TMP = new THREE.Color();
-
-/** Blade counts. The shell is only ~20k vertices, so this is the build cost. */
-const BLADES_NEAR_WIDE = 175_000;
-const BLADES_NEAR_SMALL = 46_000;
-const BLADES_FAR_WIDE = 55_000;
-const BLADES_FAR_SMALL = 13_000;
 
 /**
  * The ridge behind.

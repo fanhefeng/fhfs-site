@@ -252,7 +252,22 @@
         "dressLivingGreen": "春苔",
         "dressSakura": "落樱",
         "dressMaple": "深秋",
-        "dressSequoia": "雾杉"
+        "dressSequoia": "雾杉",
+        "specTitle": "这一则的规格",
+        "specRuntime": "运行时",
+        "specRuntimeValue": "three.js r185 · 自定义 GLSL · CanvasTexture",
+        "specPasses": "渲染通道",
+        "specPassesValue": "树皮平面在拿到渲染器时烘焙两遍（每页一次），此后每帧只有一次场景渲染。",
+        "specAssets": "外部资源",
+        "specAssetsValue": "0 张贴图、0 个模型文件——它只加载自己的代码。",
+        "specGeometry": "几何",
+        "specGeometryValue": "一颗种子推出全部：扫掠管、随光加厚的苔藓垫、蕨叶、花序，以及 {blades, number} 根实例化草叶（窄屏 {bladesSmall, number} 根）。",
+        "specVariants": "配色",
+        "specVariantsValue": "{count} 套，可在画面右上角切换；几何一模一样，换的是材质、空气和天色。",
+        "specPixelRatio": "像素比",
+        "specPixelRatioValue": "跟随屏幕，上限 2；画布超过 260 万像素时降到 1.5。",
+        "specFallback": "降级",
+        "specFallbackValue": "没有 WebGL、或读者开了省流量模式时，这里是一张静态构图。"
       },
       "groveStage": {
         "name": "两张纸，一前一后站在苔藓里",

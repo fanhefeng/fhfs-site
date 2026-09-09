@@ -252,7 +252,22 @@
         "dressLivingGreen": "Living green",
         "dressSakura": "Sakura",
         "dressMaple": "Maple",
-        "dressSequoia": "Sequoia"
+        "dressSequoia": "Sequoia",
+        "specTitle": "What this one is made of",
+        "specRuntime": "Runtime",
+        "specRuntimeValue": "three.js r185 · custom GLSL · CanvasTexture",
+        "specPasses": "Passes",
+        "specPassesValue": "Two bark plates baked the moment there is a renderer, once per page; a single scene render per frame after that.",
+        "specAssets": "Assets",
+        "specAssetsValue": "No textures, no model files — the study loads nothing but its own code.",
+        "specGeometry": "Geometry",
+        "specGeometryValue": "All of it derived from one seed: swept tubes, a moss cushion that thickens toward the light, ferns, flower sprays, and {blades, number} instanced blades ({bladesSmall, number} on a narrow viewport).",
+        "specVariants": "Dresses",
+        "specVariantsValue": "{count}, switchable at the top right. The geometry is identical; the materials, the air and the sky are not.",
+        "specPixelRatio": "Pixel ratio",
+        "specPixelRatioValue": "The display's own, capped at 2 — and at 1.5 once the canvas passes 2.6 million pixels.",
+        "specFallback": "Fallback",
+        "specFallbackValue": "With no WebGL, or for a reader on save-data, this is a static composition instead."
       },
       "groveStage": {
         "name": "Two sheets of paper, one root apart",
