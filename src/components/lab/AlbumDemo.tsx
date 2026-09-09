@@ -52,12 +52,12 @@ const pad = (n: number) => String(n).padStart(2, "0");
 /**
  * An album whose pages actually bend.
  *
- * The leaf that turns is not a plane on a hinge: it is a chain of sixteen
+ * The leaf that turns is not a plane on a hinge: it is a chain of eighteen
  * nested strips (see lib/pageCurl.ts), each rotated a little further than its
  * parent about its own left edge, so the accumulated transform traces an arc
  * and the paper bows the way paper does. Every strip carries the same picture
  * at a different background offset, so the image stays continuous across a
- * surface that is being bent in sixteen pieces.
+ * surface that is being bent in eighteen pieces.
  *
  * It is DOM and CSS 3D throughout — no canvas, no WebGL, nothing to lose a
  * context. The only thing JavaScript does per frame is write three numbers per
@@ -109,7 +109,9 @@ export function AlbumDemo({
     if (!root) return;
     root.style.setProperty("--tt", `${(p.tilt * DEG).toFixed(2)}deg`);
     root.style.setProperty("--td", `${(p.delta * DEG).toFixed(3)}deg`);
-    root.style.setProperty("--lift", p.lift.toFixed(3));
+    // How far into the turn we are, 0→1→0. The gloss is gated on it so a leaf
+    // lying flat at either end has none, and it peaks as the leaf stands up.
+    root.style.setProperty("--shade", p.lift.toFixed(3));
     root.dataset.face = showsBack(p) ? "back" : "front";
     for (let i = 0; i < stripRefs.current.length; i++) {
       const el = stripRefs.current[i];
@@ -195,6 +197,21 @@ export function AlbumDemo({
     },
     []
   );
+
+  /* The leaf is built entirely out of the book's own width, in pixels, so that
+     width has to be on the element before a turn can draw. Observed rather
+     than read on resize: the book is sized off the viewport AND off the
+     surrounding column, and a column can change width without the window
+     doing anything. */
+  useEffect(() => {
+    const el = bookRef.current;
+    if (!el || !live) return;
+    const write = () => el.style.setProperty("--bw", `${el.clientWidth}px`);
+    write();
+    const ro = new ResizeObserver(write);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [live]);
 
   /** Begin a turn, held at `t` — 0 when it is about to be dragged. */
   const startTurn = useCallback(
@@ -288,7 +305,9 @@ export function AlbumDemo({
     const onMove = (e: PointerEvent) => {
       const d = drag.current;
       if (!d) {
-        // No page in hand: the book just leans toward the pointer.
+        // No page in hand: the book leans toward the pointer, but only for a
+        // pointer actually over it — this handler is also on the window.
+        if (e.currentTarget !== stage) return;
         const r = stage.getBoundingClientRect();
         const { rx, ry } = tiltFor(e.clientX, e.clientY, r);
         view.current.trx = rx;
@@ -328,20 +347,29 @@ export function AlbumDemo({
       kick();
     };
 
+    const noDrag = (e: Event) => e.preventDefault();
+
     stage.addEventListener("pointerdown", onDown);
     stage.addEventListener("pointermove", onMove);
-    stage.addEventListener("pointerup", onUp);
-    stage.addEventListener("pointercancel", onUp);
     stage.addEventListener("pointerleave", onLeave);
     stage.addEventListener("dblclick", onDouble);
-    stage.addEventListener("dragstart", (e) => e.preventDefault());
+    stage.addEventListener("dragstart", noDrag);
+    // The end of a drag is the window's business, not the book's: a hand that
+    // leaves the book still owns the page it is holding, and pointer capture
+    // is refused often enough that it cannot be the only thing keeping the
+    // turn alive.
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
     return () => {
       stage.removeEventListener("pointerdown", onDown);
       stage.removeEventListener("pointermove", onMove);
-      stage.removeEventListener("pointerup", onUp);
-      stage.removeEventListener("pointercancel", onUp);
       stage.removeEventListener("pointerleave", onLeave);
       stage.removeEventListener("dblclick", onDouble);
+      stage.removeEventListener("dragstart", noDrag);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
     };
   }, [startTurn, settle, kick, pose]);
 
@@ -472,7 +500,7 @@ function Plate({ plate }: { plate: AlbumPlate }) {
     <figure className="al-plate">
       {/* The page at rest is a real image, so the album is a list of stills
           before it is ever a book. The turning leaf is separate: its faces are
-          backgrounds, because sliding one picture across sixteen windows is
+          backgrounds, because sliding one picture across eighteen windows is
           the whole trick and an <img> cannot be offset that way. */}
       <Image
         src={plate.src}
@@ -496,7 +524,7 @@ function Plate({ plate }: { plate: AlbumPlate }) {
  * Each is a child of the one before it — the nesting is in the DOM, not in a
  * transform stack this component maintains — so the browser accumulates the
  * rotation for free. The picture is a background rather than an `<img>`
- * because the offset per strip is the whole trick: sixteen windows onto the
+ * because the offset per strip is the whole trick: eighteen windows onto the
  * same picture, side by side, add back up to one continuous page.
  */
 function Strip({
@@ -512,10 +540,7 @@ function Strip({
 }) {
   if (index >= CURL_STRIPS) return null;
 
-  const style = {
-    "--i": index,
-    "--x": `${(index * 100) / (CURL_STRIPS - 1)}%`,
-  } as CSSProperties;
+  const style = { "--i": index } as CSSProperties;
 
   return (
     <div ref={(el) => register(index, el)} className="al-strip" style={style}>
@@ -524,12 +549,14 @@ function Strip({
         style={front ? { backgroundImage: `url(${front})` } : undefined}
       >
         <i className="al-sh" />
+        <i className="al-gl" />
       </div>
       <div
         className="al-face al-back"
         style={back ? { backgroundImage: `url(${back})` } : undefined}
       >
         <i className="al-sh" />
+        <i className="al-gl" />
       </div>
       {/* The next link of the chain lives inside this one — that is what makes
           the rotations accumulate without any transform maths here. */}
@@ -573,6 +600,11 @@ const CSS = `
   position: relative;
   display: block;
   aspect-ratio: 32 / 9;
+  /* --bw is written by the component from the book's own box; a page is half
+     of it, and a strip is a page over the strip count. Everything the leaf is
+     built from is derived from these three, in pixels. */
+  --pw: calc(var(--bw, 0px) / 2);
+  --sw: calc(var(--pw) / ${CURL_STRIPS});
   /* Touch has its own idea about a horizontal drag; this is the page-turn's. */
   touch-action: pan-y;
   /* The lean toward the pointer. It belongs on the book and the perspective
@@ -669,13 +701,13 @@ const CSS = `
   top: 0;
   bottom: 0;
   transform-style: preserve-3d;
+  /* Measured off the book in real pixels, never as a percentage of the parent.
+     Inside a nested strip, 100% means the strip it hangs off, so a percentage
+     width compounds away down the chain — and even a corrected percentage
+     lands on a different sub-pixel per link, which is what shows up as a row
+     of hairline gaps: the venetian blind. */
+  width: var(--sw);
 }
-/* Only the first link divides the leaf; every link after it is as wide as the
-   one it hangs off. Dividing on all of them looks right and is not: inside a
-   strip, 100% means the PARENT STRIP, so the width compounds away — the second
-   strip comes out 1.7px and the third a tenth of one. */
-.al-curl > .al-strip { width: calc(100% / ${CURL_STRIPS}); }
-.al-strip .al-strip { width: 100%; }
 /* Every strip after the first hangs off the outer edge of its parent and adds
    one more small turn — which is the entire curl. */
 .al-curl[data-dir="next"] .al-strip { transform-origin: left center; }
@@ -687,27 +719,62 @@ const CSS = `
 
 .al-face {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  /* Reaches a hair past its own right edge, into the neighbour. Two adjacent
+     3D-transformed boxes do not share an exact edge once the compositor has
+     rounded them, and the sliver of background between them reads as a gap in
+     the paper. Overlapping costs nothing — the neighbour is drawn over it. */
+  right: -1.1px;
   backface-visibility: hidden;
-  /* Sixteen windows onto one picture: the strip is 1/16th of the page wide,
-     so the background is sized to the whole page and slid by the strip's own
-     share of it. */
+  -webkit-backface-visibility: hidden;
+  /* Eighteen windows onto one picture. The background is sized to the whole
+     page in pixels and slid by this strip's own share of it, so every window
+     lands on the same grid however the browser rounds the boxes. */
   background-repeat: no-repeat;
-  background-size: calc(100% * ${CURL_STRIPS}) 100%;
-  background-position: var(--x) center;
+  background-size: var(--pw) 100%;
 }
-.al-back { transform: rotateY(180deg); background-position: calc(100% - var(--x)) center; }
+.al-front { background-position-x: calc(-1 * var(--i) * var(--sw)); }
+/* The back is mirrored by its own 180° turn, so it walks the picture the other
+   way: strip 0 shows the far edge, the last strip shows the near one. */
+.al-back {
+  transform: rotateY(180deg);
+  background-position-x: calc((var(--i) + 1) * var(--sw) - var(--pw));
+}
 
-.al-sh {
+/* Shadow and gloss both stop short of the page's top and bottom edges. Run
+   either to the very edge and the leaf gets a hard bright or dark rule along
+   its head and foot, which reads as a sticker rather than as paper catching
+   the light. */
+.al-sh,
+.al-gl {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 5.2%, #000 94.8%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 5.2%, #000 94.8%, transparent 100%);
+}
+.al-sh {
   background: linear-gradient(
     to right,
-    rgba(0, 0, 0, var(--a1, 0)),
-    rgba(0, 0, 0, var(--a2, 0))
+    rgba(18, 14, 8, var(--a1, 0)),
+    rgba(18, 14, 8, var(--a2, 0))
   );
 }
-.al-curl[data-dir="prev"] .al-sh { background: linear-gradient(to left, rgba(0,0,0,var(--a1,0)), rgba(0,0,0,var(--a2,0))); }
+.al-curl[data-dir="prev"] .al-sh {
+  background: linear-gradient(to left, rgba(18, 14, 8, var(--a1, 0)), rgba(18, 14, 8, var(--a2, 0)));
+}
+/* The sheen that makes the bend read as a bend. Squared, so it falls away
+   quickly off the part of the arc that is facing the light — a linear falloff
+   spreads a flat wash over the whole leaf and flattens it back out. */
+.al-gl {
+  background: #fffaf0;
+  opacity: calc(var(--shade, 0) * var(--lit, 1) * var(--lit, 1) * 0.2);
+}
 
 /* ---- controls ---- */
 
@@ -770,7 +837,7 @@ const CSS = `
      screen are two postage stamps. The leaf still turns — it is just the whole
      book now, hinged on its left edge. */
   .al-sheet { grid-template-columns: 1fr; aspect-ratio: 16 / 9; }
-  .al-book[data-live] { aspect-ratio: 16 / 9; }
+  .al-book[data-live] { aspect-ratio: 16 / 9; --pw: var(--bw, 0px); }
   .al-verso { display: none; }
   .al-recto { border-radius: 0.5rem; }
   .al-book[data-live] .al-gutter { display: none; }
