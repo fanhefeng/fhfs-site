@@ -206,7 +206,27 @@ export function AlbumDemo({
   useEffect(() => {
     const el = bookRef.current;
     if (!el || !live) return;
-    const write = () => el.style.setProperty("--bw", `${el.clientWidth}px`);
+    const write = () => {
+      const bw = el.clientWidth;
+      // --two-up is set in the stylesheet, so the one-page/two-page breakpoint
+      // stays a single number living with the rest of the layout.
+      const twoUp = getComputedStyle(el).getPropertyValue("--two-up").trim() !== "0";
+      const page = twoUp ? bw / 2 : bw;
+      /* Snapped to 1/64 of a pixel, which is the grid the layout engine
+         quantises boxes onto — and the whole reason for the venetian blind.
+         A strip asked for 26.6667px is laid out at 26.65625px, but its
+         background is offset by the exact 26.6667px, so every strip slips
+         another hundredth of a pixel against its own picture and by the far
+         end of the chain the seams are a fifth of a pixel out. On paper that
+         is invisible; on a photograph it is eighteen hairlines.
+         Rounding the metric first makes the box and its background agree. */
+      const sw = Math.round((page / CURL_STRIPS) * 64) / 64;
+      el.style.setProperty("--bw", `${bw}px`);
+      el.style.setProperty("--sw", `${sw}px`);
+      // The leaf is exactly the strips it is made of, not the page it covers:
+      // those differ by up to a quarter pixel, and the strips are the truth.
+      el.style.setProperty("--pw", `${sw * CURL_STRIPS}px`);
+    };
     write();
     const ro = new ResizeObserver(write);
     ro.observe(el);
@@ -600,11 +620,10 @@ const CSS = `
   position: relative;
   display: block;
   aspect-ratio: 32 / 9;
-  /* --bw is written by the component from the book's own box; a page is half
-     of it, and a strip is a page over the strip count. Everything the leaf is
-     built from is derived from these three, in pixels. */
-  --pw: calc(var(--bw, 0px) / 2);
-  --sw: calc(var(--pw) / ${CURL_STRIPS});
+  /* --bw, --pw and --sw are written by the component, in pixels, snapped to
+     the layout grid — see the note where they are measured. This only says
+     which layout we are in, so the breakpoint lives in one place. */
+  --two-up: 1;
   /* Touch has its own idea about a horizontal drag; this is the page-turn's. */
   touch-action: pan-y;
   /* The lean toward the pointer. It belongs on the book and the perspective
@@ -721,11 +740,16 @@ const CSS = `
   position: absolute;
   top: 0;
   bottom: 0;
+  /* Each face reaches a hair past one of its edges, into the neighbour: two
+     adjacent 3D-transformed boxes do not share an exact edge once the
+     compositor has rounded them, and the sliver of background between them is
+     the venetian blind.
+     WHICH edge is the whole trick. The overlap only works because the next
+     strip paints over it, and past the quarter turn preserve-3d reverses the
+     painting order — so an overlap that was safely hidden becomes 1.1px
+     of the wrong picture, on strips that by then are only a couple of pixels
+     wide. So it flips with the leaf. */
   left: 0;
-  /* Reaches a hair past its own right edge, into the neighbour. Two adjacent
-     3D-transformed boxes do not share an exact edge once the compositor has
-     rounded them, and the sliver of background between them reads as a gap in
-     the paper. Overlapping costs nothing — the neighbour is drawn over it. */
   right: -1.1px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -733,7 +757,7 @@ const CSS = `
      page in pixels and slid by this strip's own share of it, so every window
      lands on the same grid however the browser rounds the boxes. */
   background-repeat: no-repeat;
-  background-size: var(--pw) 100%;
+  background-size: var(--pw) auto;
 }
 .al-front { background-position-x: calc(-1 * var(--i) * var(--sw)); }
 /* The back is mirrored by its own 180° turn, so it walks the picture the other
@@ -837,7 +861,7 @@ const CSS = `
      screen are two postage stamps. The leaf still turns — it is just the whole
      book now, hinged on its left edge. */
   .al-sheet { grid-template-columns: 1fr; aspect-ratio: 16 / 9; }
-  .al-book[data-live] { aspect-ratio: 16 / 9; --pw: var(--bw, 0px); }
+  .al-book[data-live] { aspect-ratio: 16 / 9; --two-up: 0; }
   .al-verso { display: none; }
   .al-recto { border-radius: 0.5rem; }
   .al-book[data-live] .al-gutter { display: none; }
