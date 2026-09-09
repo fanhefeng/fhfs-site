@@ -15,7 +15,8 @@ export type LabSlug =
   | "liquid-metal"
   | "workstation"
   | "lens-slider"
-  | "neon";
+  | "neon"
+  | "album";
 
 export type LabEntry = {
   slug: LabSlug;
@@ -29,7 +30,8 @@ export type LabEntry = {
     | "liquidMetal"
     | "workstation"
     | "lensSlider"
-    | "neon";
+    | "neon"
+    | "album";
   /** Index number printed beside the name, editorial-style. */
   ordinal: string;
   /** Dot + rule colour, from the muted gallery hues used across the site. */
@@ -55,6 +57,10 @@ export const LAB_ENTRIES: LabEntry[] = [
   // canvas, a brush face traced by its outline in four layers of stroke, and
   // a fixed score of flickers to light it. The music sits under the sign.
   { slug: "neon", key: "neon", ordinal: "09", accent: "#3f5fd6" },
+  // The 大话西游 stills, bound as a book. The leaf that turns is a chain of
+  // nested strips rather than a plane on a hinge — DOM and CSS 3D throughout,
+  // no canvas anywhere in it.
+  { slug: "album", key: "album", ordinal: "10", accent: "#8a5a3c" },
 ];
 
 export const labEntry = (slug: string): LabEntry | undefined =>

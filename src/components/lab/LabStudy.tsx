@@ -4,6 +4,9 @@ import dynamic from "next/dynamic";
 import type { LabSlug } from "./entries";
 import { LENS_SLIDES } from "./lensSlides";
 import { NEON_STILLS } from "./neonStills";
+// The album binds the stills the 大话西游 room already hangs — same files,
+// same captions, read straight off that room's fixture list.
+import { ODYSSEY_STILLS } from "@/components/odyssey/stills";
 
 /**
  * One study per route, and only that study's code.
@@ -52,6 +55,9 @@ const LensSliderDemo = dynamic(
 // but the sign is SVG — so it keeps its SSR pass: the page reads whole
 // before its chunk lands, and the wall paints over.
 const NeonSignDemo = dynamic(() => import("./NeonSignDemo").then((m) => m.NeonSignDemo));
+// DOM and CSS 3D only, so it renders server-side and the stills are in the
+// HTML whether or not the chunk ever lands.
+const AlbumDemo = dynamic(() => import("./AlbumDemo").then((m) => m.AlbumDemo));
 
 /** Every string a study can ask for, already translated by the page. */
 export type StudyText = Record<string, string>;
@@ -113,6 +119,25 @@ export function LabStudy({ slug, accent, text }: Props) {
           stageSettle={text.stageSettle}
           dressLegend={text.dressLegend}
           dressNames={text}
+        />
+      );
+    case "album":
+      return (
+        <AlbumDemo
+          accent={accent}
+          hint={text.hint}
+          prevLabel={text.prev}
+          nextLabel={text.next}
+          counterAria={text.counterAria}
+          credit={text.credit}
+          plates={ODYSSEY_STILLS.map((still) => ({
+            src: `/odyssey/${still.file}.jpg`,
+            width: still.width,
+            height: still.height,
+            alt: text[`${still.id}Alt`],
+            title: text[`${still.id}Title`],
+            meta: text[`${still.id}Meta`],
+          }))}
         />
       );
     case "grove-stage":

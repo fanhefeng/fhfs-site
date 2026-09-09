@@ -355,6 +355,16 @@
         "keysTitle": "Epilogue",
         "keysMeta": "Epilogue · a road of piano keys",
         "keysAlt": "In a white world, a winding road of piano keys leads to a distant streetlamp, the two of them at its end"
+      },
+      "album": {
+        "hint": "Turn with the arrows — or the arrow keys",
+        "name": "An album that actually turns",
+        "tagline": "CSS 3D · nested strips",
+        "summary": "The twelve stills off the 大话西游 room's wall, bound as a book. The leaf that turns is not a plane on a hinge — it is sixteen nested strips, each rotated a little further than the last, and the sum of them is the arc paper bends through.",
+        "note": "There is no canvas in this one and no WebGL: the turn is drawn by the browser's own 3D compositor. The trick is the nesting — sixteen divs inside one another, each adding the same small angle to its parent's rotation, and because transforms inherit, sixteen small turns accumulate into a curve. Every strip carries the same still, slid sideways by its own share of the width, so a picture broken into sixteen pieces adds back up to a continuous page. Per frame JavaScript does one thing: work out sixteen pairs of shading numbers and write them onto custom properties. The compositor does the rest. Halfway through, the leaf goes edge-on and the faces swap — which is why its back carries the page you are turning to. The stills are the same files and the same captions that room already ships; this only binds them. With no JavaScript at all it is an honest list of pictures.",
+        "prev": "Previous page",
+        "next": "Next page",
+        "counterAria": "Page number"
       }
     }
   },
