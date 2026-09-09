@@ -247,7 +247,12 @@
         "fallback": "当前环境没有可用的 WebGL，这里展示静态构图。",
         "stageScan": "01 · 勘测",
         "stageGrow": "02 · 生长",
-        "stageSettle": "03 · 停歇"
+        "stageSettle": "03 · 停歇",
+        "dressLegend": "换一身季节",
+        "dressLivingGreen": "春苔",
+        "dressSakura": "落樱",
+        "dressMaple": "深秋",
+        "dressSequoia": "雾杉"
       },
       "groveStage": {
         "name": "两张纸，一前一后站在苔藓里",

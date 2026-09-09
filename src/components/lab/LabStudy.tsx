@@ -111,6 +111,8 @@ export function LabStudy({ slug, accent, text }: Props) {
           stageScan={text.stageScan}
           stageGrow={text.stageGrow}
           stageSettle={text.stageSettle}
+          dressLegend={text.dressLegend}
+          dressNames={text}
         />
       );
     case "grove-stage":
