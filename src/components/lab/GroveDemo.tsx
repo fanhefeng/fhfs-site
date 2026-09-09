@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
 import { watchContextLoss } from "@/lib/webgl";
@@ -19,6 +19,11 @@ type Props = {
   stageScan: string;
   stageGrow: string;
   stageSettle: string;
+  /** What the picker calls itself, for the group's accessible name. */
+  dressLegend: string;
+  /** Every translated string the study was handed; the dress names are looked
+   *  up out of it by the message key each palette carries. */
+  dressNames: Record<string, string>;
 };
 
 import {
@@ -45,15 +50,30 @@ import { bakeBarkPlates } from "@/lib/grove/bark";
 
 import {
   flowerTexture,
+  moteTexture,
+  poolTexture,
   radialTexture,
   wingTexture,
   wingGeometry,
   bodyGeometry,
 } from "@/components/grove/plates";
+import {
+  grovePalette,
+  GROVE_PALETTE_KEYS,
+  DEFAULT_PALETTE,
+  DRESS_COLOURS,
+  type DressColourUniform,
+  type GrovePalette,
+  type GrovePaletteKey,
+  type RGB,
+} from "@/lib/grove/palettes";
 
 /* ────────────────────────────────────────────────────────────────────────
    component
    ──────────────────────────────────────────────────────────────────────── */
+
+/** Scratch colour for the dress tween, so a 60fps interpolation allocates none. */
+const TMP = new THREE.Color();
 
 /** Blade counts. The shell is only ~20k vertices, so this is the build cost. */
 const BLADES_NEAR_WIDE = 175_000;
@@ -106,6 +126,8 @@ export function GroveDemo({
   stageScan,
   stageGrow,
   stageSettle,
+  dressLegend,
+  dressNames,
 }: Props) {
   const scope = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -123,6 +145,21 @@ export function GroveDemo({
   const [degraded, setDegraded] = useState(false);
   /** Bumped when a lost context comes back, so the effect rebuilds on it. */
   const [epoch, setEpoch] = useState(0);
+
+  /** Which dress the grove has on. */
+  const [dress, setDress] = useState<GrovePaletteKey>(DEFAULT_PALETTE);
+  /**
+   * Read by the build, written by the picker.
+   *
+   * The scene is not rebuilt to change colour — a rebuild re-bakes the bark
+   * plates and re-grows a quarter of a million blades, and it would restart the
+   * survey the reader is in the middle of scrubbing. So the build publishes a
+   * function here that repaints what is already on the GPU, and the ref is what
+   * lets a rebuild (a lost context) come back wearing the dress that was on
+   * rather than the one the effect closed over.
+   */
+  const dressRef = useRef<GrovePaletteKey>(DEFAULT_PALETTE);
+  const repaintRef = useRef<((p: GrovePalette) => void) | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -147,6 +184,9 @@ export function GroveDemo({
       if (disposed) return;
 
       const small = window.innerWidth < 900;
+      // A dress change is a 0.45s cross-fade of the whole picture; someone who
+      // asked for less motion gets the new colours on the next frame instead.
+      const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       let renderer: THREE.WebGLRenderer;
       try {
@@ -206,12 +246,27 @@ export function GroveDemo({
          write to uPhase moves the wind, the pollen and the cage together. Only
          the terms that differ between the near root and the ridge behind it
          get their own object. */
+      /* The dress this build opens in — whatever the picker last chose, so a
+         rebuild after a lost context comes back the colour it went away. */
+      const dress0 = grovePalette(dressRef.current);
+
       const shared = {
         uKeyDir: { value: new THREE.Vector3(-0.3, 0.92, 0.28).normalize() },
-        uKeyCol: { value: new THREE.Color(1.14, 1.06, 0.88) },
+        uKeyCol: { value: new THREE.Color(...dress0.keyCol) },
         uFillDir: { value: new THREE.Vector3(0.12, -0.86, 0.5).normalize() },
-        uFillCol: { value: new THREE.Color(0.78, 0.78, 0.62) },
-        uAmbCol: { value: new THREE.Color(0.086, 0.09, 0.08) },
+        uFillCol: { value: new THREE.Color(...dress0.fillCol) },
+        uAmbCol: { value: new THREE.Color(...dress0.ambCol) },
+        uMossDeep: { value: new THREE.Color(...dress0.mossDeep) },
+        uMossLit: { value: new THREE.Color(...dress0.mossLit) },
+        uLichen: { value: new THREE.Color(...dress0.lichen) },
+        uGrassDeep: { value: new THREE.Color(...dress0.grassDeep) },
+        uGrassMid: { value: new THREE.Color(...dress0.grassMid) },
+        uGrassTip: { value: new THREE.Color(...dress0.grassTip) },
+        uGrassTipHi: { value: new THREE.Color(...dress0.grassTipHi) },
+        uFernDeep: { value: new THREE.Color(...dress0.fernDeep) },
+        uFernLit: { value: new THREE.Color(...dress0.fernLit) },
+        uScanGlow: { value: new THREE.Color(...dress0.scanGlow) },
+        uScanRim: { value: new THREE.Color(...dress0.scanRim) },
         uPhase: { value: 0 },
         uScanO: { value: new THREE.Vector3(-BOX_W * 0.75, -1.4, 2.2) },
         uScanR: { value: 0 },
@@ -227,7 +282,7 @@ export function GroveDemo({
       };
 
       type Air = {
-        hazeCol: [number, number, number];
+        hazeCol: RGB;
         haze: number;
         fog: number;
         hazeLift: number;
@@ -248,13 +303,16 @@ export function GroveDemo({
         uMouseR: { value: air.mouseR },
       });
 
-      const flowerMap = flowerTexture();
-      const moteMap = radialTexture(64, [
-        [0, "rgba(255,255,255,1)"],
-        [0.35, "rgba(236,244,224,0.5)"],
-        [1, "rgba(236,244,224,0)"],
-      ]);
-      textures.push(flowerMap, moteMap);
+      /* The painted plates are the one part of a dress that is not a uniform:
+         they are canvases, so changing colour means drawing a new one. These
+         are collected rather than pushed straight onto `textures` because the
+         repaint has to dispose the outgoing pair itself — leaving them to
+         teardown would leak one texture per dress the reader tries on. */
+      const flowerMats: THREE.ShaderMaterial[] = [];
+      const moteMats: THREE.ShaderMaterial[] = [];
+      const poolMats: THREE.MeshBasicMaterial[] = [];
+      let flowerMap = flowerTexture(dress0.petal, dress0.heart);
+      let moteMap = moteTexture(dress0.moteCore, dress0.moteEdge);
 
       /* ---- one root, assembled ---- */
       type Built = { group: THREE.Group; uniforms: ReturnType<typeof groupUniforms>; wire: THREE.LineSegments };
@@ -382,6 +440,7 @@ export function GroveDemo({
           group.add(flowers);
           geometries.push(flowerGeo);
           materials.push(flowerMat);
+          flowerMats.push(flowerMat);
         }
 
         /* the survey cage */
@@ -413,10 +472,7 @@ export function GroveDemo({
       };
 
       const nearBuilt = assemble(near, {
-        hazeCol: [0.176, 0.195, 0.145],
-        haze: 0.15,
-        fog: 0,
-        hazeLift: 0.2,
+        ...dress0.near,
         boxH: near.boxH,
         mouseR: 1.2,
         // The near root is framed whole, so nothing of it is ever cut.
@@ -434,10 +490,7 @@ export function GroveDemo({
         // sits the ridge inside a light pool with cards over it; here it is
         // bare against the stage, and at the reference's value it comes
         // forward as a pale mound instead of receding.
-        hazeCol: [0.088, 0.098, 0.072],
-        haze: 0.16,
-        fog: 0.26,
-        hazeLift: 0.9,
+        ...dress0.far,
         boxH: far.boxH,
         mouseR: 0.001,
         // Both ends gone well before the tube's own caps, over a long feather.
@@ -449,17 +502,13 @@ export function GroveDemo({
       const plane = new THREE.PlaneGeometry(1, 1);
       geometries.push(plane);
 
-      const glowMap = radialTexture(256, [
-        [0, "rgba(226,236,212,0.30)"],
-        [0.42, "rgba(214,226,200,0.10)"],
-        [1, "rgba(214,226,200,0)"],
-      ]);
+      let glowMap = poolTexture(dress0.poolInner, dress0.poolOuter);
       const shadowMap = radialTexture(256, [
         [0, "rgba(12,16,10,0.62)"],
         [0.45, "rgba(12,16,10,0.26)"],
         [1, "rgba(12,16,10,0)"],
       ]);
-      textures.push(glowMap, shadowMap);
+      textures.push(shadowMap);
 
       const glowMat = new THREE.MeshBasicMaterial({
         map: glowMap,
@@ -467,6 +516,7 @@ export function GroveDemo({
         depthWrite: false,
         blending: THREE.AdditiveBlending,
       });
+      poolMats.push(glowMat);
       const glow = new THREE.Mesh(plane, glowMat);
       glow.scale.set(26, 17, 1);
       glow.position.set(-1.6, -0.6, -11);
@@ -512,6 +562,7 @@ export function GroveDemo({
       scene.add(moteField);
       geometries.push(moteGeo);
       materials.push(moteMat);
+      moteMats.push(moteMat);
 
       /* ---- the pointer's pollen trail ---- */
       const SPRAY_N = 620;
@@ -547,6 +598,7 @@ export function GroveDemo({
       scene.add(sprayField);
       geometries.push(sprayGeo);
       materials.push(sprayMat);
+      moteMats.push(sprayMat);
 
       let sprayHead = 0;
       let sprayDirty = false;
@@ -1086,6 +1138,97 @@ export function GroveDemo({
       setLive(true);
       ScrollTrigger.refresh();
 
+      /* ---- changing dress ----
+         Every colour in the scene is either a uniform or one of two painted
+         plates, so this is the whole of it: write the uniforms in place (they
+         are shared by reference, so one write reaches every material that took
+         them), and swap the two canvases. No geometry is touched, the survey
+         keeps whatever position the scrollbar left it at, and the frame after
+         this one is simply drawn in the new colours. */
+      /* The bands of air, paired with the half of the dress each reads. */
+      const bands = [
+        [nearBuilt.uniforms, "near"],
+        [farBuilt.uniforms, "far"],
+      ] as const;
+
+      let dressTween: gsap.core.Tween | null = null;
+
+      const repaint = (p: GrovePalette, animate = true) => {
+        dressTween?.kill();
+
+        // The painted plates cannot be interpolated — they are canvases — so
+        // they are swapped outright. At this size (a floret is a few pixels,
+        // a grain of pollen one) the cut is invisible under a moving tween,
+        // and cross-fading two of each would cost more than the dress does.
+        const flowerNext = flowerTexture(p.petal, p.heart);
+        const moteNext = moteTexture(p.moteCore, p.moteEdge);
+        const glowNext = poolTexture(p.poolInner, p.poolOuter);
+        for (const m of flowerMats) m.uniforms.uMap.value = flowerNext;
+        for (const m of moteMats) m.uniforms.uMap.value = moteNext;
+        for (const m of poolMats) m.map = glowNext;
+        // Dropped only once nothing points at them any more.
+        flowerMap.dispose();
+        moteMap.dispose();
+        glowMap.dispose();
+        flowerMap = flowerNext;
+        moteMap = moteNext;
+        glowMap = glowNext;
+
+        /* Where the scene is NOW, not where the last dress said it should be:
+           a second press mid-tween has to start from the colours actually on
+           screen, or the picture jumps back before it moves on. Captured even
+           for an instant change — it costs fourteen clones and keeps the two
+           paths reading the same. */
+        const from = {} as Record<DressColourUniform | "near" | "far", THREE.Color>;
+        for (const u of Object.keys(DRESS_COLOURS) as DressColourUniform[]) {
+          from[u] = shared[u].value.clone();
+        }
+        const fromAir = {} as Record<"near" | "far", { haze: number; fog: number; hazeLift: number }>;
+        for (const [uniforms, side] of bands) {
+          from[side] = uniforms.uHazeCol.value.clone();
+          fromAir[side] = {
+            haze: uniforms.uHaze.value,
+            fog: uniforms.uFog.value,
+            hazeLift: uniforms.uHazeLift.value,
+          };
+        }
+
+        const write = (t: number) => {
+          for (const [u, field] of Object.entries(DRESS_COLOURS) as [
+            DressColourUniform,
+            keyof GrovePalette,
+          ][]) {
+            shared[u].value.lerpColors(from[u], TMP.setRGB(...(p[field] as RGB)), t);
+          }
+          for (const [uniforms, side] of bands) {
+            const air = p[side];
+            const a = fromAir[side];
+            uniforms.uHazeCol.value.lerpColors(from[side], TMP.setRGB(...air.hazeCol), t);
+            uniforms.uHaze.value = a.haze + (air.haze - a.haze) * t;
+            uniforms.uFog.value = a.fog + (air.fog - a.fog) * t;
+            uniforms.uHazeLift.value = a.hazeLift + (air.hazeLift - a.hazeLift) * t;
+          }
+          dirtyRef.current = true;
+        };
+
+        if (!animate || calm.matches) {
+          write(1);
+          return;
+        }
+
+        const at = { t: 0 };
+        dressTween = gsap.to(at, {
+          t: 1,
+          duration: 0.45,
+          ease: EASE.default,
+          onUpdate: () => write(at.t),
+        });
+      };
+      repaintRef.current = repaint;
+      // The picker may have moved while the build was waiting on the viewport
+      // gate; `dress0` was read at the top of it, so catch up if it has.
+      if (dressRef.current !== dress0.key) repaint(grovePalette(dressRef.current), false);
+
       teardown = () => {
         gsap.ticker.remove(tick);
         window.removeEventListener("resize", onResize);
@@ -1093,12 +1236,18 @@ export function GroveDemo({
         canvas.removeEventListener("pointermove", onPointerMove);
         canvas.removeEventListener("pointerleave", onPointerLeave);
         applyRef.current = null;
+        repaintRef.current = null;
+        dressTween?.kill();
         // Collected as they were made rather than walked off the graph: the
         // wings share two geometries and two materials across four meshes, and
         // a traverse would dispose each of those several times over.
         for (const g of geometries) g.dispose();
         for (const m of materials) m.dispose();
         for (const t of textures) t.dispose();
+        // The painted plates are held in `let`s because a repaint swaps them,
+        // so the pair to release is whichever dress is on at teardown.
+        flowerMap.dispose();
+        moteMap.dispose();
         barkPlates.dispose();
         releaseRenderer(renderer);
       };
@@ -1125,6 +1274,14 @@ export function GroveDemo({
       teardown?.();
     };
   }, [epoch]);
+
+  /* The picker writes the ref as well as the state: the ref is what a rebuild
+     reads to come back in the right dress, and it has to be current even for a
+     build that has not happened yet. */
+  useEffect(() => {
+    dressRef.current = dress;
+    repaintRef.current?.(grovePalette(dress));
+  }, [dress]);
 
   useGSAP(
     () => {
@@ -1175,7 +1332,15 @@ export function GroveDemo({
   );
 
   return (
-    <div ref={scope} style={{ "--gv-accent": accent } as CSSProperties}>
+    <div
+      ref={scope}
+      style={
+        {
+          "--gv-accent": accent,
+          "--gv-backdrop": grovePalette(dress).backdrop,
+        } as CSSProperties
+      }
+    >
       <style href="lab-grove" precedence="medium">
         {CSS}
       </style>
@@ -1197,6 +1362,31 @@ export function GroveDemo({
           <p className="gv-hint" aria-hidden="true">
             {hint}
           </p>
+
+          {/* The dress picker. Hidden entirely when the scene never came up:
+              with no canvas there is nothing to recolour, and a row of dead
+              buttons over the fallback still would only ask to be pressed. */}
+          {!degraded && (
+            <div className="gv-dress" role="group" aria-label={dressLegend}>
+              {GROVE_PALETTE_KEYS.map((key) => {
+                const p = grovePalette(key);
+                const on = key === dress;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    className="gv-dress-btn"
+                    style={{ "--gv-swatch": p.swatch } as CSSProperties}
+                    aria-pressed={on}
+                    onClick={() => setDress(key)}
+                  >
+                    <span className="gv-dress-dot" aria-hidden="true" />
+                    {dressNames[p.label] ?? key}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -1226,7 +1416,8 @@ const CSS = `
   background:
     radial-gradient(64% 52% at 27% 84%, rgba(232, 238, 222, 0.086) 0%, rgba(232, 238, 222, 0) 72%),
     radial-gradient(70% 60% at 92% 8%, rgba(24, 28, 20, 0.1) 0%, rgba(24, 28, 20, 0) 68%),
-    #4a4d44;
+    var(--gv-backdrop, #4a4d44);
+  transition: background-color var(--dur-3, 0.35s) ease;
 }
 .gv-canvas { display: block; width: 100%; height: 100%; }
 .gv-canvas[data-degraded] { visibility: hidden; }
@@ -1291,5 +1482,92 @@ const CSS = `
 .gv-hint {
   right: clamp(1rem, 4vw, 2.5rem);
   color: rgba(242, 239, 228, 0.42);
+}
+
+/* The dress picker, top right — the one thing in the frame that is a control
+   rather than a caption, so it is also the only thing here that takes the
+   pointer back off the canvas. */
+.gv-dress {
+  position: absolute;
+  top: clamp(1rem, 4vw, 2.5rem);
+  right: clamp(1rem, 4vw, 2.5rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.375rem;
+  max-width: min(60vw, 22rem);
+}
+.gv-dress-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(242, 239, 228, 0.16);
+  border-radius: 999px;
+  background: rgba(12, 14, 11, 0.42);
+  color: rgba(242, 239, 228, 0.62);
+  font-family: var(--font-stack-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color var(--dur-2, 0.2s) ease,
+    border-color var(--dur-2, 0.2s) ease,
+    background-color var(--dur-2, 0.2s) ease;
+}
+.gv-dress-btn:hover {
+  color: rgba(242, 239, 228, 0.92);
+  border-color: rgba(242, 239, 228, 0.34);
+}
+.gv-dress-btn[aria-pressed="true"] {
+  color: rgba(242, 239, 228, 0.96);
+  border-color: rgba(242, 239, 228, 0.46);
+  background: rgba(12, 14, 11, 0.66);
+}
+.gv-dress-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--gv-swatch);
+  /* The swatch is the only saturated thing in the row, so it carries the
+     whole state read at a glance; unselected dots sit back with the label. */
+  opacity: 0.55;
+  transition: opacity var(--dur-2, 0.2s) ease;
+}
+.gv-dress-btn[aria-pressed="true"] .gv-dress-dot {
+  opacity: 1;
+}
+
+/* On a narrow viewport the site's own header sits exactly where the picker
+   wants to be — the island is centred at the top of every page, and at this
+   width it covers the first two pills. So the row comes out from under it and
+   spans instead: centred, below the island, across the empty sky. */
+@media (max-width: 640px) {
+  .gv-dress {
+    top: 5.25rem;
+    left: 1rem;
+    right: 1rem;
+    justify-content: center;
+    max-width: none;
+  }
+  .gv-dress-btn {
+    padding: 0.35rem 0.55rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* A finger needs a target a mouse does not. Keyed on the pointer rather than
+   the viewport so a narrow desktop window keeps the compact row, and a tablet
+   at 1024px still gets something it can actually hit. The pills are already
+   only a few characters wide, so the height is the axis that has to give. */
+@media (pointer: coarse) {
+  .gv-dress {
+    gap: 0.5rem;
+  }
+  .gv-dress-btn {
+    min-height: 2.75rem;
+    padding-inline: 0.85rem;
+  }
 }
 `;

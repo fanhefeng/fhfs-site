@@ -18,8 +18,16 @@ import * as THREE from "three";
  * A spray, not a bloom. One five-petal flower at this size renders as a little
  * asterisk; what reads as white-flowered moss is a cluster of florets, so the
  * plate carries the whole cluster and each instance draws one spray.
+ *
+ * `petal` is an "r,g,b" triple rather than a full colour because the alpha is
+ * the plate's own business — the smaller florets are painted fainter, which is
+ * what gives a flat cluster its depth. Defaults are the spring dress, so a
+ * caller that has no opinion gets the flower this scene was built with.
  */
-export function flowerTexture(): THREE.CanvasTexture {
+export function flowerTexture(
+  petal = "255,255,251",
+  heart = "#f0e7bd"
+): THREE.CanvasTexture {
   const c = document.createElement("canvas");
   c.width = c.height = 64;
   const g = c.getContext("2d")!;
@@ -34,13 +42,13 @@ export function flowerTexture(): THREE.CanvasTexture {
     for (let p = 0; p < 5; p++) {
       g.save();
       g.rotate((p / 5) * Math.PI * 2);
-      g.fillStyle = `rgba(255,255,251,${0.72 + 0.28 * (r / 7.4)})`;
+      g.fillStyle = `rgba(${petal},${0.72 + 0.28 * (r / 7.4)})`;
       g.beginPath();
       g.ellipse(0, -r * 0.55, r * 0.34, r * 0.55, 0, 0, Math.PI * 2);
       g.fill();
       g.restore();
     }
-    g.fillStyle = "#f0e7bd";
+    g.fillStyle = heart;
     g.beginPath();
     g.arc(0, 0, r * 0.24, 0, Math.PI * 2);
     g.fill();
@@ -50,6 +58,30 @@ export function flowerTexture(): THREE.CanvasTexture {
   t.minFilter = THREE.LinearMipmapLinearFilter;
   t.generateMipmaps = true;
   return t;
+}
+
+/**
+ * The two radial plates a dress owns, so neither page writes the falloff twice.
+ *
+ * Both take "r,g,b" triples rather than finished colours: the alpha ramp IS the
+ * plate — a grain of pollen is opaque at its core and gone at its rim, and a
+ * pool of light is a tenth of an opacity that reaches zero — so only the hue is
+ * the dress's to choose.
+ */
+export function moteTexture(core: string, edge: string): THREE.CanvasTexture {
+  return radialTexture(64, [
+    [0, `rgba(${core},1)`],
+    [0.35, `rgba(${edge},0.5)`],
+    [1, `rgba(${edge},0)`],
+  ]);
+}
+
+export function poolTexture(inner: string, outer: string): THREE.CanvasTexture {
+  return radialTexture(256, [
+    [0, `rgba(${inner},0.30)`],
+    [0.42, `rgba(${outer},0.10)`],
+    [1, `rgba(${outer},0)`],
+  ]);
 }
 
 /** A soft radial sprite, for the light pool and the contact shadow. */

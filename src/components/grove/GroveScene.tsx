@@ -19,7 +19,11 @@ import {
   WING_VERT, WING_FRAG,
   BODY_VERT, BODY_FRAG,
 } from "@/lib/grove/shaders";
-import { flowerTexture, radialTexture, wingTexture, wingGeometry, bodyGeometry } from "@/components/grove/plates";
+import { flowerTexture, moteTexture, radialTexture, wingTexture, wingGeometry, bodyGeometry } from "@/components/grove/plates";
+import { grovePalette, DEFAULT_PALETTE } from "@/lib/grove/palettes";
+
+/** The cover wears one dress. The study is where the others are tried on. */
+const DRESS = grovePalette(DEFAULT_PALETTE);
 
 type Props = {
   /** The element the canvas fills, and the frame the pointer is read against. */
@@ -177,11 +181,26 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     /* ---- what every material agrees on ---- */
     const shared = {
       uKeyDir: { value: new THREE.Vector3(-0.3, 0.92, 0.28).normalize() },
-      uKeyCol: { value: new THREE.Color(1.14, 1.06, 0.88) },
+      uKeyCol: { value: new THREE.Color(...DRESS.keyCol) },
       uFillDir: { value: new THREE.Vector3(0.12, -0.86, 0.5).normalize() },
       // the pale pool on the floor of the hero, bouncing back up
-      uFillCol: { value: new THREE.Color(0.78, 0.78, 0.62) },
-      uAmbCol: { value: new THREE.Color(0.086, 0.09, 0.08) },
+      uFillCol: { value: new THREE.Color(...DRESS.fillCol) },
+      uAmbCol: { value: new THREE.Color(...DRESS.ambCol) },
+      // What the moss, the fur and the fronds are made of. The cover wears the
+      // spring dress and only that one; the study at /lab/grove is where the
+      // other three can be tried on. Fed from the same table either way, so
+      // the numbers cannot drift apart.
+      uMossDeep: { value: new THREE.Color(...DRESS.mossDeep) },
+      uMossLit: { value: new THREE.Color(...DRESS.mossLit) },
+      uLichen: { value: new THREE.Color(...DRESS.lichen) },
+      uGrassDeep: { value: new THREE.Color(...DRESS.grassDeep) },
+      uGrassMid: { value: new THREE.Color(...DRESS.grassMid) },
+      uGrassTip: { value: new THREE.Color(...DRESS.grassTip) },
+      uGrassTipHi: { value: new THREE.Color(...DRESS.grassTipHi) },
+      uFernDeep: { value: new THREE.Color(...DRESS.fernDeep) },
+      uFernLit: { value: new THREE.Color(...DRESS.fernLit) },
+      uScanGlow: { value: new THREE.Color(...DRESS.scanGlow) },
+      uScanRim: { value: new THREE.Color(...DRESS.scanRim) },
       uPhase: { value: 0 },
       uScanO: { value: new THREE.Vector3(-900, -260, 240) },
       uScanR: { value: 0 },
@@ -226,12 +245,8 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     // scene, see lib/grove/bark.ts.
     const barkPlates = bakeBarkPlates(renderer, small);
 
-    const flowerMap = flowerTexture();
-    const moteMap = radialTexture(64, [
-      [0, "rgba(255,255,255,1)"],
-      [0.35, "rgba(236,244,224,0.5)"],
-      [1, "rgba(236,244,224,0)"],
-    ]);
+    const flowerMap = flowerTexture(DRESS.petal, DRESS.heart);
+    const moteMap = moteTexture(DRESS.moteCore, DRESS.moteEdge);
     textures.push(flowerMap, moteMap);
 
     /* ---- one root, assembled ---- */

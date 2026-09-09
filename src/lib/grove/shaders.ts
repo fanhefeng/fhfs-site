@@ -303,6 +303,8 @@ varying float vH;
 /* the baked plates — see BARK_BAKE_FRAG */
 uniform sampler2D uBark, uBarkLich;
 uniform float uBarkV;
+/* what the cushion and the crust are made of — see lib/grove/palettes.ts */
+uniform vec3 uMossDeep, uMossLit, uLichen, uScanGlow;
 ${NOISE_GLSL}
 ${LIGHT_GLSL}
 ${SCAN_GLSL}
@@ -355,7 +357,7 @@ void main(){
   wood *= 1.0 - 0.70 * crack;
 
   float mo = gfbm(vec2(vW.x * 2.6, vW.z * 2.6 + vW.y * 1.9)) * 0.5 + 0.5;
-  vec3 moss = mix(vec3(0.0204, 0.0311, 0.0050), vec3(0.0914, 0.1392, 0.0227), mo);
+  vec3 moss = mix(uMossDeep, uMossLit, mo);
   moss *= 0.80 + 0.42 * cap;
 
   vec3 col = mix(wood, moss, m);
@@ -363,7 +365,7 @@ void main(){
   /* A pale lichen crust where bare wood faces up. */
   float lich = smoothstep(0.56, 0.84, texture2D(uBarkLich, buv).r);
   lich *= (1.0 - m) * smoothstep(-0.10, 0.70, N.y) * smoothstep(0.15, 0.50, h);
-  col = mix(col, vec3(0.162, 0.176, 0.132), lich * 0.78);
+  col = mix(col, uLichen, lich * 0.78);
 
   /* Contact shadow along the moss line. The cushion overhangs the bark it
      sits on; without this the two materials meet on a clean edge that reads
@@ -383,7 +385,7 @@ void main(){
      units and the whole root is only about twelve of them across — at the
      first-guess rate this band was a couple of pixels wide and may as well not
      have been there. */
-  lit += vec3(0.30, 0.72, 0.46) * exp(-edge * uScanW.x * 1.6) * 0.75;
+  lit += uScanGlow * exp(-edge * uScanW.x * 1.6) * 0.75;
 
   gl_FragColor = finish(aerial(lit, vH), fade);
 }
@@ -458,6 +460,8 @@ export const GRASS_FRAG = /* glsl */ `
 precision highp float;
 varying float vT, vShade, vTone, vH, vPart;
 varying vec3 vN, vW, vL;
+/* a blade, root to crown — see lib/grove/palettes.ts */
+uniform vec3 uGrassDeep, uGrassMid, uGrassTip, uGrassTipHi;
 ${LIGHT_GLSL}
 ${SCAN_GLSL}
 ${OUTPUT_GLSL}
@@ -468,17 +472,13 @@ void main(){
   float fade = endFade(vL.x) * maskAt(vL, uBoxH);
   FADE_DISCARD(fade)
 
-  /* Linear-space colours. The channel ratios are solved backwards from a
-     photographic reference rather than picked: real moss sits around hue 77°,
-     saturation 56%, value 23% — a good deal more yellow, and a good deal
-     deeper, than the green a shader reaches for unaided. */
-  vec3 deep  = vec3(0.0126, 0.0192, 0.0031);
-  vec3 mid   = vec3(0.0488, 0.0744, 0.0121);
-  vec3 tip   = vec3(0.1222, 0.1860, 0.0304);
-  vec3 tipHi = vec3(0.2600, 0.3900, 0.0640);
-
-  vec3 col = mix(deep, mid, smoothstep(0.0, 0.62, vT));
-  col = mix(col, tip, smoothstep(0.38, 1.0, vT) * (0.35 + 0.65 * vTone));
+  /* Linear-space colours, supplied by the dress. The channel ratios are solved
+     backwards from a photographic reference rather than picked: real moss sits
+     around hue 77°, saturation 56%, value 23% — a good deal more yellow, and a
+     good deal deeper, than the green a shader reaches for unaided. The other
+     dresses move that hue and keep the ratios. */
+  vec3 col = mix(uGrassDeep, uGrassMid, smoothstep(0.0, 0.62, vT));
+  col = mix(col, uGrassTip, smoothstep(0.38, 1.0, vT) * (0.35 + 0.65 * vTone));
   col *= 0.62 + 0.72 * vTone;
   col *= vShade;
   /* parted fur shows the shaded pile underneath it */
@@ -495,7 +495,7 @@ void main(){
      is exactly the flat mid-tone the render is trying to escape. Only the
      last quarter of a blade is in the open, and it carries the whole top
      decile of the histogram. */
-  lit += tipHi * smoothstep(0.68, 1.0, vT) * vTone
+  lit += uGrassTipHi * smoothstep(0.68, 1.0, vT) * vTone
        * (0.30 + 0.70 * max(dot(N, uKeyDir), 0.0)) * 0.95;
 
   vec3 V = normalize(cameraPosition - vW);
@@ -547,6 +547,8 @@ precision highp float;
 varying vec2 vUv;
 varying vec3 vN, vW, vL;
 varying float vH, vTint;
+/* frond, untinted and tinted — see lib/grove/palettes.ts */
+uniform vec3 uFernDeep, uFernLit;
 ${LIGHT_GLSL}
 ${SCAN_GLSL}
 ${OUTPUT_GLSL}
@@ -558,7 +560,7 @@ void main(){
   vec3 N = normalize(vN);
   if (!gl_FrontFacing) N = -N;
   vec3 V = normalize(cameraPosition - vW);
-  vec3 base = mix(vec3(0.0270, 0.0450, 0.0099), vec3(0.0690, 0.1150, 0.0253), vTint);
+  vec3 base = mix(uFernDeep, uFernLit, vTint);
   base *= 0.80 + 0.30 * smoothstep(0.0, 0.8, vUv.x);
   vec3 lit = litSurface(N, base, 0.9);
   /* fronds are thin — light comes through them */
@@ -648,6 +650,9 @@ uniform float uScanR, uWire, uPhase;
    lingers behind it, z: spacing of the survey ticks running out along the
    beam. All three are world distances — see uScanW. */
 uniform vec3 uWireK;
+/* The cage is the survey made visible, so it wears the dress's scan colour:
+   uScanGlow along the lingering trail, uScanRim on the front itself. */
+uniform vec3 uScanGlow, uScanRim;
 varying vec3 vW;
 void main(){
   float d = distance(vW, uScanO);
@@ -660,7 +665,7 @@ void main(){
   if (a < 0.004) discard;
   /* survey ticks running out along the beam */
   a *= 0.66 + 0.34 * sin(d * uWireK.z - uPhase * 3.0);
-  vec3 col = mix(vec3(0.30, 0.72, 0.46), vec3(0.86, 1.00, 0.90), rim);
+  vec3 col = mix(uScanGlow, uScanRim, rim);
   gl_FragColor = vec4(col, clamp(a, 0.0, 1.0));
 }
 `;

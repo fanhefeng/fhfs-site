@@ -247,7 +247,12 @@
         "fallback": "No WebGL available here, so this falls back to the static composition.",
         "stageScan": "01 · Survey",
         "stageGrow": "02 · Growth",
-        "stageSettle": "03 · Settle"
+        "stageSettle": "03 · Settle",
+        "dressLegend": "Try a season",
+        "dressLivingGreen": "Living green",
+        "dressSakura": "Sakura",
+        "dressMaple": "Maple",
+        "dressSequoia": "Sequoia"
       },
       "groveStage": {
         "name": "Two sheets of paper, one root apart",

@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
 import { LAB_ENTRIES, labEntry } from "@/components/lab/entries";
+import { GROVE_PALETTE_KEYS, GROVE_PALETTES } from "@/lib/grove/palettes";
 import { LENS_SLIDES } from "@/components/lab/lensSlides";
 import { NEON_STILLS } from "@/components/lab/neonStills";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
@@ -43,7 +44,18 @@ const STUDY_KEYS: Record<string, string[]> = {
   scrollVideo: ["loading", "captionOne", "captionOneBody", "captionTwo", "captionTwoBody"],
   dissolve: ["headline", "body", "tail", "fallback"],
   meltingText: ["sampleOne", "sampleTwo", "sampleThree", "labelLoad", "labelInView", "labelScrub"],
-  grove: ["headline", "body", "tail", "fallback", "stageScan", "stageGrow", "stageSettle"],
+  grove: [
+    "headline",
+    "body",
+    "tail",
+    "fallback",
+    "stageScan",
+    "stageGrow",
+    "stageSettle",
+    "dressLegend",
+    // One name per dress, by the message key the palette table carries.
+    ...GROVE_PALETTE_KEYS.map((k) => GROVE_PALETTES[k].label),
+  ],
   groveStage: ["pointerHint", "fallback"],
   liquidMetal: ["headline", "body", "tail", "fallback", "label", "stageField", "stageMolten", "stageBloom"],
   workstation: ["deskHint"],
