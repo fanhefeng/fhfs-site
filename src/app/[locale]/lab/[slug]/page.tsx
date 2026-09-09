@@ -7,6 +7,13 @@ import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
 import { LAB_ENTRIES, labEntry } from "@/components/lab/entries";
 import { GROVE_PALETTE_KEYS, GROVE_PALETTES } from "@/lib/grove/palettes";
+import { StudySpec, type SpecRow } from "@/components/lab/StudySpec";
+import {
+  BLADES_NEAR_WIDE,
+  BLADES_NEAR_SMALL,
+  BLADES_FAR_WIDE,
+  BLADES_FAR_SMALL,
+} from "@/lib/grove/geometry";
 import { LENS_SLIDES } from "@/components/lab/lensSlides";
 import { NEON_STILLS } from "@/components/lab/neonStills";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
@@ -53,6 +60,19 @@ const STUDY_KEYS: Record<string, string[]> = {
     "stageGrow",
     "stageSettle",
     "dressLegend",
+    "specTitle",
+    "specRuntime",
+    "specRuntimeValue",
+    "specPasses",
+    "specPassesValue",
+    "specAssets",
+    "specAssetsValue",
+    "specGeometry",
+    "specPixelRatio",
+    "specPixelRatioValue",
+    "specFallback",
+    "specFallbackValue",
+    "specVariants",
     // One name per dress, by the message key the palette table carries.
     ...GROVE_PALETTE_KEYS.map((k) => GROVE_PALETTES[k].label),
   ],
@@ -123,6 +143,36 @@ export default async function LabDemoPage({
     });
   }
 
+  /**
+   * The spec table, for the studies that have one. Only the grove so far.
+   *
+   * The blade count and the number of dresses are read from the modules that
+   * define them, not typed into the catalogue: those are exactly the two
+   * numbers that change when the scene does, and a table that quietly goes
+   * stale is worse than no table.
+   */
+  const spec: SpecRow[] | null =
+    entry.slug === "grove"
+      ? [
+          { label: t(`${ns}.specRuntime`), value: t(`${ns}.specRuntimeValue`) },
+          { label: t(`${ns}.specPasses`), value: t(`${ns}.specPassesValue`) },
+          { label: t(`${ns}.specAssets`), value: t(`${ns}.specAssetsValue`) },
+          {
+            label: t(`${ns}.specGeometry`),
+            value: t(`${ns}.specGeometryValue`, {
+              blades: BLADES_NEAR_WIDE + BLADES_FAR_WIDE,
+              bladesSmall: BLADES_NEAR_SMALL + BLADES_FAR_SMALL,
+            }),
+          },
+          {
+            label: t(`${ns}.specVariants`),
+            value: t(`${ns}.specVariantsValue`, { count: GROVE_PALETTE_KEYS.length }),
+          },
+          { label: t(`${ns}.specPixelRatio`), value: t(`${ns}.specPixelRatioValue`) },
+          { label: t(`${ns}.specFallback`), value: t(`${ns}.specFallbackValue`) },
+        ]
+      : null;
+
   return (
     <main id="main" className="flex-1">
       <header className="mx-auto w-full max-w-[680px] px-6 pt-24 pb-10">
@@ -148,6 +198,8 @@ export default async function LabDemoPage({
             {t(`${ns}.credit`)}
           </p>
         )}
+
+        {spec && <StudySpec title={t(`${ns}.specTitle`)} rows={spec} />}
         <Link
           href="/lab"
           className="hit-ext mt-8 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
