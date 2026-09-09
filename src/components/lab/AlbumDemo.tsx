@@ -212,25 +212,45 @@ export function AlbumDemo({
       // stays a single number living with the rest of the layout.
       const twoUp = getComputedStyle(el).getPropertyValue("--two-up").trim() !== "0";
       const page = twoUp ? bw / 2 : bw;
-      /* Snapped to 1/64 of a pixel, which is the grid the layout engine
-         quantises boxes onto — and the whole reason for the venetian blind.
-         A strip asked for 26.6667px is laid out at 26.65625px, but its
-         background is offset by the exact 26.6667px, so every strip slips
-         another hundredth of a pixel against its own picture and by the far
-         end of the chain the seams are a fifth of a pixel out. On paper that
-         is invisible; on a photograph it is eighteen hairlines.
-         Rounding the metric first makes the box and its background agree. */
-      const sw = Math.round((page / CURL_STRIPS) * 64) / 64;
+      /* A strip has to be a whole number of DEVICE pixels wide.
+         This is the venetian blind, and it took measuring to see: a strip
+         asked for 26.6667px is laid out at 26.65625px, because boxes are
+         quantised — but its background is offset by the exact 26.6667px,
+         which is not. Every strip then slides a hundredth of a pixel against
+         its own slice of the picture, and the seams end up a fifth of a pixel
+         out by the end of the chain.
+         Rounding to the CSS pixel grid is not enough: at devicePixelRatio 2
+         a 26.671875px strip is 53.34 device pixels, and the rasteriser still
+         has to choose. Rounding to the device grid leaves nothing to choose.
+         On paper — which is what the reference implementation turns — none of
+         this shows. On a film still it is eighteen hairlines. */
+      const dpr = window.devicePixelRatio || 1;
       el.style.setProperty("--bw", `${bw}px`);
-      el.style.setProperty("--sw", `${sw}px`);
-      // The leaf is exactly the strips it is made of, not the page it covers:
-      // those differ by up to a quarter pixel, and the strips are the truth.
-      el.style.setProperty("--pw", `${sw * CURL_STRIPS}px`);
+      el.style.setProperty("--pw", `${page}px`);
+      /* Each boundary is rounded, and each strip is the gap between two of
+         them — rather than one width rounded and multiplied. Rounding the
+         width instead leaves a remainder for somebody to absorb: give it all
+         to the last strip and at devicePixelRatio 1 that strip comes out 21px
+         against everyone else's 27, which bends visibly differently and puts
+         a kink in the arc. Spread this way, no two strips differ by more than
+         a single device pixel, and the boundaries still land exactly on the
+         page's edges. */
+      for (let i = 0; i <= CURL_STRIPS; i++) {
+        const at = Math.round(((page * i) / CURL_STRIPS) * dpr) / dpr;
+        el.style.setProperty(`--ox${i}`, `${at}px`);
+      }
     };
     write();
     const ro = new ResizeObserver(write);
     ro.observe(el);
-    return () => ro.disconnect();
+    // Dragging the window to a display of a different density changes the
+    // device grid without changing the element's box, so the observer alone
+    // would not hear about it.
+    window.addEventListener("resize", write);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", write);
+    };
   }, [live]);
 
   /** Begin a turn, held at `t` — 0 when it is about to be dragged. */
@@ -560,10 +580,20 @@ function Strip({
 }) {
   if (index >= CURL_STRIPS) return null;
 
-  const style = { "--i": index } as CSSProperties;
+  /* This strip spans the gap between boundary `index` and the next one. Both
+     are whole device pixels, so its box and its slice of the picture agree. */
+  const style = {
+    "--ox": `var(--ox${index})`,
+    "--oxb": `var(--ox${index + 1})`,
+    width: `calc(var(--ox${index + 1}) - var(--ox${index}))`,
+  } as CSSProperties;
 
   return (
-    <div ref={(el) => register(index, el)} className="al-strip" style={style}>
+    <div
+      ref={(el) => register(index, el)}
+      className="al-strip"
+      style={style}
+    >
       <div
         className="al-face al-front"
         style={front ? { backgroundImage: `url(${front})` } : undefined}
@@ -725,7 +755,7 @@ const CSS = `
      width compounds away down the chain — and even a corrected percentage
      lands on a different sub-pixel per link, which is what shows up as a row
      of hairline gaps: the venetian blind. */
-  width: var(--sw);
+  /* width comes from the boundary pair, inline — see the Strip component. */
 }
 /* Every strip after the first hangs off the outer edge of its parent and adds
    one more small turn — which is the entire curl. */
@@ -759,12 +789,12 @@ const CSS = `
   background-repeat: no-repeat;
   background-size: var(--pw) auto;
 }
-.al-front { background-position-x: calc(-1 * var(--i) * var(--sw)); }
+.al-front { background-position-x: calc(-1 * var(--ox)); }
 /* The back is mirrored by its own 180° turn, so it walks the picture the other
    way: strip 0 shows the far edge, the last strip shows the near one. */
 .al-back {
   transform: rotateY(180deg);
-  background-position-x: calc((var(--i) + 1) * var(--sw) - var(--pw));
+  background-position-x: calc(var(--oxb) - var(--pw));
 }
 
 /* Shadow and gloss both stop short of the page's top and bottom edges. Run
