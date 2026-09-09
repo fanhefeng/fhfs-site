@@ -3,14 +3,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/gsap";
+import { prefersReducedMotion } from "@/lib/gsap";
 import {
   CURL_STRIPS,
   curlPose,
-  spreads,
-  stripLight,
+  dragProgress,
+  shouldCommit,
   showsBack,
+  spreads,
+  springStep,
+  springSettled,
+  SPRING_CANCEL,
+  SPRING_COMMIT,
+  ZOOM_IN,
+  ZOOM_MAX,
+  ZOOM_MIN,
+  stripLight,
+  tiltFor,
+  TAP_SLOP,
   type CurlPose,
+  type Spring,
 } from "@/lib/pageCurl";
 
 export type AlbumPlate = {
@@ -32,9 +44,6 @@ type Props = {
   counterAria: string;
   credit: string;
 };
-
-/** How long a turn takes when it is played rather than dragged, in seconds. */
-const TURN = 0.78;
 
 const DEG = 180 / Math.PI;
 
@@ -68,6 +77,7 @@ export function AlbumDemo({
   credit,
 }: Props) {
   const scope = useRef<HTMLDivElement>(null);
+  const bookRef = useRef<HTMLDivElement>(null);
   const curlRef = useRef<HTMLDivElement>(null);
   const stripRefs = useRef<HTMLDivElement[]>([]);
 
@@ -75,10 +85,16 @@ export function AlbumDemo({
   const [at, setAt] = useState(0);
   /** null when the book is at rest; otherwise the turn in flight. */
   const [turn, setTurn] = useState<{ dir: 1 | -1; from: number } | null>(null);
-  const busy = useRef(false);
   /** False through the server render and the first paint; see the note below. */
   const [live, setLive] = useState(false);
   useEffect(() => setLive(true), []);
+
+  /* The pointer handlers are bound once and read the current turn from a ref:
+     re-subscribing them on every state change would drop a capture mid-drag. */
+  const turnRef = useRef<{ dir: 1 | -1; from: number } | null>(null);
+  turnRef.current = turn;
+  const liveRef = useRef(false);
+  liveRef.current = live;
 
   /**
    * Write a pose onto the DOM.
@@ -108,36 +124,226 @@ export function AlbumDemo({
     }
   }, []);
 
-  const go = useCallback(
-    (dir: 1 | -1) => {
-      if (busy.current) return;
-      const next = at + dir;
-      if (next < 0 || next >= sheets.length) return;
+  /* ---- the turn, driven by hand or let go of ----
+     One rAF loop owns the leaf while it is moving. It runs only while there
+     is something left to integrate — a spring still settling, a lean still
+     easing home — and stops itself the moment both have arrived, which is the
+     standing rule for the moving layers here (DESIGN.md §5.3). */
+  const raf = useRef<number | null>(null);
+  const spring = useRef<{ to: number; k: number; c: number; done: () => void } | null>(null);
+  const state = useRef<Spring>({ value: 0, velocity: 0 });
+  const view = useRef({ rx: 0, ry: 0, z: 1, trx: 0, try_: 0, tz: 1 });
+  const lastFrame = useRef(0);
 
-      // Someone who asked for less motion gets the page, not the turn.
-      if (prefersReducedMotion()) {
-        setAt(next);
-        return;
+  const applyView = useCallback(() => {
+    const el = bookRef.current;
+    if (!el) return;
+    el.style.setProperty("--rx", `${view.current.rx.toFixed(2)}deg`);
+    el.style.setProperty("--ry", `${view.current.ry.toFixed(2)}deg`);
+    el.style.setProperty("--zoom", view.current.z.toFixed(3));
+  }, []);
+
+  const frame = useCallback(
+    (now: number) => {
+      raf.current = null;
+      const dt = Math.min(0.032, (now - lastFrame.current) / 1000 || 0.016);
+      lastFrame.current = now;
+
+      const sp = spring.current;
+      if (sp) {
+        state.current = springStep(state.current, sp.to, dt, sp.k, sp.c);
+        if (springSettled(state.current, sp.to)) {
+          state.current = { value: sp.to, velocity: 0 };
+          pose(curlPose(sp.to));
+          spring.current = null;
+          sp.done();
+        } else {
+          pose(curlPose(state.current.value));
+        }
       }
 
-      busy.current = true;
-      setTurn({ dir, from: at });
-      const t = { v: 0 };
-      gsap.to(t, {
-        v: 1,
-        duration: TURN,
-        ease: EASE.default,
-        onStart: () => pose(curlPose(0)),
-        onUpdate: () => pose(curlPose(t.v)),
-        onComplete: () => {
-          setAt(next);
-          setTurn(null);
-          busy.current = false;
-        },
-      });
+      // The lean chases its target by a fixed fraction each frame — a spring
+      // here would wobble the whole book every time the pointer twitched.
+      const v = view.current;
+      let leaning = false;
+      for (const [k, t] of [["rx", "trx"], ["ry", "try_"], ["z", "tz"]] as const) {
+        const d = v[t] - v[k];
+        if (Math.abs(d) > 0.0006) {
+          v[k] += d * 0.14;
+          leaning = true;
+        } else v[k] = v[t];
+      }
+      if (leaning) applyView();
+
+      if ((spring.current || leaning) && raf.current === null) {
+        raf.current = requestAnimationFrame(frame);
+      }
     },
-    [at, sheets.length, pose]
+    [pose, applyView]
   );
+
+  const kick = useCallback(() => {
+    if (raf.current === null) {
+      lastFrame.current = performance.now();
+      raf.current = requestAnimationFrame(frame);
+    }
+  }, [frame]);
+
+  useEffect(
+    () => () => {
+      if (raf.current !== null) cancelAnimationFrame(raf.current);
+    },
+    []
+  );
+
+  /** Begin a turn, held at `t` — 0 when it is about to be dragged. */
+  const startTurn = useCallback(
+    (dir: 1 | -1, t = 0) => {
+      const to = at + dir;
+      if (to < 0 || to >= sheets.length) return false;
+      spring.current = null;
+      state.current = { value: t, velocity: 0 };
+      setTurn({ dir, from: at });
+      return true;
+    },
+    [at, sheets.length]
+  );
+
+  const settle = useCallback(
+    (to: 0 | 1) => {
+      const t = turnRef.current;
+      if (!t) return;
+      if (prefersReducedMotion()) {
+        if (to === 1) setAt(t.from + t.dir);
+        setTurn(null);
+        return;
+      }
+      const { k, c } = to === 1 ? SPRING_COMMIT : SPRING_CANCEL;
+      spring.current = {
+        to,
+        k,
+        c,
+        done: () => {
+          if (to === 1) setAt(t.from + t.dir);
+          setTurn(null);
+        },
+      };
+      kick();
+    },
+    [kick]
+  );
+
+  /** Buttons and keys: start it and let the spring carry it all the way. */
+  const go = useCallback(
+    (dir: 1 | -1) => {
+      if (turnRef.current || drag.current) return;
+      if (!startTurn(dir, 0)) return;
+      if (prefersReducedMotion()) {
+        setAt(at + dir);
+        setTurn(null);
+        return;
+      }
+      spring.current = {
+        to: 1,
+        ...SPRING_COMMIT,
+        done: () => {
+          setAt(at + dir);
+          setTurn(null);
+        },
+      };
+      kick();
+    },
+    [at, startTurn, kick]
+  );
+
+  /* ---- pointer ----
+     Pressing on a half of the book picks the direction and opens that turn at
+     zero; moving pins its progress to the hand; letting go either finishes it
+     or springs it back. A press that never really moved is a tap, and simply
+     turns the page. */
+  const drag = useRef<{ dir: 1 | -1; x0: number; w: number; moved: number; vel: number; at: number } | null>(null);
+
+  useEffect(() => {
+    const stage = bookRef.current;
+    if (!stage) return;
+
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0 || turnRef.current || !liveRef.current) return;
+      const r = stage.getBoundingClientRect();
+      const dir: 1 | -1 = (e.clientX - r.left) / r.width > 0.5 ? 1 : -1;
+      if (!startTurn(dir, 0)) return;
+      e.preventDefault();
+      // Capture keeps the drag alive if the hand leaves the book mid-turn. It
+      // throws for a pointer the browser does not consider active, and losing
+      // the capture is survivable — losing the drag state is not, because the
+      // page would hang half-turned with nothing left to finish it.
+      try {
+        stage.setPointerCapture(e.pointerId);
+      } catch {
+        /* not a live pointer; carry on without capture */
+      }
+      drag.current = { dir, x0: e.clientX, w: r.width, moved: 0, vel: 0, at: performance.now() };
+    };
+
+    const onMove = (e: PointerEvent) => {
+      const d = drag.current;
+      if (!d) {
+        // No page in hand: the book just leans toward the pointer.
+        const r = stage.getBoundingClientRect();
+        const { rx, ry } = tiltFor(e.clientX, e.clientY, r);
+        view.current.trx = rx;
+        view.current.try_ = ry;
+        kick();
+        return;
+      }
+      const dx = e.clientX - d.x0;
+      d.moved = Math.max(d.moved, Math.abs(dx));
+      const t = dragProgress(dx, d.dir, d.w);
+      const now = performance.now();
+      d.vel = (t - state.current.value) / Math.max(0.001, (now - d.at) / 1000);
+      d.at = now;
+      state.current = { value: t, velocity: 0 };
+      pose(curlPose(t));
+    };
+
+    const onUp = () => {
+      const d = drag.current;
+      if (!d) return;
+      drag.current = null;
+      if (!turnRef.current) return;
+      // A tap turns the page; a drag is judged on where it got to and how fast.
+      settle(d.moved < TAP_SLOP || shouldCommit(state.current.value, d.vel) ? 1 : 0);
+    };
+
+    const onLeave = () => {
+      view.current.trx = 0;
+      view.current.try_ = 0;
+      kick();
+    };
+
+    // Lean in, and back out again. Clamped so neither end can run away.
+    const onDouble = () => {
+      const z = view.current.tz > 1 ? 1 : ZOOM_IN;
+      view.current.tz = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
+      kick();
+    };
+
+    stage.addEventListener("pointerdown", onDown);
+    stage.addEventListener("pointermove", onMove);
+    stage.addEventListener("pointerup", onUp);
+    stage.addEventListener("pointercancel", onUp);
+    stage.addEventListener("pointerleave", onLeave);
+    stage.addEventListener("dblclick", onDouble);
+    stage.addEventListener("dragstart", (e) => e.preventDefault());
+    return () => {
+      stage.removeEventListener("pointerdown", onDown);
+      stage.removeEventListener("pointermove", onMove);
+      stage.removeEventListener("pointerup", onUp);
+      stage.removeEventListener("pointercancel", onUp);
+      stage.removeEventListener("pointerleave", onLeave);
+      stage.removeEventListener("dblclick", onDouble);
+    };
+  }, [startTurn, settle, kick, pose]);
 
   // Arrow keys, once the album has focus — the same two moves the buttons make.
   useEffect(() => {
@@ -151,14 +357,11 @@ export function AlbumDemo({
     return () => el.removeEventListener("keydown", onKey);
   }, [go]);
 
-  // The chain is rebuilt whenever a turn starts, so its strips have to be
-  // re-posed before the first frame the browser paints them in.
-  useGSAP(
-    () => {
-      if (turn) pose(curlPose(0));
-    },
-    { scope, dependencies: [turn], revertOnUpdate: true }
-  );
+  // A fresh chain has to be posed before the browser paints it, or the first
+  // frame of every turn is a flat page.
+  useEffect(() => {
+    if (turn) pose(curlPose(state.current.value));
+  }, [turn, pose]);
 
   const leaving = turn ? sheets[turn.from] : null;
   const arriving = turn ? sheets[turn.from + turn.dir] : null;
@@ -208,7 +411,7 @@ export function AlbumDemo({
             it into a book — so with no JavaScript, or before the chunk lands,
             the album is still the whole album and a crawler sees all twelve
             pictures rather than the two on top of the pile. */}
-        <div className="al-book" data-live={live || undefined}>
+        <div ref={bookRef} className="al-book" data-live={live || undefined}>
           {sheets.map(([l, r], i) => (
             <div key={i} className="al-sheet" data-role={roleOf(i)}>
               <div className="al-leaf al-verso">{l && <Plate plate={l} />}</div>
@@ -342,6 +545,9 @@ const CSS = `
   display: grid;
   place-items: center;
   padding: clamp(1rem, 4vw, 3rem) 1rem 0;
+  /* One camera for the whole scene — the book leans inside it. */
+  perspective: 4000px;
+  perspective-origin: 50% 44%;
 }
 
 /* Before JavaScript: a stack of spreads, one under the next, every still at
@@ -367,8 +573,18 @@ const CSS = `
   position: relative;
   display: block;
   aspect-ratio: 32 / 9;
-  perspective: 4000px;
-  perspective-origin: 50% 44%;
+  /* Touch has its own idea about a horizontal drag; this is the page-turn's. */
+  touch-action: pan-y;
+  /* The lean toward the pointer. It belongs on the book and the perspective
+     belongs on the stage outside it: put both on one element and the rotation
+     is applied to the camera rather than to what the camera is looking at, so
+     the book skews flat instead of leaning. */
+  --rx: 0deg;
+  --ry: 0deg;
+  --zoom: 1;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--zoom));
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 .al-book[data-live] .al-sheet {
   position: absolute;
