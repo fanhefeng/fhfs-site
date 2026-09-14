@@ -12,13 +12,13 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
   近期文章、软件架子与一段关于。没走大门的话，开场点灯仪式每会话一次。
 - **/blog** —— 目录页式索引：按年分组的纯文字行，日期右对齐；文章页单栏
   68ch，中文标题逐行揭示、拉丁标题解码进场。
-- **/portfolio** —— 一张暗室台灯的照片随滚动溶解成纸（实验室「溶解转场」的成品）
-  + Mac / iPhone 设备框里翻看各个软件 + 手作日志。
 - **/software** —— keynote 式 bento 展柜，分类筛选用 Flip 重排；版本号读自各仓库
-  的 GitHub 最新 release。
+  的 GitHub 最新 release；页尾是 Mac / iPhone 设备框，逐个翻看。做过的东西都在这一页
+  （原 /portfolio 已下线，308 到这里）。
 - **/about** —— 点阵名字画布、横穿屏幕的标语（全站唯一 pin）、贴纸墙、版本履历。
-- **/lab** —— 九则动效研究：滚动帧序列、溶解、融化文字、苔藓树根、苔藓里的两张纸卡、
-  色散按钮、可拖拽的 3D 工作台、镜头畸变滑块、Seb's 式的霓虹招牌。每则按路由单独拆包。
+- **/lab** —— 十则动效研究：滚动帧序列、溶解、融化文字、苔藓树根、苔藓里的两张纸卡、
+  色散按钮、可拖拽的 3D 工作台、镜头畸变滑块、Seb's 式的霓虹招牌、翻得动的影集。
+  每则按路由单独拆包。
 - **/intro** —— R3F 的 3D 头像：滚动带镜头绕头飞行，每张贴纸停一站，
   即一份滚动叙事的简历（`docs/INTRO3D.md`）。
 - **/resume** —— 正式的一页简历：左栏编号标签、右栏概述 / 技能 / 经历 / 开源 / 教育，
@@ -110,8 +110,6 @@ pnpm db:studio   # 表格界面
   （CC-BY-4.0，画布下方署名）；原模型 8.5MB 经
   `gltf-transform optimize`（Draco + 1024px WebP）压到 1.1MB，Draco 解码器
   自托管于 `public/draco/`。
-- /portfolio 封面照片 `public/portfolio/lamp.jpg`：Sixteen Miles Out 摄，
-  [Unsplash License](https://unsplash.com/license)（可商用、无需署名）。
 - /lab/lens-slider 的四张照片 `public/lab/lens/`（均为 Unsplash License，
   经 Lorem Picsum 取得，1440px 宽重编码）：`river.jpg` Steve Carter、
   `falls.jpg` Andrew Coelho、`sea.jpg` Anna Popović、`coffee.jpg` Karl Fredrickson。
@@ -119,7 +117,9 @@ pnpm db:studio   # 表格界面
   轮廓量自 Wikimedia Commons 上 Espandero 对着电影描摹的矢量 `File:Seb's.svg`（CC BY-SA 4.0，
   页面上有署名），F 由原版的 E 去掉底横而来、H 是照它的笔画新造的，不用字体；砖墙是 canvas 画的。
   同一块招牌也是首页的大门（`components/home/NeonSplash.tsx`，硬着陆时每 session 一次，
-  推门是从圆环里穿过去）。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
+  推门是从圆环里穿过去），它的圆环与音符也是站标：favicon（`app/icon.svg`）、灵动岛和
+  页脚上套着 `fhf` 的圆环（`components/neon/SignRing.tsx`）、OG 卡题头（`lib/ogMark.tsx`）
+  都从同一份几何（`components/neon/geometry.ts`）画出来。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
   `lib/jukebox.ts` 是它的 store），经 Spotify iFrame API 放官方曲目（Mia & Sebastian's Theme，
   Justin Hurwitz），未登录 Spotify 的访客只能听 30 秒试听；开关是招牌本身和灵动岛上的音符。
   Spotify 到不了时（大陆网络会重置到 open.spotify.com 的连接）退回网易云音乐官方外链播放器，

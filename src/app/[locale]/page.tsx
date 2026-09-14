@@ -38,7 +38,7 @@ const NOW_COUNT = 3;
  * control under it, and a mono line of facts the database can vouch for.
  * Then the approach — a window the scrollbar opens onto the grove, and the
  * paper of the issue coming back down over it. Then the issue itself at the
- * 680px measure: what was written, what was built, and where to find the
+ * 720px measure: what was written, what was built, and where to find the
  * person who did it.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
@@ -141,7 +141,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <Opening
           headline={[th("headline1"), th("headline2")]}
           lede={th("lede")}
-          cta={{ label: th("cta"), href: `/${locale}/portfolio` }}
+          cta={{ label: th("cta"), href: `/${locale}/software` }}
           meta={meta}
         />
   
@@ -169,10 +169,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           ]}
         />
   
-        {/* The issue itself, at the 680px measure. */}
+        {/* The issue itself, at the site's 720px reading measure. */}
         <div
           id="issue"
-          className="mx-auto flex w-full max-w-[680px] scroll-mt-24 flex-col gap-20 px-6 pt-24 pb-24 md:gap-24 md:pt-32 md:pb-32"
+          className="mx-auto flex w-full max-w-[720px] scroll-mt-24 flex-col gap-20 px-6 pt-24 pb-24 md:gap-24 md:pt-32 md:pb-32"
         >
           <RecentWriting
             items={posts}

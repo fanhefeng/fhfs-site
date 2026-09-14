@@ -14,7 +14,7 @@ export const generateMetadata = sectionMetadata("lab", "/lab");
  * Lab index — one line per study, in the craft log's voice: name, one
  * sentence, no thumbnail. The demos themselves need a full viewport and
  * several screens of scroll distance, so each lives on its own route rather
- * than being squeezed into a 680px column here.
+ * than being squeezed into a 720px column here.
  */
 export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
   const { locale } = await params;
@@ -23,7 +23,7 @@ export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
   const t = await getTranslations("lab");
 
   return (
-    <main id="main" className="mx-auto w-full max-w-[680px] flex-1 px-6 pb-24 pt-24">
+    <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-24 pt-24">
       <header>
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("kicker")}

@@ -8,6 +8,7 @@ import { useLocalClock } from "@/lib/useLocalClock";
 import { clusterNav, NAV_GROUP_LABEL_KEY, type NavLink } from "@/lib/nav";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { PeelSticker } from "@/components/ui/PeelSticker";
+import { SignRing } from "@/components/neon/SignRing";
 
 /**
  * The quietest place on the site: a single-line colophon strip. Small
@@ -31,11 +32,17 @@ export function Footer({ items }: { items: NavLink[] }) {
     <footer className="relative mt-24 border-t border-line">
       {/* pr reserves the sticker's corner on every wrap breakpoint. */}
       <div className="mx-auto flex min-h-28 max-w-[1120px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-8 pr-40 text-[13px] sm:px-10 sm:pr-44">
+        {/* The same badge as the island's: the name in the sign's ring. */}
         <Link
           href="/"
-          className="hit-ext inline-block py-1 font-mono text-xs tracking-[0.08em] text-fg no-underline"
+          aria-label={site.signName}
+          className="hit-ext inline-flex items-center py-1 text-fg no-underline"
         >
-          {site.signName}
+          <SignRing id="ft" className="size-8 text-fg">
+            <span className="font-mono text-[10px] font-semibold lowercase tracking-[0.02em]">
+              {site.signName}
+            </span>
+          </SignRing>
         </Link>
 
         {/* Build-time year is baked into the static HTML; let the client

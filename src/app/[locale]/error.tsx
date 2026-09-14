@@ -46,7 +46,7 @@ export default function LocaleError({
       <title>{`${t("title")} | ${site.signName}`}</title>
       <main
         id="main"
-        className="mx-auto flex w-full max-w-[680px] flex-1 flex-col justify-center px-6 pb-28 pt-32"
+        className="mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-center px-6 pb-28 pt-32"
       >
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("kicker")}

@@ -190,7 +190,7 @@ export default async function LabDemoPage({
 
   return (
     <main id="main" className="flex-1">
-      <header className="mx-auto w-full max-w-[680px] px-6 pt-24 pb-10">
+      <header className="mx-auto w-full max-w-[720px] px-6 pt-24 pb-10">
         <Link
           href="/lab"
           className="hit-ext inline-flex min-h-11 items-center font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
@@ -206,7 +206,7 @@ export default async function LabDemoPage({
 
       <LabStudy slug={entry.slug} accent={entry.accent} text={text} />
 
-      <section className="mx-auto w-full max-w-[680px] px-6 pb-28 pt-20">
+      <section className="mx-auto w-full max-w-[720px] px-6 pb-28 pt-20">
         <p className="text-body text-fg-secondary">{t(`${ns}.note`)}</p>
         {entry.slug === "workstation" && (
           <p className="mt-4 font-mono text-meta text-fg-tertiary">

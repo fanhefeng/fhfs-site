@@ -8,7 +8,7 @@
 
 /**
  * The three wings of the nav table. `issue` is the magazine proper (writing,
- * software, the lab, the craft page); `rooms` are the one-page, one-record
+ * software, the lab); `rooms` are the one-page, one-record
  * themes (the board, the secrets, the idols, the film) and whatever rooms
  * come later; `me` is the author (about, the 3D intro, the résumé). A row
  * with no group is on its own — home, today.
@@ -86,9 +86,9 @@ export type NavBranch<T> = { door: T; members: T[] };
 
 /**
  * The full-screen menu's two levels. A row that is not a door hangs under
- * the nearest door *before* it in the same group — so /portfolio, listed
- * after /software, sits under 软件; the rooms sit under 生活; /intro under
- * 关于. A row with no group, or with no door before it in its group, stands
+ * the nearest door *before* it in the same group — so the rooms sit under
+ * 生活 and /intro under 关于. A row with no group, or with no door before it
+ * in its group, stands
  * as a branch of its own (home is the one such row today), so a row can be
  * misfiled in the admin but never vanish.
  */

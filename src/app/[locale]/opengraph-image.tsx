@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { loadOgFonts, OG, OG_BG, OG_FONT_FAMILY, OG_SIZE } from "@/lib/og";
+import { OgSignMark } from "@/lib/ogMark";
 
 export const dynamic = "force-static";
 export const size = OG_SIZE;
@@ -46,17 +47,9 @@ export default async function OgImage({
           fontFamily: OG_FONT_FAMILY,
         }}
       >
-        {/* Masthead line — the amber dot is the site's lit lamp. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div
-            style={{
-              display: "flex",
-              width: 14,
-              height: 14,
-              borderRadius: 7,
-              background: OG.accent,
-            }}
-          />
+        {/* Masthead line — the site's mark, the ring off the sign. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <OgSignMark size={48} />
           <div
             style={{
               display: "flex",

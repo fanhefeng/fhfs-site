@@ -40,8 +40,8 @@ export type FullNavProps = {
  * cascade up; behind it the page recedes (main scale .98 + 2px blur).
  * Two levels: the doors (the rows on the header surface) as the numbered
  * display words, and under each the rows of its group in small type — the
- * rooms under 生活, the craft page under 软件, the 3D intro under 关于 —
- * so a phone gets every page in one press without eleven display rows.
+ * rooms under 生活, the 3D intro under 关于 — so a phone gets every page
+ * in one press without eleven display rows.
  * Closing is deliberately asymmetric — the whole sheet sinks and dissolves
  * into blur, built from to() tweens so a mid-flight toggle simply takes
  * over from wherever things are (raMQBVQ's clear() + rebuild pattern:

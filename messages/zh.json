@@ -73,7 +73,7 @@
     "headline1": "科技改变世界",
     "headline2": "",
     "lede": "河津出生，北京、青岛走过，如今在上海。九年前端，从小拉小提琴，对世界始终好奇。",
-    "cta": "去看作品",
+    "cta": "看看我做的东西",
     "statPosts": "写下的",
     "statPostsValue": "{count} 篇",
     "statApps": "自研软件",
@@ -165,39 +165,10 @@
     "introLink": "换一种方式认识我",
     "empty": "简历内容正在整理中，稍后回来看看。"
   },
-  "portfolio": {
-    "kicker": "画廊 · 手艺",
-    "title": "作品画廊",
-    "subtitle": "一盏灯，几件软件，和一些关于手感的练习。",
-    "coverAlt": "暗室里一盏亮着的台灯，桌上一台电脑，窗外有树",
-    "heroTail": "往下滚，灯留到最后",
-    "heroFallback": "当前环境没有可用的 WebGL，这里展示照片本身。",
-    "scrollHint": "向下滚动",
-    "worksTitle": "在展作品",
-    "visit": "查看作品",
-    "experimentsTitle": "实验",
-    "experimentsSub": "一行一个的小练习，偶尔更新。",
-    "openDemo": "打开原型",
-    "lens": {
-      "heading": "玻璃盖在活的 DOM 上",
-      "body": "这段文字仍然是真的 DOM：可以选中、可以搜索、可以聚焦——玻璃只是画在它上面的一层。",
-      "hint": "光标移进来试试——透镜会跟着走",
-      "fallback": "当前浏览器没有 HTML-in-Canvas，这里展示 CSS 玻璃降级版。",
-      "link": "这条链接依然可以点"
-    },
-    "status": {
-      "live": "已上线",
-      "wip": "进行中",
-      "planned": "构想中"
-    },
-    "emptyTitle": "正在布展",
-    "empty": "正在布展——这面墙很快会挂上东西。",
-    "emptyCta": "先去看看软件"
-  },
   "lab": {
     "kicker": "动效实验室",
     "title": "实验室",
-    "subtitle": "九则练习。滚动条在这里不是导航，是播放头。",
+    "subtitle": "十则练习。滚动条在这里不是导航，是播放头。",
     "open": "进去看看",
     "back": "回实验室",
     "backToIndex": "← 实验室",

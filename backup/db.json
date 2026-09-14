@@ -3885,17 +3885,6 @@
       "group": "issue"
     },
     {
-      "href": "/portfolio",
-      "labelKey": "portfolio",
-      "surfaces": [
-        "footer",
-        "fullnav",
-        "sitemap"
-      ],
-      "sort": 3,
-      "group": "issue"
-    },
-    {
       "href": "/lab",
       "labelKey": "lab",
       "surfaces": [
@@ -3950,17 +3939,6 @@
         "sitemap"
       ],
       "sort": 8,
-      "group": "rooms"
-    },
-    {
-      "href": "/secrets",
-      "labelKey": "secrets",
-      "surfaces": [
-        "footer",
-        "fullnav",
-        "sitemap"
-      ],
-      "sort": 9,
       "group": "rooms"
     },
     {
@@ -4146,8 +4124,8 @@
     },
     {
       "key": "grove.cta",
-      "zh": "去看作品",
-      "en": "See the work",
+      "zh": "看看我做的东西",
+      "en": "See what I've made",
       "note": null
     },
     {
@@ -4572,128 +4550,14 @@
     },
     {
       "key": "lab.subtitle",
-      "zh": "九则练习。滚动条在这里不是导航，是播放头。",
-      "en": "Nine studies. Here the scrollbar is not navigation — it is the playhead.",
+      "zh": "十则练习。滚动条在这里不是导航，是播放头。",
+      "en": "Ten studies. Here the scrollbar is not navigation — it is the playhead.",
       "note": null
     },
     {
       "key": "lab.title",
       "zh": "实验室",
       "en": "Lab",
-      "note": null
-    },
-    {
-      "key": "portfolio.empty",
-      "zh": "正在布展——这面墙很快会挂上东西。",
-      "en": "Installation in progress — this wall fills up soon.",
-      "note": null
-    },
-    {
-      "key": "portfolio.emptyCta",
-      "zh": "先去看看软件",
-      "en": "Browse the software first",
-      "note": null
-    },
-    {
-      "key": "portfolio.emptyTitle",
-      "zh": "正在布展",
-      "en": "Installation in progress",
-      "note": null
-    },
-    {
-      "key": "portfolio.experimentsSub",
-      "zh": "一行一个的小练习，偶尔更新。",
-      "en": "One-line studies, updated now and then.",
-      "note": null
-    },
-    {
-      "key": "portfolio.experimentsTitle",
-      "zh": "实验",
-      "en": "Experiments",
-      "note": null
-    },
-    {
-      "key": "portfolio.heroFallback",
-      "zh": "当前环境没有可用的 WebGL，这里展示照片本身。",
-      "en": "No WebGL available here — showing the photograph as it is.",
-      "note": null
-    },
-    {
-      "key": "portfolio.heroTail",
-      "zh": "往下滚，灯留到最后",
-      "en": "Scroll — the lamp stays till the end",
-      "note": null
-    },
-    {
-      "key": "portfolio.kicker",
-      "zh": "画廊 · 手艺",
-      "en": "Gallery · Craft",
-      "note": null
-    },
-    {
-      "key": "portfolio.lens.body",
-      "zh": "这段文字仍然是真的 DOM：可以选中、可以搜索、可以聚焦——玻璃只是画在它上面的一层。",
-      "en": "This text is still real DOM: selectable, searchable, focusable. The glass is only painted on top of it.",
-      "note": null
-    },
-    {
-      "key": "portfolio.lens.fallback",
-      "zh": "当前浏览器没有 HTML-in-Canvas，这里展示 CSS 玻璃降级版。",
-      "en": "No HTML-in-Canvas in this browser — showing the CSS glass fallback.",
-      "note": null
-    },
-    {
-      "key": "portfolio.lens.heading",
-      "zh": "玻璃盖在活的 DOM 上",
-      "en": "Glass over living DOM",
-      "note": null
-    },
-    {
-      "key": "portfolio.lens.hint",
-      "zh": "光标移进来试试——透镜会跟着走",
-      "en": "Move your cursor in — the lens follows",
-      "note": null
-    },
-    {
-      "key": "portfolio.lens.link",
-      "zh": "这条链接依然可以点",
-      "en": "This link still clicks",
-      "note": null
-    },
-    {
-      "key": "portfolio.openDemo",
-      "zh": "打开原型",
-      "en": "Open the demo",
-      "note": null
-    },
-    {
-      "key": "portfolio.scrollHint",
-      "zh": "向下滚动",
-      "en": "Scroll",
-      "note": null
-    },
-    {
-      "key": "portfolio.subtitle",
-      "zh": "一盏灯，几件软件，和一些关于手感的练习。",
-      "en": "One lamp, a few pieces of software, and some studies in feel.",
-      "note": null
-    },
-    {
-      "key": "portfolio.title",
-      "zh": "作品画廊",
-      "en": "Craft",
-      "note": null
-    },
-    {
-      "key": "portfolio.visit",
-      "zh": "查看作品",
-      "en": "View work",
-      "note": null
-    },
-    {
-      "key": "portfolio.worksTitle",
-      "zh": "在展作品",
-      "en": "On view",
       "note": null
     },
     {

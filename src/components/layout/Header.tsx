@@ -6,10 +6,12 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { gsap, useGSAP, Flip } from "@/lib/gsap";
 import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/nav";
+import { useJukebox } from "@/lib/jukebox";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
 import { JukeboxSwitch } from "@/components/fx/JukeboxSwitch";
+import { SignRing } from "@/components/neon/SignRing";
 import { FullNav } from "./FullNav";
 
 type Props = {
@@ -33,6 +35,19 @@ const LINES = [
 
 /** Desktop = the island expands inline; below this the burger opens FullNav. */
 const DESKTOP = "(min-width: 768px)";
+
+/**
+ * From here up the island stands open by itself: the doors are on the page
+ * without a press. A site whose whole map sits behind a burger has no map —
+ * this was the one thing every "simple" personal site did that this one did
+ * not. Narrower desktops keep the press: between 768 and 1023px an open
+ * island and the page's own layout start competing for the same width.
+ */
+const WIDE = "(min-width: 1024px)";
+/** Scroll travel that folds the open island (down) or unfolds it (up). */
+const FOLD_TRAVEL = 48;
+/** Above this scroll position the island is always open on a wide screen. */
+const FOLD_TOP = 64;
 
 /** Hamburger ⇄ X morph, in seconds. */
 const GLYPH_DURATION = 0.35;
@@ -72,6 +87,8 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const locale = useLocale();
+  /** The ring around the wordmark lights with the music, like the note. */
+  const { wanted } = useJukebox();
   /** Which rows hang under each door — by group, off the whole table. */
   const membersOf = new Map(attachMembers(allLinks).map((b) => [b.door.href, b.members]));
 
@@ -92,6 +109,11 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   const lineRefs = useRef<(SVGLineElement | null)[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const expandedRef = useRef(false);
+  /** The next open lands at its end state without playing — the wide
+   *  screen's default open, on mount and when the viewport widens into it. */
+  const instantRef = useRef(false);
+  /** Escape closed the tray: hand focus to the burger once it is back. */
+  const returnFocusRef = useRef(false);
 
   useEffect(() => {
     expandedRef.current = expanded;
@@ -134,8 +156,13 @@ export function Header({ links, menuLinks, allLinks }: Props) {
     const island = islandRef.current;
     const tray = trayRef.current;
     const ind = indicatorRef.current;
+    const burger = burgerRef.current;
     if (!island || !tray) return null;
 
+    // A rebuild can start with the burger already folded away (a locale
+    // switch while open, below); it must be measured and tweened from rest,
+    // or the reverse would "restore" it to nothing.
+    if (burger) gsap.set(burger, { clearProps: "width,opacity,visibility" });
     gsap.set(tray, { visibility: "visible", width: "auto" });
     const trayW = Math.ceil(tray.getBoundingClientRect().width);
     const baseW = Math.ceil(island.getBoundingClientRect().width) - trayW;
@@ -152,6 +179,13 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       onReverseComplete: () => {
         gsap.set(tray, { visibility: "hidden" });
         if (ind) gsap.set(ind, { autoAlpha: 0 });
+        if (burger) {
+          gsap.set(burger, { clearProps: "width,opacity,visibility" });
+          if (returnFocusRef.current) {
+            returnFocusRef.current = false;
+            burger.focus({ preventScroll: true });
+          }
+        }
       },
     });
     tl.to(
@@ -170,8 +204,32 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       },
       0.14
     );
+    // On a wide screen the open island has no X. The doors are simply there,
+    // and a close control at rest would ask "close what?" — so the burger
+    // folds away with the open and is back the moment the island folds.
+    if (burger && window.matchMedia(WIDE).matches) {
+      tl.to(
+        burger,
+        { width: 0, autoAlpha: 0, duration: 0.3, ease: "power2.out", easeReverse: "power1.out" },
+        0
+      );
+    }
     return tl;
   }, [fitIndicator]);
+
+  /**
+   * Re-measure an open tray in place: rebuild the timeline at its settled
+   * end state with fresh label widths (and, on a wide screen, the burger
+   * folded), so the next close still reverses cleanly and nothing is clipped.
+   */
+  const refit = useCallback(() => {
+    if (!expandedRef.current) return;
+    tlRef.current?.kill();
+    const rebuilt = buildOpenTimeline();
+    tlRef.current = rebuilt;
+    rebuilt?.progress(1);
+    fitIndicator(true);
+  }, [buildOpenTimeline, fitIndicator]);
 
   // Open/close choreography. Mid-flight toggles reuse the live timeline so
   // the capsule reverses from wherever it is — it never jumps.
@@ -189,7 +247,13 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         tl?.kill();
         const fresh = buildOpenTimeline();
         tlRef.current = fresh;
-        fresh?.timeScale(1).play(0);
+        if (instantRef.current) {
+          // The wide screen's own open: already there, not arriving.
+          instantRef.current = false;
+          fresh?.progress(1);
+        } else {
+          fresh?.timeScale(1).play(0);
+        }
       } else {
         const tl = tlRef.current;
         if (!tl || tl.progress() === 0) return;
@@ -300,10 +364,17 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       if (e.key !== "Escape") return;
       e.preventDefault();
       setExpanded(false);
+      // On a wide screen the burger is folded away while the tray is open
+      // and focus() on a hidden button is a no-op; the close timeline hands
+      // focus over once it is back.
+      returnFocusRef.current = true;
       burgerRef.current?.focus({ preventScroll: true });
     };
     const onPointerDown = (e: PointerEvent) => {
-      if (!islandRef.current?.contains(e.target as Node)) setExpanded(false);
+      if (islandRef.current?.contains(e.target as Node)) return;
+      // A pointer closed it: the pointer is where focus should stay.
+      returnFocusRef.current = false;
+      setExpanded(false);
     };
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("pointerdown", onPointerDown);
@@ -324,23 +395,85 @@ export function Header({ links, menuLinks, allLinks }: Props) {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
+  // On a wide screen the island stands open by itself. Scrolling down folds
+  // it back to the wordmark — the page is being read and the island is
+  // chrome — and scrolling up unfolds it; near the top it is always open.
+  // The fold only ever reacts to travel, never to position alone, so a
+  // reader who pressed it shut stays shut until they scroll back up, and a
+  // long page never flickers around a threshold.
+  useEffect(() => {
+    const mq = window.matchMedia(WIDE);
+    let lastY = window.scrollY;
+    let travel = 0;
+    const settle = () => {
+      if (!mq.matches) return;
+      if (window.scrollY < FOLD_TOP && !expandedRef.current) {
+        instantRef.current = true;
+        setExpanded(true);
+      }
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      if (!mq.matches) return;
+      if (y < FOLD_TOP) {
+        travel = 0;
+        if (!expandedRef.current) setExpanded(true);
+        return;
+      }
+      travel = Math.sign(dy) === Math.sign(travel) ? travel + dy : dy;
+      if (travel > FOLD_TRAVEL && expandedRef.current) {
+        travel = 0;
+        setExpanded(false);
+      } else if (travel < -FOLD_TRAVEL && !expandedRef.current) {
+        travel = 0;
+        setExpanded(true);
+      }
+    };
+    const onChange = () => {
+      if (!mq.matches) {
+        setExpanded(false);
+        return;
+      }
+      // Widened into wide with the tray already open (pressed open on a
+      // narrower desktop): its timeline was built without the burger's fold
+      // and measured for the old width — rebuild it in place.
+      if (expandedRef.current) refit();
+      else settle();
+    };
+    settle();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    mq.addEventListener("change", onChange);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      mq.removeEventListener("change", onChange);
+    };
+  }, [refit]);
+
   // Route change while the tray is open (browser Back, etc.): the capsule
   // indicator Flips across to the new aria-current link.
   useEffect(() => {
     if (expandedRef.current) fitIndicator(false);
   }, [pathname, fitIndicator]);
 
-  // Locale switch changes every label width; if the tray is open, rebuild
-  // the timeline at its settled end state with fresh measurements so the
-  // next close still reverses cleanly.
+  // Locale switch changes every label width.
+  useEffect(refit, [locale, refit]);
+
+  // So does the web fonts' arrival: the wide screen's default open measures
+  // the tray at mount, which can be before Yozai and Geist Mono have landed,
+  // and a width taken in the fallback faces can clip the last item by a few
+  // pixels once the real ones swap in. Effects run once more than they need
+  // to on a locale switch; a rebuild at progress(1) is invisible.
   useEffect(() => {
-    if (!expandedRef.current) return;
-    tlRef.current?.kill();
-    const rebuilt = buildOpenTimeline();
-    tlRef.current = rebuilt;
-    rebuilt?.progress(1);
-    fitIndicator(true);
-  }, [locale, buildOpenTimeline, fitIndicator]);
+    let live = true;
+    document.fonts.ready.then(() => {
+      if (live) refit();
+    });
+    return () => {
+      live = false;
+    };
+  }, [refit]);
 
   const onBurger = () => {
     if (window.matchMedia(DESKTOP).matches) setExpanded((v) => !v);
@@ -395,13 +528,19 @@ export function Header({ links, menuLinks, allLinks }: Props) {
               ringRef={ringRef}
             />
 
-            {/* Wordmark badge. */}
+            {/* Wordmark badge: the name inside the ring off the sign, with
+                the note beside it as the music's switch — the island wears
+                the sign's parts. The ring lights with the note. */}
             <Link
               href="/"
               aria-label={site.signName}
-              className="hit-ext relative z-[1] flex h-11 items-center rounded-full px-2.5 font-mono text-[13px] font-semibold lowercase tracking-[0.02em] text-fg"
+              className="hit-ext relative z-[1] flex h-11 items-center rounded-full px-1"
             >
-              {site.signName}
+              <SignRing id="isl" lit={wanted} className="size-9 text-fg">
+                <span className="font-mono text-[12px] font-semibold lowercase tracking-[0.02em] text-fg">
+                  {site.signName}
+                </span>
+              </SignRing>
             </Link>
 
             {/* Tray: width-animated between the wordmark and the burger.

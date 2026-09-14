@@ -14,7 +14,6 @@ const IMMUTABLE_PATHS = [
   "/grove/:path*",
   "/lab/dissolve/:path*",
   "/lab/neon/:path*",
-  "/portfolio/:path*",
   "/idols/:path*",
   "/odyssey/:path*",
 ];
@@ -57,6 +56,13 @@ const nextConfig: NextConfig = {
       {
         source: "/:locale(zh|en)/grove",
         destination: "/:locale",
+        permanent: true,
+      },
+      // The portfolio never had a work to hang; its device frames went back
+      // to /software, which is where the page's one link pointed anyway.
+      {
+        source: "/:locale(zh|en)/portfolio",
+        destination: "/:locale/software",
         permanent: true,
       },
     ];

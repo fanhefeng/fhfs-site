@@ -13,7 +13,7 @@ import { MomentBoard } from "@/components/moments/MomentBoard";
 export const generateMetadata = sectionMetadata("moments", "/moments");
 
 /**
- * 《多的是你不知道的事》— the board. A 680px column like the rest of the
+ * 《多的是你不知道的事》— the board. A 720px column like the rest of the
  * issue, and its own record on: the song the page is named after plays
  * while the reader is here (`RoomMusic`). The instants are formatted here,
  * in the site's zone, so the board never has to know what a Date is.
@@ -41,7 +41,7 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
   const langNotice = t("langNotice");
 
   return (
-    <main id="main" className="mx-auto w-full max-w-[680px] flex-1 px-6 pb-28 pt-32 md:pt-40">
+    <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
       <Reveal as="section" className="mb-10">
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("kicker")}</p>
         <h1 className="mt-3 text-display-sm">{t("title")}</h1>
