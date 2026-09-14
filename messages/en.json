@@ -73,7 +73,7 @@
     "headline1": "Tech changes the world",
     "headline2": "",
     "lede": "Born in Hejin, Shanxi; Beijing and Qingdao along the way; Shanghai now. Nine years of front-end, a violin since childhood, and a standing curiosity about the world.",
-    "cta": "See the work",
+    "cta": "See what I've made",
     "statPosts": "Written",
     "statPostsValue": "{count, plural, one {# piece} other {# pieces}}",
     "statApps": "Software",
@@ -165,39 +165,10 @@
     "introLink": "Meet me the other way round",
     "empty": "The resume is still being put together — check back soon."
   },
-  "portfolio": {
-    "kicker": "Gallery · Craft",
-    "title": "Craft",
-    "subtitle": "One lamp, a few pieces of software, and some studies in feel.",
-    "coverAlt": "A desk lamp left on in a dark room, a computer on the desk, trees outside the window",
-    "heroTail": "Scroll — the lamp stays till the end",
-    "heroFallback": "No WebGL available here — showing the photograph as it is.",
-    "scrollHint": "Scroll",
-    "worksTitle": "On view",
-    "visit": "View work",
-    "experimentsTitle": "Experiments",
-    "experimentsSub": "One-line studies, updated now and then.",
-    "openDemo": "Open the demo",
-    "lens": {
-      "heading": "Glass over living DOM",
-      "body": "This text is still real DOM: selectable, searchable, focusable. The glass is only painted on top of it.",
-      "hint": "Move your cursor in — the lens follows",
-      "fallback": "No HTML-in-Canvas in this browser — showing the CSS glass fallback.",
-      "link": "This link still clicks"
-    },
-    "status": {
-      "live": "Live",
-      "wip": "In progress",
-      "planned": "Planned"
-    },
-    "emptyTitle": "Installation in progress",
-    "empty": "Installation in progress — this wall fills up soon.",
-    "emptyCta": "Browse the software first"
-  },
   "lab": {
     "kicker": "Motion lab",
     "title": "Lab",
-    "subtitle": "Nine studies. Here the scrollbar is not navigation — it is the playhead.",
+    "subtitle": "Ten studies. Here the scrollbar is not navigation — it is the playhead.",
     "open": "Open",
     "back": "Back to the lab",
     "backToIndex": "← Lab",

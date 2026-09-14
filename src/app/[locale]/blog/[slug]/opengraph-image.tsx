@@ -4,6 +4,7 @@ import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getAllSlugs, getPost } from "@/lib/content";
 import { loadOgFonts, OG, OG_BG, OG_FONT_FAMILY, OG_SIZE } from "@/lib/og";
+import { OgSignMark } from "@/lib/ogMark";
 
 export const dynamic = "force-static";
 export const size = OG_SIZE;
@@ -83,17 +84,9 @@ export default async function PostOgImage({
           fontFamily: OG_FONT_FAMILY,
         }}
       >
-        {/* Meta line: date · tags, led by the amber lamp. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div
-            style={{
-              display: "flex",
-              width: 14,
-              height: 14,
-              borderRadius: 7,
-              background: OG.accent,
-            }}
-          />
+        {/* Meta line: date · tags, led by the site's mark. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <OgSignMark size={44} />
           <div
             style={{
               display: "flex",
