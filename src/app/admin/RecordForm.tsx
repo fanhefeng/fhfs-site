@@ -20,7 +20,7 @@ export type Field =
   | { name: string; label: string; kind: "select"; options: string[] }
   | { name: string; label: string; kind: "localized" }
   | { name: string; label: string; kind: "localizedArea"; rows?: number }
-  | { name: string; label: string; kind: "lines"; hint?: string };
+  | { name: string; label: string; kind: "lines"; hint?: string; rows?: number };
 
 export type RecordData = { [key: string]: unknown };
 
@@ -139,7 +139,7 @@ export function RecordForm({
                             locale
                           ]?.join("\n") ?? ""
                         }
-                        rows={4}
+                        rows={field.rows ?? 4}
                         className={`${inputClass} font-mono text-caption`}
                       />
                     </label>

@@ -1,0 +1,1 @@
+ALTER TABLE "resume_profiles" ADD COLUMN "sections" jsonb DEFAULT '{"zh":[],"en":[]}'::jsonb NOT NULL;

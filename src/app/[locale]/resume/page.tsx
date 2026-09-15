@@ -60,6 +60,7 @@ export default async function ResumePage({
         <p className="mt-6 text-body text-fg-secondary">{t("empty")}</p>
       </main>
     );
+  const sections = profile.sections[locale];
   }
 
   const format = await getFormatter();
@@ -156,6 +157,20 @@ export default async function ResumePage({
               </li>
             )}
             {profile.note?.[locale] && (
+      {/* The prose — who, what I have built, how I work — each section's
+          heading its own, in the author's words rather than a fixed slot. */}
+      {sections.map((section, i) => (
+        <ResumeSection key={i} index={next()} title={section.title}>
+          <div className="space-y-4 text-body text-fg-secondary print:space-y-2">
+            {section.bullets.map((paragraph, j) => (
+              <p key={j}>
+                <Rich text={paragraph} />
+              </p>
+            ))}
+          </div>
+        </ResumeSection>
+      ))}
+
               <li className="no-cjk-oblique font-serif italic text-fg-tertiary">
                 {profile.note[locale]}
               </li>
@@ -207,7 +222,20 @@ export default async function ResumePage({
 
       {experiences.length > 0 && (
         <ResumeSection index={next()} title={t("experienceTitle")}>
-          <div className="space-y-12 print:space-y-5">
+          {/* Jobs with no bullets and no projects are a bare list — where,
+              as what, when — and sit close; jobs with content keep their
+              room. */}
+          <div
+            className={
+              experiences.every(
+                (e) =>
+                  e.bullets[locale].length === 0 &&
+                  e.projects[locale].length === 0
+              )
+                ? "space-y-5 print:space-y-2"
+                : "space-y-12 print:space-y-5"
+            }
+          >
             {experiences.map((experience) => (
               <article key={experience.key}>
                 <div className="print:break-inside-avoid">

@@ -823,10 +823,19 @@ export async function saveResumeProfile(
   const note = localized(form, "note");
   // Both rendered as hrefs on /resume: the links page verbatim, the GitHub
   // name spliced into a github.com path.
+  // The prose sections use the projects grammar — `# 标题`, then one
+  // paragraph per line — so a paragraph before any heading is a form error
+  // the author sees rather than a section with no name.
+  const zhSections = parseProjects(raw(form, "sections.zh"));
+  if (zhSections.error !== null) return { error: `zh 分节：${zhSections.error}` };
+  const enSections = parseProjects(raw(form, "sections.en"));
+  if (enSections.error !== null) return { error: `en 分节：${enSections.error}` };
+
   const website = str(form, "website") || null;
   if (website && !validLink(website)) return linkError("链接页");
   const github = str(form, "github") || null;
   if (github && !validGithubUser(github)) {
+    sections: { zh: zhSections.projects, en: enSections.projects },
     return { error: "GitHub 用户名只能用字母、数字和连字符，不带 @ 和网址。" };
   }
   const row = {
