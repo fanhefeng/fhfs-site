@@ -312,6 +312,17 @@ export const resumeProfiles = pgTable("resume_profiles", {
   key: text().primaryKey(),
   name: localized().notNull(),
   tagline: localized().notNull(),
+  /**
+   * The prose of the page — "Who", "What I have built", "How I work" — each
+   * a heading with its paragraphs, in the order they appear, rendered ahead
+   * of everything else. Reuses the ResumeProject shape (title + lines,
+   * `period` unused) so the admin textarea speaks the one grammar it already
+   * has for a heading with lines under it.
+   */
+  sections: jsonb()
+    .$type<{ zh: ResumeProject[]; en: ResumeProject[] }>()
+    .notNull()
+    .default(EMPTY_LINES),
   /** Summary paragraphs. */
   intro: jsonb().$type<LocalizedLines>().notNull(),
   /** Bullets under the summary — the claims with numbers in them. */

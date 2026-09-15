@@ -2,7 +2,7 @@ import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { resumeExperiences, resumeProfiles } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
-import { formatSkillLine } from "@/lib/resume";
+import { formatProjects, formatSkillLine } from "@/lib/resume";
 import { AdminChrome } from "../AdminChrome";
 import { RecordForm, type Field } from "../RecordForm";
 import { saveResumeProfile } from "../actions";
@@ -14,10 +14,18 @@ const PROFILE_FIELDS: Field[] = [
   { name: "name", label: "名字", kind: "localized" },
   { name: "tagline", label: "一句话（角色/定位）", kind: "localized" },
   {
-    name: "intro",
-    label: "概述",
+    name: "sections",
+    label: "分节正文",
     kind: "lines",
-    hint: "一行一段，空行忽略。",
+    rows: 24,
+    hint:
+      "页面的主体，显示在个人信息之后、其余各节之前。以「# 标题」起一节（我是谁 / 我做过什么 / 我怎么工作……），下面一行一段，节之间空一行。段落里 **粗体** 和 `代码` 会按样式渲染。",
+  },
+  {
+    name: "intro",
+    label: "概述（可空）",
+    kind: "lines",
+    hint: "一行一段，空行忽略。有分节正文时通常留空。",
   },
   { name: "highlights", label: "概述下的要点", kind: "lines", hint: INLINE_HINT },
   {
@@ -75,10 +83,16 @@ export default async function ResumeAdminPage() {
   };
 
   // The form edits lists as textareas, so the skills table is handed over
-  // already written out in its `name | items` grammar, one group per line.
+  // already written out in its `name | items` grammar, one group per line,
+  // and the sections in the `# 标题` grammar, split back into lines for the
+  // textarea to join.
   const record = profile
     ? {
         ...profile,
+        sections: {
+          zh: formatProjects(profile.sections.zh).split("\n"),
+          en: formatProjects(profile.sections.en).split("\n"),
+        },
         skills: {
           zh: profile.skills.zh.map(formatSkillLine),
           en: profile.skills.en.map(formatSkillLine),
@@ -87,6 +101,7 @@ export default async function ResumeAdminPage() {
     : {
         name: { zh: "", en: "" },
         tagline: { zh: "", en: "" },
+        sections: { zh: [], en: [] },
         intro: { zh: [], en: [] },
         highlights: { zh: [], en: [] },
         skills: { zh: [], en: [] },
@@ -102,7 +117,8 @@ export default async function ResumeAdminPage() {
   return (
     <AdminChrome title="简历页">
       <p className="mb-8 max-w-[70ch] text-caption text-fg-tertiary">
-        <code>/resume</code> 的内容：上面是个人信息、概述、技能、开源与教育，下面一条条是工作经历。
+        <code>/resume</code> 的内容：上面是个人信息、分节正文、概述、技能、开源与教育，下面一条条是工作经历——
+        经历留空要点和项目，页面就只列公司、职位和时间段一行。
         时间段是原样显示的文字——写成什么样，页面就显示什么样，不做日期运算。
         这一页是公开的，电话、邮箱、具体公司名这类信息请自行斟酌。
       </p>

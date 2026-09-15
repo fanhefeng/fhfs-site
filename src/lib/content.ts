@@ -658,6 +658,7 @@ export const getIntroNodes = unstable_cache(
 export type ResumeProfile = {
   name: Localized;
   tagline: Localized;
+  sections: { zh: ResumeProject[]; en: ResumeProject[] };
   intro: LocalizedLines;
   highlights: LocalizedLines;
   skills: { zh: SkillGroup[]; en: SkillGroup[] };
@@ -693,6 +694,7 @@ export const getResumeProfile = unstable_cache(
       .select({
         name: resumeProfiles.name,
         tagline: resumeProfiles.tagline,
+        sections: resumeProfiles.sections,
         intro: resumeProfiles.intro,
         highlights: resumeProfiles.highlights,
         skills: resumeProfiles.skills,
