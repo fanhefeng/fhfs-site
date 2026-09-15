@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
 import { LAB_ENTRIES, labEntry } from "@/components/lab/entries";
@@ -113,9 +114,8 @@ const STUDY_KEYS: Record<string, string[]> = {
 export default async function LabDemoPage({
   params,
 }: PageProps<"/[locale]/lab/[slug]">) {
-  const { locale, slug } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
+  const { slug } = await params;
   const entry = labEntry(slug);
   if (!entry) notFound();
   const t = await getTranslations("lab");

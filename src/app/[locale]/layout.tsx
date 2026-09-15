@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { getMessages, setRequestLocale, getTranslations } from "next-intl/server";
 import { fontVariables } from "../fonts";
 import { ThemeInitScript } from "../ThemeInitScript";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
 import { getAllNavItems, getNavItems, type NavItem } from "@/lib/content";
+import { CLIENT_NAMESPACES, pick } from "@/lib/messages";
 import type { NavLink } from "@/lib/nav";
 import { feedTypes } from "@/lib/seo";
 import { Header } from "@/components/layout/Header";
@@ -72,6 +73,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
   setRequestLocale(locale);
   const t = await getTranslations("layout");
+  // Only the namespaces client components read cross the wire; the rest of
+  // the catalogue stays on the server (see CLIENT_NAMESPACES).
+  const clientMessages = pick(await getMessages(), CLIENT_NAMESPACES);
 
   // One nav table, three surfaces. These used to be three constants that had
   // already drifted apart: /intro only ever reached the sitemap, and home only
@@ -113,7 +117,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             script wrapped in a div, and not next/script, is written out in
             ThemeInitScript.tsx. ThemeKeeper below owns every later change. */}
         <ThemeInitScript />
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <ThemeKeeper />
           <SmoothScroll />
           <RouteTransition />

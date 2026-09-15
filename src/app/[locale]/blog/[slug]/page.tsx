@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import {
-  setRequestLocale,
-  getTranslations,
-  getFormatter,
-} from "next-intl/server";
+import { getTranslations, getFormatter } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import {
   getAdjacentPosts,
@@ -100,9 +97,8 @@ function TopScrim() {
  * (Chinese); everything below it is static by design.
  */
 export default async function PostPage({ params }: PageProps<"/[locale]/blog/[slug]">) {
-  const { locale, slug } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
+  const { slug } = await params;
   const t = await getTranslations("blog");
   const format = await getFormatter();
   const post = await getPost(slug, locale);

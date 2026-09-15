@@ -1,9 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { getAllNavItems, getMoments, getSecrets } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
@@ -24,9 +22,7 @@ type SubLink = { href: string; label: string };
  * `components/life/rooms`. No record of its own: a corridor is not a room.
  */
 export default async function LifePage({ params }: PageProps<"/[locale]/life">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
   const t = await getTranslations("life");
   const tNav = await getTranslations("nav");
   const tTracks = await getTranslations("tracks");

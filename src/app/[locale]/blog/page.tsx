@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { getPosts, getAllTags } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { YearIndex } from "@/components/blog/PostCard";
@@ -16,9 +14,7 @@ export const generateMetadata = sectionMetadata("blog", "/blog");
  * at this volume a reader wants to scan titles, not browse tiles.
  */
 export default async function BlogPage({ params }: PageProps<"/[locale]/blog">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
   const t = await getTranslations("blog");
   const posts = await getPosts(locale);
   const tags = await getAllTags(locale);

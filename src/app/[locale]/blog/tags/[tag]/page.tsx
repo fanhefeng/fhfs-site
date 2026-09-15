@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { feedTypes } from "@/lib/seo";
@@ -54,9 +55,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/blog/tag
  * more than one tap away.
  */
 export default async function TagPage({ params }: PageProps<"/[locale]/blog/tags/[tag]">) {
-  const { locale, tag: encoded } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
+  const { tag: encoded } = await params;
   const tag = decodeSegment(encoded);
   const t = await getTranslations("blog");
   const posts = await getPostsByTag(tag, locale);

@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
 import { getMoments } from "@/lib/content";
 import { stampInZone, type BoardMoment } from "@/lib/moments";
@@ -19,9 +17,7 @@ export const generateMetadata = sectionMetadata("moments", "/moments");
  * in the site's zone, so the board never has to know what a Date is.
  */
 export default async function MomentsPage({ params }: PageProps<"/[locale]/moments">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  await pageLocale(params);
   const t = await getTranslations("moments");
   const tt = await getTranslations("tracks.unknown");
   const tc = await getTranslations("common");

@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
 import { sectionMetadata } from "@/lib/seo";
 import { getIntroNodes } from "@/lib/content";
@@ -26,9 +24,7 @@ export const generateMetadata = sectionMetadata("intro", "/intro");
 export default async function IntroPage({
   params,
 }: PageProps<"/[locale]/intro">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
 
   const t = await getTranslations("intro");
 

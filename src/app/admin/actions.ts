@@ -3,6 +3,7 @@
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { and, eq, sql } from "drizzle-orm";
+import type { AnyPgColumn, PgInsertValue, PgTable, PgUpdateSetSource } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
@@ -72,6 +73,46 @@ const linkError = (label: string): ActionState => ({
 const existsError = (key: string): ActionState => ({
   error: `key 已存在：已经有「${key}」了，换一个或去编辑原来那条。`,
 });
+
+/** A table saved by its `key` column — every record list the admin edits
+ *  one row at a time. */
+type KeyedTable = PgTable & { key: AnyPgColumn; id: AnyPgColumn };
+
+const goneError = (key: string): ActionState => ({
+  error: `「${key}」已经不在了——可能刚在别处被删掉。刷新这一页再看。`,
+});
+
+/**
+ * The one save behind every keyed "new / edit" form. `isNew` is the "new"
+ * form's promise that it is not overwriting anything: the insert then does
+ * nothing on a conflict, and the form gets the exists error back instead of
+ * silently replacing whatever had the key. The edit form's promise is the
+ * opposite — the row exists — so it is an UPDATE by key, and a form left
+ * open past a delete gets told rather than quietly resurrecting the row.
+ * The columns a table keeps for itself (`id`, timestamps) never come from
+ * the form, so the row is the whole update either way. Returns the error to
+ * hand the form, or null when the row is in.
+ */
+async function upsertKeyed<T extends KeyedTable>(
+  table: T,
+  row: PgInsertValue<T> & { key: string },
+  isNew: boolean
+): Promise<ActionState | null> {
+  if (isNew) {
+    const inserted = await db
+      .insert(table)
+      .values(row)
+      .onConflictDoNothing({ target: table.key })
+      .returning({ id: table.id });
+    return inserted.length ? null : existsError(row.key);
+  }
+  const updated = await db
+    .update(table)
+    .set(row as PgUpdateSetSource<T>)
+    .where(eq(table.key, row.key))
+    .returning({ id: table.id });
+  return updated.length ? null : goneError(row.key);
+}
 
 // ---------------------------------------------------------------------------
 // Posts
@@ -459,19 +500,8 @@ export async function saveTimelineEntry(
     sort: sort.value,
   };
 
-  if (form.get("isNew")) {
-    const inserted = await db
-      .insert(schema.timelineEntries)
-      .values(row)
-      .onConflictDoNothing({ target: schema.timelineEntries.key })
-      .returning({ id: schema.timelineEntries.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.timelineEntries)
-      .values(row)
-      .onConflictDoUpdate({ target: schema.timelineEntries.key, set: row });
-  }
+  const exists = await upsertKeyed(schema.timelineEntries, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.timeline);
   return { ok: true };
@@ -531,21 +561,8 @@ export async function saveApp(
     sort: sort.value,
   };
 
-  if (form.get("isNew")) {
-    // Same guard as a new post: the "new app" form must not overwrite one
-    // that already has this key.
-    const inserted = await db
-      .insert(schema.apps)
-      .values(row)
-      .onConflictDoNothing({ target: schema.apps.key })
-      .returning({ id: schema.apps.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.apps)
-      .values(row)
-      .onConflictDoUpdate({ target: schema.apps.key, set: row });
-  }
+  const exists = await upsertKeyed(schema.apps, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.apps);
   return { ok: true };
@@ -588,19 +605,8 @@ export async function saveExperiment(
     sort: sort.value,
   };
 
-  if (form.get("isNew")) {
-    const inserted = await db
-      .insert(schema.experiments)
-      .values(row)
-      .onConflictDoNothing({ target: schema.experiments.key })
-      .returning({ id: schema.experiments.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.experiments)
-      .values(row)
-      .onConflictDoUpdate({ target: schema.experiments.key, set: row });
-  }
+  const exists = await upsertKeyed(schema.experiments, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.experiments);
   return { ok: true };
@@ -776,20 +782,8 @@ export async function saveWork(
     sort: sort.value,
   };
 
-  if (form.get("isNew")) {
-    // The "new work" form must not overwrite one that already has this key.
-    const inserted = await db
-      .insert(schema.works)
-      .values(row)
-      .onConflictDoNothing({ target: schema.works.key })
-      .returning({ id: schema.works.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.works)
-      .values(row)
-      .onConflictDoUpdate({ target: schema.works.key, set: row });
-  }
+  const exists = await upsertKeyed(schema.works, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.works);
   return { ok: true };
@@ -823,6 +817,12 @@ export async function saveResumeProfile(
   const note = localized(form, "note");
   // Both rendered as hrefs on /resume: the links page verbatim, the GitHub
   // name spliced into a github.com path.
+  const website = str(form, "website") || null;
+  if (website && !validLink(website)) return linkError("链接页");
+  const github = str(form, "github") || null;
+  if (github && !validGithubUser(github)) {
+    return { error: "GitHub 用户名只能用字母、数字和连字符，不带 @ 和网址。" };
+  }
   // The prose sections use the projects grammar — `# 标题`, then one
   // paragraph per line — so a paragraph before any heading is a form error
   // the author sees rather than a section with no name.
@@ -831,17 +831,11 @@ export async function saveResumeProfile(
   const enSections = parseProjects(raw(form, "sections.en"));
   if (enSections.error !== null) return { error: `en 分节：${enSections.error}` };
 
-  const website = str(form, "website") || null;
-  if (website && !validLink(website)) return linkError("链接页");
-  const github = str(form, "github") || null;
-  if (github && !validGithubUser(github)) {
-    sections: { zh: zhSections.projects, en: enSections.projects },
-    return { error: "GitHub 用户名只能用字母、数字和连字符，不带 @ 和网址。" };
-  }
   const row = {
     key: "main",
     name,
     tagline: localized(form, "tagline"),
+    sections: { zh: zhSections.projects, en: enSections.projects },
     intro: localizedLines(form, "intro"),
     highlights: localizedLines(form, "highlights"),
     // `name | items` per line — the grammar is in src/lib/resume.ts.
@@ -915,20 +909,8 @@ export async function saveResumeExperience(
     sort: sort.value,
   };
 
-  if (form.get("isNew")) {
-    // The "new experience" form must not overwrite a job that has this key.
-    const inserted = await db
-      .insert(schema.resumeExperiences)
-      .values(row)
-      .onConflictDoNothing({ target: schema.resumeExperiences.key })
-      .returning({ id: schema.resumeExperiences.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.resumeExperiences)
-      .values(row)
-      .onConflictDoUpdate({ target: schema.resumeExperiences.key, set: row });
-  }
+  const exists = await upsertKeyed(schema.resumeExperiences, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.resume);
   return { ok: true };
@@ -969,19 +951,8 @@ export async function saveIntroNode(
     sort: sort.value,
   };
 
-  if (form.get("isNew")) {
-    const inserted = await db
-      .insert(schema.introNodes)
-      .values(row)
-      .onConflictDoNothing({ target: schema.introNodes.key })
-      .returning({ id: schema.introNodes.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.introNodes)
-      .values(row)
-      .onConflictDoUpdate({ target: schema.introNodes.key, set: row });
-  }
+  const exists = await upsertKeyed(schema.introNodes, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.intro);
   return { ok: true };

@@ -347,6 +347,10 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
                 <Link
                   href={door.href}
                   aria-current={here ? "page" : active ? "true" : undefined}
+                  // The sheet is in the DOM on every page, hidden — and a
+                  // hidden link still counts as "in the viewport" to the
+                  // prefetcher. Its routes load when the reader opens it.
+                  prefetch={false}
                   onClick={() => {
                     // Already on this page: nothing will navigate, so the
                     // click just lowers the shade again.
@@ -380,6 +384,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
                           <Link
                             href={member.href}
                             aria-current={current ? "page" : undefined}
+                            prefetch={false}
                             onClick={() => {
                               if (member.href === pathname) onClose();
                             }}

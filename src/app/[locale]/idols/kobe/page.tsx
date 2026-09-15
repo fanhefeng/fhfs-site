@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { localeAlternates } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
@@ -29,9 +29,7 @@ export async function generateMetadata({
  * A wide page (1040px) for the statue and the pictures, the text narrower.
  */
 export default async function KobePage({ params }: PageProps<"/[locale]/idols/kobe">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  await pageLocale(params);
   const t = await getTranslations("idols");
   const tk = await getTranslations("idols.kobe");
 

@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
@@ -17,9 +15,7 @@ export const generateMetadata = sectionMetadata("lab", "/lab");
  * than being squeezed into a 720px column here.
  */
 export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  await pageLocale(params);
   const t = await getTranslations("lab");
 
   return (

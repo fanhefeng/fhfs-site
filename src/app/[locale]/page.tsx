@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { pageLocale } from "@/i18n/page";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
@@ -42,9 +42,7 @@ const NOW_COUNT = 3;
  * person who did it.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
 
   const t = await getTranslations("home");
   const th = await getTranslations("grove");

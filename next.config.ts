@@ -8,6 +8,10 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
  * new file name — so a browser may keep them for as long as it likes.
  */
 const IMMUTABLE_PATHS = [
+  // The Yozai slices: a Chinese page fetches thirty to fifty of them, and
+  // without this every visit re-validated each one. Re-splitting the font
+  // goes into a new folder name, never over these files.
+  "/fonts/:path*",
   "/lab/scroll-video/:path*",
   "/models/:path*",
   "/draco/:path*",

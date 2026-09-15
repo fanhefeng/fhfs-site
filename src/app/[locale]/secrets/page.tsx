@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { getSecrets } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
@@ -17,9 +15,7 @@ export const generateMetadata = sectionMetadata("secrets", "/secrets");
  * than inventing a piece.
  */
 export default async function SecretsPage({ params }: PageProps<"/[locale]/secrets">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
   const t = await getTranslations("secrets");
   const tt = await getTranslations("tracks.secret");
   const tc = await getTranslations("common");

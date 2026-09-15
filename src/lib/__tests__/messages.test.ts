@@ -1,5 +1,50 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { merge } from "@/lib/messages";
+import { CLIENT_NAMESPACES, merge, pick } from "@/lib/messages";
+
+/** Every .ts/.tsx under `dir`, recursively. */
+function sourceFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const file = path.join(dir, name);
+    if (statSync(file).isDirectory()) out.push(...sourceFiles(file));
+    else if (/\.tsx?$/.test(name)) out.push(file);
+  }
+  return out;
+}
+
+describe("CLIENT_NAMESPACES", () => {
+  // The layout hands the client only these namespaces. A component that
+  // reads another one through `useTranslations` would fail in the browser
+  // with MISSING_MESSAGE — so the list is checked against the source, not
+  // remembered.
+  it("covers every namespace a component reads with useTranslations", () => {
+    const src = fileURLToPath(new URL("../../", import.meta.url));
+    const used = new Set<string>();
+    for (const file of sourceFiles(src)) {
+      const text = readFileSync(file, "utf8");
+      for (const m of text.matchAll(/useTranslations\(\s*(?:"([^"]*)"|'([^']*)')?\s*\)/g)) {
+        // A call with no namespace at all would need the whole catalogue —
+        // recorded as "*", which is never in the list.
+        used.add((m[1] ?? m[2] ?? "*").split(".")[0]);
+      }
+    }
+    expect(used.size).toBeGreaterThan(0);
+    const missing = [...used].filter((ns) => !(CLIENT_NAMESPACES as readonly string[]).includes(ns));
+    expect(missing).toEqual([]);
+  });
+});
+
+describe("pick", () => {
+  it("keeps only the named namespaces and skips ones the catalogue lacks", () => {
+    expect(pick({ nav: { a: 1 }, lab: { b: 2 }, plain: "x" }, ["nav", "plain", "none"])).toEqual({
+      nav: { a: 1 },
+      plain: "x",
+    });
+  });
+});
 
 const base = {
   home: { heroLine1: "默认", heroLine2: "第二行", nested: { deep: "x" } },

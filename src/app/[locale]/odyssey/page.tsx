@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { RoomMusic } from "@/components/fx/RoomMusic";
@@ -17,9 +15,7 @@ export const generateMetadata = sectionMetadata("odyssey", "/odyssey");
  * A wide page (1040px) for the pictures, the text at 720px like the rest.
  */
 export default async function OdysseyPage({ params }: PageProps<"/[locale]/odyssey">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
   const t = await getTranslations("odyssey");
   const tt = await getTranslations("tracks.odyssey");
   const tc = await getTranslations("common");

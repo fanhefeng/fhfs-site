@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations, getFormatter } from "next-intl/server";
+import { getTranslations, getFormatter } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import {
   getAdjacentSecrets,
@@ -48,9 +49,8 @@ export async function generateMetadata({
  * for an episode — two things playing at once is not a secret, it is noise.
  */
 export default async function SecretPage({ params }: PageProps<"/[locale]/secrets/[slug]">) {
-  const { locale, slug } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
+  const { slug } = await params;
   const t = await getTranslations("secrets");
   const tt = await getTranslations("tracks.secret");
   const tc = await getTranslations("common");
