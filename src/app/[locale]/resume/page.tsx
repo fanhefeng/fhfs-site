@@ -1,11 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import {
-  getFormatter,
-  getTranslations,
-  setRequestLocale,
-} from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getFormatter, getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { getResumeExperiences, getResumeProfile } from "@/lib/content";
@@ -40,9 +34,7 @@ const metaLabel =
 export default async function ResumePage({
   params,
 }: PageProps<"/[locale]/resume">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
 
   const [t, profile, experiences] = await Promise.all([
     getTranslations("resume"),
@@ -60,7 +52,6 @@ export default async function ResumePage({
         <p className="mt-6 text-body text-fg-secondary">{t("empty")}</p>
       </main>
     );
-  const sections = profile.sections[locale];
   }
 
   const format = await getFormatter();
@@ -69,6 +60,7 @@ export default async function ResumePage({
     month: "long",
   });
 
+  const sections = profile.sections[locale];
   const intro = profile.intro[locale];
   const highlights = profile.highlights[locale];
   const skills = profile.skills[locale];
@@ -157,6 +149,14 @@ export default async function ResumePage({
               </li>
             )}
             {profile.note?.[locale] && (
+              <li className="no-cjk-oblique font-serif italic text-fg-tertiary">
+                {profile.note[locale]}
+              </li>
+            )}
+          </ul>
+        </header>
+      </Reveal>
+
       {/* The prose — who, what I have built, how I work — each section's
           heading its own, in the author's words rather than a fixed slot. */}
       {sections.map((section, i) => (
@@ -170,14 +170,6 @@ export default async function ResumePage({
           </div>
         </ResumeSection>
       ))}
-
-              <li className="no-cjk-oblique font-serif italic text-fg-tertiary">
-                {profile.note[locale]}
-              </li>
-            )}
-          </ul>
-        </header>
-      </Reveal>
 
       {(intro.length > 0 || highlights.length > 0) && (
         <ResumeSection index={next()} title={t("summaryTitle")}>

@@ -1,9 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
-import { NotFoundStage } from "@/components/notfound/NotFoundStage";
 import { htmlLang } from "@/i18n/routing";
 import { site } from "@/config/site";
+
+/**
+ * Split off on purpose. A segment's not-found boundary is bundled with its
+ * layout so a 404 can render without another round trip — which put the
+ * stage's particle canvas, its peelable sticker and the whole of
+ * `gsap-extras` (Draggable, Inertia, ScrambleText, CustomWiggle) into the
+ * JavaScript of every page on the site, for a page almost nobody reaches.
+ * The stage still renders on the server, so the 404 is complete HTML; only
+ * its script arrives on demand.
+ */
+const NotFoundStage = dynamic(
+  () => import("@/components/notfound/NotFoundStage").then((m) => m.NotFoundStage)
+);
 
 /**
  * The `notFound()` boundary inside a locale.

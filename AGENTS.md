@@ -38,9 +38,17 @@ Failures resolve to `null` and the badge is simply absent.
 # Architecture
 
 - **Routing**: public pages live under `src/app/[locale]/` (locales `zh`/`en`,
-  default `zh`, `localePrefix: "always"`). `/admin` sits *outside* the locale
-  tree and is a browser-based editor for all content; admin sessions are
-  jose-signed JWTs.
+  default `zh`, `localePrefix: "always"`). Every page starts with
+  `const locale = await pageLocale(params)` (`src/i18n/page.ts`): it 404s an
+  unknown locale and calls `setRequestLocale` — skip it and the page quietly
+  turns dynamic. `/admin` sits *outside* the locale tree and is a
+  browser-based editor for all content; admin sessions are jose-signed JWTs.
+- **Client messages**: the layout hands `NextIntlClientProvider` only the
+  namespaces in `CLIENT_NAMESPACES` (`src/lib/messages.ts`); without the cut
+  every page carried the whole catalogue in its RSC payload. A client
+  component that reads a new namespace with `useTranslations` must add it
+  there — `messages.test.ts` scans the source and fails otherwise. Server
+  components read everything through `getTranslations` as before.
 - **`src/proxy.ts` is the middleware** (Next 16's name for it). It must handle
   `/admin` and return *before* the next-intl middleware runs, or `/admin` gets
   locale-redirected to a route that doesn't exist. Its session check is
@@ -55,7 +63,8 @@ Failures resolve to `null` and the badge is simply absent.
   validation (`validKey`, `validDate`, `validLink`, …) live in
   `src/lib/forms.ts`, where they are unit-tested — add a rule there, not
   inline. The "new" forms send `isNew`, and the action then refuses an
-  existing key instead of upserting over it.
+  existing key instead of upserting over it — for the tables saved by `key`
+  that is `upsertKeyed(table, row, isNew)` in the same file.
 - **Error boundaries**: `src/app/[locale]/error.tsx` (a page failing at
   request time — a cold database on an uncached path), `src/app/global-error.tsx`
   (the layout itself), `src/app/admin/error.tsx`. Keep them dependency-free;
@@ -75,6 +84,12 @@ Failures resolve to `null` and the badge is simply absent.
   GSAP's clock (`gsap.ticker` drives `lenis.raf`).
 - **3D**: `/intro` uses @react-three/fiber + drei; the `/about` workbench is
   imperative three.js.
+- **Static assets under `IMMUTABLE_PATHS`** (`next.config.ts`) — the Yozai
+  font slices included — are cached for a year: never overwrite one in
+  place, give a regenerated file (or a re-split font) a new name or folder.
+  Only `src/app/[locale]/not-found.tsx` loads its stage through
+  `next/dynamic`; a not-found boundary is bundled with its layout, so
+  anything it imports statically ships with every page.
 - **Front door and music**: the home page opens with `NeonSplash` once per
   session, on a hard landing only — decided before first paint by the inline
   script in `src/lib/splash.ts` (`<html data-splash>`), which is also what

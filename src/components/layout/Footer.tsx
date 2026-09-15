@@ -72,7 +72,10 @@ export function Footer({ items }: { items: NavLink[] }) {
                 className="inline-flex flex-wrap items-center gap-x-5 gap-y-1"
               >
                 {cluster.items.map((item) => (
-                  <Link key={item.href} href={item.href} className={linkClass}>
+                  // No viewport prefetch: eleven routes' payloads fetched on
+                  // every page for a row of links almost nobody scrolls to.
+                  // A hover still prefetches, so a click stays instant.
+                  <Link key={item.href} href={item.href} prefetch={false} className={linkClass}>
                     {tNav(item.labelKey)}
                   </Link>
                 ))}

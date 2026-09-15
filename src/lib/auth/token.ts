@@ -37,7 +37,9 @@ export async function readSession(
 ): Promise<Session | null> {
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret());
+    // The one algorithm this site signs with; anything else in a token's
+    // header is refused before the signature is even checked.
+    const { payload } = await jwtVerify(token, secret(), { algorithms: ["HS256"] });
     return payload.sub === "admin" ? { sub: payload.sub } : null;
   } catch {
     return null;

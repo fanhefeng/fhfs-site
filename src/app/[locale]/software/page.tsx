@@ -1,7 +1,5 @@
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { getApps } from "@/lib/content";
 import { getLatestReleases } from "@/lib/github";
 import { sectionMetadata } from "@/lib/seo";
@@ -22,9 +20,7 @@ export const generateMetadata = sectionMetadata("software", "/software");
  * that page is gone, and this is the one shelf everything made stands on.
  */
 export default async function SoftwarePage({ params }: PageProps<"/[locale]/software">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  const locale = await pageLocale(params);
   const t = await getTranslations("software");
 
   const rows = await getApps();

@@ -1,8 +1,6 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { hasLocale } from "next-intl";
-import { setRequestLocale, getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getTranslations } from "next-intl/server";
+import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { sectionMetadata } from "@/lib/seo";
 import { IDOLS } from "@/components/idols/entries";
@@ -12,9 +10,7 @@ export const generateMetadata = sectionMetadata("idols", "/idols");
 
 /** The wall: one card per idol, the picture large and the name under it. */
 export default async function IdolsPage({ params }: PageProps<"/[locale]/idols">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
+  await pageLocale(params);
   const t = await getTranslations("idols");
 
   return (

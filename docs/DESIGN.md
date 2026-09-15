@@ -448,6 +448,46 @@
 >   隐喻只留纸、灯、贴纸三样——森林是封面画，霓虹只做大门、音乐开关与站标，房间的说法只在
 >   「生活」一翼里出现。
 
+> **2026-09-15 补记（整体优化：先量再改，只改量得出来的）**，覆盖上文与之相悖的句子：
+> - **量法**：`pnpm build && pnpm start`，浏览器里按 `performance.getEntriesByType("resource")` 分类求和
+>   `encodedBodySize`（压缩后字节），HTML 用 `curl -H 'Accept-Encoding: gzip, br'` 看 `size_download`。
+>   改前 /zh/blog：HTML 30 KB、JS 356 KB / 29 个、CSS 122 KB / 3 个、字体 991 KB / 33 个、链接预取
+>   148 KB / 47 次；一个空白路由（/zh/lab/grove）HTML 也有 27.6 KB。
+> - **整本翻译文案不再随每页下发**：`NextIntlClientProvider` 不传 `messages` 时会把 `getRequestConfig`
+>   合并后的整本目录（19 KB JSON，转义后更大）塞进每一页的 RSC 载荷，也塞进每一次预取。现在 layout 用
+>   `pick(await getMessages(), CLIENT_NAMESPACES)` 只给客户端组件真正 `useTranslations` 的 11 个命名空间
+>   （`src/lib/messages.ts`）；`messages.test.ts` 扫描 `src` 里所有 `useTranslations("…")` 调用，漏一个
+>   命名空间测试就红，而不是等浏览器报 MISSING_MESSAGE。服务端组件照旧 `getTranslations` 读全本。
+>   **新加客户端组件读新命名空间，先把它加进 `CLIENT_NAMESPACES`。**
+> - **404 边界拆包**：段的 `not-found.tsx` 与 layout 打在一起，于是 `NotFoundStage`（粒子画布、可撕贴纸）
+>   连同整份 `gsap-extras`（Draggable / Inertia / ScrambleText / CustomWiggle）进了每一页的 JS。
+>   改为 `next/dynamic` 按需加载，SSR 照旧输出完整 404。§1.5 里「gsap-extras 只由用到的组件引入」的
+>   规矩这才真正成立。
+> - **Noto Sans SC / Noto Serif SC 网络字体删除**（覆盖 §1.2）：两份 next/font 声明各生成 120 / 102 条
+>   `@font-face`，两个 CSS 文件 67 KB（压缩后）每页必载，而实测没有一页真的下载过一个 Noto 切片——Yozai
+>   覆盖 GB2312，Apple 上 PingFang 兜底。字体栈只留系统字：`"PingFang SC", "Hiragino Sans GB",
+>   "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC"`；衬线 `"Songti SC", "SimSun",
+>   "Noto Serif CJK SC", "Source Han Serif SC"`（Windows 的衬线点缀从此落在 SimSun 上）。OG 图不受
+>   影响（`lib/og.ts` 构建期另拉 Google Noto）。
+> - **Yozai 切片加 immutable 缓存头**（`next.config` 的 `IMMUTABLE_PATHS` 加 `/fonts/:path*`）：此前每次访问
+>   都要为三五十个切片各发一次条件请求。规矩：**重新切片要换文件夹名**，不能原地覆盖。
+> - **页脚与全屏菜单的链接 `prefetch={false}`**：全屏菜单在每一页的 DOM 里（隐藏），隐藏的链接在预取器
+>   眼里照样「在视口内」；连页脚十一条在内，每页一进来就预取二十多条路由。悬停仍会预取，点击不慢。
+> - **改后** /zh/blog：HTML 15 KB、JS 298 KB / 21 个、CSS 55 KB / 2 个、预取 80 KB / 35 次；
+>   /zh/lab/grove HTML 14.8 KB；首页预取 99 KB → 31 KB。字体没动（见下）。
+> - **仍然最大、这次没动的一项：Yozai 本身**。一页要 31–53 个切片、1–2 MB（首访，之后有缓存），因为切片是按
+>   GB2312 码位顺序（一级字按拼音）切的，常用字散在所有切片里。按字频重切（cn-font-split 默认策略，
+>   常用字集中在前几片）估计能把一页的切片数压到十个上下；需要 Yozai 400 / 500 的源字体与重切工具链，
+>   输出进新文件夹（缓存头的规矩），另开一轮做。另一个更狠的选项——去掉 500 字重、标题合成加粗——
+>   会改变标题的样子，是设计决定，没有替用户做。
+> - **健壮性与简洁**：`jwtVerify` 限定 `algorithms: ["HS256"]`；十七个页面开头的
+>   `hasLocale + notFound + setRequestLocale` 三行收进 `src/i18n/page.ts` 的 `pageLocale(params)`
+>   （返回值已是窄化的 `Locale`，漏掉 `setRequestLocale` 让页面悄悄变动态的事从此不可能）；
+>   `admin/actions.ts` 六处一模一样的「新建不覆盖 / 编辑即 upsert」块收成 `upsertKeyed(table, row, isNew)`
+>   （996 → 926 行）；简历打印样式加 `orphans / widows: 3`。审过没改的：`RouteTransition` 状态机与兜底、
+>   `scrollLock` 契约、`Jukebox` 的 Spotify → 网易云退路、`SmoothScroll` 的 ResizeObserver、登录限流、
+>   `db-import` 的批处理——都立得住。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：

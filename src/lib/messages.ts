@@ -6,6 +6,44 @@
 
 export type Messages = Record<string, unknown>;
 
+/**
+ * The namespaces client components read through `useTranslations` — and
+ * therefore the only ones the layout hands to `NextIntlClientProvider`.
+ *
+ * Without the cut, the provider inherits the whole catalogue and every page
+ * carries all of it in its RSC payload: the ten lab studies, the idol's
+ * timeline, the film's stills, the résumé labels — 19 KB of JSON escaped
+ * into the HTML of a page that renders none of it, and again inside every
+ * prefetched route. Server components keep reading the full catalogue
+ * through `getTranslations`; this list is only what has to cross the wire.
+ *
+ * A namespace missing from here fails loudly (a MISSING_MESSAGE error in the
+ * browser), and `messages.test.ts` scans `src` for every `useTranslations`
+ * call so the list cannot drift behind a new component.
+ */
+export const CLIENT_NAMESPACES = [
+  "about",
+  "blog",
+  "common",
+  "error",
+  "footer",
+  "home",
+  "moments",
+  "nav",
+  "notFound",
+  "secrets",
+  "software",
+] as const;
+
+/** The catalogue cut down to `namespaces` — a namespace it lacks is skipped. */
+export function pick(messages: Messages, namespaces: readonly string[]): Messages {
+  const out: Messages = {};
+  for (const namespace of namespaces) {
+    if (namespace in messages) out[namespace] = messages[namespace];
+  }
+  return out;
+}
+
 function isPlainObject(value: unknown): value is Messages {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
