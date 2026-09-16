@@ -51,7 +51,7 @@ export default async function MomentsAdminPage() {
     .orderBy(desc(moments.postedAt), asc(moments.key));
 
   return (
-    <AdminChrome title="说说 · 多的是你不知道的事">
+    <AdminChrome title="说说 · 峰言疯语">
       <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
         一条说说就是几行字和一个时间。时间按上海时间写到分钟；「原创」选 no 的会显示成摘录，并带上出处。
         前 242 条是从一言 App 搬来的，来源标记为 yiyan。

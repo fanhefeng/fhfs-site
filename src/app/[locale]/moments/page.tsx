@@ -11,15 +11,15 @@ import { MomentBoard } from "@/components/moments/MomentBoard";
 export const generateMetadata = sectionMetadata("moments", "/moments");
 
 /**
- * 《多的是你不知道的事》— the board. A 720px column like the rest of the
- * issue, and its own record on: the song the page is named after plays
- * while the reader is here (`RoomMusic`). The instants are formatted here,
- * in the site's zone, so the board never has to know what a Date is.
+ * 峰言疯语 — the board. A 720px column like the rest of the issue, and its own
+ * record on while the reader is here (`RoomMusic`): Lovely Day, which is
+ * about the mood of the page rather than its name. The instants are formatted
+ * here, in the site's zone, so the board never has to know what a Date is.
  */
 export default async function MomentsPage({ params }: PageProps<"/[locale]/moments">) {
   await pageLocale(params);
   const t = await getTranslations("moments");
-  const tt = await getTranslations("tracks.unknown");
+  const tt = await getTranslations("tracks.lovely");
   const tc = await getTranslations("common");
 
   const rows = await getMoments();
@@ -49,7 +49,7 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
           </p>
         )}
         <RoomMusic
-          track="unknown"
+          track="lovely"
           tonight={tc("tonight")}
           title={tt("title")}
           artist={tt("artist")}
