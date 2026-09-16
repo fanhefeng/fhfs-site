@@ -94,7 +94,16 @@ export default async function ResumePage({
 
       <Reveal as="section">
         <header>
-          <div className="flex items-start justify-between gap-6">
+          {/* 简历 is a page of 关于, not a door of its own — so it says where
+              it sits and leads back there. Off the printed sheet: paper has
+              no back. */}
+          <Link
+            href="/about"
+            className={`${metaLabel} hit-ext inline-flex min-h-11 items-center hover:text-accent print:hidden`}
+          >
+            ← {t("backToAbout")}
+          </Link>
+          <div className="mt-4 flex items-start justify-between gap-6">
             <p className={metaLabel}>{t("title")}</p>
             <PrintButton label={t("print")} ariaLabel={t("printAria")} />
           </div>

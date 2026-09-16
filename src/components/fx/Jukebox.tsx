@@ -3,26 +3,23 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { jukebox, reportGesture, reportPlayback, useJukebox } from "@/lib/jukebox";
-import { TRACKS, type TrackId } from "@/lib/tracks";
+import { trackFile, trackStandIn, trackUri, type TrackId } from "@/lib/tracks";
 
 /** Which records exist, and where — `lib/tracks`. The store says which is on. */
-const spotifyUri = (track: TrackId) => `spotify:track:${TRACKS[track].spotify}`;
 const PLAYER_W = 320;
 const PLAYER_H = 152;
 
 /**
  * The stand-in when Spotify cannot be reached at all (its host is reset from
  * some networks, mainland China's among them): NetEase Cloud Music's own
- * embed of whatever version of the record streams there without a login —
- * for the theme, Hurwitz's 10th-anniversary re-recording; for the two songs,
- * a piano rendition (`lib/tracks` says which, and the room says so on the
- * page). The embed has no remote, so it is mounted with the music wanted and
- * unmounted without, and only ever mounted with autoplay once the reader has
- * touched the page, which is when a browser would allow it.
+ * embed of whatever version of the record streams there without a login — a
+ * piano rendition for each of the three songs (`lib/tracks` says which, and
+ * the room says so on the page). The embed has no remote, so it is mounted
+ * with the music wanted and unmounted without, and only ever mounted with
+ * autoplay once the reader has touched the page, which is when a browser
+ * would allow it. The theme needs none of this: it is our own file.
  */
 const NETEASE_H = 86;
-const neteaseSrc = (track: TrackId) =>
-  `https://music.163.com/outchain/player?type=2&id=${TRACKS[track].netease}&auto=1&height=66`;
 /** How long to wait for Spotify's script before giving up on it. */
 const SPOTIFY_TIMEOUT = 12_000;
 
@@ -100,21 +97,28 @@ type Deck = {
   /** A restart has been asked for and the position has not come back round yet. */
   restarting: boolean;
   /** The record the embed was built with, or last told to load. */
-  track: TrackId;
+  track: TrackId | null;
 };
 
 /**
  * The record player behind the wall.
  *
- * Mounted once in the locale layout and never seen: a Spotify embed with its
- * remote, parked in the corner at opacity 0, playing whatever the signs ask
- * for (`lib/jukebox`). It is not loaded until the first sign lights — a
- * reader who never touches one never fetches Spotify's player — and from
- * then on it follows `wanted`: play or resume when it goes up, pause when it
- * goes down, and start the tune over when it runs out. If the browser
- * refuses the first play (the reader has not touched the site yet), the
- * first click or key anywhere tries again. It follows `track` too: a room
- * that asks for its own record gets it through `loadUri`, from the top.
+ * Mounted once in the locale layout and never seen: whatever plays, plays
+ * from here, so the tune survives a route change. Which machine it uses
+ * depends on the record the signs ask for (`lib/jukebox`, `lib/tracks`):
+ *
+ * - **Our own file** (the theme): a plain `<audio loop>`, `preload="none"`
+ *   until someone actually wants music. No embed, no script, no network but
+ *   ours — and the whole recording, not a preview.
+ * - **A streamed record** (the three songs): a Spotify embed with its remote,
+ *   parked in the corner at opacity 0 and built the first time such a record
+ *   is wanted. It follows `wanted` — play or resume up, pause down — and
+ *   starts the tune over when it runs out. A room that asks for another
+ *   streamed record gets it through `loadUri`, from the top; walking back out
+ *   to the theme takes the embed down altogether.
+ *
+ * Either way, a browser refuses the first play until the reader has touched
+ * the page, so the first click or key anywhere tries again.
  *
  * The box stays inside the viewport on purpose: browsers throttle the timers
  * of a cross-origin frame that has scrolled out of view, and the player's
@@ -124,11 +128,16 @@ type Deck = {
 export function Jukebox() {
   const t = useTranslations("common");
   const hostRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const { wanted, fallback, gestured, track } = useJukebox();
+  /** The file we serve ourselves for this record, if it is one of ours. */
+  const file = trackFile(track);
   /** The stand-in's URL while it is mounted; a re-render must never reload it. */
   const [fallbackSrc, setFallbackSrc] = useState<string | null>(null);
-  /** Spotify is being loaded or is loaded — a one-way latch. */
+  /** A streamed record has been wanted at least once — a one-way latch. */
   const [armed, setArmed] = useState(false);
+  /** Spotify's embed belongs on the page right now. */
+  const streaming = armed && !file && !fallback;
 
   const deck = useRef<Deck>({
     controller: null,
@@ -136,15 +145,18 @@ export function Jukebox() {
     playing: false,
     started: false,
     restarting: false,
-    track: "theme",
+    track: null,
   });
 
   // Browsers only let a page make sound once the reader has touched it.
   useEffect(() => {
     const onGesture = () => {
       reportGesture();
+      if (!jukebox().wanted) return;
+      const el = audioRef.current;
+      if (el?.paused) void el.play().catch(() => {});
       const d = deck.current;
-      if (jukebox().wanted && d.ready && d.controller && !d.playing) {
+      if (d.ready && d.controller && !d.playing) {
         if (d.started) d.controller.resume();
         else d.controller.play();
       }
@@ -157,15 +169,48 @@ export function Jukebox() {
     };
   }, []);
 
-  // The first time music is wanted, the player is fetched.
+  // The first time a streamed record is wanted, the player is fetched. Our
+  // own file needs nothing fetched, so a reader who only ever hears the theme
+  // never loads Spotify's script at all.
   useEffect(() => {
-    if (wanted) setArmed(true);
-  }, [wanted]);
+    if (wanted && !file) setArmed(true);
+  }, [wanted, file]);
+
+  /* ---- Our own file ---- */
+
+  // What the element reports is what the rest of the site believes: a play
+  // the browser refused never fires `play`, so `playing` stays false and the
+  // sign stays unlit until the gesture handler above gets it going.
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    const onPlay = () => reportPlayback({ playing: true });
+    const onStop = () => reportPlayback({ playing: false });
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onStop);
+    el.addEventListener("error", onStop);
+    return () => {
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onStop);
+      el.removeEventListener("error", onStop);
+      el.pause();
+      reportPlayback({ playing: false });
+    };
+  }, [file]);
+
+  // The switch, for our file: `loop` keeps it going, so there is nothing to
+  // restart and nothing to resume — the element remembers its position.
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (wanted) void el.play().catch(() => {});
+    else el.pause();
+  }, [wanted, file]);
 
   /* ---- Spotify ---- */
   useEffect(() => {
     const host = hostRef.current;
-    if (!armed || fallback || !host) return;
+    if (!streaming || !host) return;
     let disposed = false;
     // Spotify took too long: the stand-in is up, and a late arrival is ignored.
     let gaveUp = false;
@@ -190,9 +235,13 @@ export function Jukebox() {
         window.clearTimeout(timer);
         if (disposed || gaveUp) return;
         // Built with whatever record is on right now — a reader who lands
-        // straight in a room gets that room's song, not the theme first.
+        // straight in a room gets that room's song, not the one they last
+        // heard. If the record has become one of ours in the meantime, this
+        // effect is already on its way out; there is nothing to build.
+        const uri = trackUri(jukebox().track);
+        if (!uri) return;
         d.track = jukebox().track;
-        api.createController(mount, { uri: spotifyUri(d.track), width: PLAYER_W, height: PLAYER_H }, (controller) => {
+        api.createController(mount, { uri, width: PLAYER_W, height: PLAYER_H }, (controller) => {
           if (disposed) {
             controller.destroy();
             return;
@@ -201,10 +250,12 @@ export function Jukebox() {
           controller.addListener("ready", () => {
             d.ready = true;
             // The record may have changed while the embed was being built.
-            if (jukebox().track !== d.track) {
-              d.track = jukebox().track;
+            const now = jukebox().track;
+            const nowUri = trackUri(now);
+            if (nowUri && now !== d.track) {
+              d.track = now;
               d.started = false;
-              controller.loadUri(spotifyUri(d.track));
+              controller.loadUri(nowUri);
             }
             if (jukebox().wanted) controller.play();
           });
@@ -246,22 +297,26 @@ export function Jukebox() {
       d.ready = false;
       d.playing = false;
       d.started = false;
+      d.track = null;
       reportPlayback({ playing: false });
       host.replaceChildren();
     };
-  }, [armed, fallback]);
+  }, [streaming]);
 
-  // The record, for Spotify: a room asking for its own song swaps it in from
-  // the top. `loadUri` does not start playback by itself, so the switch
-  // below sees a stopped deck and plays it if the music is wanted.
+  // The record, for Spotify: a room asking for another streamed song swaps it
+  // in from the top. `loadUri` does not start playback by itself, so the
+  // switch below sees a stopped deck and plays it if the music is wanted. A
+  // record of ours is not Spotify's business — the embed has come down with
+  // `streaming` by the time this runs.
   useEffect(() => {
     const d = deck.current;
-    if (!d.ready || !d.controller || d.track === track) return;
+    const uri = trackUri(track);
+    if (!uri || !d.ready || !d.controller || d.track === track) return;
     d.track = track;
     d.started = false;
     d.playing = false;
     d.restarting = false;
-    d.controller.loadUri(spotifyUri(track));
+    d.controller.loadUri(uri);
     if (jukebox().wanted) d.controller.play();
   }, [track]);
 
@@ -283,16 +338,23 @@ export function Jukebox() {
   // change of record is a change of URL, i.e. a remount: the embed has no
   // other way to be told.
   useEffect(() => {
-    if (!fallback) return;
-    const up = wanted && gestured;
-    setFallbackSrc(up ? neteaseSrc(track) : null);
+    if (!fallback || file) {
+      setFallbackSrc(null);
+      return;
+    }
+    const src = trackStandIn(track);
+    const up = wanted && gestured && !!src;
+    setFallbackSrc(up ? src : null);
     reportPlayback({ playing: up });
-  }, [fallback, wanted, gestured, track]);
+  }, [fallback, wanted, gestured, track, file]);
 
   return (
     <div className="jukebox" aria-hidden="true" inert>
       <style href="fx-jukebox" precedence="low">{CSS}</style>
-      {fallback ? (
+      {file ? (
+        // eslint-disable-next-line jsx-a11y/media-has-caption -- an instrumental, and this player is not a control
+        <audio ref={audioRef} src={file} loop preload="none" />
+      ) : fallback ? (
         fallbackSrc && (
           <iframe
             title={t("musicTitle")}

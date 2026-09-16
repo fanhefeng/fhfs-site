@@ -20,6 +20,8 @@ const IMMUTABLE_PATHS = [
   "/lab/neon/:path*",
   "/idols/:path*",
   "/films/:path*",
+  // The theme, three megabytes of it: re-encoding goes into a new file name.
+  "/music/:path*",
 ];
 
 const nextConfig: NextConfig = {

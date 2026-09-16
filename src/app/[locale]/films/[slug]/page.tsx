@@ -44,10 +44,14 @@ function paragraphs(t: Translator, stem: string): string[] {
 
 /**
  * One film, one room. The movements: the title and who made it, with the
- * film's own record going on at the door (`RoomMusic`); the facts; the story;
- * the parts, for a film released in two; what I make of it; the lines
+ * film's own record going on at the door (`RoomMusic`); the facts; the story,
+ * one paragraph of it; the parts, for a film released in two; the lines
  * everyone remembers; the stills. A wide page (1040px) for the pictures, the
  * text at 720px like the rest.
+ *
+ * There is no review movement: a page about a film people have seen is for
+ * the film, not for an essay about it — the story says what it is, the lines
+ * and the stills do the rest.
  */
 export default async function FilmPage({ params }: PageProps<"/[locale]/films/[slug]">) {
   const locale = await pageLocale(params);
@@ -66,7 +70,6 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
     alt: tf(`stills.${still.id}.alt`),
   }));
   const story = paragraphs(tf, "story");
-  const review = paragraphs(tf, "review");
   const backToIndex = (
     <Link
       href="/films"
@@ -151,23 +154,6 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
           </Reveal>
         </section>
       )}
-
-      {/* What I make of it. */}
-      <section aria-labelledby="film-review" className="mb-24 max-w-[720px]">
-        <Reveal className="mb-8">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("reviewKicker")}</p>
-          <h2 id="film-review" className="mt-3 text-title">
-            {tf("reviewTitle")}
-          </h2>
-        </Reveal>
-        <Reveal as="div" stagger={0.08} className="space-y-5">
-          {review.map((paragraph, i) => (
-            <p key={i} className="max-w-[60ch] text-body text-fg-secondary">
-              {paragraph}
-            </p>
-          ))}
-        </Reveal>
-      </section>
 
       {/* The lines. */}
       <section aria-labelledby="film-lines" className="mb-24 max-w-[720px]">
