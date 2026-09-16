@@ -37,7 +37,6 @@ export default async function SecretsPage({ params }: PageProps<"/[locale]/secre
           tonight={tc("tonight")}
           title={tt("title")}
           artist={tt("artist")}
-          fallbackArtist={tt("fallbackArtist")}
           className="mt-6"
         />
       </Reveal>

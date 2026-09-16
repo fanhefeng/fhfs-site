@@ -26,28 +26,19 @@
   "tracks": {
     "theme": {
       "title": "Mia & Sebastian's Theme",
-      "artist": "Justin Hurwitz · La La Land OST (2016)",
-      "fallbackArtist": "Justin Hurwitz · La La Land OST (2016)"
+      "artist": "Justin Hurwitz · La La Land OST (2016)"
     },
     "lovely": {
       "title": "Lovely Day",
-      "artist": "Bill Withers (1977)",
-      "fallbackArtist": "Bill Withers (1977)"
-    },
-    "unknown": {
-      "title": "你不知道的事 · All the Things You Never Knew",
-      "artist": "Leehom Wang · theme of Love in Disguise (2010)",
-      "fallbackArtist": "piano rendition · NetEase Cloud Music (the original there needs a subscription)"
+      "artist": "Jurrivh"
     },
     "secret": {
       "title": "路小雨 · Lu Xiaoyu",
-      "artist": "Jay Chou · from the soundtrack of Secret (2007)",
-      "fallbackArtist": "Jay Chou · from the soundtrack of Secret (2007)"
+      "artist": "Jay Chou · from the soundtrack of Secret (2007)"
     },
     "odyssey": {
       "title": "一生所愛 · The Love of My Life",
-      "artist": "Lowell Lo · closing song of A Chinese Odyssey Part Two (1995)",
-      "fallbackArtist": "Lowell Lo · closing song of A Chinese Odyssey Part Two (1995)"
+      "artist": "Lowell Lo · closing song of A Chinese Odyssey Part Two (1995)"
     }
   },
   "splash": {
@@ -645,7 +636,6 @@
     "loaderAria": "Turning on the lights",
     "musicPlay": "Play the background music",
     "musicPause": "Stop the background music",
-    "musicTitle": "Background music player",
     "tonight": "Tonight · on the stand"
   },
   "error": {

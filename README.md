@@ -29,7 +29,7 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
 - **/moments** —— 「峰言疯语」（栏目名取自「疯言疯语」，头一个疯换成名字里的峰；英文名
   Peak Talk）：QQ 空间式的说说板，几行字加一个时间，按年排、按文集筛。条目本身照旧叫说说。
   头 242 条是从一言 App 搬来的两本文集（峰言疯语 / 默认文集），进这一页放 Lovely Day
-  （Bill Withers，1977）。
+  （Jurrivh）。
 - **/secrets** —— 《不能说的秘密》：不属于手札的随笔与播客，目录页 + 单篇页，播客带浏览器
   原生播放器；进这一页放原声带里的《路小雨》（周杰伦），播客单篇不放。
 - **/idols** —— 偶像墙，第一位科比：一尊用代码搭的 81 分铜像（R3F，可拖着转）、十二张
@@ -129,8 +129,7 @@ pnpm db:studio   # 表格界面
   `lib/jukebox.ts` 是它的 store），开关是招牌本身和灵动岛上的音符。门口这首 Mia & Sebastian's
   Theme（Justin Hurwitz，《爱乐之城》原声，2016）**自托管**在
   `public/music/mia-and-sebastians-theme.mp3`——一个 `<audio loop preload="none">` 直接放，
-  3 分 19 秒整首，不嵌任何第三方播放器，也没有 Spotify 未登录访客那 30 秒试听的限制，
-  大陆网络照样能听。文件由本地 320kbps 源（8.0MB）经
+  3 分 19 秒整首，不嵌任何第三方播放器，大陆网络照样能听。文件由本地 320kbps 源（8.0MB）经
   `ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100` 重编码到 2.8MB（约 112kbps VBR）；
   `/music/:path*` 在 `next.config.ts` 里按 immutable 缓存一年，重编码要换新文件名。
   六张剧照 `public/lab/neon/`（1800px JPEG）取自 TMDB 收录的片方宣传剧照，
@@ -142,16 +141,16 @@ pnpm db:studio   # 表格界面
   `MY_TEXT_CARD_DBITEM` 表得到全文、发布时间（北京时间）、所属文集、是否原创与出处，
   写进 `backup/db.json` 的 `moments` 后 `db:import`。`key` 为 `yiyan-<卡片 id>`，
   `source` 标 `yiyan`。
-- 背景音乐的唱片登记在 `src/lib/tracks.ts`，分两种。**自托管的四首**（`public/music/`，
-  都由本地无损 / 320kbps 源经 `ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100`
-  重编码，约 110–125kbps VBR）：门口的 Mia & Sebastian's Theme（3:19，2.8MB）、/moments 的
-  Lovely Day（Bill Withers 1977，4:01，3.7MB）、/films/odyssey 的《一生所爱》（卢冠廷 1995
-  原版，4:28，4.0MB）、/secrets 与 /films/secret 的《路小雨》（周杰伦，《不能说的秘密》原声带
-  里的钢琴曲，1:37，1.3MB；源 flac 尾部 3.2 秒静音已裁掉并加 0.8 秒淡出，否则循环时会空一拍）。
-  **流媒体那条路**（Spotify iFrame API + 网易云外链退路）暂时没有唱片在用：《你不知道的事》
-  还登记着，但自从峰言疯语换成 Lovely Day 就没有房间放它——代码与登记都留着，给下一首没有
-  文件的歌。房间里印的曲名一律是实际在放的那份录音——所以《不能说的秘密》那间房写的是
-  《路小雨》，不是同名主题曲。
+- 背景音乐的四张唱片登记在 `src/lib/tracks.ts`，**全部自托管**在 `public/music/`，都由本地
+  无损 / 320kbps 源经 `ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100` 重编码
+  （约 110–125kbps VBR）：门口的 Mia & Sebastian's Theme（3:19，2.8MB）、/moments 的
+  Lovely Day（Jurrivh，4:01，3.7MB）、/films/odyssey 的《一生所爱》（卢冠廷 1995 原版，
+  4:28，4.0MB）、/secrets 与 /films/secret 的《路小雨》（周杰伦，《不能说的秘密》原声带里的
+  钢琴曲，1:37，1.3MB；源 flac 尾部 3.2 秒静音已裁掉并加 0.8 秒淡出，否则循环时会空一拍）。
+  播放器因此只有一条路：一个 `<audio loop preload="none">`。**Spotify iFrame API + 网易云
+  外链退路那一整套已于 2026-09-16 退役**（连同《你不知道的事》这张唱片、`fallback` 状态和
+  `RoomMusic` 的替身署名）——要放回没有文件的歌，得把两条路一起请回来。房间里印的曲名一律是
+  实际在放的那份录音——所以《不能说的秘密》那间房写的是《路小雨》，不是同名主题曲。
 - /idols/kobe 的十二张照片取自 Wikimedia Commons（2005 – 2024），每张的作者与许可
   （公有领域 / CC BY 2.0 / CC BY-SA 2.0、3.0 / CC0）列在 `src/components/idols/kobePhotos.ts`
   并印在图下，链接回 Commons 的文件页；1600px 长边重编码放在 `public/idols/kobe/`。

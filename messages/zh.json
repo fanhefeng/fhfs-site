@@ -26,28 +26,19 @@
   "tracks": {
     "theme": {
       "title": "Mia & Sebastian's Theme",
-      "artist": "Justin Hurwitz · 《爱乐之城》原声（2016）",
-      "fallbackArtist": "Justin Hurwitz · 《爱乐之城》原声（2016）"
+      "artist": "Justin Hurwitz · 《爱乐之城》原声（2016）"
     },
     "lovely": {
       "title": "Lovely Day",
-      "artist": "Bill Withers（1977）",
-      "fallbackArtist": "Bill Withers（1977）"
-    },
-    "unknown": {
-      "title": "你不知道的事",
-      "artist": "王力宏 · 电影《恋爱通告》主题曲（2010）",
-      "fallbackArtist": "钢琴版 · 网易云音乐（原唱王力宏，原版在那里要会员才能听）"
+      "artist": "Jurrivh"
     },
     "secret": {
       "title": "路小雨",
-      "artist": "周杰伦 · 电影《不能说的秘密》原声带（2007）",
-      "fallbackArtist": "周杰伦 · 电影《不能说的秘密》原声带（2007）"
+      "artist": "周杰伦 · 电影《不能说的秘密》原声带（2007）"
     },
     "odyssey": {
       "title": "一生所爱",
-      "artist": "卢冠廷 · 电影《大话西游之大圣娶亲》片尾曲（1995）",
-      "fallbackArtist": "卢冠廷 · 电影《大话西游之大圣娶亲》片尾曲（1995）"
+      "artist": "卢冠廷 · 电影《大话西游之大圣娶亲》片尾曲（1995）"
     }
   },
   "splash": {
@@ -645,7 +636,6 @@
     "loaderAria": "正在开灯",
     "musicPlay": "放背景音乐",
     "musicPause": "停掉背景音乐",
-    "musicTitle": "背景音乐播放器",
     "tonight": "今晚 · 台上放的是"
   },
   "error": {

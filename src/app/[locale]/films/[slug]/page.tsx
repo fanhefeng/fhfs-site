@@ -96,7 +96,6 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
           tonight={tc("tonight")}
           title={tt("title")}
           artist={tt("artist")}
-          fallbackArtist={tt("fallbackArtist")}
           className="mt-6"
         />
       </Reveal>

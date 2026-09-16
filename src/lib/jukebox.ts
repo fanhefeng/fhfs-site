@@ -8,8 +8,8 @@ import { DEFAULT_TRACK, type TrackId } from "./tracks";
  * switch for the same music, and the player itself (`components/fx/Jukebox`)
  * lives in the locale layout so the tune survives a route change.
  *
- * Signs write `wanted`; the player reads it and reports back `playing` and
- * `fallback`. Rooms write `track` — the board and the secrets each play the
+ * Signs write `wanted`; the player reads it and reports back `playing`.
+ * Rooms write `track` — the board and the secrets each play the
  * song they are named after, and hand the theme back on the way out. Nothing
  * here touches the DOM — the module is plain state, so the front door, the
  * lab study, the rooms and the note on the island all read the same snapshot
@@ -20,8 +20,6 @@ export type JukeboxState = {
   wanted: boolean;
   /** Sound is actually coming out (as far as the player can tell). */
   playing: boolean;
-  /** Spotify could not be had; the stand-in recording is in use. */
-  fallback: boolean;
   /** The reader has clicked or typed on the page: a browser will allow sound now. */
   gestured: boolean;
   /** Which record is on — see `lib/tracks`. */
@@ -38,7 +36,6 @@ export type JukeboxState = {
 const INITIAL: JukeboxState = {
   wanted: false,
   playing: false,
-  fallback: false,
   gestured: false,
   track: DEFAULT_TRACK,
   silenced: false,
@@ -94,6 +91,5 @@ export const roomStart = () => set({ wanted: true });
 export const roomStop = () => set({ wanted: false });
 
 /** For the player only. */
-export const reportPlayback = (patch: Pick<JukeboxState, "playing"> | Pick<JukeboxState, "fallback">) =>
-  set(patch);
+export const reportPlayback = (patch: Pick<JukeboxState, "playing">) => set(patch);
 export const reportGesture = () => set({ gestured: true });

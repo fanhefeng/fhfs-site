@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { jukebox, roomStart, roomStop, setTrack, useJukebox } from "@/lib/jukebox";
-import { DEFAULT_TRACK, trackFile, type TrackId } from "@/lib/tracks";
+import { jukebox, roomStart, roomStop, setTrack } from "@/lib/jukebox";
+import { DEFAULT_TRACK, type TrackId } from "@/lib/tracks";
 import { JukeboxSwitch } from "./JukeboxSwitch";
 
 type Props = {
@@ -11,9 +11,6 @@ type Props = {
   tonight: string;
   title: string;
   artist: string;
-  /** Who is playing when the stand-in is up — a different recording. Never
-   *  shown for a record we serve ourselves: that one has no stand-in. */
-  fallbackArtist: string;
   className?: string;
 };
 
@@ -33,10 +30,7 @@ type Props = {
  * on tonight, and the note to switch it — so the reader can see why the
  * music changed and can stop it right here.
  */
-export function RoomMusic({ track, tonight, title, artist, fallbackArtist, className = "" }: Props) {
-  const { fallback } = useJukebox();
-  /** Spotify is out *and* this record is one it was serving. */
-  const standIn = fallback && !trackFile(track);
+export function RoomMusic({ track, tonight, title, artist, className = "" }: Props) {
   /** Whether this room was the one that put the music on. */
   const startedHere = useRef(false);
 
@@ -64,7 +58,7 @@ export function RoomMusic({ track, tonight, title, artist, fallbackArtist, class
         <span aria-hidden="true"> · </span>
         <span className="text-fg-secondary normal-case tracking-normal">{title}</span>
         <span aria-hidden="true"> · </span>
-        <span className="normal-case tracking-normal">{standIn ? fallbackArtist : artist}</span>
+        <span className="normal-case tracking-normal">{artist}</span>
       </p>
     </div>
   );
