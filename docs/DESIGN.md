@@ -524,6 +524,66 @@
 > - **未做**：不做电影的分类筛选（两部片不需要）；不做豆瓣/IMDb 的实时抓取（分数写死，一年变不了
 >   0.1）；不做 justified 行或横向胶片带（理由见上）。
 
+> **2026-09-16 补记（门口那首歌改成自己的文件）**，覆盖 09-04 补记里「**不下载/自托管商业录音**」
+> 那句、以及它下面关于主题曲走 Spotify / 网易云退路的全部句子（三首房间曲不变）：
+> - **起因**：用户拿来一份本地的 Mia & Sebastian's Theme（320kbps、3'19"），要求把音源换成它。
+>   换来的是整首而不是 30s 试听、不必等 Spotify 的脚本、大陆网络不再走那条 12s 超时 → 网易云
+>   退路的路；代价是仓库里多 2.8MB 和一份自担的版权判断（站主自己的决定，只在门口这一首上）。
+> - **编码**：`ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100`，8.0MB → 2.8MB
+>   （约 112kbps VBR），落在 `public/music/mia-and-sebastians-theme.mp3`；`/music/:path*` 进
+>   `IMMUTABLE_PATHS`，所以**重编码要换新文件名**，不许原地覆盖。
+> - **唱片有了两种**（`lib/tracks.ts`）：`{ src }` 是自己服务的文件，`{ spotify, netease }` 是
+>   别人服务的流；`trackFile` / `trackUri` / `trackStandIn` 三个取数函数替掉了原来直接读字段的写法。
+> - **播放器**（`components/fx/Jukebox.tsx`）照唱片选机器：自家文件用一个 `<audio loop
+>   preload="none">`——`loop` 天然循环，省掉 Spotify 那套「提前 1.5s `restart()`」，暂停/继续就是
+>   元素自己的位置；`playing` 只认元素的 `play`/`pause`/`error` 事件，浏览器拒掉的那次自动播放
+>   不会点亮招牌，等 document 上第一次 `pointerdown`/`keydown` 再试（与流媒体那条路同一个处理）。
+>   Spotify 的 embed 只在**要放流媒体唱片时**才挂（`streaming = armed && !file && !fallback`）：
+>   只听门口这首的读者从头到尾不加载 Spotify 的脚本；走进房间才建，走回门口连 embed 一起拆掉
+>   （原来是留着 pause）——代价是再进房间要重建一次 controller，脚本已缓存，可接受。
+> - **替身文案**：`RoomMusic` 现在看的是「这首是不是流媒体」而非全局 `fallback`，自托管的唱片
+>   永远印原唱那一行。
+> - **验证**（headless Chrome + chrome-devtools MCP）：首页推门即放，mp3 走 206，`loop=true`、
+>   `duration=198.9`；开关能停能续（26.7s → 27.9s）；进 /moments 时 `<audio>` 卸载、Spotify host
+>   接手，回首页重新挂上从头放；控制台无错。
+> - 顺带改掉 `/lab/neon` 那则研究的 note：里面还写着「未登录 Spotify 只有 30 秒试听」「到不了就退回
+>   网易云」，与门口这首的实现已经不符，改成自托管那一版的说法（双语）。
+
+> **2026-09-16 补记（电影页去掉影评，只留简介与台词）**，覆盖同日「电影成栏目」补记里「一页的节奏」
+> 那一句：
+> - **起因**：用户说每部电影的点评文字太多，「只需要有个大致影片的简介，然后放一些经典台词」。
+> - **去掉**：整个影评乐章（`reviewKicker` / `reviewTitle` / `review1..n`，页面上的 section 连同
+>   `paragraphs(tf, "review")` 一起删）。节奏变成：片名与唱片 → 事实条 → 简介 → 上下两部（仅
+>   大话西游）→ 台词 → 剧照墙 → 署名。
+> - **简介收成一段**：原来两到三段（每段约 100 字）合成一段——大话西游讲到「戴上金箍就不能再有
+>   七情六欲，上下两部就是这一个选择」为止；不能说的秘密讲到「琴房要拆的那天他坐到琴前」为止，
+>   穿越的规则与结局不写进简介，留给台词和剧照。`story1..n` 的渲染保持多段能力，只是现在各只有一段。
+> - `films.subtitle`（列表页那句）删掉「几句我的看法」；README 的栏目清单同步。
+
+> **2026-09-16 补记（简历收进「关于」：灵动岛从六扇门回到五扇）**，覆盖 09-06 补记「/resume 进主导航」
+> 与 09-14 补记里「六扇常开的门」的句子：
+> - **起因**：用户说「简历也应该是关于的一部分，关于中全部是对于我的介绍」。于是 `me` 这一翼与
+>   `rooms` 那一翼同构：**关于是门，3D 自我介绍与简历是门后的页**，正如生活是门、说说 / 偶像 /
+>   电影是房间。
+> - **只动导航归属，不动地址**：`nav_items` 里 `/resume` 的 surfaces 去掉 `header`（`backup/db.json`
+>   改完 `pnpm db:import`）。URL、外链、SEO、`/admin` 的编辑路径全不变——这是当时三个选项里代价最小
+>   而语义已经足够的那个；搬成 `/about/resume` 要动 sitemap / hreflang / OG 且只换来地址上的层级，
+>   把简历正文并进 /about 则会毁掉它自己的分享地址与打印版。
+> - **代码一行没改就对了**：`lib/nav.ts` 的 `attachMembers` 把同组非门的行挂到前一扇门下，
+>   `isActiveDoor` 让门在成员页上高亮——所以撤下 header 的那一刻，全屏菜单里「简历」自动缩进到
+>   「关于」下面，灵动岛在 /resume 和 /intro 上高亮「关于」。这套规则本来就是为房间写的，这次
+>   原样吃到了作者这一翼。
+> - **关于页多了一节目录**（`meKicker` / `meTitle` / `meItems`）：照生活走廊的行式排版——编号、
+>   页名、一句话、一行 mono 的实数（3D 自我介绍印 `getIntroNodes()` 的站数，简历印经历条数与
+>   `updatedAt` 的月份）。成员读导航表（`group === "me" && !surfaces.includes("header")`），以后
+>   往 `me` 里加页会自己列出来。原来头部那两枚小胶囊（`introTitle` / `introLink` / `resumeTitle` /
+>   `resumeLink`）退役——库里 `copy_blocks` 还留着 `about.introTitle` / `about.introLink` 两行孤儿
+>   覆盖，等在 /admin 里删。
+> - **简历页首加一条「← 关于」**（`print:hidden`：纸上没有返回键）；/intro 的出口本来就有「关于」。
+> - **踩到的坑**：改完 `nav_items` 后 dev 仍旧显示六扇门，`rm -rf .next/cache/fetch-cache` 不够——
+>   Next 16 的 dev 已经不往那儿写了（`.next/cache` 下只有 `images` / `turbopack`）。**要清整个
+>   `.next` 再重启**才看得到新的导航行。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：

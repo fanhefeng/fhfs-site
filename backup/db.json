@@ -3821,7 +3821,6 @@
       "href": "/resume",
       "labelKey": "resume",
       "surfaces": [
-        "header",
         "footer",
         "fullnav",
         "sitemap"
@@ -3841,18 +3840,6 @@
       "key": "about.colophon",
       "zh": "写于上海 · 当地时间 {time}",
       "en": "Written in Shanghai · local time {time}",
-      "note": null
-    },
-    {
-      "key": "about.introLink",
-      "zh": "走近这张脸",
-      "en": "Come closer",
-      "note": null
-    },
-    {
-      "key": "about.introTitle",
-      "zh": "换一种方式认识我",
-      "en": "Meet me the other way round",
       "note": null
     },
     {

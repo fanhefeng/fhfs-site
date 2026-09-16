@@ -15,14 +15,17 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
 - **/software** —— keynote 式 bento 展柜，分类筛选用 Flip 重排；版本号读自各仓库
   的 GitHub 最新 release；页尾是 Mac / iPhone 设备框，逐个翻看。做过的东西都在这一页
   （原 /portfolio 已下线，308 到这里）。
-- **/about** —— 点阵名字画布、横穿屏幕的标语（全站唯一 pin）、贴纸墙、版本履历。
+- **/about** —— 「关于」：作者这一翼的门。点阵名字画布、横穿屏幕的标语（全站唯一 pin）、
+  自述，接着是「同一个人，另外两种讲法」——3D 自我介绍与简历一行一页（成员与顺序读导航表
+  `nav_items.nav_group = me`，印站数 / 经历条数与更新月份），然后是贴纸墙、版本履历。
 - **/lab** —— 十则动效研究：滚动帧序列、溶解、融化文字、苔藓树根、苔藓里的两张纸卡、
   色散按钮、可拖拽的 3D 工作台、镜头畸变滑块、Seb's 式的霓虹招牌、翻得动的影集。
   每则按路由单独拆包。
 - **/intro** —— R3F 的 3D 头像：滚动带镜头绕头飞行，每张贴纸停一站，
   即一份滚动叙事的简历（`docs/INTRO3D.md`）。
 - **/resume** —— 正式的一页简历：左栏编号标签、右栏概述 / 技能 / 经历 / 开源 / 教育，
-  「打印 / 存为 PDF」走浏览器打印样式；内容全在库里，公开版本已脱敏。
+  「打印 / 存为 PDF」走浏览器打印样式；内容全在库里，公开版本已脱敏。它和 /intro 都是
+  「关于」下面的页（不在灵动岛上），页首有一条回「关于」的路，打印时不印。
 - **/moments** —— 《多的是你不知道的事》：QQ 空间式的说说板，几行字加一个时间，按年排、
   按文集筛。头 242 条是从一言 App 搬来的两本文集（峰言疯语 / 默认文集），进这一页放
   《你不知道的事》（王力宏）。
@@ -30,7 +33,7 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
   原生播放器；进这一页放《不能说的秘密》（周杰伦），播客单篇不放。
 - **/idols** —— 偶像墙，第一位科比：一尊用代码搭的 81 分铜像（R3F，可拖着转）、十二张
   Commons 授权照片、生涯节点。
-- **/films** —— 电影：看了很多遍的几部，一部一页。事实条、简介、影评、记得的台词、一面六列的
+- **/films** —— 电影：看了很多遍的几部，一部一页。事实条、一段简介、记得的台词、一面六列的
   剧照墙（点开进「放映厅」：原生 `<dialog>` 灯箱，方向键 / 滑动翻页）。《大话西游》
   （上下两部、片尾曲《一生所爱》）与《不能说的秘密》（主题曲同名）；进每一页换那部片的唱片。
   旧地址 `/odyssey` 308 到 `/films/odyssey`。
@@ -122,10 +125,13 @@ pnpm db:studio   # 表格界面
   推门是从圆环里穿过去），它的圆环与音符也是站标：favicon（`app/icon.svg`）、灵动岛和
   页脚上套着 `fhf` 的圆环（`components/neon/SignRing.tsx`）、OG 卡题头（`lib/ogMark.tsx`）
   都从同一份几何（`components/neon/geometry.ts`）画出来。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
-  `lib/jukebox.ts` 是它的 store），经 Spotify iFrame API 放官方曲目（Mia & Sebastian's Theme，
-  Justin Hurwitz），未登录 Spotify 的访客只能听 30 秒试听；开关是招牌本身和灵动岛上的音符。
-  Spotify 到不了时（大陆网络会重置到 open.spotify.com 的连接）退回网易云音乐官方外链播放器，
-  放 Hurwitz 2026 年的十周年重录版（曲目 3420987569，匿名可播；原声带版本在网易云需 VIP）。
+  `lib/jukebox.ts` 是它的 store），开关是招牌本身和灵动岛上的音符。门口这首 Mia & Sebastian's
+  Theme（Justin Hurwitz，《爱乐之城》原声，2016）**自托管**在
+  `public/music/mia-and-sebastians-theme.mp3`——一个 `<audio loop preload="none">` 直接放，
+  3 分 19 秒整首，不嵌任何第三方播放器，也没有 Spotify 未登录访客那 30 秒试听的限制，
+  大陆网络照样能听。文件由本地 320kbps 源（8.0MB）经
+  `ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100` 重编码到 2.8MB（约 112kbps VBR）；
+  `/music/:path*` 在 `next.config.ts` 里按 immutable 缓存一年，重编码要换新文件名。
   六张剧照 `public/lab/neon/`（1800px JPEG）取自 TMDB 收录的片方宣传剧照，
   © 2016 Summit Entertainment / Lionsgate，仅作个人致敬之用，页面上有署名。
 - 软件版本号：`apps.repo`（owner/name）+ `src/lib/github.ts` 读 GitHub 最新 release，
@@ -135,10 +141,11 @@ pnpm db:studio   # 表格界面
   `MY_TEXT_CARD_DBITEM` 表得到全文、发布时间（北京时间）、所属文集、是否原创与出处，
   写进 `backup/db.json` 的 `moments` 后 `db:import`。`key` 为 `yiyan-<卡片 id>`，
   `source` 标 `yiyan`。
-- 四首背景音乐都走 Spotify iFrame API（`src/lib/tracks.ts`），大陆网络到不了 Spotify 时
-  退回网易云外链播放器。《你不知道的事》与《不能说的秘密》在网易云上的原版分别要会员 /
-  根本没有，退路放的是匿名可播的钢琴翻奏（NewPiano 1998598395 / 酷客音乐 2160818134），
-  页面上如实标为「钢琴版」。同样不下载、不自托管任何商业录音。
+- 背景音乐的四张唱片登记在 `src/lib/tracks.ts`，分两种：门口那首主题曲是自托管的文件（见上），
+  另外三首房间曲仍走 Spotify iFrame API，大陆网络到不了 Spotify 时退回网易云外链播放器。
+  《你不知道的事》与《不能说的秘密》在网易云上的原版分别要会员 / 根本没有，退路放的是匿名可播的
+  钢琴翻奏（NewPiano 1998598395 / 酷客音乐 2160818134），页面上如实标为「钢琴版」——这三首
+  不下载、不自托管。
 - /idols/kobe 的十二张照片取自 Wikimedia Commons（2005 – 2024），每张的作者与许可
   （公有领域 / CC BY 2.0 / CC BY-SA 2.0、3.0 / CC0）列在 `src/components/idols/kobePhotos.ts`
   并印在图下，链接回 Commons 的文件页；1600px 长边重编码放在 `public/idols/kobe/`。

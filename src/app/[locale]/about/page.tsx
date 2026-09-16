@@ -1,11 +1,20 @@
-import { getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { getAbout, getChips, getTimeline } from "@/lib/content";
+import {
+  getAbout,
+  getAllNavItems,
+  getChips,
+  getIntroNodes,
+  getResumeExperiences,
+  getResumeProfile,
+  getTimeline,
+} from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
+import { Reveal } from "@/components/fx/Reveal";
 import { ManifestoBand } from "@/components/home/ManifestoBand";
 import { StickerWall } from "@/components/about/StickerWall";
 import { Changelog, type ChangelogEntry } from "@/components/about/Changelog";
@@ -14,8 +23,17 @@ import { Colophon } from "@/components/about/Colophon";
 export const generateMetadata = sectionMetadata("about", "/about");
 
 /**
- * About — a name, the slogan crossing the screen, the essay, a wall of
- * stickers you can throw around, and a life numbered like software.
+ * About — a name, the slogan crossing the screen, the essay, the other two
+ * pages about the same person, a wall of stickers you can throw around, and a
+ * life numbered like software.
+ *
+ * 关于 is the author's whole section, the way 生活 is the rooms': the two
+ * pages that are also about me — the 3D intro and the résumé — hang off it
+ * rather than standing beside it in the island, and the index below the essay
+ * is where a reader finds them. It reads the nav table for that (`me`, minus
+ * whatever the island carries itself), so a page added to the group lists
+ * itself here.
+ *
  * Everything interactive lives in its own client component; this file stays
  * a Server Component that only reads content and localizes it. The band is
  * the site's one pinned section — it used to open the home page, and moved
@@ -28,6 +46,7 @@ export default async function AboutPage({
   const locale = await pageLocale(params);
 
   const t = await getTranslations("about");
+  const tNav = await getTranslations("nav");
   const about = await getAbout(locale);
 
   // Resolved to one language here so the wall — a client island — never sees
@@ -53,6 +72,39 @@ export default async function AboutPage({
     };
   });
 
+  // The rest of the section: the pages under 关于 that the island does not
+  // carry itself, in the table's own order, each with something countable to
+  // show for itself.
+  const [navRows, introNodes, experiences, profile, format] = await Promise.all([
+    getAllNavItems(),
+    getIntroNodes(),
+    getResumeExperiences(),
+    getResumeProfile(),
+    getFormatter(),
+  ]);
+  const meRows = navRows.filter(
+    (row) => row.group === "me" && !row.surfaces.includes("header")
+  );
+  const meMeta = (href: string): string[] => {
+    switch (href) {
+      case "/intro":
+        return [t("meStops", { count: introNodes.length })];
+      case "/resume":
+        if (!profile) return [];
+        return [
+          t("meRoles", { count: experiences.length }),
+          t("meUpdated", {
+            date: format.dateTime(new Date(profile.updatedAt), {
+              year: "numeric",
+              month: "long",
+            }),
+          }),
+        ];
+      default:
+        return [];
+    }
+  };
+
   const column = "mx-auto w-full max-w-[720px] px-6";
 
   return (
@@ -74,30 +126,6 @@ export default async function AboutPage({
         <p className="mt-6 max-w-[46ch] text-body text-fg-secondary">
           {t("lead")}
         </p>
-
-        {/* The same person told two other ways: a head you scroll around
-            instead of a column you read, and the formal page. This header
-            is the author's front door — the nav hangs both under 关于. */}
-        <div className="mt-7 flex flex-wrap gap-3">
-          <Link
-            href="/intro"
-            className="hit-ext inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
-          >
-            <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              {t("introTitle")}
-            </span>
-            {t("introLink")} →
-          </Link>
-          <Link
-            href="/resume"
-            className="hit-ext inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
-          >
-            <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              {t("resumeTitle")}
-            </span>
-            {t("resumeLink")} →
-          </Link>
-        </div>
       </header>
 
       {/* Full-bleed: the band writes its own 100vw stage on desktop. */}
@@ -105,6 +133,63 @@ export default async function AboutPage({
 
       <div className={column}>
         {about && <Mdx html={about.html} />}
+
+        {/* The rest of 关于: the same person, told two other ways. */}
+        {meRows.length > 0 && (
+          <section aria-labelledby="about-me" className="mt-24">
+            <Reveal className="mb-8">
+              <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+                {t("meKicker")}
+              </p>
+              <h2 id="about-me" className="mt-3 text-title">
+                {t("meTitle")}
+              </h2>
+            </Reveal>
+            <Reveal as="ol" role="list" stagger={0.06} className="border-t border-line">
+              {meRows.map((row, i) => {
+                const meta = meMeta(row.href);
+                return (
+                  <li
+                    key={row.href}
+                    className="about-me-row relative grid grid-cols-[auto_1fr] gap-x-4 border-b border-line py-6 sm:gap-x-6"
+                  >
+                    <span
+                      className="pt-1 font-mono text-[0.6875rem] tracking-[0.08em] text-fg-tertiary"
+                      aria-hidden="true"
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div className="min-w-0">
+                      <Link
+                        href={row.href}
+                        className="hit-ext text-heading text-fg transition-colors hover:text-accent"
+                      >
+                        {tNav(row.labelKey)}
+                      </Link>
+                      {t.has(`meItems.${row.labelKey}`) && (
+                        <p className="mt-1.5 max-w-[52ch] text-caption text-fg-secondary">
+                          {t(`meItems.${row.labelKey}`)}
+                        </p>
+                      )}
+                      {meta.length > 0 && (
+                        <p className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+                          {meta.map((line) => (
+                            <span key={line} className="tabular-nums">
+                              {line}
+                            </span>
+                          ))}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </Reveal>
+            <style href="about-me-index" precedence="medium">
+              {ROW_CSS}
+            </style>
+          </section>
+        )}
 
         <StickerWall
           chips={chips}
@@ -126,3 +211,22 @@ export default async function AboutPage({
     </main>
   );
 }
+
+/** The same accent rule 生活's corridor and the lab index draw: it appears on
+ *  the left on hover, and is the only motion a text row gets. */
+const ROW_CSS = `
+.about-me-row::before {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 1.5rem;
+  bottom: 1.5rem;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+.about-me-row:hover::before,
+.about-me-row:focus-within::before { opacity: 0.75; }
+`;

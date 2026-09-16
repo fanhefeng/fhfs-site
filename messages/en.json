@@ -27,7 +27,7 @@
     "theme": {
       "title": "Mia & Sebastian's Theme",
       "artist": "Justin Hurwitz · La La Land OST (2016)",
-      "fallbackArtist": "Justin Hurwitz · 10th Anniversary Version (2026) · NetEase Cloud Music"
+      "fallbackArtist": "Justin Hurwitz · La La Land OST (2016)"
     },
     "unknown": {
       "title": "你不知道的事 · All the Things You Never Knew",
@@ -128,10 +128,15 @@
     "changelogAria": "Life milestones, numbered like software releases",
     "changelogDot": "Released {date}",
     "colophon": "Written in Shanghai · local time {time}",
-    "introTitle": "Meet me the other way round",
-    "introLink": "Come closer",
-    "resumeTitle": "The formal page",
-    "resumeLink": "The résumé"
+    "meKicker": "Two more pages",
+    "meTitle": "The same person, told two other ways",
+    "meItems": {
+      "intro": "A head you can drag around; scroll and it follows you, stopping to say a piece at each station.",
+      "resume": "The formal page: what I have done, what I know, where I studied — one screen, and it prints."
+    },
+    "meStops": "{count} stops",
+    "meRoles": "{count} roles",
+    "meUpdated": "updated {date}"
   },
   "intro": {
     "title": "Another introduction",
@@ -150,6 +155,7 @@
   "resume": {
     "title": "Resume",
     "subtitle": "The formal page: who I am and what I've done.",
+    "backToAbout": "About",
     "summaryTitle": "Summary",
     "skillsTitle": "Skills",
     "experienceTitle": "Experience",
@@ -300,7 +306,7 @@
         "name": "Welcome to fhf's",
         "tagline": "SVG lettering traced from the film's sign + a filter for the tube + a GSAP flicker score",
         "summary": "A brick wall, a blue neon sign, Mia & Sebastian's Theme, and a few stills on the wall. The sign is drawn stroke by stroke after the one over the door of Seb's in La La Land, with the name swapped for mine.",
-        "note": "There is no font, on the sign in the film or here: the lettering follows a vector traced stroke by stroke from the film and published on Wikimedia Commons (Seb's.svg, Espandero, CC BY-SA 4.0). The ring's centre and radius, the angles of its two breaks — at the top right where the note's stem leaves it, and at the lower left — the ends of the bar, and the whole outlines of the S and the note are measured straight off it. The original has no F or H: the F is its E without the foot, the stem closed with the same rounded end as the arms, keeping even the little stub of the middle arm that pokes out past the stem; the H is two stems joined by a bar as heavy as the E's middle arm, its edges on the same tilt. The letters stand upright on a baseline that climbs 9.5° to the right; the ring's left arc simply stops at the lower left, while the right arc runs round the bottom and folds back up into the bar — one tube. What is drawn is the solid letter; the tube is found by a filter: feMorphology erodes the shape inward by thirteen units and subtracting that from the original leaves a band of constant width hugging the outline — exactly what a neon shop does, bending tube along the edge of painted lettering. The white core is eroded out of the same band, the halo is the band dilated and blurred, and the four layers merge back into one. The bricks are painted once by a canvas: every brick its own hue and lightness, a hairline of light along its top, a shadow under it, grain over the lot; after that not one frame is painted. Lighting up is not a fade but a fixed score of blinks: the ring stutters first, the bar follows, then the letters one at a time, each hesitating in its own way, until it holds. The sign is the bar's main switch: lights off, music stops; lights on, it plays again and the music comes back. The same sign now hangs over the site's front door: landing on the cover you meet it first, and the way in is through the ring — the letters go dark, the ring holds, the paper shows through it and the wall pushes past you. The music is the site's background music, its player hidden in the layout behind the wall: it runs through Spotify's iFrame API and is asked to play the moment the sign holds steady; if the browser refuses (you have not clicked anything on this site yet), your first click on the page tries again; once inside, the note on the island is its switch. Without a Spotify login it is a 30-second preview, restarted when it ends. Where Spotify cannot be reached at all (the script errors, or says nothing for 12 seconds), the player behind the wall becomes NetEase Cloud Music's own embed of Hurwitz's 2026 tenth-anniversary re-recording: it has no remote, so it can only be mounted and unmounted with the switch, and it makes no sound until you have clicked somewhere on the page. Further along the wall hang a few stills from the film's nights.",
+        "note": "There is no font, on the sign in the film or here: the lettering follows a vector traced stroke by stroke from the film and published on Wikimedia Commons (Seb's.svg, Espandero, CC BY-SA 4.0). The ring's centre and radius, the angles of its two breaks — at the top right where the note's stem leaves it, and at the lower left — the ends of the bar, and the whole outlines of the S and the note are measured straight off it. The original has no F or H: the F is its E without the foot, the stem closed with the same rounded end as the arms, keeping even the little stub of the middle arm that pokes out past the stem; the H is two stems joined by a bar as heavy as the E's middle arm, its edges on the same tilt. The letters stand upright on a baseline that climbs 9.5° to the right; the ring's left arc simply stops at the lower left, while the right arc runs round the bottom and folds back up into the bar — one tube. What is drawn is the solid letter; the tube is found by a filter: feMorphology erodes the shape inward by thirteen units and subtracting that from the original leaves a band of constant width hugging the outline — exactly what a neon shop does, bending tube along the edge of painted lettering. The white core is eroded out of the same band, the halo is the band dilated and blurred, and the four layers merge back into one. The bricks are painted once by a canvas: every brick its own hue and lightness, a hairline of light along its top, a shadow under it, grain over the lot; after that not one frame is painted. Lighting up is not a fade but a fixed score of blinks: the ring stutters first, the bar follows, then the letters one at a time, each hesitating in its own way, until it holds. The sign is the bar's main switch: lights off, music stops; lights on, it plays again and the music comes back. The same sign now hangs over the site's front door: landing on the cover you meet it first, and the way in is through the ring — the letters go dark, the ring holds, the paper shows through it and the wall pushes past you. The music is the site's background music, its player hidden in the layout behind the wall, and the recording is one we host ourselves: Hurwitz's Mia & Sebastian's Theme, all three minutes and nineteen seconds of it, starting over when it ends — no embedded player, and so no login to get past. It is asked to play the moment the sign holds steady; if the browser refuses (you have not clicked anything on this site yet), your first click on the page tries again; once inside, the note on the island is its switch. Further along the wall hang a few stills from the film's nights.",
         "welcome": "Welcome to",
         "signOn": "Switch the sign on",
         "signOff": "Switch the sign off",
@@ -454,7 +460,7 @@
   "films": {
     "kicker": "Films · watched too many times",
     "title": "Films",
-    "subtitle": "The ones watched too many times: a synopsis, a few thoughts of my own, the lines I remember, and a wall of stills. Each puts on its own record at the door.",
+    "subtitle": "The ones watched too many times: a synopsis, the lines I remember, and a wall of stills. Each puts on its own record at the door.",
     "open": "Open",
     "backToIndex": "← Films",
     "countStills": "{count} stills",
@@ -467,7 +473,6 @@
       "rating": "Douban"
     },
     "storyKicker": "Synopsis",
-    "reviewKicker": "Review",
     "linesKicker": "Lines",
     "viewer": {
       "open": "View larger",
@@ -492,8 +497,7 @@
         "rating": "9.0 / 9.2"
       },
       "storyTitle": "Five hundred years before, five hundred years after",
-      "story1": "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. To save Bai Jingjing he uses the Pandora's Box to land back in the same night again and again — until the box carries him five hundred years back instead, into the Bull King's cave, where he meets Zixia: the fairy who has sworn to marry whoever can draw her sword.",
-      "story2": "To save Zixia he must put on the golden headband and become the Monkey King; with it on, he may feel nothing again. The two parts are that one choice: in Pandora's Box he is still running after Bai Jingjing; in Cinderella he finally knows whom he loves — too late.",
+      "story1": "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. To save Bai Jingjing he uses the Pandora's Box to land back in the same night again and again — until the box carries him five hundred years back instead, into the Bull King's cave, where he meets Zixia. To save her he must put on the golden headband and become the Monkey King; with it on, he may feel nothing again. The two parts are that one choice.",
       "partsKicker": "The two parts",
       "partsTitle": "Pandora's Box, and Cinderella",
       "parts": {
@@ -508,10 +512,6 @@
           "note": "The box carries him five hundred years back, where he meets the fairy Zixia. To save her he must put on the golden headband; with it on, he may never love her again."
         }
       },
-      "reviewTitle": "You laugh to the end, and find it was a tragedy",
-      "review1": "It did modestly in Hong Kong in 1995 and barely screened on the mainland; what made it a classic came years later — pirated VCDs in university dorms, and post after post on the BBSes written in its voice. A nonsense comedy in which a generation found fate and regret: probably the strangest posthumous verdict in Chinese cinema.",
-      "review2": "Its trick is that both layers hold at once. The first ninety minutes are Stephen Chow at his most unbuttoned — the Spider Cave, Spider Woman, the Tang Monk's nagging, gags too dense to breathe between; then comes the scene on the city wall, and every laugh before it turns out to have been a set-up. Joker does not become the Monkey King so much as he is made to admit he always was.",
-      "review3": "Athena Chu's Zixia is the soul of both films: that one wink, that line — I guessed the beginning, but I could not guess the ending — give a myth the weight of one particular person. Cinderella holds 9.2 on Douban and Pandora's Box 9.0, the former near the top of its Top 250; the score is a footnote. The evidence is that thirty years on, people still stop at the city wall.",
       "linesTitle": "The ones I remember",
       "lines": {
         "love": {
@@ -561,13 +561,7 @@
         "rating": "8.2"
       },
       "storyTitle": "A hundred and eight steps",
-      "story1": "Ye Xianglun transfers to the arts school where his father teaches, and on his first day follows an unfamiliar tune to the old piano room, where Lu Xiaoyu is playing. He asks what the piece is; that, she says, is a secret. They cycle, shelter from the rain, share one pair of headphones in a record shop — and she has counted the way from the piano room to the classroom with her eyes shut: a hundred and eight steps, so as to see him first.",
-      "story2": "But Xiaoyu is often missing from class, and when she is there it is as if nothing had happened. After one misunderstanding she vanishes for good. Xianglun cannot find her at graduation; he finds her instead in a class photograph from 1979 in the school's archive — the year his father arrived as a young teacher.",
-      "story3": "The piano room is to be demolished. He finds the old score, and the rules written on it: the way back has been on the piano all along, and the first person you see on arrival is the only one who can see you. As the bulldozers come in he sits down at the piano and plays Secret from the top, faster and faster.",
-      "reviewTitle": "A love story that keeps its secret to the end",
-      "review1": "For a debut its ambition is not small: a school romance, a time-slip and a mystery that only opens in the last reel, and Chou drops none of them. His way through is to hand everything to the music — the piano duel, the four-hand piece with Xiaoyu, the title song over the end — so that where the plot cannot move, the piano carries it.",
-      "review2": "Mark Lee Ping-bing's camera turns the old campus at Tamsui into a place where time can be made to stop: the red-brick arches, the afternoons of rain, the light through the blinds of the piano room. Gwei Lun-mei's Xiaoyu hardly makes a large gesture; her not-quite-saying is the rhythm of the whole film, and when the truth comes out, every stray-looking scene before it lands.",
-      "review3": "It has a first film's faults too — the classmates' comedy sometimes slips its key, and the rules of the time-slip do not bear much inspection. But the Golden Horse gave it Best Original Song and Best Visual Effects, it holds 8.2 on Douban, and the Japanese remake of 2024 and the Korean one of 2025 both set out to tell it again — neither with that piano room.",
+      "story1": "Ye Xianglun transfers to the arts school where his father teaches, and on his first day follows an unfamiliar tune to the old piano room, where Lu Xiaoyu is playing. He asks what the piece is; that, she says, is a secret. She is often missing from class, and after one misunderstanding she vanishes for good — until he finds her in a class photograph from 1979 in the school's archive. On the day the piano room is to be pulled down, he sits at the piano and plays Secret from the top.",
       "linesTitle": "The ones I remember",
       "lines": {
         "steps": {
