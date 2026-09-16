@@ -53,7 +53,6 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
           tonight={tc("tonight")}
           title={tt("title")}
           artist={tt("artist")}
-          fallbackArtist={tt("fallbackArtist")}
           className="mt-6"
         />
       </Reveal>

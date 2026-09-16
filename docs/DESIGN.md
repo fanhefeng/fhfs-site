@@ -560,6 +560,21 @@
 >   穿越的规则与结局不写进简介，留给台词和剧照。`story1..n` 的渲染保持多段能力，只是现在各只有一段。
 > - `films.subtitle`（列表页那句）删掉「几句我的看法」；README 的栏目清单同步。
 
+> **2026-09-16 补记（Spotify 那条路退役，播放器只剩一个 `<audio>`）**，覆盖 09-04 补记里
+> 整段关于 iFrame API、`restart()` 循环、12s 超时与网易云外链退路的做法：
+> - 四首唱片都有了自己的文件之后，流媒体那条路只剩《你不知道的事》一张没人放的唱片撑着，
+>   用户让它一起退役。删掉的是：`tracks.unknown` 与 `Track` 的 `{spotify, netease}` 分支、
+>   `trackUri` / `trackStandIn`、Jukebox 里整套 iFrame API（脚本注入、`window.__spotifyIframeApi`、
+>   controller、`playback_update` 提前 1.5s `restart()`、`SPOTIFY_TIMEOUT`、`armed` / `streaming`
+>   闩）、网易云 iframe 与 `fallbackSrc`、store 的 `fallback` 状态、`RoomMusic` 的
+>   `fallbackArtist`（四个页面的传参一并删）、`messages` 里每条 `tracks.*.fallbackArtist` 与
+>   `common.musicTitle`（那是给网易云 iframe 的 title）。Jukebox 从 380 行降到 100 行。
+> - 留下的播放器就是**一个 `<audio loop preload="none">`**：`loop` 天然循环所以没有重启逻辑，
+>   暂停/继续是元素自己的位置，`playing` 只认 `play`/`pause`/`error` 事件，浏览器拒掉的第一次
+>   自动播放仍靠 document 上捕获阶段的第一次 `pointerdown`/`keydown` 补救。`.jukebox` 盒子
+>   从 320×152 缩成 0×0：没有跨域 iframe 要养，就不用再为「离屏被节流」留在视口里了。
+> - **要放回一首没有文件的歌**，得把这两条路一起请回来——tracks.ts 顶部的注释写着这句话。
+
 > **2026-09-16 补记（说说板改叫「峰言疯语」，唱片换成 Lovely Day）**，覆盖 09-07 补记里
 > 「说说 · 《多的是你不知道的事》」那个栏目名：
 > - **名字**：栏目标题改成「峰言疯语」——取自「疯言疯语」，头一个疯换成用户名字里的峰；
@@ -568,9 +583,9 @@
 > - **英文名 Peak Talk**（用户从 Peak Talk / Peak Nonsense / Loose Talk / 双语并置四个里选的）：
 >   peak 直译那个峰，英文里 peak talk 又读得出「巅峰时刻的胡话」的自嘲，和原梗的语气最近。
 >   英文 subtitle 里用一句把这个双关讲明白，免得英文读者只看到一个没来由的名字。
-> - **唱片**：`tracks.lovely`（Bill Withers 的 Lovely Day，1977，4:01，自托管 3.7MB）。
->   `ROOM_META["/moments"].track` 与页面一起改。《你不知道的事》因此空了出来——没有房间再放它，
->   它与 Jukebox 的流媒体那条路一起留着，给下一首没有文件的歌。
+> - **唱片**：`tracks.lovely`（Jurrivh 的 Lovely Day，4:01，自托管 3.7MB）。
+>   `ROOM_META["/moments"].track` 与页面一起改。《你不知道的事》因此空了出来，当天晚些时候
+>   连同流媒体那条路一起退役（见上一条补记）。
 
 > **2026-09-16 补记（另外两间房也放自己的录音）**，接着当天「门口那首歌改成自己的文件」那条：
 > - 用户又拿来两份音源：《不能说的秘密》房间的 `周杰伦 - 路小雨.flac`、大话西游房间的
