@@ -19,7 +19,7 @@ pnpm db:generate  # after editing src/db/schema.ts, then:
 pnpm db:migrate
 pnpm db:check     # print what's actually in each table
 pnpm db:export    # write DB back to backup/
-pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/dev/cache/fetch-cache` + restart does the same)
+pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/cache/fetch-cache` + restart does the same)
 ```
 
 Tests cover only pure functions in `src/lib`; there is no component or e2e

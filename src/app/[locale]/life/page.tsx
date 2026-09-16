@@ -7,7 +7,7 @@ import { getAllNavItems, getMoments, getSecrets } from "@/lib/content";
 import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { IDOLS } from "@/components/idols/entries";
-import { ODYSSEY_STILLS } from "@/components/odyssey/stills";
+import { FILMS } from "@/components/films/entries";
 import { ROOM_META } from "@/components/life/rooms";
 
 export const generateMetadata = sectionMetadata("life", "/life");
@@ -27,6 +27,7 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
   const tNav = await getTranslations("nav");
   const tTracks = await getTranslations("tracks");
   const tIdols = await getTranslations("idols");
+  const tFilms = await getTranslations("films");
 
   const rooms = (await getAllNavItems()).filter(
     (row) => row.group === "rooms" && !row.surfaces.includes("header")
@@ -42,8 +43,8 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
         return secrets.length ? t("countPieces", { count: secrets.length }) : t("empty");
       case "/idols":
         return t("countIdols", { count: IDOLS.length });
-      case "/odyssey":
-        return t("countStills", { count: ODYSSEY_STILLS.length });
+      case "/films":
+        return t("countFilms", { count: FILMS.length });
       default:
         return null;
     }
@@ -53,6 +54,8 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
     switch (href) {
       case "/idols":
         return IDOLS.map((idol) => ({ href: `/idols/${idol.slug}`, label: tIdols(`${idol.key}.name`) }));
+      case "/films":
+        return FILMS.map((film) => ({ href: `/films/${film.slug}`, label: tFilms(`${film.slug}.title`) }));
       default:
         return [];
     }

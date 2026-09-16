@@ -3,8 +3,8 @@
  *
  * One player (`components/fx/Jukebox`), several tunes: the front door and the
  * neon study play the theme; 《多的是你不知道的事》 plays the song it is named
- * after, 《不能说的秘密》 likewise, and the 大话西游 room plays the film's
- * closing song. A room asks for its record through `setTrack` in
+ * after, 《不能说的秘密》 likewise — the essays and the film share it — and
+ * the 大话西游 room plays the film's closing song. A room asks for its record through `setTrack` in
  * `lib/jukebox`; what the record *is* — the Spotify track and the stand-in on
  * NetEase — lives here, and only here.
  *

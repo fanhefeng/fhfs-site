@@ -17,7 +17,7 @@ import {
 } from "@/lib/grove/geometry";
 import { LENS_SLIDES } from "@/components/lab/lensSlides";
 import { NEON_STILLS } from "@/components/lab/neonStills";
-import { ODYSSEY_STILLS } from "@/components/odyssey/stills";
+import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
 import { getPosts } from "@/lib/content";
 
@@ -149,7 +149,7 @@ export default async function LabDemoPage({
   // the same captions and, importantly, the same rights line. Duplicating a
   // credit is how two copies of it end up disagreeing.
   if (entry.slug === "album") {
-    const to = await getTranslations("odyssey");
+    const to = await getTranslations("films.odyssey");
     for (const still of ODYSSEY_STILLS) {
       text[`${still.id}Title`] = to(`stills.${still.id}.title`);
       text[`${still.id}Meta`] = to(`stills.${still.id}.meta`);

@@ -12,6 +12,7 @@ import {
 } from "@/lib/content";
 import { LAB_ENTRIES } from "@/components/lab/entries";
 import { IDOLS } from "@/components/idols/entries";
+import { FILMS } from "@/components/films/entries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
@@ -51,9 +52,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // The idols hang one level below /idols, listed in code like the studies.
-  for (const idol of IDOLS) {
-    const path = `/idols/${idol.slug}`;
+  // The idols and the films hang one level below their rooms, listed in
+  // code like the studies.
+  const subPaths = [
+    ...IDOLS.map((idol) => `/idols/${idol.slug}`),
+    ...FILMS.map((film) => `/films/${film.slug}`),
+  ];
+  for (const path of subPaths) {
     for (const locale of routing.locales) {
       entries.push({
         url: `${site.url}/${locale}${path}`,

@@ -1,5 +1,6 @@
 import type { TrackId } from "@/lib/tracks";
 import { IDOLS } from "@/components/idols/entries";
+import { FILMS, filmCover, stillSrc } from "@/components/films/entries";
 
 /**
  * What /life knows about each room beyond its link. The rooms themselves —
@@ -20,6 +21,8 @@ export type RoomMeta = {
   accent: string;
 };
 
+const firstFilm = filmCover(FILMS[0]);
+
 export const ROOM_META: Record<string, RoomMeta> = {
   "/moments": { key: "moments", track: "unknown", accent: "#b45309" },
   "/secrets": { key: "secrets", track: "secret", accent: "#6e8bff" },
@@ -30,10 +33,11 @@ export const ROOM_META: Record<string, RoomMeta> = {
     cover: IDOLS[0].cover,
     accent: IDOLS[0].accent,
   },
-  "/odyssey": {
-    key: "odyssey",
-    track: "odyssey",
-    cover: { src: "/odyssey/monkey-king.jpg", width: 1800, height: 1013 },
-    accent: "#b8552e",
+  // Likewise the first film's card. No record on the row: each film puts on
+  // its own at its door, and the index between them plays the theme.
+  "/films": {
+    key: "films",
+    cover: { src: stillSrc(FILMS[0], firstFilm), width: firstFilm.width, height: firstFilm.height },
+    accent: FILMS[0].accent,
   },
 };

@@ -6,7 +6,7 @@ import { LENS_SLIDES } from "./lensSlides";
 import { NEON_STILLS } from "./neonStills";
 // The album binds the stills the 大话西游 room already hangs — same files,
 // same captions, read straight off that room's fixture list.
-import { ODYSSEY_STILLS } from "@/components/odyssey/stills";
+import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
 
 /**
  * One study per route, and only that study's code.
@@ -131,7 +131,7 @@ export function LabStudy({ slug, accent, text }: Props) {
           counterAria={text.counterAria}
           credit={text.credit}
           plates={ODYSSEY_STILLS.map((still) => ({
-            src: `/odyssey/${still.file}.jpg`,
+            src: `/films/odyssey/${still.file}.jpg`,
             width: still.width,
             height: still.height,
             alt: text[`${still.id}Alt`],
