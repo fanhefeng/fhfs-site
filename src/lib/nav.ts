@@ -9,7 +9,7 @@
 /**
  * The three wings of the nav table. `issue` is the magazine proper (writing,
  * software, the lab); `rooms` are the one-page, one-record
- * themes (the board, the secrets, the idols, the film) and whatever rooms
+ * themes (the board, the secrets, the idols, the films) and whatever rooms
  * come later; `me` is the author (about, the 3D intro, the résumé). A row
  * with no group is on its own — home, today.
  */
@@ -55,7 +55,7 @@ export const isActivePath = (pathname: string, href: string): boolean =>
 
 /**
  * A door is current on its own pages and on the pages of the rows hanging
- * under it — so the island lights 「生活」 while the reader is in /odyssey,
+ * under it — so the island lights 「生活」 while the reader is in /films,
  * and 「关于」 while they are in /intro.
  */
 export const isActiveDoor = (

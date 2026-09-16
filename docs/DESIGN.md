@@ -488,6 +488,42 @@
 >   `scrollLock` 契约、`Jukebox` 的 Spotify → 网易云退路、`SmoothScroll` 的 ResizeObserver、登录限流、
 >   `db-import` 的批处理——都立得住。
 
+> **2026-09-16 补记（电影成栏目：`/films`，大话西游搬进去，加《不能说的秘密》；偶像不动）**，覆盖
+> 09-07 补记里「第四个房间 /odyssey」的路由与文件位置：
+> - **起因**：用户要一个专放电影的板块——把《大话西游》归进去、再加《不能说的秘密》；科比归「偶像」，
+>   不与电影混排。科比本来就在 /idols，这次不动；变的是电影从「一部片一间房」变成「一间房、几部片」。
+> - **路由**：`/films` 是房间（目录卡片：3:2 的剧照、片名、年份、一句话、「N 张剧照 · 唱片」），
+>   `/films/[slug]` 一部一页（`generateStaticParams` 读 `components/films/entries.ts` 的 `FILMS`，
+>   `dynamicParams=false`，与 /lab/[slug] 同一套）。`/odyssey` 在 `next.config` 里 308 到
+>   `/films/odyssey`；`public/odyssey/` 整目录 `git mv` 到 `public/films/odyssey/`（rename，不复制
+>   blob；`IMMUTABLE_PATHS` 把 `/odyssey/:path*` 换成 `/films/:path*`）。导航表 `/odyssey` 行改成
+>   `/films`（labelKey `films`，sort 8 不变），`backup/db.json` 已改并已 `db:import`。**这次是先切库后部署**，
+>   与 09-07 的顺序相反但同样安全：线上页面全是静态预渲染，导航表读在 `unstable_cache` 里，`db:import`
+>   不调 `updateTag`，旧部署照样端着缓存里的老行直到新部署整体重建——所以 `nav.odyssey` 不必留过渡，
+>   已随本次一并删掉。反过来（先部署后切库）才需要过渡标签，因为新代码会在切库前就读到老行。
+> - **一页的节奏**（`app/[locale]/films/[slug]/page.tsx`，宽版心 1040 只给剧照）：片名与班底 +
+>   `RoomMusic`（每部片自己的唱片，`FilmEntry.track`）→ 事实条（导演 / 主演 / 上映 / 片长 / 豆瓣，
+>   `9rem_1fr` 的 dl）→ 简介（`story1..n`，有几段读几段）→ 上下两部（仅 `parts` 非空的片）→ 影评
+>   （`review1..n`）→ 台词 → 剧照墙 → 署名。简介与影评是站主的话，写在 `messages` 里（`films.<slug>.*`，
+>   与其他房间同）；豆瓣分数写死在事实条里，不抓。文案命名空间从顶层 `odyssey` 收成 `films.odyssey`，
+>   `films.secret` 并列，影集那则实验室读 `films.odyssey`。
+> - **剧照墙 + 放映厅**（`components/films/FilmStills.tsx`，一个客户端组件）：墙照 09-07 的六列构图不变
+>   （span 4 + 5:6 竖裁的 span 2、三张一行、21:9 通栏收尾），多了一个 `ratio` 开关——大话西游是 16:9
+>   的视频帧，不能说的秘密是 3:2 的片场照，各按各的框裁。**看过 film-grab / shot.cafe / Awwwards 画廊
+>   合集之后的取舍**：那类站的主流是「网格 + 灯箱」（masonry 或 justified 行，点开全屏看单张，
+>   前后翻页），横向胶片带与 sticky 逐张放大是作品集站的做法，对一面剧照墙来说太重。所以只加灯箱：
+>   每张剧照本来就是指向原文件的 `<a>`（无 JS 点开就是图），有 JS 则打开原生 `<dialog>`——黑底、
+>   图撑到视口、图下标题与元信息、左上计数、方向键 / 两枚按钮 / 横滑翻页、Esc / 关闭钮 / 点背景退出；
+>   开着时走 `scrollLock` 契约，关掉焦点回到点开它的那张。进场 0.35s 淡入 + 0.5s 从 0.96 撑开，
+>   翻页从来的方向滑 24px 进来，退场 0.25s `EASE.exit`；文案由页面翻好传进去，不进 `CLIENT_NAMESPACES`。
+> - **《不能说的秘密》的素材**：TMDB 只有六张 backdrop 且四张是同一镜头，主体改取豆瓣「官方剧照」
+>   （3:2 片场照）+ 两帧电影截图（裁掉黑边，带字幕的不用），来源与抓法记在 README。曲目复用
+>   `tracks.secret`（与 /secrets 同一首）——同名的歌配同名的片，不另注册。
+> - **/life 的电影行**：条数印「2 部」，行内列出每部片的子链接（与偶像行同），缩略图是第一部片的封面剧照，
+>   不挂唱片（走廊里的目录行不放唱片，每部片进门自己放）。`life.countStills` 退役，换 `countFilms`。
+> - **未做**：不做电影的分类筛选（两部片不需要）；不做豆瓣/IMDb 的实时抓取（分数写死，一年变不了
+>   0.1）；不做 justified 行或横向胶片带（理由见上）。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：

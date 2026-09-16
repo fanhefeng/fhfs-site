@@ -19,7 +19,7 @@ const IMMUTABLE_PATHS = [
   "/lab/dissolve/:path*",
   "/lab/neon/:path*",
   "/idols/:path*",
-  "/odyssey/:path*",
+  "/films/:path*",
 ];
 
 const nextConfig: NextConfig = {
@@ -67,6 +67,13 @@ const nextConfig: NextConfig = {
       {
         source: "/:locale(zh|en)/portfolio",
         destination: "/:locale/software",
+        permanent: true,
+      },
+      // The 大话西游 room moved into the films room when the second film
+      // arrived; its old address still opens it.
+      {
+        source: "/:locale(zh|en)/odyssey",
+        destination: "/:locale/films/odyssey",
         permanent: true,
       },
     ];

@@ -37,7 +37,7 @@ const TABLE: NavLink[] = [
   link("/life", "rooms", true),
   link("/moments", "rooms"),
   link("/idols", "rooms"),
-  link("/odyssey", "rooms"),
+  link("/films", "rooms"),
   link("/secrets", "rooms"),
   link("/about", "me", true),
   link("/intro", "me"),
@@ -61,7 +61,7 @@ describe("clusterNav", () => {
       "/life",
       "/moments",
       "/idols",
-      "/odyssey",
+      "/films",
       "/secrets",
     ]);
   });
@@ -86,7 +86,7 @@ describe("attachMembers", () => {
       ["/blog", []],
       ["/software", ["/portfolio"]],
       ["/lab", []],
-      ["/life", ["/moments", "/idols", "/odyssey", "/secrets"]],
+      ["/life", ["/moments", "/idols", "/films", "/secrets"]],
       ["/about", ["/intro"]],
       ["/resume", []],
     ]);
@@ -110,12 +110,12 @@ describe("attachMembers", () => {
 });
 
 describe("isActiveDoor", () => {
-  const members = [link("/moments", "rooms"), link("/odyssey", "rooms")];
+  const members = [link("/moments", "rooms"), link("/films", "rooms")];
   it("is current on the door's own pages", () => {
     expect(isActiveDoor("/life", { href: "/life" }, members)).toBe(true);
   });
   it("is current on the pages hanging under it", () => {
-    expect(isActiveDoor("/odyssey", { href: "/life" }, members)).toBe(true);
+    expect(isActiveDoor("/films/odyssey", { href: "/life" }, members)).toBe(true);
     expect(isActiveDoor("/moments", { href: "/life" }, members)).toBe(true);
   });
   it("is not current elsewhere", () => {

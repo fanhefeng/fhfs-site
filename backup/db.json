@@ -3784,8 +3784,8 @@
       "group": "rooms"
     },
     {
-      "href": "/odyssey",
-      "labelKey": "odyssey",
+      "href": "/films",
+      "labelKey": "films",
       "surfaces": [
         "footer",
         "fullnav",
