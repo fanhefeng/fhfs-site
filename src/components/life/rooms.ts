@@ -24,7 +24,7 @@ export type RoomMeta = {
 const firstFilm = filmCover(FILMS[0]);
 
 export const ROOM_META: Record<string, RoomMeta> = {
-  "/moments": { key: "moments", track: "unknown", accent: "#b45309" },
+  "/moments": { key: "moments", track: "lovely", accent: "#b45309" },
   "/secrets": { key: "secrets", track: "secret", accent: "#6e8bff" },
   // The wall's own first card, rather than a second copy of its path, size and
   // colour — one edit to `entries.ts` moves both.

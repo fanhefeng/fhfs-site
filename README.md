@@ -26,18 +26,19 @@ fhf 的个人网站：一本安静的个人杂志兼私人画廊——收录文�
 - **/resume** —— 正式的一页简历：左栏编号标签、右栏概述 / 技能 / 经历 / 开源 / 教育，
   「打印 / 存为 PDF」走浏览器打印样式；内容全在库里，公开版本已脱敏。它和 /intro 都是
   「关于」下面的页（不在灵动岛上），页首有一条回「关于」的路，打印时不印。
-- **/moments** —— 《多的是你不知道的事》：QQ 空间式的说说板，几行字加一个时间，按年排、
-  按文集筛。头 242 条是从一言 App 搬来的两本文集（峰言疯语 / 默认文集），进这一页放
-  《你不知道的事》（王力宏）。
+- **/moments** —— 「峰言疯语」（栏目名取自「疯言疯语」，头一个疯换成名字里的峰；英文名
+  Peak Talk）：QQ 空间式的说说板，几行字加一个时间，按年排、按文集筛。条目本身照旧叫说说。
+  头 242 条是从一言 App 搬来的两本文集（峰言疯语 / 默认文集），进这一页放 Lovely Day
+  （Bill Withers，1977）。
 - **/secrets** —— 《不能说的秘密》：不属于手札的随笔与播客，目录页 + 单篇页，播客带浏览器
-  原生播放器；进这一页放《不能说的秘密》（周杰伦），播客单篇不放。
+  原生播放器；进这一页放原声带里的《路小雨》（周杰伦），播客单篇不放。
 - **/idols** —— 偶像墙，第一位科比：一尊用代码搭的 81 分铜像（R3F，可拖着转）、十二张
   Commons 授权照片、生涯节点。
 - **/films** —— 电影：看了很多遍的几部，一部一页。事实条、一段简介、记得的台词、一面六列的
   剧照墙（点开进「放映厅」：原生 `<dialog>` 灯箱，方向键 / 滑动翻页）。《大话西游》
-  （上下两部、片尾曲《一生所爱》）与《不能说的秘密》（主题曲同名）；进每一页换那部片的唱片。
+  （上下两部、片尾曲《一生所爱》）与《不能说的秘密》（原声带里的《路小雨》）；进每一页换那部片的唱片。
   旧地址 `/odyssey` 308 到 `/films/odyssey`。
-- **/life** —— 「生活」：房间的目录。说说 / 偶像 / 电影 / 秘密（以及以后每一间）一行一间，
+- **/life** —— 「生活」：房间的目录。峰言疯语 / 偶像 / 电影 / 秘密（以及以后每一间）一行一间，
   印条数和那间房的唱片；成员与顺序读导航表（`nav_items.nav_group = rooms`），配图与唱片在
   `components/life/rooms.ts`。它是灵动岛上房间们唯一的门，自己不放唱片。
 - **/admin** —— 浏览器里的编辑部：文章、说说、秘密、文案、列表全部可编辑，保存即生效。
@@ -141,11 +142,16 @@ pnpm db:studio   # 表格界面
   `MY_TEXT_CARD_DBITEM` 表得到全文、发布时间（北京时间）、所属文集、是否原创与出处，
   写进 `backup/db.json` 的 `moments` 后 `db:import`。`key` 为 `yiyan-<卡片 id>`，
   `source` 标 `yiyan`。
-- 背景音乐的四张唱片登记在 `src/lib/tracks.ts`，分两种：门口那首主题曲是自托管的文件（见上），
-  另外三首房间曲仍走 Spotify iFrame API，大陆网络到不了 Spotify 时退回网易云外链播放器。
-  《你不知道的事》与《不能说的秘密》在网易云上的原版分别要会员 / 根本没有，退路放的是匿名可播的
-  钢琴翻奏（NewPiano 1998598395 / 酷客音乐 2160818134），页面上如实标为「钢琴版」——这三首
-  不下载、不自托管。
+- 背景音乐的唱片登记在 `src/lib/tracks.ts`，分两种。**自托管的四首**（`public/music/`，
+  都由本地无损 / 320kbps 源经 `ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100`
+  重编码，约 110–125kbps VBR）：门口的 Mia & Sebastian's Theme（3:19，2.8MB）、/moments 的
+  Lovely Day（Bill Withers 1977，4:01，3.7MB）、/films/odyssey 的《一生所爱》（卢冠廷 1995
+  原版，4:28，4.0MB）、/secrets 与 /films/secret 的《路小雨》（周杰伦，《不能说的秘密》原声带
+  里的钢琴曲，1:37，1.3MB；源 flac 尾部 3.2 秒静音已裁掉并加 0.8 秒淡出，否则循环时会空一拍）。
+  **流媒体那条路**（Spotify iFrame API + 网易云外链退路）暂时没有唱片在用：《你不知道的事》
+  还登记着，但自从峰言疯语换成 Lovely Day 就没有房间放它——代码与登记都留着，给下一首没有
+  文件的歌。房间里印的曲名一律是实际在放的那份录音——所以《不能说的秘密》那间房写的是
+  《路小雨》，不是同名主题曲。
 - /idols/kobe 的十二张照片取自 Wikimedia Commons（2005 – 2024），每张的作者与许可
   （公有领域 / CC BY 2.0 / CC BY-SA 2.0、3.0 / CC0）列在 `src/components/idols/kobePhotos.ts`
   并印在图下，链接回 Commons 的文件页；1600px 长边重编码放在 `public/idols/kobe/`。
@@ -154,9 +160,8 @@ pnpm db:studio   # 表格界面
 - /films/odyssey 的十二张剧照取自 TMDB 收录的两部《大话西游》（1995）的剧照（`月光宝盒` id 13345、
   `大圣娶亲` id 21835），© 1995 彩星电影公司 / 西安电影制片厂，仅作个人致敬之用，页面上有
   署名；1800px 宽重编码放在 `public/films/odyssey/`（三张原图只有 1280px，保持原尺寸），清单与
-  尺寸在 `src/components/films/odysseyStills.ts`。音乐是《一生所爱》1995 年的原版录音
-  （Spotify `6zzVfWt16XAejBMA0mnDvg`），网易云上卢冠廷的各版都要会员，退路是匿名可播的
-  钢琴版（MappleZS 1998046134），页面上如实标为「钢琴版」。
+  尺寸在 `src/components/films/odysseyStills.ts`。音乐是《一生所爱》1995 年的原版录音，
+  自托管在 `public/music/a-lifetime-of-love.mp3`。
 - /films/secret 的十二张剧照：TMDB 上《不能说的秘密》（id 20342）只有六张 backdrop，其中四张是同一
   个单车镜头的不同裁法，撑不起一面墙，所以主体取自豆瓣电影条目（id 2124724）「官方剧照」分类
   （42 张，3:2 的片场照片）：十张官方剧照 + 两张 TMDB backdrop（单车、父亲的吉他）+ 两帧电影
@@ -164,8 +169,8 @@ pnpm db:studio   # 表格界面
   杰威尔音乐，仅作个人致敬之用，页面上有署名。豆瓣的列表页对脚本会跳 `sec.douban.com` 验证，
   要用真浏览器（chrome-devtools MCP 的隔离上下文）打开一次拿到图 id，图片本身
   `img9.doubanio.com/view/photo/raw/public/p<id>.jpg` 带 Referer 就能下；保持原尺寸
-  （1500–1800px），清单在 `src/components/films/secretStills.ts`。音乐是同名主题曲，与 /secrets
-  共用 `tracks.secret`。
+  （1500–1800px），清单在 `src/components/films/secretStills.ts`。音乐是原声带里的《路小雨》，
+  自托管在 `public/music/lu-xiaoyu.mp3`，与 /secrets 共用 `tracks.secret`。
 - /intro 的头像 `head.glb` 由单张照片重建（TRELLIS 风格化 v3），眼镜为程序
   几何补回——重建会把镜片糊成阴影（`docs/INTRO3D.md`）。
 

@@ -14,7 +14,7 @@
     "lab": "Lab",
     "intro": "3D Intro",
     "resume": "Resume",
-    "moments": "Moments",
+    "moments": "Peak Talk",
     "secrets": "Secrets",
     "idols": "Idols",
     "films": "Films",
@@ -29,20 +29,25 @@
       "artist": "Justin Hurwitz · La La Land OST (2016)",
       "fallbackArtist": "Justin Hurwitz · La La Land OST (2016)"
     },
+    "lovely": {
+      "title": "Lovely Day",
+      "artist": "Bill Withers (1977)",
+      "fallbackArtist": "Bill Withers (1977)"
+    },
     "unknown": {
       "title": "你不知道的事 · All the Things You Never Knew",
       "artist": "Leehom Wang · theme of Love in Disguise (2010)",
       "fallbackArtist": "piano rendition · NetEase Cloud Music (the original there needs a subscription)"
     },
     "secret": {
-      "title": "不能說的秘密 · Secret",
-      "artist": "Jay Chou · theme of Secret (2007)",
-      "fallbackArtist": "piano rendition · NetEase Cloud Music (the original is not available there)"
+      "title": "路小雨 · Lu Xiaoyu",
+      "artist": "Jay Chou · from the soundtrack of Secret (2007)",
+      "fallbackArtist": "Jay Chou · from the soundtrack of Secret (2007)"
     },
     "odyssey": {
       "title": "一生所愛 · The Love of My Life",
       "artist": "Lowell Lo · closing song of A Chinese Odyssey Part Two (1995)",
-      "fallbackArtist": "piano rendition · NetEase Cloud Music (the original there needs a subscription)"
+      "fallbackArtist": "Lowell Lo · closing song of A Chinese Odyssey Part Two (1995)"
     }
   },
   "splash": {
@@ -346,9 +351,9 @@
     }
   },
   "moments": {
-    "kicker": "Moments · a line at a time",
-    "title": "All the Things You Never Knew",
-    "subtitle": "Like a QQ Zone of old: a few lines, a time, nothing more. The early ones were written in two notebooks in the 一言 app and moved here; the rest are written here directly.",
+    "kicker": "Peak Talk · a line at a time",
+    "title": "Peak Talk",
+    "subtitle": "峰言疯语 — the Chinese name puns on 疯言疯语, “raving talk”, with the first 疯 swapped for the 峰 (peak) in my own name. Like a QQ Zone of old: a few lines, a time, nothing more. The early ones were written in two notebooks in the 一言 app and moved here; the rest are written here directly.",
     "count": "{count, plural, one {# moment} other {# moments}}",
     "filterAll": "All",
     "filterAria": "Filter by notebook",
@@ -451,7 +456,7 @@
     "countFilms": "{count, plural, one {# film} other {# films}}",
     "empty": "Nothing told yet",
     "items": {
-      "moments": { "title": "All the Things You Never Knew", "line": "The board: a few lines and a time, since 2017." },
+      "moments": { "title": "Peak Talk", "line": "The board: a few lines and a time, since 2017." },
       "secrets": { "title": "Secret", "line": "Essays and episodes — what the notes are not." },
       "idols": { "title": "Idols", "line": "The people on the wall. First, Kobe." },
       "films": { "title": "Films", "line": "The ones watched too many times: A Chinese Odyssey, Secret. A wall of stills each, and a record at the door." }
@@ -544,7 +549,7 @@
         "gate": { "title": "The gate", "meta": "Cinderella · the Monkey King", "alt": "The Monkey King, headband on, staff across his shoulders in front of a city gate" },
         "wall": { "title": "On the city wall", "meta": "Cinderella · the ending", "alt": "On the city wall, two people standing in an embrace, snow mountains in the distance" }
       },
-      "credit": "Stills © 1995 Choi Sing Film / Xi'an Film Studio, via TMDB; 一生所愛 is played through Spotify's official recording, with an anonymously streamable piano rendition on NetEase Cloud Music where Spotify cannot be reached. A personal homage only."
+      "credit": "Stills © 1995 Choi Sing Film / Xi'an Film Studio, via TMDB; the closing song 一生所愛 (Lowell Lo, 1995) is a recording this site hosts itself, played whole and looped. A personal homage only."
     },
     "secret": {
       "kicker": "Secret · 2007",
@@ -594,7 +599,7 @@
         "note": { "title": "The words on the score", "meta": "Secret · the last page", "alt": "Handwriting on yellowed paper: whether or not we meet again, whether or not you forget me, I only want to tell you one secret" },
         "rooftop": { "title": "The roof", "meta": "Sunset · the Tamsui river", "alt": "On a bench on the roof, the two of them side by side, watching the sun set over the river" }
       },
-      "credit": "Stills © 2007 Edko Films / JVR Music, official stills via Douban and TMDB; 不能說的秘密 is played through Spotify's official recording, with an anonymously streamable piano rendition on NetEase Cloud Music where Spotify cannot be reached. A personal homage only."
+      "credit": "Stills © 2007 Edko Films / JVR Music, official stills via Douban and TMDB; 路小雨, from the film's own soundtrack (Jay Chou, 2007), is a recording this site hosts itself, played whole and looped. A personal homage only."
     }
   },
   "software": {

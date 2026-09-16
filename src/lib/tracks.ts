@@ -7,22 +7,28 @@
  * the 大话西游 room plays the film's closing song. A room asks for its record through `setTrack` in
  * `lib/jukebox`; what the record *is* lives here, and only here.
  *
- * A record comes in one of two forms. The theme is **self-hosted**: the file
- * under `public/music` is served from our own origin, so it plays whole, in
- * every network, with no embed, no login and no thirty-second preview — the
- * front door's own tune was worth the 2.8 MB. The other three are
- * **streamed**: the Spotify track, with a NetEase Cloud Music stand-in for
- * the networks that cannot reach Spotify at all. Those stand-ins follow the
- * rule written down in the README (内容与模型从哪来): whatever NetEase will
- * stream to a visitor who is not logged in — for the three songs a piano
- * rendition, the originals there being behind a VIP wall (Wang, Lo) or absent
- * altogether (Chou) — and the page says so beside the title rather than
- * pretending otherwise.
+ * A record comes in one of two forms. Every record a room actually plays is
+ * **self-hosted**: a file under `public/music`, served from our own origin,
+ * playing whole in every network with no embed, no login and no
+ * thirty-second preview. 《你不知道的事》 is the one **streamed** record
+ * left — the Spotify track with a NetEase Cloud Music stand-in for the
+ * networks that cannot reach Spotify at all — and no room plays it today;
+ * both it and the player's streaming path stay for the next record that
+ * arrives without a file. That stand-in follows the rule written down in the
+ * README (内容与模型从哪来): whatever NetEase will stream to a visitor who is
+ * not logged in — a piano rendition, the original there being behind a VIP
+ * wall — and the page would say so beside the title rather than pretending
+ * otherwise.
+ *
+ * What plays in a room is the recording we have, and the copy names *that*
+ * recording: 《不能说的秘密》's room plays 《路小雨》, the piano piece from the
+ * film's own soundtrack, and says so — the room is named after the film, not
+ * after the song.
  *
  * Titles and artists are copy, so they stay in `messages/*.json` under
  * `tracks.<id>`; a room reads them there and hands them to `RoomMusic`.
  */
-export type TrackId = "theme" | "unknown" | "secret" | "odyssey";
+export type TrackId = "theme" | "lovely" | "unknown" | "secret" | "odyssey";
 
 export type Track =
   /** Ours to serve: a file under `public/music`, played by a plain `<audio>`. */
@@ -34,12 +40,16 @@ export type Track =
 export const TRACKS: Record<TrackId, Track> = {
   /** Mia & Sebastian's Theme — Justin Hurwitz, La La Land (2016); ours, whole. */
   theme: { src: "/music/mia-and-sebastians-theme.mp3" },
-  /** 你不知道的事 — 王力宏 (2010); stand-in: a piano rendition (NewPiano). */
+  /** Lovely Day — Bill Withers (1977); ours, whole. 峰言疯语's record. */
+  lovely: { src: "/music/lovely-day.mp3" },
+  /** 你不知道的事 — 王力宏 (2010); stand-in: a piano rendition (NewPiano).
+   *  No room plays it since 峰言疯语 took Lovely Day — it is the only record
+   *  left on the streamed path, and the path stays for the next one. */
   unknown: { spotify: "3HH9pAwNfQVXYVUbmHxWwn", netease: "1998598395" },
-  /** 不能說的秘密 — 周杰倫 (2007); stand-in: a piano rendition (酷客音乐). */
-  secret: { spotify: "5mktG3zst5SVxAiVHY4j6C", netease: "2160818134" },
-  /** 一生所愛 — 盧冠廷, the 1995 original; stand-in: a piano rendition (MappleZS). */
-  odyssey: { spotify: "6zzVfWt16XAejBMA0mnDvg", netease: "1998046134" },
+  /** 路小雨 — 周杰倫, from the 不能說的秘密 soundtrack (2007); ours, whole. */
+  secret: { src: "/music/lu-xiaoyu.mp3" },
+  /** 一生所愛 — 盧冠廷, the 1995 original; ours, whole. */
+  odyssey: { src: "/music/a-lifetime-of-love.mp3" },
 };
 
 /** The file we serve ourselves, or `null` for a record that is streamed. */
