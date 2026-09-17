@@ -42,7 +42,10 @@ export function LoginForm({ next }: { next: string }) {
         {pending && (
           <span
             aria-hidden
-            className="size-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent"
+            // Reduce-motion stops the spin and closes the gap the spin was
+            // reading from, so it rests as a whole ring rather than a broken
+            // one. The button's own label already says what is happening.
+            className="size-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent motion-reduce:animate-none motion-reduce:border-t-current"
           />
         )}
         {pending ? "正在进入…" : "进入"}

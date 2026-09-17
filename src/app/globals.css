@@ -494,7 +494,11 @@ body {
  * the grain never end at all, which is exactly the case WCAG 2.2.2 wants a stop
  * mechanism for, and reduce-motion is the only stop signal a page gets. The
  * glow, the paper and the scroll hint all stay; they simply hold still.
- * Everything else on the site is a one-shot entrance and is not gated.
+ * Everything else on the site is a one-shot entrance and is not gated — the
+ * one exception being the three waiting rings (the two admin buttons and the
+ * workbench's loader), which also spin with nothing to stop them but are
+ * gated where they are written, with `motion-reduce:` utilities, because they
+ * are Tailwind's animation rather than one of ours.
  *
  * Last in the section on purpose: these selectors carry no more specificity
  * than the three rules above, so an earlier block would lose the cascade to

@@ -8,6 +8,7 @@ export default async function NewSecret() {
     <AdminChrome
       title="新的秘密"
       section="/admin/secrets"
+      sub
       view={null}
       blurb="slug 和语言存下之后就不能改了——它们是这条的地址。"
     >

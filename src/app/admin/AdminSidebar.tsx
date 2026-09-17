@@ -30,13 +30,21 @@ export function AdminSidebar({ counts }: { counts: SectionCounts }) {
 
   useEffect(() => setOpen(false), [pathname]);
 
-  // The drawer is a layer over the page; the page under it must not scroll.
+  // The drawer is a layer over the page; the page under it must not scroll,
+  // and Escape closes it — it covers the screen the way a dialog does, and a
+  // layer you can only leave by finding the backdrop is a trap for anyone not
+  // using a mouse.
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKey);
     };
   }, [open]);
 

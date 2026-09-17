@@ -23,6 +23,7 @@ export async function AdminChrome({
   action,
   /** Overrides the section's own blurb — for sub-pages with something else to say. */
   blurb,
+  sub,
   view,
 }: {
   title: string;
@@ -32,6 +33,12 @@ export async function AdminChrome({
   /** Optional control shown beside the heading, e.g. "new post". */
   action?: React.ReactNode;
   blurb?: string;
+  /**
+   * A page *below* the section — one post, one episode, the "new" form —
+   * rather than the section's own index. It gets a crumb back to the section,
+   * and no count: the number belongs to the list, not to one row of it.
+   */
+  sub?: boolean;
   /**
    * Where "看前台" should point, overriding the section's own page: a single
    * post links to itself rather than to the index. `null` drops the link —
@@ -43,7 +50,11 @@ export async function AdminChrome({
   const meta = section ? sectionByHref(section) : undefined;
   const group = section ? groupOf(section) : undefined;
   // A sub-page counts nothing of its own — the number belongs to the section.
-  const count = section && view === undefined ? counts[section] : undefined;
+  // Asked of `sub` and not of `view`: whether this page is one row of a list
+  // and where "看前台" points are two questions, and reading the second as
+  // the first would have cost an index page its count the day one wanted to
+  // override that link.
+  const count = section && !sub ? counts[section] : undefined;
   const viewHref =
     view !== undefined ? view : meta?.view ? `/zh${meta.view}` : null;
 
@@ -68,7 +79,7 @@ export async function AdminChrome({
               )}
               {/* A sub-page (one post, one episode) names its section too, and
                   links back to it — that list is where it came from. */}
-              {view !== undefined && meta && (
+              {sub && meta && (
                 <>
                   <span className="mx-1.5 opacity-50">›</span>
                   <Link

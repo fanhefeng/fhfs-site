@@ -29,6 +29,7 @@ export default async function EditPost({
       section="/admin/posts"
       blurb={`${slug} · ${locale}`}
       // A draft 404s on the site — no point linking to it.
+      sub
       view={post.draft ? null : `/${locale}/blog/${slug}`}
       action={
         post.draft ? (
