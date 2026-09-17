@@ -160,13 +160,17 @@ try {
     );
   }
 
-  // Every write landed: the old backup goes, and the staged one takes its name.
-  await rm(OUT, { recursive: true, force: true });
-  await rename(STAGE, OUT);
 } catch (error) {
   await rm(STAGE, { recursive: true, force: true });
   throw error;
 }
+
+// Every write landed: the old backup goes, and the staged one takes its name.
+// Outside the guard above on purpose — the moment `backup/` is gone the
+// staged copy is the only copy there is, and a rename that fails must leave
+// it standing rather than be swept up as a failed write.
+await rm(OUT, { recursive: true, force: true });
+await rename(STAGE, OUT);
 
 const counts = Object.entries(data).map(
   ([table, rows]) => `${table} ${(rows as unknown[]).length}`
