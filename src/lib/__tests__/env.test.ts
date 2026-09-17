@@ -54,13 +54,14 @@ describe("the variables the code reads", () => {
     return out;
   }
 
-  // Set by the platform or the toolchain, not by whoever deploys.
-  const AMBIENT = new Set(["NODE_ENV", "VERCEL_PROJECT_PRODUCTION_URL"]);
+  // Set by the platform or the toolchain, not by whoever deploys — and
+  // CHROME_PATH, which only tells `pnpm smoke` where a browser is.
+  const AMBIENT = new Set(["NODE_ENV", "VERCEL_PROJECT_PRODUCTION_URL", "CHROME_PATH"]);
 
   const read = new Set<string>();
   for (const file of [...sources(path.join(root, "src")), ...sources(path.join(root, "scripts"))]) {
     for (const m of readFileSync(file, "utf8").matchAll(/process\.env\.([A-Z][A-Z0-9_]*)/g)) {
-      if (!AMBIENT.has(m[1])) read.add(m[1]);
+      if (!AMBIENT.has(m[1]!)) read.add(m[1]!);
     }
   }
 

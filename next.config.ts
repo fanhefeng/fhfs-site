@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } from "next/constants";
+import { contentSecurityPolicy } from "./src/lib/csp";
 import { envProblems } from "./src/lib/env";
 import { HASHED_ROUTES } from "./src/lib/immutable";
 
@@ -18,6 +19,10 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [
+          {
+            key: "Content-Security-Policy",
+            value: contentSecurityPolicy({ dev: process.env.NODE_ENV === "development" }),
+          },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },
