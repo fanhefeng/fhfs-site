@@ -75,7 +75,9 @@ export function SaveControls({
       {pending && (
         <span
           aria-hidden
-          className="size-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent"
+          // Stops under reduce-motion, and closes its gap so it rests as a
+          // whole ring; "保存中…" beside it is the part that carries meaning.
+          className="size-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent motion-reduce:animate-none motion-reduce:border-t-current"
         />
       )}
       {pending ? "保存中…" : label}

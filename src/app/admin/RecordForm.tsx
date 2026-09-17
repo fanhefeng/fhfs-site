@@ -103,6 +103,11 @@ export function RecordForm({
     if (bucket) bucket.fields.push(field);
     else groups.push({ name, fields: [field] });
   }
+  // First-seen order alone put the ungrouped block first only when an
+  // ungrouped field happened to be declared first — true of every table so
+  // far, and not of the next one to put a group at the top of its list.
+  const loose = groups.findIndex((group) => group.name === null);
+  if (loose > 0) groups.unshift(...groups.splice(loose, 1));
 
   const renderField = (field: Field) => {
     const labelId = `${formId}-${field.name}`;

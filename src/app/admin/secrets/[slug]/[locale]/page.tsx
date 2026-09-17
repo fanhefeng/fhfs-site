@@ -27,6 +27,7 @@ export default async function EditSecret({
       title={secret.title}
       section="/admin/secrets"
       blurb={`${slug} · ${locale} · ${secret.kind === "podcast" ? "播客" : "随笔"}`}
+      sub
       view={secret.draft ? null : `/${locale}/secrets/${slug}`}
       action={
         secret.draft ? (

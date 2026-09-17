@@ -555,7 +555,11 @@ export function Workstation({ hint, className }: Props) {
         >
           <div
             className={`h-8 w-8 rounded-full border border-accent/50 border-t-transparent ${
-              status === "ready" ? "" : "animate-spin"
+              status === "ready"
+                ? ""
+                : // The same gate the admin spinners wear: reduce-motion stops
+                  // it and closes its gap, so it waits as a whole ring.
+                  "animate-spin motion-reduce:animate-none motion-reduce:border-t-accent/50"
             }`}
           />
         </div>
