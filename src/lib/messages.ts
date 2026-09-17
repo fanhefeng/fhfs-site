@@ -39,7 +39,10 @@ export const CLIENT_NAMESPACES = [
 export function pick(messages: Messages, namespaces: readonly string[]): Messages {
   const out: Messages = {};
   for (const namespace of namespaces) {
-    if (namespace in messages) out[namespace] = messages[namespace];
+    // Own keys only. `in` walks the prototype, so a namespace named after
+    // something on `Object.prototype` would hand the client a method where a
+    // catalogue should be — and `merge` below already refuses that direction.
+    if (Object.hasOwn(messages, namespace)) out[namespace] = messages[namespace];
   }
   return out;
 }
