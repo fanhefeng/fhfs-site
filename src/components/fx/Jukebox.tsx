@@ -44,17 +44,22 @@ export function Jukebox() {
     };
   }, []);
 
-  // The element is the source of truth for `playing`.
+  // The element is the source of truth for `playing` — and `playing` is the
+  // event that means sound, where `play` only means the request was accepted.
+  // These files are one to four megabytes behind `preload="none"`, so the gap
+  // between the two is the whole of the first buffer. Deliberately no
+  // `waiting` handler: a stall mid-track would flicker the state off and on,
+  // and the track is still the one playing.
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
     const onPlay = () => reportPlayback({ playing: true });
     const onStop = () => reportPlayback({ playing: false });
-    el.addEventListener("play", onPlay);
+    el.addEventListener("playing", onPlay);
     el.addEventListener("pause", onStop);
     el.addEventListener("error", onStop);
     return () => {
-      el.removeEventListener("play", onPlay);
+      el.removeEventListener("playing", onPlay);
       el.removeEventListener("pause", onStop);
       el.removeEventListener("error", onStop);
       el.pause();
