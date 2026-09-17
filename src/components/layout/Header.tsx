@@ -425,7 +425,12 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       travel = Math.sign(dy) === Math.sign(travel) ? travel + dy : dy;
       if (travel > FOLD_TRAVEL && expandedRef.current) {
         travel = 0;
-        setExpanded(false);
+        // Not out from under a keyboard reader: the keys that scroll the page
+        // are pressed while the focus sits on a door in the tray, and folding
+        // sets the tray `visibility: hidden` — which cannot hold focus, so it
+        // would drop to the body mid-read. The island stays open until they
+        // tab out of it, the same courtesy the pressed-shut island gets.
+        if (!trayRef.current?.contains(document.activeElement)) setExpanded(false);
       } else if (travel < -FOLD_TRAVEL && !expandedRef.current) {
         travel = 0;
         setExpanded(true);
