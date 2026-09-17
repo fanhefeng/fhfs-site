@@ -5,6 +5,8 @@ import { deletePost, savePost } from "../actions/posts";
 import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
+import { useFieldErrors } from "../ui/fieldErrors";
+import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import { DeleteRow } from "../DeleteRow";
 import { Select } from "../ui/Select";
 import { Toggle } from "../ui/Segmented";
@@ -29,10 +31,11 @@ type PostDraft = {
  */
 export function PostForm({ post, isNew }: { post: PostDraft; isNew: boolean }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(savePost, {});
+  const check = useFieldErrors();
 
   return (
     <>
-      <form action={formAction} className="space-y-5">
+      <form action={formAction} className="space-y-5" {...check.formProps}>
         {/* Tells savePost to redirect to the edit page: this page's props are a
             blank draft, and React resets the form to them after the action —
             without the redirect a successful save wipes the editor. */}
@@ -45,8 +48,12 @@ export function PostForm({ post, isNew }: { post: PostDraft; isNew: boolean }) {
               defaultValue={post.slug}
               readOnly={!isNew}
               required
+              pattern={KEY_PATTERN}
+              data-mismatch={KEY_MESSAGE}
               className={`${inputClass} ${isNew ? "" : "text-fg-tertiary"}`}
+              {...check.field("slug")}
             />
+            {check.message("slug")}
           </label>
 
           <div className="space-y-1.5">
@@ -74,14 +81,25 @@ export function PostForm({ post, isNew }: { post: PostDraft; isNew: boolean }) {
               defaultValue={post.date}
               placeholder="2026-08-05"
               required
+              pattern="\d{4}-\d{2}-\d{2}"
+              data-mismatch="日期要写成 YYYY-MM-DD。"
               className={inputClass}
+              {...check.field("date")}
             />
+            {check.message("date")}
           </label>
         </div>
 
         <label className="block space-y-1.5">
           <span className={labelClass}>标题</span>
-          <input name="title" defaultValue={post.title} required className={inputClass} />
+          <input
+            name="title"
+            defaultValue={post.title}
+            required
+            className={inputClass}
+            {...check.field("title")}
+          />
+          {check.message("title")}
         </label>
 
         <label className="block space-y-1.5">
