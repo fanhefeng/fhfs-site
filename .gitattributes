@@ -1,0 +1,21 @@
+# LF everywhere, whatever the checkout's platform says: the asset manifest is
+# a hash of file bytes, and a CRLF checkout would hash differently.
+* text=auto eol=lf
+
+# Never text, never diffed, never normalised.
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.woff2 binary
+*.mp3 binary
+*.glb binary
+*.wasm binary
+
+# Generated or vendored: collapsed in GitHub's diffs, left out of language stats.
+pnpm-lock.yaml linguist-generated
+src/lib/assets.gen.json linguist-generated
+src/app/yozai.css linguist-generated
+drizzle/meta/** linguist-generated
+backup/** linguist-generated
+public/draco/** linguist-vendored
