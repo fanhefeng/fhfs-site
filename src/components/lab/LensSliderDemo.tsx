@@ -258,7 +258,7 @@ export function LensSliderDemo({
       const linesOf = (i: number) => articles[i].querySelectorAll<HTMLElement>(".ls-body, .ls-meta");
 
       // Everything but the first slide starts below its mask.
-      articles.forEach((el, i) => {
+      articles.forEach((_, i) => {
         if (i === shownRef.current) return;
         gsap.set(charsOf(i), { yPercent: 110 });
         gsap.set(linesOf(i), { autoAlpha: 0, y: 14 });

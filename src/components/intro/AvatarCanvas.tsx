@@ -55,13 +55,13 @@ class CanvasBoundary extends Component<
   { onError: () => void; children: ReactNode },
   { failed: boolean }
 > {
-  state = { failed: false };
+  override state = { failed: false };
 
   static getDerivedStateFromError() {
     return { failed: true };
   }
 
-  componentDidCatch(error: unknown) {
+  override componentDidCatch(error: unknown) {
     // Degrading in silence would hide a genuine bug in the scene behind a
     // perfectly plausible-looking page.
     console.error(
@@ -71,7 +71,7 @@ class CanvasBoundary extends Component<
     this.props.onError();
   }
 
-  render() {
+  override render() {
     return this.state.failed ? null : this.props.children;
   }
 }
