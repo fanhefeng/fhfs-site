@@ -6,6 +6,8 @@ import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, textareaClass } from "../styles";
 import { DeleteRow } from "../DeleteRow";
 import { SaveControls } from "../SaveControls";
+import { useFieldErrors } from "../ui/fieldErrors";
+import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 
 export type WorkDraft = {
   key: string;
@@ -21,10 +23,11 @@ export type WorkDraft = {
 
 export function WorkForm({ work, isNew }: { work: WorkDraft; isNew: boolean }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(saveWork, {});
+  const check = useFieldErrors();
 
   return (
     <>
-      <form action={formAction} className="space-y-5">
+      <form action={formAction} className="space-y-5" {...check.formProps}>
         {/* Tells saveWork to refuse a key that already exists rather than
             overwrite the work that has it. */}
         {isNew && <input type="hidden" name="isNew" value="1" />}
@@ -36,8 +39,12 @@ export function WorkForm({ work, isNew }: { work: WorkDraft; isNew: boolean }) {
               defaultValue={work.key}
               readOnly={!isNew}
               required
+              pattern={KEY_PATTERN}
+              data-mismatch={KEY_MESSAGE}
               className={`${inputClass} ${isNew ? "" : "text-fg-tertiary"}`}
+              {...check.field("key")}
             />
+            {check.message("key")}
           </label>
           <label className="space-y-1.5">
             <span className={labelClass}>年份</span>

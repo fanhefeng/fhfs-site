@@ -49,9 +49,22 @@ export const list = (form: FormData, key: string): string[] =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+/**
+ * The grammar of a key, as source: the action tests it, and the "new" forms
+ * hand the same string to `<input pattern>` so a bad key is caught beside the
+ * field instead of after a round trip. The hyphen is escaped because a
+ * browser compiles `pattern` with the `v` flag, where a bare one in a class
+ * is a syntax error — and an invalid pattern is silently no pattern at all.
+ */
+export const KEY_PATTERN = "[a-z0-9][a-z0-9\\-]*";
+const KEY_RE = new RegExp(`^${KEY_PATTERN}$`);
+
 /** Shared by every keyed table — an empty key would upsert a "" row forever.
  *  Post slugs obey the same grammar (they become URLs). */
-export const validKey = (key: string): boolean => /^[a-z0-9][a-z0-9-]*$/.test(key);
+export const validKey = (key: string): boolean => KEY_RE.test(key);
+
+/** What the forms say beside a key that breaks the grammar. */
+export const KEY_MESSAGE = "只能用小写字母、数字和连字符，且不能以连字符开头。";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 

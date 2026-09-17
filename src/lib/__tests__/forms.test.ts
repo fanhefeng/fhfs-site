@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  KEY_PATTERN,
   intField,
   list,
   localized,
@@ -71,6 +72,14 @@ describe("validKey", () => {
     expect(validKey("Caps")).toBe(false);
     expect(validKey("with space")).toBe(false);
     expect(validKey("dots.in")).toBe(false);
+  });
+
+  it("is a pattern a browser can compile — `<input pattern>` uses the v flag", () => {
+    // An unescaped hyphen in a class throws here, and in a form it would
+    // just quietly switch the constraint off.
+    const asBrowser = new RegExp(`^(?:${KEY_PATTERN})$`, "v");
+    expect(asBrowser.test("my-post-2")).toBe(true);
+    expect(asBrowser.test("-leading")).toBe(false);
   });
 });
 
