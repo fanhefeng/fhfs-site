@@ -79,8 +79,8 @@ export function Jukebox() {
   );
 }
 
-/* Out of sight, and out of the way: an audio element draws nothing, but the
-   box stays a box so nothing else can lay out over a zero-sized node. */
+/* Out of sight, and out of the way: an audio element draws nothing, so the box
+   is 0×0 and fixed — out of the flow entirely, with nothing to lay out around. */
 const CSS = `
 .jukebox {
   position: fixed;

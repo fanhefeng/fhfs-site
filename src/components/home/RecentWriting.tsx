@@ -53,8 +53,10 @@ export function RecentWriting({ items, title, viewAllLabel, index }: Props) {
               </span>
               <span className="flex shrink-0 items-baseline gap-3 font-mono text-meta text-fg-tertiary">
                 {/* Reading time waits for interest where hovering exists; on
-                    touch there is nothing to hover, so it just stays. */}
-                <span className="transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100">
+                    touch there is nothing to hover, so it just stays. Keyboard
+                    focus counts as interest too — without that variant the
+                    reading time is the one thing a tab-through never sees. */}
+                <span className="transition-opacity duration-200 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-visible:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
                   {item.readingTime}
                 </span>
                 <span className="tabular-nums">{item.date}</span>

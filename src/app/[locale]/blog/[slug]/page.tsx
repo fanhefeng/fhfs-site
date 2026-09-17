@@ -122,7 +122,10 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
             description: post.summary,
             datePublished: post.date,
             author: { "@type": "Person", name: site.author },
-            url: `${site.url}/${locale}/blog/${post.slug}`,
+            // The same URL `generateMetadata` calls canonical: on a fallback
+            // render this prefix is not where the text lives, and two URLs each
+            // claiming to be the article is the thing hreflang exists to avoid.
+            url: `${site.url}/${post.locale}/blog/${post.slug}`,
           }}
         />
         {/* A fallback article is the other language's text under this
@@ -132,11 +135,14 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
             lang below. */}
         <article lang={post.isFallback ? htmlLang(post.locale) : undefined}>
           <header className="mb-12">
-            <p
-              lang={post.isFallback ? htmlLang(locale) : undefined}
-              className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
-            >
-              <time dateTime={post.date}>
+            {/* The line's own words are this locale's, even on a fallback
+                render — but the tags are the author's, in whatever language
+                they were written, so the override stops before them. */}
+            <p className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+              <time
+                dateTime={post.date}
+                lang={post.isFallback ? htmlLang(locale) : undefined}
+              >
                 {format.dateTime(new Date(post.date), {
                   year: "numeric",
                   month: "long",
@@ -144,7 +150,9 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
                 })}
               </time>
               <span aria-hidden>·</span>
-              <span>{t("readingTime", { minutes })}</span>
+              <span lang={post.isFallback ? htmlLang(locale) : undefined}>
+                {t("readingTime", { minutes })}
+              </span>
               {post.tags.map((tag) => (
                 <TagPill key={tag} tag={tag} />
               ))}

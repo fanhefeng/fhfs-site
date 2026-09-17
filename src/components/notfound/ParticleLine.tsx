@@ -506,6 +506,11 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
         if (ready) {
           redraw();
           start();
+        } else {
+          // Re-sampling failed — a zero-sized box, or the text wrapped. The
+          // real text comes back below; the dots from the last size have to
+          // go with it, or they sit on top of it.
+          ctx.clearRect(0, 0, cssW, cssH);
         }
       }, 180);
     });

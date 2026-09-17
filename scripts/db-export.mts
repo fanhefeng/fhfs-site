@@ -19,7 +19,7 @@
  *
  *   pnpm db:export
  */
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { asc } from "drizzle-orm";
@@ -30,6 +30,13 @@ import { connect } from "./connect.mjs";
 const db = connect();
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "backup");
+/**
+ * The snapshot is built next door and moved into place. `backup/` is the
+ * committed copy of the database, and emptying it before the first write means
+ * a connection that drops halfway leaves a half-written backup where a whole
+ * one used to be — recoverable from git, but only if someone notices.
+ */
+const STAGE = path.join(ROOT, ".backup.staging");
 
 /**
  * Every ordering below is total, not just sorted.
@@ -100,60 +107,69 @@ const data = {
 const strip = <T extends Record<string, unknown>>(rows: T[]) =>
   rows.map(({ id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest }) => rest);
 
-await rm(OUT, { recursive: true, force: true });
-await mkdir(path.join(OUT, "posts"), { recursive: true });
+await rm(STAGE, { recursive: true, force: true });
+await mkdir(path.join(STAGE, "posts"), { recursive: true });
 
-await writeFile(
-  path.join(OUT, "db.json"),
-  JSON.stringify(
-    Object.fromEntries(
-      Object.entries(data).map(([table, rows]) => [table, strip(rows as any)])
-    ),
-    null,
-    2
-  ) + "\n"
-);
-
-/** The article again, as the file it used to be. */
-for (const post of data.posts) {
-  const frontmatter = toYaml({
-    title: post.title,
-    date: post.date,
-    tags: post.tags,
-    summary: post.summary,
-    ...(post.draft ? { draft: true } : {}),
-  });
+try {
   await writeFile(
-    path.join(OUT, "posts", `${post.slug}.${post.locale}.md`),
-    `---\n${frontmatter}---\n\n${post.bodyMd}`
+    path.join(STAGE, "db.json"),
+    JSON.stringify(
+      Object.fromEntries(
+        Object.entries(data).map(([table, rows]) => [table, strip(rows as any)])
+      ),
+      null,
+      2
+    ) + "\n"
   );
-}
 
-/** The secrets likewise, in their own folder — a slug shared with a post
- *  must not overwrite it. */
-await mkdir(path.join(OUT, "secrets"), { recursive: true });
-for (const secret of data.secrets) {
-  const frontmatter = toYaml({
-    title: secret.title,
-    kind: secret.kind,
-    date: secret.date,
-    summary: secret.summary,
-    ...(secret.audio ? { audio: secret.audio } : {}),
-    ...(secret.duration != null ? { duration: secret.duration } : {}),
-    ...(secret.draft ? { draft: true } : {}),
-  });
-  await writeFile(
-    path.join(OUT, "secrets", `${secret.slug}.${secret.locale}.md`),
-    `---\n${frontmatter}---\n\n${secret.bodyMd}`
-  );
-}
+  /** The article again, as the file it used to be. */
+  for (const post of data.posts) {
+    const frontmatter = toYaml({
+      title: post.title,
+      date: post.date,
+      tags: post.tags,
+      summary: post.summary,
+      ...(post.draft ? { draft: true } : {}),
+    });
+    await writeFile(
+      path.join(STAGE, "posts", `${post.slug}.${post.locale}.md`),
+      `---\n${frontmatter}---\n\n${post.bodyMd}`
+    );
+  }
 
-for (const about of data.abouts) {
-  const frontmatter = toYaml({ title: about.title });
-  await writeFile(
-    path.join(OUT, `about.${about.locale}.md`),
-    `---\n${frontmatter}---\n\n${about.bodyMd}`
-  );
+  /** The secrets likewise, in their own folder — a slug shared with a post
+   *  must not overwrite it. */
+  await mkdir(path.join(STAGE, "secrets"), { recursive: true });
+  for (const secret of data.secrets) {
+    const frontmatter = toYaml({
+      title: secret.title,
+      kind: secret.kind,
+      date: secret.date,
+      summary: secret.summary,
+      ...(secret.audio ? { audio: secret.audio } : {}),
+      ...(secret.duration != null ? { duration: secret.duration } : {}),
+      ...(secret.draft ? { draft: true } : {}),
+    });
+    await writeFile(
+      path.join(STAGE, "secrets", `${secret.slug}.${secret.locale}.md`),
+      `---\n${frontmatter}---\n\n${secret.bodyMd}`
+    );
+  }
+
+  for (const about of data.abouts) {
+    const frontmatter = toYaml({ title: about.title });
+    await writeFile(
+      path.join(STAGE, `about.${about.locale}.md`),
+      `---\n${frontmatter}---\n\n${about.bodyMd}`
+    );
+  }
+
+  // Every write landed: the old backup goes, and the staged one takes its name.
+  await rm(OUT, { recursive: true, force: true });
+  await rename(STAGE, OUT);
+} catch (error) {
+  await rm(STAGE, { recursive: true, force: true });
+  throw error;
 }
 
 const counts = Object.entries(data).map(

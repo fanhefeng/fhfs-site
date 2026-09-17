@@ -48,3 +48,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Half-written snapshot from a db:export that failed partway.
+.backup.staging/

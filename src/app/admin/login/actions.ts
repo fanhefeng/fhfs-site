@@ -47,7 +47,7 @@ export async function login(
   }
 
   const password = formData.get("password");
-  if (typeof password !== "string" || !verifyPassword(password, stored)) {
+  if (typeof password !== "string" || !(await verifyPassword(password, stored))) {
     return { error: "密码不对。" };
   }
 

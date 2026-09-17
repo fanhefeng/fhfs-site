@@ -72,7 +72,10 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
           description: secret.summary,
           datePublished: secret.date,
           author: { "@type": "Person", name: site.author },
-          url: `${site.url}/${locale}/secrets/${secret.slug}`,
+          // The same URL `generateMetadata` calls canonical: on a fallback
+          // render this prefix is not where the text lives, and two URLs each
+          // claiming to be the article is the thing hreflang exists to avoid.
+          url: `${site.url}/${secret.locale}/secrets/${secret.slug}`,
           ...(isPodcast && secret.audio
             ? { associatedMedia: { "@type": "MediaObject", contentUrl: secret.audio } }
             : {}),

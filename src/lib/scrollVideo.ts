@@ -86,7 +86,15 @@ export class ScrollVideo {
         while (cursor < indices.length && !this.destroyed) {
           const index = indices[cursor++];
           try {
-            this.frames[index] = await this.loadFrame(index);
+            const frame = await this.loadFrame(index);
+            // `destroy()` closed and emptied `frames` while this was in
+            // flight; storing it now would put a bitmap nothing will ever
+            // close back into the array, one per worker still loading.
+            if (this.destroyed) {
+              if ("close" in frame) frame.close();
+              return;
+            }
+            this.frames[index] = frame;
           } catch {
             // One missing frame is survivable: the draw path falls back to
             // the nearest loaded neighbour.

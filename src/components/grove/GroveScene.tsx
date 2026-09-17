@@ -829,9 +829,15 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       W = hero.clientWidth;
       H = hero.clientHeight;
       if (!W || !H) return;
-      const dpr = Math.max(
-        1,
-        Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2, Math.sqrt(PIXEL_BUDGET / (W * H)))
+      // No floor at 1×: on a frame large enough to blow the budget the ratio
+      // has to be allowed below it, which is exactly what PIXEL_BUDGET's note
+      // promises for a 5K display. Solving it against the budget is the whole
+      // point — clamping it back to 1 would spend a third more than the budget
+      // on the largest frames, which are the ones that can least afford it.
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        small ? 1.6 : 2,
+        Math.sqrt(PIXEL_BUDGET / (W * H))
       );
       renderer.setPixelRatio(dpr);
       renderer.setSize(W, H, false);
