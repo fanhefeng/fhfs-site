@@ -330,6 +330,10 @@ export function AlbumDemo({
       const dir: 1 | -1 = (e.clientX - r.left) / r.width > 0.5 ? 1 : -1;
       if (!startTurn(dir, 0)) return;
       e.preventDefault();
+      // That also cancels the focus the press would have handed the scope, and
+      // the arrow keys listen there — so give it the focus outright. Without
+      // this, turning a page by hand is exactly what switches the keyboard off.
+      scope.current?.focus({ preventScroll: true });
       // Capture keeps the drag alive if the hand leaves the book mid-turn. It
       // throws for a pointer the browser does not consider active, and losing
       // the capture is survivable — losing the drag state is not, because the
@@ -355,6 +359,12 @@ export function AlbumDemo({
         kick();
         return;
       }
+      // One pointermove reaches this handler twice — once on the book, once on
+      // the window it bubbles to. Only the second pass is measured: the first
+      // would already have moved `value` to where the hand is, leaving the
+      // window's pass a distance of zero and a speed of zero with it, which is
+      // the number the flick at `onUp` is judged on.
+      if (e.currentTarget !== window) return;
       const dx = e.clientX - d.x0;
       d.moved = Math.max(d.moved, Math.abs(dx));
       const t = dragProgress(dx, d.dir, d.w);

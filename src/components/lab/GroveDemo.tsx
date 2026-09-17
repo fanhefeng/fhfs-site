@@ -114,7 +114,7 @@ const FAR_TOP = 1.36;
  * at all once the hand is still.
  *
  * The build is deferred until the stage is near the viewport, then split off
- * behind two frames — growing two roots and planting nearly 200k blades is a
+ * behind two frames — growing two roots and planting 230k blades is a
  * few hundred ms of blocked main thread, and doing it during the page's
  * entrance animation is exactly when it is most visible.
  */
@@ -1247,9 +1247,11 @@ export function GroveDemo({
         for (const m of materials) m.dispose();
         for (const t of textures) t.dispose();
         // The painted plates are held in `let`s because a repaint swaps them,
-        // so the pair to release is whichever dress is on at teardown.
+        // so the set to release is whichever dress is on at teardown — the
+        // same three the repaint drops, plus the bark.
         flowerMap.dispose();
         moteMap.dispose();
+        glowMap.dispose();
         barkPlates.dispose();
         releaseRenderer(renderer);
       };
