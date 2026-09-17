@@ -1,0 +1,5 @@
+# Formatting only. `git config blame.ignoreRevsFile .git-blame-ignore-revs` makes
+# blame look through these; GitHub does so by itself.
+
+# Format the tree with Prettier
+f1b9cf53418c8f96e81338d06ae54c502172f152
