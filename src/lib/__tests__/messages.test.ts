@@ -44,6 +44,10 @@ describe("pick", () => {
       plain: "x",
     });
   });
+
+  it("never reaches through the prototype for one", () => {
+    expect(pick({}, ["toString", "constructor"])).toEqual({});
+  });
 });
 
 const base = {
