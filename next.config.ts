@@ -85,11 +85,14 @@ const nextConfig: NextConfig = {
  * A production build or server refuses to start on a missing or mangled
  * variable, naming all of them at once (src/lib/env.ts). Left to themselves
  * they surface one by one — the admin's two not until somebody tries to log
- * in. `next dev`, `next typegen` and the linter are other phases and are left
- * alone: CI type-checks with no environment at all.
+ * in. `next dev` is another phase and is left alone. `next typegen` is not —
+ * it loads this file as a production build — so it is told apart by name:
+ * CI type-checks with no environment at all, and generating route types
+ * reads nothing that needs one.
  */
 export default function config(phase: string): NextConfig {
-  if (phase === PHASE_PRODUCTION_BUILD || phase === PHASE_PRODUCTION_SERVER) {
+  const running = phase === PHASE_PRODUCTION_BUILD || phase === PHASE_PRODUCTION_SERVER;
+  if (running && !process.argv.includes("typegen")) {
     const problems = envProblems(process.env);
     if (problems.length > 0) {
       throw new Error(`Environment not fit to run:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
