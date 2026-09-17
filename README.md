@@ -130,7 +130,8 @@ pnpm db:studio   # 表格界面
   Theme（Justin Hurwitz，《爱乐之城》原声，2016）**自托管**在
   `public/music/mia-and-sebastians-theme.mp3`——一个 `<audio loop preload="none">` 直接放，
   3 分 19 秒整首，不嵌任何第三方播放器，大陆网络照样能听。文件由本地 320kbps 源（8.0MB）经
-  `ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100` 重编码到 2.8MB（约 112kbps VBR）；
+  `pnpm media:music <源文件> <名字>`（`scripts/encode-music.mts`：去元数据、LAME `-q:a 5`、44.1kHz，
+  并报告首尾静音）重编码到 2.8MB（约 112kbps VBR）；
   页面引用的是带内容 hash 的地址（`asset()`，见 `src/lib/immutable.ts`），只有它缓存一年；重编码后跑
   `pnpm assets` 即可，不必改文件名。
   六张剧照 `public/lab/neon/`（1800px JPEG）取自 TMDB 收录的片方宣传剧照，
