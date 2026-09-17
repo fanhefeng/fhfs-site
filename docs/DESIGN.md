@@ -665,6 +665,38 @@
 >   14 个页面，长缓存目录的请求全部带 hash、零 404；`next/image` 经优化器取带 hash 的地址正常。
 >   **Vercel 上优化器回源是否同样过 rewrite，本地验不了，上线后看一眼 `/films` 的剧照。**
 
+> **2026-09-17 补记（工程化整理：把「靠人记」的规矩换成机器查的）**，接着当天「内容 hash 地址」那条：
+> - **同一类问题的排查结论**：两样东西必须一致、却只靠人保持一致的地方，当时全部是对的，但没有一处
+>   有东西盯着。现在盯着的：代码里写的图片宽高 ↔ 真实文件、剧照清单 ↔ 目录、帧数 ↔ 帧文件
+>   （`media.test.ts`）；zh/en 文案键对齐；`gsap` 只能经 `@/lib/gsap`（oxlint 规则，`GSDevTools` 的
+>   调试用动态 import 是唯一显式豁免）；页面以 `pageLocale` 开头、读库只在 `content.ts` 且只在
+>   `unstable_cache` 里、每个 action 先验会话后失效缓存（`conventions.test.ts`）；schema 里每张表都在
+>   db:check / export / import / 备份里登记（`tables.test.ts`）。
+> - **环境与域名**：`src/lib/env.ts` 一处描述全部变量，生产构建/启动时一次性报出所有缺失或畸形的
+>   （此前 admin 两个密钥要到部署后第一次登录才暴露）；`.env.example` 与之由测试保持一致。`site.url`
+>   改从部署读（`SITE_URL` > Vercel 生产域名 > 回落值），绑域名不用再记得改代码。
+> - **CSP**（`src/lib/csp.ts`）：脚本与样式保留 `'unsafe-inline'`——nonce 方案要求全站动态渲染，与全量
+>   预渲染冲突，Next 文档明说；其余全部收紧为同源。`'wasm-unsafe-eval'` 与 `blob:` worker 是 Draco
+>   解码器要的，去掉后 `/intro` 当场失败（验证过）。**以后加任何第三方脚本/字体/iframe/请求都要先改这里。**
+> - **`pnpm smoke`**：不引测试框架、不下浏览器，用本机 Chrome 走 CDP 把 sitemap 里每一页开一遍，
+>   抓 4xx、异常、控制台错误（CSP 违规就长这样）、以及没走 `asset()` 的资源请求。CI 第二个任务
+>   `build` 用只读库角色 `ci_readonly`（只能 SELECT，且读不了 `login_attempts`）构建后跑它。
+>   起因很具体：拆 actions 时一个相对 `import()` 少了一层 `../`，tsc 看不出来，只有构建抓到。
+> - **TypeScript 收紧**：加 `noUncheckedIndexedAccess` 等五项。约 340 处里绝大多数是循环边界/定长表
+>   保证有效的下标，用 `!`；WebGL uniform 查找确实可能落空，用 `?? null`（与 WebIDL 对 undefined 的
+>   处理逐位等价）。**唯一有意的行为变化**：`LabStudy` 取文案缺键时抛错——每个实验页都预渲染，所以是
+>   构建失败而不是线上一块空白。
+> - **其余**：`admin/actions.ts`（911 行）按表拆成 `actions/` 目录，函数原样搬；Prettier（钉死 3.9.6，
+>   行宽 100，是改动行数最少的设置；3.9.7 因 pnpm 的发布观察期策略没用）单独一个格式化提交并登记
+>   `.git-blame-ignore-revs`；`.githooks`（pre-commit 自动重算资源清单、查格式与 lint，pre-push 跑
+>   `pnpm check`）；覆盖率只算「有同名测试的模块」（98%，下限 93/88/90/93），顺带给 `markdown.ts` 的
+>   渲染管线补了端到端测试（原先只测了 URL 判定，XSS 防线本身没测）；Dependabot 周更、`sharp`
+>   设下限修掉 high 漏洞；sitemap 静态页不再填构建时间；`pnpm media:music` 取代 README 里那句
+>   ffmpeg；LICENSE 写明代码 MIT、文字与他人媒体不授权。
+> - **没做成的**：字体切分脚本。原始 cn-font-split 参数没留下记录，复现不了现有切片；该工具安装时
+>   还要从 GitHub 拉原生库、跑构建脚本，不适合进依赖。留给「Yozai 按字频重切」那一轮一并定参数。
+>   `three` r186 也没升——小版本常带破坏性改动，要看画面，Dependabot 里已排除并写了原因。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：
