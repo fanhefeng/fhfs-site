@@ -1,3 +1,5 @@
+import { asset } from "@/lib/asset";
+
 /**
  * The 3D intro: everything about the avatar that is *not* words.
  *
@@ -35,7 +37,7 @@ export type IntroSticker = {
   distance: number;
 };
 
-export const MODEL_URL = "/models/head.glb";
+export const MODEL_URL = asset("/models/head.glb");
 
 /**
  * Where the centre of the face sits, measured downwards from the top of the

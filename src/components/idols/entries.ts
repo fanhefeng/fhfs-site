@@ -1,3 +1,5 @@
+import { asset } from "@/lib/asset";
+
 /**
  * The wall of idols — who hangs on it, and where. One so far. The copy for
  * each lives under `idols.<key>` in the message catalogues; what is here is
@@ -26,7 +28,7 @@ export const IDOLS: IdolEntry[] = [
     slug: "kobe",
     key: "kobe",
     cover: {
-      src: "/idols/kobe/kobe-bryant-8.jpg",
+      src: asset("/idols/kobe/kobe-bryant-8.jpg"),
       width: 1071,
       height: 1600,
       altKey: "kobe.photos.hawaii8.alt",

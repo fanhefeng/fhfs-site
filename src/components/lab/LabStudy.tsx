@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import dynamic from "next/dynamic";
 import type { LabSlug } from "./entries";
 import { LENS_SLIDES } from "./lensSlides";
@@ -131,7 +132,7 @@ export function LabStudy({ slug, accent, text }: Props) {
           counterAria={text.counterAria}
           credit={text.credit}
           plates={ODYSSEY_STILLS.map((still) => ({
-            src: `/films/odyssey/${still.file}.jpg`,
+            src: asset(`/films/odyssey/${still.file}.jpg`),
             width: still.width,
             height: still.height,
             alt: text[`${still.id}Alt`],
@@ -151,7 +152,7 @@ export function LabStudy({ slug, accent, text }: Props) {
               label: text.cardALabel,
               title: text.cardATitle,
               href: text.cardAHref,
-              src: "/grove/moss-plate.webp",
+              src: asset("/grove/moss-plate.webp"),
               alt: text.cardAAlt,
               linkLabel: text.cardALink,
             },
@@ -159,7 +160,7 @@ export function LabStudy({ slug, accent, text }: Props) {
               label: text.cardBLabel,
               title: text.cardBTitle,
               href: text.cardBHref,
-              src: "/lab/dissolve/forest.jpg",
+              src: asset("/lab/dissolve/forest.jpg"),
               alt: text.cardBAlt,
               linkLabel: text.cardBLink,
             },
@@ -193,7 +194,7 @@ export function LabStudy({ slug, accent, text }: Props) {
           prevLabel={text.prev}
           nextLabel={text.next}
           slides={LENS_SLIDES.map((name) => ({
-            src: `/lab/lens/${name}.jpg`,
+            src: asset(`/lab/lens/${name}.jpg`),
             alt: text[`${name}Alt`],
             title: text[`${name}Title`],
             body: text[`${name}Body`],
@@ -212,7 +213,7 @@ export function LabStudy({ slug, accent, text }: Props) {
           galleryLede={text.galleryLede}
           credit={text.credit}
           stills={NEON_STILLS.map((still) => ({
-            src: `/lab/neon/${still.file}.jpg`,
+            src: asset(`/lab/neon/${still.file}.jpg`),
             width: still.width,
             height: still.height,
             span: still.span,

@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import Image from "next/image";
 import {
   useCallback,
@@ -97,7 +98,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   const dirRef = useRef(0);
   const swipeRef = useRef<{ x: number; y: number } | null>(null);
 
-  const src = (still: FilmStill) => `/films/${folder}/${still.file}.jpg`;
+  const src = (still: FilmStill) => asset(`/films/${folder}/${still.file}.jpg`);
 
   const open = (index: number, opener: HTMLElement) => {
     openerRef.current = opener;

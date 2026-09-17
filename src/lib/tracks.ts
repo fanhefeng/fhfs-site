@@ -1,3 +1,5 @@
+import { asset } from "@/lib/asset";
+
 /**
  * The records the site owns, by the room that plays them.
  *
@@ -32,13 +34,13 @@ export type Track = { src: string };
 
 const TRACKS: Record<TrackId, Track> = {
   /** Mia & Sebastian's Theme — Justin Hurwitz, La La Land (2016). */
-  theme: { src: "/music/mia-and-sebastians-theme.mp3" },
+  theme: { src: asset("/music/mia-and-sebastians-theme.mp3") },
   /** Lovely Day — Jurrivh. 峰言疯语's record. */
-  lovely: { src: "/music/lovely-day.mp3" },
+  lovely: { src: asset("/music/lovely-day.mp3") },
   /** 路小雨 — 周杰倫, from the 不能說的秘密 soundtrack (2007). */
-  secret: { src: "/music/lu-xiaoyu.mp3" },
+  secret: { src: asset("/music/lu-xiaoyu.mp3") },
   /** 一生所愛 — 盧冠廷, the 1995 original. */
-  odyssey: { src: "/music/a-lifetime-of-love.mp3" },
+  odyssey: { src: asset("/music/a-lifetime-of-love.mp3") },
 };
 
 /** The file this record plays. */

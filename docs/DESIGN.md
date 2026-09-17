@@ -645,6 +645,26 @@
 >   常量）、十几个只在本文件内用的符号上多余的 `export`、`gsap-extras` 里没人 import 的再导出
 >   （注册保留）、`retryFetch.ts` 头注释里一句过期的话；`yaml` 只有导出脚本用，挪到 devDependencies。
 
+> **2026-09-17 补记（`public/` 资源改成内容 hash 地址，「换文件名」那条规矩作废）**，覆盖 09-15 补记
+> 「重新切片要换文件夹名」、09-16 补记「重编码要换新文件名，不许原地覆盖」两句：
+> - **起因**：`public/` 不过打包器，文件名没有 hash，一年的 `immutable` 全靠「别原地覆盖」这条人记的
+>   规矩撑着；`/lab/lens` 四张图 08-28 进库时忘了进列表，三周没人发现。
+> - **做法**：`pnpm assets` 给长缓存目录下每个文件算 sha256 前 8 位，写进 `src/lib/assets.gen.json`
+>   （入库）；代码里一律 `asset("/lab/lens/sea.jpg")` → `/lab/lens/sea.c694b7cb.jpg`。`next.config.ts`
+>   的 `beforeFiles` rewrite 把带 hash 的地址映回原文件，**只有带 hash 的地址**发一年 `immutable`，
+>   原地址回到默认的每次再验证。地址形状、目录清单都在 `src/lib/immutable.ts`。
+> - **三个目录按整目录算一个 hash**，放在路径段里（`/draco/_b84c9890/draco_decoder.wasm`）：draco
+>   的文件名是 three.js 定的，改不了；90 帧和 174 个字体切片逐个列 hash 会把清单送进客户端包。
+>   `yozai.css` 里的地址由 `pnpm assets` 一并改写。
+> - **不靠记的三道闸**（都在 `pnpm check` 里）：`public/` 下每个文件必须归进某个清单；
+>   `assets.gen.json` 与 `yozai.css` 必须和磁盘上的文件对得上（换了图没跑 `pnpm assets` 就挂）；
+>   源码里指向这些目录的带扩展名字面量必须包在 `asset(` 里。三道都反向验证过会挂。
+> - **没选的路**：静态 `import`（打包器自带 hash）——mp3 / glb / draco 目录 / 按序号拼的 90 帧都走不了，
+>   会变成两套机制；给文件物理改名——仓库里文件名跟着内容变，diff 和引用都难看。
+> - **验证**：dev 与 `next build && next start` 下逐类地址核对状态码与缓存头；headless Chrome 走了
+>   14 个页面，长缓存目录的请求全部带 hash、零 404；`next/image` 经优化器取带 hash 的地址正常。
+>   **Vercel 上优化器回源是否同样过 rewrite，本地验不了，上线后看一眼 `/films` 的剧照。**
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：

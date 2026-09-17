@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -152,7 +153,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               label: th("cardLabLabel"),
               title: th("cardLabTitle"),
               href: `/${locale}/lab/grove`,
-              src: "/grove/moss-plate.webp",
+              src: asset("/grove/moss-plate.webp"),
               alt: th("cardLabAlt"),
               linkLabel: th("cardLabLink"),
             },
@@ -160,7 +161,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               label: th("cardPostLabel"),
               title: latest?.title ?? th("cardPostFallback"),
               href: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
-              src: "/lab/dissolve/forest.jpg",
+              src: asset("/lab/dissolve/forest.jpg"),
               alt: th("cardPostAlt"),
               linkLabel: th("cardPostLink"),
             },

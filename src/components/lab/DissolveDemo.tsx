@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
@@ -16,7 +17,7 @@ type Props = {
   fallbackNote: string;
 };
 
-const IMAGE = "/lab/dissolve/forest.jpg";
+const IMAGE = asset("/lab/dissolve/forest.jpg");
 
 const VERT = /* glsl */ `
 varying vec2 vUv;

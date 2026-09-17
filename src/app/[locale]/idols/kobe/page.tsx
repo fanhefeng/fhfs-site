@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -75,7 +76,7 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
           hint={tk("statueHint")}
           loading={tk("loading")}
           fallbackNote={tk("statueFallback")}
-          fallback={{ src: `/idols/kobe/${cover.file}`, width: cover.width, height: cover.height, alt: cover.alt }}
+          fallback={{ src: asset(`/idols/kobe/${cover.file}`), width: cover.width, height: cover.height, alt: cover.alt }}
           turnLeft={tk("turnLeft")}
           turnRight={tk("turnRight")}
         />

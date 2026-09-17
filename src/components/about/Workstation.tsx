@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
@@ -11,7 +12,7 @@ import { DRACO_DECODER_PATH } from "@/lib/three/draco";
  * the hero model of the owner's old fhf-portfolio, now living on the About
  * page. Compressed from 8.5 MB to 1.1 MB (Draco + 1024px WebP) at build
  * time; the Draco decoder is served from /draco/. */
-const MODEL_URL = "/models/workstation.glb";
+const MODEL_URL = asset("/models/workstation.glb");
 /** Idle turntable speed, rad/s — slow enough to read as "alive", not spin. */
 const IDLE_SPIN = 0.16;
 /**
