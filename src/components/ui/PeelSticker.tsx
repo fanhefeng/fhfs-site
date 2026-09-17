@@ -40,16 +40,18 @@ export function PeelSticker({
     // Placement rides an outer wrapper: a caller passing `absolute` would
     // otherwise collide with the `relative` the peel layers are anchored to.
     <div className={className}>
-      <div className="group relative h-[72px] w-28 rotate-[-2.5deg] [perspective:520px]">
+      <div className="group relative h-[72px] w-fit min-w-28 rotate-[-2.5deg] [perspective:520px]">
         {/* What the sticker was hiding: the address, on a plain surface card.
-          Inert while covered so the hidden link can't be tabbed into. */}
-        <span className="absolute inset-0 flex items-center justify-center rounded-[10px] border border-dashed border-line bg-surface px-2 text-center">
+          Inert while covered so the hidden link can't be tabbed into. The
+          card is the one in-flow layer: the address sits on a single line and
+          sets the sticker's width, so the note always covers it exactly. */}
+        <span className="flex h-full items-center justify-center whitespace-nowrap rounded-[10px] border border-dashed border-line bg-surface px-2.5 text-center">
           {email ? (
             <a
               href={`mailto:${email}`}
               tabIndex={peeled ? 0 : -1}
               aria-hidden={!peeled}
-              className="break-all font-mono text-[10.5px] leading-tight text-accent underline decoration-from-font underline-offset-2"
+              className="font-mono text-[10.5px] leading-tight text-accent underline decoration-from-font underline-offset-2"
             >
               {email}
             </a>

@@ -188,6 +188,10 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   };
 
   const onPointerDown = (e: PointerEvent<HTMLElement>) => {
+    // A press that starts on a control belongs to that control. The swipe is
+    // 40px and the buttons are wider than that, so a press that wandered
+    // across one would have fired its click and a swipe both, stepping twice.
+    if ((e.target as HTMLElement).closest("button")) return;
     swipeRef.current = { x: e.clientX, y: e.clientY };
   };
   const onPointerUp = (e: PointerEvent<HTMLElement>) => {

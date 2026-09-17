@@ -30,8 +30,11 @@ export function Footer({ items }: { items: NavLink[] }) {
 
   return (
     <footer className="relative mt-24 border-t border-line">
-      {/* pr reserves the sticker's corner on every wrap breakpoint. */}
-      <div className="mx-auto flex min-h-28 max-w-[1120px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-8 pr-40 text-[13px] sm:px-10 sm:pr-44">
+      {/* The sticker is as wide as the address on it, too wide to sit beside
+          a phone's links: there it gets a band of its own under them (pb).
+          From sm up it keeps its corner (pr), and the reserve shrinks as the
+          viewport outgrows the 1120px column and the sticker drifts clear. */}
+      <div className="mx-auto flex min-h-28 max-w-[1120px] flex-wrap items-center gap-x-6 gap-y-2 px-6 pb-28 pt-8 text-[13px] sm:px-10 sm:py-8 sm:pr-[clamp(2.5rem,calc(15.5rem_-_(100vw_-_1120px)_/_2),15.5rem)]">
         {/* The same badge as the island's: the name in the sign's ring. */}
         <Link
           href="/"
