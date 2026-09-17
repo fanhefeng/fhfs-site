@@ -1,0 +1,16 @@
+# Generated, vendored or written by a tool that has its own opinion.
+.next
+node_modules
+pnpm-lock.yaml
+backup
+drizzle
+public
+patches
+next-env.d.ts
+src/lib/assets.gen.json
+src/app/yozai.css
+
+# Prose. Prettier would re-flow tables and list markers in documents that are
+# read far more than they are diffed.
+*.md
+tools
