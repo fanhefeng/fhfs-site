@@ -771,3 +771,24 @@ body {
     widows: 3;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * /admin — the one animation the workbench uses
+ *
+ * Panels that appear under a control (the Select listbox, the mobile section
+ * drawer) come up with it rather than blinking into place. It is a one-shot
+ * entrance on an element that has just mounted, so there is nothing to pause:
+ * §1.5's "no reduced-motion tiers" applies, and this is not one of the five
+ * exceptions. GSAP stays out of /admin entirely — the editor loads none of the
+ * front-end's animation rig, and a 140ms keyframe needs none of it.
+ * ------------------------------------------------------------------------- */
+@keyframes admin-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -25,19 +25,15 @@ export default async function EditSecret({
   return (
     <AdminChrome
       title={secret.title}
+      section="/admin/secrets"
+      blurb={`${slug} · ${locale} · ${secret.kind === "podcast" ? "播客" : "随笔"}`}
+      view={secret.draft ? null : `/${locale}/secrets/${slug}`}
       action={
         secret.draft ? (
-          <span className="text-caption text-fg-tertiary">草稿，未发布</span>
-        ) : (
-          <a
-            href={`/${locale}/secrets/${slug}`}
-            target="_blank"
-            rel="noreferrer"
-            className="text-caption text-fg-tertiary hover:text-accent"
-          >
-            在站上看 ↗
-          </a>
-        )
+          <span className="font-mono text-meta uppercase tracking-meta text-accent">
+            草稿，未发布
+          </span>
+        ) : null
       }
     >
       <SecretForm

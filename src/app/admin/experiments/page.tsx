@@ -6,6 +6,7 @@ import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { deleteExperiment, saveExperiment } from "../actions";
 import type { Field, RecordData } from "../RecordForm";
+import { Note } from "../ui/Note";
 
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
@@ -15,7 +16,11 @@ const FIELDS: Field[] = [
     name: "status",
     label: "状态",
     kind: "select",
-    options: ["live", "wip", "planned"],
+    options: [
+      { value: "live", label: "live · 在跑", hint: "站上点得开，效果是真的" },
+      { value: "wip", label: "wip · 在做", hint: "动工了，还没上线" },
+      { value: "planned", label: "planned · 想做", hint: "只是个念头，别写成已完成" },
+    ],
   },
   { name: "accent", label: "圆点颜色（hex）", kind: "text", placeholder: "#4c7a5b" },
   { name: "href", label: "外链（可空）", kind: "text" },
@@ -42,16 +47,16 @@ export default async function ExperimentsPage() {
   };
 
   return (
-    <AdminChrome title="实验">
-      <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
-        状态要说实话：<code>live</code> 是真的在跑，<code>planned</code> 是还没做。
-        不是这里实现的就填外链指回出处。效果从站上撤掉了，这里也要跟着撤——
+    <AdminChrome title="实验" section="/admin/experiments">
+      <Note>
+        状态要说实话。不是这里实现的就填外链指回出处；效果从站上撤掉了，这里也要跟着撤——
         删掉，或者至少把状态改掉。
-      </p>
+      </Note>
       <RecordList
         action={saveExperiment}
         deleteAction={deleteExperiment}
         fields={FIELDS}
+        unit="个"
         rows={rows.map((row) => ({
           id: row.key,
           label: row.name.zh,

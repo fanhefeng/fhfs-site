@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { posts } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
+import { ghostButtonClass } from "../styles";
 
 export default async function PostsIndex() {
   await requireAdminPage();
@@ -22,11 +23,12 @@ export default async function PostsIndex() {
   return (
     <AdminChrome
       title="文章"
+      section="/admin/posts"
       action={
-        <Link
-          href="/admin/posts/new"
-          className="min-h-11 rounded-card border border-line px-4 py-2.5 text-caption hover:border-accent hover:text-accent"
-        >
+        <Link href="/admin/posts/new" className={ghostButtonClass}>
+          <span aria-hidden className="text-fg-tertiary">
+            +
+          </span>
           写新的
         </Link>
       }
@@ -36,7 +38,7 @@ export default async function PostsIndex() {
           <li key={`${post.slug}.${post.locale}`}>
             <Link
               href={`/admin/posts/${post.slug}/${post.locale}`}
-              className="flex min-h-11 flex-wrap items-baseline gap-x-4 gap-y-1 py-3 hover:text-accent"
+              className="group flex min-h-12 flex-wrap items-baseline gap-x-4 gap-y-1 px-2 py-3 transition-colors hover:bg-surface/60"
             >
               <span className="font-mono text-meta text-fg-tertiary tabular-nums">
                 {post.date}
@@ -44,7 +46,9 @@ export default async function PostsIndex() {
               <span className="font-mono text-meta uppercase text-fg-tertiary">
                 {post.locale}
               </span>
-              <span className="flex-1 text-body">{post.title}</span>
+              <span className="flex-1 text-body transition-colors group-hover:text-accent">
+                {post.title}
+              </span>
               {post.draft && (
                 <span className="font-mono text-meta uppercase tracking-meta text-accent">
                   草稿

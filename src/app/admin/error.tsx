@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { buttonClass } from "./styles";
+import { buttonClass, ghostButtonClass } from "./styles";
 
 /**
  * The admin's error boundary.
@@ -42,10 +42,7 @@ export default function AdminError({
         <button type="button" onClick={reset} className={buttonClass}>
           再试一次
         </button>
-        <Link
-          href="/admin/login"
-          className="min-h-11 rounded-card border border-line px-4 py-2.5 text-caption hover:border-accent hover:text-accent"
-        >
+        <Link href="/admin/login" className={ghostButtonClass}>
           重新登录
         </Link>
         <Link href="/admin" className="text-caption text-fg-tertiary hover:text-accent">
