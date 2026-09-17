@@ -11,11 +11,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Commands
 
 ```bash
-pnpm check        # tsc --noEmit + oxlint + vitest — the gate; run before calling work done
-pnpm test         # vitest over src/lib pure functions only (src/lib/__tests__)
+pnpm check        # tsc + oxlint + prettier --check + vitest with its coverage floor — the gate
+pnpm test         # vitest over src/lib (src/lib/__tests__); test:coverage adds the floor
+pnpm format       # prettier --write (pinned version, printWidth 100)
 pnpm dev          # dev server
-pnpm build        # prerenders from the DB — DATABASE_URL required, fails loudly without
+pnpm build        # prerenders from the DB — fails loudly on a missing/malformed env var (src/lib/env.ts)
+pnpm smoke [url]  # every page in the sitemap, in this machine's Chrome: 4xx, exceptions, console/CSP errors
 pnpm assets       # after touching public/: re-hash, rewrite assets.gen.json + yozai.css
+pnpm media:music <src> <name>   # encode a record the way the others were, report loop silence
 pnpm db:generate  # after editing src/db/schema.ts, then:
 pnpm db:migrate
 pnpm db:check     # print what's actually in each table
@@ -23,12 +26,27 @@ pnpm db:export    # write DB back to backup/
 pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/cache/fetch-cache` + restart does the same)
 ```
 
-Tests cover only pure functions in `src/lib`; there is no component or e2e
-suite. The scripts share `scripts/connect.mts` (env, unpooled URL, the same
-connection-level retry as the site, with more patient delays); a new script
-calls `connect()` rather than building its own handle. `pnpm lint` runs the project-local oxlint (`.oxlintrc.json`) over
-`src`, `scripts` and the config files; CI (`.github/workflows/check.yml`) runs
-`pnpm check` on Node 24 (`.node-version`, `engines`). This machine's Node and
+Tests cover pure functions in `src/lib`, plus a set that reads the *source*
+rather than running it — the rules that break without an error:
+`conventions.test.ts` (pages start from `pageLocale`, the database is read
+only in `content.ts` and only inside `unstable_cache`, every admin action
+checks the session first and invalidates last), `asset.test.ts`,
+`media.test.ts` (sizes written in code against the files), `tables.test.ts`
+(every schema table named in db:check / export / import / backup),
+`env.test.ts`, `messages.test.ts`. When you add a rule of that kind to this
+file, add its check there. There is no component suite; `pnpm smoke` is the
+end-to-end pass. The scripts share `scripts/connect.mts` (env, unpooled URL,
+the same connection-level retry as the site, with more patient delays); a new
+script calls `connect()` rather than building its own handle. `pnpm lint` runs
+the project-local oxlint (`.oxlintrc.json`); `gsap` may only be imported via
+`@/lib/gsap` (a lint rule). TypeScript runs with `noUncheckedIndexedAccess`:
+use `!` where a loop bound or a fixed table proves the index, narrow
+otherwise. CI (`.github/workflows/check.yml`) runs `pnpm check` and
+`pnpm audit`, then a second job builds against a read-only database role
+(`ci_readonly`) and runs the smoke test; both on Node 24 (`.node-version`,
+`engines`). Hooks in `.githooks/` (installed by `pnpm install`): pre-commit
+regenerates the asset manifest when `public/` changed and checks format and
+lint on staged files; pre-push runs `pnpm check`. This machine's Node and
 global JS CLIs are managed by `vp`, not npm/nvm.
 
 The one read from outside the database is `src/lib/github.ts`: each app's
@@ -69,6 +87,15 @@ Failures resolve to `null` and the badge is simply absent.
   that is `upsertKeyed(table, row, isNew)` in `shared.ts`.
   `conventions.test.ts` checks the session-first, invalidate-last shape of
   every action.
+- **Environment and origin**: every variable is described in
+  `src/lib/env.ts` and documented in `.env.example` (a test keeps them in
+  step); a new `process.env.X` needs a rule there. `site.url` comes from the
+  deployment (`src/lib/siteUrl.ts`: `SITE_URL`, else Vercel's production
+  domain) — never hard-code the origin.
+- **Security headers**: the CSP lives in `src/lib/csp.ts` and is sent from
+  `next.config.ts`. It allows nothing cross-origin; a new third-party script,
+  font, frame or fetch has to be added there, and `pnpm smoke` is how you find
+  out you forgot.
 - **Error boundaries**: `src/app/[locale]/error.tsx` (a page failing at
   request time — a cold database on an uncached path), `src/app/global-error.tsx`
   (the layout itself), `src/app/admin/error.tsx`. Keep them dependency-free;
