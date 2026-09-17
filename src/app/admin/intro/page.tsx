@@ -4,7 +4,7 @@ import { introNodes } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { deleteIntroNode, saveIntroNode } from "../actions";
+import { deleteIntroNode, saveIntroNode } from "../actions/intro";
 import type { Field, RecordData } from "../RecordForm";
 import { Note } from "../ui/Note";
 

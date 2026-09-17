@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { saveAbout, type ActionState } from "../actions";
+import { saveAbout } from "../actions/about";
+import type { ActionState } from "../actions/shared";
 import { inputClass, monoClass, textareaClass, labelClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 

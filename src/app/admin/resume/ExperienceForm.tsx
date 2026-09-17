@@ -3,11 +3,8 @@
 import { useActionState } from "react";
 import type { ResumeProject } from "@/db/schema";
 import { formatProjects } from "@/lib/resume";
-import {
-  deleteResumeExperience,
-  saveResumeExperience,
-  type ActionState,
-} from "../actions";
+import { deleteResumeExperience, saveResumeExperience } from "../actions/resume";
+import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { DeleteRow } from "../DeleteRow";
 import { SaveControls } from "../SaveControls";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import type { ActionState } from "./actions";
+import type { ActionState } from "./actions/shared";
 import { hintClass, inputClass, labelClass, metaClass, monoClass, textareaClass } from "./styles";
 import { SaveControls } from "./SaveControls";
 import { DeleteRow } from "./DeleteRow";

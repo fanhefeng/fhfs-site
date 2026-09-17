@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { saveChips, type ActionState } from "../actions";
+import { saveChips } from "../actions/chips";
+import type { ActionState } from "../actions/shared";
 import { ghostButtonClass, inputClass, labelClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 import { Select } from "../ui/Select";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { ActionState } from "./actions";
+import type { ActionState } from "./actions/shared";
 import { RecordForm, type Field, type RecordData } from "./RecordForm";
 import { cardClass, fieldSkin, ghostButtonClass, hintClass, metaClass } from "./styles";
 

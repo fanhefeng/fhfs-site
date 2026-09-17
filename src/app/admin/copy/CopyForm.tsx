@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { saveCopy, type ActionState } from "../actions";
+import { saveCopy } from "../actions/copy";
+import type { ActionState } from "../actions/shared";
 import { cardClass, fieldSkin, hintClass, inputClass, metaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 

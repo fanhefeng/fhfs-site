@@ -8,7 +8,7 @@ import { buttonClass, ghostButtonClass } from "./styles";
  * The admin's error boundary.
  *
  * The save actions never throw for an expired session — they hand the form a
- * message instead, so nothing typed is lost (see actions.ts). What still
+ * message instead, so nothing typed is lost (see actions/shared.ts). What still
  * reaches here: a delete pressed after the session ran out, a database that
  * would not answer, or a bug. The page says so in the editor's own language,
  * and offers the two ways out that actually help — try again, or sign in

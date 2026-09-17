@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { deleteSecret, saveSecret, type ActionState } from "../actions";
+import { deleteSecret, saveSecret } from "../actions/secrets";
+import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { DeleteRow } from "../DeleteRow";
 import { Select } from "../ui/Select";
