@@ -509,8 +509,15 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
         } else {
           // Re-sampling failed — a zero-sized box, or the text wrapped. The
           // real text comes back below; the dots from the last size have to
-          // go with it, or they sit on top of it.
-          ctx.clearRect(0, 0, cssW, cssH);
+          // go with it, or they sit on top of it. Cleared by the bitmap's own
+          // pixels, with the dpr transform stood down for the one call:
+          // `sample` writes the new `cssW`/`cssH` before it gives up, and a
+          // box that shrank — or went to zero — would leave the old dots
+          // outside that rectangle standing.
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.restore();
         }
       }, 180);
     });
