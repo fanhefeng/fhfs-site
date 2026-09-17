@@ -31,5 +31,42 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # typecheck + lint + unit tests — the same gate as local `pnpm check`.
+      # typecheck + lint + unit tests with their coverage floor — the same
+      # gate as local `pnpm check`.
       - run: pnpm check
+
+      - run: pnpm audit --prod --audit-level high
+
+  # What `check` cannot see. A relative import one folder too shallow, a page
+  # that throws while prerendering, a Content-Security-Policy that blocks the
+  # decoder: all of them type-check, and all of them used to be found by the
+  # deploy. This builds the site the way Vercel does and walks it in a browser.
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # A role that can only SELECT (`ci_readonly`, and not from
+      # login_attempts). Absent on pull requests from forks and from
+      # Dependabot, which get no secrets — the steps below skip themselves
+      # there, and the push to main after the merge runs them.
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # The build refuses to start without these two (src/lib/env.ts). Nobody
+      # logs in to a CI build; they only have to be well-formed.
+      AUTH_SECRET: ci-only-not-a-secret-ci-only-not-a-secret-00
+      ADMIN_PASSWORD_HASH: 00000000000000000000000000000000:0000000000000000000000000000000000000000000000000000000000000000
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - if: env.DATABASE_URL != ''
+        run: pnpm build
+
+      - if: env.DATABASE_URL != ''
+        run: |
+          pnpm start &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/robots.txt && break; sleep 1; done
+          pnpm smoke http://localhost:3000
