@@ -30,7 +30,7 @@ export type TrackId = "theme" | "lovely" | "secret" | "odyssey";
 /** Ours to serve: a file under `public/music`, played by a plain `<audio>`. */
 export type Track = { src: string };
 
-export const TRACKS: Record<TrackId, Track> = {
+const TRACKS: Record<TrackId, Track> = {
   /** Mia & Sebastian's Theme — Justin Hurwitz, La La Land (2016). */
   theme: { src: "/music/mia-and-sebastians-theme.mp3" },
   /** Lovely Day — Jurrivh. 峰言疯语's record. */

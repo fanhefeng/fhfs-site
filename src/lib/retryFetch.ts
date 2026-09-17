@@ -6,8 +6,8 @@
  * connects: the handshake hangs until undici's connect timeout and the
  * driver reports `fetch failed`. Without this, one such fetch was a 500 on
  * whichever page was rendering, and a failed build if it happened during
- * the prerender. `scripts/db-import.mts` guards the same thing statement by
- * statement.
+ * the prerender. The scripts wear the same wrapper with more patient delays
+ * (`scripts/connect.mts`).
  *
  * Only a network-level failure is retried: `fetch` rejects with a
  * `TypeError` for exactly those, and never for an HTTP status or a Postgres
@@ -23,7 +23,7 @@ export type FetchLike = (
 ) => Promise<Response>;
 
 /** The pause before each retry, in ms: two retries, the second patient. */
-export const RETRY_DELAYS: readonly number[] = [300, 1200];
+const RETRY_DELAYS: readonly number[] = [300, 1200];
 
 /**
  * What `fetch` throws when it could not get a response at all. Node builds

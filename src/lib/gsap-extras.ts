@@ -31,13 +31,8 @@ gsap.registerPlugin(
   ExpoScaleEase
 );
 
-// InertiaPlugin, ScrambleTextPlugin and CustomWiggle are re-exported for the
-// odd case that wants the class; their string forms work from registration
-// alone.
-export {
-  Draggable,
-  InertiaPlugin,
-  ScrambleTextPlugin,
-  CustomWiggle,
-  ExpoScaleEase,
-};
+// Only the class a component actually names is exported. The rest work from
+// registration alone — `inertia: true`, `scrambleText:`, `"wiggle(…)"`.
+// ExpoScaleEase has no string form (see above), so the first component that
+// wants it adds it to this export.
+export { Draggable };

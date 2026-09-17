@@ -82,7 +82,7 @@ export function NeonFilter({
 }
 
 /** The glass by daylight: the same band, unlit. */
-export function DarkGlassFilter({ id }: { id: string }) {
+function DarkGlassFilter({ id }: { id: string }) {
   return (
     <filter id={id} x="-15%" y="-15%" width="130%" height="130%" colorInterpolationFilters="sRGB">
       <feMorphology in="SourceAlpha" operator="erode" radius={TUBE} result="inner" />
@@ -94,7 +94,7 @@ export function DarkGlassFilter({ id }: { id: string }) {
 }
 
 /** The one rule the art needs: every lit segment starts dark. */
-export const NEON_ART_CSS = `.neon-lit .neon-seg { opacity: 0; }`;
+const NEON_ART_CSS = `.neon-lit .neon-seg { opacity: 0; }`;
 
 type ArtProps = {
   /** Prefix for every id inside — the same sign may hang twice on a page. */
@@ -189,9 +189,6 @@ export function score(tl: gsap.core.Timeline, targets: Element[], at: number, st
 
 /** Picks a segment's elements out of a sign. */
 export type SegPicker = (name: SegName) => Element[];
-
-/** Where the lighting-up score ends: after this, nothing is repainted. */
-export const LIGHT_SCORE_END = 2.7;
 
 /**
  * Lighting up: the ring stutters first, the bar follows, the letters one at

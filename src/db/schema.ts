@@ -35,11 +35,6 @@ export const appCategoryEnum = pgEnum("app_category", [
   "game",
   "website",
 ]);
-export const experimentStatusEnum = pgEnum("experiment_status", [
-  "live",
-  "wip",
-  "planned",
-]);
 export const chipToneEnum = pgEnum("chip_tone", ["paper", "ink", "accent"]);
 export const secretKindEnum = pgEnum("secret_kind", ["essay", "podcast"]);
 
@@ -251,24 +246,6 @@ export const works = pgTable("works", {
   // Stored for the same reason apps carry one: a colour derived from list
   // position repaints the whole wall the moment anything is reordered.
   accent: text(),
-  sort: integer().notNull().default(0),
-});
-
-/**
- * The craft log. Merges `CRAFT_ENTRIES` (structure) with
- * `portfolio.experiments.<id>` (copy) — adding one used to mean editing a
- * constant plus two message files, with nothing to catch a missed edit.
- */
-export const experiments = pgTable("experiments", {
-  id: serial().primaryKey(),
-  key: text().notNull().unique(),
-  name: localized().notNull(),
-  description: localized().notNull(),
-  status: experimentStatusEnum().notNull(),
-  accent: text(),
-  href: text(),
-  // Names an in-page demo component when the experiment ships one.
-  demo: text(),
   sort: integer().notNull().default(0),
 });
 

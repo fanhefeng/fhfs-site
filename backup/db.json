@@ -2993,72 +2993,6 @@
     }
   ],
   "works": [],
-  "experiments": [
-    {
-      "key": "specularEdge",
-      "name": {
-        "en": "Lit glass edge",
-        "zh": "被照亮的玻璃描边"
-      },
-      "description": {
-        "en": "A feSpecularLighting point light rides the card's hairline rim — the cursor is the torch, the colour is the project's own. Touch gets a static rim.",
-        "zh": "卡片描边接一枚 feSpecularLighting 点光源，光标就是手电，光源颜色取每件作品自己的主色；触摸设备下退为静态微光。"
-      },
-      "status": "live",
-      "accent": "#b45309",
-      "href": "https://codepen.io/jh3yy/pen/azORaYx",
-      "demo": null,
-      "sort": 1
-    },
-    {
-      "key": "liquidLens",
-      "name": {
-        "en": "Liquid glass lens",
-        "zh": "液态玻璃透镜"
-      },
-      "description": {
-        "en": "HTML-in-Canvas draws the living DOM into a canvas, then a refracting puck magnifies it under the cursor — the link underneath stays clickable and focusable. Browsers without the API get CSS glass.",
-        "zh": "用 HTML-in-Canvas 把活的 DOM 画进画布，再在光标处叠一枚放大的折射透镜；下面的链接照样可点、可聚焦。不支持的浏览器退回 CSS 玻璃。"
-      },
-      "status": "wip",
-      "accent": "#3e6d93",
-      "href": null,
-      "demo": "liquid-lens",
-      "sort": 2
-    },
-    {
-      "key": "shatteredGlass",
-      "name": {
-        "en": "Three.js shattered-glass hero",
-        "zh": "Three.js 碎玻璃 hero"
-      },
-      "description": {
-        "en": "Five Voronoi-cut panes with dispersion, iridescence and clearcoat — someone else's experiment; this page just keeps the link.",
-        "zh": "Voronoi 切开的五块折射玻璃，色散、薄膜干涉、清漆高光一应俱全——别人的实验，这里只做记录和外链。"
-      },
-      "status": "planned",
-      "accent": "#6b5ba8",
-      "href": "https://experiments.thisiswhitespace.com/glass-hero",
-      "demo": null,
-      "sort": 3
-    },
-    {
-      "key": "lightsOn",
-      "name": {
-        "en": "Lights on",
-        "zh": "开灯"
-      },
-      "description": {
-        "en": "The theme switch is opening and closing the gallery: a 1.2s cross-fade wrapped in a View Transition, aurora and imagery changing shift together.",
-        "zh": "全站的亮暗切换是一次开馆与闭馆：1.2s 交叉淡化包在 View Transition 里，光晕和图像同时换班。"
-      },
-      "status": "live",
-      "accent": "#a8465f",
-      "href": null,
-      "demo": null,
-      "sort": 4
-    }
-  ],
   "introNodes": [
     {
       "key": "frontend",
@@ -4156,8 +4090,8 @@
     },
     {
       "key": "lab.items.dissolve.note",
-      "zh": "垂直梯度做主导，低频 fbm 把边缘揉碎，高频碎点补细节。阈值随滚动扫过整屏。这一则已经用在了作品页的封面上。",
-      "en": "A vertical gradient leads, low-frequency fbm crumbles the edge, high-frequency speckle adds grain. The threshold sweeps the screen as you scroll. This study is now the cover of the portfolio.",
+      "zh": "垂直梯度做主导，低频 fbm 把边缘揉碎，高频碎点补细节。阈值随滚动扫过整屏。",
+      "en": "A vertical gradient leads, low-frequency fbm crumbles the edge, high-frequency speckle adds grain. The threshold sweeps the screen as you scroll.",
       "note": null
     },
     {

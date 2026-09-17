@@ -31,7 +31,7 @@ export type LiquidMix = {
   base: number;
 };
 
-export const FULL_MIX: LiquidMix = {
+const FULL_MIX: LiquidMix = {
   rim: 1,
   soften: COMPOSITE.soften,
   glow: COMPOSITE.glow,

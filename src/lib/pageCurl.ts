@@ -121,7 +121,7 @@ export function spreads<T>(items: readonly T[]): [T, T | null][] {
  * every turn is a slow crawl to the edge of the screen; requiring much less
  * makes the page fly away from under the finger.
  */
-export const DRAG_SPAN = 0.62;
+const DRAG_SPAN = 0.62;
 
 export function dragProgress(dx: number, dir: 1 | -1, width: number): number {
   const raw = (dir === 1 ? -dx : dx) / (width * DRAG_SPAN);

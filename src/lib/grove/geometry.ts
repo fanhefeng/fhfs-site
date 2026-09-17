@@ -60,7 +60,7 @@ const ASPECT_FAR = 1600 / 757;
    ──────────────────────────────────────────────────────────────────────── */
 
 /** mulberry32 — small, fast, and seeded, which is the whole point. */
-export function makeRng(seed: number): () => number {
+function makeRng(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -117,12 +117,12 @@ function fbm2(x: number, y: number): number {
   return s / 0.9375;
 }
 
-export function smoothstep(edge0: number, edge1: number, x: number): number {
+function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.min(Math.max((x - edge0) / (edge1 - edge0), 0), 1);
   return t * t * (3 - 2 * t);
 }
 
-export function clamp01(x: number): number {
+function clamp01(x: number): number {
   return x < 0 ? 0 : x > 1 ? 1 : x;
 }
 
