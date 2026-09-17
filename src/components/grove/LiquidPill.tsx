@@ -234,9 +234,9 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     };
 
     const fieldArr = new Float32Array(FIELD_ORDER.length);
-    for (let i = 0; i < FIELD_ORDER.length; i++) fieldArr[i] = FIELD[FIELD_ORDER[i]];
+    for (let i = 0; i < FIELD_ORDER.length; i++) fieldArr[i] = FIELD[FIELD_ORDER[i]!];
     const rimArr = new Float32Array(RIM_ORDER.length);
-    for (let i = 0; i < RIM_ORDER.length; i++) rimArr[i] = RIM[RIM_ORDER[i]];
+    for (let i = 0; i < RIM_ORDER.length; i++) rimArr[i] = RIM[RIM_ORDER[i]!];
 
     const slots = Array.from({ length: RIPPLE_SLOTS }, () => ({ x: 0, y: 0, t: -99, on: 0 }));
     const slotArr = new Float32Array(RIPPLE_SLOTS * 4);
@@ -248,7 +248,7 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const addRipple = (x: number, y: number) => {
-      const r = slots[slotNext];
+      const r = slots[slotNext]!;
       slotNext = (slotNext + 1) % slots.length;
       r.x = x; r.y = y; r.t = clock; r.on = 1;
     };
@@ -281,60 +281,60 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       const m = mix();
       const bw = Math.max(1.5, 3.2 * (BH / 516));
       for (let i = 0; i < slots.length; i++) {
-        const r = slots[i];
+        const r = slots[i]!;
         if (r.on && clock - r.t > RIPPLE_LIFE) r.on = 0;
         slotArr[i * 4] = r.x; slotArr[i * 4 + 1] = r.y;
         slotArr[i * 4 + 2] = r.t; slotArr[i * 4 + 3] = r.on;
       }
       const setShared = (u: Prog["u"]) => {
-        gl.uniform2f(u.uC, CX, CY);
-        gl.uniform2f(u.uHalf, BW / 2, BH / 2);
-        gl.uniform1f(u.uT, clock);
-        gl.uniform1f(u.uPress, press);
-        gl.uniform4fv(u.uRip, slotArr);
-        gl.uniform4f(u.uRipK, DISTURB.speed, DISTURB.width, DISTURB.decay, DISTURB.amp);
-        gl.uniform4f(u.uRipK2, DISTURB.facet, DISTURB.lobes, DISTURB.sharp, DISTURB.emit);
-        gl.uniform4f(u.uPtr, ptrS.x, ptrS.y, ptrAmt, ptrSpeed);
-        gl.uniform4f(u.uPtrK, DISTURB.ptrRad, DISTURB.ptrAmp, DISTURB.ptrFast, DISTURB.ptrRim);
+        gl.uniform2f(u.uC ?? null, CX, CY);
+        gl.uniform2f(u.uHalf ?? null, BW / 2, BH / 2);
+        gl.uniform1f(u.uT ?? null, clock);
+        gl.uniform1f(u.uPress ?? null, press);
+        gl.uniform4fv(u.uRip ?? null, slotArr);
+        gl.uniform4f(u.uRipK ?? null, DISTURB.speed, DISTURB.width, DISTURB.decay, DISTURB.amp);
+        gl.uniform4f(u.uRipK2 ?? null, DISTURB.facet, DISTURB.lobes, DISTURB.sharp, DISTURB.emit);
+        gl.uniform4f(u.uPtr ?? null, ptrS.x, ptrS.y, ptrAmt, ptrSpeed);
+        gl.uniform4f(u.uPtrK ?? null, DISTURB.ptrRad, DISTURB.ptrAmp, DISTURB.ptrFast, DISTURB.ptrRim);
       };
 
       gl.useProgram(pScene.p);
       setShared(pScene.u);
-      gl.uniform1f(pScene.u.uHover, Math.min(1, m.base + (1 - m.base) * hover));
-      gl.uniform1fv(pScene.u.uP, fieldArr);
+      gl.uniform1f(pScene.u.uHover ?? null, Math.min(1, m.base + (1 - m.base) * hover));
+      gl.uniform1fv(pScene.u.uP ?? null, fieldArr);
       drawTo(T_core);
 
       gl.useProgram(pRim.p);
       setShared(pRim.u);
-      gl.uniform1f(pRim.u.uBw, bw);
-      gl.uniform1fv(pRim.u.uE, rimArr);
+      gl.uniform1f(pRim.u.uBw ?? null, bw);
+      gl.uniform1fv(pRim.u.uE ?? null, rimArr);
       drawTo(T_rim);
 
       gl.useProgram(pDown.p);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, T_core.tex);
-      gl.uniform1i(pDown.u.uTex, 0);
-      gl.uniform1f(pDown.u.uAdd, 0);
-      gl.uniform2f(pDown.u.uDstTexel, 1 / T_s1.w, 1 / T_s1.h);
-      gl.uniform2f(pDown.u.uSrcTexel, 1 / W, 1 / H);
+      gl.uniform1i(pDown.u.uTex ?? null, 0);
+      gl.uniform1f(pDown.u.uAdd ?? null, 0);
+      gl.uniform2f(pDown.u.uDstTexel ?? null, 1 / T_s1.w, 1 / T_s1.h);
+      gl.uniform2f(pDown.u.uSrcTexel ?? null, 1 / W, 1 / H);
       drawTo(T_s1);
 
       gl.useProgram(pBlur.p);
-      gl.uniform1i(pBlur.u.uTex, 0);
-      gl.uniform2f(pBlur.u.uTexel, 1 / T_s1.w, 1 / T_s1.h);
+      gl.uniform1i(pBlur.u.uTex ?? null, 0);
+      gl.uniform2f(pBlur.u.uTexel ?? null, 1 / T_s1.w, 1 / T_s1.h);
       // One very wide 9-tap pass leaves comb ghosts — the taps end up further
       // apart than the sigma they describe — so it is split into passes whose
       // radii add in quadrature.
       const sigTex = m.soften * (BH * 0.5) * 0.95;
       if (sigTex > 0.1) {
         const iters = Math.min(4, Math.max(1, Math.ceil(sigTex / 3)));
-        gl.uniform1f(pBlur.u.uR, sigTex / Math.sqrt(iters) / 1.95);
+        gl.uniform1f(pBlur.u.uR ?? null, sigTex / Math.sqrt(iters) / 1.95);
         for (let i = 0; i < iters; i++) {
           gl.bindTexture(gl.TEXTURE_2D, T_s1.tex);
-          gl.uniform2f(pBlur.u.uDir, 1, 0);
+          gl.uniform2f(pBlur.u.uDir ?? null, 1, 0);
           drawTo(T_s2);
           gl.bindTexture(gl.TEXTURE_2D, T_s2.tex);
-          gl.uniform2f(pBlur.u.uDir, 0, 1);
+          gl.uniform2f(pBlur.u.uDir ?? null, 0, 1);
           drawTo(T_s1);
         }
       }
@@ -344,25 +344,25 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       gl.bindTexture(gl.TEXTURE_2D, T_s1.tex);
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, T_rim.tex);
-      gl.uniform1i(pDown.u.uTex, 0);
-      gl.uniform1i(pDown.u.uTex2, 1);
-      gl.uniform1f(pDown.u.uAdd, 1);
-      gl.uniform2f(pDown.u.uDstTexel, 1 / T_a.w, 1 / T_a.h);
-      gl.uniform2f(pDown.u.uSrcTexel, 1 / T_s1.w, 1 / T_s1.h);
+      gl.uniform1i(pDown.u.uTex ?? null, 0);
+      gl.uniform1i(pDown.u.uTex2 ?? null, 1);
+      gl.uniform1f(pDown.u.uAdd ?? null, 1);
+      gl.uniform2f(pDown.u.uDstTexel ?? null, 1 / T_a.w, 1 / T_a.h);
+      gl.uniform2f(pDown.u.uSrcTexel ?? null, 1 / T_s1.w, 1 / T_s1.h);
       drawTo(T_a);
 
       gl.useProgram(pBlur.p);
       gl.activeTexture(gl.TEXTURE0);
-      gl.uniform1i(pBlur.u.uTex, 0);
-      gl.uniform2f(pBlur.u.uTexel, 1 / T_a.w, 1 / T_a.h);
+      gl.uniform1i(pBlur.u.uTex ?? null, 0);
+      gl.uniform2f(pBlur.u.uTexel ?? null, 1 / T_a.w, 1 / T_a.h);
       const rs = (COMPOSITE.glowR * (BH / DOWN)) / GLOW_TEX;
       for (const r of [1, 2.3, 5.2, 9]) {
-        gl.uniform1f(pBlur.u.uR, r * rs);
+        gl.uniform1f(pBlur.u.uR ?? null, r * rs);
         gl.bindTexture(gl.TEXTURE_2D, T_a.tex);
-        gl.uniform2f(pBlur.u.uDir, 1, 0);
+        gl.uniform2f(pBlur.u.uDir ?? null, 1, 0);
         drawTo(T_b);
         gl.bindTexture(gl.TEXTURE_2D, T_b.tex);
-        gl.uniform2f(pBlur.u.uDir, 0, 1);
+        gl.uniform2f(pBlur.u.uDir ?? null, 0, 1);
         drawTo(T_a);
       }
 
@@ -370,20 +370,20 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       setShared(pComp.u);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, T_s1.tex);
-      gl.uniform1i(pComp.u.uSoft, 0);
+      gl.uniform1i(pComp.u.uSoft ?? null, 0);
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, T_rim.tex);
-      gl.uniform1i(pComp.u.uRim, 1);
+      gl.uniform1i(pComp.u.uRim ?? null, 1);
       gl.activeTexture(gl.TEXTURE2);
       gl.bindTexture(gl.TEXTURE_2D, T_a.tex);
-      gl.uniform1i(pComp.u.uGlow, 2);
-      gl.uniform2f(pComp.u.uRes, W, H);
-      gl.uniform1f(pComp.u.uGlowGain, m.glow);
-      gl.uniform1f(pComp.u.uGlowIn, COMPOSITE.glowIn);
-      gl.uniform1f(pComp.u.uOccl, COMPOSITE.occl);
-      gl.uniform1f(pComp.u.uDim, FIELD.dim);
-      gl.uniform1f(pComp.u.uPunch, m.punch);
-      gl.uniform1f(pComp.u.uRimGain, m.rim);
+      gl.uniform1i(pComp.u.uGlow ?? null, 2);
+      gl.uniform2f(pComp.u.uRes ?? null, W, H);
+      gl.uniform1f(pComp.u.uGlowGain ?? null, m.glow);
+      gl.uniform1f(pComp.u.uGlowIn ?? null, COMPOSITE.glowIn);
+      gl.uniform1f(pComp.u.uOccl ?? null, COMPOSITE.occl);
+      gl.uniform1f(pComp.u.uDim ?? null, FIELD.dim);
+      gl.uniform1f(pComp.u.uPunch ?? null, m.punch);
+      gl.uniform1f(pComp.u.uRimGain ?? null, m.rim);
       drawTo(null);
     };
 

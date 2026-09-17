@@ -374,7 +374,7 @@ export function Workstation({ hint, className }: Props) {
       // Screens and LEDs breathe on offset phases; the case light follows
       // the same pulse so its spill on the desk feels tied to the LEDs.
       for (let i = 0; i < glowMats.length; i++) {
-        const g = glowMats[i];
+        const g = glowMats[i]!;
         g.mat.emissiveIntensity = g.base * (0.85 + 0.15 * Math.sin(t * 1.7 + i));
       }
       caseLight.intensity = 6 * (1 + 0.2 * Math.sin(t * 1.7));

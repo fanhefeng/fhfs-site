@@ -28,7 +28,7 @@ describe("CLIENT_NAMESPACES", () => {
       for (const m of text.matchAll(/useTranslations\(\s*(?:"([^"]*)"|'([^']*)')?\s*\)/g)) {
         // A call with no namespace at all would need the whole catalogue —
         // recorded as "*", which is never in the list.
-        used.add((m[1] ?? m[2] ?? "*").split(".")[0]);
+        used.add((m[1] ?? m[2] ?? "*").split(".")[0]!);
       }
     }
     expect(used.size).toBeGreaterThan(0);

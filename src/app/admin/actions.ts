@@ -300,7 +300,7 @@ function parseMomentTime(value: string): Date | null {
   const match = MOMENT_TIME_RE.exec(value);
   if (!match) return null;
   const [, day, hour, minute] = match;
-  if (!validDate(day) || Number(hour) > 23 || Number(minute) > 59) return null;
+  if (!validDate(day!) || Number(hour) > 23 || Number(minute) > 59) return null;
   // The site's zone is UTC+8 without daylight saving, so the offset is a constant.
   return new Date(`${day}T${hour}:${minute}:00+08:00`);
 }
@@ -577,7 +577,7 @@ function collectRows(form: FormData, prefix: string): string[] {
   const indices = new Set<string>();
   for (const key of form.keys()) {
     const match = new RegExp(`^${prefix}\\.(\\d+)\\.`).exec(key);
-    if (match) indices.add(match[1]);
+    if (match) indices.add(match[1]!);
   }
   return [...indices].sort((a, b) => Number(a) - Number(b));
 }
@@ -673,7 +673,7 @@ export async function saveNavItems(
   );
   for (const row of rows) {
     const known =
-      (Object.hasOwn(zhNav, row.labelKey) && Object.hasOwn(enNav, row.labelKey)) ||
+      (Object.hasOwn(zhNav!, row.labelKey) && Object.hasOwn(enNav!, row.labelKey)) ||
       overrides.has(`nav.${row.labelKey}`);
     if (!known) {
       return {

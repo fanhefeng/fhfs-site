@@ -66,7 +66,7 @@ export function bakeBarkPlates(renderer: THREE.WebGLRenderer, small: boolean): B
 
   const previous = renderer.getRenderTarget();
   for (const [pass, rt] of [[0, plateRT], [1, lichenRT]] as const) {
-    material.uniforms.uPass.value = pass;
+    material.uniforms.uPass!.value = pass;
     renderer.setRenderTarget(rt);
     renderer.render(scene, camera);
   }

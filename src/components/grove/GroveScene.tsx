@@ -543,10 +543,10 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     const flushGrains = () => {
       if (!sprayDirty) return;
       const at = sprayGeo.attributes;
-      at.position.needsUpdate = true;
-      at.aVel.needsUpdate = true;
-      at.aBirth.needsUpdate = true;
-      at.aRnd.needsUpdate = true;
+      at.position!.needsUpdate = true;
+      at.aVel!.needsUpdate = true;
+      at.aBirth!.needsUpdate = true;
+      at.aRnd!.needsUpdate = true;
       sprayDirty = false;
     };
 

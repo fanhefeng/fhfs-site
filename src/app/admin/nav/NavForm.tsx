@@ -80,7 +80,7 @@ export function NavForm({ items }: { items: NavRow[] }) {
     const target = index + delta;
     if (index < 0 || target < 0 || target >= rows.length) return;
     const next = [...rows];
-    [next[index], next[target]] = [next[target], next[index]];
+    [next[index], next[target]] = [next[target]!, next[index]!];
     setRows(next);
     requestAnimationFrame(() => {
       document

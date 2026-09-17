@@ -40,7 +40,7 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
     meta: tk(`photos.${photo.id}.meta`),
     alt: tk(`photos.${photo.id}.alt`),
   }));
-  const cover = photos[0];
+  const cover = photos[0]!;
 
   return (
     <main id="main" className="mx-auto w-full max-w-[1040px] flex-1 px-6 pb-28 pt-32 md:pt-40">

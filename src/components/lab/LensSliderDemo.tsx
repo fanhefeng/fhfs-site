@@ -254,8 +254,8 @@ export function LensSliderDemo({
 
       const live = mode === "live";
       const articles = Array.from(copy.querySelectorAll<HTMLElement>(".ls-slide"));
-      const charsOf = (i: number) => articles[i].querySelectorAll<HTMLElement>(".ls-char");
-      const linesOf = (i: number) => articles[i].querySelectorAll<HTMLElement>(".ls-body, .ls-meta");
+      const charsOf = (i: number) => articles[i]!.querySelectorAll<HTMLElement>(".ls-char");
+      const linesOf = (i: number) => articles[i]!.querySelectorAll<HTMLElement>(".ls-body, .ls-meta");
 
       // Everything but the first slide starts below its mask.
       articles.forEach((_, i) => {
@@ -271,8 +271,8 @@ export function LensSliderDemo({
       const still = stillRef.current;
       const showStill = (i: number) => {
         if (!still || live) return;
-        still.src = slides[i].src;
-        still.alt = slides[i].alt;
+        still.src = slides[i]!.src;
+        still.alt = slides[i]!.alt;
       };
 
       /* One lens at a time. `flight` is the pair in the air; `pending` is
@@ -287,8 +287,8 @@ export function LensSliderDemo({
         shownRef.current = landed;
         progress.current.value = 0;
         bindRef.current?.(landed, landed);
-        articles[from === landed ? to : from].setAttribute("aria-hidden", "true");
-        articles[landed].removeAttribute("aria-hidden");
+        articles[from === landed ? to : from]!.setAttribute("aria-hidden", "true");
+        articles[landed]!.removeAttribute("aria-hidden");
         setCounter(landed);
         showStill(landed);
         const next = pending;
@@ -319,7 +319,7 @@ export function LensSliderDemo({
         if (next === from) return;
 
         bindRef.current?.(from, next);
-        articles[next].removeAttribute("aria-hidden");
+        articles[next]!.removeAttribute("aria-hidden");
         setCounter(next);
 
         const tween = gsap.fromTo(

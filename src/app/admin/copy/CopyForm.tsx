@@ -36,7 +36,7 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
 
   const groups = new Map<string, CopyRow[]>();
   for (const row of rows) {
-    const namespace = row.key.split(".")[0];
+    const namespace = row.key.split(".")[0]!;
     groups.set(namespace, [...(groups.get(namespace) ?? []), row]);
   }
 

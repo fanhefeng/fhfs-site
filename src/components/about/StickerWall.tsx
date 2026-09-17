@@ -82,7 +82,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
         const rect = from.getBoundingClientRect();
         const count = 1 + Math.round(Math.random());
         for (let k = 0; k < count; k += 1) {
-          const el = puffs[nextPuff(puffCursor)];
+          const el = puffs[nextPuff(puffCursor)]!;
           puffCursor += 1;
           gsap.killTweensOf(el);
           gsap.set(el, {

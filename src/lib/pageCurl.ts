@@ -103,7 +103,7 @@ export function showsBack(pose: CurlPose): boolean {
 export function spreads<T>(items: readonly T[]): [T, T | null][] {
   const out: [T, T | null][] = [];
   for (let i = 0; i < items.length; i += 2) {
-    out.push([items[i], i + 1 < items.length ? items[i + 1] : null]);
+    out.push([items[i]!, i + 1 < items.length ? items[i + 1]! : null]);
   }
   return out;
 }

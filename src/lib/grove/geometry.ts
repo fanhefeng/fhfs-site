@@ -222,15 +222,18 @@ function transportFrames(curve: THREE.CatmullRomCurve3, segs: number): Frames {
     tangents.push(curve.getTangentAt(i / segs).normalize());
   }
 
-  const ref = Math.abs(tangents[0].y) < 0.9 ? UP : new THREE.Vector3(1, 0, 0);
-  normals.push(new THREE.Vector3().crossVectors(tangents[0], ref).normalize());
+  const t0 = tangents[0]!;
+  const ref = Math.abs(t0.y) < 0.9 ? UP : new THREE.Vector3(1, 0, 0);
+  normals.push(new THREE.Vector3().crossVectors(t0, ref).normalize());
 
   for (let i = 1; i <= segs; i++) {
-    const axis = new THREE.Vector3().crossVectors(tangents[i - 1], tangents[i]);
-    const n = normals[i - 1].clone();
+    const ta = tangents[i - 1]!;
+    const tb = tangents[i]!;
+    const axis = new THREE.Vector3().crossVectors(ta, tb);
+    const n = normals[i - 1]!.clone();
     if (axis.lengthSq() > 1e-12) {
       axis.normalize();
-      const dot = Math.min(1, Math.max(-1, tangents[i - 1].dot(tangents[i])));
+      const dot = Math.min(1, Math.max(-1, ta.dot(tb)));
       n.applyAxisAngle(axis, Math.acos(dot));
     }
     normals.push(n.normalize());
@@ -244,7 +247,8 @@ function table(values: number[]): (t: number) => number {
   return (t: number) => {
     const x = clamp01(t) * (values.length - 1);
     const i = Math.min(values.length - 2, Math.floor(x));
-    return values[i] + (values[i + 1] - values[i]) * (x - i);
+    const v0 = values[i]!;
+    return v0 + (values[i + 1]! - v0) * (x - i);
   };
 }
 
@@ -336,13 +340,13 @@ function limbFrame(limb: Limb, t: number): void {
   const i = Math.min(limb.segs - 1, Math.floor(f));
   const a = f - i;
   const fr = limb.frames;
-  _p.copy(fr.points[i]).lerp(fr.points[i + 1], a);
+  _p.copy(fr.points[i]!).lerp(fr.points[i + 1]!, a);
   // Control points are traced along the MIDLINE of the silhouette, but the
   // silhouette is asymmetric — bare wood below, wood plus cushion above. The
   // tube's own axis therefore sits half a cushion lower than the trace.
   if (limb.sink) _p.y -= limb.moss(t) * limb.sink;
-  _t.copy(fr.tangents[i]).lerp(fr.tangents[i + 1], a).normalize();
-  _n.copy(fr.normals[i]).lerp(fr.normals[i + 1], a);
+  _t.copy(fr.tangents[i]!).lerp(fr.tangents[i + 1]!, a).normalize();
+  _n.copy(fr.normals[i]!).lerp(fr.normals[i + 1]!, a);
   // Re-orthogonalise: lerping two unit normals gives a vector that is neither
   // unit nor perpendicular to the lerped tangent.
   _n.addScaledVector(_t, -_n.dot(_t)).normalize();
@@ -475,7 +479,7 @@ function tessellate(limb: Limb, bag: Bag): void {
     const ii = Math.min(S, Math.max(0, i2));
     const jj = (j2 + R) % R; // theta wraps — no seam in the normals
     const q = (ii * (R + 1) + jj) * 3;
-    return out.set(grid[q], grid[q + 1], grid[q + 2]);
+    return out.set(grid[q]!, grid[q + 1]!, grid[q + 2]!);
   };
 
   for (let i = 0; i <= S; i++) {
@@ -491,14 +495,14 @@ function tessellate(limb: Limb, bag: Bag): void {
       else n.normalize();
 
       const k = (i * (R + 1) + j) * 3;
-      bag.pos.push(grid[k], grid[k + 1], grid[k + 2]);
+      bag.pos.push(grid[k]!, grid[k + 1]!, grid[k + 2]!);
       bag.nor.push(n.x, n.y, n.z);
       // u is a triangle wave so the bark grain mirrors at the seam instead of
       // showing a hard join where the texture coordinate wraps.
       bag.inf.push(
         1 - Math.abs(2 * (j / R) - 1),
         (i / S) * limb.vScale,
-        caps[i * (R + 1) + j]
+        caps[i * (R + 1) + j]!
       );
       gnrm[k] = n.x;
       gnrm[k + 1] = n.y;
@@ -562,22 +566,22 @@ function plantBlades(
       const q00 = (i * (R + 1) + j) * 3;
       const q10 = q00 + 3;
       const q01 = ((i + 1) * (R + 1) + j) * 3;
-      const ax = grid[q10] - grid[q00];
-      const ay = grid[q10 + 1] - grid[q00 + 1];
-      const az = grid[q10 + 2] - grid[q00 + 2];
-      const bx = grid[q01] - grid[q00];
-      const by = grid[q01 + 1] - grid[q00 + 1];
-      const bz = grid[q01 + 2] - grid[q00 + 2];
+      const ax = grid[q10]! - grid[q00]!;
+      const ay = grid[q10 + 1]! - grid[q00 + 1]!;
+      const az = grid[q10 + 2]! - grid[q00 + 2]!;
+      const bx = grid[q01]! - grid[q00]!;
+      const by = grid[q01 + 1]! - grid[q00 + 1]!;
+      const bz = grid[q01 + 2]! - grid[q00 + 2]!;
       const cx = ay * bz - az * by;
       const cy = az * bx - ax * bz;
       const cz = ax * by - ay * bx;
       const area = Math.sqrt(cx * cx + cy * cy + cz * cz);
       const cap =
         0.25 *
-        (caps[i * (R + 1) + j] +
-          caps[i * (R + 1) + j + 1] +
-          caps[(i + 1) * (R + 1) + j] +
-          caps[(i + 1) * (R + 1) + j + 1]);
+        (caps[i * (R + 1) + j]! +
+          caps[i * (R + 1) + j + 1]! +
+          caps[(i + 1) * (R + 1) + j]! +
+          caps[(i + 1) * (R + 1) + j + 1]!);
       total += area * cap * cap;
       cdf[i * R + j] = total;
     }
@@ -591,7 +595,7 @@ function plantBlades(
     let hi = cells - 1;
     while (lo < hi) {
       const mid = (lo + hi) >> 1;
-      if (cdf[mid] < target) lo = mid + 1;
+      if (cdf[mid]! < target) lo = mid + 1;
       else hi = mid;
     }
     const i = (lo / R) | 0;
@@ -607,22 +611,22 @@ function plantBlades(
     const w1 = u * (1 - v);
     const w2 = (1 - u) * v;
     const w3 = u * v;
-    const cap = caps[i0] * w0 + caps[i1] * w1 + caps[i2] * w2 + caps[i3] * w3;
+    const cap = caps[i0]! * w0 + caps[i1]! * w1 + caps[i2]! * w2 + caps[i3]! * w3;
     if (cap < 0.05) continue;
 
     const p0 = i0 * 3;
     const p1 = i1 * 3;
     const p2 = i2 * 3;
     const p3 = i3 * 3;
-    const px = grid[p0] * w0 + grid[p1] * w1 + grid[p2] * w2 + grid[p3] * w3;
-    const py = grid[p0 + 1] * w0 + grid[p1 + 1] * w1 + grid[p2 + 1] * w2 + grid[p3 + 1] * w3;
-    const pz = grid[p0 + 2] * w0 + grid[p1 + 2] * w1 + grid[p2 + 2] * w2 + grid[p3 + 2] * w3;
+    const px = grid[p0]! * w0 + grid[p1]! * w1 + grid[p2]! * w2 + grid[p3]! * w3;
+    const py = grid[p0 + 1]! * w0 + grid[p1 + 1]! * w1 + grid[p2 + 1]! * w2 + grid[p3 + 1]! * w3;
+    const pz = grid[p0 + 2]! * w0 + grid[p1 + 2]! * w1 + grid[p2 + 2]! * w2 + grid[p3 + 2]! * w3;
     // The grid normal is the cushion's own normal, lumps included. Standing
     // the fur on the smooth cross-section normal instead flattens every bump
     // the displacement just produced.
-    const nx = gn[p0] * w0 + gn[p1] * w1 + gn[p2] * w2 + gn[p3] * w3;
-    const ny = gn[p0 + 1] * w0 + gn[p1 + 1] * w1 + gn[p2 + 1] * w2 + gn[p3 + 1] * w3;
-    const nz = gn[p0 + 2] * w0 + gn[p1 + 2] * w1 + gn[p2 + 2] * w2 + gn[p3 + 2] * w3;
+    const nx = gn[p0]! * w0 + gn[p1]! * w1 + gn[p2]! * w2 + gn[p3]! * w3;
+    const ny = gn[p0 + 1]! * w0 + gn[p1 + 1]! * w1 + gn[p2 + 1]! * w2 + gn[p3 + 1]! * w3;
+    const nz = gn[p0 + 2]! * w0 + gn[p1 + 2]! * w1 + gn[p2 + 2]! * w2 + gn[p3 + 2]! * w3;
     const nl = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
 
     bag.off.push(px, py, pz);
@@ -668,14 +672,14 @@ function buildWire(limb: Limb, out: number[]): void {
     for (let j = 0; j < R; j++) {
       const a = (i * (R + 1) + j) * 3;
       const b = a + 3;
-      out.push(g[a], g[a + 1], g[a + 2], g[b], g[b + 1], g[b + 2]);
+      out.push(g[a]!, g[a + 1]!, g[a + 2]!, g[b]!, g[b + 1]!, g[b + 2]!);
     }
   }
   for (let j = 0; j < R; j += sparEvery) {
     for (let i = 0; i < S; i++) {
       const a = (i * (R + 1) + j) * 3;
       const b = ((i + 1) * (R + 1) + j) * 3;
-      out.push(g[a], g[a + 1], g[a + 2], g[b], g[b + 1], g[b + 2]);
+      out.push(g[a]!, g[a + 1]!, g[a + 2]!, g[b]!, g[b + 1]!, g[b + 2]!);
     }
   }
 }
@@ -1069,7 +1073,7 @@ export function buildGrove(opt: GroveOptions): Grove {
     const extra: Limb[] = [];
     for (let i = 0; i < 14; i++) {
       const r = rng();
-      const src = limbs[r < 0.62 ? 0 : r < 0.82 ? 1 : 2];
+      const src = limbs[r < 0.62 ? 0 : r < 0.82 ? 1 : 2]!;
       const t = rand(0.04, 0.96);
       limbSurface(src, t, rng() * TAU, hp, hn);
       if (hn.y < -0.35) continue;
@@ -1120,7 +1124,7 @@ export function buildGrove(opt: GroveOptions): Grove {
   const face = new THREE.Vector3();
   const jitter = new THREE.Vector3();
   for (let k = 0, guard = 0; k < opt.ferns && guard < opt.ferns * 60; guard++) {
-    const host = hosts[Math.floor(rng() * hosts.length)];
+    const host = hosts[Math.floor(rng() * hosts.length)]!;
     // Well up in the cushion and facing the sky: a frond growing sideways out
     // of the flank has nothing to stand on and reads as a decal.
     if (limbSurface(host, rng(), rng() * TAU, p, n) < 0.55) continue;
@@ -1143,7 +1147,7 @@ export function buildGrove(opt: GroveOptions): Grove {
   const wp: number[] = [];
   const wr: number[] = [];
   for (let k = 0, guard = 0; k < opt.flowers && guard < opt.flowers * 40; guard++) {
-    const host = hosts[Math.floor(rng() * hosts.length)];
+    const host = hosts[Math.floor(rng() * hosts.length)]!;
     const t0 = rng();
     const th0 = rng() * TAU;
     for (let c = 0; c < 9 && k < opt.flowers; c++) {
@@ -1161,7 +1165,7 @@ export function buildGrove(opt: GroveOptions): Grove {
   // lens so the butterfly's open wings are actually seen rather than edge-on.
   const perch = new THREE.Vector3();
   {
-    const crest = limbs[0];
+    const crest = limbs[0]!;
     const probeP = new THREE.Vector3();
     const probeN = new THREE.Vector3();
     let best = -Infinity;
@@ -1177,7 +1181,7 @@ export function buildGrove(opt: GroveOptions): Grove {
 
   let reach = 0;
   for (let i = 0; i < bag.pos.length; i += 3) {
-    const d = Math.hypot(bag.pos[i], bag.pos[i + 1], bag.pos[i + 2]);
+    const d = Math.hypot(bag.pos[i]!, bag.pos[i + 1]!, bag.pos[i + 2]!);
     if (d > reach) reach = d;
   }
 

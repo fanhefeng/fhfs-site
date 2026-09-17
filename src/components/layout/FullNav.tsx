@@ -249,7 +249,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
         : idx === -1 || idx === cycle.length - 1
           ? 0
           : idx + 1;
-      const target = cycle[next];
+      const target = cycle[next]!;
       // The nav is its own scroll box now: bring a row folded below the
       // fold into view before focusing it, or the focus ring lands on a
       // link nobody can see. The burger is outside the box — leave it be.

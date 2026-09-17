@@ -21,7 +21,7 @@ function jpegSize(file: string): { width: number; height: number } {
       i++;
       continue;
     }
-    const marker = bytes[i + 1];
+    const marker = bytes[i + 1]!;
     // SOF0–SOF15, minus the three in that range that are not frame headers.
     if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
       return { width: bytes.readUInt16BE(i + 7), height: bytes.readUInt16BE(i + 5) };

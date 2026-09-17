@@ -95,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     section: "blog" | "secrets"
   ) => {
     slugs.forEach((slug, i) => {
-      const editions = editionsBySlug[i];
+      const editions = editionsBySlug[i]!;
       const available: Locale[] = editions.map(({ locale }) => locale);
       for (const { locale, date } of editions) {
         entries.push({
@@ -116,7 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // other locale never uses 404s there, so each locale lists only its own —
   // and no alternates, because there is no counterpart to point at.
   routing.locales.forEach((locale, i) => {
-    for (const { tag } of tagsByLocale[i]) {
+    for (const { tag } of tagsByLocale[i]!) {
       entries.push({
         url: `${site.url}/${locale}/blog/tags/${encodeURIComponent(tag)}`,
       });

@@ -189,7 +189,7 @@ export function NeonSplash({
         if (!poweredRef.current || entering || main.isActive() || stutter?.isActive() || !isFinePointer()) return;
         const i = Math.floor(Math.random() * letters.length);
         stutter = gsap.timeline();
-        score(stutter, letters[i], 0, STUTTER);
+        score(stutter, letters[i]!, 0, STUTTER);
       });
 
       // The sign hangs a little in front of the wall: it rides the pointer

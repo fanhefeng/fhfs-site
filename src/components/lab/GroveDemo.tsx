@@ -628,10 +628,10 @@ export function GroveDemo({
       const flushGrains = () => {
         if (!sprayDirty) return;
         const at = sprayGeo.attributes;
-        at.position.needsUpdate = true;
-        at.aVel.needsUpdate = true;
-        at.aBirth.needsUpdate = true;
-        at.aRnd.needsUpdate = true;
+        at.position!.needsUpdate = true;
+        at.aVel!.needsUpdate = true;
+        at.aBirth!.needsUpdate = true;
+        at.aRnd!.needsUpdate = true;
         sprayDirty = false;
       };
 
@@ -1165,8 +1165,8 @@ export function GroveDemo({
         const flowerNext = flowerTexture(p.petal, p.heart);
         const moteNext = moteTexture(p.moteCore, p.moteEdge);
         const glowNext = poolTexture(p.poolInner, p.poolOuter);
-        for (const m of flowerMats) m.uniforms.uMap.value = flowerNext;
-        for (const m of moteMats) m.uniforms.uMap.value = moteNext;
+        for (const m of flowerMats) m.uniforms.uMap!.value = flowerNext;
+        for (const m of moteMats) m.uniforms.uMap!.value = moteNext;
         for (const m of poolMats) m.map = glowNext;
         // Dropped only once nothing points at them any more.
         flowerMap.dispose();
@@ -1309,7 +1309,7 @@ export function GroveDemo({
           const act = phase.current.value < 0.34 ? 0 : phase.current.value < 0.66 ? 1 : 2;
           if (act !== shown && labelRef.current) {
             shown = act;
-            labelRef.current.textContent = labels[act];
+            labelRef.current.textContent = labels[act]!;
           }
         },
         scrollTrigger: {

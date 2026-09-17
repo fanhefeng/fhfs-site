@@ -42,10 +42,10 @@ export function buildManifest(root: string): AssetManifest {
     if (set === undefined) manifest.files[url] = hash.slice(0, HASH_LENGTH);
     // A set's hash covers names as well as bytes: a file renamed inside it
     // is a different folder to whoever asks for the old name.
-    else members[set].push(`${url}\0${hash}`);
+    else members[set]!.push(`${url}\0${hash}`);
   }
   for (const set of ASSET_SETS) {
-    manifest.sets[set] = digest(members[set].join("\n")).slice(0, HASH_LENGTH);
+    manifest.sets[set] = digest(members[set]!.join("\n")).slice(0, HASH_LENGTH);
   }
   return manifest;
 }

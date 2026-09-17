@@ -46,7 +46,7 @@ export function splitText(text: string): { lines: SplitLine[]; total: number } {
       if (CJK.test(glyph)) {
         // Closing punctuation rides along with the word before it.
         if (NO_LINE_START.test(glyph) && words.length) {
-          const prev = words[words.length - 1];
+          const prev = words[words.length - 1]!;
           if (!prev.isSpace && !current.length) {
             prev.chars.push({ char: glyph, index: index++ });
             continue;

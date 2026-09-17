@@ -96,7 +96,7 @@ describe("admin server actions", () => {
   // The proxy's check is optimistic; this is the authorization boundary.
   it("all check the session before anything else", () => {
     const late = actions.filter(({ body }) => {
-      const first = body.slice(1).trim().split(";")[0];
+      const first = body.slice(1).trim().split(";")[0]!;
       return !/\b(requireAdmin|adminSession)\(\)/.test(first);
     });
     expect(late.map(({ name }) => name)).toEqual([]);

@@ -21,7 +21,7 @@ export function OgSignMark({ size }: { size: number }) {
   const ring = `${ARC_L} ${ARC_R}`;
   const stroke = { fill: "none", strokeLinecap: "round" as const };
   const note = { strokeLinejoin: "round" as const };
-  const fit = `translate(${INSET} ${INSET}) scale(${(PLATE - INSET * 2) / MARK_SIZE}) translate(${-MARK_X} ${-MARK_Y})`;
+  const fit = `translate(${INSET} ${INSET}) scale(${(PLATE - INSET * 2) / MARK_SIZE!}) translate(${-MARK_X!} ${-MARK_Y!})`;
   return (
     <svg
       width={size}

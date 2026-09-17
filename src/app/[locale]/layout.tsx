@@ -97,7 +97,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       getNavItems("fullnav"),
       getAllNavItems(),
     ])
-  ).map((rows) => rows.map(toLink));
+  ).map((rows) => rows.map(toLink)) as [NavLink[], NavLink[], NavLink[], NavLink[]];
 
   return (
     // No data-theme here on purpose. React only touches attributes it

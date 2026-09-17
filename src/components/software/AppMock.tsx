@@ -16,7 +16,7 @@ type Props = {
  * stands in for a screenshot, so it keeps its own flat product-UI palette in
  * both themes instead of dissolving into the page around it.
  */
-const TONE: Record<Tone, Record<string, string>> = {
+const TONE = {
   light: {
     bg: "#ffffff",
     chrome: "#f1efe9",
@@ -33,7 +33,7 @@ const TONE: Record<Tone, Record<string, string>> = {
     barStrong: "rgba(255,255,255,0.34)",
     tint: "rgba(255,255,255,0.05)",
   },
-};
+} satisfies Record<Tone, Record<string, string>>;
 
 /** A rounded bar standing in for a line of UI text. */
 function Bar({ w, color, h = 4 }: { w: string; color: string; h?: number }) {

@@ -63,7 +63,7 @@ function blank() {
   const [day, clock] = time.split(" ");
   return {
     key: "",
-    postedAt: `${day.replaceAll(".", "-")} ${clock}`,
+    postedAt: `${day!.replaceAll(".", "-")} ${clock}`,
     content: "",
     collection: "",
     original: "yes",
@@ -104,7 +104,7 @@ export default async function MomentsAdminPage() {
             meta: `${time}${row.collection ? ` · ${row.collection}` : ""}${row.draft ? " · 草稿" : ""}`,
             data: {
               ...row,
-              postedAt: `${day.replaceAll(".", "-")} ${clock}`,
+              postedAt: `${day!.replaceAll(".", "-")} ${clock}`,
               original: row.original ? "yes" : "no",
               draft: row.draft ? "yes" : "no",
             },

@@ -85,7 +85,7 @@ export function SegmentedFilter({
       if (!dir) return;
       e.preventDefault();
       const i = options.findIndex((o) => o.value === value);
-      const next = options[(i + dir + options.length) % options.length];
+      const next = options[(i + dir + options.length) % options.length]!;
       onChange(next.value);
       rootRef.current
         ?.querySelector<HTMLElement>(`[data-seg="${CSS.escape(next.value)}"]`)

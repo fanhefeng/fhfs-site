@@ -70,55 +70,63 @@ type Props = {
 };
 
 export function LabStudy({ slug, accent, text }: Props) {
+  // The page fills `text` key by key from a list it keeps by hand. A key it
+  // forgot used to arrive here as `undefined` and render as a blank; every
+  // study is prerendered, so throwing turns that into a failed build instead.
+  const s = (key: string): string => {
+    const value = text[key];
+    if (value === undefined) throw new Error(`lab study "${slug}" asks for text.${key}, which the page never set`);
+    return value;
+  };
   switch (slug) {
     case "scroll-video":
       return (
         <ScrollVideoDemo
           accent={accent}
-          hint={text.hint}
-          loading={text.loading}
-          captionOne={text.captionOne}
-          captionOneBody={text.captionOneBody}
-          captionTwo={text.captionTwo}
-          captionTwoBody={text.captionTwoBody}
+          hint={s("hint")}
+          loading={s("loading")}
+          captionOne={s("captionOne")}
+          captionOneBody={s("captionOneBody")}
+          captionTwo={s("captionTwo")}
+          captionTwoBody={s("captionTwoBody")}
         />
       );
     case "dissolve":
       return (
         <DissolveDemo
           accent={accent}
-          hint={text.hint}
-          headline={text.headline}
-          body={text.body}
-          tail={text.tail}
-          fallbackNote={text.fallback}
+          hint={s("hint")}
+          headline={s("headline")}
+          body={s("body")}
+          tail={s("tail")}
+          fallbackNote={s("fallback")}
         />
       );
     case "melting-text":
       return (
         <MeltingTextDemo
           accent={accent}
-          sampleOne={text.sampleOne}
-          sampleTwo={text.sampleTwo}
-          sampleThree={text.sampleThree}
-          labelLoad={text.labelLoad}
-          labelInView={text.labelInView}
-          labelScrub={text.labelScrub}
+          sampleOne={s("sampleOne")}
+          sampleTwo={s("sampleTwo")}
+          sampleThree={s("sampleThree")}
+          labelLoad={s("labelLoad")}
+          labelInView={s("labelInView")}
+          labelScrub={s("labelScrub")}
         />
       );
     case "grove":
       return (
         <GroveDemo
           accent={accent}
-          hint={text.hint}
-          headline={text.headline}
-          body={text.body}
-          tail={text.tail}
-          fallbackNote={text.fallback}
-          stageScan={text.stageScan}
-          stageGrow={text.stageGrow}
-          stageSettle={text.stageSettle}
-          dressLegend={text.dressLegend}
+          hint={s("hint")}
+          headline={s("headline")}
+          body={s("body")}
+          tail={s("tail")}
+          fallbackNote={s("fallback")}
+          stageScan={s("stageScan")}
+          stageGrow={s("stageGrow")}
+          stageSettle={s("stageSettle")}
+          dressLegend={s("dressLegend")}
           dressNames={text}
         />
       );
@@ -126,18 +134,18 @@ export function LabStudy({ slug, accent, text }: Props) {
       return (
         <AlbumDemo
           accent={accent}
-          hint={text.hint}
-          prevLabel={text.prev}
-          nextLabel={text.next}
-          counterAria={text.counterAria}
-          credit={text.credit}
+          hint={s("hint")}
+          prevLabel={s("prev")}
+          nextLabel={s("next")}
+          counterAria={s("counterAria")}
+          credit={s("credit")}
           plates={ODYSSEY_STILLS.map((still) => ({
             src: asset(`/films/odyssey/${still.file}.jpg`),
             width: still.width,
             height: still.height,
-            alt: text[`${still.id}Alt`],
-            title: text[`${still.id}Title`],
-            meta: text[`${still.id}Meta`],
+            alt: s(`${still.id}Alt`),
+            title: s(`${still.id}Title`),
+            meta: s(`${still.id}Meta`),
           }))}
         />
       );
@@ -145,24 +153,24 @@ export function LabStudy({ slug, accent, text }: Props) {
       return (
         <GroveStageDemo
           accent={accent}
-          hint={text.pointerHint}
-          fallbackNote={text.fallback}
+          hint={s("pointerHint")}
+          fallbackNote={s("fallback")}
           cards={[
             {
-              label: text.cardALabel,
-              title: text.cardATitle,
-              href: text.cardAHref,
+              label: s("cardALabel"),
+              title: s("cardATitle"),
+              href: s("cardAHref"),
               src: asset("/grove/moss-plate.webp"),
-              alt: text.cardAAlt,
-              linkLabel: text.cardALink,
+              alt: s("cardAAlt"),
+              linkLabel: s("cardALink"),
             },
             {
-              label: text.cardBLabel,
-              title: text.cardBTitle,
-              href: text.cardBHref,
+              label: s("cardBLabel"),
+              title: s("cardBTitle"),
+              href: s("cardBHref"),
               src: asset("/lab/dissolve/forest.jpg"),
-              alt: text.cardBAlt,
-              linkLabel: text.cardBLink,
+              alt: s("cardBAlt"),
+              linkLabel: s("cardBLink"),
             },
           ]}
         />
@@ -171,55 +179,55 @@ export function LabStudy({ slug, accent, text }: Props) {
       return (
         <LiquidMetalDemo
           accent={accent}
-          hint={text.hint}
-          headline={text.headline}
-          body={text.body}
-          tail={text.tail}
-          fallbackNote={text.fallback}
-          label={text.label}
-          stageField={text.stageField}
-          stageMolten={text.stageMolten}
-          stageBloom={text.stageBloom}
+          hint={s("hint")}
+          headline={s("headline")}
+          body={s("body")}
+          tail={s("tail")}
+          fallbackNote={s("fallback")}
+          label={s("label")}
+          stageField={s("stageField")}
+          stageMolten={s("stageMolten")}
+          stageBloom={s("stageBloom")}
         />
       );
     case "workstation":
-      return <Workstation hint={text.deskHint} className="mx-auto w-full max-w-5xl px-6" />;
+      return <Workstation hint={s("deskHint")} className="mx-auto w-full max-w-5xl px-6" />;
     case "lens-slider":
       return (
         <LensSliderDemo
           accent={accent}
-          hint={text.hint}
-          fallbackNote={text.fallback}
-          counterAria={text.counterAria}
-          prevLabel={text.prev}
-          nextLabel={text.next}
+          hint={s("hint")}
+          fallbackNote={s("fallback")}
+          counterAria={s("counterAria")}
+          prevLabel={s("prev")}
+          nextLabel={s("next")}
           slides={LENS_SLIDES.map((name) => ({
             src: asset(`/lab/lens/${name}.jpg`),
-            alt: text[`${name}Alt`],
-            title: text[`${name}Title`],
-            body: text[`${name}Body`],
-            meta: text[`${name}Meta`],
+            alt: s(`${name}Alt`),
+            title: s(`${name}Title`),
+            body: s(`${name}Body`),
+            meta: s(`${name}Meta`),
           }))}
         />
       );
     case "neon":
       return (
         <NeonSignDemo
-          welcome={text.welcome}
-          signOn={text.signOn}
-          signOff={text.signOff}
-          galleryKicker={text.galleryKicker}
-          galleryTitle={text.galleryTitle}
-          galleryLede={text.galleryLede}
-          credit={text.credit}
+          welcome={s("welcome")}
+          signOn={s("signOn")}
+          signOff={s("signOff")}
+          galleryKicker={s("galleryKicker")}
+          galleryTitle={s("galleryTitle")}
+          galleryLede={s("galleryLede")}
+          credit={s("credit")}
           stills={NEON_STILLS.map((still) => ({
             src: asset(`/lab/neon/${still.file}.jpg`),
             width: still.width,
             height: still.height,
             span: still.span,
-            alt: text[`${still.id}Alt`],
-            title: text[`${still.id}Title`],
-            meta: text[`${still.id}Meta`],
+            alt: s(`${still.id}Alt`),
+            title: s(`${still.id}Title`),
+            meta: s(`${still.id}Meta`),
           }))}
         />
       );
