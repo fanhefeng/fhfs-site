@@ -23,7 +23,9 @@
 /** The shared skin of anything you type into: input, textarea, the select trigger. */
 export const fieldSkin =
   "rounded-chip border border-line bg-surface-raised text-fg transition-[border-color,box-shadow,background-color] duration-150 " +
-  "hover:border-fg-tertiary/35 focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-accent/20 focus-visible:outline-none";
+  "hover:border-fg-tertiary/35 focus-visible:border-accent focus-visible:ring-[3px] focus-visible:ring-accent/20 focus-visible:outline-none " +
+  // Set by `useFieldErrors` on a field that failed its constraint.
+  "aria-invalid:border-accent aria-invalid:hover:border-accent";
 
 export const inputClass = `w-full px-3.5 py-2.5 text-body placeholder:text-fg-tertiary/60 read-only:bg-surface read-only:text-fg-tertiary read-only:hover:border-line ${fieldSkin}`;
 

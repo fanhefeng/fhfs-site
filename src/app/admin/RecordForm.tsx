@@ -7,6 +7,8 @@ import { SaveControls } from "./SaveControls";
 import { DeleteRow } from "./DeleteRow";
 import { Select, type SelectOption } from "./ui/Select";
 import { Segmented } from "./ui/Segmented";
+import { useFieldErrors } from "./ui/fieldErrors";
+import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 
 export type Field =
   | {
@@ -87,6 +89,7 @@ export function RecordForm({
 }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(action, {});
   const formId = useId();
+  const check = useFieldErrors();
 
   const value = (name: string): string => {
     const parts = name.split(".");
@@ -222,6 +225,8 @@ export function RecordForm({
 
     // A new row's key has to be typed; an existing row's must not change.
     const readOnly = !isNew && field.kind === "text" && field.readOnly;
+    // The read-only field of a table is its key, and a new one has to be typed.
+    const typedKey = isNew && field.kind === "text" && field.readOnly;
 
     return (
       <label key={field.name} className="block space-y-1.5">
@@ -233,16 +238,20 @@ export function RecordForm({
           defaultValue={value(field.name)}
           placeholder={"placeholder" in field ? field.placeholder : undefined}
           readOnly={readOnly || undefined}
-          required={isNew && field.kind === "text" && field.readOnly}
+          required={typedKey}
+          pattern={typedKey ? KEY_PATTERN : undefined}
+          data-mismatch={typedKey ? KEY_MESSAGE : undefined}
           className={`${inputClass} ${field.kind === "number" ? "tabular-nums" : ""}`}
+          {...check.field(field.name)}
         />
+        {check.message(field.name)}
       </label>
     );
   };
 
   return (
     <>
-      <form action={formAction} className="space-y-6">
+      <form action={formAction} className="space-y-6" {...check.formProps}>
         {isNew && <input type="hidden" name="isNew" value="1" />}
 
         {groups.map((group) => (

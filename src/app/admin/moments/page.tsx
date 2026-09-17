@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { moments } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { site } from "@/config/site";
-import { stampInZone } from "@/lib/moments";
+import { momentKey, stampInZone } from "@/lib/moments";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { deleteMoment, saveMoment } from "../actions/moments";
@@ -11,7 +11,14 @@ import type { Field } from "../RecordForm";
 import { Note } from "../ui/Note";
 
 const FIELDS: Field[] = [
-  { name: "key", label: "key", kind: "text", readOnly: true, placeholder: "m-2026-09-07-1" },
+  {
+    name: "key",
+    label: "key",
+    kind: "text",
+    readOnly: true,
+    placeholder: "m-20260907-231500",
+    hint: "已经按现在的时刻填好了，不用管它。想自己起也行：小写字母、数字、连字符。",
+  },
   {
     name: "postedAt",
     label: "时间（上海时间，到分钟）",
@@ -63,12 +70,14 @@ const FIELDS: Field[] = [
   },
 ];
 
-/** A new line, dated now to the minute in the site's zone. */
+/** A new line, dated now to the minute in the site's zone, and keyed by the
+ *  same instant — the key is an identity, not something worth composing. */
 function blank() {
-  const { time } = stampInZone(new Date().toISOString(), site.timeZone);
+  const now = new Date().toISOString();
+  const { time } = stampInZone(now, site.timeZone);
   const [day, clock] = time.split(" ");
   return {
-    key: "",
+    key: momentKey(now, site.timeZone),
     postedAt: `${day!.replaceAll(".", "-")} ${clock}`,
     content: "",
     collection: "",
@@ -88,7 +97,7 @@ export default async function MomentsAdminPage() {
     <AdminChrome title="说说" section="/admin/moments">
       <Note>
         时间按上海时间写到分钟，写错一分钟就换一个位置——板子是按时刻排的。 key
-        是这条说说的身份，存下就别改。
+        是这条说说的身份，只要不重复就行：新写的会自动填好，存下之后不能改。
       </Note>
       <RecordList
         action={saveMoment}

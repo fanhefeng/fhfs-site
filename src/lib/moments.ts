@@ -49,6 +49,28 @@ export function stampInZone(iso: string, timeZone: string): { year: string; time
 }
 
 /**
+ * The key a line written in the admin starts out with: `m-20260918-231507`,
+ * the second it was opened, in the given zone. A key only has to be unique
+ * and never change; nobody should have to invent one to post a sentence, and
+ * a second is fine-grained enough that two lines never ask for the same one.
+ */
+export function momentKey(iso: string, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(iso));
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `m-${get("year")}${get("month")}${get("day")}-${get("hour")}${get("minute")}${get("second")}`;
+}
+
+/**
  * The notebooks on the board with how many lines each holds, in order of
  * first appearance — the newest notebook first, since the list is. Lines
  * filed under no notebook are not a notebook.

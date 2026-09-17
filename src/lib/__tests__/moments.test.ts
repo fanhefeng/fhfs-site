@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { collections, shouldFold, stampInZone } from "@/lib/moments";
+import { validKey } from "@/lib/forms";
+import { collections, momentKey, shouldFold, stampInZone } from "@/lib/moments";
 
 describe("stampInZone", () => {
   it("prints the instant in the given zone, dots and a 24-hour clock", () => {
@@ -16,6 +17,14 @@ describe("stampInZone", () => {
       time: "2024.01.01 01:30",
     });
     expect(stampInZone("2024-01-01T00:10:00.000Z", "Asia/Shanghai").time).toBe("2024.01.01 08:10");
+  });
+});
+
+describe("momentKey", () => {
+  it("is the second in the given zone, in the grammar every key obeys", () => {
+    const key = momentKey("2026-09-18T15:15:07.000Z", "Asia/Shanghai");
+    expect(key).toBe("m-20260918-231507");
+    expect(validKey(key)).toBe(true);
   });
 });
 
