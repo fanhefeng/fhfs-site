@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { deleteWork, saveWork, type ActionState } from "../actions";
+import { deleteWork, saveWork } from "../actions/works";
+import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, textareaClass } from "../styles";
 import { DeleteRow } from "../DeleteRow";
 import { SaveControls } from "../SaveControls";

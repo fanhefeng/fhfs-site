@@ -4,7 +4,7 @@ import { timelineEntries } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { deleteTimelineEntry, saveTimelineEntry } from "../actions";
+import { deleteTimelineEntry, saveTimelineEntry } from "../actions/timeline";
 import type { Field, RecordData } from "../RecordForm";
 import { Note } from "../ui/Note";
 

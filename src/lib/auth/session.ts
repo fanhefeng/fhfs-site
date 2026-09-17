@@ -57,7 +57,7 @@ export async function requireAdmin(): Promise<Session> {
 
 /**
  * The same check as a value: the session, or null once it has expired. The
- * form-reporting actions in `app/admin/actions.ts` start with
+ * form-reporting actions in `app/admin/actions/` start with
  * `if (!(await adminSession())) return SESSION_EXPIRED;` and hand the editor
  * a message beside the save button, keeping the form — and its contents — on
  * screen. Never call it without reading the result; that is what

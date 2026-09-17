@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ActionState } from "./actions";
+import type { ActionState } from "./actions/shared";
 import { buttonClass } from "./styles";
 
 /**

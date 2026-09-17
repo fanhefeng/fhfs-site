@@ -55,7 +55,8 @@ Failures resolve to `null` and the badge is simply absent.
   locale-redirected to a route that doesn't exist. Its session check is
   deliberately optimistic — the real authorization boundary is
   `requireAdmin()` at the top of every Server Action.
-- **Writes**: every admin write lives in `src/app/admin/actions.ts`, starts
+- **Writes**: every admin write lives in `src/app/admin/actions/`, one file per
+  table with the shared pieces in `shared.ts`; each starts
   with a session check, and ends with `updateTag` — never `revalidateTag`,
   which would serve the stale copy to the very person who just pressed save.
   An action that reports to a form checks with `adminSession()` and returns
@@ -65,7 +66,9 @@ Failures resolve to `null` and the badge is simply absent.
   `src/lib/forms.ts`, where they are unit-tested — add a rule there, not
   inline. The "new" forms send `isNew`, and the action then refuses an
   existing key instead of upserting over it — for the tables saved by `key`
-  that is `upsertKeyed(table, row, isNew)` in the same file.
+  that is `upsertKeyed(table, row, isNew)` in `shared.ts`.
+  `conventions.test.ts` checks the session-first, invalidate-last shape of
+  every action.
 - **Error boundaries**: `src/app/[locale]/error.tsx` (a page failing at
   request time — a cold database on an uncached path), `src/app/global-error.tsx`
   (the layout itself), `src/app/admin/error.tsx`. Keep them dependency-free;

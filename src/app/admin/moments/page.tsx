@@ -6,7 +6,7 @@ import { site } from "@/config/site";
 import { stampInZone } from "@/lib/moments";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { deleteMoment, saveMoment } from "../actions";
+import { deleteMoment, saveMoment } from "../actions/moments";
 import type { Field } from "../RecordForm";
 import { Note } from "../ui/Note";
 

@@ -4,7 +4,7 @@ import { apps } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
-import { deleteApp, saveApp } from "../actions";
+import { deleteApp, saveApp } from "../actions/apps";
 import type { Field, RecordData } from "../RecordForm";
 import { Note } from "../ui/Note";
 

@@ -2,7 +2,8 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { NAV_GROUPS, type NavGroup } from "@/lib/nav";
-import { saveNavItems, type ActionState } from "../actions";
+import { saveNavItems } from "../actions/nav";
+import type { ActionState } from "../actions/shared";
 import { cardClass, ghostButtonClass, inputClass, labelClass, metaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 import { Select } from "../ui/Select";

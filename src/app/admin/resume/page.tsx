@@ -5,7 +5,7 @@ import { requireAdminPage } from "@/lib/auth/session";
 import { formatProjects, formatSkillLine } from "@/lib/resume";
 import { AdminChrome } from "../AdminChrome";
 import { RecordForm, type Field } from "../RecordForm";
-import { saveResumeProfile } from "../actions";
+import { saveResumeProfile } from "../actions/resume";
 import { ExperienceForm, type ExperienceDraft } from "./ExperienceForm";
 import { Note } from "../ui/Note";
 import { cardClass, metaClass } from "../styles";
