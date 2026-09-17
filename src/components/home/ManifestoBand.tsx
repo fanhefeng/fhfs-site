@@ -49,7 +49,7 @@ export function ManifestoBand() {
         split.revert();
       };
     },
-    { dependencies: [locale], scope: container, revertOnUpdate: true }
+    { dependencies: [locale], scope: container, revertOnUpdate: true },
   );
 
   return (

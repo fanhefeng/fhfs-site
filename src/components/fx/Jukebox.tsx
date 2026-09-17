@@ -77,7 +77,9 @@ export function Jukebox() {
 
   return (
     <div className="jukebox" aria-hidden="true" inert>
-      <style href="fx-jukebox" precedence="low">{CSS}</style>
+      <style href="fx-jukebox" precedence="low">
+        {CSS}
+      </style>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption -- an instrumental, and this player is not a control */}
       <audio ref={audioRef} src={file} loop preload="none" />
     </div>

@@ -53,8 +53,7 @@ export function Reveal({ children, as = "div", className, stagger, role }: Props
     () => {
       const el = ref.current;
       if (!el) return;
-      const targets: gsap.TweenTarget =
-        stagger != null ? Array.from(el.children) : el;
+      const targets: gsap.TweenTarget = stagger != null ? Array.from(el.children) : el;
       gsap.from(targets, {
         ...REVEAL_VARS,
         stagger: stagger ?? 0,
@@ -64,7 +63,7 @@ export function Reveal({ children, as = "div", className, stagger, role }: Props
         scrollTrigger: { trigger: el, start: REVEAL_START, once: true },
       });
     },
-    { scope: ref }
+    { scope: ref },
   );
 
   return (

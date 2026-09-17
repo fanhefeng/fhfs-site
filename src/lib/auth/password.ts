@@ -18,7 +18,7 @@ const KEY_LENGTH = 64;
 const scryptAsync = promisify(scrypt) as (
   password: string,
   salt: string,
-  keylen: number
+  keylen: number,
 ) => Promise<Buffer>;
 
 /** Minting a hash is `pnpm admin:password`, a CLI that does this once and

@@ -23,11 +23,16 @@ function sourceFiles(dir: string): string[] {
   return out;
 }
 
-const files = sourceFiles(src).map((file) => ({ file: rel(file), text: readFileSync(file, "utf8") }));
+const files = sourceFiles(src).map((file) => ({
+  file: rel(file),
+  text: readFileSync(file, "utf8"),
+}));
 
 /** Top-level declarations of a module: split where a line starts a new one. */
 function declarations(text: string): string[] {
-  return text.split(/^(?=(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function|const|let|class)\s)/m);
+  return text.split(
+    /^(?=(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function|const|let|class)\s)/m,
+  );
 }
 
 /** The body of a function declaration, comments removed. */
@@ -45,7 +50,11 @@ describe("public pages", () => {
   it("all start from pageLocale(params)", () => {
     const pages = files.filter(({ file }) => /^app\/\[locale\]\/.*(page|layout)\.tsx$/.test(file));
     expect(pages.length).toBeGreaterThan(10);
-    expect(pages.filter(({ text }) => !/await pageLocale\(|\bsetRequestLocale\(/.test(text)).map(({ file }) => file)).toEqual([]);
+    expect(
+      pages
+        .filter(({ text }) => !/await pageLocale\(|\bsetRequestLocale\(/.test(text))
+        .map(({ file }) => file),
+    ).toEqual([]);
   });
 });
 
@@ -59,7 +68,9 @@ describe("the database", () => {
     const strays = files
       .filter(({ file, text }) => !allowed.test(file) && importsDb.test(text))
       // Types and the schema's own enums carry no connection.
-      .filter(({ text }) => /import\s+(?!type\b)[^;]*from\s+"(@\/db|(\.\.?\/)+db)(\/index)?"/.test(text));
+      .filter(({ text }) =>
+        /import\s+(?!type\b)[^;]*from\s+"(@\/db|(\.\.?\/)+db)(\/index)?"/.test(text),
+      );
     expect(strays.map(({ file }) => file)).toEqual([]);
   });
 
@@ -81,12 +92,15 @@ describe("the database", () => {
 
 describe("admin server actions", () => {
   const actionFiles = files.filter(
-    ({ file, text }) => file.startsWith("app/admin/") && !file.startsWith("app/admin/login/") && text.startsWith('"use server";')
+    ({ file, text }) =>
+      file.startsWith("app/admin/") &&
+      !file.startsWith("app/admin/login/") &&
+      text.startsWith('"use server";'),
   );
   const actions = actionFiles.flatMap(({ file, text }) =>
     declarations(text)
       .filter((d) => /^export\s+async\s+function\s/.test(d))
-      .map((d) => ({ name: `${file}: ${d.match(/function\s+(\w+)/)![1]}`, body: body(d) }))
+      .map((d) => ({ name: `${file}: ${d.match(/function\s+(\w+)/)![1]}`, body: body(d) })),
   );
 
   it("are found", () => {
@@ -105,10 +119,14 @@ describe("admin server actions", () => {
   // updateTag, through invalidate(): a save that skips it succeeds and
   // changes nothing anyone can see.
   it("all invalidate what they wrote", () => {
-    expect(actions.filter(({ body }) => !/\binvalidate\(/.test(body)).map(({ name }) => name)).toEqual([]);
+    expect(
+      actions.filter(({ body }) => !/\binvalidate\(/.test(body)).map(({ name }) => name),
+    ).toEqual([]);
   });
 
   it("never reach for revalidateTag, which serves the saver the stale copy", () => {
-    expect(actionFiles.filter(({ text }) => /\brevalidateTag\s*\(/.test(text)).map(({ file }) => file)).toEqual([]);
+    expect(
+      actionFiles.filter(({ text }) => /\brevalidateTag\s*\(/.test(text)).map(({ file }) => file),
+    ).toEqual([]);
   });
 });

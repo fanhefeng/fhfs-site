@@ -8,10 +8,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
 
-export async function saveAbout(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveAbout(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const locale = parseLocale(str(form, "locale"));

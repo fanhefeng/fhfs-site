@@ -64,10 +64,7 @@ const data = {
     .select()
     .from(schema.timelineEntries)
     .orderBy(asc(schema.timelineEntries.sort), asc(schema.timelineEntries.key)),
-  apps: await db
-    .select()
-    .from(schema.apps)
-    .orderBy(asc(schema.apps.sort), asc(schema.apps.key)),
+  apps: await db.select().from(schema.apps).orderBy(asc(schema.apps.sort), asc(schema.apps.key)),
   works: await db
     .select()
     .from(schema.works)
@@ -84,18 +81,12 @@ const data = {
     .select()
     .from(schema.resumeExperiences)
     .orderBy(asc(schema.resumeExperiences.sort), asc(schema.resumeExperiences.key)),
-  chips: await db
-    .select()
-    .from(schema.chips)
-    .orderBy(asc(schema.chips.sort), asc(schema.chips.id)),
+  chips: await db.select().from(schema.chips).orderBy(asc(schema.chips.sort), asc(schema.chips.id)),
   navItems: await db
     .select()
     .from(schema.navItems)
     .orderBy(asc(schema.navItems.sort), asc(schema.navItems.href)),
-  copyBlocks: await db
-    .select()
-    .from(schema.copyBlocks)
-    .orderBy(asc(schema.copyBlocks.key)),
+  copyBlocks: await db.select().from(schema.copyBlocks).orderBy(asc(schema.copyBlocks.key)),
 };
 
 // Serial ids and timestamps are restatements of the data, not part of it —
@@ -110,12 +101,10 @@ try {
   await writeFile(
     path.join(STAGE, "db.json"),
     JSON.stringify(
-      Object.fromEntries(
-        Object.entries(data).map(([table, rows]) => [table, strip(rows as any)])
-      ),
+      Object.fromEntries(Object.entries(data).map(([table, rows]) => [table, strip(rows as any)])),
       null,
-      2
-    ) + "\n"
+      2,
+    ) + "\n",
   );
 
   /** The article again, as the file it used to be. */
@@ -129,7 +118,7 @@ try {
     });
     await writeFile(
       path.join(STAGE, "posts", `${post.slug}.${post.locale}.md`),
-      `---\n${frontmatter}---\n\n${post.bodyMd}`
+      `---\n${frontmatter}---\n\n${post.bodyMd}`,
     );
   }
 
@@ -148,7 +137,7 @@ try {
     });
     await writeFile(
       path.join(STAGE, "secrets", `${secret.slug}.${secret.locale}.md`),
-      `---\n${frontmatter}---\n\n${secret.bodyMd}`
+      `---\n${frontmatter}---\n\n${secret.bodyMd}`,
     );
   }
 
@@ -156,10 +145,9 @@ try {
     const frontmatter = toYaml({ title: about.title });
     await writeFile(
       path.join(STAGE, `about.${about.locale}.md`),
-      `---\n${frontmatter}---\n\n${about.bodyMd}`
+      `---\n${frontmatter}---\n\n${about.bodyMd}`,
     );
   }
-
 } catch (error) {
   await rm(STAGE, { recursive: true, force: true });
   throw error;
@@ -173,6 +161,6 @@ await rm(OUT, { recursive: true, force: true });
 await rename(STAGE, OUT);
 
 const counts = Object.entries(data).map(
-  ([table, rows]) => `${table} ${(rows as unknown[]).length}`
+  ([table, rows]) => `${table} ${(rows as unknown[]).length}`,
 );
 console.log(`backup/ written — ${counts.join(", ")}`);

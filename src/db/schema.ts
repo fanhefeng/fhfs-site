@@ -29,12 +29,7 @@ import {
  */
 
 export const localeEnum = pgEnum("locale", ["zh", "en"]);
-export const appCategoryEnum = pgEnum("app_category", [
-  "desktop",
-  "tool",
-  "game",
-  "website",
-]);
+export const appCategoryEnum = pgEnum("app_category", ["desktop", "tool", "game", "website"]);
 export const chipToneEnum = pgEnum("chip_tone", ["paper", "ink", "accent"]);
 export const secretKindEnum = pgEnum("secret_kind", ["essay", "podcast"]);
 
@@ -86,19 +81,18 @@ export const posts = pgTable(
     // Tags are per-locale strings, not translations of each other: the Chinese
     // post carries 手札, the English one carries notes. A tag entity table
     // would change the /blog/tags/[tag] URLs, so they stay an array.
-    tags: text().array().notNull().default(sql`'{}'`),
+    tags: text()
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
     draft: boolean().notNull().default(false),
     bodyMd: text("body_md").notNull(),
     bodyHtml: text("body_html").notNull(),
     readingMinutes: integer("reading_minutes").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [unique("posts_slug_locale").on(t.slug, t.locale)]
+  (t) => [unique("posts_slug_locale").on(t.slug, t.locale)],
 );
 
 export const abouts = pgTable("abouts", {
@@ -106,9 +100,7 @@ export const abouts = pgTable("abouts", {
   title: text().notNull(),
   bodyMd: text("body_md").notNull(),
   bodyHtml: text("body_html").notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 /**
@@ -136,14 +128,10 @@ export const secrets = pgTable(
     bodyMd: text("body_md").notNull(),
     bodyHtml: text("body_html").notNull(),
     readingMinutes: integer("reading_minutes").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [unique("secrets_slug_locale").on(t.slug, t.locale)]
+  (t) => [unique("secrets_slug_locale").on(t.slug, t.locale)],
 );
 
 /**
@@ -172,12 +160,8 @@ export const moments = pgTable("moments", {
   /** An optional one-word mood — the board's equivalent of a tag. */
   mood: text(),
   draft: boolean().notNull().default(false),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ---------------------------------------------------------------------------
@@ -204,11 +188,8 @@ export const timelineEntries = pgTable(
     sort: integer().notNull(),
   },
   (t) => [
-    check(
-      "timeline_has_date_or_label",
-      sql`${t.date} IS NOT NULL OR ${t.dateLabel} IS NOT NULL`
-    ),
-  ]
+    check("timeline_has_date_or_label", sql`${t.date} IS NOT NULL OR ${t.dateLabel} IS NOT NULL`),
+  ],
 );
 
 /**
@@ -228,7 +209,10 @@ export const apps = pgTable("apps", {
   // this repo's latest release at render time (src/lib/github.ts), so a new
   // release updates the site without anyone retyping a number here.
   repo: text(),
-  platforms: text().array().notNull().default(sql`'{}'`),
+  platforms: text()
+    .array()
+    .notNull()
+    .default(sql`'{}'`),
   accent: text(),
   hue: integer(),
   sort: integer().notNull().default(0),
@@ -242,7 +226,10 @@ export const works = pgTable("works", {
   year: integer().notNull(),
   cover: text(),
   url: text(),
-  tags: text().array().notNull().default(sql`'{}'`),
+  tags: text()
+    .array()
+    .notNull()
+    .default(sql`'{}'`),
   // Stored for the same reason apps carry one: a colour derived from list
   // position repaints the whole wall the moment anything is reordered.
   accent: text(),
@@ -304,10 +291,7 @@ export const resumeProfiles = pgTable("resume_profiles", {
   intro: jsonb().$type<LocalizedLines>().notNull(),
   /** Bullets under the summary — the claims with numbers in them. */
   highlights: jsonb().$type<LocalizedLines>().notNull().default(EMPTY_LINES),
-  skills: jsonb()
-    .$type<{ zh: SkillGroup[]; en: SkillGroup[] }>()
-    .notNull()
-    .default(EMPTY_LINES),
+  skills: jsonb().$type<{ zh: SkillGroup[]; en: SkillGroup[] }>().notNull().default(EMPTY_LINES),
   /** Open source and side projects, one bullet each. */
   projects: jsonb().$type<LocalizedLines>().notNull().default(EMPTY_LINES),
   /** One line per degree. */
@@ -320,9 +304,7 @@ export const resumeProfiles = pgTable("resume_profiles", {
   /** One line beside the contact details — an aside in the author's voice
    *  ("offers welcome"), kept out of the summary so it can change alone. */
   note: localized(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 /**
@@ -371,7 +353,10 @@ export const navItems = pgTable("nav_items", {
   href: text().notNull(),
   // Still points at a `nav.<key>` label in the message catalogue.
   labelKey: text("label_key").notNull(),
-  surfaces: text().array().notNull().default(sql`'{}'`),
+  surfaces: text()
+    .array()
+    .notNull()
+    .default(sql`'{}'`),
   sort: integer().notNull().default(0),
   // Which wing of the site the link belongs to — `issue` / `rooms` / `me`
   // (`src/lib/nav.ts`), or null for a row on its own. The footer clusters by
@@ -425,5 +410,5 @@ export const loginAttempts = pgTable(
   },
   // Every login counts this address's rows inside the window; without the
   // index that is a full scan of a table that only ever grows between logins.
-  (t) => [index("login_attempts_ip_at").on(t.ip, t.at)]
+  (t) => [index("login_attempts_ip_at").on(t.ip, t.at)],
 );

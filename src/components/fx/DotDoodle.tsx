@@ -101,8 +101,7 @@ const HOVER_LEAVE_MS = 700;
 const IDLE_FPS = 30;
 const IDLE_FRAME_MS = 1000 / IDLE_FPS;
 
-const clamp = (v: number, lo: number, hi: number) =>
-  v < lo ? lo : v > hi ? hi : v;
+const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 /** The rebound above. May briefly exceed 1 — callers clamp what they use it for. */
@@ -180,10 +179,7 @@ function buildCells(text: string): { cells: Cell[]; blocks: number } {
         const on = glyph[row - PAD]?.[col - PAD] === "#";
         const dx = Math.abs(col - mid) / mid;
         const dy = Math.abs(row - mid) / mid;
-        const dist = Math.pow(
-          Math.pow(dx, EDGE_EXP) + Math.pow(dy, EDGE_EXP),
-          1 / EDGE_EXP
-        );
+        const dist = Math.pow(Math.pow(dx, EDGE_EXP) + Math.pow(dy, EDGE_EXP), 1 / EDGE_EXP);
         // Carve the outline: cells past the ragged cutoff never exist. Only
         // noise is eligible — the glyph stays whole by the padding above.
         if (!on && dist > RIM_CUTOFF + Math.random() * RIM_JITTER) continue;
@@ -194,17 +190,12 @@ function buildCells(text: string): { cells: Cell[]; blocks: number } {
         const rdx = col - mid;
         const rdy = row - mid;
         const rr = Math.hypot(rdx, rdy) / mid;
-        const bulge =
-          rr > 0
-            ? Math.sin(rr * LENS) / (rr * Math.sin(LENS))
-            : LENS / Math.sin(LENS);
+        const bulge = rr > 0 ? Math.sin(rr * LENS) / (rr * Math.sin(LENS)) : LENS / Math.sin(LENS);
         cells.push({
           block,
           on,
           falloff: 1 - FALLOFF * Math.pow(Math.min(dist, 1), 1.5),
-          rim: smoothstep(
-            clamp((dist - RIM_START) / (RIM_END - RIM_START), 0, 1)
-          ),
+          rim: smoothstep(clamp((dist - RIM_START) / (RIM_END - RIM_START), 0, 1)),
           px: mid + rdx * bulge + (Math.random() - 0.5) * 2 * scatter,
           py: mid + rdy * bulge + (Math.random() - 0.5) * 2 * scatter,
           bulge,
@@ -289,9 +280,7 @@ export function DotDoodle({ text, className }: Props) {
       const cell = pool[Math.floor(Math.random() * pool.length)];
       if (!cell) return;
       cell.accent = {
-        rgb: palette.accents[
-          Math.floor(Math.random() * palette.accents.length)
-        ] ?? [180, 83, 9],
+        rgb: palette.accents[Math.floor(Math.random() * palette.accents.length)] ?? [180, 83, 9],
         born,
         life: 7 + Math.random() * 9,
       };
@@ -374,11 +363,7 @@ export function DotDoodle({ text, className }: Props) {
         intro = 1 - Math.pow(1 - intro, 3);
         if (intro <= 0) continue;
 
-        const n =
-          0.5 +
-          0.5 *
-            (0.62 * Math.sin(t * c.f1 + c.p1) +
-              0.38 * Math.sin(t * c.f2 + c.p2));
+        const n = 0.5 + 0.5 * (0.62 * Math.sin(t * c.f1 + c.p1) + 0.38 * Math.sin(t * c.f2 + c.p2));
 
         // Hovering also retires the falloff: the field flattens into an even
         // matrix, which is what makes the surfaced name read as deliberate.
@@ -387,21 +372,12 @@ export function DotDoodle({ text, className }: Props) {
         let alpha: number;
         let radius: number;
         if (c.on) {
-          alpha = lerp(
-            lerp(GLYPH_ALPHA[0], GLYPH_ALPHA[1], n),
-            HOVER_GLYPH_ALPHA,
-            h
-          );
+          alpha = lerp(lerp(GLYPH_ALPHA[0], GLYPH_ALPHA[1], n), HOVER_GLYPH_ALPHA, h);
           alpha *= 0.85 + 0.15 * fall;
           radius = GLYPH_RADIUS * cell * (0.95 + 0.05 * n) * (0.82 + 0.18 * fall);
         } else {
           const nd = Math.pow(n, NOISE_GAMMA);
-          alpha =
-            lerp(
-              lerp(NOISE_ALPHA[0], NOISE_ALPHA[1], nd),
-              HOVER_QUIET_ALPHA,
-              h
-            ) * fall;
+          alpha = lerp(lerp(NOISE_ALPHA[0], NOISE_ALPHA[1], nd), HOVER_QUIET_ALPHA, h) * fall;
           radius =
             lerp(lerp(NOISE_RADIUS[0], NOISE_RADIUS[1], nd), HOVER_QUIET_RADIUS, h) *
             cell *
@@ -412,9 +388,7 @@ export function DotDoodle({ text, className }: Props) {
         if (c.accent) {
           const age = t - c.accent.born;
           // Fade in and out, and step aside entirely while surfaced.
-          const fade =
-            clamp(Math.min(age / 1.2, (c.accent.life - age) / 1.2), 0, 1) *
-            (1 - h);
+          const fade = clamp(Math.min(age / 1.2, (c.accent.life - age) / 1.2), 0, 1) * (1 - h);
           if (fade > 0) {
             const a = c.accent.rgb;
             style = `rgb(${lerp(ink[0], a[0], fade) | 0}, ${lerp(ink[1], a[1], fade) | 0}, ${lerp(ink[2], a[2], fade) | 0})`;
@@ -459,11 +433,7 @@ export function DotDoodle({ text, className }: Props) {
       // A tab switch must not dump a multi-second delta into the transition.
       const dt = Math.min(now - lastFrameAt, 100);
       lastFrameAt = now;
-      hoverT = clamp(
-        hoverT + (hovered ? dt / HOVER_ENTER_MS : -dt / HOVER_LEAVE_MS),
-        0,
-        1
-      );
+      hoverT = clamp(hoverT + (hovered ? dt / HOVER_ENTER_MS : -dt / HOVER_LEAVE_MS), 0, 1);
       elapsed = now / 1000 - startedAt;
       draw(elapsed);
     };
@@ -525,7 +495,7 @@ export function DotDoodle({ text, className }: Props) {
         visible = entry?.isIntersecting ?? false;
         sync();
       },
-      { rootMargin: "100px" }
+      { rootMargin: "100px" },
     );
     io.observe(canvas);
 
@@ -538,8 +508,7 @@ export function DotDoodle({ text, className }: Props) {
       for (const c of cells) {
         if (!c.accent) continue;
         c.accent.rgb =
-          palette.accents[Math.floor(Math.random() * palette.accents.length)] ??
-          c.accent.rgb;
+          palette.accents[Math.floor(Math.random() * palette.accents.length)] ?? c.accent.rgb;
       }
       if (!running) redraw();
     });

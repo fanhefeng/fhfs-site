@@ -14,8 +14,7 @@ export type Theme = "dark" | "light";
 export const THEME_STORAGE_KEY = "fhfs-theme";
 
 export const readTheme = (): Theme =>
-  typeof document !== "undefined" &&
-  document.documentElement.dataset.theme === "dark"
+  typeof document !== "undefined" && document.documentElement.dataset.theme === "dark"
     ? "dark"
     : "light";
 

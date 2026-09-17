@@ -89,9 +89,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
         tight.style.opacity = String(1 - lift);
         soft.style.opacity = String(lift);
         // The hidden line only resolves once there is room to read it.
-        secret.style.opacity = String(
-          gsap.utils.clamp(0, 1, (state.p - 0.25) / 0.45)
-        );
+        secret.style.opacity = String(gsap.utils.clamp(0, 1, (state.p - 0.25) / 0.45));
       };
 
       const settle = (to: number) => {
@@ -157,7 +155,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
         peelApi.current = null;
       };
     },
-    { scope: stickerRef }
+    { scope: stickerRef },
   );
 
   const bilingual = blocks.length > 1;
@@ -182,11 +180,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
         {/* One column per language: an unmatched URL can't tell us which one
             the reader wants, so both stay on offer. */}
         <div
-          className={
-            bilingual
-              ? "mt-8 grid gap-10 sm:grid-cols-2 sm:gap-8"
-              : "mt-8 max-w-[46ch]"
-          }
+          className={bilingual ? "mt-8 grid gap-10 sm:grid-cols-2 sm:gap-8" : "mt-8 max-w-[46ch]"}
         >
           {blocks.map((b, i) => (
             <section key={b.lang} lang={b.lang}>
@@ -195,9 +189,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
               ) : (
                 <h2 className="text-title font-display text-fg">{b.title}</h2>
               )}
-              <p className="mt-4 text-body text-fg-secondary">
-                {b.description}
-              </p>
+              <p className="mt-4 text-body text-fg-secondary">{b.description}</p>
 
               {/* Two ways out — home, or straight into the writing. */}
               <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
@@ -223,10 +215,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
         {/* The corner easter egg. Sticker = content material, so it stays
             paper-white in both themes; only what it hides is themed. */}
         <div className="mt-16 flex justify-end sm:mt-24">
-          <div
-            ref={stickerRef}
-            className="relative size-56 rotate-[-3deg] md:size-64"
-          >
+          <div ref={stickerRef} className="relative size-56 rotate-[-3deg] md:size-64">
             {/* Underneath: the line you only get to read by tearing. */}
             {/* Sized and parked so the whole line clears the crease at
                 full peel: everything below the corner-to-corner diagonal. */}
@@ -299,8 +288,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
                 data-flap
                 style={{
                   clipPath: REST.flap,
-                  backgroundImage:
-                    "linear-gradient(315deg, #cfc9bb 0%, #e9e5dc 62%, #f8f6f1 100%)",
+                  backgroundImage: "linear-gradient(315deg, #cfc9bb 0%, #e9e5dc 62%, #f8f6f1 100%)",
                 }}
                 className="size-full rounded-[14px]"
               />

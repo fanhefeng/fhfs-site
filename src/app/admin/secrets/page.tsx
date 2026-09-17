@@ -48,12 +48,16 @@ export default async function SecretsIndex() {
             >
               <span className="font-mono text-meta text-fg-tertiary tabular-nums">{row.date}</span>
               <span className="font-mono text-meta uppercase text-fg-tertiary">{row.locale}</span>
-              <span className="font-mono text-meta text-accent">{row.kind === "podcast" ? "播客" : "随笔"}</span>
+              <span className="font-mono text-meta text-accent">
+                {row.kind === "podcast" ? "播客" : "随笔"}
+              </span>
               <span className="flex-1 text-body transition-colors group-hover:text-accent">
                 {row.title}
               </span>
               {row.draft && (
-                <span className="font-mono text-meta uppercase tracking-meta text-accent">草稿</span>
+                <span className="font-mono text-meta uppercase tracking-meta text-accent">
+                  草稿
+                </span>
               )}
               <span className="font-mono text-meta text-fg-tertiary tabular-nums">
                 {row.kind === "podcast" ? `${row.duration ?? "?"}m` : `${row.readingMinutes}m`}

@@ -32,9 +32,7 @@ export async function createSession(): Promise<string> {
 }
 
 /** Verifies a token's signature and expiry. No database, no side effects. */
-export async function readSession(
-  token: string | undefined
-): Promise<Session | null> {
+export async function readSession(token: string | undefined): Promise<Session | null> {
   if (!token) return null;
   try {
     // The one algorithm this site signs with; anything else in a token's

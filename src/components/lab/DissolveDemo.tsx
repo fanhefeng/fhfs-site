@@ -144,14 +144,7 @@ void main(){
  * four while the threshold is parked, which is what keeps a pinned WebGL
  * canvas from costing anything while the reader is not scrolling.
  */
-export function DissolveDemo({
-  accent,
-  hint,
-  headline,
-  body,
-  tail,
-  fallbackNote,
-}: Props) {
+export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote }: Props) {
   const scope = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -296,7 +289,7 @@ export function DissolveDemo({
       undefined,
       () => {
         if (!disposed) setDegraded(true);
-      }
+      },
     );
 
     return () => {
@@ -324,10 +317,7 @@ export function DissolveDemo({
       // underneath it. Without this the text is invisible for half the scroll.
       const ink = gsap.utils.interpolate("#f2efe4", "#232a21");
       const glow = gsap.utils.interpolate("rgba(0,0,0,0.55)", "rgba(0,0,0,0)");
-      const inkAt = gsap.utils.pipe(
-        gsap.utils.mapRange(0.2, 0.48, 0, 1),
-        gsap.utils.clamp(0, 1)
-      );
+      const inkAt = gsap.utils.pipe(gsap.utils.mapRange(0.2, 0.48, 0, 1), gsap.utils.clamp(0, 1));
 
       const paintInk = () => {
         const el = copyRef.current;
@@ -366,7 +356,7 @@ export function DissolveDemo({
         tween.kill();
       };
     },
-    { scope, dependencies: [live] }
+    { scope, dependencies: [live] },
   );
 
   return (
@@ -377,7 +367,12 @@ export function DissolveDemo({
 
       <div ref={stageRef} className="dz-stage">
         <div ref={stickyRef} className="dz-sticky">
-          <canvas ref={canvasRef} className="dz-canvas" data-degraded={degraded || undefined} aria-hidden="true" />
+          <canvas
+            ref={canvasRef}
+            className="dz-canvas"
+            data-degraded={degraded || undefined}
+            aria-hidden="true"
+          />
 
           <div ref={copyRef} className="dz-copy">
             <h2 className="dz-headline">{headline}</h2>

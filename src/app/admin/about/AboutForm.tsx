@@ -11,10 +11,7 @@ export function AboutForm({
 }: {
   about: { locale: "zh" | "en"; title: string; bodyMd: string };
 }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    saveAbout,
-    {}
-  );
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveAbout, {});
 
   return (
     <form action={formAction} className="space-y-4">

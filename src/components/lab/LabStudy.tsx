@@ -21,37 +21,31 @@ import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
  * so there is nothing lost to the missing SSR pass beyond the copy inside
  * them — and that copy is repeated in the page's own header.
  */
-const ScrollVideoDemo = dynamic(
-  () => import("./ScrollVideoDemo").then((m) => m.ScrollVideoDemo),
-  { ssr: false }
-);
-const DissolveDemo = dynamic(
-  () => import("./DissolveDemo").then((m) => m.DissolveDemo),
-  { ssr: false }
-);
-const MeltingTextDemo = dynamic(
-  () => import("./MeltingTextDemo").then((m) => m.MeltingTextDemo),
-  { ssr: false }
-);
+const ScrollVideoDemo = dynamic(() => import("./ScrollVideoDemo").then((m) => m.ScrollVideoDemo), {
+  ssr: false,
+});
+const DissolveDemo = dynamic(() => import("./DissolveDemo").then((m) => m.DissolveDemo), {
+  ssr: false,
+});
+const MeltingTextDemo = dynamic(() => import("./MeltingTextDemo").then((m) => m.MeltingTextDemo), {
+  ssr: false,
+});
 const GroveDemo = dynamic(() => import("./GroveDemo").then((m) => m.GroveDemo), {
   ssr: false,
 });
-const GroveStageDemo = dynamic(
-  () => import("./GroveStageDemo").then((m) => m.GroveStageDemo),
-  { ssr: false }
-);
-const LiquidMetalDemo = dynamic(
-  () => import("./LiquidMetalDemo").then((m) => m.LiquidMetalDemo),
-  { ssr: false }
-);
+const GroveStageDemo = dynamic(() => import("./GroveStageDemo").then((m) => m.GroveStageDemo), {
+  ssr: false,
+});
+const LiquidMetalDemo = dynamic(() => import("./LiquidMetalDemo").then((m) => m.LiquidMetalDemo), {
+  ssr: false,
+});
 const Workstation = dynamic(
   () => import("@/components/about/Workstation").then((m) => m.Workstation),
-  { ssr: false }
+  { ssr: false },
 );
-const LensSliderDemo = dynamic(
-  () => import("./LensSliderDemo").then((m) => m.LensSliderDemo),
-  { ssr: false }
-);
+const LensSliderDemo = dynamic(() => import("./LensSliderDemo").then((m) => m.LensSliderDemo), {
+  ssr: false,
+});
 // The one study that is DOM through and through — a canvas for the bricks,
 // but the sign is SVG — so it keeps its SSR pass: the page reads whole
 // before its chunk lands, and the wall paints over.
@@ -75,7 +69,8 @@ export function LabStudy({ slug, accent, text }: Props) {
   // study is prerendered, so throwing turns that into a failed build instead.
   const s = (key: string): string => {
     const value = text[key];
-    if (value === undefined) throw new Error(`lab study "${slug}" asks for text.${key}, which the page never set`);
+    if (value === undefined)
+      throw new Error(`lab study "${slug}" asks for text.${key}, which the page never set`);
     return value;
   };
   switch (slug) {

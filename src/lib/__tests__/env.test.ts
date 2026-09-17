@@ -15,30 +15,50 @@ const good = {
 describe("envProblems", () => {
   it("passes the required three, with the optional ones absent or empty", () => {
     expect(envProblems(good)).toEqual([]);
-    expect(envProblems({ ...good, GITHUB_TOKEN: "", DATABASE_URL_UNPOOLED: undefined })).toEqual([]);
+    expect(envProblems({ ...good, GITHUB_TOKEN: "", DATABASE_URL_UNPOOLED: undefined })).toEqual(
+      [],
+    );
   });
 
   it("names every missing variable at once", () => {
     const problems = envProblems({});
     expect(problems).toHaveLength(3);
-    expect(problems.join("\n")).toMatch(/DATABASE_URL is not set[\s\S]*AUTH_SECRET is not set[\s\S]*ADMIN_PASSWORD_HASH is not set/);
+    expect(problems.join("\n")).toMatch(
+      /DATABASE_URL is not set[\s\S]*AUTH_SECRET is not set[\s\S]*ADMIN_PASSWORD_HASH is not set/,
+    );
   });
 
   it("treats an empty required value as missing", () => {
-    expect(envProblems({ ...good, AUTH_SECRET: "" })).toEqual([expect.stringMatching(/^AUTH_SECRET is not set/)]);
+    expect(envProblems({ ...good, AUTH_SECRET: "" })).toEqual([
+      expect.stringMatching(/^AUTH_SECRET is not set/),
+    ]);
   });
 
   it("catches a placeholder, a pasted password, a wrong scheme and a stray space", () => {
-    expect(envProblems({ ...good, AUTH_SECRET: "changeme" })).toEqual([expect.stringMatching(/^AUTH_SECRET is set but malformed/)]);
-    expect(envProblems({ ...good, ADMIN_PASSWORD_HASH: "hunter2" })).toEqual([expect.stringMatching(/^ADMIN_PASSWORD_HASH/)]);
-    expect(envProblems({ ...good, DATABASE_URL: "mysql://host/db" })).toEqual([expect.stringMatching(/^DATABASE_URL/)]);
-    expect(envProblems({ ...good, DATABASE_URL_UNPOOLED: "host/db" })).toEqual([expect.stringMatching(/^DATABASE_URL_UNPOOLED/)]);
-    expect(envProblems({ ...good, SITE_URL: "https://example.com/" })).toEqual([expect.stringMatching(/^SITE_URL/)]);
-    expect(envProblems({ ...good, GITHUB_TOKEN: ` ${"g".repeat(40)}` })).toEqual([expect.stringMatching(/^GITHUB_TOKEN/)]);
+    expect(envProblems({ ...good, AUTH_SECRET: "changeme" })).toEqual([
+      expect.stringMatching(/^AUTH_SECRET is set but malformed/),
+    ]);
+    expect(envProblems({ ...good, ADMIN_PASSWORD_HASH: "hunter2" })).toEqual([
+      expect.stringMatching(/^ADMIN_PASSWORD_HASH/),
+    ]);
+    expect(envProblems({ ...good, DATABASE_URL: "mysql://host/db" })).toEqual([
+      expect.stringMatching(/^DATABASE_URL/),
+    ]);
+    expect(envProblems({ ...good, DATABASE_URL_UNPOOLED: "host/db" })).toEqual([
+      expect.stringMatching(/^DATABASE_URL_UNPOOLED/),
+    ]);
+    expect(envProblems({ ...good, SITE_URL: "https://example.com/" })).toEqual([
+      expect.stringMatching(/^SITE_URL/),
+    ]);
+    expect(envProblems({ ...good, GITHUB_TOKEN: ` ${"g".repeat(40)}` })).toEqual([
+      expect.stringMatching(/^GITHUB_TOKEN/),
+    ]);
   });
 
   it("never repeats a value into the message", () => {
-    expect(envProblems({ ...good, AUTH_SECRET: "sekrit-value" }).join("\n")).not.toContain("sekrit-value");
+    expect(envProblems({ ...good, AUTH_SECRET: "sekrit-value" }).join("\n")).not.toContain(
+      "sekrit-value",
+    );
   });
 });
 
@@ -71,7 +91,9 @@ describe("the variables the code reads", () => {
   });
 
   it("are the ones .env.example documents, no more and no fewer", () => {
-    const documented = [...readFileSync(path.join(root, ".env.example"), "utf8").matchAll(/^([A-Z][A-Z0-9_]*)=/gm)].map((m) => m[1]);
+    const documented = [
+      ...readFileSync(path.join(root, ".env.example"), "utf8").matchAll(/^([A-Z][A-Z0-9_]*)=/gm),
+    ].map((m) => m[1]);
     expect(documented.sort()).toEqual(Object.keys(ENV_RULES).sort());
   });
 });

@@ -38,14 +38,8 @@ export function SaveControls({
   const messages = (
     <>
       {state.error && (
-        <p
-          role="alert"
-          className="flex items-center gap-2 text-caption text-accent"
-        >
-          <span
-            aria-hidden
-            className="size-1.5 shrink-0 rounded-full bg-accent"
-          />
+        <p role="alert" className="flex items-center gap-2 text-caption text-accent">
+          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
           {state.error}
         </p>
       )}

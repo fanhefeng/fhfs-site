@@ -40,12 +40,8 @@ export default async function PostsIndex() {
               href={`/admin/posts/${post.slug}/${post.locale}`}
               className="group flex min-h-12 flex-wrap items-baseline gap-x-4 gap-y-1 px-2 py-3 transition-colors hover:bg-surface/60"
             >
-              <span className="font-mono text-meta text-fg-tertiary tabular-nums">
-                {post.date}
-              </span>
-              <span className="font-mono text-meta uppercase text-fg-tertiary">
-                {post.locale}
-              </span>
+              <span className="font-mono text-meta text-fg-tertiary tabular-nums">{post.date}</span>
+              <span className="font-mono text-meta uppercase text-fg-tertiary">{post.locale}</span>
               <span className="flex-1 text-body transition-colors group-hover:text-accent">
                 {post.title}
               </span>

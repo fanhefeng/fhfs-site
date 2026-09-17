@@ -17,7 +17,5 @@
  * where nothing moves.
  */
 export function Mdx({ html }: { html: string }) {
-  return (
-    <div className="prose-editorial" dangerouslySetInnerHTML={{ __html: html }} />
-  );
+  return <div className="prose-editorial" dangerouslySetInnerHTML={{ __html: html }} />;
 }

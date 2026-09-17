@@ -43,11 +43,7 @@ export function DeleteRow({
           <button type="submit" className={dangerButtonClass}>
             确认删除
           </button>
-          <button
-            type="button"
-            onClick={() => setArmed(false)}
-            className={ghostButtonClass}
-          >
+          <button type="button" onClick={() => setArmed(false)} className={ghostButtonClass}>
             算了
           </button>
         </div>

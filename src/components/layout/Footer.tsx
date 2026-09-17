@@ -50,18 +50,12 @@ export function Footer({ items }: { items: NavLink[] }) {
 
         {/* Build-time year is baked into the static HTML; let the client
             keep it rather than fail hydration right after New Year. */}
-        <span
-          suppressHydrationWarning
-          className="font-mono text-[11px] text-fg-tertiary"
-        >
+        <span suppressHydrationWarning className="font-mono text-[11px] text-fg-tertiary">
           © {new Date().getFullYear()} {site.author}
           <span className="hidden sm:inline"> · {t("rights")}</span>
         </span>
 
-        <nav
-          aria-label={t("navAria")}
-          className="flex flex-wrap items-center gap-x-5 gap-y-1"
-        >
+        <nav aria-label={t("navAria")} className="flex flex-wrap items-center gap-x-5 gap-y-1">
           {clusterNav(items).map((cluster, i) => (
             // Keyed by position too: a group can recur after another one
             // (a misordered table) and then names alone would collide.
@@ -90,11 +84,7 @@ export function Footer({ items }: { items: NavLink[] }) {
         <span className="flex items-center gap-x-5">
           {/* Plain <a>: rss.xml is a file route, not a page — skip the
               route transition curtain. */}
-          <a
-            href={`/${locale}/rss.xml`}
-            data-no-transition
-            className={linkClass}
-          >
+          <a href={`/${locale}/rss.xml`} data-no-transition className={linkClass}>
             {t("rss")}
           </a>
           <a

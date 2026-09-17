@@ -24,7 +24,7 @@ if (!url) {
   throw new Error(
     "DATABASE_URL is not set. It is required at build time and at runtime — " +
       "pull it with `vercel env pull .env.local`, or copy the pooled " +
-      "connection string from the Neon dashboard."
+      "connection string from the Neon dashboard.",
   );
 }
 
@@ -40,9 +40,7 @@ if (!url) {
  * anything when repeated. Keep the writes that way; a plain insert into a
  * serial-keyed table would not be.
  */
-neonConfig.fetchFunction = withConnectionRetry((input, init) =>
-  fetch(input, init)
-);
+neonConfig.fetchFunction = withConnectionRetry((input, init) => fetch(input, init));
 
 export const db = drizzle(url, { schema });
 

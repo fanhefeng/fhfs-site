@@ -16,14 +16,10 @@ export default async function LoginPage({
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6">
       <div className={`${cardClass} p-6 shadow-card sm:p-8`}>
         <h1 className={metaClass}>fhf · admin</h1>
-        <p className="mt-2 text-caption text-fg-tertiary">
-          一个密码，进去就能改站上的内容。
-        </p>
-      {/* Carried through the sign-in so a bookmarked edit page comes back.
+        <p className="mt-2 text-caption text-fg-tertiary">一个密码，进去就能改站上的内容。</p>
+        {/* Carried through the sign-in so a bookmarked edit page comes back.
           `next` can arrive as an array (?next=a&next=b) — treat that as unset. */}
-        <LoginForm
-          next={typeof next === "string" && next.startsWith("/admin") ? next : ""}
-        />
+        <LoginForm next={typeof next === "string" && next.startsWith("/admin") ? next : ""} />
       </div>
     </main>
   );

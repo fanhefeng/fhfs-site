@@ -43,13 +43,9 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const l: Locale = hasLocale(routing.locales, locale)
-    ? locale
-    : routing.defaultLocale;
+  const l: Locale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   return {
     metadataBase: new URL(site.url),
     title: { default: site.title[l], template: `%s | ${site.signName}` },

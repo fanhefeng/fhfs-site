@@ -40,7 +40,8 @@ export const ENV_RULES: Record<string, Rule> = {
   SITE_URL: {
     required: false,
     valid: (v) => /^https:\/\/[a-z0-9.-]+$/.test(v),
-    shape: "an https:// origin with no path or trailing slash (overrides the domain Vercel reports; src/lib/siteUrl.ts)",
+    shape:
+      "an https:// origin with no path or trailing slash (overrides the domain Vercel reports; src/lib/siteUrl.ts)",
   },
   GITHUB_TOKEN: {
     required: false,

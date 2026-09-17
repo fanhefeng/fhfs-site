@@ -36,12 +36,12 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
         label: t(`categories.${c}`),
       })),
     ],
-    [apps, t]
+    [apps, t],
   );
 
   const visible = useMemo(
     () => apps.filter((a) => filter === "all" || a.category === filter),
-    [apps, filter]
+    [apps, filter],
   );
 
   const change = useCallback((next: string) => {
@@ -72,7 +72,7 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
           gsap.fromTo(
             els,
             { autoAlpha: 0, scale: 0.94 },
-            { autoAlpha: 1, scale: 1, duration: 0.4, ease: "power2.out" }
+            { autoAlpha: 1, scale: 1, duration: 0.4, ease: "power2.out" },
           ),
         onLeave: (els) =>
           gsap.to(els, { autoAlpha: 0, scale: 0.94, duration: 0.25, ease: "power2.in" }),
@@ -81,7 +81,7 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
     // revertOnUpdate so a half-played reshuffle is torn down before the next
     // one starts (rapid clicking through the segments). The state was already
     // captured in the click handler, so reverting here costs nothing.
-    { dependencies: [filter], scope: gridRef, revertOnUpdate: true }
+    { dependencies: [filter], scope: gridRef, revertOnUpdate: true },
   );
 
   // Site-wide scroll entrance, bento flavour: stagger .06 across the cells.
@@ -102,7 +102,7 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
         });
       });
     },
-    { scope: gridRef }
+    { scope: gridRef },
   );
 
   return (
@@ -126,10 +126,7 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
 
       {/* Desktop/tablet: the bento. `relative` is required for Flip's
        * absolute-positioning pass during the reshuffle. */}
-      <div
-        ref={gridRef}
-        className="relative hidden grid-cols-2 gap-4 md:grid lg:grid-cols-3"
-      >
+      <div ref={gridRef} className="relative hidden grid-cols-2 gap-4 md:grid lg:grid-cols-3">
         {apps.map((app, i) => {
           const shown = filter === "all" || app.category === filter;
           return (

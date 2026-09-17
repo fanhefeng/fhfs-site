@@ -63,9 +63,7 @@ export class ScrollVideo {
    */
   async load(): Promise<void> {
     const all = Array.from({ length: this.frameCount }, (_, i) => i);
-    const warmup = all.filter(
-      (i) => i % this.warmupStep === 0 || i === this.frameCount - 1
-    );
+    const warmup = all.filter((i) => i % this.warmupStep === 0 || i === this.frameCount - 1);
     const warmupSet = new Set(warmup);
     const rest = all.filter((i) => !warmupSet.has(i));
 
@@ -80,30 +78,27 @@ export class ScrollVideo {
 
   private async loadBatch(indices: number[]): Promise<void> {
     let cursor = 0;
-    const workers = Array.from(
-      { length: Math.min(MAX_CONCURRENCY, indices.length) },
-      async () => {
-        while (cursor < indices.length && !this.destroyed) {
-          const index = indices[cursor++]!;
-          try {
-            const frame = await this.loadFrame(index);
-            // `destroy()` closed and emptied `frames` while this was in
-            // flight; storing it now would put a bitmap nothing will ever
-            // close back into the array, one per worker still loading.
-            if (this.destroyed) {
-              if ("close" in frame) frame.close();
-              return;
-            }
-            this.frames[index] = frame;
-          } catch {
-            // One missing frame is survivable: the draw path falls back to
-            // the nearest loaded neighbour.
+    const workers = Array.from({ length: Math.min(MAX_CONCURRENCY, indices.length) }, async () => {
+      while (cursor < indices.length && !this.destroyed) {
+        const index = indices[cursor++]!;
+        try {
+          const frame = await this.loadFrame(index);
+          // `destroy()` closed and emptied `frames` while this was in
+          // flight; storing it now would put a bitmap nothing will ever
+          // close back into the array, one per worker still loading.
+          if (this.destroyed) {
+            if ("close" in frame) frame.close();
+            return;
           }
-          this.loadedCount++;
-          this.onProgress?.(this.loadedCount, this.frameCount);
+          this.frames[index] = frame;
+        } catch {
+          // One missing frame is survivable: the draw path falls back to
+          // the nearest loaded neighbour.
         }
+        this.loadedCount++;
+        this.onProgress?.(this.loadedCount, this.frameCount);
       }
-    );
+    });
     await Promise.all(workers);
   }
 

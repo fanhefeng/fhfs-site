@@ -8,10 +8,7 @@ import { intField, localized, localizedLines, str, validKey } from "@/lib/forms"
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, KEY_ERROR, upsertKeyed, type ActionState } from "./shared";
 
-export async function saveIntroNode(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveIntroNode(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");

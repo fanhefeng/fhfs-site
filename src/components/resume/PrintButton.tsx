@@ -7,13 +7,7 @@
  * print dialog offers the PDF. No generated file to keep in step with the
  * page — what is printed is the page.
  */
-export function PrintButton({
-  label,
-  ariaLabel,
-}: {
-  label: string;
-  ariaLabel: string;
-}) {
+export function PrintButton({ label, ariaLabel }: { label: string; ariaLabel: string }) {
   return (
     <button
       type="button"

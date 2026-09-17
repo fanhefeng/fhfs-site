@@ -24,10 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Asked for all at once: awaiting inside the loop was one round trip per
   // article over the HTTP driver, in series, during the prerender — this file
   // is the one place on the site where the request count is the whole cost.
-  const [postSlugs, secretSlugs] = await Promise.all([
-    getAllSlugs(),
-    getAllSecretSlugs(),
-  ]);
+  const [postSlugs, secretSlugs] = await Promise.all([getAllSlugs(), getAllSecretSlugs()]);
   const [postEditions, secretEditions, tagsByLocale] = await Promise.all([
     Promise.all(postSlugs.map((slug) => getPostEditions(slug))),
     Promise.all(secretSlugs.map((slug) => getSecretEditions(slug))),
@@ -36,12 +33,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const newestPost = postEditions
     .flat()
     .map(({ date }) => new Date(date))
-    .reduce<Date | undefined>((newest, date) => (newest && newest >= date ? newest : date), undefined);
+    .reduce<Date | undefined>(
+      (newest, date) => (newest && newest >= date ? newest : date),
+      undefined,
+    );
 
   // The same nav table the header, footer and menu read — one place to add a
   // page, rather than four lists to remember to update.
   const staticPaths = (await getNavItems("sitemap")).map((item) =>
-    item.href === "/" ? "" : item.href
+    item.href === "/" ? "" : item.href,
   );
 
   for (const path of staticPaths) {
@@ -92,7 +92,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pushEditions = (
     slugs: string[],
     editionsBySlug: { locale: Locale; date: string }[][],
-    section: "blog" | "secrets"
+    section: "blog" | "secrets",
   ) => {
     slugs.forEach((slug, i) => {
       const editions = editionsBySlug[i]!;

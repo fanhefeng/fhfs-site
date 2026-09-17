@@ -19,17 +19,8 @@ export type WorkDraft = {
   sort: number;
 };
 
-export function WorkForm({
-  work,
-  isNew,
-}: {
-  work: WorkDraft;
-  isNew: boolean;
-}) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    saveWork,
-    {}
-  );
+export function WorkForm({ work, isNew }: { work: WorkDraft; isNew: boolean }) {
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveWork, {});
 
   return (
     <>
@@ -50,35 +41,21 @@ export function WorkForm({
           </label>
           <label className="space-y-1.5">
             <span className={labelClass}>年份</span>
-            <input
-              name="year"
-              type="number"
-              defaultValue={work.year}
-              className={inputClass}
-            />
+            <input name="year" type="number" defaultValue={work.year} className={inputClass} />
           </label>
           <label className="space-y-1.5">
             <span className={labelClass}>排序</span>
-            <input
-              name="sort"
-              type="number"
-              defaultValue={work.sort}
-              className={inputClass}
-            />
+            <input name="sort" type="number" defaultValue={work.sort} className={inputClass} />
           </label>
         </div>
 
         {(["title", "description"] as const).map((field) => (
           <div key={field}>
-            <span className={labelClass}>
-              {field === "title" ? "标题" : "描述"}
-            </span>
+            <span className={labelClass}>{field === "title" ? "标题" : "描述"}</span>
             <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
               {(["zh", "en"] as const).map((locale) => (
                 <label key={locale} className="space-y-1">
-                  <span className="font-mono text-meta text-fg-tertiary">
-                    {locale}
-                  </span>
+                  <span className="font-mono text-meta text-fg-tertiary">{locale}</span>
                   {field === "description" ? (
                     <textarea
                       name={`${field}.${locale}`}
@@ -108,22 +85,14 @@ export function WorkForm({
             {/* 列存在、也会保存，但作品墙目前不在站上（/portfolio 已下线，
                 挂上第一件作品时再议页面）——等渲染端接上前先如实标注。 */}
             <span className={labelClass}>封面路径（暂未生效）</span>
-            <input
-              name="cover"
-              defaultValue={work.cover ?? ""}
-              className={inputClass}
-            />
+            <input name="cover" defaultValue={work.cover ?? ""} className={inputClass} />
           </label>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="space-y-1.5">
             <span className={labelClass}>标签（逗号分隔）</span>
-            <input
-              name="tags"
-              defaultValue={work.tags.join(", ")}
-              className={inputClass}
-            />
+            <input name="tags" defaultValue={work.tags.join(", ")} className={inputClass} />
           </label>
           <label className="space-y-1.5">
             <span className={labelClass}>主色（hex，可空）</span>

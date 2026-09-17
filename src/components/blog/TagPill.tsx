@@ -20,13 +20,7 @@ type Props = {
  * A tag as a link. Two materials for two jobs — see `variant`. Both keep a
  * ≥44px hit area via `.hit-ext`, so the small type stays thumb-friendly.
  */
-export function TagPill({
-  tag,
-  count,
-  variant = "plain",
-  seed = 0,
-  className,
-}: Props) {
+export function TagPill({ tag, count, variant = "plain", seed = 0, className }: Props) {
   const href = `/blog/tags/${encodeURIComponent(tag)}`;
 
   if (variant === "plain") {
@@ -48,9 +42,7 @@ export function TagPill({
       <Sticker seed={seed}>
         <span className="block rounded-full bg-surface-raised px-3 py-1.5 font-mono text-[11px] uppercase tracking-meta text-fg-secondary transition-colors duration-200 group-hover:text-accent">
           {tag}
-          {count != null && (
-            <span className="ml-1.5 tabular-nums text-fg-tertiary">{count}</span>
-          )}
+          {count != null && <span className="ml-1.5 tabular-nums text-fg-tertiary">{count}</span>}
         </span>
       </Sticker>
     </Link>

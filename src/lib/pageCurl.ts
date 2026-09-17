@@ -168,13 +168,7 @@ export type Spring = { value: number; velocity: number };
 export const SPRING_COMMIT = { k: 170, c: 26 } as const;
 export const SPRING_CANCEL = { k: 150, c: 24 } as const;
 
-export function springStep(
-  s: Spring,
-  target: number,
-  dt: number,
-  k: number,
-  c: number
-): Spring {
+export function springStep(s: Spring, target: number, dt: number, k: number, c: number): Spring {
   const x = s.value - target;
   const velocity = s.velocity + (-k * x - c * s.velocity) * dt;
   return { value: s.value + velocity * dt, velocity };
@@ -214,7 +208,7 @@ export const ZOOM_IN = 1.35;
 export function tiltFor(
   cx: number,
   cy: number,
-  r: { left: number; top: number; width: number; height: number }
+  r: { left: number; top: number; width: number; height: number },
 ): { rx: number; ry: number } {
   const clamp = (v: number) => (v < -1 ? -1 : v > 1 ? 1 : v);
   const nx = clamp((cx - (r.left + r.width / 2)) / (r.width * 0.62));

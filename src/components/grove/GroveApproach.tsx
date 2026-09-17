@@ -18,10 +18,7 @@ import { APPROACH_CSS } from "./approach.css";
  * server-side either way, and `data-ready` on `.ga-scene` already gates the
  * fade-in on the scene reporting for duty.
  */
-const GroveScene = dynamic(
-  () => import("./GroveScene").then((m) => m.GroveScene),
-  { ssr: false }
-);
+const GroveScene = dynamic(() => import("./GroveScene").then((m) => m.GroveScene), { ssr: false });
 
 type Props = {
   /** Small mono line above the caption — which study this is. */
@@ -123,7 +120,9 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
     // for as long as they are on it, and every write here is a style
     // invalidation of the whole pin — for cards nobody can see.
     let onScreen = false;
-    const io = new IntersectionObserver((entries) => { onScreen = entries.some((en) => en.isIntersecting); });
+    const io = new IntersectionObserver((entries) => {
+      onScreen = entries.some((en) => en.isIntersecting);
+    });
     io.observe(pin);
 
     const tick = () => {
@@ -174,7 +173,7 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
 
           const cap =
             Math.round(
-              (span(CAP_IN[0], CAP_IN[1], p) * (1 - span(CAP_OUT[0], CAP_OUT[1], p))) * 100
+              span(CAP_IN[0], CAP_IN[1], p) * (1 - span(CAP_OUT[0], CAP_OUT[1], p)) * 100,
             ) / 100;
           if (cap !== lastCap) {
             lastCap = cap;
@@ -189,7 +188,7 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
 
           const card =
             Math.round(
-              (span(CARD_IN[0], CARD_IN[1], p) * (1 - span(CARD_OUT[0], CARD_OUT[1], p))) * 100
+              span(CARD_IN[0], CARD_IN[1], p) * (1 - span(CARD_OUT[0], CARD_OUT[1], p)) * 100,
             ) / 100;
           if (card !== lastCard) {
             lastCard = card;
@@ -220,12 +219,14 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
         delete document.body.dataset.groveImmersed;
       };
     },
-    { scope: sectionRef }
+    { scope: sectionRef },
   );
 
   return (
     <>
-      <style href="grove-approach" precedence="medium">{APPROACH_CSS}</style>
+      <style href="grove-approach" precedence="medium">
+        {APPROACH_CSS}
+      </style>
 
       <section ref={sectionRef} className="ga" aria-labelledby="ga-cap-title">
         <div ref={pinRef} className="ga-pin">
@@ -240,7 +241,12 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
                 <GroveCard slot="a" {...cards[0]} />
                 <GroveCard slot="b" {...cards[1]} />
               </div>
-              <GroveScene heroRef={sceneRef} stageRef={stageRef} coveredRef={coveredRef} onReady={onReady} />
+              <GroveScene
+                heroRef={sceneRef}
+                stageRef={stageRef}
+                coveredRef={coveredRef}
+                onReady={onReady}
+              />
               {/* The floor the caption stands on. It used to be the pin's own
                   ::after, but it has to pass *under* the card in front and over
                   the one behind, which only works from inside the scene. */}
@@ -251,10 +257,21 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
 
           <div className="ga-cap">
             <span className="ga-cap-kicker">{kicker}</span>
-            <p id="ga-cap-title" className="ga-cap-title">{title}</p>
+            <p id="ga-cap-title" className="ga-cap-title">
+              {title}
+            </p>
             <a className="ga-cap-link" href={link.href}>
               {link.label}
-              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" aria-hidden="true">
+              <svg
+                viewBox="0 0 16 16"
+                width="13"
+                height="13"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
                 <path d="M3.5 8h9M9 4.5 12.5 8 9 11.5" />
               </svg>
             </a>

@@ -10,7 +10,10 @@
       "error",
       {
         "paths": [
-          { "name": "gsap", "message": "Import gsap from @/lib/gsap — the plugins are registered there, once." },
+          {
+            "name": "gsap",
+            "message": "Import gsap from @/lib/gsap — the plugins are registered there, once."
+          },
           { "name": "@gsap/react", "message": "Import useGSAP from @/lib/gsap." }
         ],
         "patterns": [{ "group": ["gsap/*"], "message": "Import GSAP plugins from @/lib/gsap." }]

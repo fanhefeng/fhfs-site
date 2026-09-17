@@ -37,7 +37,7 @@ export function ExperienceForm({
 }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     saveResumeExperience,
-    {}
+    {},
   );
 
   return (
@@ -68,49 +68,39 @@ export function ExperienceForm({
           </label>
         </div>
 
-        {(Object.keys(LINE_FIELDS) as (keyof typeof LINE_FIELDS)[]).map(
-          (field) => (
-            <div key={field}>
-              <span className={labelClass}>{LINE_FIELDS[field]}</span>
-              <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
-                {(["zh", "en"] as const).map((locale) => (
-                  <label key={locale} className="space-y-1">
-                    <span className="font-mono text-meta text-fg-tertiary">
-                      {locale}
-                    </span>
-                    <input
-                      name={`${field}.${locale}`}
-                      defaultValue={experience[field]?.[locale] ?? ""}
-                      className={inputClass}
-                    />
-                  </label>
-                ))}
-              </div>
+        {(Object.keys(LINE_FIELDS) as (keyof typeof LINE_FIELDS)[]).map((field) => (
+          <div key={field}>
+            <span className={labelClass}>{LINE_FIELDS[field]}</span>
+            <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
+              {(["zh", "en"] as const).map((locale) => (
+                <label key={locale} className="space-y-1">
+                  <span className="font-mono text-meta text-fg-tertiary">{locale}</span>
+                  <input
+                    name={`${field}.${locale}`}
+                    defaultValue={experience[field]?.[locale] ?? ""}
+                    className={inputClass}
+                  />
+                </label>
+              ))}
             </div>
-          )
-        )}
+          </div>
+        ))}
 
         <label className="block space-y-1.5">
           <span className={labelClass}>链接（可空）</span>
-          <input
-            name="url"
-            defaultValue={experience.url ?? ""}
-            className={inputClass}
-          />
+          <input name="url" defaultValue={experience.url ?? ""} className={inputClass} />
         </label>
 
         <div>
           <span className={labelClass}>要点</span>
           <p className="mt-1 text-caption text-fg-tertiary">
-            这份工作本身的要点，一行一条，显示在项目之前。留空则整段不显示。
-            **粗体** 和 `代码` 会按样式渲染。
+            这份工作本身的要点，一行一条，显示在项目之前。留空则整段不显示。 **粗体** 和 `代码`
+            会按样式渲染。
           </p>
           <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
             {(["zh", "en"] as const).map((locale) => (
               <label key={locale} className="space-y-1">
-                <span className="font-mono text-meta text-fg-tertiary">
-                  {locale}
-                </span>
+                <span className="font-mono text-meta text-fg-tertiary">{locale}</span>
                 <textarea
                   name={`bullets.${locale}`}
                   defaultValue={experience.bullets[locale].join("\n")}
@@ -131,9 +121,7 @@ export function ExperienceForm({
           <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
             {(["zh", "en"] as const).map((locale) => (
               <label key={locale} className="space-y-1">
-                <span className="font-mono text-meta text-fg-tertiary">
-                  {locale}
-                </span>
+                <span className="font-mono text-meta text-fg-tertiary">{locale}</span>
                 <textarea
                   name={`projects.${locale}`}
                   defaultValue={formatProjects(experience.projects[locale])}

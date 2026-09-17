@@ -52,9 +52,7 @@ export default function LocaleError({
           {t("kicker")}
         </p>
         <h1 className="mt-4 text-display-sm text-fg">{t("title")}</h1>
-        <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">
-          {t("description")}
-        </p>
+        <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("description")}</p>
         {/* Vercel's log line carries the same digest, so a reader who quotes
             it points straight at the cause. */}
         {error.digest && (

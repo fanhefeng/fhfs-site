@@ -41,9 +41,21 @@ const jpegsIn = (dir: string) =>
 // loads — into the old box, cropped or letterboxed, with nothing to notice.
 describe("the pictures listed in code", () => {
   const galleries = [
-    { name: "odyssey stills", dir: "films/odyssey", items: ODYSSEY_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })) },
-    { name: "secret stills", dir: "films/secret", items: SECRET_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })) },
-    { name: "neon stills", dir: "lab/neon", items: NEON_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })) },
+    {
+      name: "odyssey stills",
+      dir: "films/odyssey",
+      items: ODYSSEY_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
+    },
+    {
+      name: "secret stills",
+      dir: "films/secret",
+      items: SECRET_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
+    },
+    {
+      name: "neon stills",
+      dir: "lab/neon",
+      items: NEON_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
+    },
     { name: "kobe photos", dir: "idols/kobe", items: KOBE_PHOTOS },
   ];
 
@@ -52,7 +64,10 @@ describe("the pictures listed in code", () => {
       const wrong = items
         .map((item) => ({ item, real: jpegSize(inPublic(`${dir}/${item.file}`)) }))
         .filter(({ item, real }) => item.width !== real.width || item.height !== real.height)
-        .map(({ item, real }) => `${item.file}: says ${item.width}×${item.height}, is ${real.width}×${real.height}`);
+        .map(
+          ({ item, real }) =>
+            `${item.file}: says ${item.width}×${item.height}, is ${real.width}×${real.height}`,
+        );
       expect(wrong).toEqual([]);
     });
 
@@ -77,10 +92,12 @@ describe("the pictures listed in code", () => {
 describe("the scroll-video manifest", () => {
   it("counts the frames that are there, under the names it gives them", () => {
     const names = Array.from({ length: frames.frameCount }, (_, i) =>
-      frames.pattern.replace("%d", String(i + 1).padStart(frames.padding, "0"))
+      frames.pattern.replace("%d", String(i + 1).padStart(frames.padding, "0")),
     );
-    expect(readdirSync(inPublic("lab/scroll-video/frames")).filter((name) => name !== ".DS_Store").sort()).toEqual(
-      names.sort()
-    );
+    expect(
+      readdirSync(inPublic("lab/scroll-video/frames"))
+        .filter((name) => name !== ".DS_Store")
+        .sort(),
+    ).toEqual(names.sort());
   });
 });

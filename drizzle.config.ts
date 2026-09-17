@@ -16,7 +16,7 @@ const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 
 if (!url) {
   throw new Error(
-    "DATABASE_URL_UNPOOLED (preferred) or DATABASE_URL must be set to run migrations."
+    "DATABASE_URL_UNPOOLED (preferred) or DATABASE_URL must be set to run migrations.",
   );
 }
 

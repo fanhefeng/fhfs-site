@@ -115,7 +115,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
             easeReverse: "power3.in",
             overwrite: "auto",
           },
-          i * 0.05
+          i * 0.05,
         );
       });
       if (iconRef.current) {
@@ -128,7 +128,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
             easeReverse: "power2.in",
             overwrite: "auto",
           },
-          0
+          0,
         );
       }
       tlRef.current = tl;
@@ -136,7 +136,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
         tlRef.current = null;
       };
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   // Drive the one timeline from React state — exits run at 2.2× on the
@@ -228,7 +228,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
           >
             <ActionIcon name={action.key} />
           </button>
-        )
+        ),
       )}
 
       {/* Copy confirmation lives in the live region only — no extra chrome. */}

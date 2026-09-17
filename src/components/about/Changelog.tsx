@@ -65,8 +65,7 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
        * One ScrollTrigger per entry; whichever entry owns the middle band of
        * the viewport decides the year. */
       if (strip && rows.length > 1) {
-        const rowHeight = (strip.firstElementChild as HTMLElement | null)
-          ?.offsetHeight;
+        const rowHeight = (strip.firstElementChild as HTMLElement | null)?.offsetHeight;
         let current = 0;
         const snapTo = (row: number) => {
           if (row === current || !rowHeight) return;
@@ -145,7 +144,7 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
     // revertOnUpdate: without it the teardown above is deferred to unmount, so
     // a change in entry count would stack a second trigger, tween and listener
     // set on every node.
-    { scope: rootRef, dependencies: [entries.length], revertOnUpdate: true }
+    { scope: rootRef, dependencies: [entries.length], revertOnUpdate: true },
   );
 
   return (
@@ -190,10 +189,7 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
                 aria-label={entry.dateAria}
                 className="hit-ext absolute left-0 top-7 z-10 h-3.5 w-3.5 rounded-full border border-line bg-surface-raised shadow-card [&::before]:-inset-[15px]"
               >
-                <span
-                  aria-hidden="true"
-                  className="absolute inset-[3px] rounded-full bg-accent"
-                />
+                <span aria-hidden="true" className="absolute inset-[3px] rounded-full bg-accent" />
                 <span
                   data-tip
                   aria-hidden="true"

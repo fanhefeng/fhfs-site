@@ -20,7 +20,7 @@ export function Rich({ text }: { text: string }) {
           </code>
         ) : (
           <Fragment key={i}>{run.text}</Fragment>
-        )
+        ),
       )}
     </>
   );

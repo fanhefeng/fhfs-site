@@ -5,12 +5,7 @@ import { getTranslations, getFormatter } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import {
-  getAdjacentSecrets,
-  getAllSecretSlugs,
-  getSecret,
-  getSecretEditions,
-} from "@/lib/content";
+import { getAdjacentSecrets, getAllSecretSlugs, getSecret, getSecretEditions } from "@/lib/content";
 import { HAS_CJK } from "@/lib/reading";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
@@ -35,7 +30,7 @@ export async function generateMetadata({
   const alternates = localeAlternates(
     `/secrets/${slug}`,
     locale,
-    (await getSecretEditions(slug)).map((edition) => edition.locale)
+    (await getSecretEditions(slug)).map((edition) => edition.locale),
   );
   if (secret.isFallback) {
     alternates.canonical = `${site.url}/${secret.locale}/secrets/${slug}`;
@@ -100,19 +95,19 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
                 day: "numeric",
               })}
             </time>
-            {isPodcast
-              ? secret.duration != null && (
-                  <>
-                    <span aria-hidden>·</span>
-                    <span>{t("duration", { minutes: secret.duration })}</span>
-                  </>
-                )
-              : (
-                  <>
-                    <span aria-hidden>·</span>
-                    <span>{t("readingTime", { minutes: secret.readingMinutes })}</span>
-                  </>
-                )}
+            {isPodcast ? (
+              secret.duration != null && (
+                <>
+                  <span aria-hidden>·</span>
+                  <span>{t("duration", { minutes: secret.duration })}</span>
+                </>
+              )
+            ) : (
+              <>
+                <span aria-hidden>·</span>
+                <span>{t("readingTime", { minutes: secret.readingMinutes })}</span>
+              </>
+            )}
           </p>
 
           <PostTitle title={secret.title} className="text-title md:text-display-sm" />
@@ -139,7 +134,10 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
         </header>
 
         {secret.isFallback && (
-          <p lang={htmlLang(locale)} className="glass-thin vibrancy mb-10 rounded-card px-4 py-3 text-caption">
+          <p
+            lang={htmlLang(locale)}
+            className="glass-thin vibrancy mb-10 rounded-card px-4 py-3 text-caption"
+          >
             {t("fallbackNotice")}
           </p>
         )}
@@ -167,7 +165,10 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
       </article>
 
       {(older || newer) && (
-        <nav aria-label={t("postNavAria")} className="mt-20 grid gap-8 border-t border-line pt-8 sm:grid-cols-2">
+        <nav
+          aria-label={t("postNavAria")}
+          className="mt-20 grid gap-8 border-t border-line pt-8 sm:grid-cols-2"
+        >
           {older && (
             <Link href={`/secrets/${older.slug}`} className="group flex flex-col gap-1.5">
               <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">

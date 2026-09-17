@@ -128,10 +128,7 @@ function Body({ app, tone }: { app: SoftwareApp; tone: Tone }) {
     return (
       <div className="flex h-full flex-col gap-2 p-[6%]">
         <div className="flex shrink-0 items-center gap-2">
-          <span
-            className="block size-2 shrink-0 rounded-[2px]"
-            style={{ background: accent }}
-          />
+          <span className="block size-2 shrink-0 rounded-[2px]" style={{ background: accent }} />
           <Bar w="38%" color={c.barStrong} h={4} />
         </div>
         {["72%", "54%", "63%", "40%", "58%"].map((w, i) => (
@@ -187,33 +184,17 @@ function Body({ app, tone }: { app: SoftwareApp; tone: Tone }) {
   );
 }
 
-function Face({
-  app,
-  tone,
-  chrome,
-}: {
-  app: SoftwareApp;
-  tone: Tone;
-  chrome: "window" | "bare";
-}) {
+function Face({ app, tone, chrome }: { app: SoftwareApp; tone: Tone; chrome: "window" | "bare" }) {
   const c = TONE[tone];
   return (
-    <div
-      aria-hidden
-      className="absolute inset-0 flex flex-col"
-      style={{ background: c.bg }}
-    >
+    <div aria-hidden className="absolute inset-0 flex flex-col" style={{ background: c.bg }}>
       {chrome === "window" && (
         <div
           className="flex h-[8%] max-h-6 min-h-[14px] shrink-0 items-center gap-1 px-2"
           style={{ background: c.chrome, borderBottom: `1px solid ${c.line}` }}
         >
           {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="block size-1.5 rounded-full"
-              style={{ background: c.bar }}
-            />
+            <span key={i} className="block size-1.5 rounded-full" style={{ background: c.bar }} />
           ))}
         </div>
       )}
@@ -239,11 +220,7 @@ function Face({
  */
 export function AppMock({ app, chrome = "window", label, className }: Props) {
   return (
-    <div
-      role="img"
-      aria-label={label}
-      className={`relative overflow-hidden ${className ?? ""}`}
-    >
+    <div role="img" aria-label={label} className={`relative overflow-hidden ${className ?? ""}`}>
       <Face app={app} tone="light" chrome={chrome} />
       {/* Only the top face's opacity moves, so the two never show through
        * each other half-way. */}

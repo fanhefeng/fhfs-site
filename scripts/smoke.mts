@@ -38,12 +38,18 @@ if (!chrome) {
 // One language is enough to load every template; both for the home page,
 // where the two differ most. The login form is the one page outside the tree.
 const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
-const listed = [...sitemap.matchAll(/<loc>[^<]*?(\/(?:zh|en)(?:\/[^<]*)?)<\/loc>/g)].map((m) => m[1]!);
-const everyPage = [...new Set([...listed.filter((p) => p === "/en" || p.startsWith("/zh")), "/admin/login"])].sort();
+const listed = [...sitemap.matchAll(/<loc>[^<]*?(\/(?:zh|en)(?:\/[^<]*)?)<\/loc>/g)].map(
+  (m) => m[1]!,
+);
+const everyPage = [
+  ...new Set([...listed.filter((p) => p === "/en" || p.startsWith("/zh")), "/admin/login"]),
+].sort();
 const asked = process.argv.slice(3);
 const pages = asked.length > 0 ? asked : everyPage;
 if (everyPage.length < 10) {
-  console.error(`smoke: the sitemap at ${base} lists only ${everyPage.length} pages — is the site up?`);
+  console.error(
+    `smoke: the sitemap at ${base} lists only ${everyPage.length} pages — is the site up?`,
+  );
   process.exit(2);
 }
 
@@ -61,7 +67,7 @@ const browser = spawn(
     "--autoplay-policy=no-user-gesture-required",
     "about:blank",
   ],
-  { stdio: "ignore" }
+  { stdio: "ignore" },
 );
 const quit = (code: number): never => {
   browser.kill();
@@ -81,7 +87,9 @@ if (!version?.ok) {
   quit(2);
 }
 
-const target = (await (await fetch(`http://localhost:${PORT}/json/new?about:blank`, { method: "PUT" })).json()) as {
+const target = (await (
+  await fetch(`http://localhost:${PORT}/json/new?about:blank`, { method: "PUT" })
+).json()) as {
   webSocketDebuggerUrl: string;
 };
 const socket = new WebSocket(target.webSocketDebuggerUrl);
@@ -99,7 +107,12 @@ const unhashed = new RegExp(`^(${IMMUTABLE_DIRS.join("|")})/(?!.*[._][0-9a-f]{8}
 let problems: string[] = [];
 
 socket.addEventListener("message", (event) => {
-  const message = JSON.parse(String(event.data)) as { id?: number; result?: unknown; method?: string; params?: any };
+  const message = JSON.parse(String(event.data)) as {
+    id?: number;
+    result?: unknown;
+    method?: string;
+    params?: any;
+  };
   if (message.id !== undefined) {
     pending.get(message.id)?.(message.result);
     pending.delete(message.id);
@@ -118,16 +131,28 @@ socket.addEventListener("message", (event) => {
     const details = params.exceptionDetails;
     problems.push(`exception: ${details.exception?.description?.split("\n")[0] ?? details.text}`);
   } else if (method === "Log.entryAdded" && params.entry.level === "error") {
-    problems.push(`console: ${params.entry.text}${params.entry.url ? ` (${params.entry.url})` : ""}`);
+    problems.push(
+      `console: ${params.entry.text}${params.entry.url ? ` (${params.entry.url})` : ""}`,
+    );
   } else if (method === "Runtime.consoleAPICalled" && params.type === "error") {
-    problems.push(`console.error: ${params.args.map((arg: any) => arg.value ?? arg.description ?? "").join(" ").slice(0, 300)}`);
+    problems.push(
+      `console.error: ${params.args
+        .map((arg: any) => arg.value ?? arg.description ?? "")
+        .join(" ")
+        .slice(0, 300)}`,
+    );
   }
 });
 
 await send("Network.enable");
 await send("Runtime.enable");
 await send("Log.enable");
-await send("Emulation.setDeviceMetricsOverride", { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+await send("Emulation.setDeviceMetricsOverride", {
+  width: 1440,
+  height: 900,
+  deviceScaleFactor: 1,
+  mobile: false,
+});
 
 let failed = 0;
 for (const page of pages) {
@@ -147,5 +172,9 @@ for (const page of pages) {
   if (found.length > 0) failed++;
 }
 
-console.log(failed === 0 ? `smoke: ${pages.length} pages, nothing wrong` : `smoke: ${failed} of ${pages.length} pages have problems`);
+console.log(
+  failed === 0
+    ? `smoke: ${pages.length} pages, nothing wrong`
+    : `smoke: ${failed} of ${pages.length} pages have problems`,
+);
 quit(failed === 0 ? 0 : 1);

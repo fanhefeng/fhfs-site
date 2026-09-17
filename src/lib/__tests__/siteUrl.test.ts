@@ -9,11 +9,15 @@ describe("siteUrl", () => {
 
   it("takes the production domain Vercel reports, which comes without a scheme", () => {
     expect(siteUrl({ VERCEL_PROJECT_PRODUCTION_URL: "fhf.example" })).toBe("https://fhf.example");
-    expect(siteUrl({ VERCEL_PROJECT_PRODUCTION_URL: "https://fhf.example/" })).toBe("https://fhf.example");
+    expect(siteUrl({ VERCEL_PROJECT_PRODUCTION_URL: "https://fhf.example/" })).toBe(
+      "https://fhf.example",
+    );
   });
 
   it("lets SITE_URL override it", () => {
-    expect(siteUrl({ SITE_URL: "https://a.example", VERCEL_PROJECT_PRODUCTION_URL: "b.example" })).toBe("https://a.example");
+    expect(
+      siteUrl({ SITE_URL: "https://a.example", VERCEL_PROJECT_PRODUCTION_URL: "b.example" }),
+    ).toBe("https://a.example");
   });
 
   it("never ends in a slash — every caller appends a path", () => {

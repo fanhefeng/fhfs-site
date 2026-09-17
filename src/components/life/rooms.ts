@@ -37,7 +37,11 @@ export const ROOM_META: Record<string, RoomMeta> = {
   // its own at its door, and the index between them plays the theme.
   "/films": {
     key: "films",
-    cover: { src: stillSrc(FILMS[0]!, firstFilm), width: firstFilm.width, height: firstFilm.height },
+    cover: {
+      src: stillSrc(FILMS[0]!, firstFilm),
+      width: firstFilm.width,
+      height: firstFilm.height,
+    },
     accent: FILMS[0]!.accent,
   },
 };

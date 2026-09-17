@@ -14,7 +14,7 @@ import { hashPassword } from "../src/lib/auth/password";
 
 if (process.argv.length > 2) {
   console.error(
-    "密码不走命令行参数——它会进 shell history 和 ps 输出。直接运行，在提示符里输入（或用管道传入）。"
+    "密码不走命令行参数——它会进 shell history 和 ps 输出。直接运行，在提示符里输入（或用管道传入）。",
   );
   process.exit(1);
 }
@@ -31,9 +31,7 @@ function readPassword(): Promise<string> {
       // spaces included — is part of the password: the login form hands the
       // field to verifyPassword untrimmed, so trimming here would mint a hash
       // no typed password can ever match.
-      stdin.on("end", () =>
-        resolve((data.split("\n")[0] ?? "").replace(/\r$/, ""))
-      );
+      stdin.on("end", () => resolve((data.split("\n")[0] ?? "").replace(/\r$/, "")));
     });
   }
   process.stderr.write("要哈希的密码（留空自动生成，输入不回显）: ");

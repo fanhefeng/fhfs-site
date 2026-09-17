@@ -5,10 +5,7 @@ import { login, type LoginState } from "./actions";
 import { buttonClass, inputClass } from "../styles";
 
 export function LoginForm({ next }: { next: string }) {
-  const [state, formAction, pending] = useActionState<LoginState, FormData>(
-    login,
-    {}
-  );
+  const [state, formAction, pending] = useActionState<LoginState, FormData>(login, {});
 
   return (
     <form action={formAction} className="mt-6">
@@ -34,11 +31,7 @@ export function LoginForm({ next }: { next: string }) {
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className={`${buttonClass} mt-4 w-full`}
-      >
+      <button type="submit" disabled={pending} className={`${buttonClass} mt-4 w-full`}>
         {pending && (
           <span
             aria-hidden

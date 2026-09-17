@@ -49,9 +49,7 @@ export type NavLink = {
  * the pages under it — `/blog` on `/blog/some-post` — and nowhere else.
  */
 export const isActivePath = (pathname: string, href: string): boolean =>
-  href === "/"
-    ? pathname === "/"
-    : pathname === href || pathname.startsWith(`${href}/`);
+  href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
 /**
  * A door is current on its own pages and on the pages of the rows hanging
@@ -61,7 +59,7 @@ export const isActivePath = (pathname: string, href: string): boolean =>
 export const isActiveDoor = (
   pathname: string,
   door: { href: string },
-  members: readonly { href: string }[]
+  members: readonly { href: string }[],
 ): boolean =>
   isActivePath(pathname, door.href) || members.some((m) => isActivePath(pathname, m.href));
 
@@ -72,7 +70,9 @@ export type NavCluster<T> = { group: NavGroup | null; items: T[] };
  * clusters with a hairline between them. Rows without a group cluster with
  * each other the same way, so nothing is ever dropped for lacking one.
  */
-export function clusterNav<T extends { group: NavGroup | null }>(items: readonly T[]): NavCluster<T>[] {
+export function clusterNav<T extends { group: NavGroup | null }>(
+  items: readonly T[],
+): NavCluster<T>[] {
   const clusters: NavCluster<T>[] = [];
   for (const item of items) {
     const last = clusters[clusters.length - 1];
@@ -93,7 +93,7 @@ export type NavBranch<T> = { door: T; members: T[] };
  * misfiled in the admin but never vanish.
  */
 export function attachMembers<T extends { group: NavGroup | null; door: boolean }>(
-  items: readonly T[]
+  items: readonly T[],
 ): NavBranch<T>[] {
   const branches: NavBranch<T>[] = [];
   let open: NavBranch<T> | null = null;

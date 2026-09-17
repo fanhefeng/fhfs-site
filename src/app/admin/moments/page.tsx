@@ -36,7 +36,13 @@ const FIELDS: Field[] = [
     hint: "摘录时填，前台会跟在句子后面。",
     group: "出处",
   },
-  { name: "collection", label: "文集（可空）", kind: "text", placeholder: "峰言疯语", group: "出处" },
+  {
+    name: "collection",
+    label: "文集（可空）",
+    kind: "text",
+    placeholder: "峰言疯语",
+    group: "出处",
+  },
   {
     name: "source",
     label: "来源标记",
@@ -76,16 +82,13 @@ function blank() {
 
 export default async function MomentsAdminPage() {
   await requireAdminPage();
-  const rows = await db
-    .select()
-    .from(moments)
-    .orderBy(desc(moments.postedAt), asc(moments.key));
+  const rows = await db.select().from(moments).orderBy(desc(moments.postedAt), asc(moments.key));
 
   return (
     <AdminChrome title="说说" section="/admin/moments">
       <Note>
-        时间按上海时间写到分钟，写错一分钟就换一个位置——板子是按时刻排的。
-        key 是这条说说的身份，存下就别改。
+        时间按上海时间写到分钟，写错一分钟就换一个位置——板子是按时刻排的。 key
+        是这条说说的身份，存下就别改。
       </Note>
       <RecordList
         action={saveMoment}

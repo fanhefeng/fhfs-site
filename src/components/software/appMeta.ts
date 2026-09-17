@@ -56,16 +56,10 @@ export function appMonogram(name: string): string {
 
 /** Accent color for one of the mock's two tones. */
 export function mockAccent(hue: number, tone: "light" | "dark"): string {
-  return tone === "light"
-    ? `oklch(0.58 0.15 ${hue})`
-    : `oklch(0.74 0.15 ${hue})`;
+  return tone === "light" ? `oklch(0.58 0.15 ${hue})` : `oklch(0.74 0.15 ${hue})`;
 }
 
-export function toSoftwareApp(
-  app: App,
-  index: number,
-  locale: Locale
-): SoftwareApp {
+export function toSoftwareApp(app: App, index: number, locale: Locale): SoftwareApp {
   const category = app.category;
   return {
     id: app.key,

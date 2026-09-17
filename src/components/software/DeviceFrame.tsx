@@ -44,10 +44,7 @@ export function DeviceFrame({ device, children, className }: Props) {
         aria-hidden
         className="mx-auto block h-3 w-[15%] bg-line [clip-path:polygon(6%_0,94%_0,100%_100%,0_100%)]"
       />
-      <span
-        aria-hidden
-        className="mx-auto block h-1.5 w-[32%] rounded-b-full bg-line"
-      />
+      <span aria-hidden className="mx-auto block h-1.5 w-[32%] rounded-b-full bg-line" />
     </div>
   );
 }

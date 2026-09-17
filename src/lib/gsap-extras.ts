@@ -23,13 +23,7 @@ import { gsap } from "./gsap";
  * A component that needs one of these imports it from here and keeps
  * importing `gsap` / `useGSAP` / `EASE` from `@/lib/gsap`.
  */
-gsap.registerPlugin(
-  Draggable,
-  InertiaPlugin,
-  ScrambleTextPlugin,
-  CustomWiggle,
-  ExpoScaleEase
-);
+gsap.registerPlugin(Draggable, InertiaPlugin, ScrambleTextPlugin, CustomWiggle, ExpoScaleEase);
 
 // Only the class a component actually names is exported. The rest work from
 // registration alone — `inertia: true`, `scrambleText:`, `"wiggle(…)"`.

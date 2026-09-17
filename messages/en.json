@@ -406,31 +406,123 @@
       "timelineTitle": "Philadelphia to Los Angeles",
       "credit": "Photographs from Wikimedia Commons, each under its own licence (author and licence under every picture); the statue is procedural geometry, a personal homage only.",
       "photos": {
-        "hawaii8": { "title": "Number 8", "meta": "Hawaii · preseason · 2005", "alt": "Kobe Bryant in the number 8 purple-and-gold jersey, set at the free-throw line" },
-        "hawaiiDunk": { "title": "Hanging on the rim", "meta": "Hawaii · preseason · 2005", "alt": "Kobe Bryant hanging from the rim with both hands after a dunk" },
-        "drives2007": { "title": "The drive", "meta": "Washington · 2007", "alt": "Kobe Bryant driving to the basket against the Wizards" },
-        "dunk2008": { "title": "Take-off", "meta": "Washington · 2008", "alt": "Kobe Bryant in the air, about to dunk" },
-        "beijing2008": { "title": "Beijing", "meta": "Olympic semifinal · 2008", "alt": "Kobe Bryant in a Team USA jersey during the Beijing Olympics semifinal" },
-        "parade2009": { "title": "Victory parade", "meta": "Disneyland · 2009", "alt": "Kobe Bryant waving to the crowd during the Lakers' championship parade at Disneyland" },
-        "game2010": { "title": "Number 24", "meta": "2010", "alt": "Kobe Bryant in the number 24 jersey during a game" },
-        "obama2010": { "title": "Visitors at the White House", "meta": "Washington · 2010", "alt": "The 2010 champion Lakers with President Obama at a community event in Washington" },
-        "london2012": { "title": "A smile on the bench", "meta": "Team USA · 2012", "alt": "Kobe Bryant smiling on the Team USA bench" },
-        "stage2013": { "title": "On stage", "meta": "2013", "alt": "Kobe Bryant on stage at an event" },
-        "farewell2015": { "title": "The last season", "meta": "Washington · 2015", "alt": "Kobe Bryant in the number 24 jersey during his farewell season" },
-        "cabanyal2024": { "title": "On the wall", "meta": "Valencia · 2024", "alt": "A mural of Kobe Bryant on a wall in the Cabanyal district of Valencia" }
+        "hawaii8": {
+          "title": "Number 8",
+          "meta": "Hawaii · preseason · 2005",
+          "alt": "Kobe Bryant in the number 8 purple-and-gold jersey, set at the free-throw line"
+        },
+        "hawaiiDunk": {
+          "title": "Hanging on the rim",
+          "meta": "Hawaii · preseason · 2005",
+          "alt": "Kobe Bryant hanging from the rim with both hands after a dunk"
+        },
+        "drives2007": {
+          "title": "The drive",
+          "meta": "Washington · 2007",
+          "alt": "Kobe Bryant driving to the basket against the Wizards"
+        },
+        "dunk2008": {
+          "title": "Take-off",
+          "meta": "Washington · 2008",
+          "alt": "Kobe Bryant in the air, about to dunk"
+        },
+        "beijing2008": {
+          "title": "Beijing",
+          "meta": "Olympic semifinal · 2008",
+          "alt": "Kobe Bryant in a Team USA jersey during the Beijing Olympics semifinal"
+        },
+        "parade2009": {
+          "title": "Victory parade",
+          "meta": "Disneyland · 2009",
+          "alt": "Kobe Bryant waving to the crowd during the Lakers' championship parade at Disneyland"
+        },
+        "game2010": {
+          "title": "Number 24",
+          "meta": "2010",
+          "alt": "Kobe Bryant in the number 24 jersey during a game"
+        },
+        "obama2010": {
+          "title": "Visitors at the White House",
+          "meta": "Washington · 2010",
+          "alt": "The 2010 champion Lakers with President Obama at a community event in Washington"
+        },
+        "london2012": {
+          "title": "A smile on the bench",
+          "meta": "Team USA · 2012",
+          "alt": "Kobe Bryant smiling on the Team USA bench"
+        },
+        "stage2013": {
+          "title": "On stage",
+          "meta": "2013",
+          "alt": "Kobe Bryant on stage at an event"
+        },
+        "farewell2015": {
+          "title": "The last season",
+          "meta": "Washington · 2015",
+          "alt": "Kobe Bryant in the number 24 jersey during his farewell season"
+        },
+        "cabanyal2024": {
+          "title": "On the wall",
+          "meta": "Valencia · 2024",
+          "alt": "A mural of Kobe Bryant on a wall in the Cabanyal district of Valencia"
+        }
       },
       "timeline": {
-        "born": { "date": "1978.08.23", "title": "Born in Philadelphia", "note": "His father Joe Bryant played in the NBA too; seven years of his childhood were spent in Italy." },
-        "draft": { "date": "1996.06", "title": "Straight from high school", "note": "Picked 13th by the Hornets and traded to the Lakers at once — at 17." },
-        "threepeat": { "date": "2000 – 2002", "title": "Three-peat", "note": "Three titles in three years, beside Shaquille O'Neal." },
-        "eightyone": { "date": "2006.01.22", "title": "81 points", "note": "Against the Toronto Raptors — the second-highest single game in NBA history." },
-        "mvp": { "date": "2008", "title": "MVP · gold in Beijing", "note": "His one regular-season MVP; that summer, gold with the Redeem Team." },
-        "backtoback": { "date": "2009 – 2010", "title": "Back to back", "note": "Finals MVP both times; the fifth championship." },
-        "farewell": { "date": "2016.04.13", "title": "60 in the last game", "note": "Against the Jazz, the final game of his career: 60 points." },
-        "retired": { "date": "2017.12.18", "title": "Two jerseys retired", "note": "8 and 24 went up into the rafters of Staples Center together." },
-        "oscar": { "date": "2018.03.04", "title": "An Oscar", "note": "Dear Basketball won Best Animated Short Film." },
-        "gone": { "date": "2020.01.26", "title": "Gone", "note": "Killed with his daughter Gianna in a helicopter crash in Calabasas, at 41. Elected to the Naismith Hall of Fame the same year." },
-        "statue": { "date": "2024.02.08", "title": "The statue", "note": "Number 8, a finger to the sky, on Star Plaza outside Crypto.com Arena." }
+        "born": {
+          "date": "1978.08.23",
+          "title": "Born in Philadelphia",
+          "note": "His father Joe Bryant played in the NBA too; seven years of his childhood were spent in Italy."
+        },
+        "draft": {
+          "date": "1996.06",
+          "title": "Straight from high school",
+          "note": "Picked 13th by the Hornets and traded to the Lakers at once — at 17."
+        },
+        "threepeat": {
+          "date": "2000 – 2002",
+          "title": "Three-peat",
+          "note": "Three titles in three years, beside Shaquille O'Neal."
+        },
+        "eightyone": {
+          "date": "2006.01.22",
+          "title": "81 points",
+          "note": "Against the Toronto Raptors — the second-highest single game in NBA history."
+        },
+        "mvp": {
+          "date": "2008",
+          "title": "MVP · gold in Beijing",
+          "note": "His one regular-season MVP; that summer, gold with the Redeem Team."
+        },
+        "backtoback": {
+          "date": "2009 – 2010",
+          "title": "Back to back",
+          "note": "Finals MVP both times; the fifth championship."
+        },
+        "farewell": {
+          "date": "2016.04.13",
+          "title": "60 in the last game",
+          "note": "Against the Jazz, the final game of his career: 60 points."
+        },
+        "retired": {
+          "date": "2017.12.18",
+          "title": "Two jerseys retired",
+          "note": "8 and 24 went up into the rafters of Staples Center together."
+        },
+        "oscar": {
+          "date": "2018.03.04",
+          "title": "An Oscar",
+          "note": "Dear Basketball won Best Animated Short Film."
+        },
+        "gone": {
+          "date": "2020.01.26",
+          "title": "Gone",
+          "note": "Killed with his daughter Gianna in a helicopter crash in Calabasas, at 41. Elected to the Naismith Hall of Fame the same year."
+        },
+        "statue": {
+          "date": "2024.02.08",
+          "title": "The statue",
+          "note": "Number 8, a finger to the sky, on Star Plaza outside Crypto.com Arena."
+        }
       }
     }
   },
@@ -449,7 +541,10 @@
       "moments": { "title": "Peak Talk", "line": "The board: a few lines and a time, since 2017." },
       "secrets": { "title": "Secret", "line": "Essays and episodes — what the notes are not." },
       "idols": { "title": "Idols", "line": "The people on the wall. First, Kobe." },
-      "films": { "title": "Films", "line": "The ones watched too many times: A Chinese Odyssey, Secret. A wall of stills each, and a record at the door." }
+      "films": {
+        "title": "Films",
+        "line": "The ones watched too many times: A Chinese Odyssey, Secret. A wall of stills each, and a record at the door."
+      }
     }
   },
   "films": {
@@ -526,18 +621,66 @@
       "stillsTitle": "The scenes that stayed",
       "stillsLede": "The desert, the city wall, the Spider Cave, a wedding, and that one wink. Open any of them for the screening room.",
       "stills": {
-        "monkeyKing": { "title": "The Monkey King", "meta": "Cinderella · a golden sky", "alt": "The Monkey King, headband on, with his staff across his shoulders under a golden sky" },
-        "wink": { "title": "That wink", "meta": "Cinderella · Zixia", "alt": "The fairy Zixia winking at the camera" },
-        "desert": { "title": "The desert", "meta": "Cinderella · on the dunes", "alt": "Two people sitting side by side on the crest of a dune in an endless desert" },
-        "reeds": { "title": "The reeds", "meta": "Pandora's Box · Joker", "alt": "Joker standing among pink reeds, looking back" },
-        "bride": { "title": "The phoenix crown", "meta": "Cinderella · Zixia", "alt": "The fairy Zixia in a phoenix crown and a red wedding dress" },
-        "wedding": { "title": "The wedding", "meta": "Cinderella · the Bull King's cave", "alt": "A wedding all in red — Zixia, the Bull King and Joker standing together" },
-        "jingjing": { "title": "Bai Jingjing", "meta": "Pandora's Box · the desert", "alt": "In the desert, Joker holding Bai Jingjing where she has fallen" },
-        "cave": { "title": "The Spider Cave", "meta": "Cinderella · inside", "alt": "Joker sitting among the tangled roots inside the Spider Cave" },
-        "zixia": { "title": "Zixia", "meta": "Cinderella · a raised hand", "alt": "The fairy Zixia raising a hand, smiling at the camera" },
-        "box": { "title": "Pandora's Box", "meta": "Pandora's Box · Joker", "alt": "Joker sitting on the ground, holding up the Pandora's Box" },
-        "gate": { "title": "The gate", "meta": "Cinderella · the Monkey King", "alt": "The Monkey King, headband on, staff across his shoulders in front of a city gate" },
-        "wall": { "title": "On the city wall", "meta": "Cinderella · the ending", "alt": "On the city wall, two people standing in an embrace, snow mountains in the distance" }
+        "monkeyKing": {
+          "title": "The Monkey King",
+          "meta": "Cinderella · a golden sky",
+          "alt": "The Monkey King, headband on, with his staff across his shoulders under a golden sky"
+        },
+        "wink": {
+          "title": "That wink",
+          "meta": "Cinderella · Zixia",
+          "alt": "The fairy Zixia winking at the camera"
+        },
+        "desert": {
+          "title": "The desert",
+          "meta": "Cinderella · on the dunes",
+          "alt": "Two people sitting side by side on the crest of a dune in an endless desert"
+        },
+        "reeds": {
+          "title": "The reeds",
+          "meta": "Pandora's Box · Joker",
+          "alt": "Joker standing among pink reeds, looking back"
+        },
+        "bride": {
+          "title": "The phoenix crown",
+          "meta": "Cinderella · Zixia",
+          "alt": "The fairy Zixia in a phoenix crown and a red wedding dress"
+        },
+        "wedding": {
+          "title": "The wedding",
+          "meta": "Cinderella · the Bull King's cave",
+          "alt": "A wedding all in red — Zixia, the Bull King and Joker standing together"
+        },
+        "jingjing": {
+          "title": "Bai Jingjing",
+          "meta": "Pandora's Box · the desert",
+          "alt": "In the desert, Joker holding Bai Jingjing where she has fallen"
+        },
+        "cave": {
+          "title": "The Spider Cave",
+          "meta": "Cinderella · inside",
+          "alt": "Joker sitting among the tangled roots inside the Spider Cave"
+        },
+        "zixia": {
+          "title": "Zixia",
+          "meta": "Cinderella · a raised hand",
+          "alt": "The fairy Zixia raising a hand, smiling at the camera"
+        },
+        "box": {
+          "title": "Pandora's Box",
+          "meta": "Pandora's Box · Joker",
+          "alt": "Joker sitting on the ground, holding up the Pandora's Box"
+        },
+        "gate": {
+          "title": "The gate",
+          "meta": "Cinderella · the Monkey King",
+          "alt": "The Monkey King, headband on, staff across his shoulders in front of a city gate"
+        },
+        "wall": {
+          "title": "On the city wall",
+          "meta": "Cinderella · the ending",
+          "alt": "On the city wall, two people standing in an embrace, snow mountains in the distance"
+        }
       },
       "credit": "Stills © 1995 Choi Sing Film / Xi'an Film Studio, via TMDB; the closing song 一生所愛 (Lowell Lo, 1995) is a recording this site hosts itself, played whole and looped. A personal homage only."
     },
@@ -576,18 +719,66 @@
       "stillsTitle": "The scenes that stayed",
       "stillsLede": "The piano room, the arcade, a rainy day, a photograph from 1979, and the sunset on the roof. Open any of them for the screening room.",
       "stills": {
-        "piano": { "title": "The piano room", "meta": "First meeting · the old piano room", "alt": "In the old piano room, Xianglun at the piano and Xiaoyu leaning on its far end" },
-        "doorway": { "title": "The doorway", "meta": "Xiaoyu · outside the piano room", "alt": "Xiaoyu standing in the doorway of the piano room, head down, smiling" },
-        "corridor": { "title": "The arcade", "meta": "Tamkang · a hundred and eight steps", "alt": "The two of them in black coats walking side by side down a red-brick arcade" },
-        "bike": { "title": "The bicycle", "meta": "The way home", "alt": "Xianglun cycling with Xiaoyu on the back, one hand on his shoulder" },
-        "icecream": { "title": "Ice cream", "meta": "The Tamsui riverside · dusk", "alt": "At dusk by the river, two people touching ice-cream cones together" },
-        "rain": { "title": "Rain", "meta": "Two umbrellas", "alt": "On a rainy campus, the two of them walking side by side under separate umbrellas" },
-        "duel": { "title": "The piano duel", "meta": "The hall · against Yuhao", "alt": "In the hall, Xianglun playing with his head down and the seats behind him full of students" },
-        "desk": { "title": "The desk", "meta": "1979 · Xiaoyu", "alt": "Xiaoyu bent over a desk, writing on it: I am Xiaoyu, I love you, do you love me" },
-        "photo1979": { "title": "The photograph", "meta": "1979 · the archive", "alt": "In a yellowed photograph, Xiaoyu standing beside the young Mr Ye" },
-        "guitar": { "title": "The guitar", "meta": "Mr Ye · at home", "alt": "Mr Ye playing the guitar by a window at home" },
-        "note": { "title": "The words on the score", "meta": "Secret · the last page", "alt": "Handwriting on yellowed paper: whether or not we meet again, whether or not you forget me, I only want to tell you one secret" },
-        "rooftop": { "title": "The roof", "meta": "Sunset · the Tamsui river", "alt": "On a bench on the roof, the two of them side by side, watching the sun set over the river" }
+        "piano": {
+          "title": "The piano room",
+          "meta": "First meeting · the old piano room",
+          "alt": "In the old piano room, Xianglun at the piano and Xiaoyu leaning on its far end"
+        },
+        "doorway": {
+          "title": "The doorway",
+          "meta": "Xiaoyu · outside the piano room",
+          "alt": "Xiaoyu standing in the doorway of the piano room, head down, smiling"
+        },
+        "corridor": {
+          "title": "The arcade",
+          "meta": "Tamkang · a hundred and eight steps",
+          "alt": "The two of them in black coats walking side by side down a red-brick arcade"
+        },
+        "bike": {
+          "title": "The bicycle",
+          "meta": "The way home",
+          "alt": "Xianglun cycling with Xiaoyu on the back, one hand on his shoulder"
+        },
+        "icecream": {
+          "title": "Ice cream",
+          "meta": "The Tamsui riverside · dusk",
+          "alt": "At dusk by the river, two people touching ice-cream cones together"
+        },
+        "rain": {
+          "title": "Rain",
+          "meta": "Two umbrellas",
+          "alt": "On a rainy campus, the two of them walking side by side under separate umbrellas"
+        },
+        "duel": {
+          "title": "The piano duel",
+          "meta": "The hall · against Yuhao",
+          "alt": "In the hall, Xianglun playing with his head down and the seats behind him full of students"
+        },
+        "desk": {
+          "title": "The desk",
+          "meta": "1979 · Xiaoyu",
+          "alt": "Xiaoyu bent over a desk, writing on it: I am Xiaoyu, I love you, do you love me"
+        },
+        "photo1979": {
+          "title": "The photograph",
+          "meta": "1979 · the archive",
+          "alt": "In a yellowed photograph, Xiaoyu standing beside the young Mr Ye"
+        },
+        "guitar": {
+          "title": "The guitar",
+          "meta": "Mr Ye · at home",
+          "alt": "Mr Ye playing the guitar by a window at home"
+        },
+        "note": {
+          "title": "The words on the score",
+          "meta": "Secret · the last page",
+          "alt": "Handwriting on yellowed paper: whether or not we meet again, whether or not you forget me, I only want to tell you one secret"
+        },
+        "rooftop": {
+          "title": "The roof",
+          "meta": "Sunset · the Tamsui river",
+          "alt": "On a bench on the roof, the two of them side by side, watching the sun set over the river"
+        }
       },
       "credit": "Stills © 2007 Edko Films / JVR Music, official stills via Douban and TMDB; 路小雨, from the film's own soundtrack (Jay Chou, 2007), is a recording this site hosts itself, played whole and looped. A personal homage only."
     }

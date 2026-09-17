@@ -27,13 +27,7 @@ type Props = {
  * cross-faded via opacity — box-shadow itself is never animated. No GSAP,
  * no per-frame JS.
  */
-export function PeelSticker({
-  email,
-  hint,
-  ariaLabel,
-  fallback,
-  className,
-}: Props) {
+export function PeelSticker({ email, hint, ariaLabel, fallback, className }: Props) {
   const [peeled, setPeeled] = useState(false);
 
   return (
@@ -70,9 +64,7 @@ export function PeelSticker({
         <span
           aria-hidden
           className={`absolute inset-0 z-[1] rounded-[10px] shadow-[0_2px_6px_var(--sticker-shadow-color)] transition-opacity duration-300 ${
-            peeled
-              ? "opacity-0"
-              : "opacity-100 group-hover:opacity-0 group-focus-within:opacity-0"
+            peeled ? "opacity-0" : "opacity-100 group-hover:opacity-0 group-focus-within:opacity-0"
           }`}
         />
         <span

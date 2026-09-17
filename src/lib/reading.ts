@@ -24,7 +24,6 @@ export function readingMinutes(source: string): number {
     .replace(/<[^>]+>/g, " ")
     .replace(/https?:\/\/\S+/g, " ");
   const cjk = text.match(CJK)?.length ?? 0;
-  const latin =
-    text.replace(CJK, " ").match(/[A-Za-z0-9][A-Za-z0-9'’-]*/g)?.length ?? 0;
+  const latin = text.replace(CJK, " ").match(/[A-Za-z0-9][A-Za-z0-9'’-]*/g)?.length ?? 0;
   return Math.max(1, Math.round(cjk / 350 + latin / 220));
 }

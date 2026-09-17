@@ -11,10 +11,7 @@ import { readingMinutes } from "@/lib/reading";
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, DATE_ERROR, type ActionState } from "./shared";
 
-export async function savePost(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function savePost(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const slug = str(form, "slug");

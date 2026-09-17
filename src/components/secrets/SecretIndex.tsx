@@ -54,7 +54,9 @@ function SecretLine({ item }: { item: SecretSummary }) {
           />
         </span>
         <span className="flex shrink-0 items-baseline gap-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          <span className="text-accent">{t(item.kind === "podcast" ? "kindPodcast" : "kindEssay")}</span>
+          <span className="text-accent">
+            {t(item.kind === "podcast" ? "kindPodcast" : "kindEssay")}
+          </span>
           {length && (
             <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 sm:inline-block">
               {length}

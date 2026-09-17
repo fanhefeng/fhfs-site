@@ -23,10 +23,7 @@ function parseMomentTime(value: string): Date | null {
   return new Date(`${day}T${hour}:${minute}:00+08:00`);
 }
 
-export async function saveMoment(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveMoment(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");

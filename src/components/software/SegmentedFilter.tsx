@@ -23,13 +23,7 @@ type Props = {
  * Buttons are ≥44px tall and remain plain buttons with `aria-pressed`; arrow
  * keys move between them for keyboard users.
  */
-export function SegmentedFilter({
-  options,
-  value,
-  onChange,
-  ariaLabel,
-  className,
-}: Props) {
+export function SegmentedFilter({ options, value, onChange, ariaLabel, className }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLSpanElement>(null);
   /** False until the pill has been placed once — the first placement never
@@ -54,7 +48,7 @@ export function SegmentedFilter({
       gsap.set(pill, next);
       Flip.from(state, { duration: 0.42, ease: EASE.default, absolute: false });
     },
-    [value]
+    [value],
   );
 
   useGSAP(
@@ -64,7 +58,7 @@ export function SegmentedFilter({
     },
     // Deliberately NOT revertOnUpdate: reverting would snap the pill back to
     // its origin before Flip could read where it actually is.
-    { dependencies: [place], scope: rootRef }
+    { dependencies: [place], scope: rootRef },
   );
 
   /* Re-seat on resize (label widths change with the viewport) — never
@@ -91,7 +85,7 @@ export function SegmentedFilter({
         ?.querySelector<HTMLElement>(`[data-seg="${CSS.escape(next.value)}"]`)
         ?.focus();
     },
-    [options, value, onChange]
+    [options, value, onChange],
   );
 
   return (

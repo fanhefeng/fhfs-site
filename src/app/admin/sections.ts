@@ -154,9 +154,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
 ];
 
 /** Flat, in the same order — for lookups by href. */
-export const SECTIONS: AdminSection[] = SECTION_GROUPS.flatMap(
-  (group) => group.sections
-);
+export const SECTIONS: AdminSection[] = SECTION_GROUPS.flatMap((group) => group.sections);
 
 export function sectionByHref(href: string): AdminSection | undefined {
   return SECTIONS.find((section) => section.href === href);
@@ -164,7 +162,5 @@ export function sectionByHref(href: string): AdminSection | undefined {
 
 /** The group a section belongs to, for the breadcrumb. */
 export function groupOf(href: string): AdminGroup | undefined {
-  return SECTION_GROUPS.find((group) =>
-    group.sections.some((section) => section.href === href)
-  );
+  return SECTION_GROUPS.find((group) => group.sections.some((section) => section.href === href));
 }

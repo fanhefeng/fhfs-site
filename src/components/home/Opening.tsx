@@ -97,7 +97,9 @@ export function Opening({ headline, lede, cta, meta }: Props) {
       className="op relative flex min-h-svh flex-col justify-center px-6 pt-32 pb-24"
       data-in={entered || undefined}
     >
-      <style href="home-opening" precedence="medium">{CSS}</style>
+      <style href="home-opening" precedence="medium">
+        {CSS}
+      </style>
 
       <div className="mx-auto w-full max-w-[1080px]">
         {/* Each line of the manifesto is a line the writer chose, so none of
@@ -120,7 +122,11 @@ export function Opening({ headline, lede, cta, meta }: Props) {
           {/* A line left empty in the copy is not a blank line — the
               manifesto is simply shorter. */}
           {headline.filter(Boolean).map((line, i) => (
-            <span key={line} className="op-line" style={{ "--d": `${i * 110}ms` } as React.CSSProperties}>
+            <span
+              key={line}
+              className="op-line"
+              style={{ "--d": `${i * 110}ms` } as React.CSSProperties}
+            >
               <i>{line}</i>
             </span>
           ))}
@@ -140,14 +146,16 @@ export function Opening({ headline, lede, cta, meta }: Props) {
             asked for. */}
         <div
           className="op-fade"
-          style={{
-            "--d": "420ms",
-            marginTop: `calc(2.75rem - ${PILL_PAD})`,
-            marginBottom: `calc(-1 * ${PILL_PAD})`,
-            // Left too, or the button hangs a pad's width inside the measure
-            // and stops lining up with the type above it.
-            marginLeft: `calc(-1 * ${PILL_PAD})`,
-          } as React.CSSProperties}
+          style={
+            {
+              "--d": "420ms",
+              marginTop: `calc(2.75rem - ${PILL_PAD})`,
+              marginBottom: `calc(-1 * ${PILL_PAD})`,
+              // Left too, or the button hangs a pad's width inside the measure
+              // and stops lining up with the type above it.
+              marginLeft: `calc(-1 * ${PILL_PAD})`,
+            } as React.CSSProperties
+          }
         >
           <LiquidPill height={PILL_H} base={0} href={cta.href} label={cta.label}>
             <svg className="lp-ico" viewBox="0 0 115 115" aria-hidden="true">

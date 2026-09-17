@@ -39,11 +39,11 @@ for (const t of TABLES) {
 console.log("\ntimeline (sort order, newest first)");
 for (const r of await rows(
   `select version, date, (date_label is not null) as has_label
-   from timeline_entries order by sort`
+   from timeline_entries order by sort`,
 )) {
   console.log(
     `  ${String(r.version).padEnd(5)} ${r.date ?? "—         "}` +
-      `${r.has_label ? "  dateLabel" : ""}`
+      `${r.has_label ? "  dateLabel" : ""}`,
   );
 }
 
@@ -51,33 +51,33 @@ console.log("\nposts");
 for (const r of await rows(
   `select slug, locale, date, reading_minutes, coalesce(array_length(tags,1),0) as tag_count,
           length(body_html) as html_len
-   from posts order by date desc, locale`
+   from posts order by date desc, locale`,
 )) {
   console.log(
     `  ${r.date}  ${r.locale}  ${String(r.reading_minutes).padStart(2)}min  ` +
-      `${r.tag_count} tags  ${String(r.html_len).padStart(6)}B  ${r.slug}`
+      `${r.tag_count} tags  ${String(r.html_len).padStart(6)}B  ${r.slug}`,
   );
 }
 
 console.log("\napps");
-for (const r of await rows(
-  `select key, category, accent, hue, sort from apps order by sort`
-)) {
+for (const r of await rows(`select key, category, accent, hue, sort from apps order by sort`)) {
   console.log(
     `  ${String(r.key).padEnd(15)} ${String(r.category).padEnd(9)} ` +
-      `${r.accent ?? "—"}  hue ${r.hue}`
+      `${r.accent ?? "—"}  hue ${r.hue}`,
   );
 }
 
 console.log("\nnav_items");
 for (const r of await rows(`select href, surfaces, nav_group from nav_items order by sort`)) {
-  console.log(`  ${String(r.href).padEnd(11)} ${String(r.nav_group ?? "—").padEnd(6)} ${r.surfaces.join(", ")}`);
+  console.log(
+    `  ${String(r.href).padEnd(11)} ${String(r.nav_group ?? "—").padEnd(6)} ${r.surfaces.join(", ")}`,
+  );
 }
 
 console.log("\ncopy_blocks (first line of each namespace)");
 for (const r of await rows(
   `select split_part(key, '.', 1) as ns, count(*)::int as n
-   from copy_blocks group by 1 order by 1`
+   from copy_blocks group by 1 order by 1`,
 )) {
   console.log(`  ${String(r.ns).padEnd(11)} ${r.n}`);
 }

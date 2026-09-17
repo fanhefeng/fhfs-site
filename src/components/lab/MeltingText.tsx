@@ -104,10 +104,7 @@ export function MeltingText({
 
   // useId emits characters that are illegal inside a CSS url(#…) reference.
   const rawId = useId();
-  const filterId = useMemo(
-    () => `melt-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`,
-    [rawId]
-  );
+  const filterId = useMemo(() => `melt-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`, [rawId]);
 
   const { lines } = useMemo(() => splitText(children), [children]);
   const useGoo = goo > 0;
@@ -128,7 +125,7 @@ export function MeltingText({
       node.setAttribute("stdDeviation", value.toFixed(3));
       stage.style.filter = `url(#${filterId})`;
     },
-    [filterId]
+    [filterId],
   );
 
   useGSAP(
@@ -138,7 +135,7 @@ export function MeltingText({
       if (!stage || !root) return;
 
       const chars = gsap.utils.toArray<HTMLElement>(
-        stage.querySelectorAll<HTMLElement>("[data-mt-char]:not([data-mt-space])")
+        stage.querySelectorAll<HTMLElement>("[data-mt-char]:not([data-mt-space])"),
       );
       if (!chars.length) return;
 
@@ -191,12 +188,8 @@ export function MeltingText({
               ease: "power1.out",
               stagger: stagVars,
             },
-            0
-          ).to(
-            chars,
-            { y: 0, scale: 1, filter: "blur(0px)", duration, stagger: stagVars },
-            0
-          );
+            0,
+          ).to(chars, { y: 0, scale: 1, filter: "blur(0px)", duration, stagger: stagVars }, 0);
 
           if (useGoo) {
             tl.to(
@@ -209,7 +202,7 @@ export function MeltingText({
                 duration: tl.duration() * 0.82,
                 onUpdate: () => applyGoo(gooState.value),
               },
-              0
+              0,
             );
           }
 
@@ -240,7 +233,7 @@ export function MeltingText({
             tl.kill();
             stage.style.filter = "none";
           };
-        }
+        },
       );
 
       return () => mm.revert();
@@ -266,7 +259,7 @@ export function MeltingText({
         repeat,
       ],
       revertOnUpdate: true,
-    }
+    },
   );
 
   let charIndex = 0;

@@ -16,13 +16,17 @@ import {
 } from "@/lib/forms";
 import { parseProjects, parseSkillLines } from "@/lib/resume";
 import { TAGS } from "@/lib/content";
-import { invalidate, SESSION_EXPIRED, KEY_ERROR, linkError, upsertKeyed, type ActionState } from "./shared";
+import {
+  invalidate,
+  SESSION_EXPIRED,
+  KEY_ERROR,
+  linkError,
+  upsertKeyed,
+  type ActionState,
+} from "./shared";
 
 /** One row, key "main" — everything on /resume but the jobs, as one form. */
-export async function saveResumeProfile(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveResumeProfile(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const name = localized(form, "name");
@@ -83,7 +87,7 @@ export async function saveResumeProfile(
 
 export async function saveResumeExperience(
   _prev: ActionState,
-  form: FormData
+  form: FormData,
 ): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
@@ -137,8 +141,6 @@ export async function deleteResumeExperience(form: FormData): Promise<void> {
   await requireAdmin();
   const key = str(form, "key");
   if (!key) return;
-  await db
-    .delete(schema.resumeExperiences)
-    .where(eq(schema.resumeExperiences.key, key));
+  await db.delete(schema.resumeExperiences).where(eq(schema.resumeExperiences.key, key));
   invalidate(TAGS.resume);
 }

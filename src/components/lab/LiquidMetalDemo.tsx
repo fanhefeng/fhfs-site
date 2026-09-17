@@ -201,7 +201,8 @@ export function LiquidMetalDemo({
       t.w = w;
       t.h = h;
       gl.bindTexture(gl.TEXTURE_2D, t.tex);
-      if (hasFloat) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+      if (hasFloat)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
       else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     };
 
@@ -358,7 +359,13 @@ export function LiquidMetalDemo({
         gl.uniform4f(u.uRipK ?? null, DISTURB.speed, DISTURB.width, DISTURB.decay, DISTURB.amp);
         gl.uniform4f(u.uRipK2 ?? null, DISTURB.facet, DISTURB.lobes, DISTURB.sharp, DISTURB.emit);
         gl.uniform4f(u.uPtr ?? null, ptrS.x, ptrS.y, ptrAmt, ptrSpeed);
-        gl.uniform4f(u.uPtrK ?? null, DISTURB.ptrRad, DISTURB.ptrAmp, DISTURB.ptrFast, DISTURB.ptrRim);
+        gl.uniform4f(
+          u.uPtrK ?? null,
+          DISTURB.ptrRad,
+          DISTURB.ptrAmp,
+          DISTURB.ptrFast,
+          DISTURB.ptrRim,
+        );
       };
 
       // 1. the metal field, masked to the pill
@@ -686,7 +693,7 @@ export function LiquidMetalDemo({
         tween.kill();
       };
     },
-    { scope, dependencies: [live], revertOnUpdate: true }
+    { scope, dependencies: [live], revertOnUpdate: true },
   );
 
   return (
@@ -699,7 +706,12 @@ export function LiquidMetalDemo({
         <div ref={stickyRef} className="lm-sticky">
           <div ref={padRef} className="lm-pad">
             <div className="lm-plate" aria-hidden="true" />
-            <canvas ref={canvasRef} className="lm-canvas" data-degraded={degraded || undefined} aria-hidden="true" />
+            <canvas
+              ref={canvasRef}
+              className="lm-canvas"
+              data-degraded={degraded || undefined}
+              aria-hidden="true"
+            />
             <button ref={buttonRef} className="lm-btn" type="button">
               <svg className="lm-ico" viewBox="0 0 115 115" aria-hidden="true">
                 <g stroke="currentColor" strokeWidth="11" strokeLinecap="round">

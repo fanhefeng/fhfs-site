@@ -6,12 +6,16 @@ import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
 import { intField, localized, str, validDate, validKey } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
-import { invalidate, SESSION_EXPIRED, KEY_ERROR, DATE_ERROR, upsertKeyed, type ActionState } from "./shared";
+import {
+  invalidate,
+  SESSION_EXPIRED,
+  KEY_ERROR,
+  DATE_ERROR,
+  upsertKeyed,
+  type ActionState,
+} from "./shared";
 
-export async function saveTimelineEntry(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveTimelineEntry(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");
@@ -51,8 +55,6 @@ export async function deleteTimelineEntry(form: FormData): Promise<void> {
   await requireAdmin();
   const key = str(form, "key");
   if (!key) return;
-  await db
-    .delete(schema.timelineEntries)
-    .where(eq(schema.timelineEntries.key, key));
+  await db.delete(schema.timelineEntries).where(eq(schema.timelineEntries.key, key));
   invalidate(TAGS.timeline);
 }

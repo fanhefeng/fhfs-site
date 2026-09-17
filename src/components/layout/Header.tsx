@@ -188,11 +188,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         }
       },
     });
-    tl.to(
-      tray,
-      { width: w, duration: 0.8, ease: "back.out(2)", easeReverse: "power2.out" },
-      0
-    ).to(
+    tl.to(tray, { width: w, duration: 0.8, ease: "back.out(2)", easeReverse: "power2.out" }, 0).to(
       items,
       {
         autoAlpha: 1,
@@ -202,7 +198,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         easeReverse: "power1.out",
         stagger: 0.05,
       },
-      0.14
+      0.14,
     );
     // On a wide screen the open island has no X. The doors are simply there,
     // and a close control at rest would ask "close what?" — so the burger
@@ -211,7 +207,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       tl.to(
         burger,
         { width: 0, autoAlpha: 0, duration: 0.3, ease: "power2.out", easeReverse: "power1.out" },
-        0
+        0,
       );
     }
     return tl;
@@ -263,7 +259,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         tl.timeScale(2.5).reverse();
       }
     },
-    { dependencies: [expanded], scope: rootRef }
+    { dependencies: [expanded], scope: rootRef },
   );
 
   // Hamburger ⇄ X: tween the SVG line endpoint *attributes* into the
@@ -287,7 +283,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         overwrite: "auto",
       });
     },
-    { dependencies: [glyphOpen], scope: rootRef }
+    { dependencies: [glyphOpen], scope: rootRef },
   );
 
   // Cursor-following specular glint: a fePointLight rides the pointer and
@@ -302,49 +298,45 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       if (!island || !ring || !light) return;
 
       const mm = gsap.matchMedia();
-      mm.add(
-        "(hover: hover) and (pointer: fine)",
-        () => {
-          // One tween reused for every move, rather than a fresh gsap.to per
-          // pointermove event. quickTo cannot address `attr.x` directly, so it
-          // drives a plain object and writes the attribute on update.
-          const pos = { x: -200 };
-          const xTo = gsap.quickTo(pos, "x", {
-            duration: 0.25,
-            ease: "power2.out",
-            onUpdate: () => light.setAttribute("x", String(pos.x)),
-          });
-          // Event-driven read; fePointLight's x lives in the ring's own user
-          // space, so the island rect maps clientX directly. y stays at
-          // GLINT.y — see the constant.
-          const localX = (e: PointerEvent) =>
-            e.clientX - island.getBoundingClientRect().left;
+      mm.add("(hover: hover) and (pointer: fine)", () => {
+        // One tween reused for every move, rather than a fresh gsap.to per
+        // pointermove event. quickTo cannot address `attr.x` directly, so it
+        // drives a plain object and writes the attribute on update.
+        const pos = { x: -200 };
+        const xTo = gsap.quickTo(pos, "x", {
+          duration: 0.25,
+          ease: "power2.out",
+          onUpdate: () => light.setAttribute("x", String(pos.x)),
+        });
+        // Event-driven read; fePointLight's x lives in the ring's own user
+        // space, so the island rect maps clientX directly. y stays at
+        // GLINT.y — see the constant.
+        const localX = (e: PointerEvent) => e.clientX - island.getBoundingClientRect().left;
 
-          const onEnter = (e: PointerEvent) => {
-            // Land lit under the pointer. Easing in from wherever the last
-            // exit left the light is what made the glint swipe across the
-            // capsule on every re-entry.
-            pos.x = localX(e);
-            light.setAttribute("x", String(pos.x));
-            gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
-          };
-          const onMove = (e: PointerEvent) => xTo(localX(e));
-          const onLeave = () => {
-            gsap.to(ring, { opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" });
-          };
-          island.addEventListener("pointerenter", onEnter);
-          island.addEventListener("pointermove", onMove);
-          island.addEventListener("pointerleave", onLeave);
-          return () => {
-            island.removeEventListener("pointerenter", onEnter);
-            island.removeEventListener("pointermove", onMove);
-            island.removeEventListener("pointerleave", onLeave);
-          };
-        }
-      );
+        const onEnter = (e: PointerEvent) => {
+          // Land lit under the pointer. Easing in from wherever the last
+          // exit left the light is what made the glint swipe across the
+          // capsule on every re-entry.
+          pos.x = localX(e);
+          light.setAttribute("x", String(pos.x));
+          gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
+        };
+        const onMove = (e: PointerEvent) => xTo(localX(e));
+        const onLeave = () => {
+          gsap.to(ring, { opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+        };
+        island.addEventListener("pointerenter", onEnter);
+        island.addEventListener("pointermove", onMove);
+        island.addEventListener("pointerleave", onLeave);
+        return () => {
+          island.removeEventListener("pointerenter", onEnter);
+          island.removeEventListener("pointermove", onMove);
+          island.removeEventListener("pointerleave", onLeave);
+        };
+      });
       return () => mm.revert();
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   // Scroll-edge: once the page scrolls, a paper gradient fades in under the
@@ -527,11 +519,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
             }`}
           >
             {/* Glint ring: lit by the fePointLight, invisible at rest. */}
-            <GlintRing
-              filterId="isl-glint"
-              className="rounded-full"
-              ringRef={ringRef}
-            />
+            <GlintRing filterId="isl-glint" className="rounded-full" ringRef={ringRef} />
 
             {/* Wordmark badge: the name inside the ring off the sign, with
                 the note beside it as the music's switch — the island wears
@@ -635,7 +623,12 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         </div>
       </header>
 
-      <FullNav links={menuLinks} open={navOpen} onClose={() => setNavOpen(false)} triggerRef={burgerRef} />
+      <FullNav
+        links={menuLinks}
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+        triggerRef={burgerRef}
+      />
     </>
   );
 }

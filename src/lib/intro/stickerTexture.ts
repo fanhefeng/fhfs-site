@@ -22,8 +22,7 @@ const HEIGHT_BY_SHAPE: Record<StickerShape, number> = {
 };
 
 const TEXT_FONT = '"Helvetica Neue", "PingFang SC", Helvetica, Arial, sans-serif';
-const EMOJI_FONT =
-  '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
 export type StickerTexture = {
   texture: THREE.CanvasTexture;
@@ -37,7 +36,7 @@ function tracePath(
   x: number,
   y: number,
   w: number,
-  h: number
+  h: number,
 ) {
   ctx.beginPath();
   if (shape === "circle") {
@@ -61,7 +60,7 @@ function fitFont(
   text: string,
   weight: string,
   startPx: number,
-  maxWidth: number
+  maxWidth: number,
 ) {
   let px = startPx;
   for (;;) {

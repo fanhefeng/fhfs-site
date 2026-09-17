@@ -9,17 +9,33 @@ import { watchContextLoss } from "@/lib/webgl";
 import { buildGrove, buildMotes, BOX_W } from "@/lib/grove/geometry";
 import { bakeBarkPlates } from "@/lib/grove/bark";
 import {
-  BARK_VERT, BARK_FRAG,
-  GRASS_VERT, GRASS_FRAG,
-  FERN_VERT, FERN_FRAG,
-  FLOWER_VERT, FLOWER_FRAG,
-  WIRE_VERT, WIRE_FRAG,
-  MOTE_VERT, MOTE_FRAG,
-  SPRAY_VERT, SPRAY_FRAG,
-  WING_VERT, WING_FRAG,
-  BODY_VERT, BODY_FRAG,
+  BARK_VERT,
+  BARK_FRAG,
+  GRASS_VERT,
+  GRASS_FRAG,
+  FERN_VERT,
+  FERN_FRAG,
+  FLOWER_VERT,
+  FLOWER_FRAG,
+  WIRE_VERT,
+  WIRE_FRAG,
+  MOTE_VERT,
+  MOTE_FRAG,
+  SPRAY_VERT,
+  SPRAY_FRAG,
+  WING_VERT,
+  WING_FRAG,
+  BODY_VERT,
+  BODY_FRAG,
 } from "@/lib/grove/shaders";
-import { flowerTexture, moteTexture, radialTexture, wingTexture, wingGeometry, bodyGeometry } from "@/components/grove/plates";
+import {
+  flowerTexture,
+  moteTexture,
+  radialTexture,
+  wingTexture,
+  wingGeometry,
+  bodyGeometry,
+} from "@/components/grove/plates";
 import { grovePalette, DEFAULT_PALETTE } from "@/lib/grove/palettes";
 
 /** The cover wears one dress. The study is where the others are tried on. */
@@ -145,7 +161,12 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
 
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance",
+      });
     } catch {
       ctx.dispose();
       onReady?.();
@@ -273,13 +294,24 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
          twin: same everything, discards compiled out. The blending root keeps
          its discards — a blended pile gets no hidden-surface removal anyway,
          and its ends really do fade to nothing. */
-      const opaque = (params: THREE.ShaderMaterialParameters, mesh: (m: THREE.ShaderMaterial) => THREE.Mesh) => {
-        const live = new THREE.ShaderMaterial({ ...params, transparent: soft, depthWrite: true, side: THREE.DoubleSide });
+      const opaque = (
+        params: THREE.ShaderMaterialParameters,
+        mesh: (m: THREE.ShaderMaterial) => THREE.Mesh,
+      ) => {
+        const live = new THREE.ShaderMaterial({
+          ...params,
+          transparent: soft,
+          depthWrite: true,
+          side: THREE.DoubleSide,
+        });
         const m = mesh(live);
         materials.push(live);
         if (!soft) {
           const calm = new THREE.ShaderMaterial({
-            ...params, transparent: false, depthWrite: true, side: THREE.DoubleSide,
+            ...params,
+            transparent: false,
+            depthWrite: true,
+            side: THREE.DoubleSide,
             defines: { SETTLED: 1 },
           });
           materials.push(calm);
@@ -294,8 +326,12 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       barkGeo.setAttribute("aInfo", new THREE.BufferAttribute(grove.bark.info, 3));
       barkGeo.setIndex(new THREE.BufferAttribute(grove.bark.index, 1));
       const bark = opaque(
-        { uniforms: { ...uniforms, ...barkPlates.uniforms }, vertexShader: BARK_VERT, fragmentShader: BARK_FRAG },
-        (m) => new THREE.Mesh(barkGeo, m)
+        {
+          uniforms: { ...uniforms, ...barkPlates.uniforms },
+          vertexShader: BARK_VERT,
+          fragmentShader: BARK_FRAG,
+        },
+        (m) => new THREE.Mesh(barkGeo, m),
       );
       bark.frustumCulled = false;
       bark.renderOrder = order;
@@ -332,7 +368,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       bladeGeo.instanceCount = grove.blades.count;
       const grass = opaque(
         { uniforms, vertexShader: GRASS_VERT, fragmentShader: GRASS_FRAG },
-        (m) => new THREE.Mesh(bladeGeo, m)
+        (m) => new THREE.Mesh(bladeGeo, m),
       );
       grass.frustumCulled = false;
       grass.renderOrder = order + 0.1;
@@ -352,7 +388,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
         fernGeo.instanceCount = grove.ferns.count;
         const fern = opaque(
           { uniforms, vertexShader: FERN_VERT, fragmentShader: FERN_FRAG },
-          (m) => new THREE.Mesh(fernGeo, m)
+          (m) => new THREE.Mesh(fernGeo, m),
         );
         fern.frustumCulled = false;
         fern.renderOrder = order + 0.2;
@@ -363,16 +399,31 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       /* flowers */
       if (grove.flowers.count > 0) {
         const flowerGeo = new THREE.InstancedBufferGeometry();
-        flowerGeo.setAttribute("position", new THREE.Float32BufferAttribute([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3));
+        flowerGeo.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(
+            [-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0],
+            3,
+          ),
+        );
         flowerGeo.setAttribute("uv", new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2));
         flowerGeo.setIndex([0, 1, 2, 0, 2, 3]);
-        flowerGeo.setAttribute("aOffset", new THREE.InstancedBufferAttribute(grove.flowers.offset, 3));
-        flowerGeo.setAttribute("aRandom", new THREE.InstancedBufferAttribute(grove.flowers.random, 2));
+        flowerGeo.setAttribute(
+          "aOffset",
+          new THREE.InstancedBufferAttribute(grove.flowers.offset, 3),
+        );
+        flowerGeo.setAttribute(
+          "aRandom",
+          new THREE.InstancedBufferAttribute(grove.flowers.random, 2),
+        );
         flowerGeo.instanceCount = grove.flowers.count;
         const flowerMat = new THREE.ShaderMaterial({
           uniforms: { ...uniforms, uMap: { value: flowerMap } },
-          vertexShader: FLOWER_VERT, fragmentShader: FLOWER_FRAG,
-          transparent: true, depthWrite: false, side: THREE.DoubleSide,
+          vertexShader: FLOWER_VERT,
+          fragmentShader: FLOWER_FRAG,
+          transparent: true,
+          depthWrite: false,
+          side: THREE.DoubleSide,
         });
         const flowers = new THREE.Mesh(flowerGeo, flowerMat);
         flowers.frustumCulled = false;
@@ -393,8 +444,11 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
           uPhase: shared.uPhase,
           uWireK: { value: new THREE.Vector3(135, 950, 0.045) },
         },
-        vertexShader: WIRE_VERT, fragmentShader: WIRE_FRAG,
-        transparent: true, depthWrite: false, depthTest: false,
+        vertexShader: WIRE_VERT,
+        fragmentShader: WIRE_FRAG,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
         blending: THREE.AdditiveBlending,
       });
       const wire = new THREE.LineSegments(wireGeo, wireMat);
@@ -425,16 +479,34 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       flowerSize: [0.034, 0.062],
     });
 
-    const nearBuilt = assemble(near, {
-      box: ARCH, haze: 0.15, fog: 0, hazeLift: 0.2,
-      hazeCol: [0.176, 0.195, 0.145], mouseR: 1.2, mask: null,
-    }, 2);
+    const nearBuilt = assemble(
+      near,
+      {
+        box: ARCH,
+        haze: 0.15,
+        fog: 0,
+        hazeLift: 0.2,
+        hazeCol: [0.176, 0.195, 0.145],
+        mouseR: 1.2,
+        mask: null,
+      },
+      2,
+    );
     // The ridge dissolves before it reaches the cards (local x 0.4 → 3.4) and
     // into the floor light below it (the lower 0–42% of its box).
-    const farBuilt = assemble(far, {
-      box: FAR, haze: 0.16, fog: 0.26, hazeLift: 0.92,
-      hazeCol: [0.15, 0.164, 0.12], mouseR: 1.4, mask: [0.4, 3.4, 0, 0.42],
-    }, 0);
+    const farBuilt = assemble(
+      far,
+      {
+        box: FAR,
+        haze: 0.16,
+        fog: 0.26,
+        hazeLift: 0.92,
+        hazeCol: [0.15, 0.164, 0.12],
+        mouseR: 1.4,
+        mask: [0.4, 3.4, 0, 0.42],
+      },
+      0,
+    );
 
     /* ---- shadow and light pool: everything that needs no geometry ---- */
     const plane = new THREE.PlaneGeometry(1, 1);
@@ -451,14 +523,25 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     ]);
     textures.push(shadowMap, glowMap);
 
-    const shadowMat = new THREE.MeshBasicMaterial({ map: shadowMap, transparent: true, depthWrite: false, depthTest: false });
+    const shadowMat = new THREE.MeshBasicMaterial({
+      map: shadowMap,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+    });
     const shadowMesh = new THREE.Mesh(plane, shadowMat);
     shadowMesh.renderOrder = 1;
     shadowMesh.position.z = -70;
     scene.add(shadowMesh);
     materials.push(shadowMat);
 
-    const glowMat = new THREE.MeshBasicMaterial({ map: glowMap, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
+    const glowMat = new THREE.MeshBasicMaterial({
+      map: glowMap,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
+    });
     const glowMesh = new THREE.Mesh(plane, glowMat);
     glowMesh.renderOrder = -1;
     glowMesh.position.z = -320;
@@ -481,8 +564,12 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       uClimb: { value: motes.climb },
     };
     const moteMat = new THREE.ShaderMaterial({
-      uniforms: moteUniforms, vertexShader: MOTE_VERT, fragmentShader: MOTE_FRAG,
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: moteUniforms,
+      vertexShader: MOTE_VERT,
+      fragmentShader: MOTE_FRAG,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
     });
     const moteField = new THREE.Points(moteGeo, moteMat);
     moteField.frustumCulled = false;
@@ -512,8 +599,13 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       uLife: { value: SPRAY_LIFE },
     };
     const sprayMat = new THREE.ShaderMaterial({
-      uniforms: sprayUniforms, vertexShader: SPRAY_VERT, fragmentShader: SPRAY_FRAG,
-      transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
+      uniforms: sprayUniforms,
+      vertexShader: SPRAY_VERT,
+      fragmentShader: SPRAY_FRAG,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
     });
     const sprayField = new THREE.Points(sprayGeo, sprayMat);
     sprayField.frustumCulled = false;
@@ -558,16 +650,23 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     const wingMaterial = (hind: boolean, bend: { value: number }) =>
       new THREE.ShaderMaterial({
         uniforms: {
-          uKeyDir: shared.uKeyDir, uKeyCol: shared.uKeyCol, uAmbCol: shared.uAmbCol,
-          uBend: bend, uHind: { value: hind ? 1 : 0 }, uTex: { value: wingMap },
+          uKeyDir: shared.uKeyDir,
+          uKeyCol: shared.uKeyCol,
+          uAmbCol: shared.uAmbCol,
+          uBend: bend,
+          uHind: { value: hind ? 1 : 0 },
+          uTex: { value: wingMap },
         },
-        vertexShader: WING_VERT, fragmentShader: WING_FRAG, side: THREE.DoubleSide,
+        vertexShader: WING_VERT,
+        fragmentShader: WING_FRAG,
+        side: THREE.DoubleSide,
       });
     const foreMat = wingMaterial(false, bendFore);
     const hindMat = wingMaterial(true, bendHind);
     const bodyMat = new THREE.ShaderMaterial({
       uniforms: { uKeyDir: shared.uKeyDir, uKeyCol: shared.uKeyCol, uAmbCol: shared.uAmbCol },
-      vertexShader: BODY_VERT, fragmentShader: BODY_FRAG,
+      vertexShader: BODY_VERT,
+      fragmentShader: BODY_FRAG,
     });
     const antMat = new THREE.MeshBasicMaterial({ color: 0x171208 });
     materials.push(foreMat, hindMat, bodyMat, antMat);
@@ -601,7 +700,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       const curve = new THREE.QuadraticBezierCurve3(
         new THREE.Vector3(0.01 * sx, 0.02, 0.15),
         new THREE.Vector3(0.062 * sx, 0.075, 0.3),
-        new THREE.Vector3(0.105 * sx, 0.11, 0.43)
+        new THREE.Vector3(0.105 * sx, 0.11, 0.43),
       );
       const antGeo = new THREE.TubeGeometry(curve, 12, 0.0042, 5, false);
       geometries.push(antGeo);
@@ -613,7 +712,9 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     }
     butterfly.scale.setScalar(0.205);
     butterfly.renderOrder = 5;
-    butterfly.traverse((o) => { o.frustumCulled = false; });
+    butterfly.traverse((o) => {
+      o.frustumCulled = false;
+    });
     nearBuilt.group.add(butterfly);
 
     /* ---- the flight ----
@@ -623,9 +724,12 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
        raycast, and in the units it flies in. */
     const perch = near.perch.clone();
     const BOX3 = {
-      x0: perch.x - 1.5, x1: perch.x + 2.1,
-      y0: perch.y - 0.1, y1: perch.y + 1.35,
-      z0: perch.z - 0.25, z1: perch.z + 0.95,
+      x0: perch.x - 1.5,
+      x1: perch.x + 2.1,
+      y0: perch.y - 0.1,
+      y1: perch.y + 1.35,
+      z0: perch.z - 0.25,
+      z1: perch.z + 0.95,
     };
     const rand = (lo: number, hi: number) => lo + (hi - lo) * Math.random();
     const st = {
@@ -643,7 +747,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       st.tgt.set(
         rand(BOX3.x0 + 0.3, BOX3.x1 - 0.3),
         rand(perch.y + 0.35, BOX3.y1 - 0.2),
-        rand(BOX3.z0 + 0.2, BOX3.z1 - 0.15)
+        rand(BOX3.z0 + 0.2, BOX3.z1 - 0.15),
       );
     };
     pickTarget();
@@ -706,9 +810,15 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
 
       st.timer -= dt;
       if (st.mode === "cruise") {
-        if (st.timer <= 0) { st.mode = "approach"; st.timer = 14; }
+        if (st.timer <= 0) {
+          st.mode = "approach";
+          st.timer = 14;
+        }
       } else if (st.mode === "approach") {
-        if (st.pos.distanceTo(perch) < 0.12 || st.timer <= 0) { st.mode = "landed"; st.timer = rand(7, 10); }
+        if (st.pos.distanceTo(perch) < 0.12 || st.timer <= 0) {
+          st.mode = "landed";
+          st.timer = rand(7, 10);
+        }
       } else if (st.mode === "landed") {
         // the whole point of a perched insect is that it will not stay put
         if (st.timer <= 0 || spook > 0.3) {
@@ -720,7 +830,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
             st.tgt.set(
               Math.min(BOX3.x1 - 0.3, Math.max(BOX3.x0 + 0.3, st.pos.x + away.x * 1.5)),
               Math.min(BOX3.y1 - 0.2, perch.y + 0.9),
-              Math.min(BOX3.z1 - 0.15, Math.max(BOX3.z0 + 0.2, st.pos.z + 0.4))
+              Math.min(BOX3.z1 - 0.15, Math.max(BOX3.z0 + 0.2, st.pos.z + 0.4)),
             );
           }
         }
@@ -767,7 +877,10 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       desired.x += (Math.sin(t * 3.1) + 0.6 * Math.sin(t * 7.7 + 1.1)) * 0.2 * wander;
       desired.y += (Math.sin(t * 1.9 + 1.7) + 0.55 * Math.sin(t * 4.6)) * 0.4 * wander;
       desired.z += Math.sin(t * 2.7 + 3.4) * 0.24 * wander;
-      if (st.mode === "takeoff") { desired.y += 0.7; desired.z += 0.35; }
+      if (st.mode === "takeoff") {
+        desired.y += 0.7;
+        desired.z += 0.35;
+      }
       if (spook > 0.002) {
         away.copy(st.pos).sub(m);
         away.z *= 0.3;
@@ -797,7 +910,13 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
 
       basis.makeBasis(vRight, vUp, vFwd);
       flightQ.setFromRotationMatrix(basis);
-      qTmp.setFromAxisAngle(AX_Z, st.bank + Math.sin(t * 0.83) * 0.3 + Math.sin(st.flap) * 0.05 + Math.sin(t * 21) * spook * 0.16);
+      qTmp.setFromAxisAngle(
+        AX_Z,
+        st.bank +
+          Math.sin(t * 0.83) * 0.3 +
+          Math.sin(st.flap) * 0.05 +
+          Math.sin(t * 21) * spook * 0.16,
+      );
       flightQ.multiply(qTmp);
       qTmp.setFromAxisAngle(AX_X, Math.sin(st.flap) * 0.1 - 0.06);
       flightQ.multiply(qTmp);
@@ -812,7 +931,17 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     let H = 1;
     let scanMax = 1;
 
-    const place = (group: THREE.Group, box: Box, pinFx: number, pinFy: number, z: number, u: number, ox: number, oy: number, cover: number) => {
+    const place = (
+      group: THREE.Group,
+      box: Box,
+      pinFx: number,
+      pinFy: number,
+      z: number,
+      u: number,
+      ox: number,
+      oy: number,
+      cover: number,
+    ) => {
       const boxH = box.w / box.aspect;
       const scale = (box.w * u * cover) / BOX_W;
       const k = (DIST - z) / DIST; // undo the perspective shrink
@@ -837,7 +966,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       const dpr = Math.min(
         window.devicePixelRatio || 1,
         small ? 1.6 : 2,
-        Math.sqrt(PIXEL_BUDGET / (W * H))
+        Math.sqrt(PIXEL_BUDGET / (W * H)),
       );
       renderer.setPixelRatio(dpr);
       renderer.setSize(W, H, false);
@@ -890,7 +1019,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       scanMax = Math.hypot(W, H) * 1.3 + 900;
 
       const buf = renderer.getDrawingBufferSize(new THREE.Vector2());
-      moteUniforms.uScale.value = (buf.y * 0.5) / Math.tan(((camera.fov * Math.PI) / 180) / 2);
+      moteUniforms.uScale.value = (buf.y * 0.5) / Math.tan((camera.fov * Math.PI) / 180 / 2);
       moteUniforms.uSize.value = Math.max(1.8, 3 * u * cover);
       sprayUniforms.uSize.value = Math.max(2.6, 4.4 * u * cover);
 
@@ -918,7 +1047,10 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       }
       for (const built of [nearBuilt, farBuilt]) {
         const u = built.uniforms.uMouse.value;
-        if (!mouseLive) { u.copy(AWAY); continue; }
+        if (!mouseLive) {
+          u.copy(AWAY);
+          continue;
+        }
         tmpLocal.copy(hitWorld);
         built.group.worldToLocal(tmpLocal);
         if (u.x > 999) u.copy(tmpLocal);
@@ -934,19 +1066,30 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     const sprayAt = new THREE.Vector3();
     let sprayIdle = 0;
     const emitSpray = (dt: number) => {
-      if (!mouseLive) { sprayLast.x = 9999; return; }
+      if (!mouseLive) {
+        sprayLast.x = 9999;
+        return;
+      }
       sprayAt.copy(hitWorld);
       nearBuilt.group.worldToLocal(sprayAt);
-      if (sprayLast.x > 9000) { sprayLast.copy(sprayAt); return; }
+      if (sprayLast.x > 9000) {
+        sprayLast.copy(sprayAt);
+        return;
+      }
       const n = Math.min(14, Math.floor(sprayAt.distanceTo(sprayLast) / 0.037));
       for (let k = 1; k <= n; k++) {
         sprayStep.lerpVectors(sprayLast, sprayAt, k / n);
         spawnGrain(sprayStep);
       }
-      if (n > 0) { sprayLast.copy(sprayAt); sprayIdle = 0; }
-      else {
+      if (n > 0) {
+        sprayLast.copy(sprayAt);
+        sprayIdle = 0;
+      } else {
         sprayIdle += dt;
-        if (sprayIdle > 0.055) { spawnGrain(sprayAt); sprayIdle = 0; }
+        if (sprayIdle > 0.055) {
+          spawnGrain(sprayAt);
+          sprayIdle = 0;
+        }
       }
       flushGrains();
     };
@@ -975,8 +1118,17 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
 
     /* The last time the reader did anything — see FPS_IDLE. */
     let lastInput = performance.now();
-    const markInput = () => { lastInput = performance.now(); };
-    for (const type of ["wheel", "scroll", "keydown", "touchstart", "touchmove", "pointerdown"] as const) {
+    const markInput = () => {
+      lastInput = performance.now();
+    };
+    for (const type of [
+      "wheel",
+      "scroll",
+      "keydown",
+      "touchstart",
+      "touchmove",
+      "pointerdown",
+    ] as const) {
       window.addEventListener(type, markInput, { passive: true });
     }
 
@@ -1013,15 +1165,28 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     let visible = !document.hidden;
     // Coming back from a hidden tab or from off screen: the canvas has kept
     // its last frame, but be safe and draw once rather than trust it.
-    const onVisibility = () => { visible = !document.hidden; needsRender = true; };
+    const onVisibility = () => {
+      visible = !document.hidden;
+      needsRender = true;
+    };
     document.addEventListener("visibilitychange", onVisibility);
     // Focus only picks the frame rate; it never stops the loop.
     let focused = document.hasFocus();
-    const onFocus = () => { focused = true; };
-    const onBlur = () => { focused = false; };
+    const onFocus = () => {
+      focused = true;
+    };
+    const onBlur = () => {
+      focused = false;
+    };
     window.addEventListener("focus", onFocus);
     window.addEventListener("blur", onBlur);
-    const io = new IntersectionObserver((entries) => { onScreen = entries.some((en) => en.isIntersecting); needsRender = true; }, { rootMargin: "10% 0px" });
+    const io = new IntersectionObserver(
+      (entries) => {
+        onScreen = entries.some((en) => en.isIntersecting);
+        needsRender = true;
+      },
+      { rootMargin: "10% 0px" },
+    );
     io.observe(hero);
 
     /* While the canvas is being drawn, the page says so. The site's ambient
@@ -1112,9 +1277,11 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       setLive(active && !calm.matches);
       if (!active) return;
       pending += deltaMs;
-      const fps = !focused ? FPS_BLURRED
-        : scanning || performance.now() - lastInput < IDLE_AFTER_MS ? FPS_FOCUSED
-        : FPS_IDLE;
+      const fps = !focused
+        ? FPS_BLURRED
+        : scanning || performance.now() - lastInput < IDLE_AFTER_MS
+          ? FPS_FOCUSED
+          : FPS_IDLE;
       if (pending < 1000 / fps - 1) return;
       const dt = Math.min(pending / 1000, 0.05);
       pending = 0;
@@ -1168,8 +1335,10 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
     // Hold the pulse for a page nobody is looking at: a background tab gets no
     // frames, so the scan would never advance and the hero would still be
     // empty when it was finally opened.
-    if (!calm.matches && !document.hidden) { scanning = true; shared.uScanR.value = 0; }
-    else settle();
+    if (!calm.matches && !document.hidden) {
+      scanning = true;
+      shared.uScanR.value = 0;
+    } else settle();
 
     renderer.render(scene, camera);
     precompileSettled();
@@ -1183,7 +1352,14 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       setLive(false);
       io.disconnect();
       hero.removeEventListener("grove:burst", onBurst as EventListener);
-      for (const type of ["wheel", "scroll", "keydown", "touchstart", "touchmove", "pointerdown"] as const) {
+      for (const type of [
+        "wheel",
+        "scroll",
+        "keydown",
+        "touchstart",
+        "touchmove",
+        "pointerdown",
+      ] as const) {
         window.removeEventListener(type, markInput);
       }
       window.removeEventListener("pointermove", onPointerMove);

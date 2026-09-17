@@ -58,5 +58,4 @@ export const dangerButtonClass =
 export const cardClass = "rounded-card border border-line bg-surface-raised";
 
 /** The mono kicker used for group names, counts and timestamps. */
-export const metaClass =
-  "font-mono text-meta uppercase tracking-meta text-fg-tertiary";
+export const metaClass = "font-mono text-meta uppercase tracking-meta text-fg-tertiary";

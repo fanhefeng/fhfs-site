@@ -11,14 +11,9 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ locale: string }> }
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const l: Locale = hasLocale(routing.locales, locale)
-    ? locale
-    : routing.defaultLocale;
+  const l: Locale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
 
   const self = `${site.url}/${l}/rss.xml`;
   const feed = new Feed({
@@ -51,9 +46,7 @@ export async function GET(
   for (const post of await getPosts(l)) {
     const url = `${site.url}/${post.locale}/blog/${post.slug}`;
     feed.addItem({
-      title: post.isFallback
-        ? `${post.title} ${t("feedFallbackTag")}`
-        : post.title,
+      title: post.isFallback ? `${post.title} ${t("feedFallbackTag")}` : post.title,
       id: url,
       link: url,
       description: post.summary,

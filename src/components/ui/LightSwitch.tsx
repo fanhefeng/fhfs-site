@@ -86,10 +86,7 @@ export function LightSwitch({ className }: { className?: string }) {
       className={`inline-flex h-11 min-w-11 cursor-pointer items-center justify-center ${className ?? ""}`}
     >
       {/* Track — glass capsule; the knob is the lamp. */}
-      <span
-        aria-hidden
-        className="liquid-chip relative block h-6 w-11 rounded-full"
-      >
+      <span aria-hidden className="liquid-chip relative block h-6 w-11 rounded-full">
         <span
           className={`absolute left-0.5 top-0.5 flex size-5 items-center justify-center rounded-full bg-surface-raised shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-[translate] duration-200 ease-out ${
             on ? "translate-x-5" : "translate-x-0"
@@ -98,9 +95,7 @@ export function LightSwitch({ className }: { className?: string }) {
           {/* Filament dot: amber and haloed when the lights are on. */}
           <span
             className={`block size-1.5 rounded-full transition-colors duration-200 ${
-              on
-                ? "bg-accent shadow-[0_0_8px_2px_rgba(255,184,107,0.75)]"
-                : "bg-fg-tertiary"
+              on ? "bg-accent shadow-[0_0_8px_2px_rgba(255,184,107,0.75)]" : "bg-fg-tertiary"
             }`}
           />
         </span>

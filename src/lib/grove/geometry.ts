@@ -259,10 +259,7 @@ function table(values: number[]): (t: number) => number {
  */
 function knot(t: number, a: number, b: number): number {
   return (
-    1 +
-    a * Math.sin(t * 23 + 1.3) +
-    b * Math.sin(t * 57 + 0.4) +
-    b * 0.5 * Math.sin(t * 103 + 2.2)
+    1 + a * Math.sin(t * 23 + 1.3) + b * Math.sin(t * 57 + 0.4) + b * 0.5 * Math.sin(t * 103 + 2.2)
   );
 }
 
@@ -282,7 +279,7 @@ type LimbOptions = {
 /** Assemble a limb around an already-solved centreline. */
 function rawLimb(
   curve: THREE.CatmullRomCurve3,
-  opt: LimbOptions & { radius: (t: number) => number; moss: (t: number) => number }
+  opt: LimbOptions & { radius: (t: number) => number; moss: (t: number) => number },
 ): Limb {
   return {
     curve,
@@ -304,13 +301,13 @@ function rawLimb(
 function makeLimb(
   place: (fx: number, fy: number, z?: number) => THREE.Vector3,
   pts: [number, number, number][],
-  opt: LimbOptions
+  opt: LimbOptions,
 ): Limb {
   const curve = new THREE.CatmullRomCurve3(
     pts.map((q) => place(q[0], q[1], q[2])),
     false,
     "centripetal",
-    0.5
+    0.5,
   );
 
   let radius = opt.radius;
@@ -345,7 +342,9 @@ function limbFrame(limb: Limb, t: number): void {
   // silhouette is asymmetric — bare wood below, wood plus cushion above. The
   // tube's own axis therefore sits half a cushion lower than the trace.
   if (limb.sink) _p.y -= limb.moss(t) * limb.sink;
-  _t.copy(fr.tangents[i]!).lerp(fr.tangents[i + 1]!, a).normalize();
+  _t.copy(fr.tangents[i]!)
+    .lerp(fr.tangents[i + 1]!, a)
+    .normalize();
   _n.copy(fr.normals[i]!).lerp(fr.normals[i + 1]!, a);
   // Re-orthogonalise: lerping two unit normals gives a vector that is neither
   // unit nor perpendicular to the lerped tangent.
@@ -363,7 +362,7 @@ function limbSurface(
   t: number,
   theta: number,
   outP: THREE.Vector3,
-  outN: THREE.Vector3
+  outN: THREE.Vector3,
 ): number {
   limbFrame(limb, t);
   const steep = Math.min(1, Math.abs(_t.y) * 1.15);
@@ -499,11 +498,7 @@ function tessellate(limb: Limb, bag: Bag): void {
       bag.nor.push(n.x, n.y, n.z);
       // u is a triangle wave so the bark grain mirrors at the seam instead of
       // showing a hard join where the texture coordinate wraps.
-      bag.inf.push(
-        1 - Math.abs(2 * (j / R) - 1),
-        (i / S) * limb.vScale,
-        caps[i * (R + 1) + j]!
-      );
+      bag.inf.push(1 - Math.abs(2 * (j / R) - 1), (i / S) * limb.vScale, caps[i * (R + 1) + j]!);
       gnrm[k] = n.x;
       gnrm[k + 1] = n.y;
       gnrm[k + 2] = n.z;
@@ -544,12 +539,7 @@ type FurBag = {
  * cushion instead of the tube's parameterisation (where a fine-segmented
  * stretch would otherwise collect a stripe of extra fur).
  */
-function plantBlades(
-  limb: Limb,
-  count: number,
-  bag: FurBag,
-  rng: () => number
-): number {
+function plantBlades(limb: Limb, count: number, bag: FurBag, rng: () => number): number {
   const grid = limb.grid;
   const gn = limb.gridNormal;
   const caps = limb.gridCap;
@@ -639,12 +629,12 @@ function plantBlades(
       rng() * TAU,
       limb.blade((i + v) / S) * (0.45 + 0.6 * cap) * (0.58 + 0.5 * rng()) * stray,
       (rng() - 0.5) * 1.15,
-      rng()
+      rng(),
     );
     // Two scales of clumping: broad cushions, and the tufts inside them.
     bag.aux.push(
       fbm2(px * 0.85 + 17, pz * 0.85 - py * 0.7) * 0.62 +
-        fbm2(px * 5.6 - 3.3, pz * 5.6 + py * 2.1) * 0.38
+        fbm2(px * 5.6 - 3.3, pz * 5.6 + py * 2.1) * 0.38,
     );
     planted++;
   }
@@ -724,7 +714,8 @@ function fernGeometry(): {
       for (let k = 0; k <= SEG; k++) {
         const f = k / SEG;
         // pinnae sweep forward and droop as they run out
-        const w = 0.088 * pl * Math.pow(Math.sin(Math.PI * Math.min(f * 1.25, 1)), 0.7) * (1 - 0.35 * f);
+        const w =
+          0.088 * pl * Math.pow(Math.sin(Math.PI * Math.min(f * 1.25, 1)), 0.7) * (1 - 0.35 * f);
         rachis(s + f * pl * 0.34, b);
         const x = side * f * pl;
         const y = b.y - 0.22 * pl * f * f;
@@ -791,7 +782,7 @@ function growOffshoot(
   len: number,
   r0: number,
   gen: number,
-  rng: () => number
+  rng: () => number,
 ): void {
   const rand = (lo: number, hi: number) => lo + (hi - lo) * rng();
 
@@ -818,7 +809,7 @@ function growOffshoot(
     ],
     false,
     "centripetal",
-    0.5
+    0.5,
   );
 
   const r1 = r0 * 0.52;
@@ -832,7 +823,7 @@ function growOffshoot(
       radius: (t) => (r0 + (r1 - r0) * t) * (1 - 0.86 * smoothstep(0.9, 1, t)),
       moss: (t) => (r0 + (r1 - r0) * t) * 0.95 * (1 - 0.55 * t),
       blade: (t) => (r0 + (r1 - r0) * t) * 0.3 * (1 - 0.55 * t) + 0.035,
-    })
+    }),
   );
 
   if (gen >= 1) return;
@@ -849,7 +840,15 @@ function growOffshoot(
       .applyAxisAngle(ax, rand(0.45, 1.05))
       .addScaledVector(UP, 0.16)
       .normalize();
-    growOffshoot(list, pt, kdir, len * rand(0.5, 0.74), (r0 + (r1 - r0) * tt) * rand(0.58, 0.78), gen + 1, rng);
+    growOffshoot(
+      list,
+      pt,
+      kdir,
+      len * rand(0.5, 0.74),
+      (r0 + (r1 - r0) * tt) * rand(0.58, 0.78),
+      gen + 1,
+      rng,
+    );
   }
 }
 
@@ -894,8 +893,8 @@ function buildNearLimbs(): Limb[] {
         vScale: BARK_V_MAX,
         band: [0.575, 0.59, 0.63, 0.68, 0.695, 0.615, 0.58, 0.48, 0.55, 0.55, 0.52],
         sink: 0.5,
-      }
-    )
+      },
+    ),
   );
 
   const legRadius = table([0.3, 0.28, 0.26, 0.25, 0.24, 0.23, 0.22]);
@@ -918,8 +917,8 @@ function buildNearLimbs(): Limb[] {
         vScale: 22,
         radius: (t) => legRadius(t) * knot(t, 0.05, 0.022),
         moss: legMoss,
-      }
-    )
+      },
+    ),
   );
 
   const farRadius = table([0.23, 0.25, 0.27, 0.3, 0.33, 0.36, 0.4]);
@@ -943,8 +942,8 @@ function buildNearLimbs(): Limb[] {
         vScale: 22,
         radius: (t) => farRadius(t) * knot(t, 0.05, 0.022),
         moss: farMoss,
-      }
-    )
+      },
+    ),
   );
 
   return limbs;
@@ -975,7 +974,7 @@ function buildFarLimbs(): Limb[] {
         vScale: 26,
         band: [0.76, 0.9, 0.9, 0.96, 0.925, 0.95, 1.02, 1.02, 0.99, 1.1, 1.3],
         sink: 0.5,
-      }
+      },
     ),
   ];
 }
@@ -1085,7 +1084,15 @@ export function buildGrove(opt: GroveOptions): Grove {
         .addScaledVector(UP, rand(-0.5, 0.55))
         .normalize();
       hp.addScaledVector(hn, -src.radius(t) * 0.55);
-      growOffshoot(extra, hp.clone(), dir, rand(0.28, 0.72), src.radius(t) * rand(0.22, 0.4), 0, rng);
+      growOffshoot(
+        extra,
+        hp.clone(),
+        dir,
+        rand(0.28, 0.72),
+        src.radius(t) * rand(0.22, 0.4),
+        0,
+        rng,
+      );
     }
     limbs.push(...extra);
   }

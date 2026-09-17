@@ -55,8 +55,7 @@ export async function AdminChrome({
   // the first would have cost an index page its count the day one wanted to
   // override that link.
   const count = section && !sub ? counts[section] : undefined;
-  const viewHref =
-    view !== undefined ? view : meta?.view ? `/zh${meta.view}` : null;
+  const viewHref = view !== undefined ? view : meta?.view ? `/zh${meta.view}` : null;
 
   return (
     <div className="lg:flex">
@@ -82,10 +81,7 @@ export async function AdminChrome({
               {sub && meta && (
                 <>
                   <span className="mx-1.5 opacity-50">›</span>
-                  <Link
-                    href={meta.href}
-                    className="transition-colors hover:text-accent"
-                  >
+                  <Link href={meta.href} className="transition-colors hover:text-accent">
                     {meta.label}
                   </Link>
                 </>
@@ -104,12 +100,7 @@ export async function AdminChrome({
 
               <div className="flex flex-wrap items-center gap-3">
                 {viewHref && (
-                  <a
-                    href={viewHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={ghostButtonClass}
-                  >
+                  <a href={viewHref} target="_blank" rel="noreferrer" className={ghostButtonClass}>
                     看前台
                     <svg viewBox="0 0 12 12" aria-hidden className="size-3">
                       <path

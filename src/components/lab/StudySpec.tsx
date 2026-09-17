@@ -22,9 +22,7 @@ export type SpecRow = {
 export function StudySpec({ title, rows }: { title: string; rows: SpecRow[] }) {
   return (
     <section className="mt-12">
-      <h2 className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-        {title}
-      </h2>
+      <h2 className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{title}</h2>
       {/* A definition list rather than a table: these are pairs, not a grid —
           nothing lines up across rows and there is no column to compare down.
           The rule between them does the work a table's borders would. */}

@@ -29,21 +29,27 @@ describe("the folder lists", () => {
 
   it("name only folders that exist", () => {
     const missing = [...IMMUTABLE_DIRS, ...MUTABLE_DIRS, ...ASSET_SETS].filter(
-      (dir) => !statSync(path.join(root, "public", dir), { throwIfNoEntry: false })?.isDirectory()
+      (dir) => !statSync(path.join(root, "public", dir), { throwIfNoEntry: false })?.isDirectory(),
     );
     expect(missing).toEqual([]);
   });
 
   it("put no folder in two lists, nor one inside another", () => {
     const dirs = [...IMMUTABLE_DIRS, ...MUTABLE_DIRS];
-    expect(dirs.filter((a, i) => dirs.some((b, j) => i !== j && `${a}/`.startsWith(`${b}/`)))).toEqual([]);
-    expect(ASSET_SETS.filter((a, i) => ASSET_SETS.some((b, j) => i !== j && `${a}/`.startsWith(`${b}/`)))).toEqual(
-      []
-    );
+    expect(
+      dirs.filter((a, i) => dirs.some((b, j) => i !== j && `${a}/`.startsWith(`${b}/`))),
+    ).toEqual([]);
+    expect(
+      ASSET_SETS.filter((a, i) =>
+        ASSET_SETS.some((b, j) => i !== j && `${a}/`.startsWith(`${b}/`)),
+      ),
+    ).toEqual([]);
   });
 
   it("keep every set inside an immutable folder", () => {
-    expect(ASSET_SETS.filter((set) => !IMMUTABLE_DIRS.some((dir) => `${set}/`.startsWith(`${dir}/`)))).toEqual([]);
+    expect(
+      ASSET_SETS.filter((set) => !IMMUTABLE_DIRS.some((dir) => `${set}/`.startsWith(`${dir}/`))),
+    ).toEqual([]);
   });
 });
 
@@ -73,7 +79,7 @@ describe("hashed addresses", () => {
 
   it("put a set's hash right under the set's folder", () => {
     expect(withSetHash("/fonts/yozai/400/yz-87.woff2", "/fonts/yozai", "3fa9c1d2")).toBe(
-      "/fonts/yozai/_3fa9c1d2/400/yz-87.woff2"
+      "/fonts/yozai/_3fa9c1d2/400/yz-87.woff2",
     );
     expect(withSetHash("/draco/", "/draco", "3fa9c1d2")).toBe("/draco/_3fa9c1d2/");
   });
@@ -90,26 +96,35 @@ describe("hashed addresses", () => {
       source: "/lab/lens/:path*.:hash([0-9a-f]{8}).:ext(\\w+)",
       destination: "/lab/lens/:path*.:ext",
     });
-    expect(HASHED_ROUTES).toContainEqual({ source: "/draco/_:hash([0-9a-f]{8})/:path*", destination: "/draco/:path*" });
+    expect(HASHED_ROUTES).toContainEqual({
+      source: "/draco/_:hash([0-9a-f]{8})/:path*",
+      destination: "/draco/:path*",
+    });
   });
 });
 
 describe("resolveAsset", () => {
   const manifest: AssetManifest = {
     files: { "/lab/lens/sea.jpg": "11111111" },
-    sets: { "/draco": "22222222", "/fonts/yozai": "33333333", "/lab/scroll-video/frames": "44444444" },
+    sets: {
+      "/draco": "22222222",
+      "/fonts/yozai": "33333333",
+      "/lab/scroll-video/frames": "44444444",
+    },
   };
 
   it("hashes a file by its own hash and a set member by the set's", () => {
     expect(resolveAsset(manifest, "/lab/lens/sea.jpg")).toBe("/lab/lens/sea.11111111.jpg");
     expect(resolveAsset(manifest, "/draco/")).toBe("/draco/_22222222/");
     expect(resolveAsset(manifest, "/lab/scroll-video/frames/0001.webp")).toBe(
-      "/lab/scroll-video/frames/_44444444/0001.webp"
+      "/lab/scroll-video/frames/_44444444/0001.webp",
     );
   });
 
   it("hands back what is not ours to hash", () => {
-    expect(resolveAsset(manifest, "https://example.com/films/a.jpg")).toBe("https://example.com/films/a.jpg");
+    expect(resolveAsset(manifest, "https://example.com/films/a.jpg")).toBe(
+      "https://example.com/films/a.jpg",
+    );
     expect(resolveAsset(manifest, "/covers/a.jpg")).toBe("/covers/a.jpg");
   });
 

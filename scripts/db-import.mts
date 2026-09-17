@@ -32,9 +32,10 @@ import { connect } from "./connect.mjs";
 const db = connect();
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const data = JSON.parse(
-  await readFile(path.join(ROOT, "backup", "db.json"), "utf8")
-) as Record<string, any[]>;
+const data = JSON.parse(await readFile(path.join(ROOT, "backup", "db.json"), "utf8")) as Record<
+  string,
+  any[]
+>;
 
 /** One request for the whole table; an empty table sends nothing. */
 async function batch(label: string, statements: BatchItem<"pg">[]) {
@@ -53,7 +54,7 @@ const posts = await Promise.all(
     ...row,
     bodyHtml: await renderMarkdown(row.bodyMd),
     readingMinutes: readingMinutes(row.bodyMd),
-  }))
+  })),
 );
 await batch(
   "posts",
@@ -64,15 +65,15 @@ await batch(
       .onConflictDoUpdate({
         target: [schema.posts.slug, schema.posts.locale],
         set: { ...value, updatedAt: new Date() },
-      })
-  )
+      }),
+  ),
 );
 
 const abouts = await Promise.all(
   (data.abouts ?? []).map(async (row) => ({
     ...row,
     bodyHtml: await renderMarkdown(row.bodyMd),
-  }))
+  })),
 );
 await batch(
   "abouts",
@@ -83,8 +84,8 @@ await batch(
       .onConflictDoUpdate({
         target: schema.abouts.locale,
         set: { ...value, updatedAt: new Date() },
-      })
-  )
+      }),
+  ),
 );
 
 // The secrets are posts in all but name: same derived columns, same key.
@@ -93,7 +94,7 @@ const secrets = await Promise.all(
     ...row,
     bodyHtml: await renderMarkdown(row.bodyMd),
     readingMinutes: readingMinutes(row.bodyMd),
-  }))
+  })),
 );
 await batch(
   "secrets",
@@ -104,8 +105,8 @@ await batch(
       .onConflictDoUpdate({
         target: [schema.secrets.slug, schema.secrets.locale],
         set: { ...value, updatedAt: new Date() },
-      })
-  )
+      }),
+  ),
 );
 
 // The board travels with its instants as ISO strings; the column wants Dates.
@@ -122,8 +123,8 @@ await batch(
       .onConflictDoUpdate({
         target: schema.moments.key,
         set: { ...value, updatedAt: new Date() },
-      })
-  )
+      }),
+  ),
 );
 
 // Every table with a natural key that /admin can also delete from.
@@ -147,7 +148,7 @@ for (const [table, rows] of keyed) {
         .insert(table as any)
         .values(row)
         .onConflictDoUpdate({ target: (table as any).key, set });
-    })
+    }),
   );
 }
 

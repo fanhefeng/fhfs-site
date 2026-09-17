@@ -96,8 +96,12 @@ function paintWall(canvas: HTMLCanvasElement, w: number, h: number) {
   // down the wall it simply stays dim.
   const first = Math.min(h, window.innerHeight || h);
   const vignette = ctx.createRadialGradient(
-    w / 2, first * 0.42, Math.min(w, first) * 0.12,
-    w / 2, first * 0.42, Math.max(w, first) * 0.72
+    w / 2,
+    first * 0.42,
+    Math.min(w, first) * 0.12,
+    w / 2,
+    first * 0.42,
+    Math.max(w, first) * 0.72,
   );
   vignette.addColorStop(0, "rgba(0,0,0,0)");
   vignette.addColorStop(0.5, "rgba(0,0,0,0.42)");
@@ -116,7 +120,11 @@ function paintWall(canvas: HTMLCanvasElement, w: number, h: number) {
  * variables), and the wall is painted at the stage's size. Returns false when
  * the stage has no size yet.
  */
-export function layoutWall(stage: HTMLElement, wall: HTMLCanvasElement, sign: HTMLElement): boolean {
+export function layoutWall(
+  stage: HTMLElement,
+  wall: HTMLCanvasElement,
+  sign: HTMLElement,
+): boolean {
   const r = stage.getBoundingClientRect();
   if (r.width === 0 || r.height === 0) return false;
   const s = sign.getBoundingClientRect();

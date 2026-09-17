@@ -17,10 +17,7 @@
  * or a keyed delete — repeating one changes nothing (see src/db/index.ts).
  */
 
-export type FetchLike = (
-  input: RequestInfo | URL,
-  init?: RequestInit
-) => Promise<Response>;
+export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 /** The pause before each retry, in ms: two retries, the second patient. */
 const RETRY_DELAYS: readonly number[] = [300, 1200];
@@ -34,8 +31,7 @@ const RETRY_DELAYS: readonly number[] = [300, 1200];
 export const isConnectionFailure = (error: unknown): boolean =>
   error instanceof TypeError && "cause" in error;
 
-const wait = (ms: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
  * Wraps `fetchImpl` so a connection failure is retried after each delay in
@@ -45,7 +41,7 @@ const wait = (ms: number) =>
 export function withConnectionRetry(
   fetchImpl: FetchLike,
   delays: readonly number[] = RETRY_DELAYS,
-  sleep: (ms: number) => Promise<void> = wait
+  sleep: (ms: number) => Promise<void> = wait,
 ): FetchLike {
   return async (input, init) => {
     for (let attempt = 0; ; attempt++) {

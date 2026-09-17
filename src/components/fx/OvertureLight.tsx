@@ -5,11 +5,7 @@ import { useTranslations } from "next-intl";
 import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { splashDue } from "@/lib/splash";
-import {
-  announceOvertureDone,
-  markOvertureSeen,
-  overtureSeen,
-} from "@/lib/overture";
+import { announceOvertureDone, markOvertureSeen, overtureSeen } from "@/lib/overture";
 
 /** Where the lamp hangs — cord length, glow flood and circle reveal all
  * share this origin so the light reads as one source. */
@@ -175,7 +171,7 @@ export function OvertureLight() {
             duration: 0.5,
             ease: "power2.out",
           },
-          FLOOD_AT
+          FLOOD_AT,
         )
         .to(scrim, { opacity: 0, duration: 0.44, ease: "power2.inOut" }, 0.42)
         // 4. Relay: hand over before the last of the warm tint melts, so
@@ -183,11 +179,7 @@ export function OvertureLight() {
         .add(() => {
           announceOvertureDone();
         }, DONE_AT)
-        .to(
-          overlay,
-          { autoAlpha: 0, duration: END_AT - 0.62, ease: "power1.inOut" },
-          0.62
-        )
+        .to(overlay, { autoAlpha: 0, duration: END_AT - 0.62, ease: "power1.inOut" }, 0.62)
         .add(() => {
           unlock();
           window.removeEventListener("keydown", onKeyDown);
@@ -211,10 +203,13 @@ export function OvertureLight() {
       // while scrubbing under ?overture, where sitting mid-play is the point.
       const failsafe = debug
         ? undefined
-        : window.setTimeout(() => {
-            const active = tlRef.current;
-            if (active && active.progress() < 1) active.progress(1);
-          }, (END_AT + 3) * 1000);
+        : window.setTimeout(
+            () => {
+              const active = tlRef.current;
+              if (active && active.progress() < 1) active.progress(1);
+            },
+            (END_AT + 3) * 1000,
+          );
 
       // The scrubber, loaded on demand so it never reaches a production
       // bundle. `alive` guards the import landing after an unmount.
@@ -243,7 +238,7 @@ export function OvertureLight() {
         if (shown && !debug) markOvertureSeen();
       };
     },
-    { scope: container }
+    { scope: container },
   );
 
   // Fast-forward smoothly instead of jump-cutting — the light still spreads,
@@ -280,11 +275,7 @@ export function OvertureLight() {
         }`}
       >
         {/* Blackout scrim — the gallery before opening, same in both themes. */}
-        <div
-          ref={scrimRef}
-          className="absolute inset-0"
-          style={{ background: "#0e0e11" }}
-        />
+        <div ref={scrimRef} className="absolute inset-0" style={{ background: "#0e0e11" }} />
         {/* Warm light flood, unveiled by a growing clip-path circle.
             Hardcoded rgba of --glow-warm (#FFB86B) — gradients cannot take
             the token with alpha steps. */}

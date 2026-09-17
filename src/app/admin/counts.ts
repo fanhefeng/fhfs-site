@@ -44,10 +44,10 @@ export type { SectionCounts };
 export const sectionCounts = cache(async (): Promise<SectionCounts> => {
   const columns = SECTIONS.map(
     (section) =>
-      sql`(select count(*)::int from ${TABLES[section.href]}) as ${sql.identifier(section.href)}`
+      sql`(select count(*)::int from ${TABLES[section.href]}) as ${sql.identifier(section.href)}`,
   );
   const result = await db.execute<Record<string, number>>(
-    sql`select ${sql.join(columns, sql`, `)}`
+    sql`select ${sql.join(columns, sql`, `)}`,
   );
   const row = result.rows[0] ?? {};
 

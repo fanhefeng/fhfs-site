@@ -3,11 +3,7 @@ import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
 import { sectionMetadata } from "@/lib/seo";
 import { getIntroNodes } from "@/lib/content";
-import {
-  INTRO_STICKERS,
-  type IntroCopy,
-  type IntroLink,
-} from "@/lib/intro/stickers";
+import { INTRO_STICKERS, type IntroCopy, type IntroLink } from "@/lib/intro/stickers";
 import { IntroStage } from "@/components/intro/IntroStage";
 
 export const generateMetadata = sectionMetadata("intro", "/intro");
@@ -21,9 +17,7 @@ export const generateMetadata = sectionMetadata("intro", "/intro");
  * locale change; the geometry it pairs them with lives in
  * `lib/intro/stickers.ts`.
  */
-export default async function IntroPage({
-  params,
-}: PageProps<"/[locale]/intro">) {
+export default async function IntroPage({ params }: PageProps<"/[locale]/intro">) {
   const locale = await pageLocale(params);
 
   const t = await getTranslations("intro");

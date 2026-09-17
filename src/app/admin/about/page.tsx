@@ -15,8 +15,7 @@ export default async function AboutPage() {
   return (
     <AdminChrome title="关于页" section="/admin/about">
       <Note>
-        上面的标题字段目前页面并不显示——页面用的是「站点文案」里的{" "}
-        <code>about.title</code>。
+        上面的标题字段目前页面并不显示——页面用的是「站点文案」里的 <code>about.title</code>。
       </Note>
       <div className="space-y-6">
         {/* Both locales render whether or not a row exists yet — saveAbout is
@@ -25,9 +24,7 @@ export default async function AboutPage() {
           <section key={locale} className={`${cardClass} p-5 sm:p-6`}>
             <h2 className={metaClass}>{locale === "zh" ? "zh · 中文" : "en · English"}</h2>
             <div className="mt-4">
-              <AboutForm
-                about={byLocale.get(locale) ?? { locale, title: "", bodyMd: "" }}
-              />
+              <AboutForm about={byLocale.get(locale) ?? { locale, title: "", bodyMd: "" }} />
             </div>
           </section>
         ))}

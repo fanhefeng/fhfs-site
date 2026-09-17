@@ -39,13 +39,7 @@ export function ResumeSection({
  * in the margin so the text keeps one left edge. Lines carry inline
  * emphasis (see Rich).
  */
-export function Bullets({
-  items,
-  className = "",
-}: {
-  items: string[];
-  className?: string;
-}) {
+export function Bullets({ items, className = "" }: { items: string[]; className?: string }) {
   if (items.length === 0) return null;
   return (
     <ul className={`space-y-2.5 text-body text-fg-secondary print:space-y-1 ${className}`}>

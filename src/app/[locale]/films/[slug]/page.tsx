@@ -83,7 +83,9 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
     <main id="main" className="mx-auto w-full max-w-[1040px] flex-1 px-6 pb-28 pt-32 md:pt-40">
       <Reveal as="header" className="mb-16 max-w-[720px]">
         {backToIndex}
-        <p className="mt-6 font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tf("kicker")}</p>
+        <p className="mt-6 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+          {tf("kicker")}
+        </p>
         <h1 className="mt-3 text-display">{tf("title")}</h1>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           <span className="text-accent">{tf("latin")}</span>
@@ -104,8 +106,13 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
       <Reveal className="mb-24 max-w-[720px]">
         <dl className="border-t border-line">
           {FILM_FACTS.map((fact) => (
-            <div key={fact} className="grid gap-1 border-b border-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-6">
-              <dt className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t(`facts.${fact}`)}</dt>
+            <div
+              key={fact}
+              className="grid gap-1 border-b border-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-6"
+            >
+              <dt className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+                {t(`facts.${fact}`)}
+              </dt>
               <dd className="text-caption text-fg">{tf(`facts.${fact}`)}</dd>
             </div>
           ))}
@@ -115,7 +122,9 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
       {/* The story. */}
       <section aria-labelledby="film-story" className="mb-24 max-w-[720px]">
         <Reveal className="mb-8">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("storyKicker")}</p>
+          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {t("storyKicker")}
+          </p>
           <h2 id="film-story" className="mt-3 text-title">
             {tf("storyTitle")}
           </h2>
@@ -133,20 +142,27 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
       {film.parts && (
         <section aria-labelledby="film-parts" className="mb-24 max-w-[720px]">
           <Reveal className="mb-8">
-            <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tf("partsKicker")}</p>
+            <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+              {tf("partsKicker")}
+            </p>
             <h2 id="film-parts" className="mt-3 text-title">
               {tf("partsTitle")}
             </h2>
           </Reveal>
           <Reveal as="ol" stagger={0.05} className="border-t border-line">
             {film.parts.map((id) => (
-              <li key={id} className="grid gap-1 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6">
+              <li
+                key={id}
+                className="grid gap-1 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6"
+              >
                 <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
                   {tf(`parts.${id}.meta`)}
                 </span>
                 <div>
                   <p className="text-heading text-fg">{tf(`parts.${id}.title`)}</p>
-                  <p className="mt-1 max-w-[56ch] text-caption text-fg-secondary">{tf(`parts.${id}.note`)}</p>
+                  <p className="mt-1 max-w-[56ch] text-caption text-fg-secondary">
+                    {tf(`parts.${id}.note`)}
+                  </p>
                 </div>
               </li>
             ))}
@@ -157,7 +173,9 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
       {/* The lines. */}
       <section aria-labelledby="film-lines" className="mb-24 max-w-[720px]">
         <Reveal className="mb-8">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("linesKicker")}</p>
+          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {t("linesKicker")}
+          </p>
           <h2 id="film-lines" className="mt-3 text-title">
             {tf("linesTitle")}
           </h2>
@@ -185,7 +203,9 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
       {/* The stills. */}
       <section aria-labelledby="film-stills" className="mb-16">
         <Reveal className="mb-8 max-w-[720px]">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tf("stillsKicker")}</p>
+          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {tf("stillsKicker")}
+          </p>
           <h2 id="film-stills" className="mt-3 text-title">
             {tf("stillsTitle")}
           </h2>

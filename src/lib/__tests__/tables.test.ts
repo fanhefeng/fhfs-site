@@ -35,13 +35,19 @@ describe("every table in the schema", () => {
 
   it("is counted by db:check", () => {
     const script = read("scripts/db-check.mts");
-    expect(tables.filter(([, sqlName]) => !script.includes(`"${sqlName}"`)).map(([name]) => name)).toEqual([]);
+    expect(
+      tables.filter(([, sqlName]) => !script.includes(`"${sqlName}"`)).map(([name]) => name),
+    ).toEqual([]);
   });
 
   for (const script of ["scripts/db-export.mts", "scripts/db-import.mts"]) {
     it(`is handled by ${script}, if it holds content`, () => {
       const text = read(script);
-      expect(content.filter(([name]) => !new RegExp(`\\bschema\\.${name}\\b`).test(text)).map(([name]) => name)).toEqual([]);
+      expect(
+        content
+          .filter(([name]) => !new RegExp(`\\bschema\\.${name}\\b`).test(text))
+          .map(([name]) => name),
+      ).toEqual([]);
     });
   }
 

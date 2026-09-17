@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Component,
-  Suspense,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { Component, Suspense, useEffect, useState, type ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
 import { useProgress } from "@react-three/drei";
 
@@ -64,10 +58,7 @@ class CanvasBoundary extends Component<
   override componentDidCatch(error: unknown) {
     // Degrading in silence would hide a genuine bug in the scene behind a
     // perfectly plausible-looking page.
-    console.error(
-      "[intro] avatar scene failed — falling back to the résumé",
-      error
-    );
+    console.error("[intro] avatar scene failed — falling back to the résumé", error);
     this.props.onError();
   }
 
@@ -81,13 +72,7 @@ class CanvasBoundary extends Component<
  * header island floats above this and must stay reachable while the model
  * lands.
  */
-function LoadingOverlay({
-  label,
-  onStalled,
-}: {
-  label: string;
-  onStalled: () => void;
-}) {
+function LoadingOverlay({ label, onStalled }: { label: string; onStalled: () => void }) {
   const { progress, active } = useProgress();
   const ready = useIntroStore((s) => s.ready);
   const done = ready && !active;
@@ -117,28 +102,19 @@ function LoadingOverlay({
         done ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-        {label}
-      </p>
+      <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{label}</p>
       <div className="mt-5 h-px w-40 overflow-hidden bg-line">
         <div
           className="h-full bg-accent transition-[width] duration-300"
           style={{ width: `${pct.toFixed(0)}%` }}
         />
       </div>
-      <p className="mt-4 font-mono text-caption text-fg-tertiary">
-        {pct.toFixed(0)}%
-      </p>
+      <p className="mt-4 font-mono text-caption text-fg-tertiary">{pct.toFixed(0)}%</p>
     </div>
   );
 }
 
-export default function AvatarCanvas({
-  tone,
-  onScreen,
-  loadingLabel,
-  onFailed,
-}: Props) {
+export default function AvatarCanvas({ tone, onScreen, loadingLabel, onFailed }: Props) {
   // OrbitControls in edit mode drives the camera from its own pointer events,
   // which is exactly the case an on-demand loop cannot see coming; the panel
   // is a development tool, so it keeps the old always-on loop.
@@ -181,9 +157,7 @@ export default function AvatarCanvas({
         // would sit on whatever image it had drawn before the loss. The
         // listener dies with the canvas element R3F owns.
         onCreated={({ gl }) => {
-          gl.domElement.addEventListener("webglcontextrestored", () =>
-            renderOnDemand.request()
-          );
+          gl.domElement.addEventListener("webglcontextrestored", () => renderOnDemand.request());
         }}
         camera={{ position: [0, 0.2, 4.4], fov: 32, near: 0.1, far: 100 }}
       >

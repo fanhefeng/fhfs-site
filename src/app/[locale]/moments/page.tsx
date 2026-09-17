@@ -39,10 +39,14 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
   return (
     <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
       <Reveal as="section" className="mb-10">
-        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("kicker")}</p>
+        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+          {t("kicker")}
+        </p>
         <h1 className="mt-3 text-display-sm">{t("title")}</h1>
         <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("subtitle")}</p>
-        {langNotice && <p className="mt-3 max-w-[46ch] text-caption text-fg-tertiary">{langNotice}</p>}
+        {langNotice && (
+          <p className="mt-3 max-w-[46ch] text-caption text-fg-tertiary">{langNotice}</p>
+        )}
         {items.length > 0 && (
           <p className="mt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
             {t("count", { count: items.length })}

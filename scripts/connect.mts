@@ -33,7 +33,7 @@ export function connect() {
     async (ms) => {
       console.warn(`connection failed, retrying in ${ms} ms…`);
       await new Promise((resolve) => setTimeout(resolve, ms));
-    }
+    },
   );
 
   return drizzle(url, { schema });

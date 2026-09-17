@@ -108,9 +108,7 @@ export function AboutTeaser({
             <a
               key={contact.href}
               href={contact.href}
-              {...(contact.external
-                ? { target: "_blank", rel: "noreferrer" }
-                : {})}
+              {...(contact.external ? { target: "_blank", rel: "noreferrer" } : {})}
               className="hit-ext font-mono text-meta uppercase tracking-meta text-fg-secondary transition-colors hover:text-accent"
             >
               {contact.label}

@@ -5,12 +5,7 @@ import { getTranslations, getFormatter } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import {
-  getAdjacentPosts,
-  getAllSlugs,
-  getPost,
-  getPostEditions,
-} from "@/lib/content";
+import { getAdjacentPosts, getAllSlugs, getPost, getPostEditions } from "@/lib/content";
 import { HAS_CJK } from "@/lib/reading";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
@@ -31,7 +26,9 @@ export async function generateStaticParams() {
   return (await getAllSlugs()).map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const post = await getPost(slug, locale);
@@ -43,7 +40,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/blog/[sl
   const alternates = localeAlternates(
     `/blog/${slug}`,
     locale,
-    (await getPostEditions(slug)).map((edition) => edition.locale)
+    (await getPostEditions(slug)).map((edition) => edition.locale),
   );
   if (post.isFallback) {
     alternates.canonical = `${site.url}/${post.locale}/blog/${slug}`;
@@ -139,10 +136,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
                 render — but the tags are the author's, in whatever language
                 they were written, so the override stops before them. */}
             <p className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              <time
-                dateTime={post.date}
-                lang={post.isFallback ? htmlLang(locale) : undefined}
-              >
+              <time dateTime={post.date} lang={post.isFallback ? htmlLang(locale) : undefined}>
                 {format.dateTime(new Date(post.date), {
                   year: "numeric",
                   month: "long",
@@ -191,10 +185,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
             className="mt-20 grid gap-8 border-t border-line pt-8 sm:grid-cols-2"
           >
             {older && (
-              <Link
-                href={`/blog/${older.slug}`}
-                className="group flex flex-col gap-1.5"
-              >
+              <Link href={`/blog/${older.slug}`} className="group flex flex-col gap-1.5">
                 <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                   ← {t("prevPost")}
                 </span>

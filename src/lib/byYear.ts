@@ -14,10 +14,7 @@
  */
 export type YearGroup<T> = { year: string; items: T[] };
 
-export function groupByYear<T>(
-  items: readonly T[],
-  yearOf: (item: T) => string
-): YearGroup<T>[] {
+export function groupByYear<T>(items: readonly T[], yearOf: (item: T) => string): YearGroup<T>[] {
   const groups: YearGroup<T>[] = [];
   for (const item of items) {
     const year = yearOf(item);

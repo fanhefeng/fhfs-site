@@ -113,7 +113,12 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
 
           <label className="space-y-1.5">
             <span className={labelClass}>时长（分钟）</span>
-            <input name="duration" type="number" defaultValue={secret.duration} className={inputClass} />
+            <input
+              name="duration"
+              type="number"
+              defaultValue={secret.duration}
+              className={inputClass}
+            />
           </label>
 
           <div className="flex items-end pb-2.5">

@@ -9,8 +9,7 @@ import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
  * useGSAP is a layout effect, so a passive effect here would let the opening
  * curtain call stop() on an instance that does not exist yet.
  */
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 declare global {
   interface Window {

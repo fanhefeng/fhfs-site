@@ -163,12 +163,10 @@ export const getPosts = unstable_cache(
       .where(publishedOnly)
       .orderBy(...indexOrder(locale));
 
-    return byDateDesc(
-      rows.map((row) => ({ ...row, isFallback: row.locale !== locale }))
-    );
+    return byDateDesc(rows.map((row) => ({ ...row, isFallback: row.locale !== locale })));
   },
   ["posts-by-locale"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 export const getPost = unstable_cache(
@@ -184,7 +182,7 @@ export const getPost = unstable_cache(
     return { ...row, isFallback: row.locale !== locale };
   },
   ["post"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 export const getAllSlugs = unstable_cache(
@@ -197,7 +195,7 @@ export const getAllSlugs = unstable_cache(
     return rows.map((row) => row.slug);
   },
   ["all-slugs"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 /**
@@ -217,7 +215,7 @@ export const getPostEditions = unstable_cache(
       .where(and(eq(posts.slug, slug), publishedOnly))
       .orderBy(asc(posts.locale)),
   ["post-editions"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 /**
@@ -231,7 +229,7 @@ export const getPostEditions = unstable_cache(
 export const getAdjacentPosts = unstable_cache(
   async (
     slug: string,
-    locale: Locale
+    locale: Locale,
   ): Promise<{
     older: { slug: string; title: string } | null;
     newer: { slug: string; title: string } | null;
@@ -245,7 +243,7 @@ export const getAdjacentPosts = unstable_cache(
         })
         .from(posts)
         .where(publishedOnly)
-        .orderBy(...indexOrder(locale))
+        .orderBy(...indexOrder(locale)),
     );
     const index = ordered.findIndex((row) => row.slug === slug);
     if (index === -1) return { older: null, newer: null };
@@ -255,7 +253,7 @@ export const getAdjacentPosts = unstable_cache(
     return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
   },
   ["adjacent-posts"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 /**
@@ -284,7 +282,7 @@ export const getAllTags = unstable_cache(
       .sort((a, b) => b.count - a.count);
   },
   ["all-tags"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 /**
@@ -308,11 +306,11 @@ export const getPostsByTag = unstable_cache(
     return byDateDesc(
       rows
         .filter((row) => row.tags.includes(tag))
-        .map((row) => ({ ...row, isFallback: row.locale !== locale }))
+        .map((row) => ({ ...row, isFallback: row.locale !== locale })),
     );
   },
   ["posts-by-tag"],
-  cacheOptions(TAGS.posts)
+  cacheOptions(TAGS.posts),
 );
 
 // ---------------------------------------------------------------------------
@@ -364,12 +362,10 @@ export const getSecrets = unstable_cache(
       .from(secrets)
       .where(secretPublished)
       .orderBy(...secretIndexOrder(locale));
-    return byDateDesc(
-      rows.map((row) => ({ ...row, isFallback: row.locale !== locale }))
-    );
+    return byDateDesc(rows.map((row) => ({ ...row, isFallback: row.locale !== locale })));
   },
   ["secrets-by-locale"],
-  cacheOptions(TAGS.secrets)
+  cacheOptions(TAGS.secrets),
 );
 
 export const getSecret = unstable_cache(
@@ -384,7 +380,7 @@ export const getSecret = unstable_cache(
     return { ...row, isFallback: row.locale !== locale };
   },
   ["secret"],
-  cacheOptions(TAGS.secrets)
+  cacheOptions(TAGS.secrets),
 );
 
 export const getAllSecretSlugs = unstable_cache(
@@ -397,7 +393,7 @@ export const getAllSecretSlugs = unstable_cache(
     return rows.map((row) => row.slug);
   },
   ["all-secret-slugs"],
-  cacheOptions(TAGS.secrets)
+  cacheOptions(TAGS.secrets),
 );
 
 /** Which languages a secret was really written in — see `getPostEditions`. */
@@ -409,13 +405,13 @@ export const getSecretEditions = unstable_cache(
       .where(and(eq(secrets.slug, slug), secretPublished))
       .orderBy(asc(secrets.locale)),
   ["secret-editions"],
-  cacheOptions(TAGS.secrets)
+  cacheOptions(TAGS.secrets),
 );
 
 export const getAdjacentSecrets = unstable_cache(
   async (
     slug: string,
-    locale: Locale
+    locale: Locale,
   ): Promise<{
     older: { slug: string; title: string } | null;
     newer: { slug: string; title: string } | null;
@@ -429,7 +425,7 @@ export const getAdjacentSecrets = unstable_cache(
         })
         .from(secrets)
         .where(secretPublished)
-        .orderBy(...secretIndexOrder(locale))
+        .orderBy(...secretIndexOrder(locale)),
     );
     const index = ordered.findIndex((row) => row.slug === slug);
     if (index === -1) return { older: null, newer: null };
@@ -438,7 +434,7 @@ export const getAdjacentSecrets = unstable_cache(
     return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
   },
   ["adjacent-secrets"],
-  cacheOptions(TAGS.secrets)
+  cacheOptions(TAGS.secrets),
 );
 
 // ---------------------------------------------------------------------------
@@ -480,7 +476,7 @@ export const getMoments = unstable_cache(
     return rows.map((row) => ({ ...row, postedAt: row.postedAt.toISOString() }));
   },
   ["moments"],
-  cacheOptions(TAGS.moments)
+  cacheOptions(TAGS.moments),
 );
 
 // ---------------------------------------------------------------------------
@@ -505,7 +501,7 @@ export const getAbout = unstable_cache(
     return row ?? null;
   },
   ["about"],
-  cacheOptions(TAGS.about)
+  cacheOptions(TAGS.about),
 );
 
 export const getTimeline = unstable_cache(
@@ -525,7 +521,7 @@ export const getTimeline = unstable_cache(
       // deploys. Same pattern in each getter below.
       .orderBy(asc(timelineEntries.sort), asc(timelineEntries.key)),
   ["timeline"],
-  cacheOptions(TAGS.timeline)
+  cacheOptions(TAGS.timeline),
 );
 
 export const getApps = unstable_cache(
@@ -546,7 +542,7 @@ export const getApps = unstable_cache(
       .from(apps)
       .orderBy(asc(apps.sort), asc(apps.key)),
   ["apps"],
-  cacheOptions(TAGS.apps)
+  cacheOptions(TAGS.apps),
 );
 
 // The `works` table has no getter: /portfolio went offline (it 308s to
@@ -567,7 +563,7 @@ export const getChips = unstable_cache(
       .from(chips)
       .orderBy(asc(chips.sort), asc(chips.id)),
   ["chips"],
-  cacheOptions(TAGS.chips)
+  cacheOptions(TAGS.chips),
 );
 
 export type IntroNode = {
@@ -596,7 +592,7 @@ export const getIntroNodes = unstable_cache(
       .from(introNodes)
       .orderBy(asc(introNodes.sort), asc(introNodes.key)),
   ["intro-nodes"],
-  cacheOptions(TAGS.intro)
+  cacheOptions(TAGS.intro),
 );
 
 export type ResumeProfile = {
@@ -657,7 +653,7 @@ export const getResumeProfile = unstable_cache(
     return row ? { ...row, updatedAt: row.updatedAt.toISOString() } : null;
   },
   ["resume-profile"],
-  cacheOptions(TAGS.resume)
+  cacheOptions(TAGS.resume),
 );
 
 export const getResumeExperiences = unstable_cache(
@@ -676,7 +672,7 @@ export const getResumeExperiences = unstable_cache(
       .from(resumeExperiences)
       .orderBy(asc(resumeExperiences.sort), asc(resumeExperiences.key)),
   ["resume-experiences"],
-  cacheOptions(TAGS.resume)
+  cacheOptions(TAGS.resume),
 );
 
 /**
@@ -717,7 +713,7 @@ const loadCopyOverrides = unstable_cache(
     return out;
   },
   ["copy-overrides"],
-  cacheOptions(TAGS.copy)
+  cacheOptions(TAGS.copy),
 );
 
 /**
@@ -730,9 +726,7 @@ const loadCopyOverrides = unstable_cache(
  * this request and tries again on the next one — the site reads slightly out
  * of date rather than not at all.
  */
-export async function getCopyOverrides(
-  locale: Locale
-): Promise<Record<string, unknown>> {
+export async function getCopyOverrides(locale: Locale): Promise<Record<string, unknown>> {
   try {
     return await loadCopyOverrides(locale);
   } catch (error) {
@@ -773,7 +767,7 @@ export const getAllNavItems = unstable_cache(
     return rows.map((row) => ({ ...row, group: isNavGroup(row.group) ? row.group : null }));
   },
   ["nav-items"],
-  cacheOptions(TAGS.nav)
+  cacheOptions(TAGS.nav),
 );
 
 /** One list, filtered per surface — Header, Footer, FullNav and the sitemap.

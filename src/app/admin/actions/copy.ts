@@ -12,20 +12,14 @@ import { TAGS } from "@/lib/content";
 
 import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
 
-
 /**
  * Saves the copy table in one go — it is edited as one page, because that is
  * how you notice that two lines have to rhyme.
  */
-export async function saveCopy(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveCopy(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
-  const rows = await db
-    .select({ key: schema.copyBlocks.key })
-    .from(schema.copyBlocks);
+  const rows = await db.select({ key: schema.copyBlocks.key }).from(schema.copyBlocks);
 
   const kinetic = str(form, "home.heroKineticWord.zh");
   const enKinetic = str(form, "home.heroKineticWord.en");
@@ -46,7 +40,9 @@ export async function saveCopy(
     return { error: `中文 hero 里找不到「${kinetic}」，插电动画会失效。` };
   }
   if (enKinetic && !enLines.includes(enKinetic)) {
-    return { error: `English hero does not contain "${enKinetic}" — the light-up animation would not run.` };
+    return {
+      error: `English hero does not contain "${enKinetic}" — the light-up animation would not run.`,
+    };
   }
 
   // One statement, not sixty-seven. The HTTP driver spends a round trip per
@@ -57,9 +53,7 @@ export async function saveCopy(
   // page was opened would otherwise be overwritten with two empty strings.
   const values = rows
     .filter(({ key }) => form.has(`${key}.zh`) && form.has(`${key}.en`))
-    .map(
-      ({ key }) => sql`(${key}, ${raw(form, `${key}.zh`)}, ${raw(form, `${key}.en`)})`
-    );
+    .map(({ key }) => sql`(${key}, ${raw(form, `${key}.zh`)}, ${raw(form, `${key}.en`)})`);
   if (values.length) {
     await db.execute(sql`
       UPDATE copy_blocks AS c
