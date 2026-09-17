@@ -10,6 +10,7 @@
     "lint": "oxlint -c .oxlintrc.json src scripts next.config.ts drizzle.config.ts",
     "test": "vitest run",
     "check": "pnpm typecheck && pnpm lint && pnpm test",
+    "assets": "tsx scripts/assets.mts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

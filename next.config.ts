@@ -1,38 +1,8 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { HASHED_ROUTES } from "./src/lib/immutable";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
-
-/**
- * Static assets that are never edited in place — a new model or video gets a
- * new file name — so a browser may keep them for as long as it likes.
- *
- * Matched by file and not by prefix (`IMMUTABLE`, below). Several of these
- * folders share a name with a page: `/films/odyssey` and `/lab/neon` without
- * a locale are addresses next-intl answers with a *temporary* redirect to the
- * language it negotiated — and a year of `immutable` on that would nail one
- * visitor's language shut for a year, on a reply that is supposed to be
- * reconsidered every time.
- */
-const IMMUTABLE_DIRS = [
-  // The Yozai slices: a Chinese page fetches thirty to fifty of them, and
-  // without this every visit re-validated each one. Re-splitting the font
-  // goes into a new folder name, never over these files.
-  "/fonts",
-  "/lab/scroll-video",
-  "/models",
-  "/draco",
-  "/grove",
-  "/lab/dissolve",
-  "/lab/neon",
-  "/idols",
-  "/films",
-  // The theme, three megabytes of it: re-encoding goes into a new file name.
-  "/music",
-];
-
-/** A path under one of those folders that ends in a file extension. */
-const IMMUTABLE_PATHS = IMMUTABLE_DIRS.map((dir) => `${dir}/:path*.:ext(\\w+)`);
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -55,7 +25,9 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      ...IMMUTABLE_PATHS.map((source) => ({
+      // A year, and only on an address with the content's hash in it — the
+      // plain path to the same file revalidates (src/lib/immutable.ts).
+      ...HASHED_ROUTES.map(({ source }) => ({
         source,
         headers: [
           {
@@ -65,6 +37,16 @@ const nextConfig: NextConfig = {
         ],
       })),
     ];
+  },
+  rewrites() {
+    return {
+      // Before the filesystem is looked at: a hashed address is never a file
+      // that exists, and `afterFiles` would first hand `/films/…` to the
+      // [locale] routes.
+      beforeFiles: HASHED_ROUTES,
+      afterFiles: [],
+      fallback: [],
+    };
   },
   redirects() {
     return [

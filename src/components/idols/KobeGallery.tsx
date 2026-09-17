@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import Image from "next/image";
 import { Reveal } from "@/components/fx/Reveal";
 import type { KobePhoto } from "./kobePhotos";
@@ -15,7 +16,7 @@ export function KobeGallery({ photos }: { photos: GalleryPhoto[] }) {
       {photos.map((photo, i) => (
         <figure key={photo.id} className="mb-4 break-inside-avoid md:mb-5">
           <Image
-            src={`/idols/kobe/${photo.file}`}
+            src={asset(`/idols/kobe/${photo.file}`)}
             width={photo.width}
             height={photo.height}
             alt={photo.alt}

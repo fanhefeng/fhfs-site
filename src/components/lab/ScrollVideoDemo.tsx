@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
@@ -18,7 +19,9 @@ type Props = {
   captionTwoBody: string;
 };
 
-const BASE = "/lab/scroll-video";
+// One hash for the whole folder, as a path segment — ninety file hashes would
+// be ninety lines of manifest shipped to draw one canvas.
+const FRAMES = asset("/lab/scroll-video/frames/");
 /** First pass fetches every Nth frame; the loader ring tracks that pass only. */
 const WARMUP_STEP = 6;
 
@@ -63,7 +66,7 @@ export function ScrollVideoDemo({
       canvas,
       frameCount: manifest.frameCount,
       src: (n) =>
-        `${BASE}/frames/${manifest.pattern.replace(
+        `${FRAMES}${manifest.pattern.replace(
           "%d",
           String(n).padStart(manifest.padding, "0")
         )}`,

@@ -15,6 +15,7 @@ pnpm check        # tsc --noEmit + oxlint + vitest — the gate; run before call
 pnpm test         # vitest over src/lib pure functions only (src/lib/__tests__)
 pnpm dev          # dev server
 pnpm build        # prerenders from the DB — DATABASE_URL required, fails loudly without
+pnpm assets       # after touching public/: re-hash, rewrite assets.gen.json + yozai.css
 pnpm db:generate  # after editing src/db/schema.ts, then:
 pnpm db:migrate
 pnpm db:check     # print what's actually in each table
@@ -84,9 +85,15 @@ Failures resolve to `null` and the badge is simply absent.
   GSAP's clock (`gsap.ticker` drives `lenis.raf`).
 - **3D**: `/intro` uses @react-three/fiber + drei; the `/about` workbench is
   imperative three.js.
-- **Static assets under `IMMUTABLE_PATHS`** (`next.config.ts`) — the Yozai
-  font slices included — are cached for a year: never overwrite one in
-  place, give a regenerated file (or a re-split font) a new name or folder.
+- **Static assets in `public/`** are reached through `asset()`
+  (`src/lib/asset.ts`), which puts the file's content hash in the address —
+  `/lab/lens/sea.c694b7cb.jpg`; a rewrite in `next.config.ts` serves it from
+  the plain file, and only the hashed address is cached for a year
+  (`src/lib/immutable.ts` has the folder lists and the address shapes). After
+  adding, replacing or removing a file there, run `pnpm assets` and commit
+  `src/lib/assets.gen.json` (and `src/app/yozai.css`, whose font URLs it
+  rewrites); a new top-level folder goes into `IMMUTABLE_DIRS`. Tests fail on
+  a stale manifest, an unlisted folder, or a path written without `asset()`.
   Only `src/app/[locale]/not-found.tsx` loads its stage through
   `next/dynamic`; a not-found boundary is bundled with its layout, so
   anything it imports statically ships with every page.

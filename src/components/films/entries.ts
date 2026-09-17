@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import type { TrackId } from "@/lib/tracks";
 import { ODYSSEY_LINES, ODYSSEY_PARTS, ODYSSEY_STILLS } from "./odysseyStills";
 import { SECRET_LINES, SECRET_STILLS } from "./secretStills";
@@ -84,7 +85,7 @@ export const filmEntry = (slug: string): FilmEntry | undefined =>
 
 /** The public path of a still. */
 export const stillSrc = (film: FilmEntry, still: FilmStill): string =>
-  `/films/${film.slug}/${still.file}.jpg`;
+  asset(`/films/${film.slug}/${still.file}.jpg`);
 
 /** The still on a film's index card — the first one if the named id is gone. */
 export const filmCover = (film: FilmEntry): FilmStill =>

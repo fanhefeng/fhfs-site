@@ -1,3 +1,5 @@
+import { asset } from "@/lib/asset";
+
 /**
  * Where the Draco decoder is served from.
  *
@@ -13,4 +15,4 @@
  * networks, and pins the site to a third party for a file already sitting in
  * `public/`. Same reasoning as refusing drei's `<Environment preset>`.
  */
-export const DRACO_DECODER_PATH = "/draco/";
+export const DRACO_DECODER_PATH = asset("/draco/");
