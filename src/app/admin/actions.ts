@@ -89,9 +89,10 @@ const goneError = (key: string): ActionState => ({
  * silently replacing whatever had the key. The edit form's promise is the
  * opposite — the row exists — so it is an UPDATE by key, and a form left
  * open past a delete gets told rather than quietly resurrecting the row.
- * The columns a table keeps for itself (`id`, timestamps) never come from
- * the form, so the row is the whole update either way. Returns the error to
- * hand the form, or null when the row is in.
+ * The columns a table keeps for itself (`id`, `createdAt`) never come from
+ * the form, so the row is the whole update — plus a fresh `updatedAt` on the
+ * tables that keep one (the board does). Returns the error to hand the form,
+ * or null when the row is in.
  */
 async function upsertKeyed<T extends KeyedTable>(
   table: T,
@@ -106,9 +107,10 @@ async function upsertKeyed<T extends KeyedTable>(
       .returning({ id: table.id });
     return inserted.length ? null : existsError(row.key);
   }
+  const set = "updatedAt" in table ? { ...row, updatedAt: new Date() } : row;
   const updated = await db
     .update(table)
-    .set(row as PgUpdateSetSource<T>)
+    .set(set as PgUpdateSetSource<T>)
     .where(eq(table.key, row.key))
     .returning({ id: table.id });
   return updated.length ? null : goneError(row.key);
@@ -338,22 +340,8 @@ export async function saveMoment(
     draft: draft === "yes",
   };
 
-  if (form.get("isNew")) {
-    const inserted = await db
-      .insert(schema.moments)
-      .values(row)
-      .onConflictDoNothing({ target: schema.moments.key })
-      .returning({ id: schema.moments.id });
-    if (!inserted.length) return existsError(key);
-  } else {
-    await db
-      .insert(schema.moments)
-      .values(row)
-      .onConflictDoUpdate({
-        target: schema.moments.key,
-        set: { ...row, updatedAt: new Date() },
-      });
-  }
+  const exists = await upsertKeyed(schema.moments, row, Boolean(form.get("isNew")));
+  if (exists) return exists;
 
   invalidate(TAGS.moments);
   return { ok: true };
@@ -574,50 +562,6 @@ export async function deleteApp(form: FormData): Promise<void> {
   if (!key) return;
   await db.delete(schema.apps).where(eq(schema.apps.key, key));
   invalidate(TAGS.apps);
-}
-
-export async function saveExperiment(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
-  if (!(await adminSession())) return SESSION_EXPIRED;
-
-  const key = str(form, "key");
-  if (!validKey(key)) return KEY_ERROR;
-
-  const status = str(form, "status");
-  if (!["live", "wip", "planned"].includes(status)) {
-    return { error: "状态只能是 live / wip / planned。" };
-  }
-  const href = str(form, "href") || null;
-  if (href && !validLink(href)) return linkError("外链");
-  const sort = intField(form, "sort", "排序", 0);
-  if (!sort.ok) return sort;
-
-  const row = {
-    key,
-    name: localized(form, "name"),
-    description: localized(form, "description"),
-    status: status as "live" | "wip" | "planned",
-    accent: str(form, "accent") || null,
-    href,
-    demo: str(form, "demo") || null,
-    sort: sort.value,
-  };
-
-  const exists = await upsertKeyed(schema.experiments, row, Boolean(form.get("isNew")));
-  if (exists) return exists;
-
-  invalidate(TAGS.experiments);
-  return { ok: true };
-}
-
-export async function deleteExperiment(form: FormData): Promise<void> {
-  await requireAdmin();
-  const key = str(form, "key");
-  if (!key) return;
-  await db.delete(schema.experiments).where(eq(schema.experiments.key, key));
-  invalidate(TAGS.experiments);
 }
 
 /**

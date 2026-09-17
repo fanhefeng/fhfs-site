@@ -23,7 +23,7 @@
  * and a growth parameter that none of the built-in materials know about, so
  * they are ShaderMaterials anyway and the chunk plumbing would buy nothing.
  */
-export const LIGHT_GLSL = /* glsl */ `
+const LIGHT_GLSL = /* glsl */ `
 uniform vec3 uKeyDir, uKeyCol, uFillDir, uFillCol, uAmbCol, uHazeCol;
 uniform float uHaze, uFog, uHazeLift, uBoxH;
 /* x: local midpoint, y: how far out the form is kept, z: how long it takes to go */
@@ -90,7 +90,7 @@ vec3 aerial(vec3 c, float h){
  * others, and the front is wobbled by two long sines so it never reads as a
  * clean circle sweeping the screen.
  */
-export const SCAN_GLSL = /* glsl */ `
+const SCAN_GLSL = /* glsl */ `
 uniform vec3 uScanO;
 uniform float uScanR;
 /* The one thing in these shaders that cannot be written in local units: the
@@ -112,7 +112,7 @@ float scanEdge(vec3 w){
 
 /** Gradient noise — value noise puts its extrema on the lattice, which on a
     tube shows up as blobs in rows. */
-export const NOISE_GLSL = /* glsl */ `
+const NOISE_GLSL = /* glsl */ `
 vec2 hash22(vec2 p){
   p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
   return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
@@ -173,7 +173,7 @@ float ridgedAA(vec2 p, float px){
  * (DESIGN.md §5.3). The hero hands it a clock, because a hero that only
  * breathes while you scroll is not a hero. Same sway either way.
  */
-export const WIND_GLSL = /* glsl */ `
+const WIND_GLSL = /* glsl */ `
 uniform float uPhase;
 vec3 windOffset(vec3 p){
   float ph = p.x * 0.42 + p.y * 0.30 + p.z * 0.70;
@@ -187,7 +187,7 @@ vec3 windOffset(vec3 p){
 /** ACES + sRGB done here rather than through three's chunks: the chunk names
     moved in r152 and again later, and this scene does not need any of the rest
     of the pipeline those includes drag in. */
-export const OUTPUT_GLSL = /* glsl */ `
+const OUTPUT_GLSL = /* glsl */ `
 vec3 acesFilm(vec3 x){
   return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
 }
@@ -268,7 +268,7 @@ void main(){
  * settled near root: the front is parked past the far corner, and its `uCut`
  * and mask are pushed out of reach, so `fade` is 1 everywhere.
  */
-export const SETTLED_DISCARD_GLSL = /* glsl */ `
+const SETTLED_DISCARD_GLSL = /* glsl */ `
 #ifdef SETTLED
 #define SCAN_DISCARD(edge)
 #define FADE_DISCARD(fade)

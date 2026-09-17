@@ -16,7 +16,7 @@
 
 export const VIEW_BOX = "0 150 802 802";
 /** The box's side, in drawing units — the viewBox is square. */
-export const BOX = 802;
+const BOX = 802;
 
 /** Tube width, in drawing units; the core sits centred inside it. */
 export const TUBE = 13;
@@ -94,7 +94,7 @@ export const WORD: { g: GlyphName; x: number; y: number }[] = [
   { g: "S", x: 483, y: -80.5 },
 ];
 
-export const SEGS = ["ring", "bar", "note", "l0", "l1", "l2", "l3"] as const;
+const SEGS = ["ring", "bar", "note", "l0", "l1", "l2", "l3"] as const;
 export type SegName = (typeof SEGS)[number];
 export const LETTER_SEGS: SegName[] = ["l0", "l1", "l2", "l3"];
 

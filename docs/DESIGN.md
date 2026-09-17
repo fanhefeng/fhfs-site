@@ -624,6 +624,27 @@
 >   Next 16 的 dev 已经不往那儿写了（`.next/cache` 下只有 `images` / `turbopack`）。**要清整个
 >   `.next` 再重启**才看得到新的导航行。
 
+> **2026-09-17 补记（全局审查：`experiments` 表退役，两处后台说明改成实话）**，覆盖 08-26 修订里
+> 「craft 列表在 `experiments` 为空时回落到…」那一句：
+> - **`experiments` 整套删除**：09-14 `/portfolio` 下线时 `CraftList` 一起删了，此后这张表前台
+>   零读取——`/lab` 从头到尾读的是代码里的 `LAB_ENTRIES`——而 `/admin/experiments` 的说明还写着
+>   「这里只管它的说明与排序」，编辑器在改一张没人看的表。删的是：表与 `experiment_status` 枚举
+>   （迁移 `0010`）、`getExperiments`、两个 action、后台页、`counts` / `sections` / 三个脚本里的
+>   登记、`backup/db.json` 里那 4 行（git 历史里还有）。**部署顺序：先上代码，再 `pnpm db:migrate`**
+>   ——线上旧后台的行数查询还点着这张表，先删表会让 /admin 整个 500。
+> - **`works` 不同**：09-14 补记说了留着，所以表、`/admin/works`、`saveWork` 都在；只去掉了没人调
+>   的 `getWorks`，`content.ts` 原位留了一段注释说明第一件作品挂出来时 getter 放哪儿。
+> - **`/admin/copy` 的提示写反了**：原文「清空某一条它就回到文件里的写法」，实际 `merge()` 让空串
+>   覆盖默认值——`footer.timePrefix` / `timeSuffix` / `grove.headline2` 三行正是靠这一点留空的。
+>   改的是提示，不是行为。
+> - **`saveMoment` 归队 `upsertKeyed`**：它原来手写 upsert，是因为 `moments` 有 `updatedAt` 而
+>   `upsertKeyed` 的 UPDATE 不盖这个戳；代价是编辑页开着时那条在别处被删，保存会把它复活。现在
+>   `upsertKeyed` 对带 `updatedAt` 的表自己盖戳，说说和其余按 key 存的表一个契约：新建撞 key 报
+>   「已存在」，编辑遇到已删报「已经不在了」。
+> - **顺手清掉的**：`SpecularEdge.tsx`（零引用）、`nav.portfolio` 文案键、`LIGHT_SCORE_END`（死
+>   常量）、十几个只在本文件内用的符号上多余的 `export`、`gsap-extras` 里没人 import 的再导出
+>   （注册保留）、`retryFetch.ts` 头注释里一句过期的话；`yaml` 只有导出脚本用，挪到 devDependencies。
+
 ## 0. 核心概念
 
 把个人站从「深夜爵士俱乐部」改造成**一本安静的个人杂志兼私人画廊**：

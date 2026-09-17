@@ -72,10 +72,6 @@ const data = {
     .select()
     .from(schema.works)
     .orderBy(asc(schema.works.sort), asc(schema.works.key)),
-  experiments: await db
-    .select()
-    .from(schema.experiments)
-    .orderBy(asc(schema.experiments.sort), asc(schema.experiments.key)),
   introNodes: await db
     .select()
     .from(schema.introNodes)

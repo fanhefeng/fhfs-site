@@ -11,7 +11,7 @@
  * was written twice, and a page stranded behind an opaque curtain is not a
  * failure mode worth having two answers to.
  */
-export const OVERTURE_SEEN_KEY = "fhfs-overture-seen";
+const OVERTURE_SEEN_KEY = "fhfs-overture-seen";
 export const OVERTURE_DONE_EVENT = "fhfs:overture-done";
 
 /**

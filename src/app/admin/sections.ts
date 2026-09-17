@@ -42,7 +42,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
   {
     id: "issue",
     label: "本期",
-    caption: "站点当期在讲的三件事：写的、做的、试的。",
+    caption: "站点当期在讲的事：写的、做的。试的那些（/lab）写在代码里，不在这儿。",
     sections: [
       {
         href: "/admin/posts",
@@ -57,13 +57,6 @@ export const SECTION_GROUPS: AdminGroup[] = [
         blurb: "/software 上的每张卡片。版本号不填，填仓库让站点自己去读。",
         view: "/software",
         unit: "款",
-      },
-      {
-        href: "/admin/experiments",
-        label: "实验",
-        blurb: "/lab 里的实验清单——页面本身写在代码里，这里只管它的说明与排序。",
-        view: "/lab",
-        unit: "个",
       },
     ],
   },
@@ -138,7 +131,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
       {
         href: "/admin/copy",
         label: "站点文案",
-        blurb: "覆盖 messages/*.json 的默认文案。清空某条，它就回到文件里的写法。",
+        blurb: "覆盖 messages/*.json 的默认文案。写什么就是什么——清空一条，站上那处就是空的。",
         view: null,
         unit: "条",
       },

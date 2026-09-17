@@ -6,7 +6,6 @@ import {
   apps,
   chips,
   copyBlocks,
-  experiments,
   introNodes,
   moments,
   navItems,
@@ -15,7 +14,6 @@ import {
   resumeProfiles,
   secrets,
   timelineEntries,
-  works,
   type Localized,
   type LocalizedLines,
   type ResumeProject,
@@ -56,7 +54,6 @@ export const TAGS = {
   timeline: "timeline",
   copy: "copy",
   chips: "chips",
-  experiments: "experiments",
   intro: "intro",
   nav: "nav",
   resume: "resume",
@@ -102,17 +99,6 @@ export type TimelineEntry = {
   dateLabel: Localized | null;
   title: Localized;
   note: Localized;
-};
-
-export type Work = {
-  key: string;
-  title: Localized;
-  description: Localized;
-  year: number;
-  cover: string | null;
-  url: string | null;
-  tags: string[];
-  accent: string | null;
 };
 
 export type App = {
@@ -563,24 +549,10 @@ export const getApps = unstable_cache(
   cacheOptions(TAGS.apps)
 );
 
-export const getWorks = unstable_cache(
-  async (): Promise<Work[]> =>
-    db
-      .select({
-        key: works.key,
-        title: works.title,
-        description: works.description,
-        year: works.year,
-        cover: works.cover,
-        url: works.url,
-        tags: works.tags,
-        accent: works.accent,
-      })
-      .from(works)
-      .orderBy(asc(works.sort), asc(works.key)),
-  ["works"],
-  cacheOptions(TAGS.works)
-);
+// The `works` table has no getter: /portfolio went offline (it 308s to
+// /software) and nothing out front reads the shelf. /admin/works still edits
+// it; the day a page hangs a first work, its getter goes here with the
+// `works` tag `saveWork` already invalidates.
 
 // ---------------------------------------------------------------------------
 // What used to be hard-coded in components
@@ -596,34 +568,6 @@ export const getChips = unstable_cache(
       .orderBy(asc(chips.sort), asc(chips.id)),
   ["chips"],
   cacheOptions(TAGS.chips)
-);
-
-export type Experiment = {
-  key: string;
-  name: Localized;
-  description: Localized;
-  status: "live" | "wip" | "planned";
-  accent: string | null;
-  href: string | null;
-  demo: string | null;
-};
-
-export const getExperiments = unstable_cache(
-  async (): Promise<Experiment[]> =>
-    db
-      .select({
-        key: experiments.key,
-        name: experiments.name,
-        description: experiments.description,
-        status: experiments.status,
-        accent: experiments.accent,
-        href: experiments.href,
-        demo: experiments.demo,
-      })
-      .from(experiments)
-      .orderBy(asc(experiments.sort), asc(experiments.key)),
-  ["experiments"],
-  cacheOptions(TAGS.experiments)
 );
 
 export type IntroNode = {

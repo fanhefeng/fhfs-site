@@ -27,7 +27,6 @@ import { SECTIONS, type SectionCounts } from "./sections";
 const TABLES: Record<string, PgTable> = {
   "/admin/posts": schema.posts,
   "/admin/apps": schema.apps,
-  "/admin/experiments": schema.experiments,
   "/admin/moments": schema.moments,
   "/admin/secrets": schema.secrets,
   "/admin/timeline": schema.timelineEntries,
