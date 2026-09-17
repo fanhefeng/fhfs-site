@@ -37,6 +37,28 @@ describe("CLIENT_NAMESPACES", () => {
   });
 });
 
+/** `a.b.c` for every leaf of a catalogue. */
+function leafKeys(node: unknown, prefix = ""): string[] {
+  if (typeof node !== "object" || node === null) return [prefix];
+  return Object.entries(node).flatMap(([key, value]) => leafKeys(value, prefix ? `${prefix}.${key}` : key));
+}
+
+describe("the two catalogues", () => {
+  // A key one language lacks is a MISSING_MESSAGE on that language's pages
+  // only — found by whoever reads the other language, at request time.
+  it("hold the same keys", () => {
+    const root = fileURLToPath(new URL("../../../messages/", import.meta.url));
+    const keys = (file: string) => new Set(leafKeys(JSON.parse(readFileSync(path.join(root, file), "utf8"))));
+    const zh = keys("zh.json");
+    const en = keys("en.json");
+    expect(zh.size).toBeGreaterThan(0);
+    expect({
+      onlyZh: [...zh].filter((key) => !en.has(key)),
+      onlyEn: [...en].filter((key) => !zh.has(key)),
+    }).toEqual({ onlyZh: [], onlyEn: [] });
+  });
+});
+
 describe("pick", () => {
   it("keeps only the named namespaces and skips ones the catalogue lacks", () => {
     expect(pick({ nav: { a: 1 }, lab: { b: 2 }, plain: "x" }, ["nav", "plain", "none"])).toEqual({
