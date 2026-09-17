@@ -24,6 +24,11 @@ updates:
       # grove's shaders have to be looked at, not just compiled.
       - dependency-name: three
       - dependency-name: "@types/three"
+      # The types follow the runtime: Node is pinned to 24 (.node-version,
+      # engines), and newer types would let an API through that is not there
+      # to call. Move the major together with Node, by hand.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /
