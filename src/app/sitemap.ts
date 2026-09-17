@@ -16,59 +16,6 @@ import { FILMS } from "@/components/films/entries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
-  // Static pages carry no edit date of their own; the build date is the
-  // closest honest answer, and it beats leaving the field out.
-  const built = new Date();
-
-  // The same nav table the header, footer and menu read — one place to add a
-  // page, rather than four lists to remember to update.
-  const staticPaths = (await getNavItems("sitemap")).map((item) =>
-    item.href === "/" ? "" : item.href
-  );
-
-  for (const path of staticPaths) {
-    for (const locale of routing.locales) {
-      entries.push({
-        url: `${site.url}/${locale}${path}`,
-        lastModified: built,
-        alternates: { languages: localeLanguages(path) },
-        changeFrequency: path === "/blog" ? "weekly" : "monthly",
-      });
-    }
-  }
-
-  // The lab's studies live one level below /lab and are not in the nav table.
-  // Iterated rather than listed so a new entry in entries.ts shows up here
-  // without anyone remembering this file.
-  for (const entry of LAB_ENTRIES) {
-    const path = `/lab/${entry.slug}`;
-    for (const locale of routing.locales) {
-      entries.push({
-        url: `${site.url}/${locale}${path}`,
-        lastModified: built,
-        alternates: { languages: localeLanguages(path) },
-        changeFrequency: "monthly",
-      });
-    }
-  }
-
-  // The idols and the films hang one level below their rooms, listed in
-  // code like the studies.
-  const subPaths = [
-    ...IDOLS.map((idol) => `/idols/${idol.slug}`),
-    ...FILMS.map((film) => `/films/${film.slug}`),
-  ];
-  for (const path of subPaths) {
-    for (const locale of routing.locales) {
-      entries.push({
-        url: `${site.url}/${locale}${path}`,
-        lastModified: built,
-        alternates: { languages: localeLanguages(path) },
-        changeFrequency: "monthly",
-      });
-    }
-  }
-
   // Every slug is *served* under both prefixes — the read layer falls back to
   // the other language rather than 404ing — but only the locales that have
   // their own version are listed. A fallback URL is a duplicate of the
@@ -86,6 +33,61 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     Promise.all(secretSlugs.map((slug) => getSecretEditions(slug))),
     Promise.all(routing.locales.map((locale) => getAllTags(locale))),
   ]);
+  const newestPost = postEditions
+    .flat()
+    .map(({ date }) => new Date(date))
+    .reduce<Date | undefined>((newest, date) => (newest && newest >= date ? newest : date), undefined);
+
+  // The same nav table the header, footer and menu read — one place to add a
+  // page, rather than four lists to remember to update.
+  const staticPaths = (await getNavItems("sitemap")).map((item) =>
+    item.href === "/" ? "" : item.href
+  );
+
+  for (const path of staticPaths) {
+    for (const locale of routing.locales) {
+      entries.push({
+        url: `${site.url}/${locale}${path}`,
+        // The blog index changes when an article does. The other static
+        // pages carry no edit date of their own, and the field is left out
+        // rather than filled with the build date: a lastmod that moves on
+        // every deploy is one crawlers learn to ignore, the articles' with it.
+        lastModified: path === "/blog" ? newestPost : undefined,
+        alternates: { languages: localeLanguages(path) },
+        changeFrequency: path === "/blog" ? "weekly" : "monthly",
+      });
+    }
+  }
+
+  // The lab's studies live one level below /lab and are not in the nav table.
+  // Iterated rather than listed so a new entry in entries.ts shows up here
+  // without anyone remembering this file.
+  for (const entry of LAB_ENTRIES) {
+    const path = `/lab/${entry.slug}`;
+    for (const locale of routing.locales) {
+      entries.push({
+        url: `${site.url}/${locale}${path}`,
+        alternates: { languages: localeLanguages(path) },
+        changeFrequency: "monthly",
+      });
+    }
+  }
+
+  // The idols and the films hang one level below their rooms, listed in
+  // code like the studies.
+  const subPaths = [
+    ...IDOLS.map((idol) => `/idols/${idol.slug}`),
+    ...FILMS.map((film) => `/films/${film.slug}`),
+  ];
+  for (const path of subPaths) {
+    for (const locale of routing.locales) {
+      entries.push({
+        url: `${site.url}/${locale}${path}`,
+        alternates: { languages: localeLanguages(path) },
+        changeFrequency: "monthly",
+      });
+    }
+  }
 
   const pushEditions = (
     slugs: string[],

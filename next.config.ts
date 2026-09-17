@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } from "next/constants";
+import { envProblems } from "./src/lib/env";
 import { HASHED_ROUTES } from "./src/lib/immutable";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
@@ -74,4 +76,19 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+/**
+ * A production build or server refuses to start on a missing or mangled
+ * variable, naming all of them at once (src/lib/env.ts). Left to themselves
+ * they surface one by one — the admin's two not until somebody tries to log
+ * in. `next dev`, `next typegen` and the linter are other phases and are left
+ * alone: CI type-checks with no environment at all.
+ */
+export default function config(phase: string): NextConfig {
+  if (phase === PHASE_PRODUCTION_BUILD || phase === PHASE_PRODUCTION_SERVER) {
+    const problems = envProblems(process.env);
+    if (problems.length > 0) {
+      throw new Error(`Environment not fit to run:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
+    }
+  }
+  return withNextIntl(nextConfig);
+}

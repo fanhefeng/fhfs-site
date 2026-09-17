@@ -38,6 +38,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # local-only notes: anything named *.local.md stays on this machine
 *.local.md
