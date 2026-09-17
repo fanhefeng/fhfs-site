@@ -221,6 +221,9 @@ export function OvertureLight() {
       let alive = true;
       let devtools: { kill(): void } | null = null;
       if (debug) {
+        // The one import that goes round @/lib/gsap: registering it there
+        // would put a debugging tool in every page's bundle.
+        // oxlint-disable-next-line no-restricted-imports
         void import("gsap/GSDevTools").then(({ GSDevTools }) => {
           if (!alive) return;
           gsap.registerPlugin(GSDevTools);

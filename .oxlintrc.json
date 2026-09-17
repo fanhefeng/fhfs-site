@@ -6,6 +6,16 @@
   },
   "rules": {
     "eslint/no-console": ["warn", { "allow": ["warn", "error"] }],
+    "eslint/no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          { "name": "gsap", "message": "Import gsap from @/lib/gsap — the plugins are registered there, once." },
+          { "name": "@gsap/react", "message": "Import useGSAP from @/lib/gsap." }
+        ],
+        "patterns": [{ "group": ["gsap/*"], "message": "Import GSAP plugins from @/lib/gsap." }]
+      }
+    ],
     "react/exhaustive-deps": "error",
     "react/rules-of-hooks": "error",
     "react/react-in-jsx-scope": "off",
@@ -18,6 +28,10 @@
     "jsx-a11y/no-autofocus": "off"
   },
   "overrides": [
+    {
+      "files": ["src/lib/gsap.ts", "src/lib/gsap-extras.ts"],
+      "rules": { "eslint/no-restricted-imports": "off" }
+    },
     {
       "files": ["scripts/**"],
       "rules": { "eslint/no-console": "off" }
