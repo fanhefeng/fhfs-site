@@ -4204,8 +4204,8 @@
     },
     {
       "key": "lab.items.grove.summary",
-      "zh": "一条长满苔藓的树根，背后没有任何模型文件：扫掠出来的管、随光生长的苔藓垫、蕨叶与花序，和近二十万根实例化草叶。",
-      "en": "A moss-covered root with no model file behind it: swept tubes, a cushion that follows the light, ferns and flower sprays, and nearly two hundred thousand instanced blades.",
+      "zh": "一条长满苔藓的树根，背后没有任何模型文件：扫掠出来的管、随光生长的苔藓垫、蕨叶与花序，和二十三万根实例化草叶。",
+      "en": "A moss-covered root with no model file behind it: swept tubes, a cushion that follows the light, ferns and flower sprays, and two hundred and thirty thousand instanced blades.",
       "note": null
     },
     {
