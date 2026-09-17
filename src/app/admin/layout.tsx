@@ -27,17 +27,9 @@ export const metadata: Metadata = {
  *  the build from statically prerendering them with build-time data. */
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="zh-CN"
-      suppressHydrationWarning
-      className={`${fontVariables} h-full antialiased`}
-    >
+    <html lang="zh-CN" suppressHydrationWarning className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-dvh bg-bg text-fg">
         {/* The workbench is painted in the same `--bg`/`--fg` tokens the site
             is, and without this it resolved them light whatever the editor

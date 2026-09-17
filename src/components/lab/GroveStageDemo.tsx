@@ -94,7 +94,9 @@ export function GroveStageDemo({ accent, hint, fallbackNote, cards }: Props) {
     window.addEventListener("pointermove", onMove, { passive: true });
 
     let onScreen = false;
-    const io = new IntersectionObserver((entries) => { onScreen = entries.some((en) => en.isIntersecting); });
+    const io = new IntersectionObserver((entries) => {
+      onScreen = entries.some((en) => en.isIntersecting);
+    });
     io.observe(pin);
 
     const tick = () => {
@@ -121,8 +123,12 @@ export function GroveStageDemo({ accent, hint, fallbackNote, cards }: Props) {
     <div className="gs" style={{ "--gs-accent": accent } as CSSProperties}>
       {/* The approach's sheet first, this one's after it: same precedence,
           later in the document, so the overrides below win on a tie. */}
-      <style href="grove-approach" precedence="medium">{APPROACH_CSS}</style>
-      <style href="lab-grove-stage" precedence="medium">{CSS}</style>
+      <style href="grove-approach" precedence="medium">
+        {APPROACH_CSS}
+      </style>
+      <style href="lab-grove-stage" precedence="medium">
+        {CSS}
+      </style>
 
       <div
         ref={pinRef}
@@ -142,7 +148,9 @@ export function GroveStageDemo({ accent, hint, fallbackNote, cards }: Props) {
           </div>
         </div>
 
-        <p className="gs-hint" aria-hidden="true">{hint}</p>
+        <p className="gs-hint" aria-hidden="true">
+          {hint}
+        </p>
         {degraded && <p className="gs-note">{fallbackNote}</p>}
       </div>
     </div>

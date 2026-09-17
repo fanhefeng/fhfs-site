@@ -84,8 +84,7 @@ export function RouteTransition() {
        * is 20px on desktop, 10px on mobile (globals.css). Read once per
        * cover — an event-driven read, never per frame. */
       const targetBlur = () =>
-        getComputedStyle(veil).getPropertyValue("--blur-thick").trim() ||
-        "20px";
+        getComputedStyle(veil).getPropertyValue("--blur-thick").trim() || "20px";
 
       const lock = () => {
         if (locked) return;
@@ -176,11 +175,7 @@ export function RouteTransition() {
           },
         });
 
-        tl.to(
-          wordmark,
-          { autoAlpha: 0, duration: 0.18, ease: "power1.out", overwrite: "auto" },
-          0
-        )
+        tl.to(wordmark, { autoAlpha: 0, duration: 0.18, ease: "power1.out", overwrite: "auto" }, 0)
           // The veil departs power3.in — lingers a beat, then snaps clear.
           .to(
             veil,
@@ -190,7 +185,7 @@ export function RouteTransition() {
               duration: REVEAL_DURATION,
               ease: "power3.in",
             },
-            0
+            0,
           );
 
         if (main) {
@@ -206,15 +201,12 @@ export function RouteTransition() {
               ease: "power3.out",
               clearProps: "transform",
             },
-            0
+            0,
           );
         }
 
         // Net in case something else kills the timeline mid-flight.
-        timer = window.setTimeout(
-          forceClear,
-          (REVEAL_DURATION + 0.05) * 1000 + 400
-        );
+        timer = window.setTimeout(forceClear, (REVEAL_DURATION + 0.05) * 1000 + 400);
       };
       revealRef.current = reveal;
 
@@ -243,11 +235,11 @@ export function RouteTransition() {
             duration: COVER_DURATION,
             ease: "power3.out",
           },
-          0
+          0,
         ).to(
           wordmark,
           { autoAlpha: 1, duration: 0.28, ease: "power1.out", overwrite: "auto" },
-          0.05
+          0.05,
         );
       };
 
@@ -301,7 +293,7 @@ export function RouteTransition() {
         forceClear();
       };
     },
-    { scope: container }
+    { scope: container },
   );
 
   useEffect(() => {

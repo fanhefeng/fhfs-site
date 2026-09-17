@@ -73,10 +73,10 @@ function ReadingChip() {
       gsap.fromTo(
         root,
         { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.35, overwrite: "auto" }
+        { opacity: 1, y: 0, duration: 0.35, overwrite: "auto" },
       );
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   return (
@@ -91,10 +91,7 @@ function ReadingChip() {
     >
       {/* Hairline track + solid amber fill (brand color stays a solid layer;
           only the glass chip beneath it is translucent). */}
-      <span
-        aria-hidden
-        className="relative block h-0.5 w-9 overflow-hidden rounded-full bg-fg/15"
-      >
+      <span aria-hidden className="relative block h-0.5 w-9 overflow-hidden rounded-full bg-fg/15">
         <span
           ref={fillRef}
           className="absolute inset-0 origin-left scale-x-0 rounded-full bg-accent will-change-transform"

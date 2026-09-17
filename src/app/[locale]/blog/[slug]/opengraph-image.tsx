@@ -17,9 +17,7 @@ export const contentType = "image/png";
  */
 export async function generateStaticParams() {
   const slugs = await getAllSlugs();
-  return routing.locales.flatMap((locale) =>
-    slugs.map((slug) => ({ locale, slug }))
-  );
+  return routing.locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })));
 }
 
 /** CJK glyphs occupy roughly a full em — count them double when fitting. */
@@ -44,9 +42,7 @@ export default async function PostOgImage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const l: Locale = hasLocale(routing.locales, locale)
-    ? locale
-    : routing.defaultLocale;
+  const l: Locale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
   const other: Locale = l === "zh" ? "en" : "zh";
 
   const post = await getPost(slug, l);
@@ -55,117 +51,109 @@ export default async function PostOgImage({
   // quiet second deck. Skipped when the post only exists in one language (in
   // which case getPost falls back and both lookups return the same string).
   const counterpart = await getPost(slug, other);
-  const subtitle =
-    counterpart && counterpart.title !== title ? counterpart.title : null;
+  const subtitle = counterpart && counterpart.title !== title ? counterpart.title : null;
 
   const date = post ? post.date.replaceAll("-", ".") : "";
-  const meta = [date, ...(post?.tags ?? []).slice(0, 3)]
-    .filter(Boolean)
-    .join("  ·  ");
+  const meta = [date, ...(post?.tags ?? []).slice(0, 3)].filter(Boolean).join("  ·  ");
   const host = new URL(site.url).host;
 
-  const fonts = await loadOgFonts(
-    `${title}${site.signName}`,
-    `${subtitle ?? ""}${meta}${host}`
-  );
+  const fonts = await loadOgFonts(`${title}${site.signName}`, `${subtitle ?? ""}${meta}${host}`);
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "68px 84px",
-          background: OG_BG,
-          color: OG.ink,
-          fontFamily: OG_FONT_FAMILY,
-        }}
-      >
-        {/* Meta line: date · tags, led by the site's mark. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <OgSignMark size={44} />
-          <div
-            style={{
-              display: "flex",
-              fontSize: 22,
-              fontWeight: 400,
-              letterSpacing: 2,
-              color: OG.inkTertiary,
-            }}
-          >
-            {meta}
-          </div>
-        </div>
-
-        {/* Headline block. */}
-        <div style={{ display: "flex", flexDirection: "column", maxWidth: 1000 }}>
-          <div
-            style={{
-              display: "flex",
-              fontSize: titleSize(title),
-              fontWeight: 700,
-              letterSpacing: -2,
-              lineHeight: 1.18,
-              color: OG.ink,
-            }}
-          >
-            {title}
-          </div>
-          {subtitle ? (
-            <div
-              style={{
-                display: "flex",
-                marginTop: 26,
-                fontSize: 28,
-                fontWeight: 400,
-                lineHeight: 1.4,
-                color: OG.inkSecondary,
-              }}
-            >
-              {subtitle}
-            </div>
-          ) : null}
-        </div>
-
-        {/* Footer: wordmark, amber rule, host. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
-          <div
-            style={{
-              display: "flex",
-              fontSize: 34,
-              fontWeight: 700,
-              letterSpacing: -1.5,
-              color: OG.ink,
-            }}
-          >
-            {site.signName}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              width: 44,
-              height: 4,
-              borderRadius: 2,
-              background: OG.accent,
-            }}
-          />
-          <div
-            style={{
-              display: "flex",
-              fontSize: 22,
-              fontWeight: 400,
-              letterSpacing: 3,
-              color: OG.inkTertiary,
-            }}
-          >
-            {host}
-          </div>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: "68px 84px",
+        background: OG_BG,
+        color: OG.ink,
+        fontFamily: OG_FONT_FAMILY,
+      }}
+    >
+      {/* Meta line: date · tags, led by the site's mark. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <OgSignMark size={44} />
+        <div
+          style={{
+            display: "flex",
+            fontSize: 22,
+            fontWeight: 400,
+            letterSpacing: 2,
+            color: OG.inkTertiary,
+          }}
+        >
+          {meta}
         </div>
       </div>
-    ),
-    { ...size, fonts }
+
+      {/* Headline block. */}
+      <div style={{ display: "flex", flexDirection: "column", maxWidth: 1000 }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: titleSize(title),
+            fontWeight: 700,
+            letterSpacing: -2,
+            lineHeight: 1.18,
+            color: OG.ink,
+          }}
+        >
+          {title}
+        </div>
+        {subtitle ? (
+          <div
+            style={{
+              display: "flex",
+              marginTop: 26,
+              fontSize: 28,
+              fontWeight: 400,
+              lineHeight: 1.4,
+              color: OG.inkSecondary,
+            }}
+          >
+            {subtitle}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Footer: wordmark, amber rule, host. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+        <div
+          style={{
+            display: "flex",
+            fontSize: 34,
+            fontWeight: 700,
+            letterSpacing: -1.5,
+            color: OG.ink,
+          }}
+        >
+          {site.signName}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            width: 44,
+            height: 4,
+            borderRadius: 2,
+            background: OG.accent,
+          }}
+        />
+        <div
+          style={{
+            display: "flex",
+            fontSize: 22,
+            fontWeight: 400,
+            letterSpacing: 3,
+            color: OG.inkTertiary,
+          }}
+        >
+          {host}
+        </div>
+      </div>
+    </div>,
+    { ...size, fonts },
   );
 }

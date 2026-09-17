@@ -31,7 +31,7 @@ export function useLocalClock(): string | null {
         update();
         interval = window.setInterval(update, 60_000);
       },
-      (60 - new Date().getSeconds()) * 1000 + 100
+      (60 - new Date().getSeconds()) * 1000 + 100,
     );
     return () => {
       window.clearTimeout(align);

@@ -16,9 +16,7 @@ describe("lines", () => {
 
 describe("parseInline", () => {
   it("leaves plain text as one run", () => {
-    expect(parseInline("just words")).toEqual([
-      { text: "just words", kind: "text" },
-    ]);
+    expect(parseInline("just words")).toEqual([{ text: "just words", kind: "text" }]);
   });
 
   it("splits strong and code spans out of a line", () => {
@@ -45,9 +43,7 @@ describe("parseInline", () => {
   it("keeps malformed markup as the text it is", () => {
     expect(parseInline("a ** b")).toEqual([{ text: "a ** b", kind: "text" }]);
     expect(parseInline("****")).toEqual([{ text: "****", kind: "text" }]);
-    expect(parseInline("un`closed")).toEqual([
-      { text: "un`closed", kind: "text" },
-    ]);
+    expect(parseInline("un`closed")).toEqual([{ text: "un`closed", kind: "text" }]);
   });
 
   it("does not let two strong spans swallow the text between them", () => {
@@ -68,9 +64,7 @@ describe("skills", () => {
   });
 
   it("reads a line without a pipe as items with no heading", () => {
-    expect(parseSkillLines("just items")).toEqual([
-      { name: "", items: "just items" },
-    ]);
+    expect(parseSkillLines("just items")).toEqual([{ name: "", items: "just items" }]);
   });
 
   it("round-trips through the formatter", () => {
@@ -139,7 +133,7 @@ describe("projects", () => {
         "",
         "# Desktop",
         "- **Electron** shell",
-      ].join("\n")
+      ].join("\n"),
     );
   });
 });

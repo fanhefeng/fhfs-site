@@ -37,8 +37,22 @@ export function OgSignMark({ size }: { size: number }) {
         <path d={ring} {...stroke} stroke={NEON.tube} strokeWidth={36} />
         <path d={ring} {...stroke} stroke={NEON.core} strokeWidth={12} />
         <g transform={NOTE_T}>
-          <path d={NOTE_D} {...note} fill={NEON.halo} stroke={NEON.halo} strokeWidth={90} opacity={0.28} />
-          <path d={NOTE_D} {...note} fill={NEON.glow} stroke={NEON.glow} strokeWidth={40} opacity={0.7} />
+          <path
+            d={NOTE_D}
+            {...note}
+            fill={NEON.halo}
+            stroke={NEON.halo}
+            strokeWidth={90}
+            opacity={0.28}
+          />
+          <path
+            d={NOTE_D}
+            {...note}
+            fill={NEON.glow}
+            stroke={NEON.glow}
+            strokeWidth={40}
+            opacity={0.7}
+          />
           <path d={NOTE_D} {...note} fill={NEON.tube} stroke={NEON.tube} strokeWidth={14} />
           <path d={NOTE_D} fill={NEON.core} />
         </g>

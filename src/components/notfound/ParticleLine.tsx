@@ -165,7 +165,7 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
       ink = parseColor(getComputedStyle(textEl).color, [26, 26, 26]);
       accent = parseColor(
         getComputedStyle(document.documentElement).getPropertyValue("--accent"),
-        [180, 83, 9]
+        [180, 83, 9],
       );
     };
 
@@ -247,8 +247,7 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
       const data = oc.getImageData(0, 0, off.width, off.height).data;
       const width = off.width;
 
-      let gap =
-        GAP_LADDER.find(([limit]) => window.innerWidth < limit)?.[1] ?? 4;
+      let gap = GAP_LADDER.find(([limit]) => window.innerWidth < limit)?.[1] ?? 4;
 
       // Coarsen until the ceiling holds. One line of type never needs this;
       // it is here so an unusually long string cannot blow the budget.
@@ -480,7 +479,7 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
         if (visible) start();
         else stop();
       },
-      { rootMargin: "100px" }
+      { rootMargin: "100px" },
     );
     io.observe(canvas);
 
@@ -490,10 +489,7 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
       // on that would stop the loop and reset the entrance a beat after it
       // started, so only a box that actually changed counts.
       const rect = host.getBoundingClientRect();
-      if (
-        Math.abs(rect.width - sampledW) < 1 &&
-        Math.abs(rect.height - sampledH) < 1
-      ) {
+      if (Math.abs(rect.width - sampledW) < 1 && Math.abs(rect.height - sampledH) < 1) {
         return;
       }
       window.clearTimeout(resizeTimer);

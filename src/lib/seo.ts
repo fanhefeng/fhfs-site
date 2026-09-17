@@ -15,7 +15,7 @@ import { site } from "@/config/site";
  */
 export function localeLanguages(
   path: string,
-  available: readonly Locale[] = routing.locales
+  available: readonly Locale[] = routing.locales,
 ): Record<string, string> {
   const languages: Record<string, string> = {};
   for (const locale of available) {
@@ -36,12 +36,10 @@ export function feedTypes(locale: string): Record<string, string> {
 export function localeAlternates(
   path: string,
   currentLocale: string,
-  available: readonly Locale[] = routing.locales
+  available: readonly Locale[] = routing.locales,
 ): NonNullable<Metadata["alternates"]> {
   const languages = localeLanguages(path, available);
-  const xDefault = available.includes(routing.defaultLocale)
-    ? routing.defaultLocale
-    : available[0];
+  const xDefault = available.includes(routing.defaultLocale) ? routing.defaultLocale : available[0];
   if (xDefault) languages["x-default"] = `${site.url}/${xDefault}${path}`;
   return {
     canonical: `${site.url}/${currentLocale}${path}`,

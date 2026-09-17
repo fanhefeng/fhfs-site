@@ -21,8 +21,7 @@ const PROFILE_FIELDS: Field[] = [
     kind: "lines",
     rows: 24,
     group: "正文各节",
-    hint:
-      "页面的主体，显示在个人信息之后、其余各节之前。以「# 标题」起一节（我是谁 / 我做过什么 / 我怎么工作……），下面一行一段，节之间空一行。段落里 **粗体** 和 `代码` 会按样式渲染。",
+    hint: "页面的主体，显示在个人信息之后、其余各节之前。以「# 标题」起一节（我是谁 / 我做过什么 / 我怎么工作……），下面一行一段，节之间空一行。段落里 **粗体** 和 `代码` 会按样式渲染。",
   },
   {
     name: "intro",
@@ -31,7 +30,13 @@ const PROFILE_FIELDS: Field[] = [
     group: "正文各节",
     hint: "一行一段，空行忽略。有分节正文时通常留空。",
   },
-  { name: "highlights", label: "概述下的要点", kind: "lines", hint: INLINE_HINT, group: "正文各节" },
+  {
+    name: "highlights",
+    label: "概述下的要点",
+    kind: "lines",
+    hint: INLINE_HINT,
+    group: "正文各节",
+  },
   {
     name: "skills",
     label: "技能表",
@@ -132,11 +137,7 @@ export default async function ResumeAdminPage() {
       <section className={`${cardClass} p-5 sm:p-6`}>
         <h2 className={metaClass}>个人信息</h2>
         <div className="mt-4">
-          <RecordForm
-            action={saveResumeProfile}
-            fields={PROFILE_FIELDS}
-            record={record}
-          />
+          <RecordForm action={saveResumeProfile} fields={PROFILE_FIELDS} record={record} />
         </div>
       </section>
 

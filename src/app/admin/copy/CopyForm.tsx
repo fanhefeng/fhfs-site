@@ -29,10 +29,7 @@ type CopyRow = {
  * page must never do is make a save depend on what happens to be filtered in.
  */
 export function CopyForm({ rows }: { rows: CopyRow[] }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    saveCopy,
-    {}
-  );
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveCopy, {});
   const [query, setQuery] = useState("");
 
   const groups = new Map<string, CopyRow[]>();
@@ -43,8 +40,7 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
 
   const needle = query.trim().toLowerCase();
   const matches = (row: CopyRow) =>
-    !needle ||
-    `${row.key} ${row.zh} ${row.en} ${row.note ?? ""}`.toLowerCase().includes(needle);
+    !needle || `${row.key} ${row.zh} ${row.en} ${row.note ?? ""}`.toLowerCase().includes(needle);
   const hits = rows.filter(matches).length;
 
   return (
@@ -57,7 +53,12 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
             className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-fg-tertiary"
           >
             <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
-            <path d="m10.5 10.5 3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            <path
+              d="m10.5 10.5 3 3"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
           </svg>
           <input
             type="search"
@@ -120,9 +121,7 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
                     <p className="font-mono text-meta text-fg-tertiary">
                       {row.key.slice(namespace.length + 1)}
                     </p>
-                    {row.note && (
-                      <p className={`mt-1 max-w-[70ch] ${hintClass}`}>{row.note}</p>
-                    )}
+                    {row.note && <p className={`mt-1 max-w-[70ch] ${hintClass}`}>{row.note}</p>}
                     <div className="mt-2 grid gap-3 sm:grid-cols-2">
                       <label className="space-y-1">
                         <span className="font-mono text-meta text-fg-tertiary">zh</span>
@@ -149,9 +148,7 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
         })}
       </div>
 
-      {hits === 0 && (
-        <p className={`mt-6 ${hintClass}`}>没有匹配「{query}」的文案。</p>
-      )}
+      {hits === 0 && <p className={`mt-6 ${hintClass}`}>没有匹配「{query}」的文案。</p>}
 
       <SaveControls state={state} pending={pending} label="保存全部" sticky />
     </form>

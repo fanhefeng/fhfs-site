@@ -32,10 +32,7 @@ export function Segmented({
       : "peer-checked:bg-fg peer-checked:text-bg";
 
   return (
-    <div
-      role="radiogroup"
-      className="inline-flex rounded-chip border border-line bg-surface p-1"
-    >
+    <div role="radiogroup" className="inline-flex rounded-chip border border-line bg-surface p-1">
       {options.map((option) => (
         <label key={option.value} className="relative cursor-pointer">
           <input
@@ -95,13 +92,9 @@ export function Toggle({
         {/* The state in a word, so the switch is readable without knowing
             which way is "on" — only one of the two is ever shown. */}
         <span className={`${metaClass} peer-checked:hidden`}>{offLabel}</span>
-        <span className={`${metaClass} hidden text-accent peer-checked:inline`}>
-          {onLabel}
-        </span>
+        <span className={`${metaClass} hidden text-accent peer-checked:inline`}>{onLabel}</span>
       </label>
-      {hint && (
-        <p className="mt-1.5 ml-14 text-caption text-fg-tertiary">{hint}</p>
-      )}
+      {hint && <p className="mt-1.5 ml-14 text-caption text-fg-tertiary">{hint}</p>}
     </div>
   );
 }

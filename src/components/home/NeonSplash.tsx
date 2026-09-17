@@ -60,14 +60,7 @@ const PUSH_FOR = 1.0;
  * push is one transform on a masked layer — the hole tracks the ring
  * because the mask lives in the layer's own coordinates and scales with it.
  */
-export function NeonSplash({
-  label,
-  welcome,
-  signOn,
-  signOff,
-  enter,
-  enterHint,
-}: Props) {
+export function NeonSplash({ label, welcome, signOn, signOff, enter, enterHint }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const wallRef = useRef<HTMLCanvasElement>(null);
@@ -121,7 +114,17 @@ export function NeonSplash({
       const foot = footRef.current;
       const sign = switchRef.current;
       const enterBtn = enterRef.current;
-      if (!root || !stage || !svg || !spill || !welcomeEl || !foot || !sign || !enterBtn || !contextSafe) {
+      if (
+        !root ||
+        !stage ||
+        !svg ||
+        !spill ||
+        !welcomeEl ||
+        !foot ||
+        !sign ||
+        !enterBtn ||
+        !contextSafe
+      ) {
         return;
       }
 
@@ -167,7 +170,7 @@ export function NeonSplash({
           gsap.fromTo(
             [welcomeEl, foot],
             { autoAlpha: 0, filter: "blur(6px)" },
-            { autoAlpha: 1, filter: "blur(0px)", duration: 1.1, ease: EASE.default, stagger: 0.25 }
+            { autoAlpha: 1, filter: "blur(0px)", duration: 1.1, ease: EASE.default, stagger: 0.25 },
           );
         }
         wantMusic();
@@ -186,7 +189,14 @@ export function NeonSplash({
       // One tube loses its nerve for a moment under the pointer.
       let stutter: gsap.core.Timeline | null = null;
       stutterRef.current = contextSafe(() => {
-        if (!poweredRef.current || entering || main.isActive() || stutter?.isActive() || !isFinePointer()) return;
+        if (
+          !poweredRef.current ||
+          entering ||
+          main.isActive() ||
+          stutter?.isActive() ||
+          !isFinePointer()
+        )
+          return;
         const i = Math.floor(Math.random() * letters.length);
         stutter = gsap.timeline();
         score(stutter, letters[i]!, 0, STUTTER);
@@ -262,7 +272,7 @@ export function NeonSplash({
           Math.hypot(cx, cy),
           Math.hypot(vw - cx, cy),
           Math.hypot(cx, vh - cy),
-          Math.hypot(vw - cx, vh - cy)
+          Math.hypot(vw - cx, vh - cy),
         );
         // Far enough that the tube's inner edge has cleared the last corner.
         const S = (far / rIn) * 1.06 + 0.1;
@@ -283,8 +293,18 @@ export function NeonSplash({
         exit = tl;
         tl.to([welcomeEl, foot], { autoAlpha: 0, duration: 0.25, ease: EASE.exit }, 0);
         // The letters and the bar lose power; the ring and the note hold the door.
-        letters.forEach((l, i) => score(tl, l, 0.05 + i * 0.04, [[0.04, 0], [0.03, 0.5], [0.04, 0]]));
-        score(tl, bar, 0.12, [[0.05, 0], [0.04, 0.6], [0.04, 0]]);
+        letters.forEach((l, i) =>
+          score(tl, l, 0.05 + i * 0.04, [
+            [0.04, 0],
+            [0.03, 0.5],
+            [0.04, 0],
+          ]),
+        );
+        score(tl, bar, 0.12, [
+          [0.05, 0],
+          [0.04, 0.6],
+          [0.04, 0],
+        ]);
         tl.to(spill, { opacity: 0.5, duration: 0.35, ease: "none" }, 0.1);
         // The iris: paper shows through the ring.
         tl.to(p, { u: 1, duration: IRIS_FOR, ease: "power2.inOut", onUpdate: apply }, IRIS_AT);
@@ -299,7 +319,8 @@ export function NeonSplash({
       // invisible focus ring — and Enter would activate an unseen link.
       const onFocusIn = (e: FocusEvent) => {
         const target = e.target;
-        if (target instanceof Node && !root.contains(target)) enterBtn.focus({ preventScroll: true });
+        if (target instanceof Node && !root.contains(target))
+          enterBtn.focus({ preventScroll: true });
       };
       const onKeyDown = (e: KeyboardEvent) => {
         if (e.target === sign && (e.key === "Enter" || e.key === " ")) return;
@@ -352,7 +373,7 @@ export function NeonSplash({
         setPowered(false);
       };
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   if (phase === "done") return null;
@@ -361,7 +382,11 @@ export function NeonSplash({
     <>
       {/* The pre-paint decision, as raw HTML: see ThemeInitScript for why a
           script goes through a wrapper element rather than a React <script>. */}
-      <div hidden suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `<script>${SPLASH_INIT_SCRIPT}</script>` }} />
+      <div
+        hidden
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: `<script>${SPLASH_INIT_SCRIPT}</script>` }}
+      />
       <div ref={rootRef} className="ns" role="dialog" aria-modal="true" aria-label={label}>
         <style href="home-neon-splash" precedence="medium">
           {WALL_CSS + CSS}
@@ -389,7 +414,12 @@ export function NeonSplash({
             </div>
 
             <div ref={footRef} className="ns-foot">
-              <button ref={enterRef} type="button" className="ns-enter" onClick={() => enterRefFn.current?.()}>
+              <button
+                ref={enterRef}
+                type="button"
+                className="ns-enter"
+                onClick={() => enterRefFn.current?.()}
+              >
                 <span>{enter}</span>
                 <span className="ns-enter-arrow" aria-hidden="true">
                   →

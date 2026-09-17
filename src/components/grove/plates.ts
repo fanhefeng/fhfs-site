@@ -24,16 +24,19 @@ import * as THREE from "three";
  * what gives a flat cluster its depth. Defaults are the spring dress, so a
  * caller that has no opinion gets the flower this scene was built with.
  */
-export function flowerTexture(
-  petal = "255,255,251",
-  heart = "#f0e7bd"
-): THREE.CanvasTexture {
+export function flowerTexture(petal = "255,255,251", heart = "#f0e7bd"): THREE.CanvasTexture {
   const c = document.createElement("canvas");
   c.width = c.height = 64;
   const g = c.getContext("2d")!;
   const florets: [number, number, number][] = [
-    [32, 22, 7.4], [22, 33, 6.0], [42, 33, 6.2], [27, 44, 5.0],
-    [39, 45, 5.4], [32, 33, 4.4], [46, 22, 4.2], [18, 22, 4.0],
+    [32, 22, 7.4],
+    [22, 33, 6.0],
+    [42, 33, 6.2],
+    [27, 44, 5.0],
+    [39, 45, 5.4],
+    [32, 33, 4.4],
+    [46, 22, 4.2],
+    [18, 22, 4.0],
   ];
   florets.forEach(([cx, cy, r], i) => {
     g.save();
@@ -200,7 +203,8 @@ export function wingGeometry(hind: boolean): THREE.BufferGeometry {
     const span = hind ? 0.78 : 0.95;
     const lead = hind ? -0.06 - 0.26 * sp : 0.1 + 0.32 * sp - 0.14 * sp * sp;
     let chord = hind
-      ? (0.54 + 0.48 * sp) * Math.pow(Math.max(0, 1 - Math.pow(sp, 2.2)), 0.55) *
+      ? (0.54 + 0.48 * sp) *
+        Math.pow(Math.max(0, 1 - Math.pow(sp, 2.2)), 0.55) *
         (1 + 0.035 * Math.cos(sp * 22))
       : (0.56 + 0.46 * sp) * Math.pow(Math.max(0, 1 - Math.pow(sp, 2.6)), 0.55);
     // Both pairs hinge on the thorax, so both roots have to be short — give

@@ -36,20 +36,29 @@ describe("the committed hashes", () => {
 });
 
 describe("hashCssUrls", () => {
-  const manifest: AssetManifest = { files: { "/grove/moss.webp": "11111111" }, sets: { "/fonts/yozai": "22222222" } };
+  const manifest: AssetManifest = {
+    files: { "/grove/moss.webp": "11111111" },
+    sets: { "/fonts/yozai": "22222222" },
+  };
 
   it("hashes what is ours and leaves the rest", () => {
     expect(
-      hashCssUrls('a{src:url("/fonts/yozai/400/yz-1.woff2")}b{background:url("/grove/moss.webp"),url("/other/x.png")}', manifest)
+      hashCssUrls(
+        'a{src:url("/fonts/yozai/400/yz-1.woff2")}b{background:url("/grove/moss.webp"),url("/other/x.png")}',
+        manifest,
+      ),
     ).toBe(
-      'a{src:url("/fonts/yozai/_22222222/400/yz-1.woff2")}b{background:url("/grove/moss.11111111.webp"),url("/other/x.png")}'
+      'a{src:url("/fonts/yozai/_22222222/400/yz-1.woff2")}b{background:url("/grove/moss.11111111.webp"),url("/other/x.png")}',
     );
   });
 
   it("replaces a hash that has gone stale instead of stacking a second one", () => {
-    const stale = 'a{src:url("/fonts/yozai/_aaaaaaaa/400/yz-1.woff2")}b{background:url("/grove/moss.bbbbbbbb.webp")}';
+    const stale =
+      'a{src:url("/fonts/yozai/_aaaaaaaa/400/yz-1.woff2")}b{background:url("/grove/moss.bbbbbbbb.webp")}';
     const fresh = hashCssUrls(stale, manifest);
-    expect(fresh).toBe('a{src:url("/fonts/yozai/_22222222/400/yz-1.woff2")}b{background:url("/grove/moss.11111111.webp")}');
+    expect(fresh).toBe(
+      'a{src:url("/fonts/yozai/_22222222/400/yz-1.woff2")}b{background:url("/grove/moss.11111111.webp")}',
+    );
     expect(hashCssUrls(fresh, manifest)).toBe(fresh);
   });
 });
@@ -72,10 +81,12 @@ describe("asset", () => {
     for (const file of sourceFiles(path.join(root, "src"))) {
       // The three modules that define the scheme quote addresses in their
       // comments, as examples.
-      if (file.endsWith(".css") || /\/lib\/(asset|assetManifest|immutable)\.ts$/.test(file)) continue;
+      if (file.endsWith(".css") || /\/lib\/(asset|assetManifest|immutable)\.ts$/.test(file))
+        continue;
       for (const m of readFileSync(file, "utf8").matchAll(literal)) {
         seen++;
-        if (!m[1]!.endsWith("asset(")) bare.push(`${path.relative(root, file)}: ${m[0].slice(m[1]!.length)}`);
+        if (!m[1]!.endsWith("asset("))
+          bare.push(`${path.relative(root, file)}: ${m[0].slice(m[1]!.length)}`);
       }
     }
     expect(seen).toBeGreaterThan(10);
@@ -87,7 +98,11 @@ describe("asset", () => {
     const plain = new RegExp(`url\\(["']?/(?:${dirs})/(?![^)]*[._][0-9a-f]{8}[./])[^)]*\\)`, "g");
     const bare = sourceFiles(path.join(root, "src"))
       .filter((file) => file.endsWith(".css"))
-      .flatMap((file) => [...readFileSync(file, "utf8").matchAll(plain)].map((m) => `${path.relative(root, file)}: ${m[0]}`));
+      .flatMap((file) =>
+        [...readFileSync(file, "utf8").matchAll(plain)].map(
+          (m) => `${path.relative(root, file)}: ${m[0]}`,
+        ),
+      );
     expect(bare).toEqual([]);
   });
 });

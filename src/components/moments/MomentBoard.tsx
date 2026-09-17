@@ -30,7 +30,7 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
   const notebooks = useMemo(() => collections(items), [items]);
   const filtered = useMemo(
     () => (notebook ? items.filter((item) => item.collection === notebook) : items),
-    [items, notebook]
+    [items, notebook],
   );
   const groups = groupByYear(filtered, (item) => item.year);
 
@@ -86,7 +86,6 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
           </Reveal>
         </section>
       ))}
-
     </>
   );
 }
@@ -114,7 +113,9 @@ function Chip({
       }`}
     >
       <span>{children}</span>
-      <span className={`font-mono text-meta tabular-nums ${pressed ? "text-bg/70" : "text-fg-tertiary"}`}>
+      <span
+        className={`font-mono text-meta tabular-nums ${pressed ? "text-bg/70" : "text-fg-tertiary"}`}
+      >
         {count}
       </span>
     </button>
@@ -156,7 +157,10 @@ function MomentCard({
                 <span className="ml-2 font-normal text-fg-tertiary">「{item.collection}」</span>
               )}
             </p>
-            <time dateTime={item.dateTime} className="font-mono text-meta text-fg-tertiary tabular-nums">
+            <time
+              dateTime={item.dateTime}
+              className="font-mono text-meta text-fg-tertiary tabular-nums"
+            >
               {item.time}
             </time>
           </div>

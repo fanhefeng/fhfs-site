@@ -23,7 +23,7 @@ export function DeviceShowcase({ apps }: { apps: SoftwareApp[] }) {
 
   const options = useMemo<Segment[]>(
     () => apps.map((a) => ({ value: a.id, label: a.name })),
-    [apps]
+    [apps],
   );
   const current = apps.find((a) => a.id === id) ?? apps[0];
 
@@ -43,14 +43,14 @@ export function DeviceShowcase({ apps }: { apps: SoftwareApp[] }) {
           ease: "power2.out",
           overwrite: "auto",
           clearProps: "transform,opacity,visibility",
-        }
+        },
       );
     },
     // No `revertOnUpdate`: the callback returns no teardown, and DESIGN.md §1.5
     // keeps the flag for the ones that do. There is nothing to undo on a
     // channel change either — the tween clears its own props on landing, and
     // `overwrite: "auto"` retires whichever one is still in flight.
-    { dependencies: [id], scope: screensRef }
+    { dependencies: [id], scope: screensRef },
   );
 
   if (!current) return null;

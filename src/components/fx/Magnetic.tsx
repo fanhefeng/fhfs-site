@@ -53,11 +53,9 @@ export function Magnetic({ children, strength = 0.4, className }: Props) {
         if (!rect) return;
         // Cursor position -> signed offset from center, scaled by strength.
         const dx =
-          gsap.utils.mapRange(0, rect.w, -rect.w / 2, rect.w / 2, e.clientX - rect.left) *
-          strength;
+          gsap.utils.mapRange(0, rect.w, -rect.w / 2, rect.w / 2, e.clientX - rect.left) * strength;
         const dy =
-          gsap.utils.mapRange(0, rect.h, -rect.h / 2, rect.h / 2, e.clientY - rect.top) *
-          strength;
+          gsap.utils.mapRange(0, rect.h, -rect.h / 2, rect.h / 2, e.clientY - rect.top) * strength;
         gsap.to(wrap, { x: dx, y: dy, duration: 0.4, ease: "power2.out", overwrite: "auto" });
         // Parallax layer: the content leads a little further than the plate.
         gsap.to(inner, {
@@ -90,14 +88,11 @@ export function Magnetic({ children, strength = 0.4, className }: Props) {
         gsap.killTweensOf([wrap, inner]);
       };
     },
-    { scope: wrapRef }
+    { scope: wrapRef },
   );
 
   return (
-    <span
-      ref={wrapRef}
-      className={`inline-block will-change-transform ${className ?? ""}`}
-    >
+    <span ref={wrapRef} className={`inline-block will-change-transform ${className ?? ""}`}>
       <span ref={innerRef} className="inline-block will-change-transform">
         {children}
       </span>

@@ -6,12 +6,7 @@ import { useGLTF, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { DecalGeometry } from "three/addons/geometries/DecalGeometry.js";
 
-import {
-  GLASSES,
-  INTRO_STICKERS,
-  MODEL_ANCHOR_FROM_TOP,
-  MODEL_URL,
-} from "@/lib/intro/stickers";
+import { GLASSES, INTRO_STICKERS, MODEL_ANCHOR_FROM_TOP, MODEL_URL } from "@/lib/intro/stickers";
 import {
   renderOnDemand,
   scrollState,
@@ -121,11 +116,10 @@ export type Tone = "light" | "dark";
 
 /** Lit like paper by day; by night the key drops and the warm bounce carries
  *  the face, so the avatar never glows out of a dark page. */
-const LIGHTING: Record<Tone, { ambient: number; key: number; fill: number; warm: number }> =
-  {
-    light: { ambient: 0.75, key: 2.1, fill: 0.75, warm: 1.35 },
-    dark: { ambient: 0.34, key: 1.3, fill: 0.4, warm: 1.05 },
-  };
+const LIGHTING: Record<Tone, { ambient: number; key: number; fill: number; warm: number }> = {
+  light: { ambient: 0.75, key: 2.1, fill: 0.75, warm: 1.35 },
+  dark: { ambient: 0.34, key: 1.3, fill: 0.4, warm: 1.05 },
+};
 
 /**
  * The canvas is transparent on purpose — the page's own paper, aurora and
@@ -165,9 +159,7 @@ function Atmosphere({ tone }: { tone: Tone }) {
   // Read the paper colour straight off the token, so a change to `--bg` in
   // globals.css carries into the 3D fog without being restated here.
   useEffect(() => {
-    const value = getComputedStyle(document.documentElement)
-      .getPropertyValue("--bg")
-      .trim();
+    const value = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
     if (value) fogTarget.current.set(value);
     // Nothing else is going to ask for the frame this ease needs to start on.
     invalidate();
@@ -224,12 +216,7 @@ function Atmosphere({ tone }: { tone: Tone }) {
         shadow-bias={-0.0002}
       />
       <directionalLight ref={fill} position={[-4.5, 1.5, 2.5]} intensity={initial.fill} />
-      <directionalLight
-        ref={warm}
-        position={[0, 2, -5]}
-        intensity={initial.warm}
-        color="#ffe9c9"
-      />
+      <directionalLight ref={warm} position={[0, 2, -5]} intensity={initial.warm} color="#ffe9c9" />
     </>
   );
 }
@@ -255,27 +242,17 @@ function roundedRect(w: number, h: number, r: number) {
 }
 
 /** A square rod between two points — used for both temples and the bridge. */
-function bar(
-  from: THREE.Vector3,
-  to: THREE.Vector3,
-  w: number,
-  h: number,
-  mat: THREE.Material
-) {
+function bar(from: THREE.Vector3, to: THREE.Vector3, w: number, h: number, mat: THREE.Material) {
   const dir = to.clone().sub(from);
   const len = dir.length();
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, len), mat);
   mesh.position.copy(from).addScaledVector(dir, 0.5);
-  mesh.quaternion.setFromUnitVectors(
-    new THREE.Vector3(0, 0, 1),
-    dir.normalize()
-  );
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.normalize());
   return mesh;
 }
 
 function buildGlasses() {
-  const { eyeY, frontZ, lensW, lensH, lensCX, rim, depth, earX, earY, earZ } =
-    GLASSES;
+  const { eyeY, frontZ, lensW, lensH, lensCX, rim, depth, earX, earY, earZ } = GLASSES;
   const g = new THREE.Group();
   const mat = new THREE.MeshStandardMaterial({
     color: "#161616",
@@ -304,7 +281,7 @@ function buildGlasses() {
     rimMesh.position.set(
       side * (innerX + (lensW / 2) * Math.cos(wrap)),
       eyeY,
-      frontZ - (lensW / 2) * Math.sin(wrap)
+      frontZ - (lensW / 2) * Math.sin(wrap),
     );
     rimMesh.rotation.y = side * wrap;
     g.add(rimMesh);
@@ -313,13 +290,13 @@ function buildGlasses() {
         new THREE.Vector3(
           side * (innerX + lensW * Math.cos(wrap)),
           hingeY,
-          frontZ - lensW * Math.sin(wrap)
+          frontZ - lensW * Math.sin(wrap),
         ),
         new THREE.Vector3(side * earX, earY, earZ),
         0.02,
         0.035,
-        mat
-      )
+        mat,
+      ),
     );
   }
   g.add(
@@ -328,8 +305,8 @@ function buildGlasses() {
       new THREE.Vector3(lensCX - lensW / 2 + rim, hingeY, frontZ),
       0.12,
       0.03,
-      mat
-    )
+      mat,
+    ),
   );
 
   g.traverse((o) => {
@@ -378,13 +355,7 @@ type Placed = {
   texture: THREE.Texture;
 };
 
-function Decals({
-  mesh,
-  hits,
-}: {
-  mesh: THREE.Mesh | null;
-  hits: Record<string, SurfaceHit>;
-}) {
+function Decals({ mesh, hits }: { mesh: THREE.Mesh | null; hits: Record<string, SurfaceHit> }) {
   const overrides = useIntroStore((s) => s.overrides);
   const [placed, setPlaced] = useState<Placed[]>([]);
   useShadowRefresh(placed);
@@ -421,7 +392,7 @@ function Decals({
         mesh,
         hit.position,
         decalOrientation(hit, sticker.rotation),
-        new THREE.Vector3(width, height, depth)
+        new THREE.Vector3(width, height, depth),
       );
 
       out.push({ id: sticker.id, geometry, texture });
@@ -484,7 +455,7 @@ function buildStops(
   overrides: Record<string, StickerOverride>,
   /** Portrait compensation: three's fov is vertical, so a narrow viewport
    *  crops the horizontal one down to half a face. */
-  nodeDistanceScale = 1
+  nodeDistanceScale = 1,
 ): Stop[] {
   const stops: Stop[] = [
     // Opening frame: head-on and far. The target is pushed below the face so
@@ -537,8 +508,7 @@ function lerpAngle(a: number, b: number, t: number) {
   return a + delta * t;
 }
 
-const easeInOutCubic = (t: number) =>
-  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 /** A gap this long between two useFrame calls means frames stopped, not that
  *  one was slow — a dozen dropped frames at 60 Hz. */
@@ -559,13 +529,9 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
   const wide = size.width >= 640;
 
   const aspect = size.width / Math.max(1, size.height);
-  const nodeScale =
-    aspect >= 1 ? 1 : THREE.MathUtils.clamp(1.5 / aspect, 1, 2.05);
+  const nodeScale = aspect >= 1 ? 1 : THREE.MathUtils.clamp(1.5 / aspect, 1, 2.05);
 
-  const stops = useMemo(
-    () => buildStops(hits, overrides, nodeScale),
-    [hits, overrides, nodeScale]
-  );
+  const stops = useMemo(() => buildStops(hits, overrides, nodeScale), [hits, overrides, nodeScale]);
 
   useFrame((_, delta) => {
     // In edit mode OrbitControls owns the camera — scroll must not drag it.
@@ -591,8 +557,7 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
       ? scrollState.progress
       : smoothed.current + (scrollState.progress - smoothed.current) * k;
 
-    const seg =
-      THREE.MathUtils.clamp(smoothed.current, 0, 1) * (stops.length - 1);
+    const seg = THREE.MathUtils.clamp(smoothed.current, 0, 1) * (stops.length - 1);
     const i = Math.min(Math.floor(seg), stops.length - 2);
     const t = easeInOutCubic(seg - i);
 
@@ -610,11 +575,7 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
     // Make room for the card: push the aim point towards it and the sticker
     // drifts to the other half of the screen. The weight falls to zero at
     // both ends, or the carefully framed opening shot gets shoved off centre.
-    const bias = THREE.MathUtils.clamp(
-      Math.min(seg, stops.length - 1 - seg),
-      0,
-      1
-    );
+    const bias = THREE.MathUtils.clamp(Math.min(seg, stops.length - 1 - seg), 0, 1);
     if (bias > 0.001) {
       aim.current.copy(target.current);
       if (wide) {
@@ -690,10 +651,7 @@ export default function AvatarScene({ tone }: { tone: Tone }) {
     const missed: string[] = [];
     for (const raw of INTRO_STICKERS) {
       const sticker = resolveSticker(raw, overrides);
-      const hit = projectToSurface(
-        mesh,
-        dirVector(sticker.dir.theta, sticker.dir.phi)
-      );
+      const hit = projectToSurface(mesh, dirVector(sticker.dir.theta, sticker.dir.phi));
       if (hit) out[sticker.id] = hit;
       else missed.push(sticker.id);
     }
@@ -711,7 +669,7 @@ export default function AvatarScene({ tone }: { tone: Tone }) {
     warned.current = missedKey;
     console.warn(
       `[intro] no surface under: ${missedKey} — each of those loses its sticker and its camera stop. ` +
-        `Fix dir.theta / dir.phi for those ids in src/lib/intro/stickers.ts; place them with ?edit=1 (docs/INTRO3D.md).`
+        `Fix dir.theta / dir.phi for those ids in src/lib/intro/stickers.ts; place them with ?edit=1 (docs/INTRO3D.md).`,
     );
   }, [missedKey]);
 

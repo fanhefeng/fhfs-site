@@ -57,7 +57,7 @@ const FETCH_ATTEMPTS = 5;
 async function fetchWithRetry(
   url: string,
   label: string,
-  accept: (response: Response) => Promise<boolean> = async () => true
+  accept: (response: Response) => Promise<boolean> = async () => true,
 ): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 0; attempt < FETCH_ATTEMPTS; attempt++) {
@@ -88,18 +88,12 @@ async function fetchWithRetry(
  * ImageResponse (satori). The default fetch user agent receives truetype URLs.
  * Runs at build time only — every OG route is `force-static`.
  */
-async function loadGoogleFont(
-  family: string,
-  text: string,
-  weight = 400
-): Promise<ArrayBuffer> {
+async function loadGoogleFont(family: string, text: string, weight = 400): Promise<ArrayBuffer> {
   const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
-    family
+    family,
   )}:wght@${weight}&text=${encodeURIComponent(text)}`;
   const css = await (await fetchWithRetry(url, `font css ${family}`)).text();
-  const resource = css.match(
-    /src: url\((.+?)\) format\('(?:opentype|truetype)'\)/
-  );
+  const resource = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/);
   if (!resource) throw new Error(`No TTF url for font ${family}`);
   // A 200 with a truncated or non-font body (seen once as an HTML error page)
   // blows up inside satori as a DataView RangeError, so the body is checked
@@ -125,8 +119,7 @@ function isSfnt(buffer: ArrayBuffer): boolean {
 }
 
 /** CJK + fullwidth punctuation — everything Nunito cannot draw. */
-const CJK_RE =
-  /[⺀-⿿　-〿㐀-䶿一-鿿豈-﫿︰-﹏＀-￯]/;
+const CJK_RE = /[⺀-⿿　-〿㐀-䶿一-鿿豈-﫿︰-﹏＀-￯]/;
 
 /** Deduplicated character set — keeps the `&text=` subset URL short. */
 function subset(text: string, wantCjk: boolean) {
@@ -143,25 +136,17 @@ function subset(text: string, wantCjk: boolean) {
  * meta line) at 400. The CJK companion is only fetched when the text
  * actually contains CJK, so English pages pay for two requests, not four.
  */
-export async function loadOgFonts(
-  displayText: string,
-  bodyText: string
-): Promise<OgFont[]> {
+export async function loadOgFonts(displayText: string, bodyText: string): Promise<OgFont[]> {
   const jobs: Promise<OgFont>[] = [];
 
-  const push = (
-    family: string,
-    name: string,
-    text: string,
-    weight: OgWeight
-  ) => {
+  const push = (family: string, name: string, text: string, weight: OgWeight) => {
     jobs.push(
       loadGoogleFont(family, text, weight).then((data) => ({
         name,
         data,
         weight,
         style: "normal" as const,
-      }))
+      })),
     );
   };
 

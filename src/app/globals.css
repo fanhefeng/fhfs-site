@@ -61,8 +61,8 @@
   --glass-thick-shadow: 0 16px 48px rgba(20, 20, 30, 0.16);
   --chip-bg: rgba(255, 255, 255, 0.15);
   --chip-border: rgba(255, 255, 255, 0.55);
-  --chip-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -8px 16px -8px rgba(255, 255, 255, 0.25);
+  --chip-inset:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -8px 16px -8px rgba(255, 255, 255, 0.25);
   --blur-thin: 12px;
   --blur-thick: 20px;
 
@@ -84,13 +84,14 @@
    * Android — for anything outside its GB2312 subset. Serif CJK is the
    * system Songti / SimSun / Noto Serif CJK; no webfont stands behind either
    * stack any more (fonts.ts says why). */
-  --font-stack-sans: var(--font-nunito), "Yozai", "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", ui-sans-serif, system-ui,
-    sans-serif;
-  --font-stack-serif: var(--font-instrument), "Songti SC", "SimSun", "Noto Serif CJK SC",
-    "Source Han Serif SC", Georgia, serif;
-  --font-stack-mono: var(--font-geist-mono), ui-monospace, "SF Mono", SFMono-Regular,
-    Menlo, monospace;
+  --font-stack-sans:
+    var(--font-nunito), "Yozai", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    "Noto Sans CJK SC", "Source Han Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --font-stack-serif:
+    var(--font-instrument), "Songti SC", "SimSun", "Noto Serif CJK SC", "Source Han Serif SC",
+    Georgia, serif;
+  --font-stack-mono:
+    var(--font-geist-mono), ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
 }
 
 :root[data-theme="dark"] {
@@ -230,7 +231,9 @@ body {
  * The 1.2s view-transition cross-fade rides on top when available; this
  * ≥300ms fallback keeps non-supporting browsers free of brightness jumps. */
 body {
-  transition: background-color 0.35s ease, color 0.35s ease;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
 }
 
 ::selection {
@@ -573,7 +576,9 @@ body {
   text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
 }
 .prose-editorial a:hover {
   color: var(--accent);

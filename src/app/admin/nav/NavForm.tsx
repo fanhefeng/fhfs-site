@@ -43,7 +43,12 @@ const GROUP_OPTIONS = [
 ];
 
 /** A new row is, by default, a room: footer, menu and sitemap, under 生活. */
-const NEW_ROW: NavRow = { href: "", labelKey: "", surfaces: ["footer", "fullnav", "sitemap"], group: "rooms" };
+const NEW_ROW: NavRow = {
+  href: "",
+  labelKey: "",
+  surfaces: ["footer", "fullnav", "sitemap"],
+  group: "rooms",
+};
 
 let nextId = 1;
 const withIds = (rows: NavRow[]): FormRow[] => rows.map((row) => ({ ...row, id: nextId++ }));
@@ -62,10 +67,7 @@ const withIds = (rows: NavRow[]): FormRow[] => rows.map((row) => ({ ...row, id: 
  * rewrites the whole table, so stale values would silently overwrite it.
  */
 export function NavForm({ items }: { items: NavRow[] }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    saveNavItems,
-    {}
-  );
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveNavItems, {});
   const [rows, setRows] = useState<FormRow[]>(() => withIds(items));
   useEffect(() => setRows(withIds(items)), [items]);
 

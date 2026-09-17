@@ -106,7 +106,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
                 duration: 0.9,
                 ease: "power2.out",
               },
-              0.06
+              0.06,
             );
         }
       };
@@ -172,7 +172,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
             ease: "elastic.out(1, 0.5)",
             clearProps: "transform,opacity,visibility",
           },
-          i * 0.05
+          i * 0.05,
         );
       });
 
@@ -205,7 +205,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
         for (const off of teardown) off();
       };
     },
-    { scope: wallRef }
+    { scope: wallRef },
   );
 
   return (

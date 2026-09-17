@@ -10,7 +10,6 @@ import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 
-
 export type FullNavProps = {
   /**
    * The menu's links, in order, from the site's one nav table. Named `links`
@@ -127,7 +126,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
     () => {
       tlRef.current = gsap.timeline({ paused: true });
     },
-    { scope: rootRef }
+    { scope: rootRef },
   );
 
   useEffect(() => {
@@ -159,26 +158,29 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
           panel,
           { yPercent: -103, y: 0, autoAlpha: 1, filter: "blur(0px)" },
           { yPercent: 0, duration: 0.65, ease: "back.out(1.2)" },
-          0
+          0,
         ).fromTo(
           items,
           { y: 28, autoAlpha: 0 },
           // 0.04, not 0.06: the member rows are items too, and the tail of
           // the cascade should not drag past a second.
           { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out", stagger: 0.04 },
-          0.18
+          0.18,
         );
       } else {
         // Reopened mid-close: recover from current positions — no restart.
         tl.to(
           panel,
-          { yPercent: 0, y: 0, autoAlpha: 1, filter: "blur(0px)", duration: 0.35, ease: "power3.out" },
-          0
-        ).to(
-          items,
-          { y: 0, autoAlpha: 1, duration: 0.3, ease: "power3.out", stagger: 0.03 },
-          0.05
-        );
+          {
+            yPercent: 0,
+            y: 0,
+            autoAlpha: 1,
+            filter: "blur(0px)",
+            duration: 0.35,
+            ease: "power3.out",
+          },
+          0,
+        ).to(items, { y: 0, autoAlpha: 1, duration: 0.3, ease: "power3.out", stagger: 0.03 }, 0.05);
       }
       settledClosedRef.current = false;
       // Focus moves into the dialog as soon as the first word is visible —
@@ -203,12 +205,18 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
       // blur — no tumbling scenery in this issue.
       tl.to(
         items,
-        { y: 14, autoAlpha: 0, duration: 0.28, ease: "power2.in", stagger: { each: 0.02, from: "end" } },
-        0
+        {
+          y: 14,
+          autoAlpha: 0,
+          duration: 0.28,
+          ease: "power2.in",
+          stagger: { each: 0.02, from: "end" },
+        },
+        0,
       ).to(
         panel,
         { y: 48, autoAlpha: 0, filter: "blur(10px)", duration: 0.38, ease: "power2.in" },
-        0.05
+        0.05,
       );
       tl.add(() => {
         gsap.set(root, { autoAlpha: 0, pointerEvents: "none" });
@@ -235,7 +243,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
       const root = rootRef.current;
       if (!root) return;
       const focusables = Array.from(
-        root.querySelectorAll<HTMLElement>("a[href], button:not([disabled])")
+        root.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
       );
       const trigger = triggerRef.current;
       const cycle = trigger ? [...focusables, trigger] : focusables;
@@ -433,5 +441,3 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
     </div>
   );
 }
-
-

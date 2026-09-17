@@ -2,7 +2,13 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { gsap, EASE, isFinePointer } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 
@@ -28,7 +34,14 @@ const STEP = Math.PI / 4;
  * including keyboards and touch, where a drag would fight the page's
  * scroll — and stops the canvas drawing once it has scrolled away.
  */
-export function KobeStatueStage({ hint, loading, fallbackNote, fallback, turnLeft, turnRight }: Props) {
+export function KobeStatueStage({
+  hint,
+  loading,
+  fallbackNote,
+  fallback,
+  turnLeft,
+  turnRight,
+}: Props) {
   const [mode, setMode] = useState<"probing" | "3d" | "photo">("probing");
   const [ready, setReady] = useState(false);
   const [onScreen, setOnScreen] = useState(true);
@@ -45,10 +58,9 @@ export function KobeStatueStage({ hint, loading, fallbackNote, fallback, turnLef
   useEffect(() => {
     const el = stageRef.current;
     if (!el || mode !== "3d") return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setOnScreen(entry!.isIntersecting),
-      { rootMargin: "200px 0px" }
-    );
+    const observer = new IntersectionObserver(([entry]) => setOnScreen(entry!.isIntersecting), {
+      rootMargin: "200px 0px",
+    });
     observer.observe(el);
     return () => observer.disconnect();
   }, [mode]);

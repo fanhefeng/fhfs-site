@@ -37,7 +37,17 @@ type Props = {
 type V3 = [number, number, number];
 
 /** A limb: a capsule from one joint to the next. */
-function Bone({ from, to, r, material }: { from: V3; to: V3; r: number; material: THREE.Material }) {
+function Bone({
+  from,
+  to,
+  r,
+  material,
+}: {
+  from: V3;
+  to: V3;
+  r: number;
+  material: THREE.Material;
+}) {
   const { position, quaternion, length } = useMemo(() => {
     const a = new THREE.Vector3(...from);
     const b = new THREE.Vector3(...to);
@@ -46,7 +56,7 @@ function Bone({ from, to, r, material }: { from: V3; to: V3; r: number; material
     const position = a.clone().add(b).multiplyScalar(0.5);
     const quaternion = new THREE.Quaternion().setFromUnitVectors(
       new THREE.Vector3(0, 1, 0),
-      dir.normalize()
+      dir.normalize(),
     );
     return { position, quaternion, length };
   }, [from, to]);
@@ -99,7 +109,7 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
         roughness: 0.42,
         envMapIntensity: 1.1,
       }),
-    []
+    [],
   );
   const bronzeLit = useMemo(
     () =>
@@ -112,7 +122,7 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
         transparent: true,
         depthWrite: false,
       }),
-    []
+    [],
   );
   // Polished granite reads as stone only if it stays dark: a low envMap
   // intensity and a coarser roughness keep the top face from washing out
@@ -125,7 +135,7 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
         roughness: 0.55,
         envMapIntensity: 0.2,
       }),
-    []
+    [],
   );
   const shadow = useMemo(
     () =>
@@ -134,7 +144,7 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
         transparent: true,
         depthWrite: false,
       }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -267,8 +277,19 @@ export default function KobeStatue({ spin, onScreen, onReady }: Props) {
           rendered into an environment map once — no HDR file fetched. */}
       <Environment resolution={128} frames={1}>
         <Lightformer intensity={2} position={[0, 5, -9]} scale={[10, 10, 1]} color="#fff4e0" />
-        <Lightformer intensity={1.2} position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[8, 3, 1]} />
-        <Lightformer intensity={1} position={[6, 2, 2]} rotation-y={-Math.PI / 2} scale={[8, 3, 1]} color="#cfe0ff" />
+        <Lightformer
+          intensity={1.2}
+          position={[-5, 1, -1]}
+          rotation-y={Math.PI / 2}
+          scale={[8, 3, 1]}
+        />
+        <Lightformer
+          intensity={1}
+          position={[6, 2, 2]}
+          rotation-y={-Math.PI / 2}
+          scale={[8, 3, 1]}
+          color="#cfe0ff"
+        />
       </Environment>
       <Figure spin={spin} onReady={onReady} />
     </Canvas>

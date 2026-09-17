@@ -31,7 +31,9 @@ export async function generateStaticParams() {
   return [...tags].map((tag) => ({ tag }));
 }
 
-export async function generateMetadata({ params }: PageProps<"/[locale]/blog/tags/[tag]">): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/blog/tags/[tag]">): Promise<Metadata> {
   const { locale, tag: encoded } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const tag = decodeSegment(encoded);

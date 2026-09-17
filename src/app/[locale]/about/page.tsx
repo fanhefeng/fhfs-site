@@ -40,9 +40,7 @@ export const generateMetadata = sectionMetadata("about", "/about");
  * here when the grove took the cover. The 3D desk that used to sit under the
  * name is a lab study now (/lab/workstation).
  */
-export default async function AboutPage({
-  params,
-}: PageProps<"/[locale]/about">) {
+export default async function AboutPage({ params }: PageProps<"/[locale]/about">) {
   const locale = await pageLocale(params);
 
   const t = await getTranslations("about");
@@ -82,9 +80,7 @@ export default async function AboutPage({
     getResumeProfile(),
     getFormatter(),
   ]);
-  const meRows = navRows.filter(
-    (row) => row.group === "me" && !row.surfaces.includes("header")
-  );
+  const meRows = navRows.filter((row) => row.group === "me" && !row.surfaces.includes("header"));
   const meMeta = (href: string): string[] => {
     switch (href) {
       case "/intro":
@@ -110,9 +106,7 @@ export default async function AboutPage({
   return (
     <main id="main" className="flex-1 pb-24">
       <header className={`${column} pt-24 sm:pt-32`}>
-        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          {t("title")}
-        </p>
+        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("title")}</p>
         {/* The name, set in a dot matrix that keeps it half-hidden until you
             point at it. The heading still *is* the name for anything that
             reads the page — the canvas is decoration layered over it. */}
@@ -123,9 +117,7 @@ export default async function AboutPage({
         <p className="no-cjk-oblique mt-4 font-serif text-title italic leading-tight text-fg-secondary">
           {t("keywords")}
         </p>
-        <p className="mt-6 max-w-[46ch] text-body text-fg-secondary">
-          {t("lead")}
-        </p>
+        <p className="mt-6 max-w-[46ch] text-body text-fg-secondary">{t("lead")}</p>
       </header>
 
       {/* Full-bleed: the band writes its own 100vw stage on desktop. */}

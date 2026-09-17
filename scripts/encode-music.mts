@@ -37,25 +37,58 @@ const out = `${root}public/music/${name}.mp3`;
 
 execFileSync(
   "ffmpeg",
-  ["-hide_banner", "-loglevel", "error", "-y", "-i", source, "-vn", "-map_metadata", "-1", "-c:a", "libmp3lame", "-q:a", "5", "-ar", "44100", out],
-  { stdio: "inherit" }
+  [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-y",
+    "-i",
+    source,
+    "-vn",
+    "-map_metadata",
+    "-1",
+    "-c:a",
+    "libmp3lame",
+    "-q:a",
+    "5",
+    "-ar",
+    "44100",
+    out,
+  ],
+  { stdio: "inherit" },
 );
 
 // silencedetect writes to stderr; -60 dB for half a second is silence, not a quiet bar.
-const probe = spawnSync("ffmpeg", ["-hide_banner", "-i", out, "-af", "silencedetect=noise=-60dB:d=0.5", "-f", "null", "-"], {
-  encoding: "utf8",
-});
-const duration = Number(/Duration: (\d+):(\d+):([\d.]+)/.exec(probe.stderr)?.slice(1).reduce((t, part) => t * 60 + Number(part), 0));
-const silences = [...probe.stderr.matchAll(/silence_start: (-?[\d.]+)[\s\S]*?silence_end: ([\d.]+)/g)].map((m): [number, number] => [
-  Math.max(0, Number(m[1])),
-  Number(m[2]),
-]);
+const probe = spawnSync(
+  "ffmpeg",
+  ["-hide_banner", "-i", out, "-af", "silencedetect=noise=-60dB:d=0.5", "-f", "null", "-"],
+  {
+    encoding: "utf8",
+  },
+);
+const duration = Number(
+  /Duration: (\d+):(\d+):([\d.]+)/
+    .exec(probe.stderr)
+    ?.slice(1)
+    .reduce((t, part) => t * 60 + Number(part), 0),
+);
+const silences = [
+  ...probe.stderr.matchAll(/silence_start: (-?[\d.]+)[\s\S]*?silence_end: ([\d.]+)/g),
+].map((m): [number, number] => [Math.max(0, Number(m[1])), Number(m[2])]);
 const lead = silences.find(([start]) => start < 0.05);
 const tail = silences.find(([, end]) => duration - end < 0.05);
 
 const mb = (bytes: number) => `${(bytes / 1e6).toFixed(1)} MB`;
-console.log(`${out.slice(root.length)}  ${mb(statSync(source).size)} → ${mb(statSync(out).size)}  ${duration.toFixed(1)} s`);
-if (lead) console.warn(`  silent for the first ${(lead[1] - lead[0]).toFixed(1)} s — a gap on every loop; trim the source and run again`);
-if (tail) console.warn(`  silent for the last ${(tail[1] - tail[0]).toFixed(1)} s — a gap on every loop; trim the source and run again`);
+console.log(
+  `${out.slice(root.length)}  ${mb(statSync(source).size)} → ${mb(statSync(out).size)}  ${duration.toFixed(1)} s`,
+);
+if (lead)
+  console.warn(
+    `  silent for the first ${(lead[1] - lead[0]).toFixed(1)} s — a gap on every loop; trim the source and run again`,
+  );
+if (tail)
+  console.warn(
+    `  silent for the last ${(tail[1] - tail[0]).toFixed(1)} s — a gap on every loop; trim the source and run again`,
+  );
 
 execFileSync("pnpm", ["-s", "assets"], { cwd: root, stdio: "inherit" });

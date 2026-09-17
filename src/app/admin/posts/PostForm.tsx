@@ -27,17 +27,8 @@ type PostDraft = {
  * site uses, so a preview here would be a second renderer to keep honest. The
  * article page is one click away and shows the real thing.
  */
-export function PostForm({
-  post,
-  isNew,
-}: {
-  post: PostDraft;
-  isNew: boolean;
-}) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    savePost,
-    {}
-  );
+export function PostForm({ post, isNew }: { post: PostDraft; isNew: boolean }) {
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(savePost, {});
 
   return (
     <>
@@ -90,31 +81,18 @@ export function PostForm({
 
         <label className="block space-y-1.5">
           <span className={labelClass}>标题</span>
-          <input
-            name="title"
-            defaultValue={post.title}
-            required
-            className={inputClass}
-          />
+          <input name="title" defaultValue={post.title} required className={inputClass} />
         </label>
 
         <label className="block space-y-1.5">
           <span className={labelClass}>摘要</span>
-          <input
-            name="summary"
-            defaultValue={post.summary}
-            className={inputClass}
-          />
+          <input name="summary" defaultValue={post.summary} className={inputClass} />
         </label>
 
         <div className="grid gap-5 sm:grid-cols-[1fr_auto]">
           <label className="space-y-1.5">
             <span className={labelClass}>标签（逗号分隔）</span>
-            <input
-              name="tags"
-              defaultValue={post.tags.join(", ")}
-              className={inputClass}
-            />
+            <input name="tags" defaultValue={post.tags.join(", ")} className={inputClass} />
           </label>
 
           <div className="flex items-end pb-2.5">

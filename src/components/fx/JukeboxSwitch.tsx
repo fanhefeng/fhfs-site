@@ -4,7 +4,14 @@ import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { toggleMusic, useJukebox } from "@/lib/jukebox";
-import { NeonFilter, NOTE_D, NOTE_T, NOTE_VIEW_BOX, TUBE, score } from "@/components/neon/NeonSignArt";
+import {
+  NeonFilter,
+  NOTE_D,
+  NOTE_T,
+  NOTE_VIEW_BOX,
+  TUBE,
+  score,
+} from "@/components/neon/NeonSignArt";
 
 /**
  * The unlit glass, for the island: the sign's dark band takes a fixed
@@ -43,9 +50,14 @@ export function JukeboxSwitch({ className = "" }: { className?: string }) {
         return;
       }
       const tl = gsap.timeline();
-      score(tl, [lit], 0, [[0.05, 1], [0.06, 0], [0.04, 0.6], [0.03, 1]]);
+      score(tl, [lit], 0, [
+        [0.05, 1],
+        [0.06, 0],
+        [0.04, 0.6],
+        [0.03, 1],
+      ]);
     },
-    { dependencies: [wanted] }
+    { dependencies: [wanted] },
   );
 
   return (
@@ -57,7 +69,12 @@ export function JukeboxSwitch({ className = "" }: { className?: string }) {
       title={wanted ? t("musicPause") : t("musicPlay")}
       className={`grid size-11 cursor-pointer place-items-center rounded-full text-fg-secondary transition-colors hover:text-fg ${className}`}
     >
-      <svg viewBox={NOTE_VIEW_BOX} className="h-[22px] w-[15px] overflow-visible" aria-hidden="true" focusable="false">
+      <svg
+        viewBox={NOTE_VIEW_BOX}
+        className="h-[22px] w-[15px] overflow-visible"
+        aria-hidden="true"
+        focusable="false"
+      >
         <defs>
           <NeonFilter id="isl-note-lit" x="-60%" y="-30%" width="220%" height="160%" />
           <IconGlassFilter id="isl-note-dark" />

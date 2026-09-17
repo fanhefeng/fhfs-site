@@ -50,9 +50,9 @@ describe("localized / localizedLines", () => {
   });
 
   it("reads a textarea as lines, dropping blanks", () => {
-    expect(
-      localizedLines(form({ "intro.zh": "一\n\n  二  \n", "intro.en": "" }), "intro")
-    ).toEqual({ zh: ["一", "二"], en: [] });
+    expect(localizedLines(form({ "intro.zh": "一\n\n  二  \n", "intro.en": "" }), "intro")).toEqual(
+      { zh: ["一", "二"], en: [] },
+    );
   });
 });
 

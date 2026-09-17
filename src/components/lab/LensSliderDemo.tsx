@@ -204,8 +204,8 @@ export function LensSliderDemo({
         (src) =>
           new Promise<THREE.Texture>((resolve, reject) => {
             loader.load(src, resolve, undefined, reject);
-          })
-      )
+          }),
+      ),
     ).then(
       (loaded) => {
         if (disposed) {
@@ -227,7 +227,7 @@ export function LensSliderDemo({
       },
       () => {
         if (!disposed) setMode("degraded");
-      }
+      },
     );
 
     return () => {
@@ -255,7 +255,8 @@ export function LensSliderDemo({
       const live = mode === "live";
       const articles = Array.from(copy.querySelectorAll<HTMLElement>(".ls-slide"));
       const charsOf = (i: number) => articles[i]!.querySelectorAll<HTMLElement>(".ls-char");
-      const linesOf = (i: number) => articles[i]!.querySelectorAll<HTMLElement>(".ls-body, .ls-meta");
+      const linesOf = (i: number) =>
+        articles[i]!.querySelectorAll<HTMLElement>(".ls-body, .ls-meta");
 
       // Everything but the first slide starts below its mask.
       articles.forEach((_, i) => {
@@ -277,7 +278,12 @@ export function LensSliderDemo({
 
       /* One lens at a time. `flight` is the pair in the air; `pending` is
          where the scrollbar has moved on to while it was still flying. */
-      let flight: { from: number; to: number; tween: gsap.core.Tween; copy: gsap.core.Timeline } | null = null;
+      let flight: {
+        from: number;
+        to: number;
+        tween: gsap.core.Tween;
+        copy: gsap.core.Timeline;
+      } | null = null;
       let pending: number | null = null;
 
       const settle = (landed: number) => {
@@ -334,25 +340,33 @@ export function LensSliderDemo({
             },
             onComplete: () => settle(next),
             onReverseComplete: () => settle(from),
-          }
+          },
         );
 
         // Words leave upward through their masks, the next title climbs in
         // behind them; the lines below fade a beat later.
         const tl = gsap.timeline();
-        tl.to(charsOf(from), { yPercent: -110, duration: 0.45, ease: EASE.exit, stagger: 0.018 }, 0);
-        tl.to(linesOf(from), { autoAlpha: 0, y: -10, duration: 0.3, ease: EASE.exit, stagger: 0.05 }, 0);
+        tl.to(
+          charsOf(from),
+          { yPercent: -110, duration: 0.45, ease: EASE.exit, stagger: 0.018 },
+          0,
+        );
+        tl.to(
+          linesOf(from),
+          { autoAlpha: 0, y: -10, duration: 0.3, ease: EASE.exit, stagger: 0.05 },
+          0,
+        );
         tl.fromTo(
           charsOf(next),
           { yPercent: 110 },
           { yPercent: 0, duration: 0.75, ease: EASE.default, stagger: 0.03 },
-          0.32
+          0.32,
         );
         tl.fromTo(
           linesOf(next),
           { autoAlpha: 0, y: 14 },
           { autoAlpha: 1, y: 0, duration: 0.6, ease: EASE.default, stagger: 0.08 },
-          0.55
+          0.55,
         );
 
         // Under Save-Data or without WebGL the still swaps at the midpoint,
@@ -371,7 +385,7 @@ export function LensSliderDemo({
       gsap.fromTo(
         charsOf(shownRef.current),
         { yPercent: 110 },
-        { yPercent: 0, duration: 0.9, ease: EASE.default, stagger: 0.035, delay: 0.1 }
+        { yPercent: 0, duration: 0.9, ease: EASE.default, stagger: 0.035, delay: 0.1 },
       );
       setCounter(shownRef.current);
 
@@ -393,7 +407,7 @@ export function LensSliderDemo({
         goRef.current = null;
       };
     },
-    { scope, dependencies: [mode, count, slides], revertOnUpdate: true }
+    { scope, dependencies: [mode, count, slides], revertOnUpdate: true },
   );
 
   /* Scroll the page to the middle of a slide's band; the pin does the rest. */
@@ -462,7 +476,7 @@ export function LensSliderDemo({
                                 </span>
                               ))}
                             </span>
-                          )
+                          ),
                         )}
                       </span>
                     ))}
@@ -475,10 +489,20 @@ export function LensSliderDemo({
           </div>
 
           <div className="ls-nav">
-            <button type="button" className="ls-btn" aria-label={prevLabel} onClick={() => step(-1)}>
+            <button
+              type="button"
+              className="ls-btn"
+              aria-label={prevLabel}
+              onClick={() => step(-1)}
+            >
               ←
             </button>
-            <span ref={counterRef} className="ls-counter" aria-label={counterAria} aria-live="polite">
+            <span
+              ref={counterRef}
+              className="ls-counter"
+              aria-label={counterAria}
+              aria-live="polite"
+            >
               {pad(0)} / {pad(count - 1)}
             </span>
             <button type="button" className="ls-btn" aria-label={nextLabel} onClick={() => step(1)}>

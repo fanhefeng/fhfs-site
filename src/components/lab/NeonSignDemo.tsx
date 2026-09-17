@@ -146,7 +146,7 @@ export function NeonSignDemo({
           gsap.fromTo(
             welcomeEl,
             { autoAlpha: 0, filter: "blur(6px)" },
-            { autoAlpha: 1, filter: "blur(0px)", duration: 1.1, ease: EASE.default }
+            { autoAlpha: 1, filter: "blur(0px)", duration: 1.1, ease: EASE.default },
           );
         }
         wantMusic();
@@ -165,7 +165,8 @@ export function NeonSignDemo({
       // One tube loses its nerve for a moment under the pointer.
       let stutter: gsap.core.Timeline | null = null;
       stutterRef.current = contextSafe(() => {
-        if (!poweredRef.current || main.isActive() || stutter?.isActive() || !isFinePointer()) return;
+        if (!poweredRef.current || main.isActive() || stutter?.isActive() || !isFinePointer())
+          return;
         const i = Math.floor(Math.random() * letters.length);
         stutter = gsap.timeline();
         score(stutter, letters[i]!, 0, STUTTER);
@@ -229,7 +230,7 @@ export function NeonSignDemo({
         setPowered(false);
       };
     },
-    { scope }
+    { scope },
   );
 
   return (

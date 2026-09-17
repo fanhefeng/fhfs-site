@@ -6,12 +6,16 @@ import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
 import { intField, list, localized, str, validKey, validLink } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
-import { invalidate, SESSION_EXPIRED, KEY_ERROR, linkError, upsertKeyed, type ActionState } from "./shared";
+import {
+  invalidate,
+  SESSION_EXPIRED,
+  KEY_ERROR,
+  linkError,
+  upsertKeyed,
+  type ActionState,
+} from "./shared";
 
-export async function saveWork(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveWork(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const key = str(form, "key");

@@ -53,7 +53,7 @@ async function getLatestRelease(repo: string | null): Promise<Release | null> {
   if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
 
   const release = await getJson<{ tag_name: string; html_url: string }>(
-    `/repos/${repo}/releases/latest`
+    `/repos/${repo}/releases/latest`,
   );
   if (release?.tag_name) return { version: release.tag_name, url: release.html_url };
 
@@ -65,9 +65,7 @@ async function getLatestRelease(repo: string | null): Promise<Release | null> {
 }
 
 /** Latest releases for many repos at once, keyed by repo. */
-export async function getLatestReleases(
-  repos: (string | null)[]
-): Promise<Map<string, Release>> {
+export async function getLatestReleases(repos: (string | null)[]): Promise<Map<string, Release>> {
   const unique = [...new Set(repos.filter((r): r is string => Boolean(r)))];
   const results = await Promise.all(unique.map((repo) => getLatestRelease(repo)));
   const out = new Map<string, Release>();

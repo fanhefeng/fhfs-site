@@ -4,8 +4,20 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import { gsap } from "@/lib/gsap";
 import { watchContextLoss } from "@/lib/webgl";
 import {
-  VERT, FRAG_SCENE, FRAG_RIM, FRAG_DOWN, FRAG_BLUR, FRAG_COMP,
-  FIELD, FIELD_ORDER, RIM, RIM_ORDER, COMPOSITE, DISTURB, RIPPLE_LIFE, RIPPLE_SLOTS,
+  VERT,
+  FRAG_SCENE,
+  FRAG_RIM,
+  FRAG_DOWN,
+  FRAG_BLUR,
+  FRAG_COMP,
+  FIELD,
+  FIELD_ORDER,
+  RIM,
+  RIM_ORDER,
+  COMPOSITE,
+  DISTURB,
+  RIPPLE_LIFE,
+  RIPPLE_SLOTS,
 } from "@/lib/grove/liquidMetal";
 import { PILL_CSS } from "./pill.css";
 
@@ -87,7 +99,17 @@ type Target = { tex: WebGLTexture; fbo: WebGLFramebuffer; w: number; h: number }
  * rim travelling for ever; two of these over a live hero measured at half the
  * frame rate of the same page without them.
  */
-export function LiquidPill({ children, height, className, label, href, pad = 1.744, mixRef, base, onPress }: Props) {
+export function LiquidPill({
+  children,
+  height,
+  className,
+  label,
+  href,
+  pad = 1.744,
+  mixRef,
+  base,
+  onPress,
+}: Props) {
   const padRef = useRef<HTMLSpanElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const btnRef = useRef<HTMLElement>(null);
@@ -107,7 +129,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     const ctx = watchContextLoss(canvas, () => setEpoch((n) => n + 1));
 
     const gl = canvas.getContext("webgl2", {
-      alpha: true, antialias: false, premultipliedAlpha: true, powerPreference: "high-performance",
+      alpha: true,
+      antialias: false,
+      premultipliedAlpha: true,
+      powerPreference: "high-performance",
     });
     if (!gl) return ctx.dispose;
 
@@ -121,7 +146,8 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       const s = gl.createShader(type)!;
       gl.shaderSource(s, src);
       gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) ?? "shader");
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+        throw new Error(gl.getShaderInfoLog(s) ?? "shader");
       shaders.push(s);
       return s;
     };
@@ -132,7 +158,8 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       gl.attachShader(p, compile(gl.FRAGMENT_SHADER, frag));
       gl.bindAttribLocation(p, 0, "position");
       gl.linkProgram(p);
-      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) ?? "link");
+      if (!gl.getProgramParameter(p, gl.LINK_STATUS))
+        throw new Error(gl.getProgramInfoLog(p) ?? "link");
       programs.push(p);
       const u: Record<string, WebGLUniformLocation | null> = {};
       const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS) as number;
@@ -188,15 +215,25 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       t.w = w;
       t.h = h;
       gl.bindTexture(gl.TEXTURE_2D, t.tex);
-      if (hasFloat) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+      if (hasFloat)
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
       else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     };
 
-    const T_core = makeTarget(), T_rim = makeTarget();
-    const T_s1 = makeTarget(), T_s2 = makeTarget();
-    const T_a = makeTarget(), T_b = makeTarget();
+    const T_core = makeTarget(),
+      T_rim = makeTarget();
+    const T_s1 = makeTarget(),
+      T_s2 = makeTarget();
+    const T_a = makeTarget(),
+      T_b = makeTarget();
 
-    let W = 0, H = 0, BW = 0, BH = 0, CX = 0, CY = 0, DOWN = 4;
+    let W = 0,
+      H = 0,
+      BW = 0,
+      BH = 0,
+      CX = 0,
+      CY = 0,
+      DOWN = 4;
     let needResize = true;
     let dirty = true;
 
@@ -207,24 +244,34 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = Math.max(2, Math.round(r.width * dpr));
       const h = Math.max(2, Math.round(r.height * dpr));
-      if (w !== W || h !== H) { W = w; H = h; canvas.width = W; canvas.height = H; }
+      if (w !== W || h !== H) {
+        W = w;
+        H = h;
+        canvas.width = W;
+        canvas.height = H;
+      }
       BW = br.width * dpr;
       BH = br.height * dpr;
       CX = (br.left - r.left) * dpr + BW / 2;
       CY = H - ((br.top - r.top) * dpr + BH / 2); // gl_FragCoord is y-up
       sizeTarget(T_core, W, H);
       sizeTarget(T_rim, W, H);
-      const hw = Math.max(2, Math.ceil(W / 2)), hh = Math.max(2, Math.ceil(H / 2));
+      const hw = Math.max(2, Math.ceil(W / 2)),
+        hh = Math.max(2, Math.ceil(H / 2));
       sizeTarget(T_s1, hw, hh);
       sizeTarget(T_s2, hw, hh);
       DOWN = Math.max(1, Math.min(4, Math.round(BH / GLOW_TEX)));
-      const dw = Math.max(2, Math.ceil(W / DOWN)), dh = Math.max(2, Math.ceil(H / DOWN));
+      const dw = Math.max(2, Math.ceil(W / DOWN)),
+        dh = Math.max(2, Math.ceil(H / DOWN));
       sizeTarget(T_a, dw, dh);
       sizeTarget(T_b, dw, dh);
       needResize = false;
       dirty = true;
     };
-    const ro = new ResizeObserver(() => { needResize = true; dirty = true; });
+    const ro = new ResizeObserver(() => {
+      needResize = true;
+      dirty = true;
+    });
     ro.observe(padEl);
 
     const drawTo = (t: Target | null) => {
@@ -241,16 +288,26 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     const slots = Array.from({ length: RIPPLE_SLOTS }, () => ({ x: 0, y: 0, t: -99, on: 0 }));
     const slotArr = new Float32Array(RIPPLE_SLOTS * 4);
     let slotNext = 0;
-    let clock = 0, hover = 0, hoverTarget = 0, press = 0, pressTarget = 0;
-    const ptr = { x: 0, y: 0 }, ptrS = { x: 0, y: 0 };
-    let ptrAmt = 0, ptrSpeed = 0, lastMove = 0;
+    let clock = 0,
+      hover = 0,
+      hoverTarget = 0,
+      press = 0,
+      pressTarget = 0;
+    const ptr = { x: 0, y: 0 },
+      ptrS = { x: 0, y: 0 };
+    let ptrAmt = 0,
+      ptrSpeed = 0,
+      lastMove = 0;
     const on = { over: false, press: false, focus: false };
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const addRipple = (x: number, y: number) => {
       const r = slots[slotNext]!;
       slotNext = (slotNext + 1) % slots.length;
-      r.x = x; r.y = y; r.t = clock; r.on = 1;
+      r.x = x;
+      r.y = y;
+      r.t = clock;
+      r.on = 1;
     };
     /**
      * Pointer position in button-height units from the pill centre, +y down.
@@ -283,8 +340,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       for (let i = 0; i < slots.length; i++) {
         const r = slots[i]!;
         if (r.on && clock - r.t > RIPPLE_LIFE) r.on = 0;
-        slotArr[i * 4] = r.x; slotArr[i * 4 + 1] = r.y;
-        slotArr[i * 4 + 2] = r.t; slotArr[i * 4 + 3] = r.on;
+        slotArr[i * 4] = r.x;
+        slotArr[i * 4 + 1] = r.y;
+        slotArr[i * 4 + 2] = r.t;
+        slotArr[i * 4 + 3] = r.on;
       }
       const setShared = (u: Prog["u"]) => {
         gl.uniform2f(u.uC ?? null, CX, CY);
@@ -295,7 +354,13 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
         gl.uniform4f(u.uRipK ?? null, DISTURB.speed, DISTURB.width, DISTURB.decay, DISTURB.amp);
         gl.uniform4f(u.uRipK2 ?? null, DISTURB.facet, DISTURB.lobes, DISTURB.sharp, DISTURB.emit);
         gl.uniform4f(u.uPtr ?? null, ptrS.x, ptrS.y, ptrAmt, ptrSpeed);
-        gl.uniform4f(u.uPtrK ?? null, DISTURB.ptrRad, DISTURB.ptrAmp, DISTURB.ptrFast, DISTURB.ptrRim);
+        gl.uniform4f(
+          u.uPtrK ?? null,
+          DISTURB.ptrRad,
+          DISTURB.ptrAmp,
+          DISTURB.ptrFast,
+          DISTURB.ptrRim,
+        );
       };
 
       gl.useProgram(pScene.p);
@@ -391,11 +456,18 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     const onEnter = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       readPt(e, ptr);
-      ptrS.x = ptr.x; ptrS.y = ptr.y; ptrSpeed = 0;
+      ptrS.x = ptr.x;
+      ptrS.y = ptr.y;
+      ptrSpeed = 0;
       on.over = true;
       sync();
     };
-    const onLeave = (e: PointerEvent) => { if (e.pointerType === "mouse") { on.over = false; sync(); } };
+    const onLeave = (e: PointerEvent) => {
+      if (e.pointerType === "mouse") {
+        on.over = false;
+        sync();
+      }
+    };
     const onMove = (e: PointerEvent) => {
       if (!on.over && !on.press) return;
       readPt(e, ptr);
@@ -409,9 +481,18 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       addRipple(ptr.x, ptr.y);
       onPress?.(e.clientX, e.clientY);
     };
-    const onUp = () => { on.press = false; sync(); };
-    const onFocus = () => { on.focus = btn.matches(":focus-visible"); sync(); };
-    const onBlur = () => { on.focus = false; sync(); };
+    const onUp = () => {
+      on.press = false;
+      sync();
+    };
+    const onFocus = () => {
+      on.focus = btn.matches(":focus-visible");
+      sync();
+    };
+    const onBlur = () => {
+      on.focus = false;
+      sync();
+    };
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.key !== "Enter" && e.key !== " ") || e.repeat) return;
       on.press = true;
@@ -436,7 +517,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     window.addEventListener("pointercancel", onUp);
 
     let visible = !document.hidden;
-    const onVisibility = () => { visible = !document.hidden; dirty = true; };
+    const onVisibility = () => {
+      visible = !document.hidden;
+      dirty = true;
+    };
     document.addEventListener("visibilitychange", onVisibility);
 
     /* The clock turns only while the control is engaged or still settling.
@@ -455,8 +539,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       if (Math.abs(pressTarget - press) < 0.002) press = pressTarget;
 
       const lag = 1 - Math.pow(DISTURB.ptrLag, dt);
-      const dx = (ptr.x - ptrS.x) * lag, dy = (ptr.y - ptrS.y) * lag;
-      ptrS.x += dx; ptrS.y += dy;
+      const dx = (ptr.x - ptrS.x) * lag,
+        dy = (ptr.y - ptrS.y) * lag;
+      ptrS.x += dx;
+      ptrS.y += dy;
       if (Math.abs(ptr.x - ptrS.x) < 1e-4) ptrS.x = ptr.x;
       if (Math.abs(ptr.y - ptrS.y) < 1e-4) ptrS.y = ptr.y;
       const inst = Math.min(Math.hypot(dx, dy) / Math.max(dt, 1e-3) / DISTURB.ptrVref, 1);
@@ -469,8 +555,11 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       const ripLive = slots.some((r) => r.on === 1 && clock - r.t <= RIPPLE_LIFE);
       const engaged = on.over || on.press || on.focus;
       const settling =
-        hover !== hoverTarget || press !== pressTarget || ptrAmt !== wantWell ||
-        ptrS.x !== ptr.x || ptrS.y !== ptr.y;
+        hover !== hoverTarget ||
+        press !== pressTarget ||
+        ptrAmt !== wantWell ||
+        ptrS.x !== ptr.x ||
+        ptrS.y !== ptr.y;
 
       if (engaged || ripLive || settling || clock - lastMove < 0.25) {
         if (!calm.matches) clock += dt;
@@ -503,7 +592,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       ctx.dispose();
       // After a loss every handle went with the context; nothing to delete.
       if (!ctx.lost) {
-        for (const t of targets) { gl.deleteTexture(t.tex); gl.deleteFramebuffer(t.fbo); }
+        for (const t of targets) {
+          gl.deleteTexture(t.tex);
+          gl.deleteFramebuffer(t.fbo);
+        }
         for (const p of programs) gl.deleteProgram(p);
         for (const s of shaders) gl.deleteShader(s);
         gl.deleteBuffer(vbo);
@@ -516,7 +608,10 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     };
   }, [mixRef, onPress, base, epoch]);
 
-  const style = { "--lp-h": height, "--lp-pad": `calc(${pad} * var(--lp-h))` } as React.CSSProperties;
+  const style = {
+    "--lp-h": height,
+    "--lp-pad": `calc(${pad} * var(--lp-h))`,
+  } as React.CSSProperties;
   const inner = (
     <>
       <span className="lp-plate" aria-hidden="true" />
@@ -529,14 +624,26 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
       {/* The control carries its own geometry — it is no longer the grove's
           guest. React dedupes by href, so several pills on a page cost one
           stylesheet. */}
-      <style href="liquid-pill" precedence="medium">{PILL_CSS}</style>
+      <style href="liquid-pill" precedence="medium">
+        {PILL_CSS}
+      </style>
       {inner}
       {href ? (
-        <a ref={btnRef as RefObject<HTMLAnchorElement>} className="lp-btn" href={href} aria-label={label}>
+        <a
+          ref={btnRef as RefObject<HTMLAnchorElement>}
+          className="lp-btn"
+          href={href}
+          aria-label={label}
+        >
           {children}
         </a>
       ) : (
-        <button ref={btnRef as RefObject<HTMLButtonElement>} className="lp-btn" type="button" aria-label={label}>
+        <button
+          ref={btnRef as RefObject<HTMLButtonElement>}
+          className="lp-btn"
+          type="button"
+          aria-label={label}
+        >
           {children}
         </button>
       )}

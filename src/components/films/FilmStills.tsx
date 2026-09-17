@@ -109,9 +109,11 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   const step = useCallback(
     (delta: number) => {
       dirRef.current = delta;
-      setCurrent((index) => (index === null ? index : (index + delta + stills.length) % stills.length));
+      setCurrent((index) =>
+        index === null ? index : (index + delta + stills.length) % stills.length,
+      );
     },
-    [stills.length]
+    [stills.length],
   );
 
   /** The quiet exit: fade, then the native close — which is what unwinds the state. */
@@ -143,7 +145,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
       gsap.fromTo(
         frame,
         { scale: 0.96, autoAlpha: 0 },
-        { scale: 1, autoAlpha: 1, duration: 0.5, ease: EASE.default, clearProps: "transform" }
+        { scale: 1, autoAlpha: 1, duration: 0.5, ease: EASE.default, clearProps: "transform" },
       );
       return;
     }
@@ -152,7 +154,14 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
     gsap.fromTo(
       frame,
       { x: dir * 24, autoAlpha: 0 },
-      { x: 0, autoAlpha: 1, duration: 0.35, ease: EASE.default, overwrite: "auto", clearProps: "transform" }
+      {
+        x: 0,
+        autoAlpha: 1,
+        duration: 0.35,
+        ease: EASE.default,
+        overwrite: "auto",
+        clearProps: "transform",
+      },
     );
   }, [current]);
 
@@ -161,7 +170,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
     () => () => {
       if (dialogRef.current?.open) unlockScroll();
     },
-    []
+    [],
   );
 
   const onClosed = () => {
@@ -208,11 +217,17 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   const counter =
     current === null
       ? ""
-      : text.counter.replace("{index}", String(current + 1)).replace("{count}", String(stills.length));
+      : text.counter
+          .replace("{index}", String(current + 1))
+          .replace("{count}", String(stills.length));
 
   return (
     <>
-      <Reveal as="ul" stagger={0.06} className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-6 md:gap-6">
+      <Reveal
+        as="ul"
+        stagger={0.06}
+        className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-6 md:gap-6"
+      >
         {stills.map((item, i) => (
           <li key={item.id} className={`min-w-0 ${SPAN[item.span]}`}>
             <figure className="m-0">
@@ -243,7 +258,9 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
               </a>
               <figcaption className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
                 <span className="text-caption text-fg">{item.title}</span>
-                <span className="font-mono text-[0.6875rem] uppercase tracking-meta text-fg-tertiary">{item.meta}</span>
+                <span className="font-mono text-[0.6875rem] uppercase tracking-meta text-fg-tertiary">
+                  {item.meta}
+                </span>
               </figcaption>
             </figure>
           </li>
@@ -271,7 +288,10 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
       >
         {still && (
           <div className="pointer-events-none relative flex h-full flex-col items-center justify-center px-4 pb-16 pt-16 md:px-24">
-            <div ref={frameRef} className="pointer-events-auto flex min-h-0 max-w-full flex-col items-center">
+            <div
+              ref={frameRef}
+              className="pointer-events-auto flex min-h-0 max-w-full flex-col items-center"
+            >
               <Image
                 key={still.id}
                 src={src(still)}
@@ -285,11 +305,17 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
               />
               <p className="mt-4 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-0.5 px-4 text-center">
                 <span className="text-caption text-white/90">{still.title}</span>
-                <span className="font-mono text-[0.6875rem] uppercase tracking-meta text-white/55">{still.meta}</span>
+                <span className="font-mono text-[0.6875rem] uppercase tracking-meta text-white/55">
+                  {still.meta}
+                </span>
               </p>
             </div>
 
-            <button type="button" onClick={close} className={`${VIEWER_BUTTON} absolute right-4 top-4`}>
+            <button
+              type="button"
+              onClick={close}
+              className={`${VIEWER_BUTTON} absolute right-4 top-4`}
+            >
               {text.close}
             </button>
             <p

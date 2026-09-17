@@ -19,7 +19,7 @@ type Props = {
  * a flash of the wrong paper.
  */
 const PAPER = {
-  light: [0.980, 0.976, 0.965],
+  light: [0.98, 0.976, 0.965],
   dark: [0.055, 0.055, 0.067],
 } as const;
 

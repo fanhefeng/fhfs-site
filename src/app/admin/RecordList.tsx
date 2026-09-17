@@ -60,7 +60,7 @@ export function RecordList({
     const needle = query.trim().toLowerCase();
     if (!needle) return rows;
     return rows.filter((row) =>
-      `${row.id} ${row.label} ${row.meta ?? ""}`.toLowerCase().includes(needle)
+      `${row.id} ${row.label} ${row.meta ?? ""}`.toLowerCase().includes(needle),
     );
   }, [rows, query]);
 
@@ -75,7 +75,12 @@ export function RecordList({
               className="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-fg-tertiary"
             >
               <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
-              <path d="m10.5 10.5 3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <path
+                d="m10.5 10.5 3 3"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
             </svg>
             <input
               type="search"
@@ -146,9 +151,7 @@ export function RecordList({
                   {row.label || <span className="text-fg-tertiary">（空）</span>}
                 </span>
                 {row.meta && (
-                  <span className="shrink-0 font-mono text-meta text-fg-tertiary">
-                    {row.meta}
-                  </span>
+                  <span className="shrink-0 font-mono text-meta text-fg-tertiary">{row.meta}</span>
                 )}
               </button>
 

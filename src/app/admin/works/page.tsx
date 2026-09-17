@@ -9,10 +9,7 @@ import { cardClass, metaClass } from "../styles";
 
 export default async function WorksPage() {
   await requireAdminPage();
-  const rows = await db
-    .select()
-    .from(works)
-    .orderBy(asc(works.sort), asc(works.key));
+  const rows = await db.select().from(works).orderBy(asc(works.sort), asc(works.key));
 
   // Built per render, not at module scope — a warm server instance would
   // otherwise keep last year's default across New Year.
@@ -30,9 +27,7 @@ export default async function WorksPage() {
 
   return (
     <AdminChrome title="作品集" section="/admin/works">
-      <Note>
-        这里一条都没有时，旧的作品页会显示「正在布展」的空状态——那是有意的，不是坏了。
-      </Note>
+      <Note>这里一条都没有时，旧的作品页会显示「正在布展」的空状态——那是有意的，不是坏了。</Note>
 
       <div className="space-y-12">
         {rows.map((work) => (

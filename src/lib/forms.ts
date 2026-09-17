@@ -10,8 +10,7 @@ import { lines } from "@/lib/resume";
  * that needs Next.
  */
 
-export const str = (form: FormData, key: string): string =>
-  String(form.get(key) ?? "").trim();
+export const str = (form: FormData, key: string): string => String(form.get(key) ?? "").trim();
 
 /**
  * Verbatim, including leading and trailing spaces.
@@ -22,8 +21,7 @@ export const str = (form: FormData, key: string): string =>
  * gap, and nothing downstream notices: the markup still renders, HTML collapses
  * the whitespace, and the line just reads slightly wrong forever.
  */
-export const raw = (form: FormData, key: string): string =>
-  String(form.get(key) ?? "");
+export const raw = (form: FormData, key: string): string => String(form.get(key) ?? "");
 
 /** Narrows to the locale union — excluding literals off `string` does not. */
 export const parseLocale = (value: string): "zh" | "en" | null =>
@@ -84,8 +82,7 @@ export const validLink = (value: string): boolean =>
   /^https?:\/\/\S+$/.test(value) || validPath(value);
 
 /** A GitHub account name — it is spliced into a URL path on /resume. */
-export const validGithubUser = (value: string): boolean =>
-  /^[A-Za-z0-9-]{1,39}$/.test(value);
+export const validGithubUser = (value: string): boolean => /^[A-Za-z0-9-]{1,39}$/.test(value);
 
 /** What a Postgres `integer` column holds. `Number.isInteger(1e10)` is true,
  *  and the column would still refuse it — as a database error, not a form one. */
@@ -102,7 +99,7 @@ export function intField<Fallback extends number | null>(
   form: FormData,
   key: string,
   label: string,
-  fallback: Fallback
+  fallback: Fallback,
 ): { ok: true; value: number | Fallback } | { ok: false; error: string } {
   const text = str(form, key);
   if (!text) return { ok: true, value: fallback };

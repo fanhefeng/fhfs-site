@@ -105,7 +105,7 @@ export function MobileAppRail({ apps, className }: Props) {
               yoyo: true,
               repeat: 1,
               overwrite: "auto",
-            }
+            },
           );
         };
 
@@ -160,9 +160,7 @@ export function MobileAppRail({ apps, className }: Props) {
          * disappear (the row is transformed, so the browser cannot scroll
          * it into view itself). */
         const onFocusIn = (e: FocusEvent) => {
-          const item = (e.target as HTMLElement | null)?.closest<HTMLElement>(
-            "[data-rail-item]"
-          );
+          const item = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-rail-item]");
           if (!item) return;
           const i = items.indexOf(item);
           if (i < 0) return;
@@ -194,7 +192,7 @@ export function MobileAppRail({ apps, className }: Props) {
       dependencies: [apps.map((a) => a.id).join(",")],
       scope: viewportRef,
       revertOnUpdate: true,
-    }
+    },
   );
 
   return (
@@ -217,11 +215,7 @@ export function MobileAppRail({ apps, className }: Props) {
       </div>
       {/* Drag proxy: never rendered, only measured. Draggable writes x here
        * and the rail mirrors it — the demo's "drag-proxy" pattern. */}
-      <span
-        ref={proxyRef}
-        aria-hidden
-        className="pointer-events-none invisible absolute size-0"
-      />
+      <span ref={proxyRef} aria-hidden className="pointer-events-none invisible absolute size-0" />
     </div>
   );
 }

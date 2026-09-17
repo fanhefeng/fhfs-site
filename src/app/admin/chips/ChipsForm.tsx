@@ -31,10 +31,7 @@ const TONES = [
  * quietly write them back — deleted rows included.
  */
 export function ChipsForm({ chips }: { chips: ChipRow[] }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    saveChips,
-    {}
-  );
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveChips, {});
   const [rows, setRows] = useState(chips);
   useEffect(() => setRows(chips), [chips]);
 
@@ -45,18 +42,13 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
     <form action={formAction}>
       <div className="space-y-3">
         {rows.map((chip, i) => (
-          <div
-            key={i}
-            className="grid gap-3 sm:grid-cols-[1fr_1fr_8rem] sm:items-end"
-          >
+          <div key={i} className="grid gap-3 sm:grid-cols-[1fr_1fr_8rem] sm:items-end">
             <label className="space-y-1">
               {i === 0 && <span className={labelClass}>中文</span>}
               <input
                 name={`chip.${i}.label.zh`}
                 value={chip.label.zh}
-                onChange={(e) =>
-                  edit(i, { ...chip, label: { ...chip.label, zh: e.target.value } })
-                }
+                onChange={(e) => edit(i, { ...chip, label: { ...chip.label, zh: e.target.value } })}
                 className={inputClass}
               />
             </label>
@@ -65,9 +57,7 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
               <input
                 name={`chip.${i}.label.en`}
                 value={chip.label.en}
-                onChange={(e) =>
-                  edit(i, { ...chip, label: { ...chip.label, en: e.target.value } })
-                }
+                onChange={(e) => edit(i, { ...chip, label: { ...chip.label, en: e.target.value } })}
                 className={inputClass}
               />
             </label>
@@ -76,9 +66,7 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
               <Select
                 name={`chip.${i}.tone`}
                 value={chip.tone}
-                onValueChange={(tone) =>
-                  edit(i, { ...chip, tone: tone as ChipRow["tone"] })
-                }
+                onValueChange={(tone) => edit(i, { ...chip, tone: tone as ChipRow["tone"] })}
                 options={TONES}
               />
             </div>
@@ -88,9 +76,7 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
 
       <button
         type="button"
-        onClick={() =>
-          setRows([...rows, { label: { zh: "", en: "" }, tone: "paper" }])
-        }
+        onClick={() => setRows([...rows, { label: { zh: "", en: "" }, tone: "paper" }])}
         className={`${ghostButtonClass} mt-4`}
       >
         <span aria-hidden className="text-fg-tertiary">

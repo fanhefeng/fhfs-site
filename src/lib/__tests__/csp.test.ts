@@ -6,7 +6,7 @@ const parse = (policy: string): Record<string, string[]> =>
     policy.split("; ").map((directive) => {
       const [name, ...values] = directive.split(" ");
       return [name, values] as const;
-    })
+    }),
   );
 
 describe("contentSecurityPolicy", () => {
@@ -15,7 +15,10 @@ describe("contentSecurityPolicy", () => {
 
   it("lets nothing load from another origin", () => {
     for (const [name, values] of Object.entries(prod)) {
-      expect(values.filter((value) => /^https?:|^\*|^wss?:/.test(value)), name).toEqual([]);
+      expect(
+        values.filter((value) => /^https?:|^\*|^wss?:/.test(value)),
+        name,
+      ).toEqual([]);
     }
   });
 

@@ -4,11 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyPassword } from "@/lib/auth/password";
 import { clearAttempts, recordAttempt } from "@/lib/auth/throttle";
-import {
-  clearSessionCookie,
-  createSession,
-  setSessionCookie,
-} from "@/lib/auth/session";
+import { clearSessionCookie, createSession, setSessionCookie } from "@/lib/auth/session";
 
 export type LoginState = { error?: string };
 
@@ -22,10 +18,7 @@ export type LoginState = { error?: string };
  * throttle.ts), so a burst of concurrent guesses cannot all slip under the
  * same count.
  */
-export async function login(
-  _prev: LoginState,
-  formData: FormData
-): Promise<LoginState> {
+export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const stored = process.env.ADMIN_PASSWORD_HASH;
   const secret = process.env.AUTH_SECRET;
   if (!stored || !secret) {

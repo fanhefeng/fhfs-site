@@ -317,7 +317,11 @@ export function GroveDemo({
       let moteMap = moteTexture(dress0.moteCore, dress0.moteEdge);
 
       /* ---- one root, assembled ---- */
-      type Built = { group: THREE.Group; uniforms: ReturnType<typeof groupUniforms>; wire: THREE.LineSegments };
+      type Built = {
+        group: THREE.Group;
+        uniforms: ReturnType<typeof groupUniforms>;
+        wire: THREE.LineSegments;
+      };
 
       const assemble = (grove: ReturnType<typeof buildGrove>, air: Air): Built => {
         const group = new THREE.Group();
@@ -369,9 +373,18 @@ export function GroveDemo({
           bladeGeo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
           bladeGeo.setIndex(idx);
         }
-        bladeGeo.setAttribute("aOffset", new THREE.InstancedBufferAttribute(grove.blades.offset, 3));
-        bladeGeo.setAttribute("aNormal", new THREE.InstancedBufferAttribute(grove.blades.normal, 3));
-        bladeGeo.setAttribute("aRandom", new THREE.InstancedBufferAttribute(grove.blades.random, 4));
+        bladeGeo.setAttribute(
+          "aOffset",
+          new THREE.InstancedBufferAttribute(grove.blades.offset, 3),
+        );
+        bladeGeo.setAttribute(
+          "aNormal",
+          new THREE.InstancedBufferAttribute(grove.blades.normal, 3),
+        );
+        bladeGeo.setAttribute(
+          "aRandom",
+          new THREE.InstancedBufferAttribute(grove.blades.random, 4),
+        );
         bladeGeo.setAttribute("aClump", new THREE.InstancedBufferAttribute(grove.blades.clump, 1));
         bladeGeo.instanceCount = grove.blades.count;
         const grassMat = new THREE.ShaderMaterial({
@@ -396,9 +409,15 @@ export function GroveDemo({
           fernGeo.setAttribute("normal", new THREE.BufferAttribute(grove.ferns.normal, 3));
           fernGeo.setAttribute("uv", new THREE.BufferAttribute(grove.ferns.uv, 2));
           fernGeo.setIndex(new THREE.BufferAttribute(grove.ferns.index, 1));
-          fernGeo.setAttribute("aOffset", new THREE.InstancedBufferAttribute(grove.ferns.offset, 3));
+          fernGeo.setAttribute(
+            "aOffset",
+            new THREE.InstancedBufferAttribute(grove.ferns.offset, 3),
+          );
           fernGeo.setAttribute("aQuat", new THREE.InstancedBufferAttribute(grove.ferns.quat, 4));
-          fernGeo.setAttribute("aRandom", new THREE.InstancedBufferAttribute(grove.ferns.random, 2));
+          fernGeo.setAttribute(
+            "aRandom",
+            new THREE.InstancedBufferAttribute(grove.ferns.random, 2),
+          );
           fernGeo.instanceCount = grove.ferns.count;
           const fernMat = new THREE.ShaderMaterial({
             uniforms,
@@ -421,12 +440,24 @@ export function GroveDemo({
           const flowerGeo = new THREE.InstancedBufferGeometry();
           flowerGeo.setAttribute(
             "position",
-            new THREE.Float32BufferAttribute([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3)
+            new THREE.Float32BufferAttribute(
+              [-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0],
+              3,
+            ),
           );
-          flowerGeo.setAttribute("uv", new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2));
+          flowerGeo.setAttribute(
+            "uv",
+            new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2),
+          );
           flowerGeo.setIndex([0, 1, 2, 0, 2, 3]);
-          flowerGeo.setAttribute("aOffset", new THREE.InstancedBufferAttribute(grove.flowers.offset, 3));
-          flowerGeo.setAttribute("aRandom", new THREE.InstancedBufferAttribute(grove.flowers.random, 2));
+          flowerGeo.setAttribute(
+            "aOffset",
+            new THREE.InstancedBufferAttribute(grove.flowers.offset, 3),
+          );
+          flowerGeo.setAttribute(
+            "aRandom",
+            new THREE.InstancedBufferAttribute(grove.flowers.random, 2),
+          );
           flowerGeo.instanceCount = grove.flowers.count;
           const flowerMat = new THREE.ShaderMaterial({
             uniforms: { ...uniforms, uMap: { value: flowerMap } },
@@ -705,7 +736,7 @@ export function GroveDemo({
         const curve = new THREE.QuadraticBezierCurve3(
           new THREE.Vector3(0.01 * sx, 0.02, 0.15),
           new THREE.Vector3(0.062 * sx, 0.075, 0.3),
-          new THREE.Vector3(0.105 * sx, 0.11, 0.43)
+          new THREE.Vector3(0.105 * sx, 0.11, 0.43),
         );
         const antGeo = new THREE.TubeGeometry(curve, 12, 0.0042, 5, false);
         geometries.push(antGeo);
@@ -749,13 +780,13 @@ export function GroveDemo({
         farBuilt.group.position.set(
           -FAR_MID_X * FAR_SCALE,
           -0.58 * halfH - FAR_TOP * FAR_SCALE,
-          -FAR_DEPTH
+          -FAR_DEPTH,
         );
         // The front has to sweep the ridge as well as the root in front of it,
         // or half the frame is still empty when the cage has burnt off.
         scanMax = Math.max(
           near.reach * 2.4 + 3,
-          farBuilt.group.position.distanceTo(shared.uScanO.value) + far.reach * FAR_SCALE + 2
+          farBuilt.group.position.distanceTo(shared.uScanO.value) + far.reach * FAR_SCALE + 2,
         );
       };
 
@@ -770,7 +801,7 @@ export function GroveDemo({
         // Match three's own size attenuation: a mote of world size s at
         // distance d has to come out s * uScale / d pixels across.
         const buf = renderer.getDrawingBufferSize(new THREE.Vector2());
-        moteUniforms.uScale.value = buf.y * 0.5 / Math.tan(((camera.fov * Math.PI) / 180) / 2);
+        moteUniforms.uScale.value = (buf.y * 0.5) / Math.tan((camera.fov * Math.PI) / 180 / 2);
         placeRidge();
         dirtyRef.current = true;
       };
@@ -824,7 +855,7 @@ export function GroveDemo({
         approach.set(
           near.perch.x + 3.4 * (1 - land),
           near.perch.y + 2.6 * (1 - land) * (1 - land) + 0.55 * Math.sin(land * 3.1),
-          near.perch.z + 2.2 * (1 - land)
+          near.perch.z + 2.2 * (1 - land),
         );
         return out.lerpVectors(approach, near.perch, land * land);
       };
@@ -886,7 +917,7 @@ export function GroveDemo({
         camera.position.set(
           Math.sin(-0.24 * dolly) * dist + px,
           target.y + 0.9 + 0.5 * dolly + py,
-          Math.cos(-0.24 * dolly) * dist
+          Math.cos(-0.24 * dolly) * dist,
         );
         camera.lookAt(target.x + px * 0.42, target.y + 0.28 * dolly + py * 0.42, target.z);
         nearBuilt.group.rotation.set(par.y * 0.026, par.x * 0.055, 0);
@@ -1025,7 +1056,10 @@ export function GroveDemo({
       const onPointerMove = (e: PointerEvent) => {
         if (e.pointerType === "touch") return;
         const r = canvas.getBoundingClientRect();
-        ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        ndc.set(
+          ((e.clientX - r.left) / r.width) * 2 - 1,
+          -((e.clientY - r.top) / r.height) * 2 + 1,
+        );
         parTarget.set(ndc.x, -ndc.y);
         camera.updateMatrixWorld();
         raycaster.setFromCamera(ndc, camera);
@@ -1079,7 +1113,8 @@ export function GroveDemo({
            Every term here is finite: grains expire, the lean reaches its target,
            the startle eases out, and the grace window closes. */
         const grainsAlive = now < lastBirth + SPRAY_LIFE;
-        const leaning = Math.abs(par.x - parTarget.x) > 2e-4 || Math.abs(par.y - parTarget.y) > 2e-4;
+        const leaning =
+          Math.abs(par.x - parTarget.x) > 2e-4 || Math.abs(par.y - parTarget.y) > 2e-4;
         const startling = Math.abs(spook - spookTarget) > 1e-3;
         const justMoved = now - lastMove < 0.25;
         if (grainsAlive || leaning || startling || justMoved) {
@@ -1117,7 +1152,7 @@ export function GroveDemo({
             toBug.set(
               mouseNow.x - flightPos.x,
               mouseNow.y - flightPos.y,
-              (mouseNow.z - flightPos.z) * 0.3
+              (mouseNow.z - flightPos.z) * 0.3,
             );
             spookTarget = Math.min(1, Math.max(0, 1 - toBug.length() / 0.62));
             spookTarget *= spookTarget;
@@ -1185,7 +1220,10 @@ export function GroveDemo({
         for (const u of Object.keys(DRESS_COLOURS) as DressColourUniform[]) {
           from[u] = shared[u].value.clone();
         }
-        const fromAir = {} as Record<"near" | "far", { haze: number; fog: number; hazeLift: number }>;
+        const fromAir = {} as Record<
+          "near" | "far",
+          { haze: number; fog: number; hazeLift: number }
+        >;
         for (const [uniforms, side] of bands) {
           from[side] = uniforms.uHazeCol.value.clone();
           fromAir[side] = {
@@ -1267,7 +1305,7 @@ export function GroveDemo({
         io.disconnect();
         requestAnimationFrame(() => requestAnimationFrame(start));
       },
-      { rootMargin: "200% 0px" }
+      { rootMargin: "200% 0px" },
     );
     io.observe(sticky);
 
@@ -1332,7 +1370,7 @@ export function GroveDemo({
     // revertOnUpdate is required whenever dependencies and a teardown are both
     // present (DESIGN.md §1.5): without it the cleanup is deferred to unmount
     // and a dependency change leaves a second ScrollTrigger behind.
-    { scope, dependencies: [live], revertOnUpdate: true }
+    { scope, dependencies: [live], revertOnUpdate: true },
   );
 
   return (
@@ -1351,7 +1389,12 @@ export function GroveDemo({
 
       <div ref={stageRef} className="gv-stage" data-degraded={degraded || undefined}>
         <div ref={stickyRef} className="gv-sticky">
-          <canvas ref={canvasRef} className="gv-canvas" data-degraded={degraded || undefined} aria-hidden="true" />
+          <canvas
+            ref={canvasRef}
+            className="gv-canvas"
+            data-degraded={degraded || undefined}
+            aria-hidden="true"
+          />
 
           <div ref={copyRef} className="gv-copy">
             <h2 className="gv-headline">{headline}</h2>

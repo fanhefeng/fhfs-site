@@ -100,7 +100,12 @@ export function Select({
     const current = options.findIndex((option) => option.value === value);
 
     if (!open) {
-      if (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter" || event.key === " ") {
+      if (
+        event.key === "ArrowDown" ||
+        event.key === "ArrowUp" ||
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
         event.preventDefault();
         openAt(current);
       }
@@ -142,7 +147,7 @@ export function Select({
         const from = active + 1;
         const order = [...options.slice(from), ...options.slice(0, from)];
         const hit = order.find((option) =>
-          (option.label ?? option.value).toLowerCase().startsWith(needle)
+          (option.label ?? option.value).toLowerCase().startsWith(needle),
         );
         if (hit) setActive(options.indexOf(hit));
       }
@@ -176,7 +181,9 @@ export function Select({
         aria-activedescendant={open ? `${listId}-${active}` : undefined}
         aria-haspopup="listbox"
         aria-labelledby={labelledBy}
-        onClick={() => (open ? setOpen(false) : openAt(options.findIndex((o) => o.value === value)))}
+        onClick={() =>
+          open ? setOpen(false) : openAt(options.findIndex((o) => o.value === value))
+        }
         onKeyDown={onKeyDown}
         className={`${fieldSkin} flex min-h-11 w-full items-center gap-3 px-3.5 py-2.5 text-left text-body ${
           open ? "border-accent" : ""

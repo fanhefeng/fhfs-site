@@ -30,7 +30,7 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
   const tFilms = await getTranslations("films");
 
   const rooms = (await getAllNavItems()).filter(
-    (row) => row.group === "rooms" && !row.surfaces.includes("header")
+    (row) => row.group === "rooms" && !row.surfaces.includes("header"),
   );
 
   // What each room holds, counted where the room itself counts.
@@ -53,9 +53,15 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
   const subs = (href: string): SubLink[] => {
     switch (href) {
       case "/idols":
-        return IDOLS.map((idol) => ({ href: `/idols/${idol.slug}`, label: tIdols(`${idol.key}.name`) }));
+        return IDOLS.map((idol) => ({
+          href: `/idols/${idol.slug}`,
+          label: tIdols(`${idol.key}.name`),
+        }));
       case "/films":
-        return FILMS.map((film) => ({ href: `/films/${film.slug}`, label: tFilms(`${film.slug}.title`) }));
+        return FILMS.map((film) => ({
+          href: `/films/${film.slug}`,
+          label: tFilms(`${film.slug}.title`),
+        }));
       default:
         return [];
     }
@@ -64,7 +70,9 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
   return (
     <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
       <Reveal as="header" className="mb-12">
-        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{t("kicker")}</p>
+        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+          {t("kicker")}
+        </p>
         <h1 className="mt-3 text-display-sm">{t("title")}</h1>
         <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("subtitle")}</p>
       </Reveal>
@@ -76,10 +84,14 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
           {rooms.map((room, i) => {
             const meta = ROOM_META[room.href];
             const key = meta?.key ?? room.labelKey;
-            const title = t.has(`items.${key}.title`) ? t(`items.${key}.title`) : tNav(room.labelKey);
+            const title = t.has(`items.${key}.title`)
+              ? t(`items.${key}.title`)
+              : tNav(room.labelKey);
             const line = t.has(`items.${key}.line`) ? t(`items.${key}.line`) : null;
             const count = stat(room.href);
-            const record = meta?.track ? t("record", { title: tTracks(`${meta.track}.title`) }) : null;
+            const record = meta?.track
+              ? t("record", { title: tTracks(`${meta.track}.title`) })
+              : null;
             const links = subs(room.href);
             return (
               <li
@@ -87,7 +99,10 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
                 className="life-row relative grid grid-cols-[auto_1fr] gap-x-4 border-b border-line py-6 sm:grid-cols-[auto_1fr_auto] sm:gap-x-6"
                 style={{ "--row-accent": meta?.accent ?? "var(--accent)" } as CSSProperties}
               >
-                <span className="pt-1 font-mono text-[0.6875rem] tracking-[0.08em] text-fg-tertiary" aria-hidden="true">
+                <span
+                  className="pt-1 font-mono text-[0.6875rem] tracking-[0.08em] text-fg-tertiary"
+                  aria-hidden="true"
+                >
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0">
@@ -97,7 +112,9 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
                   >
                     {title}
                   </Link>
-                  {line && <p className="mt-1.5 max-w-[52ch] text-caption text-fg-secondary">{line}</p>}
+                  {line && (
+                    <p className="mt-1.5 max-w-[52ch] text-caption text-fg-secondary">{line}</p>
+                  )}
                   {(count || record) && (
                     <p className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                       {count && <span className="tabular-nums">{count}</span>}
@@ -120,7 +137,12 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
                   )}
                 </div>
                 {meta?.cover && (
-                  <Link href={room.href} tabIndex={-1} aria-hidden="true" className="hidden sm:block">
+                  <Link
+                    href={room.href}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="hidden sm:block"
+                  >
                     <Image
                       src={meta.cover.src}
                       width={meta.cover.width}

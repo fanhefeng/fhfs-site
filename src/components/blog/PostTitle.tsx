@@ -18,13 +18,7 @@ import { HAS_CJK } from "@/lib/reading";
  * The real text is always in the DOM (SSR/SEO), so a failed hydration or a
  * stalled font simply leaves a normal headline.
  */
-export function PostTitle({
-  title,
-  className,
-}: {
-  title: string;
-  className?: string;
-}) {
+export function PostTitle({ title, className }: { title: string; className?: string }) {
   const ref = useRef<HTMLHeadingElement>(null);
 
   useGSAP(
@@ -83,7 +77,7 @@ export function PostTitle({
     // soft-nav between two CJK posts reuses this instance, so the second
     // SplitText would wrap lines that the first one had already wrapped —
     // nested masks, mismeasured lines, and a headline that can stay clipped.
-    { scope: ref, dependencies: [title], revertOnUpdate: true }
+    { scope: ref, dependencies: [title], revertOnUpdate: true },
   );
 
   return (

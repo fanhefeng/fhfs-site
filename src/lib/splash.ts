@@ -16,7 +16,9 @@
 export const SPLASH_SEEN_KEY = "fhfs-splash-seen";
 
 const DEBUG_CLAUSE =
-  process.env.NODE_ENV === "production" ? "" : 'if(/[?&]splash(=|&|$)/.test(location.search))s="due";';
+  process.env.NODE_ENV === "production"
+    ? ""
+    : 'if(/[?&]splash(=|&|$)/.test(location.search))s="due";';
 
 /** Blocked storage (private mode, cookie policy) must not strand the page behind the wall: a throw reads as "seen". */
 export const SPLASH_INIT_SCRIPT = `(function(){var s="due";try{if(sessionStorage.getItem("${SPLASH_SEEN_KEY}"))s="seen"}catch(e){s="seen"}${DEBUG_CLAUSE}document.documentElement.dataset.splash=s})()`;

@@ -2,32 +2,18 @@
 
 import { db } from "@/db";
 
-
-
 import * as schema from "@/db/schema";
 import { adminSession } from "@/lib/auth/session";
-
-
 
 import { str, validPath } from "@/lib/forms";
 
 import { TAGS } from "@/lib/content";
 
-
-
 import { isNavGroup, NAV_GROUPS } from "@/lib/nav";
-
-
 
 import { invalidate, SESSION_EXPIRED, collectRows, type ActionState } from "./shared";
 
-
-
-
-export async function saveNavItems(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveNavItems(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const rows = collectRows(form, "nav")
@@ -35,7 +21,7 @@ export async function saveNavItems(
       href: str(form, `nav.${i}.href`),
       labelKey: str(form, `nav.${i}.labelKey`),
       surfaces: ["header", "footer", "fullnav", "sitemap"].filter(
-        (surface) => form.get(`nav.${i}.surface.${surface}`) === "on"
+        (surface) => form.get(`nav.${i}.surface.${surface}`) === "on",
       ),
       sort: index,
       group: str(form, `nav.${i}.group`),
@@ -65,14 +51,12 @@ export async function saveNavItems(
   const [zhNav, enNav] = await Promise.all(
     (["zh", "en"] as const).map((locale) =>
       import(`../../../../messages/${locale}.json`).then(
-        (m) => (m.default as { nav?: Record<string, unknown> }).nav ?? {}
-      )
-    )
+        (m) => (m.default as { nav?: Record<string, unknown> }).nav ?? {},
+      ),
+    ),
   );
   const overrides = new Set(
-    (
-      await db.select({ key: schema.copyBlocks.key }).from(schema.copyBlocks)
-    ).map((row) => row.key)
+    (await db.select({ key: schema.copyBlocks.key }).from(schema.copyBlocks)).map((row) => row.key),
   );
   for (const row of rows) {
     const known =
@@ -89,9 +73,7 @@ export async function saveNavItems(
   // with no header.
   const values = rows.map((row) => ({ ...row, group: row.group || null }));
   const wipe = db.delete(schema.navItems);
-  await db.batch(
-    values.length ? [wipe, db.insert(schema.navItems).values(values)] : [wipe]
-  );
+  await db.batch(values.length ? [wipe, db.insert(schema.navItems).values(values)] : [wipe]);
 
   invalidate(TAGS.nav);
   return { ok: true };

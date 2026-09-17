@@ -1,19 +1,13 @@
 import "server-only";
 import { updateTag } from "next/cache";
 
-
 import { eq } from "drizzle-orm";
 
 import type { AnyPgColumn, PgInsertValue, PgTable, PgUpdateSetSource } from "drizzle-orm/pg-core";
 
-
 import { db } from "@/db";
 
-
-
 import { TAGS } from "@/lib/content";
-
-
 
 /**
  * Every write the admin can make.
@@ -89,7 +83,7 @@ export const goneError = (key: string): ActionState => ({
 export async function upsertKeyed<T extends KeyedTable>(
   table: T,
   row: PgInsertValue<T> & { key: string },
-  isNew: boolean
+  isNew: boolean,
 ): Promise<ActionState | null> {
   if (isNew) {
     const inserted = await db

@@ -12,8 +12,7 @@ import { Bullets, ResumeSection } from "@/components/resume/ResumeSection";
 
 export const generateMetadata = sectionMetadata("resume", "/resume");
 
-const metaLabel =
-  "font-mono text-meta uppercase tracking-meta text-fg-tertiary";
+const metaLabel = "font-mono text-meta uppercase tracking-meta text-fg-tertiary";
 
 /**
  * Resume — the formal, printable counterpart to /intro's 3D face.
@@ -31,9 +30,7 @@ const metaLabel =
  * leave the email blank and name employers as loosely as they like, and the
  * page shows whatever it is given.
  */
-export default async function ResumePage({
-  params,
-}: PageProps<"/[locale]/resume">) {
+export default async function ResumePage({ params }: PageProps<"/[locale]/resume">) {
   const locale = await pageLocale(params);
 
   const [t, profile, experiences] = await Promise.all([
@@ -44,10 +41,7 @@ export default async function ResumePage({
 
   if (!profile) {
     return (
-      <main
-        id="main"
-        className="mx-auto w-full max-w-[880px] flex-1 px-6 pb-24 pt-24 sm:pt-32"
-      >
+      <main id="main" className="mx-auto w-full max-w-[880px] flex-1 px-6 pb-24 pt-24 sm:pt-32">
         {/* The way back out belongs here too — an unsaved résumé is the one
             state where there is nothing else on the page to leave by. */}
         <Link
@@ -94,9 +88,7 @@ export default async function ResumePage({
           name: profile.name[locale],
           jobTitle: profile.tagline[locale],
           url: `${site.url}/${locale}/resume`,
-          sameAs: profile.github
-            ? [`https://github.com/${profile.github}`]
-            : [site.social.github],
+          sameAs: profile.github ? [`https://github.com/${profile.github}`] : [site.social.github],
         }}
       />
 
@@ -116,9 +108,7 @@ export default async function ResumePage({
             <PrintButton label={t("print")} ariaLabel={t("printAria")} />
           </div>
 
-          <h1 className="mt-5 text-display-sm text-fg">
-            {profile.name[locale]}
-          </h1>
+          <h1 className="mt-5 text-display-sm text-fg">{profile.name[locale]}</h1>
           <p className="no-cjk-oblique mt-3 font-serif text-title italic leading-tight text-fg-secondary">
             {profile.tagline[locale]}
           </p>
@@ -213,11 +203,7 @@ export default async function ResumePage({
               >
                 {/* A bare row — the grammar allows a line with no heading —
                     takes the whole width rather than leaving the rail empty. */}
-                {group.name && (
-                  <dt className="text-caption font-medium text-fg">
-                    {group.name}
-                  </dt>
-                )}
+                {group.name && <dt className="text-caption font-medium text-fg">{group.name}</dt>}
                 <dd
                   className={`text-caption text-fg-secondary${group.name ? "" : " sm:col-span-2"}`}
                 >
@@ -237,9 +223,7 @@ export default async function ResumePage({
           <div
             className={
               experiences.every(
-                (e) =>
-                  e.bullets[locale].length === 0 &&
-                  e.projects[locale].length === 0
+                (e) => e.bullets[locale].length === 0 && e.projects[locale].length === 0,
               )
                 ? "space-y-5 print:space-y-2"
                 : "space-y-12 print:space-y-5"
@@ -282,10 +266,7 @@ export default async function ResumePage({
                 <Bullets items={experience.bullets[locale]} className="mt-4" />
 
                 {experience.projects[locale].map((project, i) => (
-                  <div
-                    key={i}
-                    className="mt-6 print:mt-3 print:break-inside-avoid"
-                  >
+                  <div key={i} className="mt-6 print:mt-3 print:break-inside-avoid">
                     <h4 className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-l-2 border-accent/50 pl-3 text-body font-medium text-fg">
                       <span>{project.title}</span>
                       {project.period && (
@@ -325,10 +306,7 @@ export default async function ResumePage({
           carrying one line of mono is a sheet nobody wanted. */}
       <footer className="mt-16 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-line pt-6 print:mt-4 print:break-before-avoid print:pt-2">
         <p className={metaLabel}>{t("updated", { date: updated })}</p>
-        <Link
-          href="/intro"
-          className={`${metaLabel} hover:text-accent print:hidden`}
-        >
+        <Link href="/intro" className={`${metaLabel} hover:text-accent print:hidden`}>
           {t("introLink")} →
         </Link>
       </footer>

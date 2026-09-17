@@ -11,11 +11,7 @@ import { TAGS } from "@/lib/content";
 
 import { invalidate, SESSION_EXPIRED, collectRows, type ActionState } from "./shared";
 
-
-export async function saveChips(
-  _prev: ActionState,
-  form: FormData
-): Promise<ActionState> {
+export async function saveChips(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
   const rows = collectRows(form, "chip")
@@ -43,9 +39,7 @@ export async function saveChips(
   // so a failed insert cannot leave the table empty. Same contract as
   // scripts/db-import.mts.
   const wipe = db.delete(schema.chips);
-  await db.batch(
-    rows.length ? [wipe, db.insert(schema.chips).values(rows)] : [wipe]
-  );
+  await db.batch(rows.length ? [wipe, db.insert(schema.chips).values(rows)] : [wipe]);
 
   invalidate(TAGS.chips);
   return { ok: true };

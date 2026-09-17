@@ -182,7 +182,7 @@ export const INTRO_STICKERS: IntroSticker[] = [
  * number — the same one `useIntroStore` publishes as `activeIndex`.
  */
 export const STICKER_BY_ID = new Map(
-  INTRO_STICKERS.map((sticker, index) => [sticker.id, { sticker, index }])
+  INTRO_STICKERS.map((sticker, index) => [sticker.id, { sticker, index }]),
 );
 
 /**

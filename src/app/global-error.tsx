@@ -42,11 +42,7 @@ export default function GlobalError({
     "inline-flex min-h-11 items-center rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent";
 
   return (
-    <html
-      lang="zh-CN"
-      suppressHydrationWarning
-      className={`${fontVariables} h-full antialiased`}
-    >
+    <html lang="zh-CN" suppressHydrationWarning className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
         <ThemeInitScript />
         <main className="mx-auto flex w-full max-w-[880px] flex-1 flex-col justify-center gap-12 px-6 py-24 sm:flex-row sm:gap-16">
@@ -56,9 +52,7 @@ export default function GlobalError({
                 {block.kicker}
               </p>
               <h1 className="mt-4 text-display-sm text-fg">{block.title}</h1>
-              <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">
-                {block.description}
-              </p>
+              <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{block.description}</p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <button type="button" onClick={reset} className={`${action} cursor-pointer`}>
                   {block.retry}

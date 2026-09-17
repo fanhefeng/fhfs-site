@@ -49,7 +49,7 @@ export function parseInline(text: string): InlineRun[] {
     runs.push(
       token.startsWith("**")
         ? { text: token.slice(2, -2), kind: "strong" }
-        : { text: token.slice(1, -1), kind: "code" }
+        : { text: token.slice(1, -1), kind: "code" },
     );
     last = match.index + token.length;
   }
@@ -93,8 +93,7 @@ export const formatSkillLines = (groups: SkillGroup[]): string =>
 const MARKER = /^[-–—•*]\s+/;
 
 export type ParsedProjects =
-  | { projects: ResumeProject[]; error: null }
-  | { projects: null; error: string };
+  { projects: ResumeProject[]; error: null } | { projects: null; error: string };
 
 /**
  * A heading line starts with `#`; what follows is the title and, after a
@@ -141,9 +140,7 @@ export function parseProjects(text: string): ParsedProjects {
 export function formatProjects(projects: ResumeProject[]): string {
   return projects
     .map((project) => {
-      const head = project.period
-        ? `# ${project.title} | ${project.period}`
-        : `# ${project.title}`;
+      const head = project.period ? `# ${project.title} | ${project.period}` : `# ${project.title}`;
       return [head, ...project.bullets.map((bullet) => `- ${bullet}`)].join("\n");
     })
     .join("\n\n");

@@ -54,7 +54,7 @@ export function stampInZone(iso: string, timeZone: string): { year: string; time
  * filed under no notebook are not a notebook.
  */
 export function collections<T extends { collection: string | null }>(
-  items: T[]
+  items: T[],
 ): { name: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const item of items) {

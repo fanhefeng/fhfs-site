@@ -51,7 +51,9 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
         >
           {t("backToIndex")}
         </Link>
-        <p className="mt-6 font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tk("kicker")}</p>
+        <p className="mt-6 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+          {tk("kicker")}
+        </p>
         <h1 className="mt-3 text-display">{tk("name")}</h1>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           <span>{tk("latin")}</span>
@@ -66,7 +68,9 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
       {/* The statue. */}
       <section aria-labelledby="kobe-statue" className="mb-24">
         <Reveal className="mb-8 max-w-[720px]">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tk("statueKicker")}</p>
+          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {tk("statueKicker")}
+          </p>
           <h2 id="kobe-statue" className="mt-3 text-title">
             {tk("statueTitle")}
           </h2>
@@ -76,7 +80,12 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
           hint={tk("statueHint")}
           loading={tk("loading")}
           fallbackNote={tk("statueFallback")}
-          fallback={{ src: asset(`/idols/kobe/${cover.file}`), width: cover.width, height: cover.height, alt: cover.alt }}
+          fallback={{
+            src: asset(`/idols/kobe/${cover.file}`),
+            width: cover.width,
+            height: cover.height,
+            alt: cover.alt,
+          }}
           turnLeft={tk("turnLeft")}
           turnRight={tk("turnRight")}
         />
@@ -96,7 +105,9 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
       {/* The photographs. */}
       <section aria-labelledby="kobe-gallery" className="mb-24">
         <Reveal className="mb-8 max-w-[720px]">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tk("galleryKicker")}</p>
+          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {tk("galleryKicker")}
+          </p>
           <h2 id="kobe-gallery" className="mt-3 text-title">
             {tk("galleryTitle")}
           </h2>
@@ -108,14 +119,19 @@ export default async function KobePage({ params }: PageProps<"/[locale]/idols/ko
       {/* The milestones. */}
       <section aria-labelledby="kobe-timeline" className="mb-16 max-w-[720px]">
         <Reveal className="mb-8">
-          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{tk("timelineKicker")}</p>
+          <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+            {tk("timelineKicker")}
+          </p>
           <h2 id="kobe-timeline" className="mt-3 text-title">
             {tk("timelineTitle")}
           </h2>
         </Reveal>
         <Reveal as="ol" stagger={0.05} className="border-t border-line">
           {KOBE_TIMELINE.map((id) => (
-            <li key={id} className="grid gap-1 border-b border-line py-4 sm:grid-cols-[9rem_1fr] sm:gap-6">
+            <li
+              key={id}
+              className="grid gap-1 border-b border-line py-4 sm:grid-cols-[9rem_1fr] sm:gap-6"
+            >
               <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
                 {tk(`timeline.${id}.date`)}
               </span>

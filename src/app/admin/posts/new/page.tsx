@@ -5,7 +5,13 @@ import { PostForm } from "../PostForm";
 export default async function NewPost() {
   await requireAdminPage();
   return (
-    <AdminChrome title="新文章" section="/admin/posts" sub view={null} blurb="slug 和语言存下之后就不能改了——它们是这篇文章的地址。">
+    <AdminChrome
+      title="新文章"
+      section="/admin/posts"
+      sub
+      view={null}
+      blurb="slug 和语言存下之后就不能改了——它们是这篇文章的地址。"
+    >
       <PostForm
         isNew
         post={{

@@ -74,7 +74,7 @@ export function Workstation({ hint, className }: Props) {
       30,
       container.clientWidth / Math.max(container.clientHeight, 1),
       0.1,
-      50
+      50,
     );
     camera.position.set(0, 1.3, 6.6);
     camera.lookAt(0, 0.15, 0);
@@ -168,9 +168,7 @@ export function Workstation({ hint, className }: Props) {
         const mesh = obj as THREE.Mesh;
         if (!mesh.isMesh) return;
         mesh.geometry.dispose();
-        const mats = Array.isArray(mesh.material)
-          ? mesh.material
-          : [mesh.material];
+        const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         for (const mat of mats) {
           // material.dispose() frees no textures, and this model carries
           // emissive and metallic-roughness maps alongside the base color.
@@ -218,11 +216,7 @@ export function Workstation({ hint, className }: Props) {
       intro.spin = HOME_Y + 1.2;
       rotY = targetY = intro.spin;
       introTl = gsap.timeline();
-      introTl.to(
-        intro,
-        { y: 0, s: 1, duration: 1.1, ease: "back.out(1.2)" },
-        0
-      );
+      introTl.to(intro, { y: 0, s: 1, duration: 1.1, ease: "back.out(1.2)" }, 0);
       // The turntable overshoots by 1.2 rad and settles fast-to-slow onto
       // the display angle — like a handler turning the piece to face front.
       spinTween = gsap.to(intro, {
@@ -234,11 +228,7 @@ export function Workstation({ hint, className }: Props) {
         },
       });
       // The pool of light fades in as the piece lands.
-      introTl.to(
-        intro,
-        { g: 1, duration: 0.9, ease: "power2.out" },
-        0.35
-      );
+      introTl.to(intro, { g: 1, duration: 0.9, ease: "power2.out" }, 0.35);
     };
 
     const lookAt = new THREE.Vector3(0, 0.15, 0);
@@ -263,11 +253,7 @@ export function Workstation({ hint, className }: Props) {
       velY = velY * 0.6 + dx * 0.4;
       // Vertical drag pitches the desk; clamped so it never flips over.
       // No inertia on tilt — pitch stays directly in hand.
-      targetTilt = THREE.MathUtils.clamp(
-        targetTilt + (e.clientY - lastY) * 0.005,
-        -0.5,
-        0.35
-      );
+      targetTilt = THREE.MathUtils.clamp(targetTilt + (e.clientY - lastY) * 0.005, -0.5, 0.35);
       lastX = e.clientX;
       lastY = e.clientY;
       lastPointerAt = performance.now();
@@ -311,11 +297,7 @@ export function Workstation({ hint, className }: Props) {
       if (!owns) return;
       e.preventDefault();
       const speed = e.ctrlKey ? 0.008 : 0.0016;
-      targetZoom = THREE.MathUtils.clamp(
-        targetZoom * Math.exp(-e.deltaY * speed),
-        0.6,
-        2.1
-      );
+      targetZoom = THREE.MathUtils.clamp(targetZoom * Math.exp(-e.deltaY * speed), 0.6, 2.1);
       lastPointerAt = performance.now();
     };
     // Double click puts everything back where it started (spin stays).
@@ -340,8 +322,7 @@ export function Workstation({ hint, className }: Props) {
       // before the idle spin resumes. Returning early leaves `lastFrame`
       // untouched, so the skipped time lands in the next `delta` and every
       // delta-driven motion keeps its real-world speed.
-      const idle =
-        !dragging && Math.abs(velY) <= 0.02 && now - lastPointerAt > 1200;
+      const idle = !dragging && Math.abs(velY) <= 0.02 && now - lastPointerAt > 1200;
       if (idle && lastFrame && now - lastFrame < IDLE_FRAME_MS) return;
 
       const t = now / 1000;
@@ -394,71 +375,69 @@ export function Workstation({ hint, className }: Props) {
       Promise.all([
         import("three/examples/jsm/loaders/GLTFLoader.js"),
         import("three/examples/jsm/loaders/DRACOLoader.js"),
-      ]).then(([{ GLTFLoader }, { DRACOLoader }]) => {
-        if (disposed) return;
-        const draco = new DRACOLoader();
-        draco.setDecoderPath(DRACO_DECODER_PATH);
-        const loader = new GLTFLoader();
-        loader.setDRACOLoader(draco);
-        loader.load(
-          MODEL_URL,
-          (gltf) => {
-            draco.dispose();
-            if (disposed) return;
-            const root = gltf.scene;
-            // Normalize: center the desk, sit it slightly below eye line.
-            const box = new THREE.Box3().setFromObject(root);
-            const size = box.getSize(new THREE.Vector3());
-            const center = box.getCenter(new THREE.Vector3());
-            const s = 4.1 / Math.max(size.x, size.y, size.z, 1e-5);
-            root.scale.setScalar(s);
-            baseModelY = -center.y * s - 0.15;
-            root.position.set(-center.x * s, baseModelY, -center.z * s);
-            baseScale = s;
-            // Park the ground pool just under the model's lowest point.
-            ground.position.y = -(size.y / 2) * s - 0.15 - 0.02;
-            ground.visible = true;
-            // Collect emissive materials (screens, LED strips) once.
-            const seen = new Set<THREE.Material>();
-            const glowName = /screen|led|light/i;
-            root.traverse((obj) => {
-              const mesh = obj as THREE.Mesh;
-              if (!mesh.isMesh) return;
-              const mats = Array.isArray(mesh.material)
-                ? mesh.material
-                : [mesh.material];
-              for (const m of mats) {
-                if (seen.has(m)) continue;
-                seen.add(m);
-                const std = m as THREE.MeshStandardMaterial;
-                if (!std.emissive) continue;
-                const lit =
-                  std.emissive.r + std.emissive.g + std.emissive.b > 0;
-                const named =
-                  glowName.test(std.name) || glowName.test(std.map?.name ?? "");
-                if (lit || named) {
-                  glowMats.push({ mat: std, base: std.emissiveIntensity });
+      ])
+        .then(([{ GLTFLoader }, { DRACOLoader }]) => {
+          if (disposed) return;
+          const draco = new DRACOLoader();
+          draco.setDecoderPath(DRACO_DECODER_PATH);
+          const loader = new GLTFLoader();
+          loader.setDRACOLoader(draco);
+          loader.load(
+            MODEL_URL,
+            (gltf) => {
+              draco.dispose();
+              if (disposed) return;
+              const root = gltf.scene;
+              // Normalize: center the desk, sit it slightly below eye line.
+              const box = new THREE.Box3().setFromObject(root);
+              const size = box.getSize(new THREE.Vector3());
+              const center = box.getCenter(new THREE.Vector3());
+              const s = 4.1 / Math.max(size.x, size.y, size.z, 1e-5);
+              root.scale.setScalar(s);
+              baseModelY = -center.y * s - 0.15;
+              root.position.set(-center.x * s, baseModelY, -center.z * s);
+              baseScale = s;
+              // Park the ground pool just under the model's lowest point.
+              ground.position.y = -(size.y / 2) * s - 0.15 - 0.02;
+              ground.visible = true;
+              // Collect emissive materials (screens, LED strips) once.
+              const seen = new Set<THREE.Material>();
+              const glowName = /screen|led|light/i;
+              root.traverse((obj) => {
+                const mesh = obj as THREE.Mesh;
+                if (!mesh.isMesh) return;
+                const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+                for (const m of mats) {
+                  if (seen.has(m)) continue;
+                  seen.add(m);
+                  const std = m as THREE.MeshStandardMaterial;
+                  if (!std.emissive) continue;
+                  const lit = std.emissive.r + std.emissive.g + std.emissive.b > 0;
+                  const named = glowName.test(std.name) || glowName.test(std.map?.name ?? "");
+                  if (lit || named) {
+                    glowMats.push({ mat: std, base: std.emissiveIntensity });
+                  }
                 }
+              });
+              turntable.add(root);
+              model = root;
+              setStatus("ready");
+              if (visibleNow) {
+                playEntrance();
               }
-            });
-            turntable.add(root);
-            model = root;
-            setStatus("ready");
-            if (visibleNow) {
-              playEntrance();
-            }
-          },
-          undefined,
-          () => {
-            draco.dispose();
-            if (!disposed) setStatus("skipped");
-          }
-        );
-      }).catch(() => {
-        // A failed chunk load (offline, blocked CDN) must not leave the
-        // spinner up forever as an unhandled rejection.
-        if (!disposed) setStatus("skipped");
-      });
+            },
+            undefined,
+            () => {
+              draco.dispose();
+              if (!disposed) setStatus("skipped");
+            },
+          );
+        })
+        .catch(() => {
+          // A failed chunk load (offline, blocked CDN) must not leave the
+          // spinner up forever as an unhandled rejection.
+          if (!disposed) setStatus("skipped");
+        });
     };
 
     // A hidden tab has nobody to show frames to. Browsers throttle rAF in
@@ -483,7 +462,7 @@ export function Workstation({ hint, className }: Props) {
         }
         setLoop(near);
       },
-      { rootMargin: "300px" }
+      { rootMargin: "300px" },
     );
     io.observe(container);
 

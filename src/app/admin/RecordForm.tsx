@@ -32,7 +32,14 @@ export type Field =
       group?: string;
     }
   | { name: string; label: string; kind: "localized"; hint?: string; group?: string }
-  | { name: string; label: string; kind: "localizedArea"; rows?: number; hint?: string; group?: string }
+  | {
+      name: string;
+      label: string;
+      kind: "localizedArea";
+      rows?: number;
+      hint?: string;
+      group?: string;
+    }
   | { name: string; label: string; kind: "lines"; hint?: string; rows?: number; group?: string };
 
 export type RecordData = { [key: string]: unknown };
@@ -78,10 +85,7 @@ export function RecordForm({
   isNew?: boolean;
   deleteAction?: (form: FormData) => Promise<void>;
 }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    action,
-    {}
-  );
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(action, {});
   const formId = useId();
 
   const value = (name: string): string => {
@@ -120,9 +124,7 @@ export function RecordForm({
           <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
             {(["zh", "en"] as const).map((locale) => (
               <label key={locale} className="space-y-1">
-                <span className="font-mono text-meta text-fg-tertiary">
-                  {locale}
-                </span>
+                <span className="font-mono text-meta text-fg-tertiary">{locale}</span>
                 {field.kind === "localizedArea" ? (
                   <textarea
                     name={`${field.name}.${locale}`}
@@ -167,15 +169,11 @@ export function RecordForm({
           <div className="mt-1.5 grid gap-3 sm:grid-cols-2">
             {(["zh", "en"] as const).map((locale) => (
               <label key={locale} className="space-y-1">
-                <span className="font-mono text-meta text-fg-tertiary">
-                  {locale}
-                </span>
+                <span className="font-mono text-meta text-fg-tertiary">{locale}</span>
                 <textarea
                   name={`${field.name}.${locale}`}
                   defaultValue={
-                    (record[field.name] as { [k: string]: string[] })?.[locale]?.join(
-                      "\n"
-                    ) ?? ""
+                    (record[field.name] as { [k: string]: string[] })?.[locale]?.join("\n") ?? ""
                   }
                   rows={field.rows ?? 4}
                   className={`${textareaClass} ${monoClass}`}
@@ -214,7 +212,7 @@ export function RecordForm({
               labelledBy={labelId}
               defaultValue={value(field.name)}
               options={field.options.map((option) =>
-                typeof option === "string" ? { value: option } : option
+                typeof option === "string" ? { value: option } : option,
               )}
             />
           )}
@@ -250,9 +248,7 @@ export function RecordForm({
         {groups.map((group) => (
           <div key={group.name ?? "_"} className="space-y-5">
             {group.name && (
-              <h3 className={`${metaClass} border-b border-line pb-2`}>
-                {group.name}
-              </h3>
+              <h3 className={`${metaClass} border-b border-line pb-2`}>{group.name}</h3>
             )}
             {group.fields.map(renderField)}
           </div>

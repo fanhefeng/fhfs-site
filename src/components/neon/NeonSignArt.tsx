@@ -122,7 +122,14 @@ export function NeonSignArt({ id, svgRef, className }: ArtProps) {
         <NeonFilter id={`${id}-lit-note`} x="-40%" y="-20%" width="180%" height="140%" />
         <DarkGlassFilter id={`${id}-dark`} />
 
-        <path id={sh("ring")} d={ARC_L} fill="none" stroke="#000" strokeWidth={RING_TUBE} strokeLinecap="round" />
+        <path
+          id={sh("ring")}
+          d={ARC_L}
+          fill="none"
+          stroke="#000"
+          strokeWidth={RING_TUBE}
+          strokeLinecap="round"
+        />
         <path
           id={sh("bar")}
           d={ARC_R_BAR}
@@ -134,7 +141,13 @@ export function NeonSignArt({ id, svgRef, className }: ArtProps) {
         />
         <path id={sh("note")} d={NOTE_D} transform={NOTE_T} fill="#000" />
         {WORD.map((l, i) => (
-          <path key={i} id={sh(`l${i}`)} d={GLYPH[l.g]} transform={`translate(${l.x} ${l.y})`} fill="#000" />
+          <path
+            key={i}
+            id={sh(`l${i}`)}
+            d={GLYPH[l.g]}
+            transform={`translate(${l.x} ${l.y})`}
+            fill="#000"
+          />
         ))}
       </defs>
 
@@ -178,7 +191,12 @@ export function NeonSignArt({ id, svgRef, className }: ArtProps) {
 export type Step = [hold: number, v: number];
 
 /** Writes a flicker score onto the timeline from `at`; returns when it ends. */
-export function score(tl: gsap.core.Timeline, targets: Element[], at: number, steps: Step[]): number {
+export function score(
+  tl: gsap.core.Timeline,
+  targets: Element[],
+  at: number,
+  steps: Step[],
+): number {
   let t = at;
   for (const [hold, v] of steps) {
     tl.set(targets, { opacity: v }, t);
@@ -204,32 +222,93 @@ export function writeLightScore(main: gsap.core.Timeline, seg: SegPicker, spill:
   for (const s of [ring, bar, note, ...letters, spill]) main.set(s, { opacity: 0 }, 0);
 
   const RING_SCORE: Step[] = [
-    [0.05, 1], [0.09, 0], [0.04, 1], [0.12, 0], [0.03, 0.55], [0.05, 0], [0.28, 1], [0.04, 0], [0.05, 1],
+    [0.05, 1],
+    [0.09, 0],
+    [0.04, 1],
+    [0.12, 0],
+    [0.03, 0.55],
+    [0.05, 0],
+    [0.28, 1],
+    [0.04, 0],
+    [0.05, 1],
   ];
   score(main, ring, 0.55, RING_SCORE);
-  score(main, spill, 0.55, RING_SCORE.map(([hold, v]) => [hold, v * 0.5] as Step));
+  score(
+    main,
+    spill,
+    0.55,
+    RING_SCORE.map(([hold, v]) => [hold, v * 0.5] as Step),
+  );
   main.to(spill, { opacity: 1, duration: 1.4, ease: "none" }, 1.3);
 
-  score(main, bar, 0.95, [[0.04, 1], [0.06, 0], [0.3, 1], [0.03, 0], [0.05, 1]]);
+  score(main, bar, 0.95, [
+    [0.04, 1],
+    [0.06, 0],
+    [0.3, 1],
+    [0.03, 0],
+    [0.05, 1],
+  ]);
 
   const LETTER_SCORES: Step[][] = [
-    [[0.05, 1], [0.07, 0], [0.04, 1], [0.05, 0], [1, 1]],
-    [[0.06, 0.4], [0.04, 0], [0.05, 1], [0.09, 0], [1, 1]],
-    [[0.04, 1], [0.03, 0], [1, 1]],
-    [[0.04, 1], [0.08, 0], [0.05, 0.5], [0.04, 1]],
+    [
+      [0.05, 1],
+      [0.07, 0],
+      [0.04, 1],
+      [0.05, 0],
+      [1, 1],
+    ],
+    [
+      [0.06, 0.4],
+      [0.04, 0],
+      [0.05, 1],
+      [0.09, 0],
+      [1, 1],
+    ],
+    [
+      [0.04, 1],
+      [0.03, 0],
+      [1, 1],
+    ],
+    [
+      [0.04, 1],
+      [0.08, 0],
+      [0.05, 0.5],
+      [0.04, 1],
+    ],
   ];
   letters.forEach((l, i) => score(main, l, 1.1 + i * 0.2, LETTER_SCORES[i]!));
-  score(main, note, 1.95, [[0.05, 1], [0.06, 0], [0.05, 1]]);
-  score(main, letters[2]!, 2.3, [[0.03, 0], [0.04, 1]]);
-  score(main, letters[1]!, 2.62, [[0.03, 0], [0.05, 1]]);
+  score(main, note, 1.95, [
+    [0.05, 1],
+    [0.06, 0],
+    [0.05, 1],
+  ]);
+  score(main, letters[2]!, 2.3, [
+    [0.03, 0],
+    [0.04, 1],
+  ]);
+  score(main, letters[1]!, 2.62, [
+    [0.03, 0],
+    [0.05, 1],
+  ]);
 }
 
 /** Switching off: one dim beat, then dark; the spill fades after it. */
-export function writeOffScore(off: gsap.core.Timeline, lit: Element[], spill: Element[], exitEase: string): void {
+export function writeOffScore(
+  off: gsap.core.Timeline,
+  lit: Element[],
+  spill: Element[],
+  exitEase: string,
+): void {
   off.set(lit, { opacity: 0.55 }, 0);
   off.set(lit, { opacity: 0 }, 0.06);
   off.to(spill, { opacity: 0, duration: 0.3, ease: exitEase }, 0);
 }
 
 /** One tube loses its nerve for a moment. */
-export const STUTTER: Step[] = [[0.04, 0], [0.05, 1], [0.03, 0], [0.04, 0.6], [0.03, 1]];
+export const STUTTER: Step[] = [
+  [0.04, 0],
+  [0.05, 1],
+  [0.03, 0],
+  [0.04, 0.6],
+  [0.03, 1],
+];

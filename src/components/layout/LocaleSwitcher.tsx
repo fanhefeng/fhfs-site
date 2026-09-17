@@ -32,5 +32,3 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     </button>
   );
 }
-
-

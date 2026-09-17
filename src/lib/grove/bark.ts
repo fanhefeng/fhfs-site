@@ -22,7 +22,11 @@ export type BarkPlates = {
   /** R: lichen field */
   lichen: THREE.Texture;
   /** for the bark material's own uniforms */
-  uniforms: { uBark: { value: THREE.Texture }; uBarkLich: { value: THREE.Texture }; uBarkV: { value: number } };
+  uniforms: {
+    uBark: { value: THREE.Texture };
+    uBarkLich: { value: THREE.Texture };
+    uBarkV: { value: number };
+  };
   dispose: () => void;
 };
 
@@ -30,7 +34,8 @@ export function bakeBarkPlates(renderer: THREE.WebGLRenderer, small: boolean): B
   const w = small ? 384 : 768;
   const h = small ? 1024 : 2048;
   const halfFloat =
-    renderer.extensions.has("EXT_color_buffer_float") || renderer.extensions.has("EXT_color_buffer_half_float");
+    renderer.extensions.has("EXT_color_buffer_float") ||
+    renderer.extensions.has("EXT_color_buffer_half_float");
 
   const target = () =>
     new THREE.WebGLRenderTarget(w, h, {
@@ -65,7 +70,10 @@ export function bakeBarkPlates(renderer: THREE.WebGLRenderer, small: boolean): B
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   const previous = renderer.getRenderTarget();
-  for (const [pass, rt] of [[0, plateRT], [1, lichenRT]] as const) {
+  for (const [pass, rt] of [
+    [0, plateRT],
+    [1, lichenRT],
+  ] as const) {
     material.uniforms.uPass!.value = pass;
     renderer.setRenderTarget(rt);
     renderer.render(scene, camera);

@@ -33,7 +33,7 @@ export function compileProgram(
   gl: WebGL2RenderingContext,
   vert: string,
   frag: string,
-  tag = "webgl"
+  tag = "webgl",
 ): WebGLProgram | null {
   const compile = (type: number, src: string) => {
     const sh = gl.createShader(type);
@@ -100,10 +100,7 @@ export type ContextWatch = {
  * harmless, and the fresh run asks the same canvas for its context and gets
  * the restored one back.
  */
-export function watchContextLoss(
-  canvas: HTMLCanvasElement,
-  onRestored: () => void
-): ContextWatch {
+export function watchContextLoss(canvas: HTMLCanvasElement, onRestored: () => void): ContextWatch {
   let lost = false;
   const onLost = (e: Event) => {
     e.preventDefault();

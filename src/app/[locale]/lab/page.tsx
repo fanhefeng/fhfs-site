@@ -41,16 +41,10 @@ export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
               </span>
               <span className="lab-body">
                 <span className="lab-line">
-                  <span className="lab-name">
-                    {t(`items.${entry.key}.name`)}
-                  </span>
-                  <span className="lab-tagline">
-                    {t(`items.${entry.key}.tagline`)}
-                  </span>
+                  <span className="lab-name">{t(`items.${entry.key}.name`)}</span>
+                  <span className="lab-tagline">{t(`items.${entry.key}.tagline`)}</span>
                 </span>
-                <span className="lab-desc">
-                  {t(`items.${entry.key}.summary`)}
-                </span>
+                <span className="lab-desc">{t(`items.${entry.key}.summary`)}</span>
               </span>
               <span className="lab-arrow" aria-hidden="true">
                 →

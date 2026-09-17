@@ -45,90 +45,82 @@ export default function EditorPanel() {
   // the slider values from here on and ignores a new `base` until `selectedId`
   // moves. Keeping the read inside the factory is what keeps the component
   // body itself pure.
-  const [, set] = useControls(
-    () => {
-      const sticker =
-        INTRO_STICKERS.find((n) => n.id === selectedId) ?? INTRO_STICKERS[0]!;
-      const base = resolveSticker(sticker, useIntroStore.getState().overrides);
+  const [, set] = useControls(() => {
+    const sticker = INTRO_STICKERS.find((n) => n.id === selectedId) ?? INTRO_STICKERS[0]!;
+    const base = resolveSticker(sticker, useIntroStore.getState().overrides);
 
-      return {
-        贴纸: {
-          value: selectedId,
-          options: Object.fromEntries(
-            INTRO_STICKERS.map((n) => [`${n.icon} ${n.label}`, n.id])
-          ),
-          onChange: (v: string) => setSelectedId(v),
-        },
-        theta: {
-          label: "水平角",
-          value: base.dir.theta,
-          min: -180,
-          max: 180,
-          step: 0.5,
-          onChange: (v: number) => patch(selectedId, { theta: v }),
-        },
-        phi: {
-          label: "垂直角",
-          value: base.dir.phi,
-          min: -89,
-          max: 89,
-          step: 0.5,
-          onChange: (v: number) => patch(selectedId, { phi: v }),
-        },
-        size: {
-          label: "尺寸",
-          value: base.size,
-          min: 0.05,
-          max: 0.8,
-          step: 0.005,
-          onChange: (v: number) => patch(selectedId, { size: v }),
-        },
-        rotation: {
-          label: "自转",
-          value: base.rotation,
-          min: -180,
-          max: 180,
-          step: 1,
-          onChange: (v: number) => patch(selectedId, { rotation: v }),
-        },
-        distance: {
-          label: "机位距离",
-          value: base.distance,
-          min: 0.4,
-          max: 3,
-          step: 0.01,
-          onChange: (v: number) => patch(selectedId, { distance: v }),
-        },
-        "导出 JSON（同时复制到剪贴板）": button(() => {
-          const overrides = useIntroStore.getState().overrides;
-          const payload = INTRO_STICKERS.map((n) => {
-            const r = resolveSticker(n, overrides);
-            return {
-              id: r.id,
-              dir: {
-                theta: +r.dir.theta.toFixed(1),
-                phi: +r.dir.phi.toFixed(1),
-              },
-              size: +r.size.toFixed(3),
-              rotation: +r.rotation.toFixed(1),
-              distance: +r.distance.toFixed(2),
-            };
-          });
-          const text = JSON.stringify(payload, null, 2);
-          // The console IS the export here: the clipboard write below is
-          // best-effort (it needs a secure context and can be denied), so this
-          // is the copy of the numbers that always survives.
-          // oxlint-disable-next-line no-console
-          console.log(
-            "[intro] paste these back into src/lib/intro/stickers.ts:\n" + text
-          );
-          navigator.clipboard?.writeText(text).catch(() => {});
-        }),
-        重置: button(() => reset()),
-      };
-    },
-    [selectedId]
-  );
+    return {
+      贴纸: {
+        value: selectedId,
+        options: Object.fromEntries(INTRO_STICKERS.map((n) => [`${n.icon} ${n.label}`, n.id])),
+        onChange: (v: string) => setSelectedId(v),
+      },
+      theta: {
+        label: "水平角",
+        value: base.dir.theta,
+        min: -180,
+        max: 180,
+        step: 0.5,
+        onChange: (v: number) => patch(selectedId, { theta: v }),
+      },
+      phi: {
+        label: "垂直角",
+        value: base.dir.phi,
+        min: -89,
+        max: 89,
+        step: 0.5,
+        onChange: (v: number) => patch(selectedId, { phi: v }),
+      },
+      size: {
+        label: "尺寸",
+        value: base.size,
+        min: 0.05,
+        max: 0.8,
+        step: 0.005,
+        onChange: (v: number) => patch(selectedId, { size: v }),
+      },
+      rotation: {
+        label: "自转",
+        value: base.rotation,
+        min: -180,
+        max: 180,
+        step: 1,
+        onChange: (v: number) => patch(selectedId, { rotation: v }),
+      },
+      distance: {
+        label: "机位距离",
+        value: base.distance,
+        min: 0.4,
+        max: 3,
+        step: 0.01,
+        onChange: (v: number) => patch(selectedId, { distance: v }),
+      },
+      "导出 JSON（同时复制到剪贴板）": button(() => {
+        const overrides = useIntroStore.getState().overrides;
+        const payload = INTRO_STICKERS.map((n) => {
+          const r = resolveSticker(n, overrides);
+          return {
+            id: r.id,
+            dir: {
+              theta: +r.dir.theta.toFixed(1),
+              phi: +r.dir.phi.toFixed(1),
+            },
+            size: +r.size.toFixed(3),
+            rotation: +r.rotation.toFixed(1),
+            distance: +r.distance.toFixed(2),
+          };
+        });
+        const text = JSON.stringify(payload, null, 2);
+        // The console IS the export here: the clipboard write below is
+        // best-effort (it needs a secure context and can be denied), so this
+        // is the copy of the numbers that always survives.
+        // oxlint-disable-next-line no-console
+        console.log("[intro] paste these back into src/lib/intro/stickers.ts:\n" + text);
+        navigator.clipboard?.writeText(text).catch(() => {});
+      }),
+      重置: button(() => reset()),
+    };
+  }, [selectedId]);
 
   // Feed the angle picked on the model back into the panel; `set` fires the
   // onChange handlers above, which are what write the store.

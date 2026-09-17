@@ -47,10 +47,7 @@ const FIELDS: Field[] = [
 
 export default async function AppsPage() {
   await requireAdminPage();
-  const rows = await db
-    .select()
-    .from(apps)
-    .orderBy(asc(apps.sort), asc(apps.key));
+  const rows = await db.select().from(apps).orderBy(asc(apps.sort), asc(apps.key));
 
   // Built per render: the default sort has to sit after whatever is there now.
   const blank: RecordData = {

@@ -62,7 +62,10 @@ export function serializeManifest(manifest: AssetManifest): string {
  * lands on the same text.
  */
 export function hashCssUrls(css: string, manifest: AssetManifest): string {
-  const hashed = new RegExp(`/_[0-9a-f]{${HASH_LENGTH}}(?=/)|\\.[0-9a-f]{${HASH_LENGTH}}(?=\\.\\w+$)`, "g");
+  const hashed = new RegExp(
+    `/_[0-9a-f]{${HASH_LENGTH}}(?=/)|\\.[0-9a-f]{${HASH_LENGTH}}(?=\\.\\w+$)`,
+    "g",
+  );
   return css.replace(/url\("(\/[^"]+)"\)/g, (whole, url: string) => {
     const plain = url.replace(hashed, "");
     return isImmutable(plain) ? `url("${resolveAsset(manifest, plain)}")` : whole;

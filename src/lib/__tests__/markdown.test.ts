@@ -35,7 +35,9 @@ describe("isSafeUrl", () => {
 // this pipeline is the whole of the defence — tested end to end, not by part.
 describe("renderMarkdown", () => {
   it("renders prose, GFM and a slugged heading that links to itself", async () => {
-    const html = await renderMarkdown("## Hello world\n\nSome *text* and ~~gone~~.\n\n| a | b |\n|---|---|\n| 1 | 2 |");
+    const html = await renderMarkdown(
+      "## Hello world\n\nSome *text* and ~~gone~~.\n\n| a | b |\n|---|---|\n| 1 | 2 |",
+    );
     expect(html).toContain('<h2 id="hello-world"><a href="#hello-world">Hello world</a></h2>');
     expect(html).toContain("<em>text</em>");
     expect(html).toContain("<del>gone</del>");
@@ -43,7 +45,9 @@ describe("renderMarkdown", () => {
   });
 
   it("drops a dangerous href or src and keeps the element", async () => {
-    const html = await renderMarkdown("[x](javascript:alert(1)) ![y](data:text/html,boo) [ok](https://example.com)");
+    const html = await renderMarkdown(
+      "[x](javascript:alert(1)) ![y](data:text/html,boo) [ok](https://example.com)",
+    );
     expect(html).not.toMatch(/javascript:|data:/);
     expect(html).toContain("<a>x</a>");
     expect(html).toContain('<img alt="y">');
@@ -51,7 +55,9 @@ describe("renderMarkdown", () => {
   });
 
   it("never lets raw HTML in the source through", async () => {
-    const html = await renderMarkdown('<script>alert(1)</script>\n\n<img src=x onerror="alert(1)">\n\ntext <b onclick="x()">bold</b>');
+    const html = await renderMarkdown(
+      '<script>alert(1)</script>\n\n<img src=x onerror="alert(1)">\n\ntext <b onclick="x()">bold</b>',
+    );
     expect(html).not.toMatch(/<script|onerror|onclick|<b /);
     expect(html).toContain("text");
   });

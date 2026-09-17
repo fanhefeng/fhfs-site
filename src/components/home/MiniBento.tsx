@@ -53,11 +53,7 @@ export function MiniBento({ items, title, viewAllLabel, index }: Props) {
         index={index}
       />
 
-      <Reveal
-        as="ul"
-        stagger={0.06}
-        className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4"
-      >
+      <Reveal as="ul" stagger={0.06} className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
         {items.map((item, i) => {
           const wide = i < 2;
           return (
@@ -85,9 +81,7 @@ export function MiniBento({ items, title, viewAllLabel, index }: Props) {
                           ↗
                         </span>
                       </span>
-                      <span className="text-caption text-fg-secondary">
-                        {item.tagline}
-                      </span>
+                      <span className="text-caption text-fg-secondary">{item.tagline}</span>
                     </span>
                     <AppMock
                       app={item.mock}
@@ -108,9 +102,7 @@ export function MiniBento({ items, title, viewAllLabel, index }: Props) {
                 )}
                 <span className="relative flex items-baseline justify-between gap-2 font-mono text-meta text-fg-tertiary">
                   <span className="uppercase tracking-meta">{item.category}</span>
-                  {item.stat ? (
-                    <span className="tabular-nums">{item.stat}</span>
-                  ) : null}
+                  {item.stat ? <span className="tabular-nums">{item.stat}</span> : null}
                 </span>
               </a>
             </li>

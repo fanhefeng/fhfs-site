@@ -75,7 +75,7 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
                 style={{
                   background: `linear-gradient(150deg, ${mockAccent(
                     app.hue,
-                    "light"
+                    "light",
                   )}, ${mockAccent(app.hue, "dark")})`,
                 }}
               >

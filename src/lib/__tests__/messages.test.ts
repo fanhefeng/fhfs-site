@@ -32,7 +32,9 @@ describe("CLIENT_NAMESPACES", () => {
       }
     }
     expect(used.size).toBeGreaterThan(0);
-    const missing = [...used].filter((ns) => !(CLIENT_NAMESPACES as readonly string[]).includes(ns));
+    const missing = [...used].filter(
+      (ns) => !(CLIENT_NAMESPACES as readonly string[]).includes(ns),
+    );
     expect(missing).toEqual([]);
   });
 });
@@ -40,7 +42,9 @@ describe("CLIENT_NAMESPACES", () => {
 /** `a.b.c` for every leaf of a catalogue. */
 function leafKeys(node: unknown, prefix = ""): string[] {
   if (typeof node !== "object" || node === null) return [prefix];
-  return Object.entries(node).flatMap(([key, value]) => leafKeys(value, prefix ? `${prefix}.${key}` : key));
+  return Object.entries(node).flatMap(([key, value]) =>
+    leafKeys(value, prefix ? `${prefix}.${key}` : key),
+  );
 }
 
 describe("the two catalogues", () => {
@@ -48,7 +52,8 @@ describe("the two catalogues", () => {
   // only — found by whoever reads the other language, at request time.
   it("hold the same keys", () => {
     const root = fileURLToPath(new URL("../../../messages/", import.meta.url));
-    const keys = (file: string) => new Set(leafKeys(JSON.parse(readFileSync(path.join(root, file), "utf8"))));
+    const keys = (file: string) =>
+      new Set(leafKeys(JSON.parse(readFileSync(path.join(root, file), "utf8"))));
     const zh = keys("zh.json");
     const en = keys("en.json");
     expect(zh.size).toBeGreaterThan(0);
@@ -95,7 +100,9 @@ describe("merge", () => {
 
   it("adds a key the catalogue lacks", () => {
     expect(merge(base, { extra: { line: "new" } })).toMatchObject({ extra: { line: "new" } });
-    expect(merge(base, { home: { heroLine3: "第三行" } }).home).toMatchObject({ heroLine3: "第三行" });
+    expect(merge(base, { home: { heroLine3: "第三行" } }).home).toMatchObject({
+      heroLine3: "第三行",
+    });
   });
 
   it("refuses a shape mismatch in either direction", () => {
@@ -114,7 +121,7 @@ describe("merge", () => {
     // JSON.parse makes a real own property named __proto__; assigning it
     // onto a plain object would be the setter.
     const override = JSON.parse(
-      '{"__proto__": {"polluted": true}, "constructor": {"x": 1}, "nav": {"__proto__": {"p": 1}}}'
+      '{"__proto__": {"polluted": true}, "constructor": {"x": 1}, "nav": {"__proto__": {"p": 1}}}',
     ) as Record<string, unknown>;
     const out = merge({ nav: { blog: "文章" } }, override);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();

@@ -14,8 +14,8 @@ import { site } from "@/config/site";
  * The stage still renders on the server, so the 404 is complete HTML; only
  * its script arrives on demand.
  */
-const NotFoundStage = dynamic(
-  () => import("@/components/notfound/NotFoundStage").then((m) => m.NotFoundStage)
+const NotFoundStage = dynamic(() =>
+  import("@/components/notfound/NotFoundStage").then((m) => m.NotFoundStage),
 );
 
 /**

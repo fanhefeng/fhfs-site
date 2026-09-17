@@ -11,7 +11,12 @@ import { Note } from "../ui/Note";
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
   { name: "version", label: "版本号", kind: "text", placeholder: "5.1" },
-  { name: "date", label: "日期（留空则用下面的占位文字）", kind: "text", placeholder: "2026-07-31" },
+  {
+    name: "date",
+    label: "日期（留空则用下面的占位文字）",
+    kind: "text",
+    placeholder: "2026-07-31",
+  },
   { name: "dateLabel", label: "日期占位文字", kind: "localized" },
   { name: "title", label: "标题", kind: "localized" },
   { name: "note", label: "说明", kind: "localizedArea" },
@@ -39,9 +44,7 @@ export default async function TimelinePage() {
 
   return (
     <AdminChrome title="版本履历" section="/admin/timeline">
-      <Note>
-        日期和占位文字至少要有一个。查不到确切日期就填占位文字——这一栏不编造日期。
-      </Note>
+      <Note>日期和占位文字至少要有一个。查不到确切日期就填占位文字——这一栏不编造日期。</Note>
       <RecordList
         action={saveTimelineEntry}
         deleteAction={deleteTimelineEntry}

@@ -66,8 +66,7 @@ type State = {
 
 export const useIntroStore = create<State>((set) => ({
   activeIndex: -1,
-  setActiveIndex: (i) =>
-    set((s) => (s.activeIndex === i ? s : { activeIndex: i })),
+  setActiveIndex: (i) => set((s) => (s.activeIndex === i ? s : { activeIndex: i })),
 
   ready: false,
   setReady: (v) => set({ ready: v }),
@@ -90,7 +89,7 @@ export const useIntroStore = create<State>((set) => ({
 /** Merge a configured sticker with whatever the editor is overriding. */
 export function resolveSticker(
   sticker: IntroSticker,
-  overrides: Record<string, StickerOverride>
+  overrides: Record<string, StickerOverride>,
 ): IntroSticker {
   const o = overrides[sticker.id];
   if (!o) return sticker;

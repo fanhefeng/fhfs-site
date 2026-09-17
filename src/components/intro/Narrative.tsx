@@ -32,8 +32,7 @@ const COPY_DENSITY = {
   /** The glass card floating over the 3D stage: tighter, one step smaller. */
   card: {
     heading: "p",
-    title:
-      "vibrancy mt-4 flex items-baseline gap-3 text-heading text-fg sm:text-title",
+    title: "vibrancy mt-4 flex items-baseline gap-3 text-heading text-fg sm:text-title",
     body: "mt-3 text-caption leading-relaxed text-fg-secondary sm:text-body",
     bullet: "flex gap-2.5 text-caption leading-relaxed text-fg-secondary",
     /** The dot is optically centred on the first line, so its offset is a
@@ -97,11 +96,7 @@ export function StickerCopy({
         <ul className="mt-4 space-y-2">
           {node.bullets.map((b) => (
             <li key={b} className={d.bullet}>
-              <span
-                aria-hidden
-                className={d.dot}
-                style={{ background: sticker.colors.bg }}
-              />
+              <span aria-hidden className={d.dot} style={{ background: sticker.colors.bg }} />
               {b}
             </li>
           ))}
@@ -134,10 +129,7 @@ export function Narrative({ text, copy, links }: Props) {
   const isOutro = active >= INTRO_STICKERS.length;
 
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 z-10 select-none"
-    >
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-10 select-none">
       {/* The portrait fills the frame, and words laid straight over a face do
           not read. This lifts the paper back up under them — the avatar
           appears to rise out of it. On a narrow screen the card also lives
@@ -151,14 +143,10 @@ export function Narrative({ text, copy, links }: Props) {
       {/* Opening frame */}
       <div
         className={`absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-12 text-center transition-all duration-700 sm:pb-16 ${
-          isHero
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-6 opacity-0"
+          isHero ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
         }`}
       >
-        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          {text.meta}
-        </p>
+        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{text.meta}</p>
         <p className="mt-3 text-display-sm text-fg">{text.name}</p>
         <p className="no-cjk-oblique mt-3 max-w-md font-serif text-heading italic leading-snug text-fg-secondary">
           {text.tagline}
@@ -169,9 +157,7 @@ export function Narrative({ text, copy, links }: Props) {
               class has to come off explicitly — otherwise the line keeps
               breathing, and keeps the page compositing, where nobody can see
               it. See .pulse-stepped in globals.css. */}
-          <span
-            className={`h-8 w-px bg-fg-tertiary ${isHero ? "pulse-stepped" : ""}`}
-          />
+          <span className={`h-8 w-px bg-fg-tertiary ${isHero ? "pulse-stepped" : ""}`} />
         </div>
       </div>
 
@@ -185,9 +171,7 @@ export function Narrative({ text, copy, links }: Props) {
           <article
             key={node.id}
             className={`absolute right-0 bottom-0 left-0 p-5 transition-all duration-500 sm:top-1/2 sm:bottom-auto sm:left-auto sm:w-[26rem] sm:-translate-y-1/2 sm:p-10 ${
-              on
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-4 opacity-0"
+              on ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
             }`}
           >
             <div className="glass-thin rounded-card p-6 sm:p-8">
@@ -200,9 +184,7 @@ export function Narrative({ text, copy, links }: Props) {
       {/* Closing frame */}
       <div
         className={`absolute inset-x-0 bottom-0 flex flex-col items-center px-6 pb-14 text-center transition-all duration-700 sm:pb-20 ${
-          isOutro
-            ? "translate-y-0 opacity-100"
-            : "pointer-events-none translate-y-6 opacity-0"
+          isOutro ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
         }`}
       >
         <p className="text-display-sm text-fg">{text.outroTitle}</p>
@@ -223,9 +205,7 @@ export function Narrative({ text, copy, links }: Props) {
               // Dropping the focus on mousedown leaves the click, and the
               // navigation it triggers, untouched.
               onMouseDown={(e) => e.preventDefault()}
-              {...(l.external
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
+              {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               className="liquid-chip rounded-full px-5 py-2.5 text-caption font-medium text-fg transition-colors hover:text-accent"
             >
               {l.label}

@@ -20,5 +20,5 @@ writeFileSync(manifestFile, serializeManifest(manifest));
 writeFileSync(cssFile, hashCssUrls(readFileSync(cssFile, "utf8"), manifest));
 
 console.log(
-  `assets: ${Object.keys(manifest.files).length} files, ${Object.keys(manifest.sets).length} sets → src/lib/assets.gen.json, src/app/yozai.css`
+  `assets: ${Object.keys(manifest.files).length} files, ${Object.keys(manifest.sets).length} sets → src/lib/assets.gen.json, src/app/yozai.css`,
 );

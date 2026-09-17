@@ -49,7 +49,7 @@ export function AdminSidebar({ counts }: { counts: SectionCounts }) {
   }, [open]);
 
   const current = SECTION_GROUPS.flatMap((group) => group.sections).find(
-    (section) => pathname === section.href || pathname.startsWith(`${section.href}/`)
+    (section) => pathname === section.href || pathname.startsWith(`${section.href}/`),
   );
 
   const nav = (

@@ -66,10 +66,7 @@ export function ScrollVideoDemo({
       canvas,
       frameCount: manifest.frameCount,
       src: (n) =>
-        `${FRAMES}${manifest.pattern.replace(
-          "%d",
-          String(n).padStart(manifest.padding, "0")
-        )}`,
+        `${FRAMES}${manifest.pattern.replace("%d", String(n).padStart(manifest.padding, "0"))}`,
       warmupStep: WARMUP_STEP,
       onProgress: (loaded, total) => {
         if (cancelled) return;
@@ -151,13 +148,8 @@ export function ScrollVideoDemo({
               if (hud) hud.textContent = String(Math.round(state.frame) + 1).padStart(4, "0");
               if (bar) bar.style.transform = `scaleX(${p})`;
 
-              const active = Math.min(
-                Math.floor(p * captions.length),
-                captions.length - 1
-              );
-              captions.forEach((el, i) =>
-                el.classList.toggle("is-active", i === active)
-              );
+              const active = Math.min(Math.floor(p * captions.length), captions.length - 1);
+              captions.forEach((el, i) => el.classList.toggle("is-active", i === active));
             },
           });
 
@@ -165,12 +157,12 @@ export function ScrollVideoDemo({
             tween.scrollTrigger?.kill();
             tween.kill();
           };
-        }
+        },
       );
 
       return () => mm.revert();
     },
-    { scope, dependencies: [ready, frameCount] }
+    { scope, dependencies: [ready, frameCount] },
   );
 
   return (

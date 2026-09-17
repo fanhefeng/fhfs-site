@@ -60,12 +60,7 @@ export function Sticker({ children, seed = 0, border = 3, className }: Props) {
           colorInterpolationFilters="sRGB"
         >
           {/* Grow the silhouette, fill it white, tuck the artwork on top. */}
-          <feMorphology
-            in="SourceAlpha"
-            operator="dilate"
-            radius={border}
-            result="edge"
-          />
+          <feMorphology in="SourceAlpha" operator="dilate" radius={border} result="edge" />
           <feFlood floodColor="#ffffff" result="fill" />
           <feComposite in="fill" in2="edge" operator="in" result="border" />
           <feMerge>

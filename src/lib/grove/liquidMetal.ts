@@ -83,9 +83,27 @@ export const FIELD = {
 } as const;
 
 export const FIELD_ORDER = [
-  "valFreq", "valAmp", "dens", "densVar", "densFreq", "wobAmp", "wobFreq",
-  "lift", "refract", "edge", "width", "disp", "skew", "fineAmp", "fineFreq",
-  "gamma", "gain", "octGain", "litLo", "litHi", "dim",
+  "valFreq",
+  "valAmp",
+  "dens",
+  "densVar",
+  "densFreq",
+  "wobAmp",
+  "wobFreq",
+  "lift",
+  "refract",
+  "edge",
+  "width",
+  "disp",
+  "skew",
+  "fineAmp",
+  "fineFreq",
+  "gamma",
+  "gain",
+  "octGain",
+  "litLo",
+  "litHi",
+  "dim",
 ] as const satisfies readonly (keyof typeof FIELD)[];
 
 /** The travelling rim, uploaded as `uE[0..7]`. Same rule about order. */
@@ -109,7 +127,14 @@ export const RIM = {
 } as const;
 
 export const RIM_ORDER = [
-  "base", "hot", "chromA", "chromS", "speed", "top", "press", "ripple",
+  "base",
+  "hot",
+  "chromA",
+  "chromS",
+  "speed",
+  "top",
+  "press",
+  "ripple",
 ] as const satisfies readonly (keyof typeof RIM)[];
 
 /** Composite and blur, read directly rather than packed into an array. */

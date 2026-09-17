@@ -15,11 +15,7 @@ import { NeonSplash } from "@/components/home/NeonSplash";
 import { GroveApproach } from "@/components/grove/GroveApproach";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
-import {
-  AboutTeaser,
-  type ContactLink,
-  type NowItem,
-} from "@/components/home/AboutTeaser";
+import { AboutTeaser, type ContactLink, type NowItem } from "@/components/home/AboutTeaser";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -89,17 +85,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     key: entry.key,
     version: entry.version,
     title: entry.title[locale],
-    date: entry.date
-      ? entry.date.slice(0, 7).replace("-", ".")
-      : (entry.dateLabel?.[locale] ?? ""),
+    date: entry.date ? entry.date.slice(0, 7).replace("-", ".") : (entry.dateLabel?.[locale] ?? ""),
   }));
 
   const contacts: ContactLink[] = [
     { label: "GitHub", href: site.social.github, external: true },
     { label: "RSS", href: `/${locale}/rss.xml` },
-    ...(site.social.email
-      ? [{ label: "Email", href: `mailto:${site.social.email}` }]
-      : []),
+    ...(site.social.email ? [{ label: "Email", href: `mailto:${site.social.email}` }] : []),
   ];
 
   /* The counts on the masthead are the same two the stat pair used to carry,
@@ -136,14 +128,14 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             ...(site.social.email ? { email: site.social.email } : {}),
           }}
         />
-  
+
         <Opening
           headline={[th("headline1"), th("headline2")]}
           lede={th("lede")}
           cta={{ label: th("cta"), href: `/${locale}/software` }}
           meta={meta}
         />
-  
+
         <GroveApproach
           kicker={th("cardLabLabel")}
           title={th("cardLabTitle")}
@@ -167,7 +159,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             },
           ]}
         />
-  
+
         {/* The issue itself, at the site's 720px reading measure. */}
         <div
           id="issue"

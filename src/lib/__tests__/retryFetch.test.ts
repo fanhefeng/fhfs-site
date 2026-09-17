@@ -20,9 +20,7 @@ describe("isConnectionFailure", () => {
   it("leaves every other error alone", () => {
     expect(isConnectionFailure(new Error("boom"))).toBe(false);
     expect(isConnectionFailure(new TypeError("no cause"))).toBe(false);
-    expect(
-      isConnectionFailure(new DOMException("aborted", "AbortError"))
-    ).toBe(false);
+    expect(isConnectionFailure(new DOMException("aborted", "AbortError"))).toBe(false);
     expect(isConnectionFailure("fetch failed")).toBe(false);
   });
 });
@@ -38,7 +36,7 @@ describe("withConnectionRetry", () => {
         return response;
       },
       [1, 2],
-      noSleep
+      noSleep,
     );
     await expect(retrying(url)).resolves.toBe(response);
     expect(calls).toEqual([url, url]);
@@ -52,7 +50,7 @@ describe("withConnectionRetry", () => {
         throw networkError();
       },
       [1, 2],
-      noSleep
+      noSleep,
     );
     await expect(retrying(url)).rejects.toThrow("fetch failed");
     expect(calls).toBe(3);
@@ -66,7 +64,7 @@ describe("withConnectionRetry", () => {
         throw new Error("relation does not exist");
       },
       [1, 2],
-      noSleep
+      noSleep,
     );
     await expect(retrying(url)).rejects.toThrow("relation does not exist");
     expect(calls).toBe(1);
@@ -84,7 +82,7 @@ describe("withConnectionRetry", () => {
       [5, 50],
       async (ms) => {
         waited.push(ms);
-      }
+      },
     );
     await retrying(url);
     expect(waited).toEqual([5, 50]);
@@ -93,10 +91,14 @@ describe("withConnectionRetry", () => {
   it("passes the request through untouched", async () => {
     const seen: [unknown, RequestInit | undefined][] = [];
     const init = { method: "POST", body: '{"query":"select 1"}' };
-    const retrying = withConnectionRetry(async (input, options) => {
-      seen.push([input, options]);
-      return new Response("");
-    }, [], noSleep);
+    const retrying = withConnectionRetry(
+      async (input, options) => {
+        seen.push([input, options]);
+        return new Response("");
+      },
+      [],
+      noSleep,
+    );
     await retrying(url, init);
     expect(seen).toEqual([[url, init]]);
   });

@@ -29,9 +29,7 @@ function ResumeDocument({ text, copy, links }: Omit<Props, "variant">) {
   return (
     <div className="mx-auto w-full max-w-[720px] px-6 pt-24 pb-24 sm:pt-32">
       <header className="border-b border-line pb-10">
-        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          {text.meta}
-        </p>
+        <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{text.meta}</p>
         <h1 className="mt-5 text-display-sm text-fg">{text.name}</h1>
         <p className="mt-2 font-mono text-meta uppercase tracking-meta text-fg-secondary">
           {text.role}
@@ -61,9 +59,7 @@ function ResumeDocument({ text, copy, links }: Omit<Props, "variant">) {
             <a
               key={l.label}
               href={l.href}
-              {...(l.external
-                ? { target: "_blank", rel: "noopener noreferrer" }
-                : {})}
+              {...(l.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               className="rounded-full border border-line px-5 py-2.5 text-caption font-medium text-fg transition-colors hover:border-accent hover:text-accent"
             >
               {l.label}

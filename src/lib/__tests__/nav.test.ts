@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { attachMembers, clusterNav, isActiveDoor, isActivePath, isNavGroup, type NavLink } from "@/lib/nav";
+import {
+  attachMembers,
+  clusterNav,
+  isActiveDoor,
+  isActivePath,
+  isNavGroup,
+  type NavLink,
+} from "@/lib/nav";
 
 describe("isActivePath", () => {
   it("home is current on the home page only", () => {
@@ -93,7 +100,11 @@ describe("attachMembers", () => {
   });
 
   it("a row with no door before it in its group stands on its own", () => {
-    const branches = attachMembers([link("/moments", "rooms"), link("/life", "rooms", true), link("/idols", "rooms")]);
+    const branches = attachMembers([
+      link("/moments", "rooms"),
+      link("/life", "rooms", true),
+      link("/idols", "rooms"),
+    ]);
     expect(branches.map((b) => [b.door.href, b.members.map((m) => m.href)])).toEqual([
       ["/moments", []],
       ["/life", ["/idols"]],

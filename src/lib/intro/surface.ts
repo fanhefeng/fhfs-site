@@ -17,13 +17,11 @@ import * as THREE from "three";
 export function dirVector(
   thetaDeg: number,
   phiDeg: number,
-  out: THREE.Vector3 = new THREE.Vector3()
+  out: THREE.Vector3 = new THREE.Vector3(),
 ): THREE.Vector3 {
   const t = THREE.MathUtils.degToRad(thetaDeg);
   const p = THREE.MathUtils.degToRad(phiDeg);
-  return out
-    .set(Math.sin(t) * Math.cos(p), Math.sin(p), Math.cos(t) * Math.cos(p))
-    .normalize();
+  return out.set(Math.sin(t) * Math.cos(p), Math.sin(p), Math.cos(t) * Math.cos(p)).normalize();
 }
 
 /** Unit vector → spherical angles (degrees). The inverse of dirVector, used
@@ -54,10 +52,7 @@ const RAY_START_DISTANCE = 4;
  * when the content asks for an angle off the side of the model, or the mesh
  * has a hole.
  */
-export function projectToSurface(
-  target: THREE.Object3D,
-  dir: THREE.Vector3
-): SurfaceHit | null {
+export function projectToSurface(target: THREE.Object3D, dir: THREE.Vector3): SurfaceHit | null {
   const origin = dir.clone().multiplyScalar(RAY_START_DISTANCE);
   raycaster.set(origin, dir.clone().negate());
   const hits = raycaster.intersectObject(target, true);
@@ -65,10 +60,7 @@ export function projectToSurface(
 
   const hit = hits[0]!;
   const normal = hit.face
-    ? hit.face.normal
-        .clone()
-        .transformDirection(hit.object.matrixWorld)
-        .normalize()
+    ? hit.face.normal.clone().transformDirection(hit.object.matrixWorld).normalize()
     : dir.clone();
 
   return { position: hit.point.clone(), normal };
@@ -77,10 +69,7 @@ export function projectToSurface(
 const dummy = new THREE.Object3D();
 
 /** Surface point + normal + spin → the decal's Euler orientation. */
-export function decalOrientation(
-  hit: SurfaceHit,
-  rotationDeg: number
-): THREE.Euler {
+export function decalOrientation(hit: SurfaceHit, rotationDeg: number): THREE.Euler {
   dummy.position.copy(hit.position);
   dummy.lookAt(hit.position.clone().add(hit.normal));
   dummy.rotateZ(THREE.MathUtils.degToRad(rotationDeg));
@@ -161,11 +150,7 @@ function dequantizeForBaking(geom: THREE.BufferGeometry) {
  */
 const baked = new WeakSet<THREE.BufferGeometry>();
 
-export function normalizeModel(
-  root: THREE.Object3D,
-  targetHeight = 2,
-  anchorFromTop = 0.5
-) {
+export function normalizeModel(root: THREE.Object3D, targetHeight = 2, anchorFromTop = 0.5) {
   const box = new THREE.Box3().setFromObject(root);
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());

@@ -168,7 +168,11 @@ export function AlbumDemo({
       // here would wobble the whole book every time the pointer twitched.
       const v = view.current;
       let leaning = false;
-      for (const [k, t] of [["rx", "trx"], ["ry", "try_"], ["z", "tz"]] as const) {
+      for (const [k, t] of [
+        ["rx", "trx"],
+        ["ry", "try_"],
+        ["z", "tz"],
+      ] as const) {
         const d = v[t] - v[k];
         if (Math.abs(d) > 0.0006) {
           v[k] += d * 0.14;
@@ -181,7 +185,7 @@ export function AlbumDemo({
         raf.current = requestAnimationFrame(frame);
       }
     },
-    [pose, applyView]
+    [pose, applyView],
   );
 
   const kick = useCallback(() => {
@@ -195,7 +199,7 @@ export function AlbumDemo({
     () => () => {
       if (raf.current !== null) cancelAnimationFrame(raf.current);
     },
-    []
+    [],
   );
 
   /* The leaf is built entirely out of the book's own width, in pixels, so that
@@ -263,7 +267,7 @@ export function AlbumDemo({
       setTurn({ dir, from: at });
       return true;
     },
-    [at, sheets.length]
+    [at, sheets.length],
   );
 
   const settle = useCallback(
@@ -287,7 +291,7 @@ export function AlbumDemo({
       };
       kick();
     },
-    [kick]
+    [kick],
   );
 
   /** Buttons and keys: start it and let the spring carry it all the way. */
@@ -310,7 +314,7 @@ export function AlbumDemo({
       };
       kick();
     },
-    [at, startTurn, kick]
+    [at, startTurn, kick],
   );
 
   /* ---- pointer ----
@@ -318,7 +322,14 @@ export function AlbumDemo({
      zero; moving pins its progress to the hand; letting go either finishes it
      or springs it back. A press that never really moved is a tap, and simply
      turns the page. */
-  const drag = useRef<{ dir: 1 | -1; x0: number; w: number; moved: number; vel: number; at: number } | null>(null);
+  const drag = useRef<{
+    dir: 1 | -1;
+    x0: number;
+    w: number;
+    moved: number;
+    vel: number;
+    at: number;
+  } | null>(null);
 
   useEffect(() => {
     const stage = bookRef.current;
@@ -428,8 +439,13 @@ export function AlbumDemo({
     const el = scope.current;
     if (!el) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
-      else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go(1);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go(-1);
+      }
     };
     el.addEventListener("keydown", onKey);
     return () => el.removeEventListener("keydown", onKey);
@@ -538,7 +554,9 @@ export function AlbumDemo({
         </button>
       </div>
 
-      <p className="al-hint" aria-hidden="true">{hint}</p>
+      <p className="al-hint" aria-hidden="true">
+        {hint}
+      </p>
       <p className="al-credit">{credit}</p>
     </div>
   );
@@ -599,11 +617,7 @@ function Strip({
   } as CSSProperties;
 
   return (
-    <div
-      ref={(el) => register(index, el)}
-      className="al-strip"
-      style={style}
-    >
+    <div ref={(el) => register(index, el)} className="al-strip" style={style}>
       <div
         className="al-face al-front"
         style={front ? { backgroundImage: `url(${front})` } : undefined}

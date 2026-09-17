@@ -27,17 +27,13 @@ export default function AdminError({
 
   return (
     <main className="mx-auto w-full max-w-4xl px-6 py-10">
-      <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-        fhf · admin
-      </p>
+      <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">fhf · admin</p>
       <h1 className="mt-6 text-title">这一步没成功</h1>
       <p className="mt-4 max-w-[60ch] text-body text-fg-secondary">
         可能是登录已经过期（会话八小时有效），也可能是数据库没有应答。
         先「再试一次」；还不行就重新登录再回来——正在编辑的表单如果还开着，内容仍在那一页里。
       </p>
-      {error.digest && (
-        <p className="mt-4 font-mono text-meta text-fg-tertiary">{error.digest}</p>
-      )}
+      {error.digest && <p className="mt-4 font-mono text-meta text-fg-tertiary">{error.digest}</p>}
       <div className="mt-8 flex flex-wrap items-center gap-4">
         <button type="button" onClick={reset} className={buttonClass}>
           再试一次

@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { splitText, type SplitLine } from "@/lib/splitText";
 
 /** The words of a line as plain strings — what a test wants to compare. */
-const flatten = (line: SplitLine) =>
-  line.map((word) => word.chars.map((c) => c.char).join(""));
+const flatten = (line: SplitLine) => line.map((word) => word.chars.map((c) => c.char).join(""));
 
 describe("splitText", () => {
   it("keeps a Latin word together and gives a space its own word", () => {
@@ -30,12 +29,7 @@ describe("splitText", () => {
   });
 
   it("hangs closing punctuation on the word before it", () => {
-    expect(flatten(splitText("你好，世界。").lines[0]!)).toEqual([
-      "你",
-      "好，",
-      "世",
-      "界。",
-    ]);
+    expect(flatten(splitText("你好，世界。").lines[0]!)).toEqual(["你", "好，", "世", "界。"]);
   });
 
   it("does not hang punctuation on a space, or on nothing", () => {

@@ -45,11 +45,7 @@ export default function GlobalNotFound() {
   });
 
   return (
-    <html
-      lang="zh-CN"
-      suppressHydrationWarning
-      className={`${fontVariables} h-full antialiased`}
-    >
+    <html lang="zh-CN" suppressHydrationWarning className={`${fontVariables} h-full antialiased`}>
       <body className="min-h-dvh flex flex-col bg-bg text-fg">
         {/* Same pre-paint theme script as the app shell: a reader who keeps
             the lights off should not get a white page thrown at them just

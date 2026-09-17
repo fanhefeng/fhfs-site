@@ -23,9 +23,7 @@ export default async function BlogPage({ params }: PageProps<"/[locale]/blog">) 
     <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
       <Reveal as="section" className="mb-12">
         <h1 className="text-display-sm">{t("title")}</h1>
-        <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">
-          {t("subtitle")}
-        </p>
+        <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("subtitle")}</p>
         {posts.length > 0 && (
           <p className="mt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
             {t("filterSummary", { count: posts.length })}

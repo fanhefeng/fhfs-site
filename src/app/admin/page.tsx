@@ -43,9 +43,7 @@ export default async function AdminHome() {
                         {counts[section.href] ?? 0} {section.unit}
                       </span>
                     </span>
-                    <span className="text-caption text-fg-tertiary">
-                      {section.blurb}
-                    </span>
+                    <span className="text-caption text-fg-tertiary">{section.blurb}</span>
                   </Link>
                 </li>
               ))}
@@ -55,8 +53,8 @@ export default async function AdminHome() {
       </div>
 
       <p className="mt-10 max-w-[62ch] text-caption text-fg-tertiary">
-        保存之后前台会立即失效重取，不用重新部署。改动只写进数据库——
-        想留一份带 diff 的纯文本副本，在本地跑 <code>pnpm db:export</code> 并提交
+        保存之后前台会立即失效重取，不用重新部署。改动只写进数据库—— 想留一份带 diff
+        的纯文本副本，在本地跑 <code>pnpm db:export</code> 并提交
         <code> backup/</code>。
       </p>
     </AdminChrome>

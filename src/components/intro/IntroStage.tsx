@@ -100,8 +100,7 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
     // site the query string alone would hand a Save-Data visitor the full
     // 3D scene.
     const wantsEditor =
-      EditorPanel !== null &&
-      new URLSearchParams(window.location.search).has("edit");
+      EditorPanel !== null && new URLSearchParams(window.location.search).has("edit");
     setEditing(wantsEditor);
 
     // The rig exists to reposition stickers on the model, so it outranks every
@@ -163,16 +162,15 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
     // revertOnUpdate, or the teardown above never runs on a dependency change
     // (useGSAP defers cleanup to unmount otherwise) and the fall back to the
     // résumé leaves a trigger writing progress for a canvas that is gone.
-    { dependencies: [mode, editing], revertOnUpdate: true }
+    { dependencies: [mode, editing], revertOnUpdate: true },
   );
 
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setOnScreen(entry?.isIntersecting ?? true),
-      { rootMargin: "10%" }
-    );
+    const io = new IntersectionObserver(([entry]) => setOnScreen(entry?.isIntersecting ?? true), {
+      rootMargin: "10%",
+    });
     io.observe(stage);
     return () => io.disconnect();
   }, [mode]);
@@ -193,9 +191,7 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
   // One viewport per stop — opening frame, each sticker, closing frame — plus
   // one more so the closing frame gets a screen of its own to rest on before
   // the footer scrolls in. In edit mode there is nothing to scroll through.
-  const trackHeight = editing
-    ? "100dvh"
-    : `${(INTRO_STICKERS.length + 3) * 100}dvh`;
+  const trackHeight = editing ? "100dvh" : `${(INTRO_STICKERS.length + 3) * 100}dvh`;
 
   return (
     <>
@@ -225,9 +221,7 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
 
       {/* The accessible copy of everything the canvas is showing. Rendered on
           the server too, so it is what a crawler reads. */}
-      {!editing && (
-        <IntroResume text={text} copy={copy} links={links} variant="seo" />
-      )}
+      {!editing && <IntroResume text={text} copy={copy} links={links} variant="seo" />}
 
       {editing && EditorPanel !== null && <EditorPanel />}
     </>

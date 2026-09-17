@@ -80,19 +80,23 @@ const STUDY_KEYS: Record<string, string[]> = {
   ],
   groveStage: ["pointerHint", "fallback"],
   album: ["hint", "prev", "next", "counterAria"],
-  liquidMetal: ["headline", "body", "tail", "fallback", "label", "stageField", "stageMolten", "stageBloom"],
+  liquidMetal: [
+    "headline",
+    "body",
+    "tail",
+    "fallback",
+    "label",
+    "stageField",
+    "stageMolten",
+    "stageBloom",
+  ],
   workstation: ["deskHint"],
   lensSlider: [
     "fallback",
     "counterAria",
     "prev",
     "next",
-    ...LENS_SLIDES.flatMap((name) => [
-      `${name}Alt`,
-      `${name}Title`,
-      `${name}Body`,
-      `${name}Meta`,
-    ]),
+    ...LENS_SLIDES.flatMap((name) => [`${name}Alt`, `${name}Title`, `${name}Body`, `${name}Meta`]),
   ],
   neon: [
     "welcome",
@@ -111,9 +115,7 @@ const STUDY_KEYS: Record<string, string[]> = {
  * its already-translated strings; the study itself is loaded on the client,
  * as its own chunk, by `LabStudy`.
  */
-export default async function LabDemoPage({
-  params,
-}: PageProps<"/[locale]/lab/[slug]">) {
+export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[slug]">) {
   const locale = await pageLocale(params);
   const { slug } = await params;
   const entry = labEntry(slug);
@@ -209,9 +211,7 @@ export default async function LabDemoPage({
       <section className="mx-auto w-full max-w-[720px] px-6 pb-28 pt-20">
         <p className="text-body text-fg-secondary">{t(`${ns}.note`)}</p>
         {entry.slug === "workstation" && (
-          <p className="mt-4 font-mono text-meta text-fg-tertiary">
-            {t(`${ns}.credit`)}
-          </p>
+          <p className="mt-4 font-mono text-meta text-fg-tertiary">{t(`${ns}.credit`)}</p>
         )}
 
         {spec && <StudySpec title={t(`${ns}.specTitle`)} rows={spec} />}
