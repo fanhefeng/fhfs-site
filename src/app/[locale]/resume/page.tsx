@@ -48,7 +48,15 @@ export default async function ResumePage({
         id="main"
         className="mx-auto w-full max-w-[880px] flex-1 px-6 pb-24 pt-24 sm:pt-32"
       >
-        <p className={metaLabel}>{t("title")}</p>
+        {/* The way back out belongs here too — an unsaved résumé is the one
+            state where there is nothing else on the page to leave by. */}
+        <Link
+          href="/about"
+          className={`${metaLabel} hit-ext inline-flex min-h-11 items-center hover:text-accent`}
+        >
+          ← {t("backToAbout")}
+        </Link>
+        <p className={`${metaLabel} mt-4`}>{t("title")}</p>
         <p className="mt-6 text-body text-fg-secondary">{t("empty")}</p>
       </main>
     );
