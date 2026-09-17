@@ -169,6 +169,11 @@ export function Select({
         role="combobox"
         aria-controls={listId}
         aria-expanded={open}
+        // On the element that holds the focus, which is this one — the options
+        // are addressed, never focused. On the listbox it named an option that
+        // no focused element pointed at, so a screen reader announced none of
+        // the arrowing. Set only while there is a list to point into.
+        aria-activedescendant={open ? `${listId}-${active}` : undefined}
         aria-haspopup="listbox"
         aria-labelledby={labelledBy}
         onClick={() => (open ? setOpen(false) : openAt(options.findIndex((o) => o.value === value)))}
@@ -202,7 +207,6 @@ export function Select({
           id={listId}
           role="listbox"
           tabIndex={-1}
-          aria-activedescendant={`${listId}-${active}`}
           className="absolute z-30 mt-1.5 max-h-72 w-full overflow-auto rounded-card border border-line bg-surface-raised p-1 shadow-lift animate-[admin-pop_140ms_ease-out]"
         >
           {options.map((option, index) => {
