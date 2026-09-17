@@ -12,5 +12,9 @@ allowBuilds:
   # Unused here — nothing needs their postinstall to run.
   sharp: false
   unrs-resolver: false
+# sharp < 0.35.4 bundles a libheif with known CVEs (GHSA-g89c-p67h-r497). It
+# comes in through next; this floor can go once next's own range is past it.
+overrides:
+  sharp: ">=0.35.4"
 patchedDependencies:
   '@react-three/fiber@9.7.0': patches/@react-three__fiber@9.7.0.patch

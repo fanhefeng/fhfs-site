@@ -1,0 +1,5 @@
+#!/bin/sh
+# What CI runs, before CI has to: types, lint, tests. Skip once with
+# `git push --no-verify` when the network or the clock says so — CI still runs.
+set -e
+pnpm -s check
