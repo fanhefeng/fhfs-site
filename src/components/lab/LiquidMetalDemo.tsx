@@ -327,8 +327,10 @@ export function LiquidMetalDemo({
     const sync = () => {
       hoverTarget = on.over || on.press || on.focus ? 1 : 0;
       pressTarget = on.press ? 1 : 0;
-      pad.dataset.hot = hoverTarget > 0.5 ? "" : undefined;
-      pad.dataset.press = on.press ? "" : undefined;
+      // Attribute presence is what the CSS keys on, and `dataset.x = undefined`
+      // sets the string "undefined" rather than removing it.
+      pad.toggleAttribute("data-hot", hoverTarget > 0.5);
+      pad.toggleAttribute("data-press", on.press);
       dirtyRef.current = true;
     };
 

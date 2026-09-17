@@ -23,8 +23,12 @@ let vtCleanup: number | undefined;
 
 /** Flips the theme, wrapped in the 1.2s view-transition cross-fade. */
 export function toggleTheme(): void {
-  const next: Theme = readTheme() === "light" ? "dark" : "light";
+  // Read inside `apply`, not here: `startViewTransition` runs its callback
+  // after the snapshot, so a second flip that lands before the first callback
+  // would otherwise read the theme it is already on its way to setting, and
+  // both presses would resolve to the same side.
   const apply = () => {
+    const next: Theme = readTheme() === "light" ? "dark" : "light";
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem(THEME_STORAGE_KEY, next);

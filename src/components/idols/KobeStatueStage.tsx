@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { invalidate } from "@react-three/fiber";
 import { gsap, EASE, isFinePointer } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 
@@ -54,7 +53,18 @@ export function KobeStatueStage({ hint, loading, fallbackNote, fallback, turnLef
     return () => observer.disconnect();
   }, [mode]);
 
-  const onReady = useCallback(() => setReady(true), []);
+  /**
+   * The scene hands its own `invalidate` out when it mounts. Importing it from
+   * `@react-three/fiber` up here would have been simpler and would also have
+   * pulled fiber into this file's chunk — the one that is *not* dynamic, and
+   * that every visitor to the page downloads whether or not the probe ever
+   * decides there will be a statue.
+   */
+  const invalidate = useRef<(() => void) | null>(null);
+  const onReady = useCallback((invalidateScene: () => void) => {
+    invalidate.current = invalidateScene;
+    setReady(true);
+  }, []);
 
   const turn = (delta: number) => {
     tween.current?.kill();
@@ -62,7 +72,7 @@ export function KobeStatueStage({ hint, loading, fallbackNote, fallback, turnLef
       current: spin.current + delta,
       duration: 0.7,
       ease: EASE.default,
-      onUpdate: () => invalidate(),
+      onUpdate: () => invalidate.current?.(),
     });
   };
 
@@ -77,7 +87,7 @@ export function KobeStatueStage({ hint, loading, fallbackNote, fallback, turnLef
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!drag.current) return;
     spin.current = drag.current.spin + (e.clientX - drag.current.x) * 0.009;
-    invalidate();
+    invalidate.current?.();
   };
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!drag.current) return;

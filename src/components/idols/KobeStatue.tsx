@@ -25,8 +25,13 @@ type Props = {
   /** The figure's turn, in radians — written by the stage, read per frame. */
   spin: MutableRefObject<number>;
   onScreen: boolean;
-  /** The first frame is on its way: the stage can fade the canvas in. */
-  onReady: () => void;
+  /**
+   * The first frame is on its way: the stage can fade the canvas in. It is
+   * handed fiber's `invalidate` as it goes — the stage drives the turn and has
+   * to ask for frames, and this is how it gets that without importing fiber
+   * into the chunk that loads before the scene is even wanted.
+   */
+  onReady: (invalidate: () => void) => void;
 };
 
 type V3 = [number, number, number];
@@ -155,7 +160,7 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
     const tl = gsap.timeline({ onUpdate: () => invalidate() });
     tl.to(spin, { current: 0, duration: 1.5, ease: EASE.default }, 0);
     tl.to(rise, { y: 0, duration: 1.2, ease: EASE.default }, 0.05);
-    onReady();
+    onReady(invalidate);
     invalidate();
     return () => {
       tl.kill();

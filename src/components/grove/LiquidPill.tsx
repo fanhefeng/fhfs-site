@@ -266,8 +266,11 @@ export function LiquidPill({ children, height, className, label, href, pad = 1.7
     const sync = () => {
       hoverTarget = on.over || on.press || on.focus ? 1 : 0;
       pressTarget = on.press ? 1 : 0;
-      padEl.dataset.hot = hoverTarget > 0.5 ? "" : undefined;
-      padEl.dataset.press = on.press ? "" : undefined;
+      // `dataset.x = undefined` writes the string "undefined", and the CSS
+      // below keys on the attribute's presence — so the pad would light up on
+      // the first pointer event and never settle back.
+      padEl.toggleAttribute("data-hot", hoverTarget > 0.5);
+      padEl.toggleAttribute("data-press", on.press);
       lastMove = clock;
       dirty = true;
     };
