@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage",
     "check": "pnpm typecheck && pnpm lint && pnpm test:coverage",
     "assets": "tsx scripts/assets.mts",
+    "smoke": "tsx scripts/smoke.mts",
     "media:music": "tsx scripts/encode-music.mts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
