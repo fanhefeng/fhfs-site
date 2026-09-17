@@ -107,7 +107,7 @@ async function loadGoogleFont(
   // otherwise; the accepted body is captured here since a Response body can
   // only be read once.
   let data: ArrayBuffer | undefined;
-  await fetchWithRetry(resource[1], `font file ${family}`, async (response) => {
+  await fetchWithRetry(resource[1]!, `font file ${family}`, async (response) => {
     const buffer = await response.arrayBuffer();
     if (!isSfnt(buffer)) return false;
     data = buffer;

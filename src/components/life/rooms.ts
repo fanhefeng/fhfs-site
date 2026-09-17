@@ -21,7 +21,7 @@ export type RoomMeta = {
   accent: string;
 };
 
-const firstFilm = filmCover(FILMS[0]);
+const firstFilm = filmCover(FILMS[0]!);
 
 export const ROOM_META: Record<string, RoomMeta> = {
   "/moments": { key: "moments", track: "lovely", accent: "#b45309" },
@@ -30,14 +30,14 @@ export const ROOM_META: Record<string, RoomMeta> = {
   // colour — one edit to `entries.ts` moves both.
   "/idols": {
     key: "idols",
-    cover: IDOLS[0].cover,
-    accent: IDOLS[0].accent,
+    cover: IDOLS[0]!.cover,
+    accent: IDOLS[0]!.accent,
   },
   // Likewise the first film's card. No record on the row: each film puts on
   // its own at its door, and the index between them plays the theme.
   "/films": {
     key: "films",
-    cover: { src: stillSrc(FILMS[0], firstFilm), width: firstFilm.width, height: firstFilm.height },
-    accent: FILMS[0].accent,
+    cover: { src: stillSrc(FILMS[0]!, firstFilm), width: firstFilm.width, height: firstFilm.height },
+    accent: FILMS[0]!.accent,
   },
 };

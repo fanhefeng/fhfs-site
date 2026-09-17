@@ -46,7 +46,7 @@ export function KobeStatueStage({ hint, loading, fallbackNote, fallback, turnLef
     const el = stageRef.current;
     if (!el || mode !== "3d") return;
     const observer = new IntersectionObserver(
-      ([entry]) => setOnScreen(entry.isIntersecting),
+      ([entry]) => setOnScreen(entry!.isIntersecting),
       { rootMargin: "200px 0px" }
     );
     observer.observe(el);

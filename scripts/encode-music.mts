@@ -46,7 +46,7 @@ const probe = spawnSync("ffmpeg", ["-hide_banner", "-i", out, "-af", "silencedet
   encoding: "utf8",
 });
 const duration = Number(/Duration: (\d+):(\d+):([\d.]+)/.exec(probe.stderr)?.slice(1).reduce((t, part) => t * 60 + Number(part), 0));
-const silences = [...probe.stderr.matchAll(/silence_start: (-?[\d.]+)[\s\S]*?silence_end: ([\d.]+)/g)].map((m) => [
+const silences = [...probe.stderr.matchAll(/silence_start: (-?[\d.]+)[\s\S]*?silence_end: ([\d.]+)/g)].map((m): [number, number] => [
   Math.max(0, Number(m[1])),
   Number(m[2]),
 ]);

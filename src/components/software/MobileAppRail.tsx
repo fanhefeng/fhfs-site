@@ -55,11 +55,11 @@ export function MobileAppRail({ apps, className }: Props) {
         const render = () => {
           for (let i = 0; i < n; i++) {
             const x = wrapX(i * step - pos.offset);
-            setX[i](x + pad);
+            setX[i]!(x + pad);
             // Cards away from the focus slot dim — depth without a scale
             // tween fighting the snap pop.
             const d = Math.min(1, Math.abs(x) / step);
-            items[i].style.opacity = String(1 - d * 0.5);
+            items[i]!.style.opacity = String(1 - d * 0.5);
           }
         };
 
@@ -73,7 +73,7 @@ export function MobileAppRail({ apps, className }: Props) {
           gsap.set(items, { clearProps: "all" });
           track.style.cssText = "";
           viewport.style.overflowX = "";
-          const cardW = items[0].offsetWidth;
+          const cardW = items[0]!.offsetWidth;
           const gap = parseFloat(getComputedStyle(track).columnGap) || 16;
           const rowH = track.offsetHeight;
 
@@ -93,7 +93,7 @@ export function MobileAppRail({ apps, className }: Props) {
 
         const popFocused = () => {
           const idx = ((Math.round(pos.offset / step) % n) + n) % n;
-          const card = items[idx].firstElementChild;
+          const card = items[idx]!.firstElementChild;
           if (!card) return;
           gsap.fromTo(
             card,

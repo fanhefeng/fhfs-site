@@ -61,5 +61,5 @@ const DOT_GLYPHS: Readonly<Record<string, readonly string[]>> = {
 
 /** The face for a character, upper-cased first. Blank when unmapped. */
 export function glyphFor(char: string): readonly string[] {
-  return DOT_GLYPHS[char.toUpperCase()] ?? DOT_GLYPHS[" "];
+  return DOT_GLYPHS[char.toUpperCase()] ?? DOT_GLYPHS[" "]!;
 }

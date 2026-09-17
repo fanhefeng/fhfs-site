@@ -218,10 +218,10 @@ export function writeLightScore(main: gsap.core.Timeline, seg: SegPicker, spill:
     [[0.04, 1], [0.03, 0], [1, 1]],
     [[0.04, 1], [0.08, 0], [0.05, 0.5], [0.04, 1]],
   ];
-  letters.forEach((l, i) => score(main, l, 1.1 + i * 0.2, LETTER_SCORES[i]));
+  letters.forEach((l, i) => score(main, l, 1.1 + i * 0.2, LETTER_SCORES[i]!));
   score(main, note, 1.95, [[0.05, 1], [0.06, 0], [0.05, 1]]);
-  score(main, letters[2], 2.3, [[0.03, 0], [0.04, 1]]);
-  score(main, letters[1], 2.62, [[0.03, 0], [0.05, 1]]);
+  score(main, letters[2]!, 2.3, [[0.03, 0], [0.04, 1]]);
+  score(main, letters[1]!, 2.62, [[0.03, 0], [0.05, 1]]);
 }
 
 /** Switching off: one dim beat, then dark; the spill fades after it. */

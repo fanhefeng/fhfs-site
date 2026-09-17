@@ -198,7 +198,7 @@ describe("tiltFor", () => {
 
   it("never exceeds its own limits", () => {
     for (const [x, y] of [[-9999, -9999], [9999, 9999], [0, 400], [800, 0]]) {
-      const { rx, ry } = tiltFor(x, y, box);
+      const { rx, ry } = tiltFor(x!, y!, box);
       expect(Math.abs(rx)).toBeLessThanOrEqual(TILT_X + 1e-9);
       expect(Math.abs(ry)).toBeLessThanOrEqual(TILT_Y + 1e-9);
     }

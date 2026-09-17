@@ -75,7 +75,7 @@ describe("asset", () => {
       if (file.endsWith(".css") || /\/lib\/(asset|assetManifest|immutable)\.ts$/.test(file)) continue;
       for (const m of readFileSync(file, "utf8").matchAll(literal)) {
         seen++;
-        if (!m[1].endsWith("asset(")) bare.push(`${path.relative(root, file)}: ${m[0].slice(m[1].length)}`);
+        if (!m[1]!.endsWith("asset(")) bare.push(`${path.relative(root, file)}: ${m[0].slice(m[1]!.length)}`);
       }
     }
     expect(seen).toBeGreaterThan(10);

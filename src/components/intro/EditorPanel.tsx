@@ -48,7 +48,7 @@ export default function EditorPanel() {
   const [, set] = useControls(
     () => {
       const sticker =
-        INTRO_STICKERS.find((n) => n.id === selectedId) ?? INTRO_STICKERS[0];
+        INTRO_STICKERS.find((n) => n.id === selectedId) ?? INTRO_STICKERS[0]!;
       const base = resolveSticker(sticker, useIntroStore.getState().overrides);
 
       return {

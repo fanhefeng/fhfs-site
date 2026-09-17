@@ -55,7 +55,7 @@ export function withConnectionRetry(
         if (attempt >= delays.length || !isConnectionFailure(error)) {
           throw error;
         }
-        await sleep(delays[attempt]);
+        await sleep(delays[attempt]!);
       }
     }
   };

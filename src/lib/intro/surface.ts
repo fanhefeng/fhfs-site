@@ -63,7 +63,7 @@ export function projectToSurface(
   const hits = raycaster.intersectObject(target, true);
   if (!hits.length) return null;
 
-  const hit = hits[0];
+  const hit = hits[0]!;
   const normal = hit.face
     ? hit.face.normal
         .clone()

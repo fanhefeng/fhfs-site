@@ -50,8 +50,8 @@ const HUES = [42, 195, 285, 150, 15, 245];
 /** Two initials at most — the monogram inside the sticker icon. */
 export function appMonogram(name: string): string {
   const words = name.trim().split(/\s+/);
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
+  if (words.length === 1) return words[0]!.slice(0, 2).toUpperCase();
+  return (words[0]![0]! + words[1]![0]!).toUpperCase();
 }
 
 /** Accent color for one of the mock's two tones. */
@@ -75,7 +75,7 @@ export function toSoftwareApp(
     category,
     website: app.website,
     platforms: app.platforms,
-    hue: app.hue ?? HUES[index % HUES.length],
+    hue: app.hue ?? HUES[index % HUES.length]!,
     cta: category === "game" ? "play" : category === "website" ? "open" : "download",
   };
 }

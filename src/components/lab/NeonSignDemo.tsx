@@ -168,7 +168,7 @@ export function NeonSignDemo({
         if (!poweredRef.current || main.isActive() || stutter?.isActive() || !isFinePointer()) return;
         const i = Math.floor(Math.random() * letters.length);
         stutter = gsap.timeline();
-        score(stutter, letters[i], 0, STUTTER);
+        score(stutter, letters[i]!, 0, STUTTER);
       });
 
       // Lights come on as the reader arrives, once.

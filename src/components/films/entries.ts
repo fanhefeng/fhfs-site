@@ -89,4 +89,4 @@ export const stillSrc = (film: FilmEntry, still: FilmStill): string =>
 
 /** The still on a film's index card — the first one if the named id is gone. */
 export const filmCover = (film: FilmEntry): FilmStill =>
-  film.stills.find((still) => still.id === film.cover) ?? film.stills[0];
+  film.stills.find((still) => still.id === film.cover) ?? film.stills[0]!;

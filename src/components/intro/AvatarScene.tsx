@@ -596,8 +596,8 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
     const i = Math.min(Math.floor(seg), stops.length - 2);
     const t = easeInOutCubic(seg - i);
 
-    const a = stops[i];
-    const b = stops[i + 1];
+    const a = stops[i]!;
+    const b = stops[i + 1]!;
 
     const theta = lerpAngle(a.theta, b.theta, t);
     const phi = THREE.MathUtils.lerp(a.phi, b.phi, t);
@@ -633,7 +633,7 @@ function CameraRig({ hits }: { hits: Record<string, SurfaceHit> }) {
 
     // The stop knows which sticker it is. Deriving it from `seg` instead would
     // be off by one for every stop after a ray that missed.
-    setActiveIndex(stops[Math.round(seg)].index);
+    setActiveIndex(stops[Math.round(seg)]!.index);
 
     // ScrollTrigger asks for a frame per scroll event, but the damping above
     // keeps moving for most of a second after the wheel stops — so the last

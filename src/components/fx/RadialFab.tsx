@@ -106,8 +106,8 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
         tl.to(
           el,
           {
-            x: pos[i].x,
-            y: pos[i].y,
+            x: pos[i]!.x,
+            y: pos[i]!.y,
             scale: 1,
             autoAlpha: 1,
             duration: 0.6,

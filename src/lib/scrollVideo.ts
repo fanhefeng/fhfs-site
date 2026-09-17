@@ -84,7 +84,7 @@ export class ScrollVideo {
       { length: Math.min(MAX_CONCURRENCY, indices.length) },
       async () => {
         while (cursor < indices.length && !this.destroyed) {
-          const index = indices[cursor++];
+          const index = indices[cursor++]!;
           try {
             const frame = await this.loadFrame(index);
             // `destroy()` closed and emptied `frames` while this was in

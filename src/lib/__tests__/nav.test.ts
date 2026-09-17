@@ -57,7 +57,7 @@ describe("clusterNav", () => {
   it("cuts the table into runs of one group, in order", () => {
     const clusters = clusterNav(TABLE.filter((row) => row.href !== "/"));
     expect(clusters.map((c) => c.group)).toEqual(["issue", "rooms", "me"]);
-    expect(clusters[1].items.map((i) => i.href)).toEqual([
+    expect(clusters[1]!.items.map((i) => i.href)).toEqual([
       "/life",
       "/moments",
       "/idols",

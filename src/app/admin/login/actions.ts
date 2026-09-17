@@ -37,7 +37,7 @@ export async function login(
   // overwrites the header (Vercel does). Self-hosting without one would let
   // a client mint fresh identities per request and reset its own throttle.
   const ip =
-    headerList.get("x-forwarded-for")?.split(",")[0].trim() ??
+    headerList.get("x-forwarded-for")?.split(",")[0]!.trim() ??
     headerList.get("x-real-ip") ??
     "unknown";
 

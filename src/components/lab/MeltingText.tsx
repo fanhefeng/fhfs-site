@@ -166,7 +166,7 @@ export function MeltingText({
 
           // Blur has to track the type size: the numbers that read as liquid
           // on a headline shred 15px copy into specks.
-          const fontSize = parseFloat(getComputedStyle(chars[0]).fontSize) || 16;
+          const fontSize = parseFloat(getComputedStyle(chars[0]!).fontSize) || 16;
           // Sub-linear, so small type still melts a little.
           const k = autoScale ? Math.pow(fontSize / REFERENCE_SIZE, 0.75) : 1;
           const blurPx = blur * k;
