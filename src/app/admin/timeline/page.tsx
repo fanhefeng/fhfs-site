@@ -6,6 +6,7 @@ import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { deleteTimelineEntry, saveTimelineEntry } from "../actions";
 import type { Field, RecordData } from "../RecordForm";
+import { Note } from "../ui/Note";
 
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
@@ -37,14 +38,15 @@ export default async function TimelinePage() {
   };
 
   return (
-    <AdminChrome title="版本履历">
-      <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
+    <AdminChrome title="版本履历" section="/admin/timeline">
+      <Note>
         日期和占位文字至少要有一个。查不到确切日期就填占位文字——这一栏不编造日期。
-      </p>
+      </Note>
       <RecordList
         action={saveTimelineEntry}
         deleteAction={deleteTimelineEntry}
         fields={FIELDS}
+        unit="版"
         rows={rows.map((row) => ({
           id: row.key,
           label: `${row.version}  ${row.title.zh}`,

@@ -2,8 +2,11 @@
 
 import { useActionState } from "react";
 import { deletePost, savePost, type ActionState } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
+import { DeleteRow } from "../DeleteRow";
+import { Select } from "../ui/Select";
+import { Toggle } from "../ui/Segmented";
 
 type PostDraft = {
   slug: string;
@@ -42,7 +45,7 @@ export function PostForm({
             blank draft, and React resets the form to them after the action —
             without the redirect a successful save wipes the editor. */}
         {isNew && <input type="hidden" name="isNew" value="1" />}
-        <div className="grid gap-5 sm:grid-cols-[1fr_6rem_10rem]">
+        <div className="grid gap-5 sm:grid-cols-[1fr_9rem_10rem]">
           <label className="space-y-1.5">
             <span className={labelClass}>slug</span>
             <input
@@ -54,20 +57,23 @@ export function PostForm({
             />
           </label>
 
-          <label className="space-y-1.5">
-            <span className={labelClass}>语言</span>
-            <select
+          <div className="space-y-1.5">
+            <span id="post-locale" className={labelClass}>
+              语言
+            </span>
+            <Select
               name="locale"
+              labelledBy="post-locale"
               defaultValue={post.locale}
               disabled={!isNew}
-              className={inputClass}
-            >
-              <option value="zh">zh</option>
-              <option value="en">en</option>
-            </select>
-            {/* A disabled select submits nothing — keep the value in the post. */}
+              options={[
+                { value: "zh", label: "zh · 中文" },
+                { value: "en", label: "en · English" },
+              ]}
+            />
+            {/* A disabled control submits nothing — keep the value in the post. */}
             {!isNew && <input type="hidden" name="locale" value={post.locale} />}
-          </label>
+          </div>
 
           <label className="space-y-1.5">
             <span className={labelClass}>日期</span>
@@ -110,15 +116,16 @@ export function PostForm({
             />
           </label>
 
-          <label className="flex items-end gap-2 pb-2.5">
-            <input
-              type="checkbox"
+          <div className="flex items-end pb-2.5">
+            <Toggle
               name="draft"
               defaultChecked={post.draft}
-              className="size-4"
+              label="草稿"
+              hint="开着就不公开，站上 404"
+              onLabel="草稿"
+              offLabel="已公开"
             />
-            <span className="text-caption">草稿（不公开）</span>
-          </label>
+          </div>
         </div>
 
         <label className="block space-y-1.5">
@@ -128,32 +135,20 @@ export function PostForm({
             defaultValue={post.bodyMd}
             rows={24}
             spellCheck={false}
-            className={`${inputClass} font-mono text-caption leading-relaxed`}
+            className={`${textareaClass} ${monoClass}`}
           />
         </label>
 
-        <SaveControls state={state} pending={pending} />
+        <SaveControls state={state} pending={pending} sticky />
       </form>
 
       {!isNew && (
-        <form
+        <DeleteRow
           action={deletePost}
-          onSubmit={(event) => {
-            if (!window.confirm(`确定删除「${post.slug}.${post.locale}」？删了就没有了。`)) {
-              event.preventDefault();
-            }
-          }}
-          className="mt-10 border-t border-line pt-6"
-        >
-          <input type="hidden" name="slug" value={post.slug} />
-          <input type="hidden" name="locale" value={post.locale} />
-          <button
-            type="submit"
-            className="text-caption text-fg-tertiary hover:text-accent"
-          >
-            删除这篇（{post.slug}.{post.locale}）
-          </button>
-        </form>
+          fields={{ slug: post.slug, locale: post.locale }}
+          what={`${post.slug}.${post.locale}`}
+          label="删除这篇"
+        />
       )}
     </>
   );

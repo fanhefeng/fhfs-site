@@ -2,7 +2,10 @@
 
 import { useActionState } from "react";
 import { deleteSecret, saveSecret, type ActionState } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
+import { DeleteRow } from "../DeleteRow";
+import { Select } from "../ui/Select";
+import { Toggle } from "../ui/Segmented";
 import { SaveControls } from "../SaveControls";
 
 export type SecretDraft = {
@@ -30,7 +33,7 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
     <>
       <form action={formAction} className="space-y-5">
         {isNew && <input type="hidden" name="isNew" value="1" />}
-        <div className="grid gap-5 sm:grid-cols-[1fr_6rem_8rem_10rem]">
+        <div className="grid gap-5 sm:grid-cols-[1fr_9rem_9rem_10rem]">
           <label className="space-y-1.5">
             <span className={labelClass}>slug</span>
             <input
@@ -42,22 +45,37 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
             />
           </label>
 
-          <label className="space-y-1.5">
-            <span className={labelClass}>语言</span>
-            <select name="locale" defaultValue={secret.locale} disabled={!isNew} className={inputClass}>
-              <option value="zh">zh</option>
-              <option value="en">en</option>
-            </select>
+          <div className="space-y-1.5">
+            <span id="secret-locale" className={labelClass}>
+              语言
+            </span>
+            <Select
+              name="locale"
+              labelledBy="secret-locale"
+              defaultValue={secret.locale}
+              disabled={!isNew}
+              options={[
+                { value: "zh", label: "zh · 中文" },
+                { value: "en", label: "en · English" },
+              ]}
+            />
             {!isNew && <input type="hidden" name="locale" value={secret.locale} />}
-          </label>
+          </div>
 
-          <label className="space-y-1.5">
-            <span className={labelClass}>类型</span>
-            <select name="kind" defaultValue={secret.kind} className={inputClass}>
-              <option value="essay">随笔</option>
-              <option value="podcast">播客</option>
-            </select>
-          </label>
+          <div className="space-y-1.5">
+            <span id="secret-kind" className={labelClass}>
+              类型
+            </span>
+            <Select
+              name="kind"
+              labelledBy="secret-kind"
+              defaultValue={secret.kind}
+              options={[
+                { value: "essay", label: "随笔", hint: "只有文字，不填音频" },
+                { value: "podcast", label: "播客", hint: "要填音频地址和时长，正文当节目笔记" },
+              ]}
+            />
+          </div>
 
           <label className="space-y-1.5">
             <span className={labelClass}>日期</span>
@@ -97,10 +115,16 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
             <input name="duration" type="number" defaultValue={secret.duration} className={inputClass} />
           </label>
 
-          <label className="flex items-end gap-2 pb-2.5">
-            <input type="checkbox" name="draft" defaultChecked={secret.draft} className="size-4" />
-            <span className="text-caption">草稿（不公开）</span>
-          </label>
+          <div className="flex items-end pb-2.5">
+            <Toggle
+              name="draft"
+              defaultChecked={secret.draft}
+              label="草稿"
+              hint="开着就不公开"
+              onLabel="草稿"
+              offLabel="已公开"
+            />
+          </div>
         </div>
 
         <label className="block space-y-1.5">
@@ -110,29 +134,20 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
             defaultValue={secret.bodyMd}
             rows={24}
             spellCheck={false}
-            className={`${inputClass} font-mono text-caption leading-relaxed`}
+            className={`${textareaClass} ${monoClass}`}
           />
         </label>
 
-        <SaveControls state={state} pending={pending} />
+        <SaveControls state={state} pending={pending} sticky />
       </form>
 
       {!isNew && (
-        <form
+        <DeleteRow
           action={deleteSecret}
-          onSubmit={(event) => {
-            if (!window.confirm(`确定删除「${secret.slug}.${secret.locale}」？删了就没有了。`)) {
-              event.preventDefault();
-            }
-          }}
-          className="mt-10 border-t border-line pt-6"
-        >
-          <input type="hidden" name="slug" value={secret.slug} />
-          <input type="hidden" name="locale" value={secret.locale} />
-          <button type="submit" className="text-caption text-fg-tertiary hover:text-accent">
-            删除这篇（{secret.slug}.{secret.locale}）
-          </button>
-        </form>
+          fields={{ slug: secret.slug, locale: secret.locale }}
+          what={`${secret.slug}.${secret.locale}`}
+          label="删除这篇"
+        />
       )}
     </>
   );

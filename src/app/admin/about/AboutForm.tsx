@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { saveAbout, type ActionState } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { inputClass, monoClass, textareaClass, labelClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 
 export function AboutForm({
@@ -31,7 +31,7 @@ export function AboutForm({
           defaultValue={about.bodyMd}
           rows={14}
           spellCheck={false}
-          className={`${inputClass} font-mono text-caption leading-relaxed`}
+          className={`${textareaClass} ${monoClass}`}
         />
       </label>
 

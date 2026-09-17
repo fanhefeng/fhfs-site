@@ -6,6 +6,7 @@ import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { deleteIntroNode, saveIntroNode } from "../actions";
 import type { Field, RecordData } from "../RecordForm";
+import { Note } from "../ui/Note";
 
 const FIELDS: Field[] = [
   { name: "key", label: "key", kind: "text", readOnly: true },
@@ -41,12 +42,12 @@ export default async function IntroPage() {
   };
 
   return (
-    <AdminChrome title="简历节点">
-      <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
+    <AdminChrome title="简历节点" section="/admin/intro">
+      <Note>
         每条对应 <code>/intro</code> 上头像的一张贴纸，靠 key 关联。贴纸的位置、
         大小、角度是手工标定的 3D 参数，留在代码里（<code>lib/intro/stickers.ts</code>）——
         这里改的是文字。key 在那边没有对应贴纸的话，这条不会被访问到。
-      </p>
+      </Note>
       <RecordList
         action={saveIntroNode}
         deleteAction={deleteIntroNode}
@@ -59,6 +60,7 @@ export default async function IntroPage() {
         }))}
         blank={blank}
         blankLabel="新节点"
+        unit="个"
       />
     </AdminChrome>
   );

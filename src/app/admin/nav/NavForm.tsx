@@ -3,8 +3,9 @@
 import { useActionState, useEffect, useState } from "react";
 import { NAV_GROUPS, type NavGroup } from "@/lib/nav";
 import { saveNavItems, type ActionState } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { cardClass, ghostButtonClass, inputClass, labelClass, metaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
+import { Select } from "../ui/Select";
 
 type NavRow = { href: string; labelKey: string; surfaces: string[]; group: NavGroup | null };
 /** A row with the identity the form needs: rows move, so the index is not one. */
@@ -23,6 +24,22 @@ const GROUP_LABELS: Record<NavGroup, string> = {
   rooms: "房间",
   me: "作者",
 };
+
+/** The same three, with what choosing one actually does to the page. */
+const GROUP_HINTS: Record<NavGroup, string> = {
+  issue: "当期在讲的：写的、做的、试的",
+  rooms: "各有各样子的房间，也会上 /life 的目录",
+  me: "关于作者本人的那几页",
+};
+
+const GROUP_OPTIONS = [
+  { value: "", label: "不分组", hint: "首页那种，不属于任何一簇" },
+  ...NAV_GROUPS.map((group) => ({
+    value: group,
+    label: GROUP_LABELS[group],
+    hint: GROUP_HINTS[group],
+  })),
+];
 
 /** A new row is, by default, a room: footer, menu and sitemap, under 生活. */
 const NEW_ROW: NavRow = { href: "", labelKey: "", surfaces: ["footer", "fullnav", "sitemap"], group: "rooms" };
@@ -87,9 +104,44 @@ export function NavForm({ items }: { items: NavRow[] }) {
 
   return (
     <form action={formAction}>
-      <div className="space-y-5">
+      <div className="space-y-4">
         {rows.map((row, i) => (
-          <div key={row.id} className="border-t border-line pt-4">
+          <div key={row.id} className={`${cardClass} p-4 sm:p-5`}>
+            <div className="mb-4 flex items-baseline justify-between gap-3">
+              <h3 className={metaClass}>{rowName(row)}</h3>
+              <span className="flex items-center gap-1 font-mono text-meta text-fg-tertiary">
+                <button
+                  type="button"
+                  onClick={() => move(row.id, -1)}
+                  disabled={i === 0}
+                  data-move="-1"
+                  data-row={row.id}
+                  aria-label={`上移 ${rowName(row)}`}
+                  className="rounded-chip px-2 py-1 transition-colors hover:text-accent disabled:opacity-30 disabled:hover:text-fg-tertiary"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => move(row.id, 1)}
+                  disabled={i === rows.length - 1}
+                  data-move="1"
+                  data-row={row.id}
+                  aria-label={`下移 ${rowName(row)}`}
+                  className="rounded-chip px-2 py-1 transition-colors hover:text-accent disabled:opacity-30 disabled:hover:text-fg-tertiary"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(row.id)}
+                  aria-label={`删除 ${rowName(row)}`}
+                  className="rounded-chip px-2 py-1 transition-colors hover:text-accent"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
             <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
               <label className="space-y-1">
                 <span className={labelClass}>路径</span>
@@ -111,28 +163,24 @@ export function NavForm({ items }: { items: NavRow[] }) {
                   className={inputClass}
                 />
               </label>
-              <label className="space-y-1">
+              <div className="space-y-1 sm:w-44">
                 <span className={labelClass}>分组</span>
-                <select
+                <Select
                   name={`nav.${i}.group`}
                   value={row.group ?? ""}
-                  onChange={(e) =>
-                    edit(row.id, { ...row, group: (e.target.value || null) as NavGroup | null })
+                  onValueChange={(group) =>
+                    edit(row.id, { ...row, group: (group || null) as NavGroup | null })
                   }
-                  className={inputClass}
-                >
-                  <option value="">不分组</option>
-                  {NAV_GROUPS.map((group) => (
-                    <option key={group} value={group}>
-                      {GROUP_LABELS[group]}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  options={GROUP_OPTIONS}
+                />
+              </div>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+            {/* Which surfaces carry this link, as chips you can see at a
+                glance — four unlabelled ticks never said which was which. */}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className={`${metaClass} mr-1`}>出现在</span>
               {SURFACES.map((surface) => (
-                <label key={surface.id} className="flex items-center gap-2">
+                <label key={surface.id} className="cursor-pointer">
                   <input
                     type="checkbox"
                     name={`nav.${i}.surface.${surface.id}`}
@@ -145,43 +193,13 @@ export function NavForm({ items }: { items: NavRow[] }) {
                           : row.surfaces.filter((s) => s !== surface.id),
                       })
                     }
-                    className="size-4"
+                    className="peer sr-only"
                   />
-                  <span className="text-caption">{surface.label}</span>
+                  <span className="block rounded-chip border border-line px-3 py-1.5 text-caption text-fg-tertiary transition-colors peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:text-accent peer-focus-visible:ring-[3px] peer-focus-visible:ring-accent/25">
+                    {surface.label}
+                  </span>
                 </label>
               ))}
-              <span className="ml-auto flex items-center gap-1 font-mono text-meta text-fg-tertiary">
-                <button
-                  type="button"
-                  onClick={() => move(row.id, -1)}
-                  disabled={i === 0}
-                  data-move="-1"
-                  data-row={row.id}
-                  aria-label={`上移 ${rowName(row)}`}
-                  className="rounded-chip px-2 py-1 hover:text-accent disabled:opacity-30 disabled:hover:text-fg-tertiary"
-                >
-                  ↑
-                </button>
-                <button
-                  type="button"
-                  onClick={() => move(row.id, 1)}
-                  disabled={i === rows.length - 1}
-                  data-move="1"
-                  data-row={row.id}
-                  aria-label={`下移 ${rowName(row)}`}
-                  className="rounded-chip px-2 py-1 hover:text-accent disabled:opacity-30 disabled:hover:text-fg-tertiary"
-                >
-                  ↓
-                </button>
-                <button
-                  type="button"
-                  onClick={() => remove(row.id)}
-                  aria-label={`删除 ${rowName(row)}`}
-                  className="rounded-chip px-2 py-1 hover:text-accent"
-                >
-                  ×
-                </button>
-              </span>
             </div>
           </div>
         ))}
@@ -190,9 +208,12 @@ export function NavForm({ items }: { items: NavRow[] }) {
       <button
         type="button"
         onClick={() => setRows([...rows, ...withIds([NEW_ROW])])}
-        className="mt-4 text-caption text-fg-tertiary hover:text-accent"
+        className={`${ghostButtonClass} mt-4`}
       >
-        + 加一间房
+        <span aria-hidden className="text-fg-tertiary">
+          +
+        </span>
+        加一间房
       </button>
 
       <SaveControls state={state} pending={pending} sticky />

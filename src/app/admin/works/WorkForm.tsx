@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { deleteWork, saveWork, type ActionState } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { inputClass, labelClass, textareaClass } from "../styles";
+import { DeleteRow } from "../DeleteRow";
 import { SaveControls } from "../SaveControls";
 
 export type WorkDraft = {
@@ -82,7 +83,7 @@ export function WorkForm({
                       name={`${field}.${locale}`}
                       defaultValue={work[field][locale]}
                       rows={3}
-                      className={inputClass}
+                      className={textareaClass}
                     />
                   ) : (
                     <input
@@ -138,23 +139,12 @@ export function WorkForm({
       </form>
 
       {!isNew && (
-        <form
+        <DeleteRow
           action={deleteWork}
-          onSubmit={(event) => {
-            if (!window.confirm(`确定删除「${work.key}」？删了就没有了。`)) {
-              event.preventDefault();
-            }
-          }}
-          className="mt-8 border-t border-line pt-6"
-        >
-          <input type="hidden" name="key" value={work.key} />
-          <button
-            type="submit"
-            className="text-caption text-fg-tertiary hover:text-accent"
-          >
-            删除这件（{work.key}）
-          </button>
-        </form>
+          fields={{ key: work.key }}
+          what={work.key}
+          label="删除这件"
+        />
       )}
     </>
   );

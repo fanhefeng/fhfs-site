@@ -5,6 +5,7 @@ import { requireAdminPage } from "@/lib/auth/session";
 import { isNavGroup } from "@/lib/nav";
 import { AdminChrome } from "../AdminChrome";
 import { NavForm } from "./NavForm";
+import { Note } from "../ui/Note";
 
 export default async function NavPage() {
   await requireAdminPage();
@@ -19,17 +20,19 @@ export default async function NavPage() {
     .orderBy(asc(navItems.sort), asc(navItems.href));
 
   return (
-    <AdminChrome title="导航">
-      <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
-        一条链接可以同时出现在好几个地方。文案 key 指向 <code>messages</code> 里的
+    <AdminChrome title="导航" section="/admin/nav">
+      <Note>
+        <p>
+          一条链接可以同时出现在好几个地方。文案 key 指向 <code>messages</code> 里的
         <code> nav.&lt;key&gt;</code>——那些界面标签不在数据库里，加新条目要顺手在
         两个 JSON 里补上对应的词，否则显示出来的会是 key 本身。清空路径即删除。
-      </p>
-      <p className="mb-6 max-w-[70ch] text-caption text-fg-tertiary">
-        分组决定页脚成簇、全屏菜单里挂在哪扇门下（门 = 同组里勾了顶栏的那一行）、
+        </p>
+        <p>
+          分组决定页脚成簇、全屏菜单里挂在哪扇门下（门 = 同组里勾了顶栏的那一行）、
         以及是否上 <code>/life</code> 这页目录：新房间一律选「房间」，勾 页脚 / 全屏菜单 /
         sitemap，插在房间一段的末尾即可，顶栏不用动。
-      </p>
+        </p>
+      </Note>
       <NavForm
         items={rows.map((row) => ({ ...row, group: isNavGroup(row.group) ? row.group : null }))}
       />

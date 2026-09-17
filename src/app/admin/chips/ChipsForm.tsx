@@ -2,13 +2,21 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { saveChips, type ActionState } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { ghostButtonClass, inputClass, labelClass } from "../styles";
 import { SaveControls } from "../SaveControls";
+import { Select } from "../ui/Select";
 
 type ChipRow = {
   label: { zh: string; en: string };
   tone: "paper" | "ink" | "accent";
 };
+
+/** The three papers a chip can be cut from, named the way the wall reads. */
+const TONES = [
+  { value: "paper", label: "paper · 纸白", hint: "默认的那种，大多数用它" },
+  { value: "ink", label: "ink · 墨黑", hint: "深色纸，压一压版面" },
+  { value: "accent", label: "accent · 琥珀", hint: "全站唯一的强调色，别用多" },
+];
 
 /**
  * The whole wall on one page, in order.
@@ -62,21 +70,17 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
                 className={inputClass}
               />
             </label>
-            <label className="space-y-1">
+            <div className="space-y-1">
               {i === 0 && <span className={labelClass}>纸色</span>}
-              <select
+              <Select
                 name={`chip.${i}.tone`}
                 value={chip.tone}
-                onChange={(e) =>
-                  edit(i, { ...chip, tone: e.target.value as ChipRow["tone"] })
+                onValueChange={(tone) =>
+                  edit(i, { ...chip, tone: tone as ChipRow["tone"] })
                 }
-                className={inputClass}
-              >
-                <option value="paper">paper</option>
-                <option value="ink">ink</option>
-                <option value="accent">accent</option>
-              </select>
-            </label>
+                options={TONES}
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -86,9 +90,12 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
         onClick={() =>
           setRows([...rows, { label: { zh: "", en: "" }, tone: "paper" }])
         }
-        className="mt-4 text-caption text-fg-tertiary hover:text-accent"
+        className={`${ghostButtonClass} mt-4`}
       >
-        + 加一张
+        <span aria-hidden className="text-fg-tertiary">
+          +
+        </span>
+        加一张
       </button>
 
       <SaveControls state={state} pending={pending} sticky />

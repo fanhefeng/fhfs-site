@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { login, type LoginState } from "./actions";
+import { buttonClass, inputClass } from "../styles";
 
 export function LoginForm({ next }: { next: string }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(
@@ -23,11 +24,12 @@ export function LoginForm({ next }: { next: string }) {
         autoFocus
         autoComplete="current-password"
         placeholder="密码"
-        className="w-full rounded-card border border-line bg-surface px-4 py-3 text-body text-fg outline-none focus-visible:border-accent"
+        className={inputClass}
       />
 
       {state.error && (
-        <p className="mt-3 text-caption text-accent" role="alert">
+        <p className="mt-3 flex items-center gap-2 text-caption text-accent" role="alert">
+          <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
           {state.error}
         </p>
       )}
@@ -35,8 +37,14 @@ export function LoginForm({ next }: { next: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-4 min-h-11 w-full rounded-card bg-fg px-4 text-caption text-bg transition-opacity disabled:opacity-50"
+        className={`${buttonClass} mt-4 w-full`}
       >
+        {pending && (
+          <span
+            aria-hidden
+            className="size-3 animate-spin rounded-full border-[1.5px] border-current border-t-transparent"
+          />
+        )}
         {pending ? "正在进入…" : "进入"}
       </button>
     </form>

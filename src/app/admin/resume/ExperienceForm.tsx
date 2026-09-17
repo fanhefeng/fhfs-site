@@ -8,7 +8,8 @@ import {
   saveResumeExperience,
   type ActionState,
 } from "../actions";
-import { inputClass, labelClass } from "../styles";
+import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
+import { DeleteRow } from "../DeleteRow";
 import { SaveControls } from "../SaveControls";
 
 export type ExperienceDraft = {
@@ -117,7 +118,7 @@ export function ExperienceForm({
                   name={`bullets.${locale}`}
                   defaultValue={experience.bullets[locale].join("\n")}
                   rows={3}
-                  className={`${inputClass} font-mono text-caption`}
+                  className={`${textareaClass} ${monoClass}`}
                 />
               </label>
             ))}
@@ -140,7 +141,7 @@ export function ExperienceForm({
                   name={`projects.${locale}`}
                   defaultValue={formatProjects(experience.projects[locale])}
                   rows={12}
-                  className={`${inputClass} font-mono text-caption`}
+                  className={`${textareaClass} ${monoClass}`}
                 />
               </label>
             ))}
@@ -151,25 +152,11 @@ export function ExperienceForm({
       </form>
 
       {!isNew && (
-        <form
+        <DeleteRow
           action={deleteResumeExperience}
-          onSubmit={(event) => {
-            if (
-              !window.confirm(`确定删除「${experience.key}」？删了就没有了。`)
-            ) {
-              event.preventDefault();
-            }
-          }}
-          className="mt-8 border-t border-line pt-6"
-        >
-          <input type="hidden" name="key" value={experience.key} />
-          <button
-            type="submit"
-            className="text-caption text-fg-tertiary hover:text-accent"
-          >
-            删除这条（{experience.key}）
-          </button>
-        </form>
+          fields={{ key: experience.key }}
+          what={experience.key}
+        />
       )}
     </>
   );
