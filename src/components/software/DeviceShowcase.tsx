@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/gsap";
 import { SegmentedFilter, type Segment } from "./SegmentedFilter";
 import { DeviceFrame } from "./DeviceFrame";
 import { AppMock } from "./AppMock";
@@ -40,7 +40,7 @@ export function DeviceShowcase({ apps }: { apps: SoftwareApp[] }) {
           autoAlpha: 1,
           scale: 1,
           duration: 0.35,
-          ease: "power2.out",
+          ease: EASE.soft,
           overwrite: "auto",
           clearProps: "transform,opacity,visibility",
         },

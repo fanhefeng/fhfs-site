@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { prefersSaveData } from "@/lib/three/guards";
 import { watchContextLoss } from "@/lib/webgl";
 import {
@@ -109,7 +109,8 @@ export function LiquidMetalDemo({
       alpha: true,
       antialias: false,
       premultipliedAlpha: true,
-      powerPreference: "high-performance",
+      // Default power preference: a pill that paints only under the pointer
+      // has no business moving a two-GPU Mac onto the discrete chip.
     });
     if (!gl) {
       setDegraded(true);
@@ -303,6 +304,10 @@ export function LiquidMetalDemo({
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const addRipple = (x: number, y: number) => {
+      // Under reduced motion the clock does not turn, so a ripple would never
+      // age out: it held `ripLive` true, and the loop at full rate, for as
+      // long as the page stayed open.
+      if (calm.matches) return;
       const r = slots[slotNext]!;
       slotNext = (slotNext + 1) % slots.length;
       r.x = x;
@@ -528,6 +533,9 @@ export function LiquidMetalDemo({
     };
     const onBlur = () => {
       on.focus = false;
+      // Space held down and Tab pressed: the keyup lands on the next control,
+      // and the button stayed pressed in.
+      on.press = false;
       sync();
     };
     const onKeyDown = (e: KeyboardEvent) => {
@@ -559,6 +567,15 @@ export function LiquidMetalDemo({
       if (visible) dirtyRef.current = true;
     };
     document.addEventListener("visibilitychange", onVisibility);
+    // Keyboard focus counts as engaged, and focus stays put when the page
+    // scrolls: tabbed to and scrolled past, the button kept the loop at full
+    // rate off screen. Nobody can see a frame drawn there.
+    let inView = true;
+    const io = new IntersectionObserver(([entry]) => {
+      inView = entry?.isIntersecting ?? true;
+      if (inView) dirtyRef.current = true;
+    });
+    io.observe(pad);
 
     /* ---- the loop ----
        The clock turns only while the button is engaged or still settling, so a
@@ -566,7 +583,7 @@ export function LiquidMetalDemo({
        snaps inside its own threshold rather than approaching one for ever,
        which is what gives the loop a last frame at all. */
     const tick = (_time: number, deltaMs: number) => {
-      if (disposed || !visible || ctx.lost) return;
+      if (disposed || !visible || !inView || ctx.lost) return;
       const dt = Math.min(deltaMs / 1000, 1 / 20);
 
       // asymmetric ease: quick to bloom, a touch quicker to die
@@ -594,7 +611,9 @@ export function LiquidMetalDemo({
       ptrAmt += (wantWell - ptrAmt) * (1 - Math.pow(0.004, dt));
       if (Math.abs(wantWell - ptrAmt) < 0.002) ptrAmt = wantWell;
 
-      const ripLive = slots.some((r) => r.on === 1 && clock - r.t <= RIPPLE_LIFE);
+      // A ripple left over from before reduced motion was switched on would
+      // never age either.
+      const ripLive = !calm.matches && slots.some((r) => r.on === 1 && clock - r.t <= RIPPLE_LIFE);
       const engaged = on.over || on.press || on.focus;
       const settling =
         hover !== hoverTarget ||
@@ -623,6 +642,7 @@ export function LiquidMetalDemo({
       disposed = true;
       gsap.ticker.remove(tick);
       ro.disconnect();
+      io.disconnect();
       applyRef.current = null;
       btn.removeEventListener("pointerenter", onEnter);
       btn.removeEventListener("pointerleave", onLeave);
@@ -666,7 +686,7 @@ export function LiquidMetalDemo({
 
       const tween = gsap.to(phase.current, {
         value: 1,
-        ease: "none",
+        ease: EASE.linear,
         onUpdate: () => {
           applyRef.current?.(phase.current.value);
           dirtyRef.current = true;

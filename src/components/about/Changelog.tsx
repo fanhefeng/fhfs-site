@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
 
 /** One release of a person. The page localizes before handing it over. */
@@ -23,6 +23,9 @@ type Props = {
   entries: ChangelogEntry[];
   title: string;
   ariaLabel: string;
+  /** Show the year rail at every width. /about keeps it to sm and up; the
+   *  lab study *is* the rail, and on a phone it was the part that vanished. */
+  railAlways?: boolean;
   className?: string;
 };
 
@@ -38,7 +41,7 @@ type Props = {
  *   `back.out` and leaving on the reversed ease at 2.2x — arrive generously,
  *   leave briskly.
  */
-export function Changelog({ entries, title, ariaLabel, className }: Props) {
+export function Changelog({ entries, title, ariaLabel, railAlways = false, className }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
 
@@ -73,7 +76,7 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
           gsap.to(strip, {
             y: -row * rowHeight,
             duration: 0.5,
-            ease: "power3.out",
+            ease: EASE.default,
             overwrite: "auto",
           });
         };
@@ -114,8 +117,8 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
           scale: 1,
           duration: 0.45,
           // Arrive with a little overshoot, leave on the reversed ease.
-          ease: "back.out(2.4)",
-          easeReverse: "power2.in",
+          ease: EASE.bubble,
+          easeReverse: EASE.exit,
           paused: true,
         });
 
@@ -158,13 +161,16 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
 
       <div ref={rootRef} className="flex gap-6">
         {/* Year rail — a one-row window onto a stack of years. */}
-        <div aria-hidden="true" className="hidden w-[4.5rem] shrink-0 sm:block">
+        <div
+          aria-hidden="true"
+          className={`${railAlways ? "block w-14" : "hidden"} shrink-0 sm:block sm:w-[4.5rem]`}
+        >
           <div className="sticky top-28 h-10 overflow-hidden">
             <div ref={stripRef} className="will-change-transform">
               {rows.map((year, i) => (
                 <div
                   key={`${year}-${i}`}
-                  className="h-10 font-mono text-[2rem] leading-10 text-fg-tertiary [font-variant-numeric:tabular-nums]"
+                  className="h-10 font-mono text-[1.5rem] leading-10 text-fg-tertiary [font-variant-numeric:tabular-nums] sm:text-[2rem]"
                 >
                   {year}
                 </div>

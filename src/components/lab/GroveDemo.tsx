@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
 import { watchContextLoss } from "@/lib/webgl";
 import {
@@ -168,10 +167,9 @@ export function GroveDemo({
     const sticky = stickyRef.current;
     if (!canvas || !sticky) return;
 
-    if (prefersSaveData() || !hasWebGL()) {
-      setDegraded(true);
-      return;
-    }
+    // Save-Data and a missing WebGL were asked before this chunk was fetched
+    // (SceneGate, in LabStudy); a renderer that cannot be built after all is
+    // still caught below.
 
     // three survives a lost context on its own, but the bark plates are
     // render targets baked once at build time (lib/grove/bark.ts), and a
@@ -196,7 +194,9 @@ export function GroveDemo({
           canvas,
           antialias: !small,
           alpha: true,
-          powerPreference: "high-performance",
+          // The default power preference, not "high-performance": that one
+          // switches a two-GPU Mac onto the discrete chip (and its fan) for as
+          // long as the page is open; the moss holds its frame rate without it.
           stencil: false,
         });
       } catch {
@@ -1078,12 +1078,17 @@ export function GroveDemo({
       canvas.addEventListener("pointermove", onPointerMove, { passive: true });
       canvas.addEventListener("pointerleave", onPointerLeave, { passive: true });
 
+      // The canvas follows the sticky box, not the window: a phone's address
+      // bar resizes the window without resizing a 100svh box, and re-measuring
+      // the pin is ScrollTrigger's own resize handling, which knows to ignore
+      // exactly that. Calling refresh() here used to make the pin jump, and
+      // it read the box before the refresh had settled it.
       const onResize = () => {
         resize();
         apply(phase.current.value);
-        ScrollTrigger.refresh();
       };
-      window.addEventListener("resize", onResize, { passive: true });
+      const stickyObserver = new ResizeObserver(onResize);
+      stickyObserver.observe(sticky);
 
       let visible = !document.hidden;
       const onVisibility = () => {
@@ -1271,7 +1276,7 @@ export function GroveDemo({
 
       teardown = () => {
         gsap.ticker.remove(tick);
-        window.removeEventListener("resize", onResize);
+        stickyObserver.disconnect();
         document.removeEventListener("visibilitychange", onVisibility);
         canvas.removeEventListener("pointermove", onPointerMove);
         canvas.removeEventListener("pointerleave", onPointerLeave);
@@ -1336,7 +1341,7 @@ export function GroveDemo({
 
       const tween = gsap.to(phase.current, {
         value: 1,
-        ease: "none",
+        ease: EASE.linear,
         // The tween's own onUpdate rather than the ScrollTrigger's: with
         // `scrub` the catch-up tween keeps running after the scrollbar has
         // stopped, and a ScrollTrigger callback stops firing at that moment —

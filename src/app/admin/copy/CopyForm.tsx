@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { saveCopy } from "../actions/copy";
-import type { ActionState } from "../actions/shared";
 import { cardClass, fieldSkin, hintClass, inputClass, metaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
+import { useSaveAction } from "../ui/useSaveAction";
 
 type CopyRow = {
   key: string;
@@ -29,7 +29,7 @@ type CopyRow = {
  * page must never do is make a save depend on what happens to be filtered in.
  */
 export function CopyForm({ rows }: { rows: CopyRow[] }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveCopy, {});
+  const { state, pending, formProps } = useSaveAction(saveCopy);
   const [query, setQuery] = useState("");
 
   const groups = new Map<string, CopyRow[]>();
@@ -44,7 +44,7 @@ export function CopyForm({ rows }: { rows: CopyRow[] }) {
   const hits = rows.filter(matches).length;
 
   return (
-    <form action={formAction}>
+    <form {...formProps}>
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-0 flex-1 sm:max-w-xs">
           <svg

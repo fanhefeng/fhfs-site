@@ -76,6 +76,23 @@ export const validDate = (value: string): boolean => {
   return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === value;
 };
 
+const MOMENT_TIME_RE = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})$/;
+
+/**
+ * A moment is stamped to the minute, in the site's zone: `2026-09-07 23:15`
+ * as the author would write it (a `T` in place of the space is fine too),
+ * read as the instant that is. Null for anything that is not a real minute —
+ * 24:00, 2026-02-30. The site's zone is UTC+8 without daylight saving, so
+ * the offset is a constant.
+ */
+export function parseMomentTime(value: string): Date | null {
+  const match = MOMENT_TIME_RE.exec(value);
+  if (!match) return null;
+  const [, day, hour, minute] = match;
+  if (!validDate(day!) || Number(hour) > 23 || Number(minute) > 59) return null;
+  return new Date(`${day}T${hour}:${minute}:00+08:00`);
+}
+
 /**
  * A site-relative path: one leading slash and no way off the site.
  * `//evil.com` also starts with "/" — a browser reads that as

@@ -1,11 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
 import { deletePost, savePost } from "../actions/posts";
-import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 import { useFieldErrors } from "../ui/fieldErrors";
+import { useSaveAction } from "../ui/useSaveAction";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import { DeleteRow } from "../DeleteRow";
 import { Select } from "../ui/Select";
@@ -30,14 +29,14 @@ type PostDraft = {
  * article page is one click away and shows the real thing.
  */
 export function PostForm({ post, isNew }: { post: PostDraft; isNew: boolean }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(savePost, {});
+  const { state, pending, formProps } = useSaveAction(savePost);
   const check = useFieldErrors();
 
   return (
     <>
-      <form action={formAction} className="space-y-5" {...check.formProps}>
+      <form {...formProps} className="space-y-5" {...check.formProps}>
         {/* Tells savePost to redirect to the edit page: this page's props are a
-            blank draft, and React resets the form to them after the action —
+            blank draft, and a saved form resets to its props (useSaveAction) —
             without the redirect a successful save wipes the editor. */}
         {isNew && <input type="hidden" name="isNew" value="1" />}
         <div className="grid gap-5 sm:grid-cols-[1fr_9rem_10rem]">

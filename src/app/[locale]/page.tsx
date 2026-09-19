@@ -2,7 +2,7 @@ import { asset } from "@/lib/asset";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { htmlLang, routing } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -59,6 +59,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const posts: WritingItem[] = allPosts.slice(0, POST_COUNT).map((post) => ({
     slug: post.slug,
     title: post.title,
+    lang: post.isFallback ? htmlLang(post.locale) : undefined,
     date: post.date.replaceAll("-", "."),
     readingTime: t("readingTime", { minutes: post.readingMinutes }),
   }));
@@ -112,8 +113,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <NeonSplash
         label={td("label")}
         welcome={td("welcome")}
-        signOn={td("signOn")}
-        signOff={td("signOff")}
+        sign={td("sign")}
         enter={td("enter")}
         enterHint={td("enterHint")}
       />

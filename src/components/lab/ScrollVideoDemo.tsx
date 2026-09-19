@@ -3,7 +3,7 @@
 import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { ScrollVideo } from "@/lib/scrollVideo";
 // Bundled rather than fetched: it is a few hundred bytes that used to cost a
 // round trip before the first frame could even be asked for.
@@ -17,6 +17,8 @@ type Props = {
   captionOneBody: string;
   captionTwo: string;
   captionTwoBody: string;
+  /** Said in place of the loader when not one frame of the first pass came back. */
+  failed?: string;
 };
 
 // One hash for the whole folder, as a path segment — ninety file hashes would
@@ -24,6 +26,7 @@ type Props = {
 const FRAMES = asset("/lab/scroll-video/frames/");
 /** First pass fetches every Nth frame; the loader ring tracks that pass only. */
 const WARMUP_STEP = 6;
+const FRAME_COUNT = manifest.frameCount;
 
 /**
  * Scroll-as-playhead: a frame sequence painted onto a canvas, with the frame
@@ -42,6 +45,7 @@ export function ScrollVideoDemo({
   captionOneBody,
   captionTwo,
   captionTwoBody,
+  failed: failedText,
 }: Props) {
   const scope = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -49,7 +53,6 @@ export function ScrollVideoDemo({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<ScrollVideo | null>(null);
 
-  const [frameCount, setFrameCount] = useState(0);
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [failed, setFailed] = useState(false);
@@ -64,7 +67,7 @@ export function ScrollVideoDemo({
 
     const player = new ScrollVideo({
       canvas,
-      frameCount: manifest.frameCount,
+      frameCount: FRAME_COUNT,
       src: (n) =>
         `${FRAMES}${manifest.pattern.replace("%d", String(n).padStart(manifest.padding, "0"))}`,
       warmupStep: WARMUP_STEP,
@@ -77,7 +80,6 @@ export function ScrollVideoDemo({
       },
     });
     playerRef.current = player;
-    setFrameCount(manifest.frameCount);
 
     player
       .load()
@@ -102,10 +104,10 @@ export function ScrollVideoDemo({
       const player = playerRef.current;
       const stage = stageRef.current;
       const sticky = stickyRef.current;
-      if (!ready || !player || !stage || !sticky || frameCount < 2) return;
+      if (!ready || !player || !stage || !sticky || FRAME_COUNT < 2) return;
 
       const captions = gsap.utils.toArray<HTMLElement>(".sv-caption", scope.current);
-      const lastFrame = frameCount - 1;
+      const lastFrame = FRAME_COUNT - 1;
       const state = { frame: 0 };
 
       // Both conditions must cover every width: a matchMedia callback only
@@ -125,7 +127,7 @@ export function ScrollVideoDemo({
 
           const tween = gsap.to(state, {
             frame: lastFrame,
-            ease: "none",
+            ease: EASE.linear,
             snap: "frame", // frame numbers are integers; don't tween through halves
             scrollTrigger: {
               trigger: stage,
@@ -162,7 +164,7 @@ export function ScrollVideoDemo({
 
       return () => mm.revert();
     },
-    { scope, dependencies: [ready, frameCount] },
+    { scope, dependencies: [ready] },
   );
 
   return (
@@ -177,11 +179,13 @@ export function ScrollVideoDemo({
 
           {!ready && (
             <div className="sv-loader">
-              <span className="sv-loader-ring" aria-hidden="true">
-                <i style={{ transform: `scaleX(${progress})` }} />
-              </span>
-              <p className="sv-loader-label">
-                {failed ? "—" : `${loading} · ${Math.round(progress * 100)}%`}
+              {!failed && (
+                <span className="sv-loader-ring" aria-hidden="true">
+                  <i style={{ transform: `scaleX(${progress})` }} />
+                </span>
+              )}
+              <p className="sv-loader-label" role={failed ? "status" : undefined}>
+                {failed ? (failedText ?? "—") : `${loading} · ${Math.round(progress * 100)}%`}
               </p>
             </div>
           )}

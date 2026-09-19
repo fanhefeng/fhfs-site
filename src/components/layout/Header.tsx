@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { gsap, useGSAP, Flip } from "@/lib/gsap";
+import { gsap, useGSAP, Flip, EASE } from "@/lib/gsap";
 import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/nav";
 import { useJukebox } from "@/lib/jukebox";
 import { LightSwitch } from "@/components/ui/LightSwitch";
@@ -114,6 +114,8 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   const instantRef = useRef(false);
   /** Escape closed the tray: hand focus to the burger once it is back. */
   const returnFocusRef = useRef(false);
+  /** The open tray is one the reader pressed open, not the wide screen's own. */
+  const pressedOpenRef = useRef(false);
 
   useEffect(() => {
     expandedRef.current = expanded;
@@ -139,7 +141,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
       Flip.fit(ind, active, { scale: false });
       gsap.set(ind, { autoAlpha: 1 });
     } else {
-      Flip.fit(ind, active, { scale: false, duration: 0.45, ease: "power3.out" });
+      Flip.fit(ind, active, { scale: false, duration: 0.45, ease: EASE.default });
       gsap.to(ind, { autoAlpha: 1, duration: 0.2, overwrite: "auto" });
     }
   }, []);
@@ -188,14 +190,14 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         }
       },
     });
-    tl.to(tray, { width: w, duration: 0.8, ease: "back.out(2)", easeReverse: "power2.out" }, 0).to(
+    tl.to(tray, { width: w, duration: 0.8, ease: EASE.stretch, easeReverse: EASE.soft }, 0).to(
       items,
       {
         autoAlpha: 1,
         y: 0,
         duration: 0.3,
-        ease: "power2.out",
-        easeReverse: "power1.out",
+        ease: EASE.soft,
+        easeReverse: EASE.fadeIn,
         stagger: 0.05,
       },
       0.14,
@@ -206,7 +208,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
     if (burger && window.matchMedia(WIDE).matches) {
       tl.to(
         burger,
-        { width: 0, autoAlpha: 0, duration: 0.3, ease: "power2.out", easeReverse: "power1.out" },
+        { width: 0, autoAlpha: 0, duration: 0.3, ease: EASE.soft, easeReverse: EASE.fadeIn },
         0,
       );
     }
@@ -269,7 +271,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
     () => {
       const [l1, l2, l3] = lineRefs.current;
       if (!l1 || !l2 || !l3) return;
-      const ease = "power2.inOut";
+      const ease = EASE.travel;
       const [top, bottom] = glyphOpen
         ? [LINES[0].cross, LINES[2].cross]
         : [LINES[0].rest, LINES[2].rest];
@@ -305,7 +307,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         const pos = { x: -200 };
         const xTo = gsap.quickTo(pos, "x", {
           duration: 0.25,
-          ease: "power2.out",
+          ease: EASE.soft,
           onUpdate: () => light.setAttribute("x", String(pos.x)),
         });
         // Event-driven read; fePointLight's x lives in the ring's own user
@@ -319,11 +321,11 @@ export function Header({ links, menuLinks, allLinks }: Props) {
           // capsule on every re-entry.
           pos.x = localX(e);
           light.setAttribute("x", String(pos.x));
-          gsap.to(ring, { opacity: 1, duration: 0.25, ease: "power2.out", overwrite: "auto" });
+          gsap.to(ring, { opacity: 1, duration: 0.25, ease: EASE.soft, overwrite: "auto" });
         };
         const onMove = (e: PointerEvent) => xTo(localX(e));
         const onLeave = () => {
-          gsap.to(ring, { opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+          gsap.to(ring, { opacity: 0, duration: 0.5, ease: EASE.soft, overwrite: "auto" });
         };
         island.addEventListener("pointerenter", onEnter);
         island.addEventListener("pointermove", onMove);
@@ -351,9 +353,26 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   // Escape closes the tray and hands focus back; a click anywhere off the
   // island collapses it (it is a toolbar, not a modal — no focus trap).
   useEffect(() => {
-    if (!expanded) return;
+    if (!expanded) {
+      pressedOpenRef.current = false;
+      return;
+    }
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // Only an Escape pressed from inside the island is the island's. On a
+      // wide screen the tray stands open by default, so this listener is live
+      // on every page: taken from anywhere, it folded the island and pulled
+      // the focus up to the burger from wherever the reader had been — and
+      // its preventDefault reached the key before the screening room's
+      // <dialog> could close on it.
+      //
+      // The one exception is an island the reader pressed open with a mouse
+      // in Safari, which does not focus a clicked button: focus never left
+      // <body>, yet the Escape is plainly meant for what they just opened.
+      const active = document.activeElement;
+      const inIsland = islandRef.current?.contains(active) ?? false;
+      const pressedFromBody = pressedOpenRef.current && (!active || active === document.body);
+      if (!inIsland && !pressedFromBody) return;
       e.preventDefault();
       setExpanded(false);
       // On a wide screen the burger is folded away while the tray is open
@@ -473,8 +492,10 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   }, [refit]);
 
   const onBurger = () => {
-    if (window.matchMedia(DESKTOP).matches) setExpanded((v) => !v);
-    else setNavOpen((v) => !v);
+    if (window.matchMedia(DESKTOP).matches) {
+      pressedOpenRef.current = !expandedRef.current;
+      setExpanded((v) => !v);
+    } else setNavOpen((v) => !v);
   };
 
   return (
@@ -591,7 +612,9 @@ export function Header({ links, menuLinks, allLinks }: Props) {
               ref={burgerRef}
               type="button"
               onClick={onBurger}
-              aria-label={glyphOpen ? t("close") : t("menu")}
+              // One name; `aria-expanded` says whether it is open ("close,
+              // expanded" was the flipped label read out).
+              aria-label={t("menu")}
               aria-expanded={glyphOpen}
               aria-controls="island-tray fullnav"
               className="relative z-[1] grid size-11 cursor-pointer place-items-center rounded-full text-fg-secondary transition-colors hover:text-fg"

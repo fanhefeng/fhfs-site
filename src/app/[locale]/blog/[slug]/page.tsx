@@ -136,6 +136,17 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
                 render — but the tags are the author's, in whatever language
                 they were written, so the override stops before them. */}
             <p className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+              {/* Where this page hangs, and the way back up — the other rooms'
+                  detail pages all open with it; this one only had the link at
+                  the very bottom, a whole article away. */}
+              <Link
+                href="/blog"
+                lang={post.isFallback ? htmlLang(locale) : undefined}
+                className="hit-ext transition-colors hover:text-accent"
+              >
+                {t("title")}
+              </Link>
+              <span aria-hidden>·</span>
               <time dateTime={post.date} lang={post.isFallback ? htmlLang(locale) : undefined}>
                 {format.dateTime(new Date(post.date), {
                   year: "numeric",
@@ -189,7 +200,10 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
                 <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                   ← {t("prevPost")}
                 </span>
-                <span className="text-heading text-fg transition-colors duration-200 group-hover:text-accent">
+                <span
+                  lang={older.locale !== locale ? htmlLang(older.locale) : undefined}
+                  className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
+                >
                   {older.title}
                 </span>
               </Link>
@@ -202,7 +216,10 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
                 <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                   {t("nextPost")} →
                 </span>
-                <span className="text-heading text-fg transition-colors duration-200 group-hover:text-accent">
+                <span
+                  lang={newer.locale !== locale ? htmlLang(newer.locale) : undefined}
+                  className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
+                >
                   {newer.title}
                 </span>
               </Link>

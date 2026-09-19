@@ -13,7 +13,7 @@ export type GalleryPhoto = KobePhoto & { title: string; meta: string; alt: strin
 export function KobeGallery({ photos }: { photos: GalleryPhoto[] }) {
   return (
     <Reveal as="div" stagger={0.06} className="columns-2 gap-4 md:columns-3 md:gap-5">
-      {photos.map((photo, i) => (
+      {photos.map((photo) => (
         <figure key={photo.id} className="mb-4 break-inside-avoid md:mb-5">
           <Image
             src={asset(`/idols/kobe/${photo.file}`)}
@@ -21,8 +21,6 @@ export function KobeGallery({ photos }: { photos: GalleryPhoto[] }) {
             height={photo.height}
             alt={photo.alt}
             sizes="(min-width: 768px) 340px, 50vw"
-            // The first two are above the fold on a phone.
-            fetchPriority={i < 2 ? "high" : undefined}
             className="w-full rounded-card bg-surface"
           />
           <figcaption className="mt-2">

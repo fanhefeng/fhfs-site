@@ -1,20 +1,19 @@
 "use client";
 
-import { useActionState } from "react";
 import { saveAbout } from "../actions/about";
-import type { ActionState } from "../actions/shared";
 import { inputClass, monoClass, textareaClass, labelClass } from "../styles";
 import { SaveControls } from "../SaveControls";
+import { useSaveAction } from "../ui/useSaveAction";
 
 export function AboutForm({
   about,
 }: {
   about: { locale: "zh" | "en"; title: string; bodyMd: string };
 }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveAbout, {});
+  const { state, pending, formProps } = useSaveAction(saveAbout);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form {...formProps} className="space-y-4">
       <input type="hidden" name="locale" value={about.locale} />
 
       <label className="block space-y-1.5">

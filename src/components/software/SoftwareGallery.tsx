@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { Flip, gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/gsap";
+import { captureGrid, playGrid, type GridState } from "@/lib/flipGrid";
 import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
+import { useUrlChoice } from "@/lib/useUrlChoice";
 import { AppCard } from "@/components/cards/AppCard";
 import { SegmentedFilter, type Segment } from "./SegmentedFilter";
 import { MobileAppRail } from "./MobileAppRail";
 import { APP_CATEGORIES, type AppFilter, type SoftwareApp } from "./appMeta";
-
-type FlipState = ReturnType<typeof Flip.getState>;
 
 /**
  * The bento itself. Every app stays in the DOM for the whole session; the
@@ -23,20 +23,27 @@ type FlipState = ReturnType<typeof Flip.getState>;
  */
 export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
   const t = useTranslations("software");
-  const [filter, setFilter] = useState<AppFilter>("all");
+  const categories = useMemo(
+    () => APP_CATEGORIES.filter((c) => apps.some((a) => a.category === c)),
+    [apps],
+  );
+  // The selection is in the address bar (`?cat=…`), so a reload or a shared
+  // link keeps it. A choice that arrives with the URL has no "before" for Flip
+  // to play from — `pending` is empty — and the cards are simply there.
+  const [choice, choose] = useUrlChoice("cat", categories);
+  const filter: AppFilter = (choice as AppFilter | null) ?? "all";
   const gridRef = useRef<HTMLDivElement>(null);
   /** Layout captured in the click handler, consumed by the layout effect. */
-  const pending = useRef<FlipState | null>(null);
+  const pending = useRef<GridState | null>(null);
+  /** How tall the grid stood at that same moment. */
+  const pendingHeight = useRef(0);
 
   const options = useMemo<Segment[]>(
     () => [
       { value: "all", label: t("filterAll") },
-      ...APP_CATEGORIES.filter((c) => apps.some((a) => a.category === c)).map((c) => ({
-        value: c,
-        label: t(`categories.${c}`),
-      })),
+      ...categories.map((c) => ({ value: c, label: t(`categories.${c}`) })),
     ],
-    [apps, t],
+    [categories, t],
   );
 
   const visible = useMemo(
@@ -44,44 +51,53 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
     [apps, filter],
   );
 
-  const change = useCallback((next: string) => {
-    const grid = gridRef.current;
-    // Capture *before* React re-renders — this is the "previous state" the
-    // cards inherit their positions from. `offsetParent` is null while the
-    // grid is display:none (phones show the rail instead), and there is
-    // nothing to reshuffle then.
-    if (grid && grid.offsetParent !== null) {
-      pending.current = Flip.getState(grid.querySelectorAll("[data-flip-item]"));
-    }
-    setFilter(next as AppFilter);
-  }, []);
+  const change = useCallback(
+    (next: string) => {
+      const grid = gridRef.current;
+      // Capture *before* React re-renders — this is the "previous state" the
+      // cards inherit their positions from. `offsetParent` is null while the
+      // grid is display:none (phones show the rail instead), and there is
+      // nothing to reshuffle then.
+      if (grid && grid.offsetParent !== null) {
+        // The height first: the capture finishes a flip that is still running
+        // on these cards, which lets go of the height that flip was holding.
+        // Read after it, a second click mid-flight would start from the
+        // settled box rather than from where the box actually stands. The
+        // height's own tween is stopped with it, or it would go on writing.
+        pendingHeight.current = grid.offsetHeight;
+        gsap.killTweensOf(grid);
+        pending.current = captureGrid(grid.querySelectorAll("[data-flip-item]"));
+      }
+      choose(next === "all" ? null : next);
+    },
+    [choose],
+  );
 
   // Runs in the layout phase after the filter render, so nothing paints in
   // the new positions before Flip pins them back to the old ones.
   useGSAP(
     () => {
       const state = pending.current;
-      if (!state) return;
+      const grid = gridRef.current;
+      if (!state || !grid) return;
       pending.current = null;
-      Flip.from(state, {
-        duration: 0.55,
-        ease: "power2.inOut",
-        absolute: true,
-        stagger: 0.03,
-        onEnter: (els) =>
-          gsap.fromTo(
-            els,
-            { autoAlpha: 0, scale: 0.94 },
-            { autoAlpha: 1, scale: 1, duration: 0.4, ease: "power2.out" },
-          ),
-        onLeave: (els) =>
-          gsap.to(els, { autoAlpha: 0, scale: 0.94, duration: 0.25, ease: "power2.in" }),
-      });
+      // The grid's own height travels with the cards, and has to be held by
+      // hand: `absolute: true` lifts every card out of the flow for as long as
+      // the flip runs, and a grid with nothing left in its flow is 0px tall —
+      // the footer jumped up under the cards and back down when they landed.
+      // The new layout's natural height can only be read here, before Flip
+      // takes the cards out. The height is held even when it does not change,
+      // and let go by the flip's own `onComplete` rather than the tween's: the
+      // stagger makes the flip outlast it.
+      const from = pendingHeight.current;
+      const to = grid.offsetHeight;
+      gsap.fromTo(grid, { height: from }, { height: to, duration: 0.55, ease: EASE.travel });
+      playGrid(state, { onComplete: () => gsap.set(grid, { clearProps: "height" }) });
     },
-    // revertOnUpdate so a half-played reshuffle is torn down before the next
-    // one starts (rapid clicking through the segments). The state was already
-    // captured in the click handler, so reverting here costs nothing.
-    { dependencies: [filter], scope: gridRef, revertOnUpdate: true },
+    // No `revertOnUpdate`: a half-played reshuffle is finished and cleared by
+    // `captureGrid` in the click handler, and reverting a finished one put
+    // stale inline styles back on the cards (see src/lib/flipGrid.ts).
+    { dependencies: [filter], scope: gridRef },
   );
 
   // Site-wide scroll entrance, bento flavour: stagger .06 across the cells.
@@ -146,7 +162,11 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
       </div>
 
       {/* Phones get the same set as a swipeable rail. */}
-      <MobileAppRail apps={visible} className="md:hidden" />
+      <MobileAppRail
+        apps={visible}
+        className="md:hidden"
+        labels={{ prev: t("railPrev"), next: t("railNext") }}
+      />
 
       {visible.length === 0 && (
         <p className="py-10 text-center text-body text-fg-secondary">{t("empty")}</p>

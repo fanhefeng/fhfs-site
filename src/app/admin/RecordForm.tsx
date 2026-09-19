@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useId } from "react";
+import { useId } from "react";
 import type { ActionState } from "./actions/shared";
 import { hintClass, inputClass, labelClass, metaClass, monoClass, textareaClass } from "./styles";
 import { SaveControls } from "./SaveControls";
@@ -9,6 +9,7 @@ import { Select, type SelectOption } from "./ui/Select";
 import { Segmented } from "./ui/Segmented";
 import { useFieldErrors } from "./ui/fieldErrors";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
+import { useSaveAction } from "./ui/useSaveAction";
 
 export type Field =
   | {
@@ -87,7 +88,7 @@ export function RecordForm({
   isNew?: boolean;
   deleteAction?: (form: FormData) => Promise<void>;
 }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(action, {});
+  const { state, pending, formProps } = useSaveAction(action);
   const formId = useId();
   const check = useFieldErrors();
 
@@ -201,6 +202,7 @@ export function RecordForm({
             <div>
               <Segmented
                 name={field.name}
+                labelledBy={labelId}
                 defaultValue={value(field.name)}
                 tone={values[1] === "yes" ? "accent" : "ink"}
                 options={field.options.map((option) => ({
@@ -251,7 +253,7 @@ export function RecordForm({
 
   return (
     <>
-      <form action={formAction} className="space-y-6" {...check.formProps}>
+      <form {...formProps} className="space-y-6" {...check.formProps}>
         {isNew && <input type="hidden" name="isNew" value="1" />}
 
         {groups.map((group) => (

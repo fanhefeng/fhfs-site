@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
+import { useFormStatus } from "react-dom";
 import { dangerButtonClass, ghostButtonClass, hintClass } from "./styles";
 
 /**
@@ -28,6 +29,22 @@ export function DeleteRow({
   label?: string;
 }) {
   const [armed, setArmed] = useState(false);
+  const backOutRef = useRef<HTMLButtonElement>(null);
+  const armRef = useRef<HTMLButtonElement>(null);
+  const moved = useRef(false);
+
+  // Arming replaces the very button that had focus, and disarming replaces the
+  // one that took it — either way focus would fall to <body>. It goes to the
+  // safe choice on the way in, and back to where it started on the way out.
+  useEffect(() => {
+    if (!moved.current) return;
+    (armed ? backOutRef : armRef).current?.focus();
+  }, [armed]);
+
+  const arm = (next: boolean) => {
+    moved.current = true;
+    setArmed(next);
+  };
 
   return (
     <form action={action} className="mt-8 border-t border-line pt-5">
@@ -40,22 +57,49 @@ export function DeleteRow({
           <p className={hintClass}>
             删掉「<span className="font-mono">{what}</span>」，没有回收站。
           </p>
-          <button type="submit" className={dangerButtonClass}>
-            确认删除
-          </button>
-          <button type="button" onClick={() => setArmed(false)} className={ghostButtonClass}>
-            算了
-          </button>
+          <Confirm />
+          <BackOut ref={backOutRef} onBackOut={() => arm(false)} />
         </div>
       ) : (
         <button
+          ref={armRef}
           type="button"
-          onClick={() => setArmed(true)}
+          onClick={() => arm(true)}
           className="text-caption text-fg-tertiary transition-colors hover:text-accent"
         >
           {label}（{what}）
         </button>
       )}
     </form>
+  );
+}
+
+/** Its own component because `useFormStatus` reads the form it is *inside*.
+ *  A delete is idempotent, so a second press did no harm — but it also said
+ *  nothing, and a cold database makes that a long silence. */
+function Confirm() {
+  const { pending } = useFormStatus();
+  return (
+    <button type="submit" disabled={pending} aria-busy={pending} className={dangerButtonClass}>
+      {pending ? "删除中…" : "确认删除"}
+    </button>
+  );
+}
+
+/** Once the delete is on its way it cannot be called back — so while it is,
+ *  "算了" says so by being unavailable, instead of folding the sentence away
+ *  and letting the row vanish a moment later anyway. */
+function BackOut({ ref, onBackOut }: { ref: Ref<HTMLButtonElement>; onBackOut: () => void }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      ref={ref}
+      type="button"
+      disabled={pending}
+      onClick={onBackOut}
+      className={ghostButtonClass}
+    >
+      算了
+    </button>
   );
 }

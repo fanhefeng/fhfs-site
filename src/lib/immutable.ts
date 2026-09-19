@@ -23,7 +23,6 @@ export const IMMUTABLE_DIRS = [
   "/grove",
   "/lab/dissolve",
   "/lab/lens",
-  "/lab/neon",
   "/idols",
   "/films",
   "/music",
@@ -54,7 +53,7 @@ const HASH = `:hash([0-9a-f]{${HASH_LENGTH}})`;
  * plain file each one is served from.
  *
  * Matched by file and not by prefix. Several of these folders share a name
- * with a page: `/films/odyssey` and `/lab/neon` without a locale are
+ * with a page: `/films/odyssey` and `/idols/kobe` without a locale are
  * addresses next-intl answers with a *temporary* redirect to the language it
  * negotiated — and a year of `immutable` on that would nail one visitor's
  * language shut for a year, on a reply that is supposed to be reconsidered

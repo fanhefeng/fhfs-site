@@ -2,10 +2,10 @@
 
 import { Fragment } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { useLocalClock } from "@/lib/useLocalClock";
-import { clusterNav, NAV_GROUP_LABEL_KEY, type NavLink } from "@/lib/nav";
+import { clusterNav, isActivePath, NAV_GROUP_LABEL_KEY, type NavLink } from "@/lib/nav";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { PeelSticker } from "@/components/ui/PeelSticker";
 import { SignRing } from "@/components/neon/SignRing";
@@ -23,6 +23,7 @@ export function Footer({ items }: { items: NavLink[] }) {
   const t = useTranslations("footer");
   const tNav = useTranslations("nav");
   const locale = useLocale();
+  const pathname = usePathname();
   const time = useLocalClock();
 
   const linkClass =
@@ -72,7 +73,22 @@ export function Footer({ items }: { items: NavLink[] }) {
                   // No viewport prefetch: eleven routes' payloads fetched on
                   // every page for a row of links almost nobody scrolls to.
                   // A hover still prefetches, so a click stays instant.
-                  <Link key={item.href} href={item.href} prefetch={false} className={linkClass}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    prefetch={false}
+                    // The third copy of the nav and the only one that did not
+                    // know where it was. Ink and a rule, not amber: the footer
+                    // stays the quietest place on the page.
+                    aria-current={
+                      pathname === item.href
+                        ? "page"
+                        : isActivePath(pathname, item.href)
+                          ? "true"
+                          : undefined
+                    }
+                    className={`${linkClass} aria-[current]:text-fg aria-[current]:underline aria-[current]:underline-offset-4`}
+                  >
                     {tNav(item.labelKey)}
                   </Link>
                 ))}

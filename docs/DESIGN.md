@@ -665,6 +665,153 @@
 >   14 个页面，长缓存目录的请求全部带 hash、零 404；`next/image` 经优化器取带 hash 的地址正常。
 >   **Vercel 上优化器回源是否同样过 rewrite，本地验不了，上线后看一眼 `/films` 的剧照。**
 
+> **2026-09-18 补记（横向宣言回到 /about；实验室收下站点自己的效果，每则链源码）**，覆盖
+> 08-28「/about 的横向 pin 改成纵向段落，全站只留推近这一个 pin」那句：
+> - **横穿屏幕的一句话回来了**。08-28 为了「一站一 pin」把它改成原地翻字，但 README 和 §2.1
+>   一直写着它在，用户也点名要。机制抽成 `fx/SidewaysBand`（pin + `containerAnimation` +
+>   SplitText，≥768px 钉住、以下淡入，`resplitKey` 换 locale 重拆），`home/ManifestoBand` 只剩
+>   两行文案。规则改成：**推近钉的是一扇窗，宣言钉的是一句话，两者性质不同，各留一处**。
+> - **实验室从十则扩到二十二则**。第十一则起是站点在用的效果，单独拿出来看：横穿屏幕的一句话、
+>   三种进场（报头行遮罩 / Reveal / 标题解码）、磁吸与描边（后拆成两则）、贴纸（白边 / 墙 / 撕）、两片点阵
+>   （404 粒子 / 关于页点阵名）、推近（首页二三幕原样挂载）、Flip 筛选重排、壳层（开灯拨杆 /
+>   阅读胶囊 / 扇形菜单 / 开灯仪式与招牌的重放按钮 / 换页的雾 / 灵动岛）、铜像、空气（光晕与纸纹
+>   放大五倍）、版本履历（读真实数据）、放映厅（大话西游的墙）。推近、铜像、履历、放映厅直接挂
+>   站点组件，不写 demo 壳；其余八则各一个 `components/lab/*Demo.tsx`。为此 `PostTitle` 加了
+>   `as` / `lang`，`ProgressHud` 导出 `ReadingChip`，`lib/overture` / `lib/splash` 各加一个
+>   `forget*()` 交回 sessionStorage 钥匙。索引页副标题的数量改成 `{count}` 读表长。
+> - **每则页尾一节「源码」**：`LabEntry.sources` 列出它由哪些文件写成（相对 `src/`），逐个链到
+>   `site.repo/blob/main/src/<path>`（`site.repo` 新增）。`lab.test.ts` 查：序号连续、slug/key 不
+>   重、每个 source 文件存在、两份文案都有 name/tagline/summary/note。
+> - **没做的**：/intro 的 3D 头像、灵动岛、全屏菜单、唱片机不进实验室——前者本身就是一页，后三样
+>   每页都在，壳层那一则只写了它们在哪并链了源码。
+> - **同日补：第五则「两张纸」并入推近**（同日实验室又拆成三十三则，推近落在第 21 则）。`/lab/grove-stage` 与推近用的是同一个
+>   `GroveScene`、同样两张 `GroveCard`、同一组坐标，`page.tsx` 里两者本就共用一段取卡片文案的分支；
+>   它比推近多出来的只有三处构图差异（stage 居中挂 `-440u`、窄画幅保留两张卡、卡片入场播一次而非
+>   scrub），没有新机制。`GroveStageDemo.tsx` 删除，「卡 a 不带 z-index 所以画在 canvas 之下」那段
+>   讲法进了推近的 note，`GroveCard.tsx` 列进推近的源码；旧地址 308 到 `/lab/approach`，
+>   液态金属起序号各前移一位。上面 08-25 补记里关于第五则的段落作历史留着。
+>   第四则「长出来的」不并：它是同一片苔藓的另一份驱动（`GroveDemo.tsx`，相机按树根半径解距离、
+>   三幕挂滚动条、可换季），和首页那份（`GroveScene.tsx`，一世界单位 = 一 CSS 像素、钉在 stage
+>   网格上、跑在时钟上）坐标系不同，卡片钉不进去。**两份 1400 行的渲染代码是下一个该收拢的重复。**
+> - **同日补：「磁吸与描边」拆成两则，磁吸修了两个毛病，实验室二十二则**。`/lab/magnetic` 只剩
+>   三颗按钮，`/lab/glint`（第 13 则，`GlintDemo.tsx`）单独放那张卡；两者机制无关，合在一页只是
+>   都「跟指针」。磁吸的毛病用 CDP 驱动真鼠标量出来的：`Magnetic` 把监听挂在会被 transform 的那层，
+>   ×0.75 时盘子连内层走光标偏移的 1.2 倍、跑得比光标快，光标永远压在它身上，pointerleave 不来，
+>   一颗按钮被拖到离静止位 312px；临界处离开 / 进入来回翻就是抖。改成三层：最外层从不动，只监听
+>   和量盒子，外套 `MAGNET_REACH`（20px）的命中圈；盘子、内层各自 tween。「还在不在」在 pointermove
+>   里按静止盒子加圈算，出圈即松手，与盘子位置无关。demo 把这圈画成虚线。
+> - **同日补：一则只放一种效果，实验室三十三则**。用户定的规矩：**不同的效果不混在一页**——两片点阵、
+>   三种进场、贴纸的三态、壳层的七样，和先前的磁吸与描边一样，合在一页只是「都属于某一类」，机制
+>   互不相干，读者拿到的是一份没人要的对比。于是 `entrances` 拆成报头的行遮罩 / y:24 揭示 / 标题的
+>   解码与揭示（11–13），`stickers` 拆成模切白边 / 贴纸墙 / 撕开的贴纸（16–18），`particles` 拆成
+>   散开又聚回的字 / 噪点里的名字（19–20），`shell` 拆成开灯 / 阅读进度 / 扇形菜单 / 开灯仪式 /
+>   推门 / 换页的雾 / 灵动岛（23–29）；四个混合 demo 文件删除，十五个单效果 demo 共用一个
+>   `StudyPanel.tsx`（一屏高、带色点的标签、下方 hint 与触屏说明，以及 `.spn-btn` / `.spn-body` /
+>   `.spn-arrow` 三个小件）。壳层里的灵动岛以前是「不进实验室」，现在自己一则：它就在这一页头顶，
+>   面板做高一点让人有距离可滚，不用挂任何东西；推门（`forgetSplash` 后整页回首页）与第 08 则霓虹
+>   招牌分开——招牌是画法与点亮，推门是穿过圆环那一下。没拆的两则：Flip 筛选重排是同一个机制的
+>   两处用法，空气的光晕与纸纹本来就是一层叠一层出现的，控件用来把其中一层拿掉看另一层。旧地址
+>   `/lab/entrances`、`/lab/stickers`、`/lab/particles`、`/lab/shell` 从未上线，不留 308。
+> - **同日补：索引分三架、每则给上一则 / 下一则，两处小修**。三十三行平铺成一列（4800px）读不出
+>   目录里本来就有的三段，索引改按 `LabEntry.group`（`piece` / `site` / `shell`，`LAB_GROUPS` 定
+>   顺序）分三架，每架一个 mono 标题、一句话、右侧序号范围（01–09 / 10–26 / 27–33）；为此把铜像、
+>   空气、履历、放映厅四则挪到壳层之前（23–26），壳层七则落 27–33，slug 不变，旧序号的交叉引用
+>   （第 08 则、第 15 则、第 21 则）都不受影响；`lab.test.ts` 查每架连成一段、顺序同 `LAB_GROUPS`、
+>   两份文案都有 title / lede。研究页源码列表之下加 `labNeighbours()` 给的上一则 / 下一则（序号 +
+>   名字），系列能顺着读，不用回索引。两处修：`.lab-tagline` 的 `white-space: nowrap` 在 390px 上把
+>   副标裁掉（霓虹那则的英文副标 658px 宽，桌面 720 版心也放不下），改成能换行、
+>   `overflow-wrap: anywhere`；源码路径手机上不再截断。`sectionMetadata` 不给 subtitle 传值，
+>   `{count}` 版副标题一进库 description 就会变成 `lab.subtitle`，加了第三个参数。库里 `lab.subtitle`
+>   还是「十则」（备份已改、没导入），这次 `db:import` 了；线上要在 /admin 存一次冲缓存，或等下次部署。
+> - **同日补：三十六则，「同属一类也不混」，看不清的则做明显，页头链源码**。用户重申三条：一则一种
+>   效果、哪怕同属一类也不混；每则效果要明显；每则链到 GitHub 源码。据此把先前留着的三则拆开：Flip
+>   拆成「分段控件的药丸」（23，`SegmentedDemo`，只挂 `SegmentedFilter`）与「筛选重排」（24，
+>   `ReshuffleDemo`，筛选按钮故意是普通按钮，不带会滑的指示器）；空气拆成「光晕」（26）与「纸纹」
+>   （27，`GrainDemo`，台子铺一层柔和渐变，关掉纸纹看色带）；标题拆成「标题的解码」（13，只剩拉丁
+>   标题）与「中文标题的行遮罩」（14，`UnmaskDemo`，版心压到 11ch 保证换行）。壳层落 30–36，
+>   推近的 kicker 改成 `第 {ordinal} 则` 由页面填序号，岛的 note 里「第 15 则」改 16。**没拆的**：
+>   霓虹招牌下的剧照墙是那间房的陈设而不是第二种效果；贴纸墙的入场 / 抖 / 扔是一面墙的三种举动；
+>   推近是首页二三幕的一段编排；履历的气泡是年份轨道的一个细节——都还是一件东西。
+>   **效果不明显的五则**（headless 截了 33 则各两张拼板审的）：开灯的拨杆在面板上只是一个点，
+>   `zoom: 2.5`；撕纸 `zoom: 1.6`；阅读胶囊 `zoom: 1.75`（`ReadingChip` 加 `className`）；扇形菜单
+>   桌面上 `md:hidden` 根本不显示，`RadialFab` 加 `always` 让则里所有宽度都挂；换页的雾原来是一个
+>   去关于页的链接，点了就离开——`RouteTransition` 对指向本页的链接直接放行，所以加了
+>   `lib/veil.ts` 的 `fhfs:veil-replay` 事件：只在 idle 时受理，cover → 停 350ms → reveal，就地演、
+>   不 push、不滚回顶部；糊上的途中若点了站内链接，链接赢——转成一次真的换页，照常回顶（实测）。用 `zoom` 而不是 `transform: scale`：CSS 过渡随之缩放且不占错布局；
+>   GSAP 动的东西（Flip、SplitText）不用 zoom，getBoundingClientRect 与 transform 在 zoom 下不同尺。
+>   **源码**：页头摘要下加「源码 · GitHub ↗」链到 `sources[0]`（demo 自己的文件），页尾清单照旧。
+>   索引三架变成 01–09 / 10–29 / 30–36。
+
+> **2026-09-19 补记（实验室 24–27：让人看得懂每则在演什么；顺手修掉 /software 的重排 bug）**
+> - **来由**：筛选重排、铜像、光晕、纸纹四则打开只有一块台子和没名字的控件，看不出效果是什么、该做什么。
+> - **共用的三样东西**进了 `StudyPanel`：`lede`（标签下一句「在这里做什么、看什么」）、`.spn-field`
+>   （控件上方印名字）、`.spn-readout`（台子**上方**一行大白话，随当前设置变——说的是「现在看到的是什么」）。
+>   四则的 `summary` 同步改成不带术语的写法，术语留在 `note`。
+> - **24 筛选重排**：多一排「站上原速 / 慢放 4 倍 / 关掉动画」——不是第二个效果，是同一个效果的慢放和缺席
+>   （光晕、纸纹的「关掉」同理）；读数报上一次点击留下 / 淡入 / 淡出各几块；网格定成三行高、底下垫九个
+>   虚线空位，能看出从哪格滑到哪格，下面的内容也不再跳。
+> - **重排 bug（线上也有）**：`/software` 选「桌面应用 → 工具 → 全部」后有一张卡片留着
+>   `visibility: hidden` 和位移——网格里一个看不见的洞。根因是 `revertOnUpdate`：回滚一个**已播完**的
+>   Flip 时，进场那条 `fromTo` 把它创建时（Flip 中途）记下的内联样式写了回来。改法在 `src/lib/flipGrid.ts`：
+>   `captureGrid` 在点击里先 `Flip.killFlipsOf(items, true)` 走完、`killTweensOf`、`clearProps`，再
+>   `getState`；`playGrid` 播放；两处都不再用 `revertOnUpdate`。高度那条 tween 由 `SoftwareGallery` 自己
+>   `killTweensOf(grid)`。顺序、慢放、关动画、中途切换、连点都实测回到原位。
+> - **25 铜像**：两个卖点在偶像页上都看不见，所以 `KobeStatue` 加了两个只给实验室用的可选入参——
+>   `wire`（线框，能数出胶囊体）和 `onFrame`（每真画一帧回调一次）。`StatueDemo` 的帧数表直接写 DOM，
+>   不走 React 状态。实测：入场后停住，静止时一帧不涨，转一下才涨。
+> - **27 纸纹的放大镜**：台子的两层再摆一遍、绕小圆圈那点放大 4 倍。只放大尺寸不够——2.5% 的对比放大了
+>   也看不见——所以镜内纸纹强度再 ×8，标签如实写「放大 4 倍 · 对比 ×8」。台子用 `container-type` +
+>   固定宽高比，镜内复制品靠 `100cqw` 还原尺寸；`cqw` 量的是内容盒，所以台子不设 padding，由玻璃卡的 margin 顶。
+> - **顺带发现、没动**：纸纹的 SVG 没有固有尺寸、`background-size` 是 `auto`，浏览器按 contain 把它拉满
+>   整个 300% 的层再平铺——实际不是 250px 的小平铺，噪点被放大了约 10 倍（颗粒约 10–15px 的软斑）。
+>   改成 `background-size: 250px` 会变成细颗粒、位图也小得多，但这是全站观感的改动，留给下次决定。
+
+> **2026-09-19 补记之二（实验室撤掉三则，剩 33 则）**：用户看过之后觉得「翻得动的影集」（原 09）、
+> 「光晕」（原 26）、「纸纹」（原 27）没什么用，删。随之删掉 `AlbumDemo` / `AuroraDemo` / `GrainDemo`、
+> 只有影集在用的 `lib/pageCurl.ts` 及其测试、三则的中英文案；序号顺排，三架变成 01–08 / 09–26 / 27–33；
+> 旧地址 `/lab/album|aurora|grain` 在 `next.config.ts` 里 308 到 `/lab`。站上的光晕层和纸纹层本身
+> 没动——删的只是讲解它们的那两则。上一条补记里「26 光晕」「27 纸纹的放大镜」两段作历史留着；
+> 纸纹 SVG 被拉满平铺的那条发现仍然成立、仍未处理。
+
+> **2026-09-18 补记（照「网页动效词典」过了一遍：补的是反馈与输入方式，不是新效果）**
+> - **来由**：Punk 的三篇《Vibe Coding 网页动效词典》（56 词，四层：工具 / 触发方式 / 动效类型 / UX 规则）。
+>   第三层的词站上几乎都已经有了（对照见下），所以没有加任何新效果；动的全在第四层——
+>   Feedback、Focus、Input modality——和两条第三层的「用法」（Stagger 别排队、布局过渡别让容器塌）。
+>   往后描述一个动效，按词典的四件事说：**谁触发 → 怎么动 → 结束/离开后怎样 → 键盘和触屏怎么替代**。
+> - **改了的**（每条都在浏览器里量过）：
+>   - `Reveal` / `REVEAL_VARS`：`autoAlpha` → `opacity`。autoAlpha 多出来的 `visibility: hidden` 把折线以下
+>     的内容全部踢出 Tab 序、无障碍树和页内查找（/moments 加载时 242 个元素、36 个控件里的 32 个）；
+>     键盘因此不滚动，不滚动就永不入场。§1.5 写的本来就是 `opacity:0`。
+>   - `Reveal` 的 stagger 只排前 12 个孩子（`STAGGER_TURNS`），其余跟在第 12 个后面一起进：列表只有
+>     一个触发点，78 条 × 0.05s 让跳到年尾的读者对着空白等 4.25s。
+>   - `SoftwareGallery`：Flip 的 `absolute: true` 期间网格高度是 **0**（实测），页脚先跳上来再弹回去。
+>     现在高度由一条补间端着（点击时先读高度、再 `getState`——后者会把还在跑的 flip 直接走完），由
+>     flip 自己的 `onComplete` 松手，因为 stagger 让 flip 比补间长。
+>   - `globals.css`：`:focus-visible` 的 `border-radius: 2px` 挪进 `@layer base`。未分层时它压过所有
+>     `rounded-*`——键盘一聚焦，圆按钮变方、药丸掉角。描边本身仍不分层。
+>   - `Header`：Esc 只在焦点位于岛内时才收岛。宽屏上岛默认展开，这个监听在每一页都活着：原先在任何
+>     地方按 Esc 都会收岛并把焦点抢到汉堡，它的 `preventDefault` 还会拦住放映厅 `<dialog>` 的关闭。
+>   - `RadialFab`：「链接已复制」除了 live region 再加一枚看得见的玻璃小签（加号左侧，两秒，重复复制
+>     只续时不叠加）；收扇时若焦点在四颗按钮上，交还给加号（它们收尾是 `visibility: hidden`）。
+>   - `MomentBoard`：全站唯一的展开/收起不再硬跳——高度 0.35s 补间，收起途中用内联
+>     `-webkit-line-clamp: unset` 把省略号留到落定；按钮加一枚会转向的 `↓`。
+>   - `Workstation`：右下角两颗箭头（一次 π/4，与拖拽同一个 `targetY`），给键盘和正在滚页面的拇指；
+>     从按钮/署名链接上起的按压不再开始拖拽；缩放顶到头之后滚轮还给页面（捏合除外）。
+>   - `FilmStills` 退场时画框缩回 0.96（进来的路倒着走）；`AlbumDemo` 的指针倾斜不理 touch；
+>     `AppCard` / `MiniBento` 的悬停抬升补上键盘的那一半（`group-has-[:focus-visible]` / `focus-visible`）。
+> - **看过、决定不动的**：Reduced motion（词典 55）不扩——§1.5 的例外清单照旧，工作台的空转因此
+>   仍无停止键，是已知的取舍；共享元素转场（50）会和 `RouteTransition` 的状态机抢同一次导航；
+>   数字滚动（44）、光标跟随/拖尾（31/34）、打字机（18）、跟随眼睛（33）站上没有合适的位置，
+>   不为凑词条而加；`FullNav` 那颗只在键盘聚焦时显形的关闭键是有意的；浏览器后退不走帘幕也是有意的。
+> - **词典 → 本站**（第三层，站上已有的）：Line reveal=报头/中文标题行遮罩 · Character reveal=横向宣言逐字 ·
+>   Scramble=拉丁标题解码 · Stagger/Fade/Slide=`Reveal` · Blur+Scale=帘幕与面板的 materialize ·
+>   Clip-path reveal=开灯仪式、推近的窗 · Mask reveal≈溶解着色器 · Horizontal scroll=横向宣言 ·
+>   Scroll zoom=推近 · Sticky scrollytelling=版本履历 · Image sequence=滚动即播放 · Scroll snap=手机软件横滑 ·
+>   Progress indicator=阅读胶囊 · Magnetic=磁吸 · Spotlight=描边的灯 · Pointer-reactive=散字、点阵名 ·
+>   3D（拖着转，不是跟着指针转）=工作台、铜像 · Modal=放映厅、全屏菜单 · Tab=分段药丸 ·
+>   Carousel=放映厅、镜头滑块、影集 · Icon morphing=汉堡→叉、加号→叉 · Layout animation=筛选重排 ·
+>   Page transition=换页的雾 · Toast=扇形菜单的小签 · Accordion=说说的折叠。
+
 > **2026-09-17 补记（工程化整理：把「靠人记」的规矩换成机器查的）**，接着当天「内容 hash 地址」那条：
 > - **同一类问题的排查结论**：两样东西必须一致、却只靠人保持一致的地方，当时全部是对的，但没有一处
 >   有东西盯着。现在盯着的：代码里写的图片宽高 ↔ 真实文件、剧照清单 ↔ 目录、帧数 ↔ 帧文件
@@ -776,11 +923,13 @@ export const EASE = {
 - **全站单一动效版本，不再按 `prefers-reduced-motion` 分档**（2026-08-04 决策，取代原「每个动效组件内建 reduce 分支」的规则）。
   原因是实测的误伤面：Windows 上该信号写作「显示动画」，被「轻松使用」开关、**性能选项 →「调整为最佳性能」**、节电模式任意一个关掉都会置为 `reduce`。这批访客从未表达过「少一点动效」，却拿到一个残缺版本且无从察觉——`/intro` 直接退化成纯文字简历，而这张脸就是那一页的全部内容。
   这条规则覆盖**所有**表达方式，包括 Tailwind 的 `motion-reduce:` 变体——它编译出来就是 `@media (prefers-reduced-motion: reduce)`。首次执行时漏掉了这一类（只 grep 了 `prefers-reduced-motion` 字面量），复查时补删 9 处；以后加动效不要再引入。
-- **唯一例外：停不下来的那几处**（2026-08-05 补回）。判据只有三个字：**循环、大面积、夺走滚动**。WCAG 2.2.2（Pause, Stop, Hide）要求超过 5s 的自动运动必须可停，而浏览器只给了 `prefers-reduced-motion` 这一个信号——全删等于把「不能停」写死。当前落在例外里的一共五处，不要再扩：
+- **唯一例外：停不下来的那几处**（2026-08-05 补回）。判据只有三个字：**循环、大面积、夺走滚动**。WCAG 2.2.2（Pause, Stop, Hide）要求超过 5s 的自动运动必须可停，而浏览器只给了 `prefers-reduced-motion` 这一个信号——全删等于把「不能停」写死。当前落在例外里的就是下面这几类，不要再扩（`src/lib/gsap.ts` 的注释按「处」数是六处：三条 CSS 循环、DotDoodle、SmoothScroll、OvertureLight；2026-09-18 补记：首页苔藓上线后，它按同一判据也在其内，见末条）：
   - CSS，globals.css 里同一个 media block：`.aurora-blob`、`.grain-layer`、`.pulse-stepped` → `animation: none`。光、纸和滚动提示都还在，只是不动。
+  - `DotDoodle`：无尽的点阵 canvas，命中时停在静帧。
   - `SmoothScroll`：Lenis 惯性滚动是全站唯一的滚动劫持，前庭风险最高。命中时直接不创建实例；所有 `window.__lenis` 消费方本来就写了原生滚动回退。
     但**回退本身必须是中性的**：没有 lenis 就等于命中了 reduce，此时 `window.scrollTo({behavior:'smooth'})` 反而比被拒掉的惯性走得更远（长文回顶是整页扫过）。`RadialFab.toTop` 因此显式给 `behavior: prefersReducedMotion() ? 'auto' : 'smooth'`——这不是第六处例外，是这一处例外的落地补正，别照着它往别处加分支。`RouteTransition` 的 `window.scrollTo(0, 0)` 是两参数瞬时形式，本来就中性；全站没有 CSS `scroll-behavior: smooth`，加之前先确认这一点还成立。
   - `OvertureLight`：0.9s 不透明全屏黑幕 + 滚动锁 + 抢焦点。命中时走 `finishInstant()`，并**顺手写掉 session key**——HomeHero 靠这把钥匙判断接力不会来了，不写就会空等 8s 安全超时，首屏一片空白。
+  - 首页苔藓（`components/grove`）：整屏、无尽循环，按判据就在例外里——`GroveScene` 与 `LiquidPill` 命中时时钟不走（风、蝴蝶、花粉停住，画面还在）。这两处**不**调 `prefersReducedMotion()`，而是自己握着 MediaQueryList：它们每帧都读，访客中途改系统设置也要立刻生效，不能靠重挂。`GroveApproach` 的卡片指针视差是一次性判断，走统一谓词。
   入场、揭幕、路由帘幕、hover、pin/视差**一律不在例外里**：它们是一次性的，不属于「停不下来」那一类。`/intro` 的 3D 也不在（那张脸就是那一页的全部内容）。谓词统一用 `prefersReducedMotion()`（`src/lib/gsap.ts`），别在组件里再散写 media query。
   仍然保留的降级信号（它们是明确意图，不是提速副作用）：`navigator.connection.saveData`（JS 侧，跳过两个 3D 场景，即真正的流量大头）、`hasWebGL()`、`(hover: hover) and (pointer: fine)`（悬停类效果）、`(min-width: 768px)`（pin/视差）。
   CSS 侧的 `prefers-reduced-data` 已删掉：MDN 明说 not supported by any user agent，那条规则从未生效过，留着只会让人以为 aurora 有开关。省流量归 `prefersSaveData()`。
@@ -907,7 +1056,8 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
   `dynamicParams = false`。Next 会把它 AND 到整条路由上，加在 `[locale]/layout.tsx`
   就等于把每一层嵌套动态段都钉成「没预渲染就 404」——而内容在库里，两次部署之间会长
   出新文章，必须能在首次请求时渲染。未知 slug 由页面里的 `notFound()` 兜底。
-  唯一的例外是 `/lab/[slug]`：那是一份写死在代码里的清单，它确实关掉了 dynamicParams。
+  例外只有两个：`/lab/[slug]` 与 `/films/[slug]`——都是写死在代码里的清单，
+  不从库里长，它们确实关掉了 dynamicParams。
 - 导航一律 `@/i18n/navigation` 的 Link/useRouter/usePathname（勿直接 next/link）。
 - 每个 page/generateMetadata：`hasLocale` 校验 + `setRequestLocale(locale)`；翻译用 `getTranslations`/`getFormatter`。
 - `'use client'` 只加在交互/GSAP 组件；页面文件保持 Server Component。
@@ -928,7 +1078,7 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 
 ### 5.3 性能预算
 
-LCP ≤1.8s（hero 纯文字）；INP <200ms；滚动 60fps：只动 transform/opacity，backdrop-filter 仅入退场瞬时；首页 JS <180KB gz（three.js 移出首页）；aurora 纯 CSS；canvas 增强层「静止停在最后一帧、零持续开销」（评审嫁接的通用验收项）。
+LCP ≤1.8s（hero 纯文字）；INP <200ms；滚动 60fps：只动 transform/opacity，backdrop-filter 仅入退场瞬时；脚本体积按 `scripts/smoke.mts` 的 `SCRIPT_BUDGET_KB` 卡（生产构建、网络上的字节数、懒加载的块也算；2026-09-19 实测 +一成：首页 660KB、three.js 场景页 740KB、其余 450KB——原先写的「首页 JS <180KB gz」从没量过，实际是它的三倍，作废）；aurora 纯 CSS；canvas 增强层「静止停在最后一帧、零持续开销」（评审嫁接的通用验收项）。
 
 ### 5.4 HTML-in-Canvas（P4 纯增强）
 

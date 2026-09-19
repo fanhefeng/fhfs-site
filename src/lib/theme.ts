@@ -13,6 +13,22 @@ export type Theme = "dark" | "light";
  *  repeat this string literally — it is inlined raw into the HTML. */
 export const THEME_STORAGE_KEY = "fhfs-theme";
 
+/** `--bg` in each theme (globals.css), for the browser's own chrome: the
+ *  layout's `theme-color` metas are written from this. */
+export const THEME_COLOR = { light: "#faf9f6", dark: "#0e0e11" } as const;
+
+/**
+ * The layout ships one `theme-color` per `prefers-color-scheme`, which is
+ * right until the reader flips the light by hand — the metas go on answering
+ * for the OS. Writing the chosen colour into every one of them makes the
+ * media queries moot, so the address bar follows the room.
+ */
+export function paintBrowserChrome(theme: Theme): void {
+  for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+    if (meta.content !== THEME_COLOR[theme]) meta.content = THEME_COLOR[theme];
+  }
+}
+
 export const readTheme = (): Theme =>
   typeof document !== "undefined" && document.documentElement.dataset.theme === "dark"
     ? "dark"
@@ -29,6 +45,7 @@ export function toggleTheme(): void {
   const apply = () => {
     const next: Theme = readTheme() === "light" ? "dark" : "light";
     document.documentElement.dataset.theme = next;
+    paintBrowserChrome(next);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {

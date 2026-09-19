@@ -1,0 +1,177 @@
+"use client";
+
+import { useRef } from "react";
+import { gsap, useGSAP, ScrollTrigger, SplitText, EASE } from "@/lib/gsap";
+import { REVEAL_VARS } from "@/components/fx/Reveal";
+
+// Referenced so bundlers keep the plugins; registration lives in @/lib/gsap.
+void ScrollTrigger;
+
+/** The band only takes over the screen where a pin is comfortable: wide
+ *  enough, and steered by a mouse or trackpad — a finger on an iPad held
+ *  upright (768–820px) fights a pinned sideways run as much as one on a
+ *  phone does. The two queries have to partition every device with nothing
+ *  between them, so the second is the negation of the first (`not` negates
+ *  the whole query) rather than a hand-picked bound: any
+ *  `max-width` twin leaves a sliver — 767.98px still misses (767.98, 768) —
+ *  and a fractional viewport is ordinary (browser zoom, non-integer DPR).
+ *  A width that matched neither would drop the band into no branch at all:
+ *  no pin, not even the calm fade-up, just inert SSR markup while the rest of
+ *  the page animates around it. */
+export const PINNED = "(min-width: 768px) and (hover: hover) and (pointer: fine)";
+export const CALM = `not all and ${PINNED}`;
+
+export type SidewaysLine = {
+  text: string;
+  /** BCP-47 tag when the line is not in the page's language, so the CJK
+   *  tracking guard in globals.css picks the right rule. */
+  lang?: string;
+  /** Type classes for this line. */
+  className?: string;
+};
+
+type Props = {
+  lines: SidewaysLine[];
+  /** Re-split when this changes — a locale switch changes every glyph. */
+  resplitKey?: string;
+  className?: string;
+};
+
+/**
+ * The sideways passage (after the GSAP demo MYyBrZw): vertical scroll mapped
+ * 1:1 onto the horizontal travel of an oversized line.
+ *
+ * On a desktop pointer the section pins for one screen and the track slides
+ * left as the reader scrolls down; every character rides its own
+ * ScrollTrigger — with `containerAnimation` set to the horizontal tween, so
+ * "left 100% → left 40%" means *horizontal* progress — and tumbles back from
+ * a random height and angle as it crosses the stage. The sentence assembles
+ * itself as you read it, and disassembles if you scroll back.
+ *
+ * Everything that makes it a band (full-height stage, max-content track, the
+ * 100vw run-up) is written by GSAP inside the matchMedia branch, so the SSR
+ * markup — and every mobile visitor — gets a plain centered statement that
+ * simply fades up. matchMedia reverts those inline styles when the query
+ * stops matching, and `revertOnUpdate` re-splits on `resplitKey`.
+ *
+ * Why a ScrollTrigger pin here, when the home cover pins with CSS sticky: the
+ * travel *is* the overflow. The pin distance is read off the track's own
+ * width, and only ScrollTrigger can make one scroll pixel equal one pixel of
+ * sideways travel (a linear ease, `EASE.linear`, is what keeps them equal).
+ */
+export function SidewaysBand({ lines, resplitKey, className }: Props) {
+  const container = useRef<HTMLElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const root = container.current;
+      const wrapper = wrapperRef.current;
+      if (!root || !wrapper) return;
+      const q = gsap.utils.selector(container);
+      const stage = q<HTMLDivElement>(".band-stage")[0];
+      const track = q<HTMLDivElement>(".band-track")[0];
+      const texts = q<HTMLElement>(".band-text");
+      if (!stage || !track || texts.length === 0) return;
+
+      const mm = gsap.matchMedia();
+
+      // Small screens and touch: the site-wide reveal, nothing else. A pinned
+      // sideways run is miserable under a finger.
+      mm.add(CALM, () => {
+        gsap.from(texts, {
+          ...REVEAL_VARS,
+          stagger: 0.1,
+          clearProps: "transform,opacity,visibility",
+          scrollTrigger: { trigger: root, start: "top 80%", once: true },
+        });
+      });
+
+      mm.add(PINNED, () => {
+        // Band layout — inline styles only, reverted with the query.
+        gsap.set(stage, {
+          height: "100svh",
+          display: "flex",
+          alignItems: "center",
+          overflow: "hidden",
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingLeft: 0,
+          paddingRight: 0,
+        });
+        gsap.set(track, {
+          display: "flex",
+          alignItems: "baseline",
+          gap: "4vw",
+          width: "max-content",
+          maxWidth: "none",
+          marginLeft: 0,
+          marginRight: 0,
+          paddingLeft: "100vw",
+          paddingRight: "22vw",
+          whiteSpace: "nowrap",
+        });
+        gsap.set(texts, { marginTop: 0 });
+
+        // Horizontal overflow becomes the pin distance, so travel speed
+        // equals scroll speed (ease "none" is required for that).
+        const dist = () => Math.max(1, track.scrollWidth - stage.clientWidth);
+        const scrollTween = gsap.to(track, {
+          x: () => -dist(),
+          ease: EASE.linear,
+          scrollTrigger: {
+            trigger: wrapper,
+            start: "top top",
+            end: () => "+=" + dist(),
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // Split words as well as chars: words keep the line unbreakable for
+        // CJK and latin alike, chars are what tumble.
+        const split = SplitText.create(texts, { type: "chars,words" });
+        split.chars.forEach((char) => {
+          gsap.from(char, {
+            yPercent: "random(-200,200)",
+            rotation: "random(-20,20)",
+            ease: EASE.momentum,
+            scrollTrigger: {
+              trigger: char,
+              containerAnimation: scrollTween,
+              start: "left 100%",
+              end: "left 40%",
+              scrub: 1,
+            },
+          });
+        });
+
+        return () => split.revert();
+      });
+    },
+    { dependencies: [resplitKey], scope: container, revertOnUpdate: true },
+  );
+
+  return (
+    <section ref={container} className={`relative ${className ?? ""}`}>
+      {/* Pin wrapper — no transform of its own, so pinning stays exact. */}
+      <div ref={wrapperRef}>
+        <div className="band-stage px-6 py-24 md:py-32">
+          <div className="band-track mx-auto w-full max-w-[680px]">
+            {lines.map((line, i) => (
+              <p
+                key={`${i}-${line.text}`}
+                lang={line.lang}
+                className={`band-text block ${line.className ?? ""}`}
+              >
+                {line.text}
+              </p>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

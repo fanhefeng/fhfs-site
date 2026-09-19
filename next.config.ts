@@ -70,6 +70,21 @@ const nextConfig: NextConfig = {
         destination: "/:locale/software",
         permanent: true,
       },
+      // The stage study — two cards in the moss — was folded into the
+      // approach, which already stood the same two cards at the same
+      // coordinates.
+      {
+        source: "/:locale(zh|en)/lab/grove-stage",
+        destination: "/:locale/lab/approach",
+        permanent: true,
+      },
+      // Three studies were retired — the album, the glow, the grain. Their
+      // addresses land on the index rather than on a 404.
+      {
+        source: "/:locale(zh|en)/lab/:slug(album|aurora|grain)",
+        destination: "/:locale/lab",
+        permanent: true,
+      },
       // The 大话西游 room moved into the films room when the second film
       // arrived; its old address still opens it.
       {

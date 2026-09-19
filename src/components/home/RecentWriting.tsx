@@ -5,6 +5,8 @@ import { SectionHeader } from "./SectionHeader";
 export type WritingItem = {
   slug: string;
   title: string;
+  /** Set when the title is the other language's (a fallback post). */
+  lang?: string;
   /** Pre-formatted, mono-friendly: 2026.03.14 */
   date: string;
   /** Pre-translated "6 min read" — the page owns the pluralisation. */
@@ -48,7 +50,10 @@ export function RecentWriting({ items, title, viewAllLabel, index }: Props) {
               href={`/blog/${item.slug}`}
               className="group flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-4"
             >
-              <span className="flex-1 text-heading underline decoration-transparent decoration-1 underline-offset-4 transition-colors duration-[250ms] group-hover:decoration-accent">
+              <span
+                lang={item.lang}
+                className="flex-1 text-heading underline decoration-transparent decoration-1 underline-offset-4 transition-colors duration-[250ms] group-hover:decoration-accent"
+              >
                 {item.title}
               </span>
               <span className="flex shrink-0 items-baseline gap-3 font-mono text-meta text-fg-tertiary">

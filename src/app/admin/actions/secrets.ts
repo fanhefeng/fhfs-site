@@ -9,7 +9,14 @@ import { intField, parseLocale, str, validDate, validKey, validLink } from "@/li
 import { renderMarkdown } from "@/lib/markdown";
 import { readingMinutes } from "@/lib/reading";
 import { TAGS } from "@/lib/content";
-import { invalidate, SESSION_EXPIRED, DATE_ERROR, linkError, type ActionState } from "./shared";
+import {
+  invalidate,
+  SESSION_EXPIRED,
+  DATE_ERROR,
+  goneError,
+  linkError,
+  type ActionState,
+} from "./shared";
 
 export async function saveSecret(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
@@ -70,13 +77,15 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
       return { error: `slug 已存在：${locale} 下已经有「${slug}」了，换一个或去编辑原文。` };
     }
   } else {
-    await db
-      .insert(schema.secrets)
-      .values(row)
-      .onConflictDoUpdate({
-        target: [schema.secrets.slug, schema.secrets.locale],
-        set: { ...row, updatedAt: new Date() },
-      });
+    // The edit form's promise is that the row exists — so an UPDATE, not an
+    // upsert: a form left open past a delete in another tab gets told, rather
+    // than quietly bringing the secret back (published, if draft was off).
+    const updated = await db
+      .update(schema.secrets)
+      .set({ ...row, updatedAt: new Date() })
+      .where(and(eq(schema.secrets.slug, slug), eq(schema.secrets.locale, locale)))
+      .returning({ id: schema.secrets.id });
+    if (!updated.length) return goneError(`${slug}.${locale}`);
   }
 
   invalidate(TAGS.secrets);
@@ -93,4 +102,6 @@ export async function deleteSecret(form: FormData): Promise<void> {
     .delete(schema.secrets)
     .where(and(eq(schema.secrets.slug, slug), eq(schema.secrets.locale, locale)));
   invalidate(TAGS.secrets);
+  // Same as deletePost: the page this was pressed on no longer has a row.
+  redirect("/admin/secrets");
 }

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { ReactNode, Ref } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/gsap";
 
 type Props = {
   children: ReactNode;
@@ -23,16 +23,34 @@ type Props = {
  * The site-wide entrance values (DESIGN.md §1.5), exported for the places
  * that cannot use the component — nested targets, matchMedia gates — yet
  * must stay on the same motion grammar.
+ *
+ * `opacity`, and deliberately not `autoAlpha`. The extra thing autoAlpha does
+ * is `visibility: hidden`, and what has not entered yet is everything below
+ * the fold: hidden that way it left the tab order, the accessibility tree and
+ * find-in-page — a keyboard went from the first screen straight to the
+ * footer, and since nothing had scrolled, nothing was ever revealed for it.
+ * Transparent content can still take the focus, the browser scrolls to what
+ * is focused, and the scroll is what plays the entrance.
  */
 export const REVEAL_VARS = {
   y: 24,
-  autoAlpha: 0,
+  opacity: 0,
   duration: 0.6,
-  ease: "power2.out",
+  ease: EASE.soft,
 } as const;
 
 /** Where the entrance fires: once, when the trigger's top clears 85%. */
 export const REVEAL_START = "top 85%";
+
+/**
+ * How many children of a staggered list take their turn. The list enters on
+ * one trigger — its own top — so the delays run on down rows nobody has
+ * reached yet: a year of seventy-eight moments at 0.05s kept its last entry
+ * invisible for four seconds after the reader had jumped to it. The first
+ * dozen are the ones a screen can hold, and they keep the cascade; the rest
+ * arrive together on the dozen's heels.
+ */
+const STAGGER_TURNS = 12;
 
 /**
  * The one scroll entrance of the site: y:24 / opacity:0 → 0.6s power2.out,
@@ -56,7 +74,7 @@ export function Reveal({ children, as = "div", className, stagger, role }: Props
       const targets: gsap.TweenTarget = stagger != null ? Array.from(el.children) : el;
       gsap.from(targets, {
         ...REVEAL_VARS,
-        stagger: stagger ?? 0,
+        stagger: stagger != null ? (i: number) => Math.min(i, STAGGER_TURNS) * stagger : 0,
         // Leave no inline residue once landed, so hover tweens and Flip
         // reads elsewhere see clean elements.
         clearProps: "transform,opacity,visibility",

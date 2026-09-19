@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { GLYPH_GRID, glyphFor } from "@/lib/dotGlyphs";
 import { parseColor, type Rgb } from "@/lib/canvasColor";
-import { prefersReducedMotion } from "@/lib/gsap";
+import { isFinePointer, prefersReducedMotion } from "@/lib/gsap";
 
 /** Gap between two glyph fields, in grid cells. Tighter than it looks: the
  *  rim below starves each field's edge, so the visual gutter runs wider than
@@ -248,6 +248,10 @@ type Props = {
  * It is a canvas that never stops, so it owes the same energy contract as the
  * two WebGL scenes: off screen or backgrounded it stops outright, and at rest
  * it samples at `IDLE_FPS` rather than at the display's refresh rate.
+ *
+ * Only a mouse (or pen) surfaces the name. Without a hovering pointer there is
+ * nothing to collapse the drift, so the field is drawn once, settled, and left
+ * still — a tap would only have flashed the name up and down.
  */
 export function DotDoodle({ text, className }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -325,8 +329,10 @@ export function DotDoodle({ text, className }: Props) {
 
     // An endless canvas loop owes the same reduce-motion contract as the CSS
     // loops and the scroll hijack (see lib/gsap.ts): here the field holds
-    // still and hover snaps between its two settled states.
-    const still = prefersReducedMotion();
+    // still and hover snaps between its two settled states. A device with no
+    // hovering pointer gets the same still field, and no hover at all.
+    const hoverable = isFinePointer();
+    const still = prefersReducedMotion() || !hoverable;
     /** Past every intro delay (≤ ~1.4s plus the 0.7s ramp). The old value of
      *  20 outlived every initial accent (born −10…0s, life 7–16s): each was
      *  retired-and-respawned at fade 0, a settled frame with no colour. */
@@ -463,7 +469,9 @@ export function DotDoodle({ text, className }: Props) {
     // the ResizeObserver below fires as soon as there is one.
     layout();
 
-    const onEnter = () => {
+    const onEnter = (e: PointerEvent) => {
+      // A finger on a laptop's touchscreen is not a hover.
+      if (e.pointerType === "touch") return;
       hovered = true;
       if (still) {
         hoverT = 1;
@@ -481,9 +489,11 @@ export function DotDoodle({ text, className }: Props) {
       }
       start();
     };
-    canvas.addEventListener("pointerenter", onEnter);
-    canvas.addEventListener("pointerleave", onLeave);
-    canvas.addEventListener("pointercancel", onLeave);
+    if (hoverable) {
+      canvas.addEventListener("pointerenter", onEnter);
+      canvas.addEventListener("pointerleave", onLeave);
+      canvas.addEventListener("pointercancel", onLeave);
+    }
 
     const ro = new ResizeObserver(() => {
       if (layout() && !running) redraw();

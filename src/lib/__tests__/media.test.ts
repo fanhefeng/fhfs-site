@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
 import { SECRET_STILLS } from "@/components/films/secretStills";
+import { LALA_STILLS } from "@/components/films/lalaStills";
 import { IDOLS } from "@/components/idols/entries";
 import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
-import { NEON_STILLS } from "@/components/lab/neonStills";
 import frames from "../../../public/lab/scroll-video/manifest.json";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -52,9 +52,9 @@ describe("the pictures listed in code", () => {
       items: SECRET_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
     },
     {
-      name: "neon stills",
-      dir: "lab/neon",
-      items: NEON_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
+      name: "lala stills",
+      dir: "films/lala",
+      items: LALA_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
     },
     { name: "kobe photos", dir: "idols/kobe", items: KOBE_PHOTOS },
   ];

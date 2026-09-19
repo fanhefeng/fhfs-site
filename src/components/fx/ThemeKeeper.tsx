@@ -1,7 +1,7 @@
 "use client";
 
-import { useLayoutEffect } from "react";
-import { THEME_STORAGE_KEY } from "@/lib/theme";
+import { useEffect, useLayoutEffect } from "react";
+import { THEME_STORAGE_KEY, paintBrowserChrome, readTheme } from "@/lib/theme";
 
 /** The stored choice, else — only when storage is unreadable — what <html>
  *  already carries, else the OS preference, else paper. */
@@ -61,6 +61,8 @@ export function ThemeKeeper() {
     const root = document.documentElement;
     const theme = resolve();
     if (root.dataset.theme !== theme) root.dataset.theme = theme;
+    // The metas are React's, re-rendered with <head>; same correction.
+    paintBrowserChrome(theme);
 
     // The same wipe takes `data-js` with it — the "scripting is on" flag the
     // pre-paint script stamps. Nothing else writes that one back, so after a
@@ -68,6 +70,24 @@ export function ThemeKeeper() {
     // rendered finished instead of animating in.
     if (!root.hasAttribute("data-js")) root.dataset.js = "";
   });
+
+  // A client navigation re-renders nothing up here, but it does replace the
+  // metas: every RSC response carries the viewport under a fresh key, so
+  // `theme-color` is re-mounted with the layout's per-OS values and a reader
+  // who flipped the light by hand got the OS colour back in the address bar
+  // on the next link. Repaint whenever <head> changes. `paintBrowserChrome`
+  // writes only on a mismatch, so its own write settles the observer.
+  useEffect(() => {
+    const repaint = () => paintBrowserChrome(readTheme());
+    const observer = new MutationObserver(repaint);
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["content"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   return null;
 }

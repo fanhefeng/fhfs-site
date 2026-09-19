@@ -23,6 +23,16 @@ const DEBUG_CLAUSE =
 /** Blocked storage (private mode, cookie policy) must not strand the page behind the wall: a throw reads as "seen". */
 export const SPLASH_INIT_SCRIPT = `(function(){var s="due";try{if(sessionStorage.getItem("${SPLASH_SEEN_KEY}"))s="seen"}catch(e){s="seen"}${DEBUG_CLAUSE}document.documentElement.dataset.splash=s})()`;
 
+/** Hand the key back: the next hard landing on the cover meets the door again.
+ *  The lab's shell study offers this as a button. */
+export function forgetSplash(): void {
+  try {
+    sessionStorage.removeItem(SPLASH_SEEN_KEY);
+  } catch {
+    /* Blocked storage already reads as seen; there is nothing to forget. */
+  }
+}
+
 /** True while the door still stands between the reader and the page. */
 export const splashDue = (): boolean => document.documentElement.dataset.splash === "due";
 
