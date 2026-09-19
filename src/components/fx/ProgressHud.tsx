@@ -25,7 +25,10 @@ export function ProgressHud() {
   return <ReadingChip key={pathname} />;
 }
 
-function ReadingChip() {
+/** The chip itself, exported for the lab's shell study, which mounts it on a
+ *  page that is not an article so the reader can see it work (and scales it
+ *  up through `className`). */
+export function ReadingChip({ className }: { className?: string } = {}) {
   const t = useTranslations("blog");
   const rootRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
@@ -87,7 +90,9 @@ function ReadingChip() {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={0}
-      className="liquid-chip pointer-events-none fixed bottom-5 left-5 z-40 flex select-none items-center gap-2.5 rounded-full px-3.5 py-2 opacity-0"
+      className={`liquid-chip pointer-events-none fixed bottom-5 left-5 z-40 flex select-none items-center gap-2.5 rounded-full px-3.5 py-2 opacity-0 ${
+        className ?? ""
+      }`}
     >
       {/* Hairline track + solid amber fill (brand color stays a solid layer;
           only the glass chip beneath it is translucent). */}
@@ -98,6 +103,7 @@ function ReadingChip() {
         />
       </span>
       <span
+        ref={pctRef}
         aria-hidden
         className="vibrancy min-w-[4ch] text-right font-mono text-[10.5px] tracking-[0.08em] [font-variant-numeric:tabular-nums]"
       >

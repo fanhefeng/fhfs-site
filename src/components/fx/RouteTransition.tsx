@@ -3,14 +3,17 @@
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { VEIL_REPLAY_EVENT } from "@/lib/veil";
 import { site } from "@/config/site";
 
 /** Veil frosting over the outgoing page. */
 const COVER_DURATION = 0.3;
 /** Incoming page materializing out of the frost. */
 const REVEAL_DURATION = 0.45;
+/** A replay in place (the lab's study) holds the frost this long before lifting. */
+const REPLAY_HOLD_MS = 350;
 /**
  * Hard ceiling on how long the veil may hang while we wait for the new
  * route to commit. A navigation that stalls, redirects to the same path, or
@@ -76,6 +79,8 @@ export function RouteTransition() {
       let timer: number | undefined;
       let locked = false;
       let pendingHref: string | null = null;
+      /** A replay in place: cover, hold, reveal — no push, no scroll to top. */
+      let replaying = false;
 
       /** The page body that materializes. Missing <main> = veil-only. */
       const page = () => document.querySelector("main");
@@ -113,6 +118,7 @@ export function RouteTransition() {
         tl?.kill();
         tl = null;
         pendingHref = null;
+        replaying = false;
         gsap.set(veil, { autoAlpha: 0, "--panel-blur": "0px" });
         gsap.set(wordmark, { autoAlpha: 0 });
         const main = page();
@@ -124,6 +130,9 @@ export function RouteTransition() {
       /** Push the latest pending destination and arm the stall net. */
       const commit = () => {
         clearTimer();
+        // A real navigation from here on, whatever raised the veil: the
+        // reveal must treat it as a new page and go to the top.
+        replaying = false;
         // Nothing is allowed to leave the veil up forever.
         timer = window.setTimeout(forceClear, NAV_TIMEOUT_MS);
         const href = pendingHref;
@@ -144,6 +153,8 @@ export function RouteTransition() {
         tl?.kill();
         phaseRef.current = "revealing";
         pendingHref = null;
+        const inPlace = replaying;
+        replaying = false;
 
         // New route, new top — but only when the committed URL has no
         // fragment. Next writes the new URL in an insertion effect and
@@ -153,7 +164,8 @@ export function RouteTransition() {
         // has already been put on the section they clicked. Resetting to 0
         // here used to yank every cross-page "/page#section" link back to the
         // top of the article. unlock() re-syncs Lenis to wherever we end up.
-        if (!window.location.hash) {
+        // A replay in place went nowhere, and stays where it was.
+        if (!inPlace && !window.location.hash) {
           // Lenis is stopped right now, hence `force`.
           const lenis = window.__lenis;
           if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
@@ -175,7 +187,7 @@ export function RouteTransition() {
           },
         });
 
-        tl.to(wordmark, { autoAlpha: 0, duration: 0.18, ease: "power1.out", overwrite: "auto" }, 0)
+        tl.to(wordmark, { autoAlpha: 0, duration: 0.18, ease: EASE.fadeIn, overwrite: "auto" }, 0)
           // The veil departs power3.in — lingers a beat, then snaps clear.
           .to(
             veil,
@@ -183,7 +195,7 @@ export function RouteTransition() {
               autoAlpha: 0,
               "--panel-blur": "0px",
               duration: REVEAL_DURATION,
-              ease: "power3.in",
+              ease: EASE.depart,
             },
             0,
           );
@@ -198,7 +210,7 @@ export function RouteTransition() {
             {
               scale: 1,
               duration: REVEAL_DURATION + 0.05,
-              ease: "power3.out",
+              ease: EASE.default,
               clearProps: "transform",
             },
             0,
@@ -223,6 +235,14 @@ export function RouteTransition() {
           onComplete: () => {
             tl = null;
             phaseRef.current = "covered";
+            // A replay with nothing to push: hold the frost a beat, then lift
+            // it here. A link clicked while it was frosting has set a
+            // destination, and that wins — the replay becomes a navigation.
+            if (replaying && !pendingHref) {
+              clearTimer();
+              timer = window.setTimeout(reveal, REPLAY_HOLD_MS);
+              return;
+            }
             commit();
           },
         });
@@ -233,12 +253,12 @@ export function RouteTransition() {
             autoAlpha: 1,
             "--panel-blur": targetBlur(),
             duration: COVER_DURATION,
-            ease: "power3.out",
+            ease: EASE.default,
           },
           0,
         ).to(
           wordmark,
-          { autoAlpha: 1, duration: 0.28, ease: "power1.out", overwrite: "auto" },
+          { autoAlpha: 1, duration: 0.28, ease: EASE.fadeIn, overwrite: "auto" },
           0.05,
         );
       };
@@ -285,10 +305,19 @@ export function RouteTransition() {
         cover();
       };
 
+      /** The lab's study asks for the veil on the spot; only from rest. */
+      const onReplay = () => {
+        if (phaseRef.current !== "idle") return;
+        replaying = true;
+        cover();
+      };
+
       document.addEventListener("click", onClick, true);
+      window.addEventListener(VEIL_REPLAY_EVENT, onReplay);
 
       return () => {
         document.removeEventListener("click", onClick, true);
+        window.removeEventListener(VEIL_REPLAY_EVENT, onReplay);
         revealRef.current = null;
         forceClear();
       };

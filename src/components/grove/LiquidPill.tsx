@@ -132,7 +132,8 @@ export function LiquidPill({
       alpha: true,
       antialias: false,
       premultipliedAlpha: true,
-      powerPreference: "high-performance",
+      // Default power preference: a pill that paints only under the pointer
+      // has no business moving a two-GPU Mac onto the discrete chip.
     });
     if (!gl) return ctx.dispose;
 
@@ -302,6 +303,9 @@ export function LiquidPill({
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const addRipple = (x: number, y: number) => {
+      // Under reduced motion the clock does not turn, so a ripple would never
+      // age out and would hold the loop at full rate for good.
+      if (calm.matches) return;
       const r = slots[slotNext]!;
       slotNext = (slotNext + 1) % slots.length;
       r.x = x;
@@ -491,6 +495,9 @@ export function LiquidPill({
     };
     const onBlur = () => {
       on.focus = false;
+      // Space held down and Tab pressed: the keyup lands on the next control,
+      // and the pill stayed pressed in.
+      on.press = false;
       sync();
     };
     const onKeyDown = (e: KeyboardEvent) => {
@@ -522,12 +529,21 @@ export function LiquidPill({
       dirty = true;
     };
     document.addEventListener("visibilitychange", onVisibility);
+    // Keyboard focus counts as engaged and stays put when the page scrolls:
+    // tabbed to and scrolled past, the pill kept the loop at full rate off
+    // screen, where nobody can see a frame.
+    let inView = true;
+    const io = new IntersectionObserver(([entry]) => {
+      inView = entry?.isIntersecting ?? true;
+      if (inView) dirty = true;
+    });
+    io.observe(padEl);
 
     /* The clock turns only while the control is engaged or still settling.
        Every easing snaps inside its own threshold rather than approaching one
        for ever, which is what gives the loop a last frame at all. */
     const tick = (_t: number, deltaMs: number) => {
-      if (disposed || !visible || ctx.lost) return;
+      if (disposed || !visible || !inView || ctx.lost) return;
       const dt = Math.min(deltaMs / 1000, 1 / 20);
 
       const hk = hoverTarget > hover ? 1 - Math.pow(0.0012, dt) : 1 - Math.pow(0.00012, dt);
@@ -552,7 +568,11 @@ export function LiquidPill({
       ptrAmt += (wantWell - ptrAmt) * (1 - Math.pow(0.004, dt));
       if (Math.abs(wantWell - ptrAmt) < 0.002) ptrAmt = wantWell;
 
-      const ripLive = slots.some((r) => r.on === 1 && clock - r.t <= RIPPLE_LIFE);
+      // Both of these are measured on the clock, and under reduced motion the
+      // clock stands still — `clock - lastMove` stayed 0 after the first hover,
+      // and the loop ran at full rate for as long as the page was open.
+      const moving = !calm.matches;
+      const ripLive = moving && slots.some((r) => r.on === 1 && clock - r.t <= RIPPLE_LIFE);
       const engaged = on.over || on.press || on.focus;
       const settling =
         hover !== hoverTarget ||
@@ -561,8 +581,8 @@ export function LiquidPill({
         ptrS.x !== ptr.x ||
         ptrS.y !== ptr.y;
 
-      if (engaged || ripLive || settling || clock - lastMove < 0.25) {
-        if (!calm.matches) clock += dt;
+      if (engaged || ripLive || settling || (moving && clock - lastMove < 0.25)) {
+        if (moving) clock += dt;
         dirty = true;
       }
       if (!dirty) return;
@@ -578,6 +598,7 @@ export function LiquidPill({
       disposed = true;
       gsap.ticker.remove(tick);
       ro.disconnect();
+      io.disconnect();
       btn.removeEventListener("pointerenter", onEnter);
       btn.removeEventListener("pointerleave", onLeave);
       btn.removeEventListener("pointerdown", onDown);

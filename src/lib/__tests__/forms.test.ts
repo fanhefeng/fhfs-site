@@ -6,6 +6,7 @@ import {
   localized,
   localizedLines,
   parseLocale,
+  parseMomentTime,
   raw,
   str,
   validDate,
@@ -92,6 +93,27 @@ describe("validDate", () => {
     expect(validDate("26-01-01")).toBe(false);
     expect(validDate("2026-1-1")).toBe(false);
     expect(validDate("")).toBe(false);
+  });
+});
+
+describe("parseMomentTime", () => {
+  it("reads a minute in the site's zone as the instant it is", () => {
+    expect(parseMomentTime("2026-09-07 23:15")?.toISOString()).toBe("2026-09-07T15:15:00.000Z");
+    expect(parseMomentTime("2026-09-07T23:15")?.toISOString()).toBe("2026-09-07T15:15:00.000Z");
+    expect(parseMomentTime("2026-01-01 00:00")?.toISOString()).toBe("2025-12-31T16:00:00.000Z");
+  });
+
+  it("refuses a minute that does not exist", () => {
+    expect(parseMomentTime("2026-09-07 24:00")).toBeNull();
+    expect(parseMomentTime("2026-09-07 23:60")).toBeNull();
+    expect(parseMomentTime("2026-02-30 12:00")).toBeNull();
+  });
+
+  it("wants the whole shape, to the minute", () => {
+    expect(parseMomentTime("2026-09-07")).toBeNull();
+    expect(parseMomentTime("2026-09-07 9:05")).toBeNull();
+    expect(parseMomentTime("2026-09-07 23:15:00")).toBeNull();
+    expect(parseMomentTime("")).toBeNull();
   });
 });
 

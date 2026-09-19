@@ -26,6 +26,11 @@ type Props = {
  * hover-capable pointers. Box-shadow is never transitioned: the resting and
  * lifted shadows are separate painted layers whose opacity swaps while they
  * ride the lift, so the card and its shadow stay welded.
+ *
+ * A keyboard gets the same lift: the card rises while one of its links wears
+ * the focus ring (`group-has-[:focus-visible]`). Not `focus-within` — that
+ * also holds after a mouse click, and the card would stay raised under a
+ * pointer that had already left.
  */
 export function AppCard({ app, index, variant = "tile", className }: Props) {
   const t = useTranslations("software");
@@ -41,15 +46,15 @@ export function AppCard({ app, index, variant = "tile", className }: Props) {
     >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 rounded-card shadow-card transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1 group-hover:opacity-0"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-card shadow-card transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1 group-hover:opacity-0 group-has-[:focus-visible]:-translate-y-1 group-has-[:focus-visible]:opacity-0"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 rounded-card opacity-0 shadow-lift transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 -z-10 rounded-card opacity-0 shadow-lift transition-[transform,opacity] duration-300 ease-out group-hover:-translate-y-1 group-hover:opacity-100 group-has-[:focus-visible]:-translate-y-1 group-has-[:focus-visible]:opacity-100"
       />
 
       <div
-        className={`glass-thin flex h-full flex-col overflow-hidden rounded-card shadow-none transition-transform duration-300 ease-out group-hover:-translate-y-1 ${
+        className={`glass-thin flex h-full flex-col overflow-hidden rounded-card shadow-none transition-transform duration-300 ease-out group-hover:-translate-y-1 group-has-[:focus-visible]:-translate-y-1 ${
           feature ? "sm:flex-row" : ""
         }`}
       >

@@ -27,20 +27,27 @@ export default async function FilmsPage({ params }: PageProps<"/[locale]/films">
       <Reveal as="ul" stagger={0.06} className="grid gap-8 sm:grid-cols-2 sm:gap-6">
         {FILMS.map((film, i) => {
           const cover = filmCover(film);
+          // An odd one out at the end takes the whole row, cut panoramic,
+          // instead of hanging alone in the left column.
+          const lone = FILMS.length % 2 === 1 && i === FILMS.length - 1;
           return (
-            <li key={film.slug}>
+            <li key={film.slug} className={lone ? "sm:col-span-2" : undefined}>
               <Link href={`/films/${film.slug}`} className="group block">
                 <span className="block overflow-hidden rounded-card bg-surface">
                   <Image
                     src={stillSrc(film, cover)}
                     width={cover.width}
                     height={cover.height}
-                    alt={t(`${film.slug}.stills.${cover.id}.alt`)}
-                    sizes="(min-width: 640px) 340px, 100vw"
+                    // The title under it is the link's name; a sentence about
+                    // the picture ahead of it only delayed it.
+                    alt=""
+                    sizes={
+                      lone ? "(min-width: 640px) 672px, 100vw" : "(min-width: 640px) 340px, 100vw"
+                    }
                     // The first card's picture is the page's largest paint.
                     loading={i === 0 ? "eager" : undefined}
                     fetchPriority={i === 0 ? "high" : undefined}
-                    className="aspect-[3/2] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                    className={`${lone ? "aspect-[3/2] sm:aspect-[21/9]" : "aspect-[3/2]"} w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]`}
                   />
                 </span>
                 <span className="mt-3 flex items-baseline justify-between gap-4">

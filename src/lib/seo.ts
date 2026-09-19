@@ -53,8 +53,17 @@ export function localeAlternates(
  * namespace plus the alternates above. The section pages differ only in
  * those two strings, so each exports
  * `export const generateMetadata = sectionMetadata("about", "/about")`.
+ *
+ * `values` fills the subtitle's placeholders, for a section whose subtitle
+ * counts something (`{count}` on the lab's). Without it a subtitle with a
+ * placeholder does not throw: next-intl logs the formatting error and hands
+ * back the key, and the description quietly reads "lab.subtitle".
  */
-export function sectionMetadata(namespace: string, path: string) {
+export function sectionMetadata(
+  namespace: string,
+  path: string,
+  values?: Record<string, string | number>,
+) {
   return async function generateMetadata({
     params,
   }: {
@@ -65,7 +74,7 @@ export function sectionMetadata(namespace: string, path: string) {
     const t = await getTranslations({ locale, namespace });
     return {
       title: t("title"),
-      description: t("subtitle"),
+      description: t("subtitle", values),
       alternates: localeAlternates(path, locale),
     };
   };

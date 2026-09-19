@@ -39,6 +39,16 @@ export function markOvertureSeen(): void {
   }
 }
 
+/** Hand the key back, so the next hard load plays the ritual again. The lab's
+ *  shell study offers this as a button; nothing on the site does it by itself. */
+export function forgetOverture(): void {
+  try {
+    sessionStorage.removeItem(OVERTURE_SEEN_KEY);
+  } catch {
+    /* Blocked storage already reads as seen; there is nothing to forget. */
+  }
+}
+
 /** The masthead is listening for this; the lamp and the door both fire it. */
 export function announceOvertureDone(): void {
   window.dispatchEvent(new Event(OVERTURE_DONE_EVENT));

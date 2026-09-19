@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
   type KeyboardEvent,
@@ -97,6 +98,10 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   /** Which way the last step went, so the next still slides in from that side. */
   const dirRef = useRef(0);
   const swipeRef = useRef<{ x: number; y: number } | null>(null);
+  /** Set when a swipe stepped: a mouse drag ends in a click on the backdrop,
+   *  which would otherwise close the room right after turning the page. */
+  const swipedRef = useRef(false);
+  const altId = useId();
 
   const src = (still: FilmStill) => asset(`/films/${folder}/${still.file}.jpg`);
 
@@ -116,10 +121,20 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
     [stills.length],
   );
 
-  /** The quiet exit: fade, then the native close — which is what unwinds the state. */
+  /** The quiet exit: fade, then the native close — which is what unwinds the
+   *  state. The still steps back to the 0.96 it arrived from as it goes, so
+   *  the way out is the way in, run backwards and faster. */
   const close = useCallback(() => {
     const dialog = dialogRef.current;
     if (!dialog?.open) return;
+    if (frameRef.current) {
+      gsap.to(frameRef.current, {
+        scale: 0.96,
+        duration: 0.25,
+        ease: EASE.exit,
+        overwrite: "auto",
+      });
+    }
     gsap.to(dialog, {
       autoAlpha: 0,
       duration: 0.25,
@@ -194,14 +209,24 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
    *  leaves. The layout layer lets pointer events through, so those clicks
    *  land on the dialog itself. */
   const onBackdropClick = (e: MouseEvent<HTMLElement>) => {
+    if (swipedRef.current) {
+      swipedRef.current = false;
+      return;
+    }
     if (e.target === e.currentTarget) close();
   };
 
   const onPointerDown = (e: PointerEvent<HTMLElement>) => {
+    swipedRef.current = false;
     // A press that starts on a control belongs to that control. The swipe is
     // 40px and the buttons are wider than that, so a press that wandered
     // across one would have fired its click and a swipe both, stepping twice.
-    if ((e.target as HTMLElement).closest("button")) return;
+    // Cleared rather than left: a start kept from a touch the browser took
+    // over would pair with this press's release and step on its own.
+    if ((e.target as HTMLElement).closest("button")) {
+      swipeRef.current = null;
+      return;
+    }
     swipeRef.current = { x: e.clientX, y: e.clientY };
   };
   const onPointerUp = (e: PointerEvent<HTMLElement>) => {
@@ -210,7 +235,13 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
     if (!start) return;
     const dx = e.clientX - start.x;
     const dy = e.clientY - start.y;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      swipedRef.current = true;
+      step(dx < 0 ? 1 : -1);
+    }
+  };
+  const onPointerCancel = () => {
+    swipeRef.current = null;
   };
 
   const still = current === null ? null : stills[current];
@@ -231,9 +262,15 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
         {stills.map((item, i) => (
           <li key={item.id} className={`min-w-0 ${SPAN[item.span]}`}>
             <figure className="m-0">
+              {/* The link's name stays short; what the picture shows is its
+                  description, which an aria-label alone would have hidden. */}
+              <span id={`${altId}-${i}`} hidden>
+                {item.alt}
+              </span>
               <a
                 href={src(item)}
                 aria-label={`${text.open} · ${item.title}`}
+                aria-describedby={`${altId}-${i}`}
                 // A file, not a route: keep RouteTransition's capture-phase
                 // interception off it, or the veil would try to push the
                 // picture's URL before this handler ever runs.
@@ -250,8 +287,6 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
                   height={item.height}
                   alt={item.alt}
                   sizes={SIZES[item.span]}
-                  // The first two are above the fold on a phone.
-                  fetchPriority={i < 2 ? "high" : undefined}
                   className={`w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02] ${RATIO[ratio][item.span]}`}
                   style={item.focus ? { objectPosition: item.focus } : undefined}
                 />
@@ -282,6 +317,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
         onClick={onBackdropClick}
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
         // Lights off: the backdrop is near-black and frosts what is left of
         // the page, so the still is the only thing lit.
         className="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none touch-pan-y border-0 bg-transparent p-0 text-white backdrop:bg-black/95 backdrop:backdrop-blur-sm"

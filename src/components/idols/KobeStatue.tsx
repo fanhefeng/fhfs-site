@@ -32,6 +32,14 @@ type Props = {
    * into the chunk that loads before the scene is even wanted.
    */
   onReady: (invalidate: () => void) => void;
+  /**
+   * The lab's two ways of showing how this is made, unused on /idols/kobe:
+   * `wire` draws the figure and its base as wireframe, so the capsules can be
+   * counted; `onFrame` is called once per frame actually drawn, which is how
+   * the study's counter shows a parked scene drawing none.
+   */
+  wire?: boolean;
+  onFrame?: () => void;
 };
 
 type V3 = [number, number, number];
@@ -100,7 +108,12 @@ function shadowTexture(): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas);
 }
 
-function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
+function Figure({
+  spin,
+  onReady,
+  wire = false,
+  onFrame,
+}: Pick<Props, "spin" | "onReady" | "wire" | "onFrame">) {
   const bronze = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -158,6 +171,18 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
     };
   }, [bronze, bronzeLit, granite, shadow]);
 
+  // Wireframe in the metal's own colour would be dark lines on a dark stage;
+  // an emissive lift makes the mesh read. One frame, asked for by hand.
+  useEffect(() => {
+    bronze.wireframe = wire;
+    bronze.emissive.set(wire ? "#c9975a" : "#000000");
+    granite.wireframe = wire;
+    granite.emissive.set(wire ? "#5d5a66" : "#000000");
+    bronzeLit.visible = !wire;
+    shadow.visible = !wire;
+    invalidate();
+  }, [wire, bronze, bronzeLit, granite, shadow]);
+
   const group = useMemo(() => new THREE.Group(), []);
   const rise = useMemo(() => ({ y: 0 }), []);
 
@@ -180,6 +205,7 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
   useFrame(() => {
     group.rotation.y = spin.current;
     group.position.y = rise.y;
+    onFrame?.();
   });
 
   return (
@@ -254,12 +280,14 @@ function Figure({ spin, onReady }: Pick<Props, "spin" | "onReady">) {
   );
 }
 
-export default function KobeStatue({ spin, onScreen, onReady }: Props) {
+export default function KobeStatue({ spin, onScreen, onReady, wire, onFrame }: Props) {
   return (
     <Canvas
       dpr={[1, 1.75]}
       frameloop={onScreen ? "demand" : "never"}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      // "default" spelled out: R3F's own default is "high-performance", which
+      // moves a two-GPU Mac onto the discrete chip for a statue drawn on demand.
+      gl={{ antialias: true, alpha: true, powerPreference: "default" }}
       camera={{ position: [0, 1.05, 5.3], fov: 34, near: 0.1, far: 50 }}
       onCreated={({ camera, gl }) => {
         // Framed on the whole monument, finger to plinth, with a little air.
@@ -291,7 +319,7 @@ export default function KobeStatue({ spin, onScreen, onReady }: Props) {
           color="#cfe0ff"
         />
       </Environment>
-      <Figure spin={spin} onReady={onReady} />
+      <Figure spin={spin} onReady={onReady} wire={wire} onFrame={onFrame} />
     </Canvas>
   );
 }

@@ -9,7 +9,7 @@ import { list, parseLocale, str, validDate, validKey } from "@/lib/forms";
 import { renderMarkdown } from "@/lib/markdown";
 import { readingMinutes } from "@/lib/reading";
 import { TAGS } from "@/lib/content";
-import { invalidate, SESSION_EXPIRED, DATE_ERROR, type ActionState } from "./shared";
+import { invalidate, SESSION_EXPIRED, DATE_ERROR, goneError, type ActionState } from "./shared";
 
 export async function savePost(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
@@ -43,8 +43,8 @@ export async function savePost(_prev: ActionState, form: FormData): Promise<Acti
 
   const isNew = Boolean(form.get("isNew"));
   if (isNew) {
-    // A new post must not land on an existing one: the upsert below would
-    // silently replace whatever was there, with no way to notice.
+    // A new post must not land on an existing one: an upsert would silently
+    // replace whatever was there, with no way to notice.
     const inserted = await db
       .insert(schema.posts)
       .values(row)
@@ -54,18 +54,20 @@ export async function savePost(_prev: ActionState, form: FormData): Promise<Acti
       return { error: `slug 已存在：${locale} 下已经有「${slug}」了，换一个或去编辑原文。` };
     }
   } else {
-    await db
-      .insert(schema.posts)
-      .values(row)
-      .onConflictDoUpdate({
-        target: [schema.posts.slug, schema.posts.locale],
-        set: { ...row, updatedAt: new Date() },
-      });
+    // The edit form's promise is that the row exists — so an UPDATE, not an
+    // upsert: a form left open past a delete in another tab gets told, rather
+    // than quietly bringing the post back (published, if draft was off).
+    const updated = await db
+      .update(schema.posts)
+      .set({ ...row, updatedAt: new Date() })
+      .where(and(eq(schema.posts.slug, slug), eq(schema.posts.locale, locale)))
+      .returning({ id: schema.posts.id });
+    if (!updated.length) return goneError(`${slug}.${locale}`);
   }
 
   invalidate(TAGS.posts);
   // A first save leaves the "new post" page behind: its props are a blank
-  // draft, and React resets the form to props once the action completes.
+  // draft, and a saved form resets to its props (`useSaveAction`).
   if (isNew) redirect(`/admin/posts/${slug}/${locale}`);
   return { ok: true };
 }
@@ -81,4 +83,7 @@ export async function deletePost(form: FormData): Promise<void> {
   // A deleted post's page is cached like any other — without this it would go
   // on being served from the edge.
   invalidate(TAGS.posts);
+  // The editor this was pressed in is the deleted post's own page; left
+  // there, it re-renders into a 404 that reads like the delete went wrong.
+  redirect("/admin/posts");
 }

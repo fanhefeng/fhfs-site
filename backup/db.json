@@ -4143,8 +4143,8 @@
     },
     {
       "key": "lab.items.grove.note",
-      "zh": "场景本身没有任何东西跑在时钟上：勘测锋面推到哪、线框笼子亮到什么程度、苔藓长到多长、花什么时候开、蝴蝶飞到哪，全都是滚动位置的纯函数。指针是唯一的活输入——画面随它倾斜，苔藓被它拨开，它划过时会从绒毛里带起一道花粉，凑近落脚的蝴蝶还会把它惊得振翅。这一层只在确实还有东西在变的时候才跑：花粉会落尽，倾斜会归位，受惊会平复；都跑完它就自己停了，停下的场景是真的一帧都不画。这一则现在就是首页的封面。",
-      "en": "Nothing in the scene itself runs on a clock: how far the survey front has travelled, how brightly the cage rides it, how long the moss has grown, when the flowers open and where the butterfly is are all pure functions of scroll position. The pointer is the one live input — the whole composition leans with it, the fur parts under it, a trail of pollen comes up out of the moss where it passes, and coming too close to the perched butterfly startles it into beating its wings. That layer runs only while something is still actually changing: the pollen falls out, the lean comes home, the startle wears off. When all three are done it stops, and a parked scene draws not one frame. This study is now the cover of the home page.",
+      "zh": "场景本身没有任何东西跑在时钟上：勘测锋面推到哪、线框笼子亮到什么程度、苔藓长到多长、花什么时候开、蝴蝶飞到哪，全都是滚动位置的纯函数。指针是唯一的活输入——画面随它倾斜，苔藓被它拨开，它划过时会从绒毛里带起一道花粉，凑近落脚的蝴蝶还会把它惊得振翅。这一层只在确实还有东西在变的时候才跑：花粉会落尽，倾斜会归位，受惊会平复；都跑完它就自己停了，停下的场景是真的一帧都不画。首页封面上的也是这片苔藓（同一套 lib/grove），是第 21 则的推近把人带进去的。",
+      "en": "Nothing in the scene itself runs on a clock: how far the survey front has travelled, how brightly the cage rides it, how long the moss has grown, when the flowers open and where the butterfly is are all pure functions of scroll position. The pointer is the one live input — the whole composition leans with it, the fur parts under it, a trail of pollen comes up out of the moss where it passes, and coming too close to the perched butterfly startles it into beating its wings. That layer runs only while something is still actually changing: the pollen falls out, the lean comes home, the startle wears off. When all three are done it stops, and a parked scene draws not one frame. The cover of the home page is this same moss (the same lib/grove), and study 21's approach is what walks you into it.",
       "note": null
     },
     {
@@ -4311,8 +4311,8 @@
     },
     {
       "key": "lab.items.workstation.note",
-      "zh": "模型原始 8.5 MB，经 gltf-transform（Draco + 1024px WebP）压到 1.1 MB，Draco 解码器自托管。进入视口才加载；空闲时降到 30 fps 采样，拖拽时全速；Save-Data 下直接跳过。滚轮只在工位正上方那一带接管缩放，其余地方照常滚页面。",
-      "en": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual.",
+      "zh": "模型原始 8.5 MB，经 gltf-transform（Draco + 1024px WebP）压到 1.1 MB，Draco 解码器自托管。进入视口才加载；空闲时降到 30 fps 采样，拖拽时全速；Save-Data 下直接跳过。滚轮只在工位正上方那一带接管缩放，其余地方照常滚页面。右下角两颗箭头转的是同一个角度，一次八分之一圈——给键盘，也给正忙着滚页面的拇指。",
+      "en": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual. The two arrows in the corner make the same turn, an eighth at a press — for a keyboard, and for a thumb that is busy scrolling the page.",
       "note": null
     },
     {
@@ -4335,8 +4335,8 @@
     },
     {
       "key": "lab.subtitle",
-      "zh": "十则练习。滚动条在这里不是导航，是播放头。",
-      "en": "Ten studies. Here the scrollbar is not navigation — it is the playhead.",
+      "zh": "{count} 则练习。滚动条在这里不是导航，是播放头。",
+      "en": "{count} studies. Here the scrollbar is not navigation — it is the playhead.",
       "note": null
     },
     {
@@ -4383,8 +4383,8 @@
     },
     {
       "key": "software.empty",
-      "zh": "这个分类下暂时还没有东西。",
-      "en": "Nothing in this category yet.",
+      "zh": "还没有应用，这一页先空着。",
+      "en": "No apps yet — this page is waiting for its first.",
       "note": null
     },
     {

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale, getTranslations } from "next-intl/server";
@@ -10,6 +10,7 @@ import { getAllNavItems, getNavItems, type NavItem } from "@/lib/content";
 import { CLIENT_NAMESPACES, pick } from "@/lib/messages";
 import type { NavLink } from "@/lib/nav";
 import { feedTypes } from "@/lib/seo";
+import { THEME_COLOR } from "@/lib/theme";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AuroraLayer } from "@/components/fx/AuroraLayer";
@@ -41,6 +42,16 @@ export function generateStaticParams() {
 type Props = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
+};
+
+// The address bar and the overscroll area, in the paper's colour or the closed
+// gallery's. These two follow the OS; a reader who flips the light by hand is
+// followed by `paintBrowserChrome` (lib/theme.ts).
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_COLOR.light },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLOR.dark },
+  ],
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

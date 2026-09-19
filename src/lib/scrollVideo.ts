@@ -60,6 +60,10 @@ export class ScrollVideo {
    * First pass grabs every `warmupStep`th frame and resolves — enough to
    * scroll through the whole sequence, with gaps. Second pass fills in the
    * rest in the background and never blocks.
+   *
+   * Rejects when the first pass brought back nothing at all: one missing
+   * frame is covered by its neighbours, but with none there is nothing to
+   * draw, and resolving left the caller showing a black canvas as "ready".
    */
   async load(): Promise<void> {
     const all = Array.from({ length: this.frameCount }, (_, i) => i);
@@ -68,6 +72,10 @@ export class ScrollVideo {
     const rest = all.filter((i) => !warmupSet.has(i));
 
     await this.loadBatch(warmup);
+    if (this.destroyed) return;
+    if (!warmup.some((i) => this.frames[i])) {
+      throw new Error("no frame of the first pass loaded");
+    }
     // First frame is in — paint it rather than leaving the reader on black.
     this.draw(0);
 

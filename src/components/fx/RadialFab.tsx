@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/gsap";
 import { toggleTheme } from "@/lib/theme";
 
 /** Quarter-circle sweep: 180° (due left) → 270° (straight up). */
@@ -16,17 +16,30 @@ type Action = { key: string; label: string; onClick?: () => void; href?: string 
  * Quick-actions FAB for article pages, mobile only (the dynamic island covers
  * the same ground on desktop, and two menus competing is worse than none).
  *
- * Four glass buttons fan out along a 90° arc with `elastic.out(1, 0.5)` and a
+ * Four glass buttons (three where there is no feed to offer) fan out along a 90° arc with `elastic.out(1, 0.5)` and a
  * 0.05s stagger — the demo-verified polar layout — while the "+" rotates 135°
  * into a "×". Closing reverses the same timeline with a firm `easeReverse`
  * ease at 2.2× speed: entrances may be showy, exits are crisp. The timeline is
  * built once and toggled with play()/reverse(), so a mid-flight tap turns the
  * menu around instead of queueing.
  */
-export function RadialFab({ shareTitle }: { shareTitle: string }) {
+export function RadialFab({
+  shareTitle,
+  always = false,
+  feed = true,
+}: {
+  shareTitle: string;
+  /** Mount at every width — the lab's study, which has no island to defer to. */
+  always?: boolean;
+  /** Offer the RSS feed. The feed is the blog's; a page that is not the blog
+   *  (/moments) leaves it out rather than subscribe the reader to something
+   *  other than what they are reading. The arc spreads what is left. */
+  feed?: boolean;
+}) {
   const t = useTranslations("blog");
   const locale = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const iconRef = useRef<SVGSVGElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [open, setOpen] = useState(false);
@@ -79,7 +92,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
   const actions: Action[] = [
     { key: "share", label: copied ? t("fabShareDone") : t("fabShare"), onClick: share },
     { key: "top", label: t("fabTop"), onClick: toTop },
-    { key: "rss", label: t("fabRss"), href: `/${locale}/rss.xml` },
+    ...(feed ? [{ key: "rss", label: t("fabRss"), href: `/${locale}/rss.xml` }] : []),
     { key: "theme", label: t("fabTheme"), onClick: flipTheme },
   ];
 
@@ -111,8 +124,8 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
             scale: 1,
             autoAlpha: 1,
             duration: 0.6,
-            ease: "elastic.out(1, 0.5)",
-            easeReverse: "power3.in",
+            ease: EASE.spring,
+            easeReverse: EASE.depart,
             overwrite: "auto",
           },
           i * 0.05,
@@ -124,8 +137,8 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
           {
             rotation: 135,
             duration: 0.5,
-            ease: "back.out(1.7)",
-            easeReverse: "power2.in",
+            ease: EASE.pop,
+            easeReverse: EASE.exit,
             overwrite: "auto",
           },
           0,
@@ -148,11 +161,26 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
     else tl.timeScale(2.2).reverse();
   }, [open]);
 
+  /**
+   * Fold the fan, and hand the focus back to the "+" if it was on one of the
+   * four: they go `visibility: hidden` at the end of the reverse, and a focus
+   * left on a hidden button falls to <body> — a keyboard reader would be sent
+   * back to the top of the page for having pressed Escape.
+   */
+  const close = useCallback(() => {
+    const root = rootRef.current;
+    const focused = document.activeElement;
+    if (root?.contains(focused) && focused !== triggerRef.current) {
+      triggerRef.current?.focus({ preventScroll: true });
+    }
+    setOpen(false);
+  }, []);
+
   // Esc closes; so does a tap anywhere outside the cluster.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") close();
     };
     const onPointer = (e: PointerEvent) => {
       if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
@@ -163,7 +191,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("pointerdown", onPointer);
     };
-  }, [open]);
+  }, [open, close]);
 
   const itemClass =
     // `invisible opacity-0` is the pre-hydration rest state: without it the
@@ -173,12 +201,15 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
   return (
     <div
       ref={rootRef}
-      className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-50 size-14 md:hidden print:hidden"
+      className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-50 size-14 print:hidden ${
+        always ? "" : "md:hidden"
+      }`}
     >
       {/* The trigger comes first in the DOM so tabbing continues *into* the
           items it just revealed, instead of stepping backwards past them.
           Position is absolute/relative, so paint order is unaffected. */}
       <button
+        ref={triggerRef}
         type="button"
         aria-expanded={open}
         aria-label={t("fabAria")}
@@ -210,7 +241,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
             aria-label={action.label}
             title={action.label}
             className={itemClass}
-            onClick={() => setOpen(false)}
+            onClick={close}
           >
             <ActionIcon name={action.key} />
           </a>
@@ -223,7 +254,7 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
             className={`${itemClass} cursor-pointer`}
             onClick={() => {
               action.onClick?.();
-              setOpen(false);
+              close();
             }}
           >
             <ActionIcon name={action.key} />
@@ -231,9 +262,27 @@ export function RadialFab({ shareTitle }: { shareTitle: string }) {
         ),
       )}
 
-      {/* Copy confirmation lives in the live region only — no extra chrome. */}
+      {/* Copy confirmation, said twice. The live region tells a screen reader;
+          the chip tells everyone else — the share button has already folded
+          away by the time the clipboard answers, so without it a sighted
+          reader pressed "share" and watched nothing happen. One chip, and one
+          timer behind it: copying again restarts the two seconds rather than
+          stacking a second notice. The words stay in it while it fades, so it
+          leaves as a label and not as an emptying box. */}
       <span aria-live="polite" className="sr-only">
         {copied ? t("fabShareDone") : ""}
+      </span>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-full top-1/2 mr-3 -translate-y-1/2"
+      >
+        <span
+          className={`glass-thin block whitespace-nowrap rounded-chip px-3 py-1.5 text-caption text-fg transition-[opacity,translate] duration-300 ease-out ${
+            copied ? "opacity-100" : "translate-y-1 opacity-0"
+          }`}
+        >
+          {t("fabShareDone")}
+        </span>
       </span>
     </div>
   );

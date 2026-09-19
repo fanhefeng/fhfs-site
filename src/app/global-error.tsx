@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { routing, htmlLang } from "@/i18n/routing";
 import { ThemeInitScript } from "./ThemeInitScript";
 import { site } from "@/config/site";
-import zh from "../../messages/zh.json";
-import en from "../../messages/en.json";
+import { ERROR_COPY } from "@/lib/errorCopy";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
@@ -17,7 +16,9 @@ import "./globals.css";
  * left to render inside — the same reason `global-not-found.tsx` exists.
  * So, like that file, this one returns a whole document, dresses itself, and
  * speaks both languages rather than guessing which one the reader wanted.
- * There is no intl provider here; copy comes straight from the catalogues.
+ * There is no intl provider here; the copy is `ERROR_COPY`, a copy of the
+ * `error` namespace — importing the catalogues themselves would put both of
+ * them in every page's scripts, since this boundary ships with the layout.
  *
  * Only served by a production build — in development Next shows its own
  * overlay instead.
@@ -33,10 +34,11 @@ export default function GlobalError({
     console.error(error);
   }, [error]);
 
-  const blocks = routing.locales.map((locale) => {
-    const m = locale === "zh" ? zh : en;
-    return { locale, lang: htmlLang(locale), ...m.error };
-  });
+  const blocks = routing.locales.map((locale) => ({
+    locale,
+    lang: htmlLang(locale),
+    ...ERROR_COPY[locale],
+  }));
 
   const action =
     "inline-flex min-h-11 items-center rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent";

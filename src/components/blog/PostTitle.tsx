@@ -18,8 +18,22 @@ import { HAS_CJK } from "@/lib/reading";
  * The real text is always in the DOM (SSR/SEO), so a failed hydration or a
  * stalled font simply leaves a normal headline.
  */
-export function PostTitle({ title, className }: { title: string; className?: string }) {
+export function PostTitle({
+  title,
+  className,
+  as = "h1",
+  lang,
+}: {
+  title: string;
+  className?: string;
+  /** BCP-47 tag when the title is not in the page's language. */
+  lang?: string;
+  /** The article's headline is an h1; the lab shows two at once and keeps
+   *  the page's own heading, so it asks for a lower rank. */
+  as?: "h1" | "h2" | "p";
+}) {
   const ref = useRef<HTMLHeadingElement>(null);
+  const Tag = as as "h1";
 
   useGSAP(
     () => {
@@ -61,7 +75,7 @@ export function PostTitle({ title, className }: { title: string; className?: str
 
       gsap.to(el, {
         duration: 0.9,
-        ease: "none",
+        ease: EASE.linear,
         overwrite: "auto",
         scrambleText: {
           text: title,
@@ -81,8 +95,8 @@ export function PostTitle({ title, className }: { title: string; className?: str
   );
 
   return (
-    <h1 ref={ref} className={className}>
+    <Tag ref={ref} className={className} lang={lang}>
       {title}
-    </h1>
+    </Tag>
   );
 }

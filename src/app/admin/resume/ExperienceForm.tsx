@@ -1,15 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
 import type { ResumeProject } from "@/db/schema";
 import { formatProjects } from "@/lib/resume";
 import { deleteResumeExperience, saveResumeExperience } from "../actions/resume";
-import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { DeleteRow } from "../DeleteRow";
 import { SaveControls } from "../SaveControls";
 import { useFieldErrors } from "../ui/fieldErrors";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
+import { useSaveAction } from "../ui/useSaveAction";
 
 export type ExperienceDraft = {
   key: string;
@@ -37,15 +36,12 @@ export function ExperienceForm({
   experience: ExperienceDraft;
   isNew: boolean;
 }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(
-    saveResumeExperience,
-    {},
-  );
+  const { state, pending, formProps } = useSaveAction(saveResumeExperience);
   const check = useFieldErrors();
 
   return (
     <>
-      <form action={formAction} className="space-y-5" {...check.formProps}>
+      <form {...formProps} className="space-y-5" {...check.formProps}>
         {/* Tells saveResumeExperience to refuse a key that already exists
             rather than overwrite the job that has it. */}
         {isNew && <input type="hidden" name="isNew" value="1" />}

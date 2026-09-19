@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { NAV_GROUPS, type NavGroup } from "@/lib/nav";
 import { saveNavItems } from "../actions/nav";
-import type { ActionState } from "../actions/shared";
 import { cardClass, ghostButtonClass, inputClass, labelClass, metaClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 import { Select } from "../ui/Select";
+import { useSaveAction } from "../ui/useSaveAction";
 
 type NavRow = { href: string; labelKey: string; surfaces: string[]; group: NavGroup | null };
 /** A row with the identity the form needs: rows move, so the index is not one. */
@@ -67,7 +67,7 @@ const withIds = (rows: NavRow[]): FormRow[] => rows.map((row) => ({ ...row, id: 
  * rewrites the whole table, so stale values would silently overwrite it.
  */
 export function NavForm({ items }: { items: NavRow[] }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveNavItems, {});
+  const { state, pending, formProps } = useSaveAction(saveNavItems);
   const [rows, setRows] = useState<FormRow[]>(() => withIds(items));
   useEffect(() => setRows(withIds(items)), [items]);
 
@@ -106,7 +106,7 @@ export function NavForm({ items }: { items: NavRow[] }) {
   };
 
   return (
-    <form action={formAction}>
+    <form {...formProps}>
       <div className="space-y-4">
         {rows.map((row, i) => (
           <div key={row.id} className={`${cardClass} p-4 sm:p-5`}>

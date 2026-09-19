@@ -231,8 +231,8 @@ export const getAdjacentPosts = unstable_cache(
     slug: string,
     locale: Locale,
   ): Promise<{
-    older: { slug: string; title: string } | null;
-    newer: { slug: string; title: string } | null;
+    older: { slug: string; title: string; locale: Locale } | null;
+    newer: { slug: string; title: string; locale: Locale } | null;
   }> => {
     const ordered = byDateDesc(
       await db
@@ -240,6 +240,9 @@ export const getAdjacentPosts = unstable_cache(
           slug: posts.slug,
           title: posts.title,
           date: posts.date,
+          // Which language the title is in: a neighbour may be a fallback row,
+          // and the page marks that with `lang`.
+          locale: posts.locale,
         })
         .from(posts)
         .where(publishedOnly)
@@ -249,7 +252,7 @@ export const getAdjacentPosts = unstable_cache(
     if (index === -1) return { older: null, newer: null };
 
     const pick = (row?: (typeof ordered)[number]) =>
-      row ? { slug: row.slug, title: row.title } : null;
+      row ? { slug: row.slug, title: row.title, locale: row.locale } : null;
     return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
   },
   ["adjacent-posts"],
@@ -413,8 +416,8 @@ export const getAdjacentSecrets = unstable_cache(
     slug: string,
     locale: Locale,
   ): Promise<{
-    older: { slug: string; title: string } | null;
-    newer: { slug: string; title: string } | null;
+    older: { slug: string; title: string; locale: Locale } | null;
+    newer: { slug: string; title: string; locale: Locale } | null;
   }> => {
     const ordered = byDateDesc(
       await db
@@ -422,6 +425,8 @@ export const getAdjacentSecrets = unstable_cache(
           slug: secrets.slug,
           title: secrets.title,
           date: secrets.date,
+          // As with posts: a neighbour may be the other language's row.
+          locale: secrets.locale,
         })
         .from(secrets)
         .where(secretPublished)
@@ -430,7 +435,7 @@ export const getAdjacentSecrets = unstable_cache(
     const index = ordered.findIndex((row) => row.slug === slug);
     if (index === -1) return { older: null, newer: null };
     const pick = (row?: (typeof ordered)[number]) =>
-      row ? { slug: row.slug, title: row.title } : null;
+      row ? { slug: row.slug, title: row.title, locale: row.locale } : null;
     return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
   },
   ["adjacent-secrets"],

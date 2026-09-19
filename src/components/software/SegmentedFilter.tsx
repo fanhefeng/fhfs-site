@@ -62,16 +62,32 @@ export function SegmentedFilter({ options, value, onChange, ariaLabel, className
   );
 
   /* Re-seat on resize (label widths change with the viewport) — never
-   * animated, it is a layout correction, not a transition. Kept out of the
-   * GSAP context so the observer is torn down on every update, not only on
-   * unmount. */
+   * animated, it is a layout correction, not a transition. One observer for
+   * the control's life, reading the current `place` through a ref: rebuilt on
+   * every change, its first notification (which every observer delivers on
+   * `observe`) landed one frame into the Flip and set the pill at its end,
+   * then the tween pulled it back — a one-frame flash on every switch. The
+   * initial notification is skipped for the same reason, and so is any that
+   * arrives mid-Flip; the Flip is already heading for the right slot. */
+  const placeRef = useRef(place);
+  useEffect(() => {
+    placeRef.current = place;
+  }, [place]);
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    const ro = new ResizeObserver(() => place(false));
+    let first = true;
+    const ro = new ResizeObserver(() => {
+      if (first) {
+        first = false;
+        return;
+      }
+      if (pillRef.current && Flip.isFlipping(pillRef.current)) return;
+      placeRef.current(false);
+    });
     ro.observe(root);
     return () => ro.disconnect();
-  }, [place]);
+  }, []);
 
   const onKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLDivElement>) => {

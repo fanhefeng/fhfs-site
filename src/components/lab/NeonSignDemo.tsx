@@ -15,13 +15,16 @@ import {
   type SegName,
 } from "@/components/neon/NeonSignArt";
 import { layoutWall, WALL_CSS } from "@/components/neon/wall";
-import type { NeonStillSpan } from "./neonStills";
+import type { StillSpan } from "@/components/films/entries";
 
+/** A print on the wall — the La La Land room's still, with its caption translated. */
 export type NeonStillItem = {
   src: string;
   width: number;
   height: number;
-  span: NeonStillSpan;
+  span: StillSpan;
+  /** `object-position` for a print cropped away from its frame. */
+  focus?: string;
   alt: string;
   title: string;
   meta: string;
@@ -29,11 +32,16 @@ export type NeonStillItem = {
 
 type Props = {
   welcome: string;
+  /** The switch's one name. It is a toggle: `aria-pressed` says whether the
+   *  sign is lit, so a label that flipped too was read as "switch the sign
+   *  off, pressed". */
   signOn: string;
-  signOff: string;
   galleryKicker: string;
   galleryTitle: string;
   galleryLede: string;
+  /** The stills' rights line — the film room's, so the two never disagree. */
+  stillsCredit: string;
+  /** The sign's own: whose tracing the lettering follows. */
   credit: string;
   stills: NeonStillItem[];
 };
@@ -54,10 +62,10 @@ type Props = {
 export function NeonSignDemo({
   welcome,
   signOn,
-  signOff,
   galleryKicker,
   galleryTitle,
   galleryLede,
+  stillsCredit,
   credit,
   stills,
 }: Props) {
@@ -255,7 +263,7 @@ export function NeonSignDemo({
               type="button"
               className="nb-switch"
               aria-pressed={powered}
-              aria-label={powered ? signOff : signOn}
+              aria-label={signOn}
               onClick={() => toggleRef.current?.()}
               onPointerEnter={() => stutterRef.current?.()}
             >
@@ -283,12 +291,9 @@ export function NeonSignDemo({
                       alt={still.alt}
                       width={still.width}
                       height={still.height}
-                      sizes={
-                        still.span === "one"
-                          ? "(min-width: 900px) 30vw, (min-width: 560px) 46vw, 92vw"
-                          : "(min-width: 900px) 62vw, 92vw"
-                      }
+                      sizes={PRINT_SIZES[still.span]}
                       className="nb-print-img"
+                      style={still.focus ? { objectPosition: still.focus } : undefined}
                     />
                   </div>
                   <figcaption className="nb-print-cap">
@@ -299,12 +304,26 @@ export function NeonSignDemo({
               </li>
             ))}
           </Reveal>
+          <p className="nb-credit">{stillsCredit}</p>
           <p className="nb-credit">{credit}</p>
         </section>
       </div>
     </section>
   );
 }
+
+/**
+ * What each print is drawn at, by the grid below: six columns from 900px in a
+ * wall that stops at 1180px (less its padding), two from 560px, one under
+ * that. `tall` stands in two columns like `one` — the height is the crop's,
+ * not the column's — and `full` takes the row.
+ */
+const PRINT_SIZES: Record<StillSpan, string> = {
+  one: "(min-width: 1180px) 360px, (min-width: 900px) 31vw, (min-width: 560px) 46vw, 92vw",
+  tall: "(min-width: 1180px) 360px, (min-width: 900px) 31vw, (min-width: 560px) 46vw, 92vw",
+  wide: "(min-width: 1180px) 740px, (min-width: 900px) 63vw, 92vw",
+  full: "(min-width: 1180px) 1120px, 94vw",
+};
 
 const CSS = `
 .nb { color: #f3f1ea; }
@@ -331,9 +350,12 @@ body[data-neon-immersed] .hd-scrim { opacity: 0; }
   padding: clamp(3.5rem, 8vh, 5rem) 1.5rem clamp(2rem, 6vh, 4rem);
 }
 
-/* The channel letters over the sign: warm, lit from inside, a little haze. */
+/* The channel letters over the sign: warm, lit from inside, a little haze.
+   Dark until the sign comes on — the server's copy used to paint lit, then
+   blink out when the trigger fired on load and fade back in. */
 .nb-welcome {
   margin: 0;
+  opacity: 0;
   padding-left: 0.34em;
   font-family: var(--font-stack-serif);
   font-size: clamp(1.05rem, 2.6vw, 1.7rem);

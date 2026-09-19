@@ -21,18 +21,52 @@ gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, CustomEase, Flip);
 gsap.defaults({ duration: 0.35, ease: "power3.out" });
 
 /**
- * Motion tokens — the only sanctioned eases. No magic ease strings in
- * components:
- * - `default`  critically damped arrive; entrances, hovers, reveals.
- * - `momentum` slight overshoot; ONLY for gestures that carry velocity
- *              (flicks, thrown cards) — a menu fading in never bounces.
- * - `exit`     reversed feel for departures; pair with timeScale(2–2.5)
- *              so exits stay crisp.
+ * Motion tokens — the only sanctioned eases. No ease strings in components:
+ * `conventions.test.ts` fails on an `ease: "…"` anywhere else in `src/`.
+ * Named for what they are used for, not for the curve; a new curve gets a
+ * token here, with the place it serves, before it gets a call site.
  */
 export const EASE = {
+  /** Critically damped arrive; entrances, hovers, the nav's settle. */
   default: "power3.out",
+  /** A gentler arrive: the scroll reveal, pointer-follow, small fades in. */
+  soft: "power2.out",
+  /** Slight overshoot; ONLY for gestures that carry velocity (flicks, thrown
+   *  cards) and the few entrances that land on one — a menu fading in never
+   *  bounces. */
   momentum: "back.out(1.2)",
+  /** Reversed feel for departures; pair with timeScale(2–2.5) so exits stay
+   *  crisp. */
   exit: "power2.in",
+  /** A departure that lingers a beat and then snaps clear: the route veil,
+   *  the fan folding its elastic arrival back up. */
+  depart: "power3.in",
+  /** At rest at both ends — a thing moving from one place to another: Flip
+   *  reflows, the grid's height, the island's width, the lens's slide, the
+   *  splash's iris. */
+  travel: "power2.inOut",
+  /** Light opacity changes: a bulb, a wordmark, a caption. */
+  fadeIn: "power1.out",
+  fadeOut: "power1.in",
+  crossfade: "power1.inOut",
+  /** Constant rate. Anything scrubbed by scroll must be linear, or a pixel of
+   *  scroll stops being a pixel of travel; also a spill of light that should
+   *  not accelerate. */
+  linear: "none",
+  /** A line rising out of its mask, fast then long: the masthead. */
+  unveil: "expo.out",
+  /** Springs into place: the radial fan, a sticker landing. */
+  spring: "elastic.out(1, 0.5)",
+  /** The magnet letting go — a slightly looser spring than `spring`. */
+  release: "elastic.out(1, 0.4)",
+  /** The fan's "+" snapping round into a "×". */
+  pop: "back.out(1.7)",
+  /** The island's tray stretching open under a click. */
+  stretch: "back.out(2)",
+  /** A changelog year bubble swelling as the rail reaches it. */
+  bubble: "back.out(2.4)",
+  /** A sticker's shiver on hover — needs CustomWiggle from `./gsap-extras`. */
+  shiver: "wiggle({ wiggles: 7, type: easeOut })",
 } as const;
 
 /**
@@ -44,6 +78,12 @@ export const EASE = {
  * (DotDoodle), the inertial scroll hijack (SmoothScroll) and the opening
  * blackout (OvertureLight). Entrances, reveals, curtains and hover effects
  * are not on it.
+ *
+ * The grove is the same exception under the same test — the moss is an endless
+ * full-screen loop — and the one place that does not call this: `GroveScene`
+ * and `LiquidPill` hold the MediaQueryList itself, because they read it every
+ * frame (the clock stands still while it matches) and a setting changed
+ * mid-visit has to land without a remount.
  *
  * Reads the live browser, so it belongs in an effect, never in a render path
  * that also runs on the server.

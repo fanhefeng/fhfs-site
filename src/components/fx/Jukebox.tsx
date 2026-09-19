@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { jukebox, reportGesture, reportPlayback, useJukebox } from "@/lib/jukebox";
+import { jukebox, reportFailure, reportGesture, reportPlayback, useJukebox } from "@/lib/jukebox";
 import { trackFile } from "@/lib/tracks";
 
 /**
@@ -15,10 +15,11 @@ import { trackFile } from "@/lib/tracks";
  * position. A room that asks for its own record gets a new `src`, from the
  * top.
  *
- * What the element reports is what the rest of the site believes: a play the
- * browser refused (the reader has not touched the page yet) never fires
- * `play`, so `playing` stays false and the sign stays unlit until the first
- * click or key anywhere tries again.
+ * The signs follow `wanted`, the player answers with `playing`. A play the
+ * browser refused (the reader has not touched the page yet) is simply tried
+ * again on the first click or key anywhere. A record that will not load is
+ * different — nothing will ever come of it — so the player switches `wanted`
+ * back off and every sign goes dark with it (`reportFailure`).
  *
  * This used to be two players — a Spotify embed with a NetEase stand-in
  * behind it — and both are gone now that every record is a file of ours
@@ -57,11 +58,11 @@ export function Jukebox() {
     const onStop = () => reportPlayback({ playing: false });
     el.addEventListener("playing", onPlay);
     el.addEventListener("pause", onStop);
-    el.addEventListener("error", onStop);
+    el.addEventListener("error", reportFailure);
     return () => {
       el.removeEventListener("playing", onPlay);
       el.removeEventListener("pause", onStop);
-      el.removeEventListener("error", onStop);
+      el.removeEventListener("error", reportFailure);
       el.pause();
       reportPlayback({ playing: false });
     };
@@ -71,8 +72,14 @@ export function Jukebox() {
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
-    if (wanted) void el.play().catch(() => {});
-    else el.pause();
+    if (!wanted) {
+      el.pause();
+      return;
+    }
+    // After a failed load the element is parked: `play()` rejects without
+    // fetching again. `load()` is what makes the next press a real retry.
+    if (el.error) el.load();
+    void el.play().catch(() => {});
   }, [wanted, file]);
 
   return (

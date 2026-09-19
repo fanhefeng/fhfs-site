@@ -2,7 +2,7 @@
 
 import { useCallback, useId, useMemo, useRef } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { splitText } from "@/lib/splitText";
 
 export type MeltingTextMode = "load" | "inView" | "scrub";
@@ -91,7 +91,7 @@ export function MeltingText({
   duration = 1.1,
   stagger = 0.05,
   staggerFrom = "start",
-  ease = "power3.out",
+  ease = EASE.default,
   delay = 0,
   start = "top 78%",
   end = "bottom 45%",
@@ -185,7 +185,7 @@ export function MeltingText({
             {
               opacity: 1,
               duration: duration * 0.34,
-              ease: "power1.out",
+              ease: EASE.fadeIn,
               stagger: stagVars,
             },
             0,
@@ -198,7 +198,7 @@ export function MeltingText({
                 value: 0,
                 // Stay sticky while the glyphs are soft, then let go before
                 // the end so the final text has clean edges.
-                ease: "power2.in",
+                ease: EASE.exit,
                 duration: tl.duration() * 0.82,
                 onUpdate: () => applyGoo(gooState.value),
               },

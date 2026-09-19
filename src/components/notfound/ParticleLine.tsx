@@ -317,10 +317,13 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
     let acc = 0;
     let last = 0;
     const pointer = { x: 0, y: 0, active: false };
+    /** Whether the last step found any particle inside the pointer's reach. */
+    let touching = false;
 
     const physics = () => {
       const r2 = POINTER_RADIUS * POINTER_RADIUS;
       let moving = false;
+      touching = false;
 
       for (const p of particles) {
         p.px = p.x;
@@ -331,6 +334,7 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
           const dy = p.y - pointer.y;
           const d2 = dx * dx + dy * dy;
           if (d2 < r2 && d2 > 0.0001) {
+            touching = true;
             const d = Math.sqrt(d2);
             const force = (1 - d / POINTER_RADIUS) * POINTER_POWER;
             p.vx += (dx / d) * force;
@@ -409,7 +413,14 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
       // accumulator filled, which is every first frame (dt≈0) and every other
       // frame at 120Hz. Without it the entrance stops itself two frames in,
       // with every particle still sitting where it was scattered.
-      if (steps > 0 && !moving && !pointer.active) {
+      //
+      // A pointer that is merely *near* does not hold it open. The canvas is
+      // the width of its panel and the wake margin sits around all of it, so
+      // "near" took in a hand resting in the empty right-hand end of a strip,
+      // far from every glyph — 60 frames a second of nothing. What holds the
+      // loop is a pointer with a particle inside its reach; anywhere else, the
+      // next move that comes within reach starts it again.
+      if (steps > 0 && !moving && !(pointer.active && touching)) {
         stop();
         redraw();
       }
@@ -459,6 +470,12 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
       pointer.active = false;
       start();
     };
+    // Out of the window altogether: no pointermove says so, and the last one
+    // may have been right on the line — which then stayed parted, with the
+    // loop held open, until the pointer came back.
+    const onPointerOut = (e: PointerEvent) => {
+      if (e.relatedTarget === null) onPointerGone();
+    };
 
     // Both directions, or a tab that starts life in the background — which is
     // what a restored session or a window opened behind another one does —
@@ -471,6 +488,8 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointercancel", onPointerGone);
+    document.addEventListener("pointerout", onPointerOut);
+    window.addEventListener("blur", onPointerGone);
     document.addEventListener("visibilitychange", onVisibility);
 
     const io = new IntersectionObserver(
@@ -536,6 +555,8 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
       window.clearTimeout(resizeTimer);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointercancel", onPointerGone);
+      document.removeEventListener("pointerout", onPointerOut);
+      window.removeEventListener("blur", onPointerGone);
       document.removeEventListener("visibilitychange", onVisibility);
       io.disconnect();
       ro.disconnect();

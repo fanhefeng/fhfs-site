@@ -106,6 +106,37 @@ const send = (method: string, params: object = {}) =>
 const unhashed = new RegExp(`^(${IMMUTABLE_DIRS.join("|")})/(?!.*[._][0-9a-f]{8}[./]).*\\.\\w+$`);
 let problems: string[] = [];
 
+/**
+ * The script budget (DESIGN.md §5.3), in KB over the wire, per page — every
+ * chunk the page ends up fetching, the lazy ones included, since the walk
+ * below scrolls far enough to wake them. First match wins.
+ *
+ * The numbers are what each kind of page weighed when the budget was written,
+ * plus about a tenth: the point is not that they are good, it is that the
+ * next dependency to land in the shell fails here instead of going unnoticed.
+ * The design doc carried a 180 KB figure for the home page for weeks while the
+ * page was three times that, because nothing ever measured it. Raise a number
+ * on purpose, in the commit that spends it.
+ *
+ * Only a production build is weighed: a dev server ships unminified modules.
+ */
+const SCRIPT_BUDGET_KB: [RegExp, number][] = [
+  // The home page: the moss (three.js) behind the fold. Measured 597.
+  [/^\/(zh|en)$/, 660],
+  // Every page that mounts a three.js scene. Measured 579–668, the statue heaviest.
+  [
+    /^\/(zh|en)\/(intro|idols\/kobe|lab\/(statue|approach|grove|workstation|lens-slider|dissolve))$/,
+    740,
+  ],
+  // The editor's login, outside the locale tree. Measured 206.
+  [/^\/admin/, 230],
+  // Everything else — a page of text and GSAP. Measured 388–408.
+  [/./, 450],
+];
+const scriptRequests = new Set<string>();
+let scriptBytes = 0;
+let devServer = false;
+
 socket.addEventListener("message", (event) => {
   const message = JSON.parse(String(event.data)) as {
     id?: number;
@@ -125,6 +156,14 @@ socket.addEventListener("message", (event) => {
     const pathname = new URL(url).pathname;
     if (status >= 400) problems.push(`${status} ${pathname}`);
     else if (unhashed.test(pathname)) problems.push(`plain address, not asset(): ${pathname}`);
+    if (params.type === "Script") {
+      scriptRequests.add(params.requestId);
+      if (/hmr-client|_dev_/.test(pathname)) devServer = true;
+    }
+  } else if (method === "Network.loadingFinished") {
+    // The size on the wire, compression and headers included — known only
+    // once the body is in, which is why it is counted here and not above.
+    if (scriptRequests.has(params.requestId)) scriptBytes += params.encodedDataLength;
   } else if (method === "Network.loadingFailed" && params.blockedReason) {
     problems.push(`blocked (${params.blockedReason}): request ${params.requestId}`);
   } else if (method === "Runtime.exceptionThrown") {
@@ -145,6 +184,9 @@ socket.addEventListener("message", (event) => {
 });
 
 await send("Network.enable");
+// Every page pays for its own scripts: with the cache on, only the first page
+// to ask for a shared chunk would be charged for it.
+await send("Network.setCacheDisabled", { cacheDisabled: true });
 await send("Runtime.enable");
 await send("Log.enable");
 await send("Emulation.setDeviceMetricsOverride", {
@@ -157,6 +199,8 @@ await send("Emulation.setDeviceMetricsOverride", {
 let failed = 0;
 for (const page of pages) {
   problems = [];
+  scriptRequests.clear();
+  scriptBytes = 0;
   await send("Page.navigate", { url: base + page });
   await sleep(SETTLE_MS);
   // Walk the page once, for whatever waits to be scrolled to.
@@ -166,12 +210,20 @@ for (const page of pages) {
     awaitPromise: true,
   });
   await sleep(1500);
+  const scriptKB = Math.round(scriptBytes / 1024);
+  const budgetKB = SCRIPT_BUDGET_KB.find(([pattern]) => pattern.test(page))![1];
+  if (!devServer && scriptKB > budgetKB) {
+    problems.push(`scripts: ${scriptKB} KB, over this page's ${budgetKB} KB budget`);
+  }
   const found = [...new Set(problems)];
-  console.log(`${found.length === 0 ? "ok  " : "FAIL"} ${page}`);
+  console.log(
+    `${found.length === 0 ? "ok  " : "FAIL"} ${page}${devServer ? "" : `  · ${scriptKB} KB js`}`,
+  );
   for (const problem of found) console.log(`       ${problem}`);
   if (found.length > 0) failed++;
 }
 
+if (devServer) console.log("smoke: a dev server — script budgets not checked");
 console.log(
   failed === 0
     ? `smoke: ${pages.length} pages, nothing wrong`

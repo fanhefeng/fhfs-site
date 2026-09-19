@@ -62,12 +62,13 @@ export function MiniBento({ items, title, viewAllLabel, index }: Props) {
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative flex h-full min-h-[7rem] flex-col justify-between gap-3 rounded-card border border-line bg-surface-raised/70 p-4 shadow-card transition-transform duration-300 ease-out hover:-translate-y-1"
+                className="group relative flex h-full min-h-[7rem] flex-col justify-between gap-3 rounded-card border border-line bg-surface-raised/70 p-4 shadow-card transition-transform duration-300 ease-out hover:-translate-y-1 focus-visible:-translate-y-1"
               >
-                {/* Lift shadow, crossfaded over the resting one. */}
+                {/* Lift shadow, crossfaded over the resting one — for a
+                    keyboard's focus as for a pointer's hover. */}
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 rounded-card opacity-0 shadow-lift transition-opacity duration-300 group-hover:opacity-100"
+                  className="pointer-events-none absolute inset-0 rounded-card opacity-0 shadow-lift transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
                 />
                 {wide && item.mock ? (
                   <span className="relative flex min-h-[6.5rem] gap-4">

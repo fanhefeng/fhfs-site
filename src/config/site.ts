@@ -27,6 +27,9 @@ export const site = {
    *  page formats dates in — so a prerender on a UTC build machine prints the
    *  same day and month a render at home would. */
   timeZone: "Asia/Shanghai",
+  /** This site's own repository — every lab study links its source there
+   *  (`components/lab/entries.ts`, `sourceUrl`). */
+  repo: "https://github.com/fanhefeng/fhfs-site",
   social: {
     github: "https://github.com/fanhefeng",
     /** Revealed under the tear-off sticker in the footer, listed on /resume

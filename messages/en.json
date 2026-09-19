@@ -43,8 +43,7 @@
   "splash": {
     "label": "Welcome to fhf's",
     "welcome": "Welcome to",
-    "signOn": "Switch the sign on",
-    "signOff": "Switch the sign off",
+    "sign": "The sign's light",
     "enter": "Come in",
     "enterHint": "or press Enter · scrolling works too"
   },
@@ -169,11 +168,30 @@
   "lab": {
     "kicker": "Motion lab",
     "title": "Lab",
-    "subtitle": "Ten studies. Here the scrollbar is not navigation — it is the playhead.",
-    "open": "Open",
+    "subtitle": "{count} studies. Here the scrollbar is not navigation — it is the playhead.",
+    "source": "Source",
+    "sourceLede": "The files this one is made of, on GitHub:",
+    "viewSource": "Source · GitHub",
     "back": "Back to the lab",
     "backToIndex": "← Lab",
     "hint": "Scroll",
+    "prev": "Previous",
+    "next": "Next",
+    "studyNav": "The studies either side",
+    "groups": {
+      "piece": {
+        "title": "Made for the lab",
+        "lede": "Studies written to see one mechanism clearly, serving no page."
+      },
+      "site": {
+        "title": "In use on the site",
+        "lede": "Effects the site runs on, taken out on their own so the mechanism can be read apart from the page it serves."
+      },
+      "shell": {
+        "title": "The shell",
+        "lede": "What every page carries: the switch, the chip, the fan, the rite, the door, the veil, the island."
+      }
+    },
     "items": {
       "scrollVideo": {
         "name": "Scroll as playhead",
@@ -184,7 +202,8 @@
         "captionOneBody": "Scroll progress becomes a frame number; the canvas only paints that frame.",
         "captionTwo": "Backwards feels the same",
         "captionTwoBody": "With no playback timeline, scrolling up simply draws in reverse.",
-        "loading": "Decoding the frame sequence"
+        "loading": "Decoding the frame sequence",
+        "failed": "The frames didn't load — reload to try again"
       },
       "dissolve": {
         "name": "Dissolve",
@@ -194,7 +213,8 @@
         "headline": "An edge is not a line",
         "body": "The dissolve front is driven by a noise field, so it reads like paper wicking water rather than a curtain being drawn.",
         "tail": "Scroll back and it grows in again.",
-        "fallback": "No WebGL available here, so this falls back to the static composition."
+        "fallback": "No WebGL available here, so this falls back to the static composition.",
+        "saveData": "Data Saver is on, so the shader was never loaded; this is the static composition instead."
       },
       "meltingText": {
         "name": "Melting type",
@@ -212,11 +232,12 @@
         "name": "Grown, not modelled",
         "tagline": "Three.js instancing + procedural geometry",
         "summary": "A moss-covered root with no model file behind it: swept tubes, a cushion that follows the light, ferns and flower sprays, and two hundred and thirty thousand instanced blades.",
-        "note": "Nothing in the scene itself runs on a clock: how far the survey front has travelled, how brightly the cage rides it, how long the moss has grown, when the flowers open and where the butterfly is are all pure functions of scroll position. The pointer is the one live input — the whole composition leans with it, the fur parts under it, a trail of pollen comes up out of the moss where it passes, and coming too close to the perched butterfly startles it into beating its wings. That layer runs only while something is still actually changing: the pollen falls out, the lean comes home, the startle wears off. When all three are done it stops, and a parked scene draws not one frame. This study is now the cover of the home page.",
+        "note": "Nothing in the scene itself runs on a clock: how far the survey front has travelled, how brightly the cage rides it, how long the moss has grown, when the flowers open and where the butterfly is are all pure functions of scroll position. The pointer is the one live input — the whole composition leans with it, the fur parts under it, a trail of pollen comes up out of the moss where it passes, and coming too close to the perched butterfly startles it into beating its wings. That layer runs only while something is still actually changing: the pollen falls out, the lean comes home, the startle wears off. When all three are done it stops, and a parked scene draws not one frame. The cover of the home page is this same moss (the same lib/grove), and study 21's approach is what walks you into it.",
         "headline": "It is grown, not drawn",
         "body": "One seed settles the whole landscape: where the root bends, which flank the moss takes, which hollow a fern comes up in, where every single blade stands. Reload and it grows back identical.",
         "tail": "Run the pointer through the moss. Scroll back and it un-grows.",
         "fallback": "No WebGL available here, so this falls back to the static composition.",
+        "saveData": "Data Saver is on, so the scene was never loaded; this is the static composition instead.",
         "stageScan": "01 · Survey",
         "stageGrow": "02 · Growth",
         "stageSettle": "03 · Settle",
@@ -241,14 +262,6 @@
         "specFallback": "Fallback",
         "specFallbackValue": "With no WebGL, or for a reader on save-data, this is a static composition instead."
       },
-      "groveStage": {
-        "name": "Two sheets of paper, one root apart",
-        "tagline": "DOM over and under a canvas",
-        "summary": "The same moss, two identical paper cards: one painted under the canvas with the root draped over its shoulder, one standing in front of it — at the reference composition's own coordinates.",
-        "note": "A card cannot stand behind a photograph of a grove, only behind a grove that is still being drawn. The whole trick is one rule: card a carries no z-index, so it paints under the canvas and the root crosses its lower right corner; card b sits at z 3. Card a's knob therefore cannot live inside it, and is rendered on its own, riding the moss. The pair stands where the reference composition put it on its 1600 × 880 grid — 890 × 200 and 1237 × 482, corner to corner on one diagonal — and it is the pair that carries the depth: two sheets of the same paper at the same size, one root apart. Split them to opposite corners and each still crosses the moss, but there is nothing left to compare. Under the pointer the two ride by different amounts, and that difference is the distance between them. The home page's approach uses the same coordinates.",
-        "pointerHint": "Move the pointer · each sheet rides its own depth",
-        "fallback": "No WebGL available here, so this is the two cards alone on an empty stage."
-      },
       "liquidMetal": {
         "name": "A button, computed all the way down",
         "tagline": "A WebGL2 dispersion shader in five passes",
@@ -267,8 +280,12 @@
         "name": "A desk you can spin",
         "tagline": "three.js + inertial drag",
         "summary": "The 3D desk left over from the old portfolio: it swings round to face you on entry, its screens breathe, and a drag leaves it coasting on inertia.",
-        "note": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual.",
+        "note": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual. The two arrows in the corner make the same turn, an eighth at a press — for a keyboard, and for a thumb that is busy scrolling the page.",
         "deskHint": "Drag to orbit · scroll to zoom · double-click to reset",
+        "deskSaveData": "Data Saver is on, so the 3D desk (a 1.1 MB model) was never loaded.",
+        "deskFallback": "The 3D desk could not be shown here: either no WebGL is available, or the model did not arrive.",
+        "turnLeft": "Turn a little to the left",
+        "turnRight": "Turn a little to the right",
         "credit": "“Gaming Desktop PC” by Yolala1232 · Sketchfab · CC-BY-4.0"
       },
       "lensSlider": {
@@ -277,6 +294,7 @@
         "summary": "Four photographs. Turning the page is not a wipe but a lens growing out of the centre of the frame: the next picture sits inside it, pulled hardest at the rim, and only once the circle has swallowed the frame does the distortion let go.",
         "note": "The shader takes two pictures and one progress. The circle's radius grows with it; inside, every pixel is pulled toward the centre by an amount that is its closeness to the rim raised to the fifth power, so only a narrow band hugging the edge magnifies and the middle stays flat. Past the half-diagonal the circle covers the frame, and the rest of the progress is that band relaxing. A ring of water ripples runs out from the rim and dies with the same curve — the one thing the original has that the breakdown left out. Each band of the scrollbar opens the lens onto the next picture; scroll back while it is still growing and it shrinks away again. After Oscar Pico's project slider (oscarpico.es), written from TTTISE's breakdown of it.",
         "fallback": "No WebGL available here, so this falls back to a plain change of picture.",
+        "saveData": "Data Saver is on, so the lens was never loaded; this falls back to a plain change of picture.",
         "counterAria": "Current slide",
         "prev": "Previous",
         "next": "Next",
@@ -301,42 +319,270 @@
         "name": "Welcome to fhf's",
         "tagline": "SVG lettering traced from the film's sign + a filter for the tube + a GSAP flicker score",
         "summary": "A brick wall, a blue neon sign, Mia & Sebastian's Theme, and a few stills on the wall. The sign is drawn stroke by stroke after the one over the door of Seb's in La La Land, with the name swapped for mine.",
-        "note": "There is no font, on the sign in the film or here: the lettering follows a vector traced stroke by stroke from the film and published on Wikimedia Commons (Seb's.svg, Espandero, CC BY-SA 4.0). The ring's centre and radius, the angles of its two breaks — at the top right where the note's stem leaves it, and at the lower left — the ends of the bar, and the whole outlines of the S and the note are measured straight off it. The original has no F or H: the F is its E without the foot, the stem closed with the same rounded end as the arms, keeping even the little stub of the middle arm that pokes out past the stem; the H is two stems joined by a bar as heavy as the E's middle arm, its edges on the same tilt. The letters stand upright on a baseline that climbs 9.5° to the right; the ring's left arc simply stops at the lower left, while the right arc runs round the bottom and folds back up into the bar — one tube. What is drawn is the solid letter; the tube is found by a filter: feMorphology erodes the shape inward by thirteen units and subtracting that from the original leaves a band of constant width hugging the outline — exactly what a neon shop does, bending tube along the edge of painted lettering. The white core is eroded out of the same band, the halo is the band dilated and blurred, and the four layers merge back into one. The bricks are painted once by a canvas: every brick its own hue and lightness, a hairline of light along its top, a shadow under it, grain over the lot; after that not one frame is painted. Lighting up is not a fade but a fixed score of blinks: the ring stutters first, the bar follows, then the letters one at a time, each hesitating in its own way, until it holds. The sign is the bar's main switch: lights off, music stops; lights on, it plays again and the music comes back. The same sign now hangs over the site's front door: landing on the cover you meet it first, and the way in is through the ring — the letters go dark, the ring holds, the paper shows through it and the wall pushes past you. The music is the site's background music, its player hidden in the layout behind the wall, and the recording is one we host ourselves: Hurwitz's Mia & Sebastian's Theme, all three minutes and nineteen seconds of it, starting over when it ends — no embedded player, and so no login to get past. It is asked to play the moment the sign holds steady; if the browser refuses (you have not clicked anything on this site yet), your first click on the page tries again; once inside, the note on the island is its switch. Further along the wall hang a few stills from the film's nights.",
+        "note": "There is no font, on the sign in the film or here: the lettering follows a vector traced stroke by stroke from the film and published on Wikimedia Commons (Seb's.svg, Espandero, CC BY-SA 4.0). The ring's centre and radius, the angles of its two breaks — at the top right where the note's stem leaves it, and at the lower left — the ends of the bar, and the whole outlines of the S and the note are measured straight off it. The original has no F or H: the F is its E without the foot, the stem closed with the same rounded end as the arms, keeping even the little stub of the middle arm that pokes out past the stem; the H is two stems joined by a bar as heavy as the E's middle arm, its edges on the same tilt. The letters stand upright on a baseline that climbs 9.5° to the right; the ring's left arc simply stops at the lower left, while the right arc runs round the bottom and folds back up into the bar — one tube. What is drawn is the solid letter; the tube is found by a filter: feMorphology erodes the shape inward by thirteen units and subtracting that from the original leaves a band of constant width hugging the outline — exactly what a neon shop does, bending tube along the edge of painted lettering. The white core is eroded out of the same band, the halo is the band dilated and blurred, and the four layers merge back into one. The bricks are painted once by a canvas: every brick its own hue and lightness, a hairline of light along its top, a shadow under it, grain over the lot; after that not one frame is painted. Lighting up is not a fade but a fixed score of blinks: the ring stutters first, the bar follows, then the letters one at a time, each hesitating in its own way, until it holds. The sign is the bar's main switch: lights off, music stops; lights on, it plays again and the music comes back. The same sign now hangs over the site's front door: landing on the cover you meet it first, and the way in is through the ring — the letters go dark, the ring holds, the paper shows through it and the wall pushes past you. The music is the site's background music, its player hidden in the layout behind the wall, and the recording is one we host ourselves: Hurwitz's Mia & Sebastian's Theme, all three minutes and nineteen seconds of it, starting over when it ends — no embedded player, and so no login to get past. It is asked to play the moment the sign holds steady; if the browser refuses (you have not clicked anything on this site yet), your first click on the page tries again; once inside, the note on the island is its switch. Further along the wall hangs the /films/lala room's set of stills, in the order of the story.",
         "welcome": "Welcome to",
-        "signOn": "Switch the sign on",
-        "signOff": "Switch the sign off",
+        "signOn": "The sign's light",
         "galleryKicker": "Stills · La La Land · 2016",
         "galleryTitle": "A few hung on the wall",
-        "galleryLede": "All from the film's nights: a piano, a lamp, the stars, and a road that never ends.",
-        "credit": "Stills © 2016 Summit Entertainment / Lionsgate, via TMDB; sign lettering after Seb's.svg by Espandero on Wikimedia Commons (CC BY-SA 4.0); used here as a personal homage only.",
-        "pianoTitle": "A night at Seb's",
-        "pianoMeta": "Seb's · piano · the lighthouse window",
-        "pianoAlt": "Sebastian playing the piano inside Seb's, a round stained-glass lighthouse window behind him",
-        "lovelyNightTitle": "A lovely night",
-        "lovelyNightMeta": "Griffith Park · violet dusk",
-        "lovelyNightAlt": "Mia and Sebastian tap-dancing beside a bench on the hill, violet dusk and city lights beyond",
-        "lampTitle": "Under the lamp",
-        "lampMeta": "The city lit below",
-        "lampAlt": "The two of them embracing under a streetlamp at night, the lights of Los Angeles spread below",
-        "pierTitle": "City of Stars",
-        "pierMeta": "Hermosa Beach · the pier · dusk",
-        "pierAlt": "Sebastian walking alone down the pier at dusk, the lamps just coming on",
-        "planetariumTitle": "Between the stars",
-        "planetariumMeta": "Griffith Observatory · afloat",
-        "planetariumAlt": "The two of them dancing in the air under the planetarium's starry dome",
-        "keysTitle": "Epilogue",
-        "keysMeta": "Epilogue · a road of piano keys",
-        "keysAlt": "In a white world, a winding road of piano keys leads to a distant streetlamp, the two of them at its end"
+        "galleryLede": "From the first dance on the freeway to the posters' road of piano keys, hung in the order of the story.",
+        "credit": "Sign lettering after Seb's.svg by Espandero on Wikimedia Commons (CC BY-SA 4.0); used here as a personal homage only."
       },
-      "album": {
-        "hint": "Turn with the arrows — or the arrow keys",
-        "name": "An album that actually turns",
-        "tagline": "CSS 3D · nested strips",
-        "summary": "The twelve stills off the 大话西游 room's wall, bound as a book. The leaf that turns is not a plane on a hinge — it is eighteen nested strips, each rotated a little further than the last, and the sum of them is the arc paper bends through.",
-        "note": "There is no canvas in this one and no WebGL: the turn is drawn by the browser's own 3D compositor. The trick is the nesting — eighteen divs inside one another, each adding the same small angle to its parent's rotation, and because transforms inherit, eighteen small turns accumulate into a curve. Every strip carries the same still, slid sideways by its own share of the width, so a picture broken into eighteen pieces adds back up to a continuous page. Per frame JavaScript does one thing: work out eighteen pairs of shading numbers and write them onto custom properties. The compositor does the rest. Halfway through, the leaf goes edge-on and the faces swap — which is why its back carries the page you are turning to. The stills are the same files and the same captions that room already ships; this only binds them. With no JavaScript at all it is an honest list of pictures.",
-        "prev": "Previous page",
-        "next": "Next page",
-        "counterAria": "Page number"
+      "sideways": {
+        "name": "One line, sideways",
+        "tagline": "ScrollTrigger pin + containerAnimation + SplitText",
+        "summary": "Scroll down and the sentence walks left. The passage pins for one screen, vertical scroll becomes horizontal travel one to one, and every character tumbles into place from a random height and angle as it crosses the stage.",
+        "note": "The pin distance is not a number: it is the track's overflow, so a pixel of scroll is a pixel of travel (the ease has to be none for that). Each character carries its own ScrollTrigger with containerAnimation pointed at the horizontal tween, so \"left 100% → left 40%\" measures horizontal progress, not page height. Everything that makes it a band — the full-height stage, the max-content track, the 100vw run-up — is written by GSAP as inline styles inside a matchMedia branch, so the server output, and every touch screen, gets a plain centred statement that simply fades up; a locale switch re-splits. The manifesto on /about is this component (fx/SidewaysBand).",
+        "lead": "Up to here the page runs downward.",
+        "lineOne": "Slow down, and the line sets itself.",
+        "lineTwo": "慢一点，字会自己排好。",
+        "lineThree": "pin · scrub 1 · ease none",
+        "tail": "And here the scrollbar is vertical again. Scroll back, and the sentence comes apart the way it came."
+      },
+      "masthead": {
+        "name": "The masthead's line mask",
+        "tagline": "overflow hidden · yPercent 112 → 0 · 110ms apart",
+        "summary": "How the cover's masthead arrives: each line rises from behind its own clip, as if it had been there all along.",
+        "note": "Each line is wrapped in overflow hidden, and the inner one rises from 112% to 0 over 1.05s on expo.out, lines 110ms apart. On the cover it is a CSS transition fired by the opening ritual; here it is a GSAP tween fired on entering the viewport, so it can be replayed — \"Again\" remounts the two lines, which is what a route change does. Why a mask beats a fade: a fade says \"it just appeared\"; a mask says \"it was always there, you just saw it\".",
+        "label": "Masthead · line mask",
+        "replay": "Again",
+        "lineOne": "Slow down,",
+        "lineTwo": "and the world starts to speak."
+      },
+      "reveal": {
+        "name": "The y:24 reveal",
+        "tagline": "The site's one scroll entrance · power2.out 0.6s",
+        "summary": "How every list and every block on the site arrives: fading up from 24px below, children 60ms apart. There is only this one, which is why the whole site keeps one rhythm.",
+        "note": "The Reveal component: y 24, opacity 0 → 1, 0.6s power2.out, once at \"top 85%\", and with a stagger the children come 60ms apart. The content is always in the DOM (server-rendered, indexable); GSAP hides it on the client only the moment before the from-tween runs — with opacity alone, never visibility: transparent content stays in the tab order and in find-in-page, so a keyboard reaches it, the browser scrolls to it, and the scroll plays the entrance. Only the first twelve children take a turn in the stagger; the rest come in on the twelfth's heels, so the end of a long list never queues. On landing clearProps drops transform, opacity and visibility, so no inline residue is left — hover tweens and Flip reads elsewhere see clean elements. It is the site's only scroll entrance; nothing else is allowed. \"Again\" remounts the list.",
+        "label": "List · y:24, staggered",
+        "replay": "Again",
+        "itemOne": "The first row comes from 24px below",
+        "itemTwo": "The second, 60ms later",
+        "itemThree": "The third, 60ms after that",
+        "itemFour": "All on the same numbers",
+        "itemFive": "No inline styles left behind"
+      },
+      "headline": {
+        "name": "The headline's decode",
+        "tagline": "ScrambleText · lowercase set · 0.9s",
+        "summary": "A Latin article headline's entrance: it decodes letter by letter, a typewriter finding the words, not a hacker terminal.",
+        "note": "PostTitle decides by whether the title has any CJK in it; a Latin title takes one 0.9s ScrambleText pass with a lowercase character set, speed 0.6, revealDelay 0.15 — each position turns over a few lowercase letters before settling, which reads as a typewriter finding the words. A Chinese title never comes this way: swapping in a glyph of a different width every frame reads as noise rather than typing, and its entrance is the line-mask study. \"Again\" remounts the title, which is what a route change does.",
+        "label": "Headline · decode",
+        "replay": "Again",
+        "title": "On side projects, and why they stay small"
+      },
+      "unmask": {
+        "name": "The Chinese headline's line mask",
+        "tagline": "SplitText mask: lines · autoSplit",
+        "summary": "A Chinese article headline's entrance: no decoding — each line rises from behind its own mask, and the lines are cut again once the font lands.",
+        "note": "The same PostTitle takes this path when the title has CJK in it: SplitText cuts it into lines, masks each one, and runs yPercent 110 → 0, 80ms apart. It looks like the masthead's line mask; the difference is who cuts the lines — the masthead's two are written by hand, these are found by SplitText at runtime from the actual width. autoSplit is load-bearing: when this runs for a Chinese title the font slices are usually still in flight, and lines cut against the fallback face break elsewhere once Yozai lands; autoSplit waits for the font, re-splits and rebuilds the tween from where it was. \"Again\" remounts the title.",
+        "label": "Headline · line mask",
+        "replay": "Again",
+        "title": "一封写给数字修士的信"
+      },
+      "magnetic": {
+        "name": "Magnet",
+        "tagline": "Pointer follow · three strengths",
+        "summary": "A button that leans toward the cursor, its label leading a little further; the moment the cursor leaves the ring, both spring home. Three buttons, three strengths, and a dotted ring showing how far the pull reaches.",
+        "note": "After GSAP's own demo azmKBBJ: the box is measured once on pointerenter (per hover, never per frame), pointermove turns the cursor's offset from centre, times a strength, into x/y, and the inner layer goes 0.6x further so the label seems to float above the plate; on leave both spring home on elastic.out. The first version listened to the layer that moves, and that gave it two faults: at ×0.75 the plate and its label together travel 1.2x the cursor's offset, so the button outruns the cursor, the cursor is always over it, pointerleave never fires, and one button could be dragged across half the screen; at the edge of that it flip-flopped between leave and enter, which read as a shiver. Now there are three layers: the outermost never moves — it only listens and is measured, with a 20px hit ring round it — and the plate and label move on their own. Whether the cursor is still here is decided against the resting box plus the ring; out of the ring, let go, wherever the plate has got to. Mouse-only.",
+        "label": "Magnet · three strengths",
+        "weak": "Light",
+        "medium": "Medium",
+        "strong": "Strong",
+        "reachNote": "The dotted ring is the reach: the pull starts when the cursor enters it and lets go when it leaves, wherever the button itself has got to.",
+        "touchNote": "On touch the buttons are buttons — the magnet only answers a mouse."
+      },
+      "glint": {
+        "name": "Glint",
+        "tagline": "feSpecularLighting · the light follows",
+        "summary": "A rim of glass that catches the light the cursor carries — only the edge lights up. The island at the top of every page wears the same one.",
+        "note": "The island's trick: a 1.5px white ring whose filter uses feSpecularLighting on SourceAlpha as the surface and an fePointLight as the lamp, then feComposite in clips the highlight back to the ring's own alpha — so only the edge is lit. The light's x/y live in the ring's own filter space, which is the pointer minus the card's corner, eased over 0.3s of power2.out on each pointermove so the lamp follows softly. On the island the light parks above the capsule's top rim and only its x follows; a card is wide enough to follow in both axes, and here the lamp sits higher (z 36) with a broader hotspot (exponent 12), so the whole rim answers as the pointer crosses, not one point of it. Mouse-only.",
+        "label": "Glint · the light follows",
+        "cardKicker": "Glass · thin",
+        "cardTitle": "The edge catches the light",
+        "cardBody": "Move the pointer across the card. The lit stretch is always the edge nearest the light.",
+        "touchNote": "On touch the card is a card — the glint only answers a mouse."
+      },
+      "dieCut": {
+        "name": "The die-cut edge",
+        "tagline": "feMorphology dilate · zero JavaScript",
+        "summary": "The site's content material: grow anything's alpha outward and fill it white, and it is a die-cut sticker. One filter, three radii.",
+        "note": "The edge is feMorphology dilate: grow SourceAlpha by N pixels, fill white, lay the artwork back on top — zero JavaScript, server-rendered; the three thicknesses are the same filter at three radii. The tilt uses the standalone CSS rotate property rather than transform, because the wall's Draggable writes transform and a thrown sticker should keep its lean. Stickers are this site's material for content: what can be stuck on is content, which is why they have a quota.",
+        "label": "Edge · three radii",
+        "sample": "Sticker"
+      },
+      "stickerWall": {
+        "name": "The sticker wall",
+        "tagline": "Polar entrance · CustomWiggle · Draggable + Inertia",
+        "summary": "The wall on /about: stickers fly in from an arc above into their slots, shiver on hover, and a mouse can throw them.",
+        "note": "The entrance is in polar coordinates: each sticker sets off from an arc above the wall and lands in its slot on elastic.out(1, 0.5), 50ms apart. Hover is a CustomWiggle on rotation only, so it composes with the transform the drag writes instead of fighting it. Drag is Draggable + Inertia: edgeResistance for a rubber-band edge, minimumMovement 10 so a stray click never counts as a throw; on release one or two mini stickers puff off from a pool of eight and fade upward. Drag is for fine pointers only — on a phone, hijacking the swipe over a wall this wide costs a page that will not scroll, more than the play is worth; on touch it is an honest row of stickers. The words here are the site's toolbox, which reads the same in both languages, so the demo carries no copy for them.",
+        "label": "Wall · throwable",
+        "wallTitle": "Toolbox",
+        "wallHint": "Throw with a mouse · tap on a phone",
+        "wallAria": "A wall of draggable stickers"
+      },
+      "peel": {
+        "name": "The peel",
+        "tagline": "CSS 3D · one boolean",
+        "summary": "The footer's note stuck over the email address: hover curls its edge, a click folds it up along the top, shows the adhesive, and fades it away. React flips one boolean.",
+        "note": "A pure CSS state machine: React flips one boolean and everything else is a transition on transform and opacity. The fold is rotateX under a 520px perspective, with the grey adhesive glimpsed halfway; the lift is sold by two stacked shadows cross-faded on opacity — box-shadow itself never animates, being a property that repaints every frame. A second activation (keyboard included) sticks it back on. While covered, the link underneath is tabIndex -1 and aria-hidden, so it cannot be tabbed into. The big one in the corner of the 404 goes further and can really be peeled off (a clip-path crease). Here it covers a line instead of an address.",
+        "label": "Peel · one boolean",
+        "peelHint": "Peel me",
+        "peelAria": "Peel the sticker",
+        "secret": "Nothing under here."
+      },
+      "scatter": {
+        "name": "Scatter and gather",
+        "tagline": "Canvas 2D · discrete spring",
+        "summary": "The line on the 404: sampled into particles, pushed apart by the pointer, springing home when it leaves; once every dot is home the loop stops outright.",
+        "note": "It samples the paragraph's own computed font and box, so nothing moves the moment the canvas takes over. Each dot is a discrete spring, v ← f·(v + e·(target − pos)); the state matrix's determinant is exactly f, and in the underdamped region the displacement envelope decays by √f per frame — so one parameter sets how long settling takes (1.1s to 1%), the ease only sets the overshoot, and each dot's ease is randomised a little so they do not arrive in lockstep. The pointer pushes dots apart within 90px, and still counts as approaching a little way outside the canvas. Once every dot is home requestAnimationFrame really stops; only the pointer, a resize or a theme flip wakes it. Mouse-only: on touch it is a paragraph.",
+        "label": "Scatter · gather",
+        "pointerHint": "Push the pointer in",
+        "text": "Scatter",
+        "touchNote": "On touch it does not move: it is a paragraph."
+      },
+      "dotName": {
+        "name": "A name in the noise",
+        "tagline": "7×7 dot fields · superellipse rim · shallow sphere",
+        "summary": "The name on /about: each letter a field of dots padded with noise, every dot's brightness drifting; point at it and the noise collapses, the letters surface.",
+        "note": "Each letter is a 7×7 dot glyph set in a field one cell wider on every side, and that ring is pure noise. The field's edge is not square: it is carved by a superellipse of exponent 4 — a circle would clip the corners of F and H, a square is exactly the die-cut look this escapes — and the cutoff radius jitters, so the edge is ragged rather than stamped. The grid is projected onto a shallow sphere, so the spacing opens in the middle and tightens at the rim; that is the field's shape and does not change on hover. Every dot is a small ellipse at a random angle, drifting in brightness on its own, and the name hides in the noise; when the pointer arrives the noise collapses and the stroke dots surface. The glyph table has A–Z only. Mouse-only: on touch it is a still field.",
+        "label": "A name in the noise",
+        "pointerHint": "Point at it",
+        "text": "FHF",
+        "touchNote": "On touch it does not move: it is a still field."
+      },
+      "approach": {
+        "name": "The approach",
+        "tagline": "CSS sticky + clip-path window + WebGL2 wash",
+        "summary": "The cover's second and third acts, as they are: the scroll opens a window in the paper onto a grove still being drawn, two paper cards standing in it — one under the canvas, one in front — holds a beat, and the next page's paper comes back down along the dissolve's front.",
+        "note": "What is pinned here is a window, not a line, so it uses CSS sticky rather than ScrollTrigger's pin: a pin-spacer has to be measured against a page whose height Lenis is smoothing, and a sticky element needs nothing measured. ScrollTrigger only reports progress — one 320svh section, the first 42% walking in (the clip-path's rounded frame opening on outQuad, the scene scaling 1.16 → 1), a hold, and from 62% the paper coming down, along the same threshold field as the dissolve study, painting paper instead of picture. Two paper cards stand in the window, one root apart. A card cannot stand behind a photograph of a grove, only behind a grove that is still being drawn, and the whole trick is one rule: card a carries no z-index, so it paints under the canvas and the trunk crosses the empty corner at its lower right; card b sits at z 3, in front of the root. The pair stands at 860 × 160 and 1237 × 482 on the stage's 1600 × 880 grid, and it is the pair that carries the depth: two sheets of the same paper at the same size, one in front of the moss and one behind it. Under the pointer the two ride by different amounts, and that difference is the distance between them. Between the window and the wash the frame is all moss; body carries data-grove-immersed then, and the masthead's paper scrim stands down for it.",
+        "kicker": "Study {ordinal}",
+        "title": "A window onto the moss",
+        "linkLabel": "See the one that grows"
+      },
+      "segmented": {
+        "name": "The segmented control's pill",
+        "tagline": "GSAP Flip · one element sliding",
+        "summary": "The selected pill in the software page's filter: on a change it slides from the slot it was in to the one it is going to, instead of appearing in the new slot.",
+        "note": "The indicator is one element: on change Flip.getState remembers where it is, it is set to the new slot, and Flip.from plays the difference — it inherits its position from the previous state, which is what makes it read as one physical part sliding. The first placement never animates: there is no previous state to inherit. On resize it is re-seated without animation — a layout correction, not a transition. The arrow keys move between slots too. The grid that reshuffles is its own study, not mixed into this one.",
+        "label": "Segmented control · pill",
+        "ariaLabel": "Pick a section",
+        "all": "All",
+        "writing": "Writing",
+        "software": "Software",
+        "lab": "Lab",
+        "selected": "Selected",
+        "keyNote": "The left and right arrow keys switch too, and the pill slides just the same."
+      },
+      "reshuffle": {
+        "name": "Filter and reshuffle",
+        "tagline": "GSAP Flip · the difference, replayed in the layout phase",
+        "summary": "When the software page is filtered by category, the app cards do not snap to a new arrangement: the ones that stay slide from their old cell to their new one, and the rest fade out. Nine coloured tiles stand in for the cards here — pick a shape, fix your eye on one tile, and watch where it goes.",
+        "note": "Every tile stays in the DOM and the filter only toggles display; the timing is the whole trick: the state is captured in the click handler, before React re-renders, and Flip.from runs in a layout-phase useGSAP so the new positions never paint first. Entering tiles fade in from scale 0.94, leaving ones go the other way, 30ms apart. The filter buttons here are plain on purpose — the sliding pill is the segmented control's own study, not mixed into this one. On a phone the software page drops this for a seamless rail you can flick (a Draggable proxy plus wrap).",
+        "ariaLabel": "Filter by shape",
+        "all": "All",
+        "round": "Round",
+        "square": "Square",
+        "line": "Line",
+        "gridNote": "Rapid clicking stays tidy: every click first finishes the reshuffle still in flight and wipes what it wrote, then starts from there.",
+        "label": "Grid · filter and reshuffle",
+        "lede": "Press Round, Square or Line: the three that stay slide up into the first row and the other six fade out; press All and they go back the way they came. If it is too quick, choose the slow motion; to see what the page would be without the effect, switch the animation off.",
+        "filterName": "Filter",
+        "motionName": "Animation",
+        "motionAria": "Choose how it animates",
+        "motionSite": "As on the site",
+        "motionSlow": "4× slower",
+        "motionNone": "Off",
+        "readoutIdle": "All nine are here and nothing is filtered yet. Press any shape above.",
+        "readout": "That change: {stay} stayed, sliding to wherever their place now is; {enter} faded in, {leave} faded out.",
+        "readoutNone": "That change had no animation: {stay} stayed, {enter} appeared and {leave} vanished, all in one instant — there is no following any tile, and that is the problem this effect solves."
+      },
+      "statue": {
+        "name": "A statue built in code",
+        "tagline": "R3F · capsules · render on demand",
+        "summary": "The bronze Kobe from the idols page. It is not a downloaded 3D model: twelve capsules and a few spheres and boxes, placed in code. And it is drawn only while you turn it — standing still, the graphics card draws no frame at all. Two things are added here so both can be seen: a wireframe view and a frame counter.",
+        "note": "It reads as a statue because everything about it is statue: one metal, one base, one gesture. Limbs are capsules from one joint to the next, turned off the y axis with setFromUnitVectors; the number is painted once to a canvas and mapped on — no font file, no glyph mesh. Nothing runs on a clock: the canvas renders on demand, the turn is a ref the stage writes before asking for one frame with invalidate(), and a parked scene draws nothing. Drag to turn on a mouse; touch and keyboards get the two arrows — hijacking a swipe on a phone would fight the page's scroll. Without WebGL, or under Save-Data, a photograph stands here instead.",
+        "label": "Statue · capsules · render on demand",
+        "lede": "Drag the statue, or press the arrows at its lower right, and watch the frame count below: it climbs only while the figure turns and stops the moment you do. Then switch to the wireframe and count the simple shapes it is made of.",
+        "viewName": "View",
+        "viewAria": "Choose the view",
+        "viewBronze": "Bronze",
+        "viewWire": "Wireframe",
+        "frameLabel": "Frames drawn",
+        "stateDrawing": "Drawing",
+        "stateIdle": "Parked · drawing nothing",
+        "frameNote": "An ordinary 3D scene redraws sixty times a second whether or not anything moved; this one stops drawing entirely when it stops turning, so leaving the page open costs no battery and spins no fan."
+      },
+      "changelog": {
+        "name": "Version history",
+        "tagline": "ScrollTrigger snap · tooltips",
+        "summary": "The life numbered like software from /about. The year on the left is a window one row tall; when an entry passes the middle of the viewport it rolls to the next year.",
+        "note": "The rows are the ones on /about, read from the database. Both pieces of motion are wayfinding, not decoration: the year rail is a stack of years behind a one-row window, and as each entry crosses the middle of the viewport ScrollTrigger snaps the stack to that entry's year, so the reader always knows when they are; each node pops the exact date on hover or focus, entering on back.out and leaving on the reversed ease at 2.2× — arrive generously, leave briskly. The rail folds away on narrow screens."
+      },
+      "screening": {
+        "name": "The screening room",
+        "tagline": "Native dialog · six-column wall",
+        "summary": "The film pages' move: stills hung six columns wide on paper, and a click opens the screening room — a native dialog, the still as large as the viewport allows, arrow keys, buttons or a swipe to move along.",
+        "note": "Every still is a link to its own file, so with no JavaScript a click still opens the picture. With it, the click opens the room: dialog.showModal() takes focus and makes the page inert behind it, scrolling goes through the shared lock (Lenis stop + overflow hidden, then scrollTo → start → refresh on the way out), and focus returns to the print that opened it. Opening is a 0.35s fade with the frame settling 0.96 → 1; a step slides the next still in 24px from the side it came from; leaving fades on power2.in and then calls close() — the state is unwound only in the native close event, so Escape, the backdrop and the button all take the same road. The stills and their captions are the 大话西游 room's, rights line included."
+      },
+      "lights": {
+        "name": "Lights",
+        "tagline": "startViewTransition · 1.2s cross-fade",
+        "summary": "The site's theme switch, the footer's own. It flips a three-part theme contract inside a view transition; sound, buzz and the fade land on the same frame.",
+        "note": "The switch flips localStorage 'fhfs-theme' + data-theme + the 'fhfs:theme' event, and every instance stays in sync by listening to that event. The swap is wrapped in document.startViewTransition, which globals.css stretches into a 1.2s cross-fade — not element-by-element recolouring, but two snapshots of the whole page laid over each other. On the same frame come a synthesised square-wave click (one AudioContext, created on the first click, no assets) and a 10ms buzz: the one place on the site that is allowed to be multimodal. The server cannot know the theme, so it renders light and reads the truth back in a layout effect — a passive effect would show dark-mode readers one frame of a switch flipped fully on.",
+        "label": "Lights",
+        "body": "The site's theme lever, the footer's own, at two and a half times its size. Sound, buzz and the 1.2s cross-fade land on the same frame."
+      },
+      "readingChip": {
+        "name": "Reading progress",
+        "tagline": "scroll → scaleX · rAF-throttled",
+        "summary": "The capsule at the bottom-left of an article: a hairline track and a percentage. It appears only on articles; here it measures this page.",
+        "note": "Scroll events are rAF-throttled and each tick writes only a transform and a textContent — no layout mutation, no React re-render. The entrance is one 0.35s float-in, and after that the capsule itself never moves again; only the fill's scaleX follows the scroll. role=progressbar with aria-valuenow lets a screen reader report the progress. In the layout it appears only on an article route, /blog/… — the pattern is anchored at both ends, or every tag listing grows a percentage too. This page is deliberately tall, so there is a distance to measure.",
+        "label": "Reading progress",
+        "body": "The capsule bottom-left. Articles only; here it measures this page."
+      },
+      "radialFan": {
+        "name": "The radial fan",
+        "tagline": "Polar · elastic.out · reversed at 2.2×",
+        "summary": "The plus in the bottom-right corner of an article on a phone: four glass buttons fan out along a 90° arc, and closing reverses the same timeline. Wide screens do not have it.",
+        "note": "The four buttons fan along the quarter-circle from 180° to 270°, radius 104, on elastic.out(1, 0.5) with a 0.05s stagger, while the plus turns 135° into a cross. The timeline is built once and toggled with play() / reverse(), so a tap mid-flight turns the menu around instead of queueing; closing runs on easeReverse at 2.2× — entrances may be showy, exits are crisp. Phones only: on a wide screen the island covers the same ground, and two menus competing is worse than none.",
+        "label": "Radial fan",
+        "body": "The plus at the bottom right: tap it and four buttons fan out along a 90° arc; tap again and it reverses. On the site it exists only on phones; here it is mounted on wide screens too."
+      },
+      "overture": {
+        "name": "The lamp",
+        "tagline": "Once per session · a sessionStorage key",
+        "summary": "The first 0.9s of a session: blackout, a cord dropping, a glow flooding the page into view. It plays once per session, so the button hands the key back and reloads.",
+        "note": "The ritual is played by OvertureLight in the layout, and whether it has played is kept in sessionStorage; this study cannot mount it — it is the act of arriving itself. So the button calls forgetOverture(): it hands the key back and reloads this page, and the layout plays it again on the way in. The masthead's line mask is what it triggers.",
+        "label": "The lamp",
+        "body": "The first 0.9s of a session: blackout, a cord dropping, a glow flooding the page into view.",
+        "action": "Watch again",
+        "reducedNote": "Your system asks for reduced motion, so the lamp is skipped and a reload shows nothing — turn that setting off to see it."
+      },
+      "door": {
+        "name": "The way in",
+        "tagline": "A hard landing · through the ring",
+        "summary": "On a hard landing at the cover you meet the brick wall and the neon first, and the way in is through the ring: the letters go dark, the ring holds, the paper shows through it, and the wall pushes past you.",
+        "note": "Whether the sign plays is decided on a hard landing at the cover, before the first paint, by the inline script in lib/splash (a data-splash attribute on the html element), once per session; an in-site navigation never plays it. So this study can only send you back to the door: forgetSplash() hands the sessionStorage key back and the page does a full load of the cover. How the sign is drawn and lit is study 08; this is the push through it.",
+        "label": "The way in",
+        "body": "The brick wall and the neon on a hard landing at the cover. The way in is through the ring.",
+        "action": "Back to the door"
+      },
+      "veil": {
+        "name": "The veil",
+        "tagline": "RouteTransition · any in-site link",
+        "summary": "Any in-site link: glass frosts over this page, and the next one condenses out of it. It is on every route change, so here a button plays it in place.",
+        "note": "RouteTransition catches the click on any in-site link: the veil frosts over first, the new route's content arrives behind it, and only then does it lift — the page changes behind the frost and the reader never sees a blank. External links, file links marked data-no-transition and modifier-key clicks pass through untouched. It happens between pages, so there was nothing to mount, and a link to this very page is ignored; so RouteTransition gained one lab-only event: the button frosts the veil in place, holds a beat and lifts it, on the same cover and reveal, without a navigation and without moving the scroll.",
+        "label": "The veil",
+        "body": "Any in-site link: glass frosts over this page, and the next one condenses out of it. Here it plays in place, without leaving.",
+        "action": "Play it"
+      },
+      "island": {
+        "name": "The island",
+        "tagline": "Folds on scroll · 48px",
+        "summary": "The capsule overhead, on every page: on a wide screen 48px of scrolling down folds it, 48px back up unfolds it. Nothing to stage — scroll down.",
+        "note": "The island is at the top of every page, this one included, so there is nothing to mount: scroll down and watch it fold; scroll back and watch it open. Folding follows the direction and distance of the scroll, not the position — 48px down folds it, 48px up unfolds it, wherever you are on the page, so the navigation is always one flick away. At 1024px and up it opens with all six doors showing and folds to a capsule as you scroll; the light on its rim is the filter of study 15. This page is deliberately tall, so there is a distance to scroll.",
+        "label": "The island",
+        "body": "Overhead. On a wide screen 48px of scrolling down folds it, 48px back up unfolds it."
       }
     }
   },
@@ -538,12 +784,21 @@
     "countFilms": "{count, plural, one {# film} other {# films}}",
     "empty": "Nothing told yet",
     "items": {
-      "moments": { "title": "Peak Talk", "line": "The board: a few lines and a time, since 2017." },
-      "secrets": { "title": "Secret", "line": "Essays and episodes — what the notes are not." },
-      "idols": { "title": "Idols", "line": "The people on the wall. First, Kobe." },
+      "moments": {
+        "title": "Peak Talk",
+        "line": "The board: a few lines and a time, since 2017."
+      },
+      "secrets": {
+        "title": "Secret",
+        "line": "Essays and episodes — what the notes are not."
+      },
+      "idols": {
+        "title": "Idols",
+        "line": "The people on the wall. First, Kobe."
+      },
       "films": {
         "title": "Films",
-        "line": "The ones watched too many times: A Chinese Odyssey, Secret. A wall of stills each, and a record at the door."
+        "line": "The ones watched too many times: A Chinese Odyssey, Secret, La La Land. A wall of stills each, and a record at the door."
       }
     }
   },
@@ -781,6 +1036,104 @@
         }
       },
       "credit": "Stills © 2007 Edko Films / JVR Music, official stills via Douban and TMDB; 路小雨, from the film's own soundtrack (Jay Chou, 2007), is a recording this site hosts itself, played whole and looped. A personal homage only."
+    },
+    "lala": {
+      "kicker": "La La Land · 2016",
+      "title": "La La Land",
+      "subtitle": "A pianist who wants a club of his own, a barista who wants to act: in love in Los Angeles, both dreams come true — just not with each other.",
+      "latin": "爱乐之城",
+      "meta": "Ryan Gosling · Emma Stone · 2016",
+      "lede": "In 2016 Damien Chazelle set the golden-age musical down in today's Los Angeles: a jam on the freeway throws Sebastian, who plays jazz, and Mia, who waits tables and fails auditions, into the same dance. They fall in love under a purple sky and let go where their dreams come true. Mia & Sebastian's Theme plays while you are on this page.",
+      "facts": {
+        "director": "Damien Chazelle",
+        "cast": "Ryan Gosling · Emma Stone · John Legend · Rosemarie DeWitt",
+        "released": "2016.12.09 · U.S.",
+        "runtime": "128 min",
+        "rating": "8.4"
+      },
+      "storyTitle": "Winter, spring, summer, fall — and winter again",
+      "story1": "In winter Mia waits tables on the studio lot and fails audition after audition, while Sebastian plays the jazz he believes in and is fired for it; a jam on the freeway throws the two of them into the same dance. In spring an old picture house and a planetarium full of stars draw them together; in summer each runs hard — Mia writing her one-woman show, Sebastian touring with Keith's band, singing songs he doesn't believe in — until autumn, and a dinner where it all comes apart. The night the show flops, Mia goes home; one phone call brings her back to a bare audition room, where one quiet song sends her to Paris — and, on a path above the city, the two of them apart. Five winters later, Mia the actress walks into a jazz club called Seb's, and the opening number under the light plays the road they didn't take, from the top.",
+      "linesTitle": "The ones I remember",
+      "lines": {
+        "passionate": {
+          "text": "People will want to go to it because you're passionate about it, and people love what other people are passionate about. You remind people of what they've forgotten.",
+          "meta": "Mia, to Sebastian"
+        },
+        "fools": {
+          "text": "Here's to the ones who dream, foolish as they may seem.",
+          "meta": "Mia, at the audition — Audition (The Fools Who Dream)"
+        },
+        "always": {
+          "text": "I'm always gonna love you. — I'm always gonna love you, too.",
+          "meta": "Mia and Sebastian, on the path after the audition"
+        }
+      },
+      "stillsKicker": "Stills · 2016",
+      "stillsTitle": "The scenes that stayed",
+      "stillsLede": "The dance on the freeway, the tap under a purple sky, dusk on the pier, a look across a cinema, and the posters' road of piano keys. Open any of them for the screening room.",
+      "stills": {
+        "freeway": {
+          "title": "The freeway",
+          "meta": "Opening · Another Day of Sun",
+          "alt": "On a jammed freeway the drivers leap out of the traffic with their arms flung wide, a woman in a green top jumping highest, the skyline of Los Angeles far behind"
+        },
+        "roommates": {
+          "title": "Roommates",
+          "meta": "Getting ready · Someone in the Crowd",
+          "alt": "In a blue apartment corridor Mia clutches a blue dress to herself with her hands over her ears, while her three roommates in red, green and yellow lean on the walls and watch her"
+        },
+        "piano": {
+          "title": "The lighthouse window",
+          "meta": "The Lighthouse Café · the piano",
+          "alt": "In a brick-walled jazz club Sebastian looks back from the piano bench, a round stained-glass window with a lighthouse behind him"
+        },
+        "lovelyNight": {
+          "title": "A lovely night",
+          "meta": "The overlook · A Lovely Night",
+          "alt": "On an overlook above the city the two land the same tap step, Mia's yellow dress just settled, a starry purple sky and one lit white lamppost behind"
+        },
+        "pier": {
+          "title": "The pier",
+          "meta": "Hermosa Beach · dusk",
+          "alt": "At dusk Sebastian walks alone down the pier, old lamp posts on either side, the sky turning from pink to violet"
+        },
+        "cinema": {
+          "title": "The cinema",
+          "meta": "The Rialto · the date",
+          "alt": "In the red seats of a picture house the two sit side by side and turn to each other, the audience a blur behind"
+        },
+        "planetarium": {
+          "title": "The planetarium",
+          "meta": "Griffith Observatory · among the stars",
+          "alt": "Inside a projection of stars the two rise into the air hand in hand, the city a blue blur below"
+        },
+        "lamp": {
+          "title": "The lamppost",
+          "meta": "Poster · a kiss under the lamp",
+          "alt": "Against a lit lamppost at night the two embrace and kiss, the yellow dress caught mid-swing, Los Angeles glowing below"
+        },
+        "messengers": {
+          "title": "On tour",
+          "meta": "The Messengers · on stage",
+          "alt": "On a stage before a deep red curtain Sebastian sings into a vintage microphone, a wash of blue behind him"
+        },
+        "stage": {
+          "title": "Before the screen",
+          "meta": "The Rialto · looking for him",
+          "alt": "Among the red seats of an old picture house Mia, in a green dress and seen from behind, stands before the screen with the projector's beam shining straight at her; in the aisle to the right, Sebastian in a tan suit stands looking at her"
+        },
+        "moonDoor": {
+          "title": "The moon door",
+          "meta": "What if · the reverie",
+          "alt": "Through a round doorway the two stand hand in hand, backs to us, facing a hand-painted Paris riverbank — a street clock, lit windows, the water — with red leaves strewn on the ground"
+        },
+        "keys": {
+          "title": "A road of piano keys",
+          "meta": "Poster · a road paved in keys",
+          "alt": "Under a grey, starry sky a row of piano keys curves into a road hung in the air; on it the two embrace and kiss, Mia's yellow dress lifted with one leg, a lit lamppost at the far end, their reflection on the mirror-like floor below"
+        }
+      },
+      "credit": "Stills © 2016 Summit Entertainment / Lionsgate, publicity stills via TMDB and official stills via Douban; Mia & Sebastian's Theme (Justin Hurwitz, 2016) is a recording this site hosts itself, played whole and looped. A personal homage only."
     }
   },
   "software": {
@@ -788,10 +1141,12 @@
     "title": "Software",
     "subtitle": "Apps and tools I've made — help yourself. Version numbers are read straight from each repo's latest GitHub release.",
     "count": "{count, plural, =0 {no apps} one {# app} other {# apps}}",
-    "empty": "Nothing in this category yet.",
+    "empty": "No apps yet — this page is waiting for its first.",
     "mockAlt": "Schematic of the {name} interface",
     "filterAll": "All",
     "filterAria": "Filter apps by category",
+    "railPrev": "Previous app",
+    "railNext": "Next app",
     "categories": {
       "desktop": "Desktop",
       "tool": "Tools",
@@ -824,6 +1179,7 @@
     "lightsOn": "Lights on",
     "lightsOff": "After hours",
     "loaderAria": "Turning on the lights",
+    "music": "Background music",
     "musicPlay": "Play the background music",
     "musicPause": "Stop the background music",
     "tonight": "Tonight · on the stand"

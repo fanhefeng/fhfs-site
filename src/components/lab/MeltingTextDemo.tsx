@@ -1,7 +1,7 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { MeltingText, MELTING_TEXT_CSS } from "@/components/lab/MeltingText";
+import { StudyPanel } from "./StudyPanel";
 
 type Props = {
   accent: string;
@@ -28,13 +28,12 @@ export function MeltingTextDemo({
   labelScrub,
 }: Props) {
   return (
-    <div className="mtd" style={{ "--mtd-accent": accent } as CSSProperties}>
+    <div className="mtd">
       <style href="lab-melting-text" precedence="medium">
         {MELTING_TEXT_CSS + DEMO_CSS}
       </style>
 
-      <section className="mtd-panel">
-        <p className="mtd-label">{labelLoad}</p>
+      <StudyPanel accent={accent} label={labelLoad}>
         <MeltingText
           as="p"
           mode="load"
@@ -48,10 +47,9 @@ export function MeltingTextDemo({
         >
           {sampleOne}
         </MeltingText>
-      </section>
+      </StudyPanel>
 
-      <section className="mtd-panel">
-        <p className="mtd-label">{labelInView}</p>
+      <StudyPanel accent={accent} label={labelInView}>
         <MeltingText
           as="p"
           mode="inView"
@@ -66,10 +64,9 @@ export function MeltingTextDemo({
         >
           {sampleTwo}
         </MeltingText>
-      </section>
+      </StudyPanel>
 
-      <section className="mtd-panel mtd-panel--tall">
-        <p className="mtd-label">{labelScrub}</p>
+      <StudyPanel accent={accent} label={labelScrub} className="mtd-tall">
         <MeltingText
           as="p"
           mode="scrub"
@@ -84,44 +81,17 @@ export function MeltingTextDemo({
         >
           {sampleThree}
         </MeltingText>
-      </section>
+      </StudyPanel>
     </div>
   );
 }
 
+/* The panels and their labels are StudyPanel's; three stacked share one rule
+   between them rather than drawing two. */
 const DEMO_CSS = `
-.mtd { border-block-start: 1px solid var(--line); }
-
-.mtd-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.5rem;
-  min-height: 62svh;
-  padding: 4rem clamp(1.5rem, 6vw, 4rem);
-  border-block-end: 1px solid var(--line);
-}
+.mtd > .spn + .spn { border-block-start: 0; }
 /* The scrub panel needs room to actually play out as you scroll past it. */
-.mtd-panel--tall { min-height: 92svh; }
-
-.mtd-label {
-  margin: 0;
-  font-family: var(--font-stack-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--fg-tertiary);
-}
-.mtd-label::before {
-  content: "";
-  display: inline-block;
-  width: 0.4rem;
-  height: 0.4rem;
-  margin-inline-end: 0.55rem;
-  border-radius: 50%;
-  background: var(--mtd-accent);
-  vertical-align: middle;
-}
+.mtd-tall .spn-panel { min-height: 92svh; }
 
 .mtd-display {
   max-width: 18ch;

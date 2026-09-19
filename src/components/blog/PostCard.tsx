@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { PostSummary } from "@/lib/content";
 import { groupByYear, yearOfDate } from "@/lib/byYear";
+import { htmlLang } from "@/i18n/routing";
 import { Reveal } from "@/components/fx/Reveal";
 
 /** The year-bucketed index — /blog and every tag page render this list. */
@@ -31,7 +32,9 @@ export function YearIndex({
  * No card, no summary, no thumbnail — the list is meant to be read like a
  * table of contents. Hovering (or keyboard-focusing) draws an amber underline
  * and floats the reading time in beside the date; both are transform/opacity
- * only, so a long list stays cheap to render.
+ * only, so a long list stays cheap to render. The waiting is only for a
+ * pointer that can hover — on a touch screen wide enough to have the column,
+ * the reading time is simply there (as in home/RecentWriting).
  */
 function PostCard({ post }: { post: PostSummary }) {
   const t = useTranslations("blog");
@@ -44,7 +47,12 @@ function PostCard({ post }: { post: PostSummary }) {
         href={`/blog/${post.slug}`}
         className="group flex min-h-11 items-baseline gap-4 py-3.5 sm:gap-8"
       >
-        <span className="relative flex-1 text-[1.3125rem] leading-snug font-medium tracking-[-0.01em] text-fg">
+        {/* A fallback row is the other language's title in this locale's list
+            — say so, or a screen reader pronounces 中文 with English rules. */}
+        <span
+          lang={post.isFallback ? htmlLang(post.locale) : undefined}
+          className="relative flex-1 text-[1.3125rem] leading-snug font-medium tracking-[-0.01em] text-fg"
+        >
           {post.title}
           {/* Underline as a scaled hairline: transform-only, no reflow. */}
           <span
@@ -53,7 +61,7 @@ function PostCard({ post }: { post: PostSummary }) {
           />
         </span>
         <span className="flex shrink-0 items-baseline gap-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 sm:inline-block">
+          <span className="hidden transition duration-[250ms] ease-out sm:inline-block [@media(hover:hover)]:translate-x-1 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:translate-x-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-visible:translate-x-0 [@media(hover:hover)]:group-focus-visible:opacity-100">
             {t("readingTime", { minutes })}
           </span>
           <time dateTime={post.date} className="tabular-nums">

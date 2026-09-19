@@ -93,3 +93,10 @@ export const roomStop = () => set({ wanted: false });
 /** For the player only. */
 export const reportPlayback = (patch: Pick<JukeboxState, "playing">) => set(patch);
 export const reportGesture = () => set({ gestured: true });
+/**
+ * The record would not load. Every sign reads `wanted`, so leaving it on is a
+ * lit sign over silence — the one state that tells the reader the opposite of
+ * what happened. The light going out again is the message. Not the reader's
+ * "no", so `silenced` stays as it was and the next press tries again.
+ */
+export const reportFailure = () => set({ wanted: false, playing: false });

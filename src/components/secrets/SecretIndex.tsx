@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { SecretSummary } from "@/lib/content";
 import { groupByYear, yearOfDate } from "@/lib/byYear";
+import { htmlLang } from "@/i18n/routing";
 import { Reveal } from "@/components/fx/Reveal";
 
 /**
@@ -46,7 +47,10 @@ function SecretLine({ item }: { item: SecretSummary }) {
         href={`/secrets/${item.slug}`}
         className="group flex min-h-11 items-baseline gap-4 py-3.5 sm:gap-8"
       >
-        <span className="relative flex-1 text-[1.3125rem] leading-snug font-medium tracking-[-0.01em] text-fg">
+        <span
+          lang={item.isFallback ? htmlLang(item.locale) : undefined}
+          className="relative flex-1 text-[1.3125rem] leading-snug font-medium tracking-[-0.01em] text-fg"
+        >
           {item.title}
           <span
             aria-hidden
@@ -58,7 +62,7 @@ function SecretLine({ item }: { item: SecretSummary }) {
             {t(item.kind === "podcast" ? "kindPodcast" : "kindEssay")}
           </span>
           {length && (
-            <span className="hidden translate-x-1 opacity-0 transition duration-[250ms] ease-out group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 sm:inline-block">
+            <span className="hidden transition duration-[250ms] ease-out sm:inline-block [@media(hover:hover)]:translate-x-1 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:translate-x-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-visible:translate-x-0 [@media(hover:hover)]:group-focus-visible:opacity-100">
               {length}
             </span>
           )}

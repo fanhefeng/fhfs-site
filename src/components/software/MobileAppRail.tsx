@@ -7,7 +7,15 @@ import { Draggable } from "@/lib/gsap-extras";
 import { AppCard } from "@/components/cards/AppCard";
 import type { SoftwareApp } from "./appMeta";
 
-type Props = { apps: SoftwareApp[]; className?: string };
+type Props = {
+  apps: SoftwareApp[];
+  className?: string;
+  /** Accessible names for the two step buttons under the rail. */
+  labels: { prev: string; next: string };
+};
+
+const STEP_BUTTON =
+  "grid size-11 place-items-center rounded-full border border-line text-fg-secondary transition-colors hover:border-accent hover:text-accent";
 
 /**
  * The phone-sized face of the bento: a swipeable rail (RwKwLWK's seamless
@@ -23,11 +31,26 @@ type Props = { apps: SoftwareApp[]; className?: string };
  * SSR (and every viewport ≥768px, and no-JS) sees a plain scroll-snap row —
  * the carousel is layered on top only under `(max-width: 767px)`, and reverted
  * cleanly by gsap.matchMedia.
+ *
+ * Under the rail, two buttons that do what a swipe does. The carousel takes
+ * the row's own scrolling away (`overflow-x: hidden`), which left dragging as
+ * the only way along it — no use to a switch, a voice command, or a hand that
+ * cannot drag. They drive the same `offset` as everything else.
  */
-export function MobileAppRail({ apps, className }: Props) {
+export function MobileAppRail({ apps, className, labels }: Props) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const proxyRef = useRef<HTMLSpanElement>(null);
+  /** One card along, in whichever mode the rail is in: the carousel installs
+   *  its own, and until it does the row is a plain scroller. */
+  const nudgeRef = useRef<((dir: -1 | 1) => void) | null>(null);
+
+  const nudge = (dir: -1 | 1) => {
+    if (nudgeRef.current) return nudgeRef.current(dir);
+    const viewport = viewportRef.current;
+    const card = trackRef.current?.querySelector<HTMLElement>("[data-rail-item]");
+    if (viewport && card) viewport.scrollBy({ left: dir * card.offsetWidth });
+  };
 
   useGSAP(
     () => {
@@ -66,6 +89,8 @@ export function MobileAppRail({ apps, className }: Props) {
         // Guard against ResizeObserver feedback: only a real width change
         // (rotation, browser chrome) justifies a re-measure.
         let lastWidth = -1;
+        /** The offset the current (or last) snap is carrying the rail to. */
+        let heading = 0;
 
         const layout = () => {
           lastWidth = viewport.clientWidth;
@@ -88,6 +113,9 @@ export function MobileAppRail({ apps, className }: Props) {
           track.style.height = `${rowH}px`;
           gsap.set(items, { position: "absolute", top: 0, left: 0, height: rowH });
           pos.offset = Math.round(pos.offset / step) * step;
+          // A re-measure lands the rail where it is; any target set in the
+          // old width's steps is gone with the tween it belonged to.
+          heading = pos.offset;
           render();
         };
 
@@ -101,7 +129,7 @@ export function MobileAppRail({ apps, className }: Props) {
             {
               scale: 1.03,
               duration: 0.16,
-              ease: "power2.out",
+              ease: EASE.soft,
               yoyo: true,
               repeat: 1,
               overwrite: "auto",
@@ -109,7 +137,11 @@ export function MobileAppRail({ apps, className }: Props) {
           );
         };
 
+        // Where the rail is going: every snap records its target, whoever
+        // asked — a stepper press, a released drag, a focused card — so a
+        // press during any of those tweens counts on from where it will land.
         const snapTo = (target: number, pop = true) => {
+          heading = target;
           gsap.to(pos, {
             offset: target,
             duration: 0.45,
@@ -121,6 +153,13 @@ export function MobileAppRail({ apps, className }: Props) {
         };
 
         layout();
+
+        // From wherever the rail is heading, not from where it is: a second
+        // press during the tween still means "one more".
+        nudgeRef.current = (dir) => {
+          const from = gsap.isTweening(pos) ? heading : pos.offset;
+          snapTo((Math.round(from / step) + dir) * step);
+        };
 
         // Held in a box so the callbacks can reach the instance that is
         // still being constructed on the line below.
@@ -174,6 +213,7 @@ export function MobileAppRail({ apps, className }: Props) {
         ro.observe(viewport);
 
         return () => {
+          nudgeRef.current = null;
           ro.disconnect();
           track.removeEventListener("focusin", onFocusIn);
           drag.instance?.kill();
@@ -213,6 +253,26 @@ export function MobileAppRail({ apps, className }: Props) {
           ))}
         </div>
       </div>
+      {apps.length > 1 && (
+        <div className="mt-4 flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => nudge(-1)}
+            aria-label={labels.prev}
+            className={STEP_BUTTON}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => nudge(1)}
+            aria-label={labels.next}
+            className={STEP_BUTTON}
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      )}
       {/* Drag proxy: never rendered, only measured. Draggable writes x here
        * and the rail mirrors it — the demo's "drag-proxy" pattern. */}
       <span ref={proxyRef} aria-hidden className="pointer-events-none invisible absolute size-0" />

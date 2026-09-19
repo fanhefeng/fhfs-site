@@ -3,10 +3,11 @@
 import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { gsap } from "@/lib/gsap";
+import { gsap, EASE } from "@/lib/gsap";
 import { prefersSaveData } from "@/lib/three/guards";
 import { releaseRenderer } from "@/lib/three/release";
 import { DRACO_DECODER_PATH } from "@/lib/three/draco";
+import { DeskFallback } from "@/components/lab/SceneGate";
 
 /* "Gaming Desktop PC" by Yolala1232 (sketchfab.com/Yolala1232), CC-BY-4.0 —
  * the hero model of the owner's old fhf-portfolio, now living on the About
@@ -41,8 +42,16 @@ const HOME_Y = 2.6;
  *  (see `onWheel`). */
 const DESK_BAND = 320;
 
+/** An eighth of a turn per press of the arrows. */
+const TURN_STEP = Math.PI / 4;
+
 type Props = {
   hint: string;
+  /** Labels for the two arrows — the turn, for a keyboard or a thumb. */
+  turnLeft: string;
+  turnRight: string;
+  /** Said in the desk's place when the scene could not be built after all. */
+  fallbackNote: string;
   className?: string;
 };
 
@@ -50,14 +59,17 @@ type Props = {
  * The owner's 3D workstation, lit and staged like a piece on a plinth.
  * A soft ground pool anchors it, an entrance beat swings it to face the
  * room, screens breathe, and a drag leaves it coasting on inertia.
- * Loads only when scrolled near, renders only while visible, and skips
- * itself entirely under Save-Data. There is one version of this scene and
- * everybody gets it — see the note in lib/three/guards.ts.
+ * Loads only when scrolled near and renders only while visible. Save-Data and
+ * a missing WebGL are asked before this chunk is fetched (`SceneGate` in the
+ * lab); the check below is only a second line. There is one version of this
+ * scene and everybody gets it — see the note in lib/three/guards.ts.
  */
-export function Workstation({ hint, className }: Props) {
+export function Workstation({ hint, turnLeft, turnRight, fallbackNote, className }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<"idle" | "ready" | "skipped">("idle");
+  /** The scene's own turn, handed out of the effect that owns the angles. */
+  const turnRef = useRef<((delta: number) => void) | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -216,26 +228,44 @@ export function Workstation({ hint, className }: Props) {
       intro.spin = HOME_Y + 1.2;
       rotY = targetY = intro.spin;
       introTl = gsap.timeline();
-      introTl.to(intro, { y: 0, s: 1, duration: 1.1, ease: "back.out(1.2)" }, 0);
+      introTl.to(intro, { y: 0, s: 1, duration: 1.1, ease: EASE.momentum }, 0);
       // The turntable overshoots by 1.2 rad and settles fast-to-slow onto
       // the display angle — like a handler turning the piece to face front.
       spinTween = gsap.to(intro, {
         spin: HOME_Y,
         duration: 1.4,
-        ease: "power3.out",
+        ease: EASE.default,
         onUpdate: () => {
           if (!dragging) rotY = targetY = intro.spin;
         },
       });
       // The pool of light fades in as the piece lands.
-      introTl.to(intro, { g: 1, duration: 0.9, ease: "power2.out" }, 0.35);
+      introTl.to(intro, { g: 1, duration: 0.9, ease: EASE.soft }, 0.35);
     };
 
     const lookAt = new THREE.Vector3(0, 0.15, 0);
     const baseOffset = camera.position.clone().sub(lookAt);
 
+    /** A press that starts on the arrows or the credit belongs to them: a
+     *  drag begun there would capture the pointer and take their click. */
+    const onControl = (e: Event) => (e.target as HTMLElement).closest("button, a") !== null;
+
+    // The arrows under the desk: the same turn a drag makes, for a keyboard,
+    // and for a thumb that would rather not drag across a page it is
+    // scrolling. It moves the target and lets the loop's own easing carry the
+    // piece there; stamping `lastPointerAt` holds the idle spin off for its
+    // usual beat and keeps the loop at full rate while the piece travels.
+    turnRef.current = (delta: number) => {
+      spinTween?.kill();
+      spinTween = null;
+      velY = 0;
+      targetY += delta;
+      lastPointerAt = performance.now();
+    };
+
     const onPointerDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (onControl(e)) return;
       dragging = true;
       velY = 0;
       // Grabbing the piece mid-entrance hands the spin over to the visitor.
@@ -283,7 +313,15 @@ export function Workstation({ hint, className }: Props) {
     measureBand();
 
     const onWheel = (e: WheelEvent) => {
-      const owns = Math.abs(e.clientX - deskCentre) < deskBand || e.ctrlKey;
+      const speed = e.ctrlKey ? 0.008 : 0.0016;
+      const nextZoom = THREE.MathUtils.clamp(targetZoom * Math.exp(-e.deltaY * speed), 0.6, 2.1);
+      // Against the stop there is nothing left for the wheel to do here, so it
+      // goes back to the page: a reader scrolling down through the band zooms
+      // out to the limit and then carries on down, where before the desk kept
+      // swallowing a wheel it could no longer use. A pinch is kept regardless
+      // — let go, it would zoom the whole page instead.
+      const spent = nextZoom === targetZoom;
+      const owns = e.ctrlKey || (Math.abs(e.clientX - deskCentre) < deskBand && !spent);
       // Lenis listens on window and never looks at `defaultPrevented`, so the
       // call below cannot hold it off on its own — leave it at that and the
       // desk zooms while the page scrolls out from under it. Its documented
@@ -296,12 +334,13 @@ export function Workstation({ hint, className }: Props) {
       container.toggleAttribute("data-lenis-prevent-wheel", owns);
       if (!owns) return;
       e.preventDefault();
-      const speed = e.ctrlKey ? 0.008 : 0.0016;
-      targetZoom = THREE.MathUtils.clamp(targetZoom * Math.exp(-e.deltaY * speed), 0.6, 2.1);
+      targetZoom = nextZoom;
       lastPointerAt = performance.now();
     };
     // Double click puts everything back where it started (spin stays).
-    const onDblClick = () => {
+    const onDblClick = (e: MouseEvent) => {
+      // Two quick presses of an arrow are two turns, not a reset.
+      if (onControl(e)) return;
       targetZoom = 1;
       targetTilt = BASE_TILT;
     };
@@ -478,6 +517,7 @@ export function Workstation({ hint, className }: Props) {
 
     return () => {
       disposed = true;
+      turnRef.current = null;
       io.disconnect();
       introTl?.kill();
       spinTween?.kill();
@@ -498,7 +538,9 @@ export function Workstation({ hint, className }: Props) {
     };
   }, []);
 
-  if (status === "skipped") return null;
+  // The renderer threw or the model never arrived. Collapsing to nothing
+  // pulled the notes under the stage up into its place with no word said.
+  if (status === "skipped") return <DeskFallback note={fallbackNote} />;
 
   return (
     <div className={className}>
@@ -549,11 +591,34 @@ export function Workstation({ hint, className }: Props) {
             href="https://sketchfab.com/3d-models/gaming-desktop-pc-d1d8282c9916438091f11aeb28787b66"
             target="_blank"
             rel="noopener noreferrer"
-            className="pointer-events-auto opacity-60 transition-opacity hover:opacity-100"
+            className="pointer-events-auto opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100"
           >
             © Yolala1232 · CC-BY-4.0
           </a>
         </div>
+        {/* The turn, without a drag: a keyboard has no other way to it, and on
+            a phone the same gesture is half of how the page scrolls. In the
+            stage's empty lower corner, clear of the desk and above the credit. */}
+        {status === "ready" && (
+          <div className="absolute bottom-9 right-6 flex gap-2 sm:right-10">
+            <button
+              type="button"
+              onClick={() => turnRef.current?.(-TURN_STEP)}
+              aria-label={turnLeft}
+              className="grid size-11 cursor-pointer place-items-center rounded-full border border-line text-fg-secondary transition-colors hover:border-accent hover:text-accent"
+            >
+              <span aria-hidden="true">←</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => turnRef.current?.(TURN_STEP)}
+              aria-label={turnRight}
+              className="grid size-11 cursor-pointer place-items-center rounded-full border border-line text-fg-secondary transition-colors hover:border-accent hover:text-accent"
+            >
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

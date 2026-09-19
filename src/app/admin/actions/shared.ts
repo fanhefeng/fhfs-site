@@ -20,7 +20,9 @@ import { TAGS } from "@/lib/content";
  * with nothing failing loudly. An action that reports to a form checks with
  * `adminSession()` and returns `SESSION_EXPIRED`, so an editor whose eight
  * hours ran out mid-article gets a line beside the save button and keeps the
- * text; a throw would have unmounted the form. The delete actions have no
+ * text; a throw would have unmounted the form. (Keeping the text is only half
+ * done here: React resets a form whose action *returns*, error or not, and
+ * `ui/useSaveAction` is what stops that.) The delete actions have no
  * form state to report to and nothing typed to lose, so they keep the
  * throwing `requireAdmin()`.
  *

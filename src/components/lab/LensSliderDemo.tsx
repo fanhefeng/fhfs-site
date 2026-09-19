@@ -2,12 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger, EASE, prefersReducedMotion } from "@/lib/gsap";
 import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
-import { releaseRenderer } from "@/lib/three/release";
 import { splitText } from "@/lib/splitText";
-import { LENS_VERT, LENS_FRAG, LENS_DURATION, slideIndexAt, bandCentre } from "@/lib/lensSlider";
+import { LENS_DURATION, slideIndexAt, bandCentre } from "@/lib/lensSlider";
 
 export type LensSlide = {
   src: string;
@@ -21,6 +19,8 @@ type Props = {
   accent: string;
   hint: string;
   fallbackNote: string;
+  /** The same note for a reader on Save-Data, who has WebGL and said no. */
+  saveDataNote: string;
   counterAria: string;
   prevLabel: string;
   nextLabel: string;
@@ -28,9 +28,6 @@ type Props = {
 };
 
 type Mode = "loading" | "live" | "degraded";
-
-/** How far the rim's rings displace, in device pixels. Zero is the reference's own look. */
-const RIPPLE = 5;
 
 const pad = (n: number) => String(n + 1).padStart(2, "0");
 
@@ -49,12 +46,15 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
  * ride a word-level mask on the way in and out.
  *
  * The canvas paints only while a lens is moving or the box has resized.
- * Between slides it costs nothing (DESIGN.md §5.3).
+ * Between slides it costs nothing (DESIGN.md §5.3). three.js lives in
+ * `lensRenderer.ts`, fetched only once Save-Data and WebGL have both said yes;
+ * the slider below works without it.
  */
 export function LensSliderDemo({
   accent,
   hint,
   fallbackNote,
+  saveDataNote,
   counterAria,
   prevLabel,
   nextLabel,
@@ -78,7 +78,14 @@ export function LensSliderDemo({
   const shownRef = useRef(0);
 
   const [mode, setMode] = useState<Mode>("loading");
+  const [saveData, setSaveData] = useState(false);
+  /** The slide the counter names — where the slider is, or is headed. */
+  const [at, setAt] = useState(0);
   const count = slides.length;
+  /** Read by the choreography, which is keyed on the pictures rather than on
+   *  this array: the page hands a new one on every render. */
+  const slidesRef = useRef(slides);
+  slidesRef.current = slides;
   /** The pictures alone, as one string: the lens is keyed on this rather
    *  than on `slides`, which the page rebuilds on every render — the
    *  copy can change (a locale switch) without the renderer being torn down
@@ -92,155 +99,42 @@ export function LensSliderDemo({
     if (!canvas || srcs.length < 2) return;
 
     if (prefersSaveData() || !hasWebGL()) {
+      setSaveData(prefersSaveData());
       setMode("degraded");
       return;
     }
 
-    let renderer: THREE.WebGLRenderer;
-    try {
-      renderer = new THREE.WebGLRenderer({
-        canvas,
-        antialias: false,
-        alpha: false,
-        powerPreference: "high-performance",
-        stencil: false,
-        depth: false,
-      });
-    } catch {
-      setMode("degraded");
-      return;
-    }
-    renderer.setClearColor(0x101210, 1);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
-    const uniforms = {
-      uTex1: { value: null as THREE.Texture | null },
-      uTex2: { value: null as THREE.Texture | null },
-      uTex1Size: { value: new THREE.Vector2(1, 1) },
-      uTex2Size: { value: new THREE.Vector2(1, 1) },
-      uRes: { value: new THREE.Vector2(1, 1) },
-      uProgress: { value: 0 },
-      uRipple: { value: RIPPLE },
-    };
-    const material = new THREE.ShaderMaterial({
-      vertexShader: LENS_VERT,
-      fragmentShader: LENS_FRAG,
-      uniforms,
-      depthTest: false,
-      depthWrite: false,
-    });
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    scene.add(new THREE.Mesh(geometry, material));
-
-    const resize = () => {
-      const el = stickyRef.current;
-      const w = el?.clientWidth || window.innerWidth;
-      const h = el?.clientHeight || window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, w * h > 2_600_000 ? 1.5 : 2);
-      renderer.setPixelRatio(dpr);
-      renderer.setSize(w, h, false);
-      uniforms.uRes.value.set(w * dpr, h * dpr);
-      dirtyRef.current = true;
-    };
-    resize();
-
-    const onResize = () => {
-      resize();
-      ScrollTrigger.refresh();
-    };
-    window.addEventListener("resize", onResize, { passive: true });
-
-    let visible = !document.hidden;
-    const onVisibility = () => {
-      visible = !document.hidden;
-      if (visible) dirtyRef.current = true;
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    // three rebuilds its own state when the context comes back and uploads
-    // the textures again on the next draw — but nothing asks for that draw,
-    // so the restored canvas would sit blank until the next scroll.
-    const onRestored = () => {
-      dirtyRef.current = true;
-    };
-    canvas.addEventListener("webglcontextrestored", onRestored);
-
-    let disposed = false;
-    const textures: THREE.Texture[] = [];
-
-    const bind = (from: number, to: number) => {
-      const a = textures[from];
-      const b = textures[to];
-      if (!a || !b) return;
-      const ia = a.image as { width: number; height: number };
-      const ib = b.image as { width: number; height: number };
-      uniforms.uTex1.value = a;
-      uniforms.uTex2.value = b;
-      uniforms.uTex1Size.value.set(ia.width, ia.height);
-      uniforms.uTex2Size.value.set(ib.width, ib.height);
-      dirtyRef.current = true;
-    };
-
-    // One clock for the whole site: gsap.ticker already drives Lenis.
-    const tick = () => {
-      if (disposed || !visible) return;
-      const p = Math.min(Math.max(progress.current.value, 0), 1);
-      if (p !== uniforms.uProgress.value) {
-        uniforms.uProgress.value = p;
-        dirtyRef.current = true;
-      }
-      if (!dirtyRef.current) return;
-      dirtyRef.current = false;
-      renderer.render(scene, camera);
-    };
-
-    // The photographs go through untouched: no colour space on the texture,
-    // so three neither decodes them on the way in nor re-encodes on the way
-    // out — this shader has no colorspace pass and would ship linear values.
-    const loader = new THREE.TextureLoader();
-    loader.setCrossOrigin("anonymous");
-    Promise.all(
-      srcs.map(
-        (src) =>
-          new Promise<THREE.Texture>((resolve, reject) => {
-            loader.load(src, resolve, undefined, reject);
-          }),
-      ),
-    ).then(
-      (loaded) => {
-        if (disposed) {
-          for (const t of loaded) t.dispose();
-          return;
-        }
-        for (const t of loaded) {
-          t.minFilter = t.magFilter = THREE.LinearFilter;
-          t.generateMipmaps = false;
-          t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
-          textures.push(t);
-        }
-        bindRef.current = bind;
-        bind(shownRef.current, shownRef.current);
-        renderer.render(scene, camera);
-        gsap.ticker.add(tick);
-        setMode("live");
-        ScrollTrigger.refresh();
+    let cancelled = false;
+    let teardown: (() => void) | null = null;
+    import("./lensRenderer").then(
+      ({ mountLens }) => {
+        if (cancelled) return;
+        teardown = mountLens({
+          canvas,
+          box: () => stickyRef.current,
+          srcs,
+          progress: progress.current,
+          dirty: dirtyRef,
+          shown: () => shownRef.current,
+          onLive: (bind) => {
+            bindRef.current = bind;
+            setMode("live");
+            ScrollTrigger.refresh();
+          },
+          onFail: () => setMode("degraded"),
+        });
       },
+      // A chunk that never arrives (offline, a stale deploy) leaves the plain
+      // slider, not a spinner.
       () => {
-        if (!disposed) setMode("degraded");
+        if (!cancelled) setMode("degraded");
       },
     );
 
     return () => {
-      disposed = true;
+      cancelled = true;
       bindRef.current = null;
-      gsap.ticker.remove(tick);
-      window.removeEventListener("resize", onResize);
-      document.removeEventListener("visibilitychange", onVisibility);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-      for (const t of textures) t.dispose();
-      geometry.dispose();
-      material.dispose();
-      releaseRenderer(renderer);
+      teardown?.();
     };
   }, [srcKey]);
 
@@ -267,13 +161,15 @@ export function LensSliderDemo({
 
       const setCounter = (i: number) => {
         if (counterRef.current) counterRef.current.textContent = `${pad(i)} / ${pad(count - 1)}`;
+        setAt(i);
       };
 
       const still = stillRef.current;
       const showStill = (i: number) => {
-        if (!still || live) return;
-        still.src = slides[i]!.src;
-        still.alt = slides[i]!.alt;
+        const slide = slidesRef.current[i];
+        if (!still || live || !slide) return;
+        still.src = slide.src;
+        still.alt = slide.alt;
       };
 
       /* One lens at a time. `flight` is the pair in the air; `pending` is
@@ -305,18 +201,24 @@ export function LensSliderDemo({
       const go = contextSafe((target: number) => {
         const next = Math.min(Math.max(target, 0), count - 1);
         if (flight) {
-          if (next === flight.from && !flight.tween.reversed()) {
+          const heading = flight.tween.reversed() ? flight.from : flight.to;
+          if (next === heading) {
+            // Already on its way there. Whatever the scrollbar had queued on
+            // the way past goes: A → B, on to C, back to B used to land on B
+            // and then fly on to C by itself.
+            pending = null;
+          } else if (next === flight.from) {
             // Back to where it came from: the lens shrinks away again.
             flight.tween.reverse();
             flight.copy.reverse();
             setCounter(flight.from);
             pending = null;
-          } else if (next === flight.to && flight.tween.reversed()) {
+          } else if (next === flight.to) {
             flight.tween.play();
             flight.copy.play();
             setCounter(flight.to);
             pending = null;
-          } else if (next !== flight.to) {
+          } else {
             pending = next;
           }
           return;
@@ -334,7 +236,7 @@ export function LensSliderDemo({
           {
             value: 1,
             duration: live ? LENS_DURATION : 0.9,
-            ease: "power2.inOut",
+            ease: EASE.travel,
             onUpdate: () => {
               dirtyRef.current = true;
             },
@@ -407,7 +309,9 @@ export function LensSliderDemo({
         goRef.current = null;
       };
     },
-    { scope, dependencies: [mode, count, slides], revertOnUpdate: true },
+    // Keyed on the pictures, not on `slides`: the page builds a new array on
+    // every render, and each new one tore the pin down and built it again.
+    { scope, dependencies: [mode, count, srcKey], revertOnUpdate: true },
   );
 
   /* Scroll the page to the middle of a slide's band; the pin does the rest. */
@@ -416,6 +320,8 @@ export function LensSliderDemo({
     const sticky = stickyRef.current;
     if (!stage || !sticky) return;
     const index = Math.min(Math.max(shownRef.current + delta, 0), count - 1);
+    // At either end the arrow is aria-disabled but still pressable.
+    if (index === shownRef.current) return;
     const top = stage.getBoundingClientRect().top + window.scrollY;
     const y = top + bandCentre(index, count) * (stage.offsetHeight - sticky.offsetHeight);
     if (window.__lenis) {
@@ -489,28 +395,37 @@ export function LensSliderDemo({
           </div>
 
           <div className="ls-nav">
+            {/* aria-disabled rather than disabled at the ends: a disabled
+                button drops the focus it had to <body>, and the press that
+                reached the last slide is the one holding it. */}
             <button
               type="button"
               className="ls-btn"
               aria-label={prevLabel}
+              aria-disabled={at === 0 || undefined}
               onClick={() => step(-1)}
             >
               ←
             </button>
-            <span
-              ref={counterRef}
-              className="ls-counter"
-              aria-label={counterAria}
-              aria-live="polite"
-            >
+            {/* A status region, so the name is read with it — on a bare span
+                aria-label is ignored. */}
+            <span ref={counterRef} className="ls-counter" role="status" aria-label={counterAria}>
               {pad(0)} / {pad(count - 1)}
             </span>
-            <button type="button" className="ls-btn" aria-label={nextLabel} onClick={() => step(1)}>
+            <button
+              type="button"
+              className="ls-btn"
+              aria-label={nextLabel}
+              aria-disabled={at === count - 1 || undefined}
+              onClick={() => step(1)}
+            >
               →
             </button>
           </div>
 
-          {mode === "degraded" && <p className="ls-note">{fallbackNote}</p>}
+          {mode === "degraded" && (
+            <p className="ls-note">{saveData ? saveDataNote : fallbackNote}</p>
+          )}
           <p className="ls-hint" aria-hidden="true">
             {hint}
           </p>
@@ -620,9 +535,10 @@ const CSS = `
   letter-spacing: 0.16em;
   color: rgba(243, 241, 234, 0.72);
 }
+/* 44px, the site's touch floor. */
 .ls-btn {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid rgba(243, 241, 234, 0.28);
   border-radius: 999px;
   background: rgba(16, 18, 16, 0.32);
@@ -634,6 +550,8 @@ const CSS = `
 }
 .ls-btn:hover,
 .ls-btn:focus-visible { border-color: var(--ls-accent); color: #fff; }
+.ls-btn[aria-disabled="true"] { opacity: 0.35; cursor: default; }
+.ls-btn[aria-disabled="true"]:hover { border-color: rgba(243, 241, 234, 0.28); color: inherit; }
 .ls-counter { min-width: 4.5em; text-align: center; font-variant-numeric: tabular-nums; }
 
 .ls-note {

@@ -23,18 +23,20 @@ pnpm db:generate  # after editing src/db/schema.ts, then:
 pnpm db:migrate
 pnpm db:check     # print what's actually in each table
 pnpm db:export    # write DB back to backup/
-pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/cache/fetch-cache` + restart does the same)
+pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/dev/cache/fetch-cache` + restart does the same — Next 16 keeps the dev data cache under .next/dev, not .next/cache)
 ```
 
 Tests cover pure functions in `src/lib`, plus a set that reads the *source*
 rather than running it — the rules that break without an error:
 `conventions.test.ts` (pages start from `pageLocale`, the database is read
 only in `content.ts` and only inside `unstable_cache`, every admin action
-checks the session first and invalidates last), `asset.test.ts`,
+checks the session first and invalidates last, every ease is an `EASE`
+token), `asset.test.ts`,
 `media.test.ts` (sizes written in code against the files), `tables.test.ts`
 (every schema table named in db:check / export / import / backup),
-`env.test.ts`, `messages.test.ts`. When you add a rule of that kind to this
-file, add its check there. There is no component suite; `pnpm smoke` is the
+`env.test.ts`, `messages.test.ts`, `lab.test.ts` (every lab study's
+`sources` exist under `src/`, and it has copy in both catalogues). When you
+add a rule of that kind to this file, add its check there. There is no component suite; `pnpm smoke` is the
 end-to-end pass. The scripts share `scripts/connect.mts` (env, unpooled URL,
 the same connection-level retry as the site, with more patient delays); a new
 script calls `connect()` rather than building its own handle. `pnpm lint` runs
@@ -110,11 +112,25 @@ Failures resolve to `null` and the badge is simply absent.
   deletes, never a plain insert into a serial-keyed table.
 - **Animation**: all GSAP plugins are registered once in `src/lib/gsap.ts` —
   import `gsap` and plugins from there, never from `"gsap"` directly. Eases
-  come from its `EASE` token table; `prefersReducedMotion` gates only the
+  come from its `EASE` token table, named by use — a new curve gets a token
+  there first; an `ease: "…"` string anywhere else fails
+  `conventions.test.ts`. `prefersReducedMotion` gates only the
   short no-stop-button list documented there. Lenis inertial scrolling shares
   GSAP's clock (`gsap.ticker` drives `lenis.raf`).
-- **3D**: `/intro` uses @react-three/fiber + drei; the `/about` workbench is
-  imperative three.js.
+- **3D**: `/intro` and the statue on `/idols/kobe` use @react-three/fiber +
+  drei; the moss on the home page (`components/grove`) and the workbench —
+  now a lab study, `/lab/workstation`, no longer on `/about` — are imperative
+  three.js. Every scene sits behind `next/dynamic`, and the component that
+  mounts it asks `prefersSaveData()` / `hasWebGL()` (`src/lib/three/guards.ts`)
+  *before* mounting: a guard inside the chunk runs after three.js has already
+  been downloaded.
+- **Admin forms** submit through `useSaveAction` (`src/app/admin/ui/`), never
+  `useActionState` directly: React resets a `<form action>` when its action
+  returns, an error included, and these forms are uncontrolled — the reset is
+  the unsaved article. `conventions.test.ts` checks it.
+- **Script budget**: `pnpm smoke` weighs every page's scripts against the
+  table in `scripts/smoke.mts` (production builds only) and fails the page
+  that goes over. Raise a number there on purpose, in the commit that spends it.
 - **Static assets in `public/`** are reached through `asset()`
   (`src/lib/asset.ts`), which puts the file's content hash in the address —
   `/lab/lens/sea.c694b7cb.jpg`; a rewrite in `next.config.ts` serves it from

@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { site } from "@/config/site";
 import { groupByYear } from "@/lib/byYear";
 import { collections, FOLD_LINES, shouldFold, type BoardMoment } from "@/lib/moments";
+import { gsap, EASE } from "@/lib/gsap";
+import { useUrlChoice } from "@/lib/useUrlChoice";
 import { Reveal } from "@/components/fx/Reveal";
 
 /**
@@ -24,17 +26,22 @@ import { Reveal } from "@/components/fx/Reveal";
  */
 export function MomentBoard({ items }: { items: BoardMoment[] }) {
   const t = useTranslations("moments");
-  const [notebook, setNotebook] = useState<string | null>(null);
   const [open, setOpen] = useState<Set<string>>(() => new Set());
 
   const notebooks = useMemo(() => collections(items), [items]);
+  // In the address bar (`?nb=…`): the chips sit at the top of two hundred
+  // entries, and a reload or a shared link used to drop the reader back into
+  // all of them.
+  const [notebook, pick] = useUrlChoice(
+    "nb",
+    useMemo(() => notebooks.map((nb) => nb.name), [notebooks]),
+  );
   const filtered = useMemo(
     () => (notebook ? items.filter((item) => item.collection === notebook) : items),
     [items, notebook],
   );
   const groups = groupByYear(filtered, (item) => item.year);
 
-  const pick = (name: string | null) => setNotebook(name);
   const toggle = (key: string) =>
     setOpen((prev) => {
       const next = new Set(prev);
@@ -46,27 +53,30 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
   return (
     <>
       {notebooks.length > 1 && (
-        <Reveal
-          as="div"
-          stagger={0.04}
-          className="mb-14 flex flex-wrap items-center gap-2"
-          // The filter is a set of radios in all but markup: one is pressed.
-          // `aria-pressed` on buttons says so to a screen reader.
-        >
-          <Chip pressed={notebook === null} onClick={() => pick(null)} count={items.length}>
-            {t("filterAll")}
-          </Chip>
-          {notebooks.map((nb) => (
-            <Chip
-              key={nb.name}
-              pressed={notebook === nb.name}
-              onClick={() => pick(nb.name)}
-              count={nb.count}
-            >
-              「{nb.name}」
+        // The filter is a set of radios in all but markup: one is pressed.
+        // `aria-pressed` on the buttons says so to a screen reader, and the
+        // group's name says what they are choosing between.
+        <div role="group" aria-label={t("filterAria")}>
+          <Reveal as="div" stagger={0.04} className="mb-14 flex flex-wrap items-center gap-2">
+            <Chip pressed={notebook === null} onClick={() => pick(null)} count={items.length}>
+              {t("filterAll")}
             </Chip>
-          ))}
-        </Reveal>
+            {notebooks.map((nb) => (
+              <Chip
+                key={nb.name}
+                pressed={notebook === nb.name}
+                onClick={() => pick(nb.name)}
+                count={nb.count}
+              >
+                「{nb.name}」
+              </Chip>
+            ))}
+          </Reveal>
+          {/* What a press did, for a reader who cannot see the list change. */}
+          <p aria-live="polite" className="sr-only">
+            {t("count", { count: filtered.length })}
+          </p>
+        </div>
       )}
 
       {groups.map(({ year, items: yearItems }) => (
@@ -140,6 +150,55 @@ function MomentCard({
   const folds = shouldFold(item.content);
   const clamped = folds && !expanded;
 
+  const bodyRef = useRef<HTMLParagraphElement>(null);
+  /** How tall the text stood when the button was pressed — where the fold
+   *  starts from. Null on every render that a press did not cause. */
+  const pressedAt = useRef<number | null>(null);
+
+  const press = () => {
+    pressedAt.current = bodyRef.current?.getBoundingClientRect().height ?? null;
+    onToggle();
+  };
+
+  /**
+   * The fold opens and closes instead of jumping: the rows below are pushed
+   * down, or drawn up, over a third of a second, so the eye keeps its place
+   * on a board of two hundred entries.
+   *
+   * The clamp itself cannot be tweened — it is on or off — so the height is,
+   * measured either side of the render. Closing is the awkward direction: the
+   * render has already put the clamp back, and a clamped box that is still
+   * tall shows an ellipsis with text running on beneath it. So the clamp is
+   * held off, inline, for as long as the box is closing, and handed back to
+   * the class when it arrives. A second press mid-flight starts from wherever
+   * the box had got to.
+   */
+  useLayoutEffect(() => {
+    const el = bodyRef.current;
+    const from = pressedAt.current;
+    pressedAt.current = null;
+    if (!el || from === null) return;
+    const release = () => {
+      el.style.removeProperty("height");
+      el.style.removeProperty("overflow");
+      el.style.removeProperty("-webkit-line-clamp");
+    };
+    // Whatever the last fold left inline is in the way of measuring this one.
+    release();
+    const to = el.getBoundingClientRect().height;
+    if (Math.abs(to - from) < 1) return;
+    if (to < from) el.style.setProperty("-webkit-line-clamp", "unset");
+    el.style.overflow = "hidden";
+    const tween = gsap.fromTo(
+      el,
+      { height: from },
+      { height: to, duration: 0.35, ease: EASE.default, onComplete: release },
+    );
+    return () => {
+      tween.kill();
+    };
+  }, [expanded]);
+
   return (
     <li className="border-b border-line py-6 last:border-b-0">
       <article>
@@ -173,6 +232,7 @@ function MomentCard({
             a card could carry a "read all" button with nothing hidden behind
             it. */}
         <p
+          ref={bodyRef}
           lang="zh-CN"
           style={clamped ? ({ "--fold-lines": FOLD_LINES } as CSSProperties) : undefined}
           className={`whitespace-pre-line text-body text-fg ${
@@ -192,11 +252,19 @@ function MomentCard({
             {folds && (
               <button
                 type="button"
-                onClick={onToggle}
+                onClick={press}
                 aria-expanded={expanded}
-                className="hit-ext shrink-0 font-mono text-meta uppercase tracking-meta text-fg-secondary transition-colors hover:text-accent"
+                className="hit-ext inline-flex shrink-0 items-center gap-1.5 font-mono text-meta uppercase tracking-meta text-fg-secondary transition-colors hover:text-accent"
               >
                 {expanded ? t("collapse") : t("expand")}
+                {/* Which way the text will go — the words alone read as a
+                    caption, and this is the one thing on the card that opens. */}
+                <span
+                  aria-hidden="true"
+                  className={`transition-transform duration-300 ease-out ${expanded ? "rotate-180" : ""}`}
+                >
+                  ↓
+                </span>
               </button>
             )}
           </footer>

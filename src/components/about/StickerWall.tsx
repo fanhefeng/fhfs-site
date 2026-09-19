@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, isFinePointer } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
 // Registers Draggable + Inertia for the drag and CustomWiggle for the
 // `wiggle(…)` hover ease.
 import { Draggable } from "@/lib/gsap-extras";
@@ -96,7 +96,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
           });
           gsap
             .timeline()
-            .to(el, { scale: 1, duration: 0.5, ease: "elastic.out(1, 0.5)" })
+            .to(el, { scale: 1, duration: 0.5, ease: EASE.spring })
             .to(
               el,
               {
@@ -104,7 +104,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
                 rotation: gsap.utils.random(-45, 45),
                 autoAlpha: 0,
                 duration: 0.9,
-                ease: "power2.out",
+                ease: EASE.soft,
               },
               0.06,
             );
@@ -138,7 +138,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
               gsap.to(el, {
                 scale: 1,
                 duration: 0.45,
-                ease: "back.out(1.2)",
+                ease: EASE.momentum,
                 overwrite: "auto",
               });
               puff(el);
@@ -169,7 +169,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
             scale: 0.55,
             autoAlpha: 0,
             duration: 0.9,
-            ease: "elastic.out(1, 0.5)",
+            ease: EASE.spring,
             clearProps: "transform,opacity,visibility",
           },
           i * 0.05,
@@ -185,7 +185,7 @@ export function StickerWall({ chips, title, hint, ariaLabel, className }: Props)
         gsap.to(el, {
           rotation: 7,
           duration: 0.7,
-          ease: "wiggle({ wiggles: 7, type: easeOut })",
+          ease: EASE.shiver,
           overwrite: "auto",
         });
       };
