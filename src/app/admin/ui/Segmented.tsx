@@ -19,12 +19,16 @@ export function Segmented({
   options,
   defaultValue,
   tone = "ink",
+  labelledBy,
 }: {
   name: string;
   options: { value: string; label: string }[];
   defaultValue?: string;
   /** Which segment colour the chosen option gets. */
   tone?: "ink" | "accent";
+  /** The id of the visible label — a radiogroup with no name is announced
+   *  as just "radio group", with the question it answers left out. */
+  labelledBy?: string;
 }) {
   const chosen =
     tone === "accent"
@@ -32,7 +36,11 @@ export function Segmented({
       : "peer-checked:bg-fg peer-checked:text-bg";
 
   return (
-    <div role="radiogroup" className="inline-flex rounded-chip border border-line bg-surface p-1">
+    <div
+      role="radiogroup"
+      aria-labelledby={labelledBy}
+      className="inline-flex rounded-chip border border-line bg-surface p-1"
+    >
       {options.map((option) => (
         <label key={option.value} className="relative cursor-pointer">
           <input

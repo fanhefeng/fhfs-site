@@ -62,6 +62,24 @@ function rehypeSafeUrls() {
 }
 
 /**
+ * An image in an article is below the headline by construction, so it waits
+ * for the reader to get near it and decodes off the main thread. Markdown has
+ * nowhere to write either attribute, and the HTML is stored as rendered — so
+ * this is the one place they can come from.
+ */
+function rehypeLazyImages() {
+  return (tree: HastNode) => {
+    const walk = (node: HastNode) => {
+      if (node.type === "element" && node.tagName === "img") {
+        node.properties = { ...node.properties, loading: "lazy", decoding: "async" };
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
+/**
  * Markdown → HTML, run once when a post is saved rather than on every render.
  *
  * This replaces the MDX bundle that content-collections used to compile. None
@@ -84,6 +102,7 @@ const pipeline = unified()
   .use(remarkGfm)
   .use(remarkRehype)
   .use(rehypeSafeUrls)
+  .use(rehypeLazyImages)
   .use(rehypeSlug)
   .use(rehypeAutolinkHeadings, { behavior: "wrap" })
   .use(rehypePrettyCode, {

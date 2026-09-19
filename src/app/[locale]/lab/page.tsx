@@ -3,16 +3,22 @@ import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
-import { LAB_ENTRIES } from "@/components/lab/entries";
+import { LAB_ENTRIES, LAB_GROUPS } from "@/components/lab/entries";
 import type { CSSProperties } from "react";
 
-export const generateMetadata = sectionMetadata("lab", "/lab");
+export const generateMetadata = sectionMetadata("lab", "/lab", { count: LAB_ENTRIES.length });
 
 /**
  * Lab index — one line per study, in the craft log's voice: name, one
  * sentence, no thumbnail. The demos themselves need a full viewport and
  * several screens of scroll distance, so each lives on its own route rather
  * than being squeezed into a 720px column here.
+ *
+ * Thirty-three lines is too many to read as one list, so they sit on the
+ * three shelves the catalogue already keeps them on — built for the lab, in
+ * use on the site, the shell — each under a heading and a sentence. The
+ * ordinals run straight through: a shelf is a place to rest the eye, not a
+ * renumbering.
  */
 export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
   await pageLocale(params);
@@ -25,34 +31,60 @@ export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
           {t("kicker")}
         </p>
         <h1 className="mt-3 text-display-sm text-fg">{t("title")}</h1>
-        <p className="mt-4 text-body text-fg-secondary">{t("subtitle")}</p>
+        <p className="mt-4 text-body text-fg-secondary">
+          {t("subtitle", { count: LAB_ENTRIES.length })}
+        </p>
       </header>
 
-      <Reveal as="ul" className="lab-index" stagger={0.06}>
-        {LAB_ENTRIES.map((entry) => (
-          <li
-            key={entry.slug}
-            className="lab-row"
-            style={{ "--row-accent": entry.accent } as CSSProperties}
-          >
-            <Link href={`/lab/${entry.slug}`} className="lab-link">
-              <span className="lab-ordinal" aria-hidden="true">
-                {entry.ordinal}
-              </span>
-              <span className="lab-body">
-                <span className="lab-line">
-                  <span className="lab-name">{t(`items.${entry.key}.name`)}</span>
-                  <span className="lab-tagline">{t(`items.${entry.key}.tagline`)}</span>
+      {LAB_GROUPS.map((group) => {
+        const entries = LAB_ENTRIES.filter((entry) => entry.group === group);
+        const first = entries[0];
+        const last = entries[entries.length - 1];
+        return (
+          <section key={group} className="lab-group" aria-labelledby={`lab-group-${group}`}>
+            <div className="lab-group-head">
+              <h2
+                id={`lab-group-${group}`}
+                className="font-mono text-meta uppercase tracking-meta text-fg-tertiary"
+              >
+                {t(`groups.${group}.title`)}
+              </h2>
+              {first && last && (
+                <span className="lab-group-range" aria-hidden="true">
+                  {first.ordinal}–{last.ordinal}
                 </span>
-                <span className="lab-desc">{t(`items.${entry.key}.summary`)}</span>
-              </span>
-              <span className="lab-arrow" aria-hidden="true">
-                →
-              </span>
-            </Link>
-          </li>
-        ))}
-      </Reveal>
+              )}
+            </div>
+            <p className="lab-group-lede">{t(`groups.${group}.lede`)}</p>
+
+            <Reveal as="ul" className="lab-index" stagger={0.06} role="list">
+              {entries.map((entry) => (
+                <li
+                  key={entry.slug}
+                  className="lab-row"
+                  style={{ "--row-accent": entry.accent } as CSSProperties}
+                >
+                  <Link href={`/lab/${entry.slug}`} className="lab-link">
+                    <span className="lab-ordinal" aria-hidden="true">
+                      {entry.ordinal}
+                    </span>
+                    <span className="lab-body">
+                      <span className="lab-line">
+                        <span className="lab-name">{t(`items.${entry.key}.name`)}</span>
+                        <span className="lab-tagline">{t(`items.${entry.key}.tagline`)}</span>
+                      </span>
+                      <span className="lab-desc">{t(`items.${entry.key}.summary`)}</span>
+                    </span>
+                    <span className="lab-arrow" aria-hidden="true">
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </Reveal>
+          </section>
+        );
+      })}
 
       <style href="lab-index" precedence="medium">
         {INDEX_CSS}
@@ -62,7 +94,32 @@ export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
 }
 
 const INDEX_CSS = `
-.lab-index { margin: 2.75rem 0 0; padding: 0; list-style: none; }
+.lab-group { margin-top: 3.5rem; }
+.lab-group + .lab-group { margin-top: 4.5rem; }
+
+.lab-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.lab-group-head h2 { margin: 0; }
+.lab-group-range {
+  font-family: var(--font-stack-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--fg-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+.lab-group-lede {
+  margin: 0.6rem 0 0;
+  max-width: 56ch;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--fg-secondary);
+}
+
+.lab-index { margin: 1.5rem 0 0; padding: 0; list-style: none; }
 
 .lab-row { position: relative; border-top: 1px solid var(--line); }
 .lab-row:last-child { border-bottom: 1px solid var(--line); }
@@ -100,7 +157,7 @@ const INDEX_CSS = `
   color: var(--fg-tertiary);
 }
 
-.lab-body { display: block; }
+.lab-body { display: block; min-width: 0; }
 .lab-line {
   display: flex;
   flex-wrap: wrap;
@@ -112,13 +169,17 @@ const INDEX_CSS = `
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+/* Beside the name when it fits, on its own line when it does not, and
+   wrapping there — never clipped. Some taglines run to three clauses, and on
+   a phone even the short ones are wider than the column. */
 .lab-tagline {
+  min-width: 0;
   font-family: var(--font-stack-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-tertiary);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .lab-desc {
   display: block;

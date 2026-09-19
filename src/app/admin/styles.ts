@@ -54,7 +54,7 @@ export const ghostButtonClass =
 /** Destructive, and quiet until hovered — deleting is never the default move. */
 export const dangerButtonClass =
   "inline-flex min-h-10 items-center gap-2 rounded-chip border border-line px-3.5 text-caption text-fg-tertiary " +
-  "transition-[color,border-color] hover:border-accent hover:text-accent";
+  "transition-[color,border-color] hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-45";
 
 /** A surface a step above the page: form panels, list rows, dashboard cards. */
 export const cardClass = "rounded-card border border-line bg-surface-raised";

@@ -4,8 +4,7 @@ import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
 import { releaseRenderer } from "@/lib/three/release";
 
 type Props = {
@@ -161,18 +160,15 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    if (prefersSaveData() || !hasWebGL()) {
-      setDegraded(true);
-      return;
-    }
-
+    // Save-Data and a missing WebGL were asked before this chunk was fetched
+    // (SceneGate, in LabStudy); what is left to catch is a renderer that
+    // cannot be built after all.
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
         canvas,
         antialias: false,
         alpha: false,
-        powerPreference: "high-performance",
         stencil: false,
         depth: false,
       });
@@ -218,11 +214,14 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
     };
     resize();
 
-    const onResize = () => {
-      resize();
-      ScrollTrigger.refresh();
-    };
-    window.addEventListener("resize", onResize, { passive: true });
+    // The canvas follows the sticky box, not the window: a phone's address
+    // bar resizes the window without resizing a 100svh box, and re-measuring
+    // the pin is ScrollTrigger's own resize handling, which knows to ignore
+    // exactly that. Calling refresh() here used to make the pin jump.
+    const stickyEl = stickyRef.current;
+    const observer = stickyEl ? new ResizeObserver(resize) : null;
+    if (stickyEl) observer!.observe(stickyEl);
+    else window.addEventListener("resize", resize, { passive: true });
 
     let visible = true;
     const onVisibility = () => {
@@ -295,7 +294,8 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
     return () => {
       disposed = true;
       gsap.ticker.remove(tick);
-      window.removeEventListener("resize", onResize);
+      observer?.disconnect();
+      window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", onVisibility);
       canvas.removeEventListener("webglcontextrestored", onRestored);
       uniforms.uTex.value?.dispose();
@@ -330,7 +330,7 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
 
       const tween = gsap.to(sweep.current, {
         value: 1,
-        ease: "none",
+        ease: EASE.linear,
         // The tween's own onUpdate, not the ScrollTrigger's: with `scrub` the
         // catch-up tween keeps running after the scrollbar stops, and a
         // ScrollTrigger callback stops firing at that moment — which left the
@@ -365,7 +365,7 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
         {CSS}
       </style>
 
-      <div ref={stageRef} className="dz-stage">
+      <div ref={stageRef} className="dz-stage" data-degraded={degraded || undefined}>
         <div ref={stickyRef} className="dz-sticky">
           <canvas
             ref={canvasRef}
@@ -394,6 +394,16 @@ const CSS = `
 /* 520vh back when the sweep folded in half — that was ~260vh per act. One act
    now, so the height follows it down rather than halving the dissolve's pace. */
 .dz-stage { position: relative; height: 300vh; }
+/* No renderer: nothing pins and nothing is driven, so the track would be two
+   blank screens under the copy. One screen, with the photograph the dissolve
+   would have started from. */
+.dz-stage[data-degraded] { height: 100svh; }
+.dz-stage[data-degraded] .dz-sticky {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.55) 100%),
+    url("${IMAGE}") center / cover no-repeat,
+    #16211a;
+}
 .dz-sticky {
   position: relative;
   height: 100svh;

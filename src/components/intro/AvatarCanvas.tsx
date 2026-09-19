@@ -148,7 +148,10 @@ export default function AvatarCanvas({ tone, onScreen, loadingLabel, onFailed }:
         gl={{
           antialias: true,
           alpha: true,
-          powerPreference: "high-performance",
+          // Spelled out: R3F's own default is "high-performance", which moves
+          // a two-GPU Mac onto the discrete chip (and its fan) for a head that
+          // renders on demand.
+          powerPreference: "default",
         }}
         // Losing the GL context is survivable: three preventDefaults the event
         // and rebuilds its state on `webglcontextrestored`. What it cannot do

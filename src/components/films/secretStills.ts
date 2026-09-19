@@ -2,7 +2,7 @@ import type { FilmStill } from "./entries";
 
 /**
  * The 不能说的秘密 wall: twelve frames in the order of the story, from the
- * first tune in the piano room to the sunset on the roof. Ten are the film's
+ * first tune in the piano room to the sunset on the roof. Eight are the film's
  * official production stills (3:2, shot on a stills camera) from Douban's
  * 官方剧照 set, two (the bicycle, the father's guitar) TMDB's backdrops, and
  * two (the desk, the score) frames of the film itself, letterboxed bars cut

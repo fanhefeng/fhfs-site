@@ -24,6 +24,10 @@
  * these into utility names.
  * ------------------------------------------------------------------------- */
 :root {
+  /* What the browser draws for itself — scrollbars, form controls, the
+   * canvas before the first paint — follows this, not the tokens. Without
+   * it a closed gallery keeps a white scrollbar down its side. */
+  color-scheme: light;
   --bg: #faf9f6;
   --surface: #f2f0ea;
   --surface-raised: #ffffff;
@@ -95,6 +99,7 @@
 }
 
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #0e0e11;
   --surface: #141417;
   --surface-raised: #1a1a1f;
@@ -244,7 +249,16 @@ body {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 2px;
+}
+/* The ring's 2px corner is a default for what has no corner of its own — an
+ * inline link, a bare button — so it sits in the base layer, under every
+ * `rounded-*` utility. Unlayered (where the outline stays, so nothing can
+ * switch it off by accident) it outranked them all: a round button went
+ * square the moment a keyboard reached it, and a pill lost its ends. */
+@layer base {
+  :focus-visible {
+    border-radius: 2px;
+  }
 }
 
 /* Press feedback baseline: feedback lands on pointer-down, everywhere.
@@ -736,6 +750,7 @@ body {
 
   :root,
   :root[data-theme="dark"] {
+    color-scheme: light;
     --bg: #ffffff;
     --surface: #ffffff;
     --surface-raised: #ffffff;

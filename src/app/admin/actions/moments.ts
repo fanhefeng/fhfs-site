@@ -4,24 +4,9 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { raw, str, validDate, validKey } from "@/lib/forms";
+import { parseMomentTime, raw, str, validKey } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, KEY_ERROR, upsertKeyed, type ActionState } from "./shared";
-
-/**
- * A moment is stamped to the minute, in the site's zone: `2026-09-07 23:15`
- * as the author would write it, stored as the instant that is.
- */
-const MOMENT_TIME_RE = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})$/;
-
-function parseMomentTime(value: string): Date | null {
-  const match = MOMENT_TIME_RE.exec(value);
-  if (!match) return null;
-  const [, day, hour, minute] = match;
-  if (!validDate(day!) || Number(hour) > 23 || Number(minute) > 59) return null;
-  // The site's zone is UTC+8 without daylight saving, so the offset is a constant.
-  return new Date(`${day}T${hour}:${minute}:00+08:00`);
-}
 
 export async function saveMoment(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;

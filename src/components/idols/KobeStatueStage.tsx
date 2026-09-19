@@ -22,6 +22,9 @@ type Props = {
   fallback: { src: string; width: number; height: number; alt: string };
   turnLeft: string;
   turnRight: string;
+  /** The lab study's two probes, passed straight to the scene; see KobeStatue. */
+  wire?: boolean;
+  onFrame?: () => void;
 };
 
 /** A quarter turn per press of the arrows. */
@@ -41,6 +44,8 @@ export function KobeStatueStage({
   fallback,
   turnLeft,
   turnRight,
+  wire,
+  onFrame,
 }: Props) {
   const [mode, setMode] = useState<"probing" | "3d" | "photo">("probing");
   const [ready, setReady] = useState(false);
@@ -134,7 +139,13 @@ export function KobeStatueStage({
               <div
                 className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}
               >
-                <KobeStatue spin={spin} onScreen={onScreen} onReady={onReady} />
+                <KobeStatue
+                  spin={spin}
+                  onScreen={onScreen}
+                  onReady={onReady}
+                  wire={wire}
+                  onFrame={onFrame}
+                />
               </div>
             )}
             {!ready && (

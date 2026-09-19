@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
+import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
 import { PaperDissolve } from "./PaperDissolve";
 import { GroveCard, type GroveCardData } from "./GroveCard";
 import { APPROACH_CSS } from "./approach.css";
@@ -88,8 +89,18 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
    *  is nothing of the grove left to see, and it stops drawing. */
   const coveredRef = useRef(false);
   const [ready, setReady] = useState(false);
+  /** Whether the scene is mounted at all — and with it, whether its chunk is
+   *  fetched. Decided out here: the scene makes the same two checks itself,
+   *  but by then three.js has already been downloaded to run them, and
+   *  Save-Data is a refusal to spend exactly those bytes (lib/three/guards). */
+  const [live, setLive] = useState(false);
 
   const onReady = useCallback(() => setReady(true), []);
+
+  useEffect(() => {
+    if (prefersSaveData() || !hasWebGL()) setReady(true);
+    else setLive(true);
+  }, []);
 
   /* Pointer parallax for the cards, published as two custom properties on the
      pin. This is what separates the two plates from each other and from the
@@ -102,7 +113,7 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
   useEffect(() => {
     const pin = pinRef.current;
     if (!pin) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     const pointer = { x: 0, y: 0 };
     const smooth = { x: 0, y: 0 };
@@ -241,12 +252,14 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
                 <GroveCard slot="a" {...cards[0]} />
                 <GroveCard slot="b" {...cards[1]} />
               </div>
-              <GroveScene
-                heroRef={sceneRef}
-                stageRef={stageRef}
-                coveredRef={coveredRef}
-                onReady={onReady}
-              />
+              {live && (
+                <GroveScene
+                  heroRef={sceneRef}
+                  stageRef={stageRef}
+                  coveredRef={coveredRef}
+                  onReady={onReady}
+                />
+              )}
               {/* The floor the caption stands on. It used to be the pin's own
                   ::after, but it has to pass *under* the card in front and over
                   the one behind, which only works from inside the scene. */}

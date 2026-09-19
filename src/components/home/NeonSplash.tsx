@@ -22,8 +22,9 @@ type Props = {
   /** The dialog's accessible name: what the sign says. */
   label: string;
   welcome: string;
-  signOn: string;
-  signOff: string;
+  /** The switch's one name. `aria-pressed` says whether the sign is lit; a
+   *  label that flipped too was read as "switch the sign off, pressed". */
+  sign: string;
   enter: string;
   enterHint: string;
 };
@@ -60,7 +61,7 @@ const PUSH_FOR = 1.0;
  * push is one transform on a masked layer — the hole tracks the ring
  * because the mask lives in the layer's own coordinates and scales with it.
  */
-export function NeonSplash({ label, welcome, signOn, signOff, enter, enterHint }: Props) {
+export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const wallRef = useRef<HTMLCanvasElement>(null);
@@ -305,13 +306,13 @@ export function NeonSplash({ label, welcome, signOn, signOff, enter, enterHint }
           [0.04, 0.6],
           [0.04, 0],
         ]);
-        tl.to(spill, { opacity: 0.5, duration: 0.35, ease: "none" }, 0.1);
+        tl.to(spill, { opacity: 0.5, duration: 0.35, ease: EASE.linear }, 0.1);
         // The iris: paper shows through the ring.
-        tl.to(p, { u: 1, duration: IRIS_FOR, ease: "power2.inOut", onUpdate: apply }, IRIS_AT);
+        tl.to(p, { u: 1, duration: IRIS_FOR, ease: EASE.travel, onUpdate: apply }, IRIS_AT);
         // Relay: the masthead starts rising as the ring begins to grow.
         tl.add(announceOvertureDone, DONE_AT);
         // The push: through the door, the ring growing around the reader.
-        tl.to(p, { s: S, duration: PUSH_FOR, ease: "power2.in", onUpdate: apply }, PUSH_AT);
+        tl.to(p, { s: S, duration: PUSH_FOR, ease: EASE.exit, onUpdate: apply }, PUSH_AT);
       };
       enterRefFn.current = contextSafe(goIn);
 
@@ -405,7 +406,7 @@ export function NeonSplash({ label, welcome, signOn, signOff, enter, enterHint }
                 type="button"
                 className="ns-switch"
                 aria-pressed={powered}
-                aria-label={powered ? signOff : signOn}
+                aria-label={sign}
                 onClick={() => toggleRef.current?.()}
                 onPointerEnter={() => stutterRef.current?.()}
               >
@@ -439,6 +440,13 @@ const CSS = `
    reader without scripting is not shut behind a door that cannot open. */
 html[data-splash="seen"] .ns,
 html:not([data-js]) .ns { display: none; }
+
+/* The wall is fixed to the viewport, and the viewport stops where the
+   scrollbar's gutter starts (scrollbar-gutter: stable, globals.css). On a
+   classic-scrollbar system that left a strip of paper down the wall's right
+   edge. The gutter is painted by the root, so while the wall is up the root is
+   the mortar's colour. */
+html[data-js][data-splash="due"] { background-color: #0a0a0f; }
 
 .ns {
   position: fixed;

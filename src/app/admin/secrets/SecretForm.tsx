@@ -1,8 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
 import { deleteSecret, saveSecret } from "../actions/secrets";
-import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { DeleteRow } from "../DeleteRow";
 import { Select } from "../ui/Select";
@@ -10,6 +8,7 @@ import { Toggle } from "../ui/Segmented";
 import { SaveControls } from "../SaveControls";
 import { useFieldErrors } from "../ui/fieldErrors";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
+import { useSaveAction } from "../ui/useSaveAction";
 
 export type SecretDraft = {
   slug: string;
@@ -30,12 +29,12 @@ export type SecretDraft = {
  * how long it runs. The notes under an episode are markdown like the rest.
  */
 export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: boolean }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveSecret, {});
+  const { state, pending, formProps } = useSaveAction(saveSecret);
   const check = useFieldErrors();
 
   return (
     <>
-      <form action={formAction} className="space-y-5" {...check.formProps}>
+      <form {...formProps} className="space-y-5" {...check.formProps}>
         {isNew && <input type="hidden" name="isNew" value="1" />}
         <div className="grid gap-5 sm:grid-cols-[1fr_9rem_9rem_10rem]">
           <label className="space-y-1.5">

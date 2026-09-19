@@ -165,7 +165,9 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
         canvas,
         alpha: true,
         antialias: true,
-        powerPreference: "high-performance",
+        // The default power preference, not "high-performance": that one
+        // switches a two-GPU Mac onto the discrete chip (and its fan) for as
+        // long as the cover is open; the moss holds its frame rate without it.
       });
     } catch {
       ctx.dispose();

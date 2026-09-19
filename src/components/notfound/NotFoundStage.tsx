@@ -161,7 +161,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
   const bilingual = blocks.length > 1;
 
   return (
-    <main className="flex flex-1 flex-col justify-center px-6 py-24 sm:py-32">
+    <main id="main" className="flex flex-1 flex-col justify-center px-6 py-24 sm:py-32">
       <div className="mx-auto w-full max-w-[680px]">
         {/* The number pulls itself together out of dots, then comes apart
             again under the cursor. Decorative — the accessible name of this

@@ -2,6 +2,7 @@ import { asset } from "@/lib/asset";
 import type { TrackId } from "@/lib/tracks";
 import { ODYSSEY_LINES, ODYSSEY_PARTS, ODYSSEY_STILLS } from "./odysseyStills";
 import { SECRET_LINES, SECRET_STILLS } from "./secretStills";
+import { LALA_LINES, LALA_STILLS } from "./lalaStills";
 
 /**
  * The films — which ones hang in the room, in what order, and everything
@@ -10,7 +11,7 @@ import { SECRET_LINES, SECRET_STILLS } from "./secretStills";
  * lives under `films.<slug>` in the message catalogues, and its pictures in
  * `public/films/<slug>/`.
  */
-export type FilmSlug = "odyssey" | "secret";
+export type FilmSlug = "odyssey" | "secret" | "lala";
 
 /** How much of the six-column wall a print takes on a desktop grid. */
 export type StillSpan = "wide" | "tall" | "one" | "full";
@@ -18,8 +19,9 @@ export type StillSpan = "wide" | "tall" | "one" | "full";
 /**
  * The frame every print on a wall is cut to. The 大话西游 stills are video
  * frames (16:9); the 不能说的秘密 ones are the production photographs, shot
- * on a stills camera (3:2). The upright and the panoramic crops are the same
- * for both.
+ * on a stills camera (3:2). La La Land's wall mixes the two and is cut to
+ * 16:9, the frame of the six publicity stills that hung under the neon sign
+ * first. The upright and the panoramic crops are the same for both.
  */
 export type FilmRatio = "video" | "photo";
 
@@ -44,7 +46,9 @@ export type FilmEntry = {
   year: string;
   /** The record the room plays on entry (`lib/tracks`). */
   track: TrackId;
-  /** Dot + rule colour on the index card and the /life row. */
+  /** The film's colour. Only the first film's is drawn today — as the hover
+   *  rule of the /films row on /life (`components/life/rooms.ts`); the index
+   *  cards and the rooms use the site accent. */
   accent: string;
   ratio: FilmRatio;
   /** The `id` of the still on the index card and the /life row. */
@@ -77,6 +81,18 @@ export const FILMS: FilmEntry[] = [
     cover: "piano",
     stills: SECRET_STILLS,
     lines: SECRET_LINES,
+  },
+  // The record is the front door's: the theme is this film's, and the room
+  // plays the same recording the sign does — one file, registered once.
+  {
+    slug: "lala",
+    year: "2016",
+    track: "theme",
+    accent: "#3f5fd6",
+    ratio: "video",
+    cover: "lamp",
+    stills: LALA_STILLS,
+    lines: LALA_LINES,
   },
 ];
 

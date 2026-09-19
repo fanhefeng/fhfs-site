@@ -50,8 +50,18 @@ describe("renderMarkdown", () => {
     );
     expect(html).not.toMatch(/javascript:|data:/);
     expect(html).toContain("<a>x</a>");
-    expect(html).toContain('<img alt="y">');
+    const img = /<img\b[^>]*>/.exec(html)?.[0];
+    expect(img).toContain('alt="y"');
+    expect(img).not.toMatch(/\ssrc=/);
     expect(html).toContain('<a href="https://example.com">ok</a>');
+  });
+
+  // The HTML is stored as rendered, so these can only come from here.
+  it("lets an article's images wait for the reader and decode off the main thread", async () => {
+    const html = await renderMarkdown("![a desk](/blog/desk.jpg)");
+    expect(html).toContain(
+      '<img src="/blog/desk.jpg" alt="a desk" loading="lazy" decoding="async">',
+    );
   });
 
   it("never lets raw HTML in the source through", async () => {

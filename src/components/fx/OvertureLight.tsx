@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { splashDue } from "@/lib/splash";
 import { announceOvertureDone, markOvertureSeen, overtureSeen } from "@/lib/overture";
@@ -157,11 +157,11 @@ export function OvertureLight() {
       const tl = gsap.timeline();
       tl
         // 1. The cord drops from the dark.
-        .to(cord, { scaleY: 1, duration: 0.2, ease: "power2.out" }, 0)
+        .to(cord, { scaleY: 1, duration: 0.2, ease: EASE.soft }, 0)
         // 2. The lamp warms up: a dim flicker first, then full.
-        .to(bulb, { autoAlpha: 0.55, duration: 0.08, ease: "power1.in" }, 0.16)
-        .to(bulb, { autoAlpha: 1, duration: 0.12, ease: "power1.out" }, 0.3)
-        .to(halo, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "power3.out" }, 0.18)
+        .to(bulb, { autoAlpha: 0.55, duration: 0.08, ease: EASE.fadeOut }, 0.16)
+        .to(bulb, { autoAlpha: 1, duration: 0.12, ease: EASE.fadeIn }, 0.3)
+        .to(halo, { autoAlpha: 1, scale: 1, duration: 0.3, ease: EASE.default }, 0.18)
         // 3. Light floods outward (clip-path circle) and pushes the dark
         //    out — the unveiling is done by the glow, not by a wipe.
         .to(
@@ -169,17 +169,17 @@ export function OvertureLight() {
           {
             clipPath: `circle(135% at ${LAMP_X} ${LAMP_Y})`,
             duration: 0.5,
-            ease: "power2.out",
+            ease: EASE.soft,
           },
           FLOOD_AT,
         )
-        .to(scrim, { opacity: 0, duration: 0.44, ease: "power2.inOut" }, 0.42)
+        .to(scrim, { opacity: 0, duration: 0.44, ease: EASE.travel }, 0.42)
         // 4. Relay: hand over before the last of the warm tint melts, so
         //    the masthead starts rising under the fading light.
         .add(() => {
           announceOvertureDone();
         }, DONE_AT)
-        .to(overlay, { autoAlpha: 0, duration: END_AT - 0.62, ease: "power1.inOut" }, 0.62)
+        .to(overlay, { autoAlpha: 0, duration: END_AT - 0.62, ease: EASE.crossfade }, 0.62)
         .add(() => {
           unlock();
           window.removeEventListener("keydown", onKeyDown);

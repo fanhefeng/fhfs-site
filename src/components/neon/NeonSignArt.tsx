@@ -1,6 +1,7 @@
 "use client";
 
 import type { Ref } from "react";
+import { EASE } from "@/lib/gsap";
 import {
   ARC_L,
   ARC_R_BAR,
@@ -239,7 +240,7 @@ export function writeLightScore(main: gsap.core.Timeline, seg: SegPicker, spill:
     0.55,
     RING_SCORE.map(([hold, v]) => [hold, v * 0.5] as Step),
   );
-  main.to(spill, { opacity: 1, duration: 1.4, ease: "none" }, 1.3);
+  main.to(spill, { opacity: 1, duration: 1.4, ease: EASE.linear }, 1.3);
 
   score(main, bar, 0.95, [
     [0.04, 1],

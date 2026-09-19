@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useRef, type RefObject } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/gsap";
 import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/nav";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { site } from "@/config/site";
@@ -99,7 +99,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
         filter: "blur(2px)",
         transformOrigin: "50% 20%",
         duration: 0.5,
-        ease: "power3.out",
+        ease: EASE.default,
         overwrite: "auto",
       });
       return;
@@ -113,7 +113,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
       scale: 1,
       filter: "blur(0px)",
       duration: 0.4,
-      ease: "power2.out",
+      ease: EASE.soft,
       overwrite: "auto",
       // A transformed <main> breaks fixed/sticky descendants — clean up.
       onComplete: () => gsap.set(main, { clearProps: "transform,filter,transformOrigin" }),
@@ -157,14 +157,14 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
         tl.fromTo(
           panel,
           { yPercent: -103, y: 0, autoAlpha: 1, filter: "blur(0px)" },
-          { yPercent: 0, duration: 0.65, ease: "back.out(1.2)" },
+          { yPercent: 0, duration: 0.65, ease: EASE.momentum },
           0,
         ).fromTo(
           items,
           { y: 28, autoAlpha: 0 },
           // 0.04, not 0.06: the member rows are items too, and the tail of
           // the cascade should not drag past a second.
-          { y: 0, autoAlpha: 1, duration: 0.5, ease: "power3.out", stagger: 0.04 },
+          { y: 0, autoAlpha: 1, duration: 0.5, ease: EASE.default, stagger: 0.04 },
           0.18,
         );
       } else {
@@ -177,10 +177,10 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
             autoAlpha: 1,
             filter: "blur(0px)",
             duration: 0.35,
-            ease: "power3.out",
+            ease: EASE.default,
           },
           0,
-        ).to(items, { y: 0, autoAlpha: 1, duration: 0.3, ease: "power3.out", stagger: 0.03 }, 0.05);
+        ).to(items, { y: 0, autoAlpha: 1, duration: 0.3, ease: EASE.default, stagger: 0.03 }, 0.05);
       }
       settledClosedRef.current = false;
       // Focus moves into the dialog as soon as the first word is visible —
@@ -209,13 +209,13 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
           y: 14,
           autoAlpha: 0,
           duration: 0.28,
-          ease: "power2.in",
+          ease: EASE.exit,
           stagger: { each: 0.02, from: "end" },
         },
         0,
       ).to(
         panel,
-        { y: 48, autoAlpha: 0, filter: "blur(10px)", duration: 0.38, ease: "power2.in" },
+        { y: 48, autoAlpha: 0, filter: "blur(10px)", duration: 0.38, ease: EASE.exit },
         0.05,
       );
       tl.add(() => {
@@ -371,8 +371,13 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
                   </span>
                   <span
                     id={doorId}
+                    // Amber *and* underlined: on the island the current
+                    // door has its capsule, here colour was the only mark —
+                    // nothing at all to a reader who cannot tell amber from ink.
                     className={`text-display-sm transition-colors ${
-                      active ? "text-accent" : "text-fg group-hover:text-accent"
+                      active
+                        ? "text-accent underline decoration-2 underline-offset-[0.18em]"
+                        : "text-fg group-hover:text-accent"
                     }`}
                   >
                     {t(door.labelKey)}
@@ -397,7 +402,9 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
                               if (member.href === pathname) onClose();
                             }}
                             className={`hit-ext inline-flex min-h-8 items-center py-1 text-caption transition-colors ${
-                              current ? "text-accent" : "text-fg-secondary hover:text-accent"
+                              current
+                                ? "text-accent underline underline-offset-4"
+                                : "text-fg-secondary hover:text-accent"
                             }`}
                           >
                             {t(member.labelKey)}

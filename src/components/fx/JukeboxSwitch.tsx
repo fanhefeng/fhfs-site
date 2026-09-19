@@ -64,8 +64,11 @@ export function JukeboxSwitch({ className = "" }: { className?: string }) {
     <button
       type="button"
       onClick={toggleMusic}
+      // One name for the switch; `aria-pressed` carries its state. A label
+      // that flipped too was read as "stop the background music, pressed".
+      // The tooltip is for the eye and may say what a press will do.
       aria-pressed={wanted}
-      aria-label={wanted ? t("musicPause") : t("musicPlay")}
+      aria-label={t("music")}
       title={wanted ? t("musicPause") : t("musicPlay")}
       className={`grid size-11 cursor-pointer place-items-center rounded-full text-fg-secondary transition-colors hover:text-fg ${className}`}
     >

@@ -174,7 +174,10 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
               <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                 ← {t("prevPost")}
               </span>
-              <span className="text-heading text-fg transition-colors duration-200 group-hover:text-accent">
+              <span
+                lang={older.locale !== locale ? htmlLang(older.locale) : undefined}
+                className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
+              >
                 {older.title}
               </span>
             </Link>
@@ -187,7 +190,10 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
               <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                 {t("nextPost")} →
               </span>
-              <span className="text-heading text-fg transition-colors duration-200 group-hover:text-accent">
+              <span
+                lang={newer.locale !== locale ? htmlLang(newer.locale) : undefined}
+                className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
+              >
                 {newer.title}
               </span>
             </Link>

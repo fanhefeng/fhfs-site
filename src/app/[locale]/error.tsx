@@ -51,8 +51,13 @@ export default function LocaleError({
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("kicker")}
         </p>
-        <h1 className="mt-4 text-display-sm text-fg">{t("title")}</h1>
-        <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("description")}</p>
+        {/* The page a reader was on is swapped for this one without a
+            navigation, so nothing announces it. An alert is read out as it
+            appears — the title and what to do, not the digest or the buttons. */}
+        <div role="alert">
+          <h1 className="mt-4 text-display-sm text-fg">{t("title")}</h1>
+          <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("description")}</p>
+        </div>
         {/* Vercel's log line carries the same digest, so a reader who quotes
             it points straight at the cause. */}
         {error.digest && (

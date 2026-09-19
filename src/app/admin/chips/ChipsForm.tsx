@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { saveChips } from "../actions/chips";
-import type { ActionState } from "../actions/shared";
 import { ghostButtonClass, inputClass, labelClass } from "../styles";
 import { SaveControls } from "../SaveControls";
 import { Select } from "../ui/Select";
+import { useSaveAction } from "../ui/useSaveAction";
 
 type ChipRow = {
   label: { zh: string; en: string };
@@ -31,7 +31,7 @@ const TONES = [
  * quietly write them back — deleted rows included.
  */
 export function ChipsForm({ chips }: { chips: ChipRow[] }) {
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(saveChips, {});
+  const { state, pending, formProps } = useSaveAction(saveChips);
   const [rows, setRows] = useState(chips);
   useEffect(() => setRows(chips), [chips]);
 
@@ -39,7 +39,7 @@ export function ChipsForm({ chips }: { chips: ChipRow[] }) {
     setRows(rows.map((r, i) => (i === index ? row : r)));
 
   return (
-    <form action={formAction}>
+    <form {...formProps}>
       <div className="space-y-3">
         {rows.map((chip, i) => (
           <div key={i} className="grid gap-3 sm:grid-cols-[1fr_1fr_8rem] sm:items-end">
