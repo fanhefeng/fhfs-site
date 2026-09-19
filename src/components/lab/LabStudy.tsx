@@ -11,6 +11,7 @@ import { filmEntry } from "@/components/films/entries";
 import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
 import type { ChangelogEntry } from "@/components/about/Changelog";
 import { DeskFallback, SceneGate, StageFallback } from "./SceneGate";
+import { StudyLede } from "./StudyPanel";
 
 /**
  * One study per route, and only that study's code.
@@ -172,12 +173,9 @@ export function LabStudy({ slug, accent, text, entries }: Props) {
       return (
         <MeltingTextDemo
           accent={accent}
-          sampleOne={s("sampleOne")}
-          sampleTwo={s("sampleTwo")}
-          sampleThree={s("sampleThree")}
-          labelLoad={s("labelLoad")}
-          labelInView={s("labelInView")}
-          labelScrub={s("labelScrub")}
+          label={s("label")}
+          replay={s("replay")}
+          sample={s("sample")}
         />
       );
     case "grove":
@@ -392,29 +390,34 @@ export function LabStudy({ slug, accent, text, entries }: Props) {
       );
     case "approach":
       return (
-        <GroveApproach
-          kicker={s("kicker")}
-          title={s("title")}
-          link={{ label: s("linkLabel"), href: s("linkHref") }}
-          cards={[
-            {
-              label: s("cardALabel"),
-              title: s("cardATitle"),
-              href: s("cardAHref"),
-              src: asset("/grove/moss-plate.webp"),
-              alt: s("cardAAlt"),
-              linkLabel: s("cardALink"),
-            },
-            {
-              label: s("cardBLabel"),
-              title: s("cardBTitle"),
-              href: s("cardBHref"),
-              src: asset("/lab/dissolve/forest.jpg"),
-              alt: s("cardBAlt"),
-              linkLabel: s("cardBLink"),
-            },
-          ]}
-        />
+        <>
+          <div className="mx-auto w-full max-w-[720px] px-6 pb-10">
+            <StudyLede>{s("lede")}</StudyLede>
+          </div>
+          <GroveApproach
+            kicker={s("kicker")}
+            title={s("title")}
+            link={{ label: s("linkLabel"), href: s("linkHref") }}
+            cards={[
+              {
+                label: s("cardALabel"),
+                title: s("cardATitle"),
+                href: s("cardAHref"),
+                src: asset("/grove/moss-plate.webp"),
+                alt: s("cardAAlt"),
+                linkLabel: s("cardALink"),
+              },
+              {
+                label: s("cardBLabel"),
+                title: s("cardBTitle"),
+                href: s("cardBHref"),
+                src: asset("/lab/dissolve/forest.jpg"),
+                alt: s("cardBAlt"),
+                linkLabel: s("cardBLink"),
+              },
+            ]}
+          />
+        </>
       );
     case "segmented":
       return (
@@ -526,6 +529,7 @@ export function LabStudy({ slug, accent, text, entries }: Props) {
       if (!entries) throw new Error(`lab study "${slug}" needs entries, which the page never set`);
       return (
         <div className="mx-auto w-full max-w-[720px] px-6 pt-8">
+          <StudyLede>{s("lede")}</StudyLede>
           <Changelog entries={entries} title={s("title")} ariaLabel={s("ariaLabel")} railAlways />
         </div>
       );
@@ -533,6 +537,9 @@ export function LabStudy({ slug, accent, text, entries }: Props) {
       const film = filmEntry("odyssey")!;
       return (
         <div className="mx-auto w-full max-w-[1040px] px-6 pt-8">
+          <div className="mb-10">
+            <StudyLede>{s("lede")}</StudyLede>
+          </div>
           <FilmStills
             folder={film.slug}
             ratio={film.ratio}

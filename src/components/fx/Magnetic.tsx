@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
 
@@ -18,6 +18,11 @@ type Props = {
  * treats a cursor beyond the ring as gone.
  */
 export const MAGNET_REACH = 20;
+
+/** The pointer kind never changes under a mounted page, so there is nothing
+ *  to subscribe to; the server, which cannot know, says "no". */
+const noSubscription = () => () => {};
+const noFinePointerOnServer = () => false;
 
 /**
  * Magnetic hover wrapper (after the official GSAP demo azmKBBJ): while the
@@ -43,6 +48,7 @@ export function Magnetic({ children, strength = 0.4, className }: Props) {
   const wrapRef = useRef<HTMLSpanElement>(null);
   const plateRef = useRef<HTMLSpanElement>(null);
   const innerRef = useRef<HTMLSpanElement>(null);
+  const fine = useSyncExternalStore(noSubscription, isFinePointer, noFinePointerOnServer);
 
   useGSAP(
     () => {
@@ -130,8 +136,14 @@ export function Magnetic({ children, strength = 0.4, className }: Props) {
   return (
     <span ref={wrapRef} className={`relative inline-block ${className ?? ""}`}>
       {/* The hit ring: MAGNET_REACH px beyond the resting box on every side.
-          Painted before the plate, so it never sits over the content. */}
-      <span aria-hidden="true" className="absolute" style={{ inset: -MAGNET_REACH }} />
+          Painted before the plate, so it never sits over the content — but
+          it is positioned, so it does sit over an unpositioned neighbour
+          closer than MAGNET_REACH, and takes that neighbour's clicks: give
+          whatever sits beside a Magnetic at least that much room (the 404's
+          two ways out wrap with a 24px gap for this). Only a hovering fine
+          pointer gets a ring at all; on a touch screen it would be a dead
+          patch over the next tap target, pulling nothing. */}
+      {fine && <span aria-hidden="true" className="absolute" style={{ inset: -MAGNET_REACH }} />}
       <span ref={plateRef} className="relative inline-block will-change-transform">
         <span ref={innerRef} className="inline-block will-change-transform">
           {children}
