@@ -4095,8 +4095,8 @@
     },
     {
       "key": "lab.items.dissolve.name",
-      "zh": "溶解转场",
-      "en": "Dissolve",
+      "zh": "噪声溶解转场",
+      "en": "Noise dissolve transition",
       "note": null
     },
     {
@@ -4137,8 +4137,8 @@
     },
     {
       "key": "lab.items.grove.name",
-      "zh": "长出来的，不是建模的",
-      "en": "Grown, not modelled",
+      "zh": "程序生成的苔藓树根",
+      "en": "A procedurally grown mossy root",
       "note": null
     },
     {
@@ -4179,8 +4179,8 @@
     },
     {
       "key": "lab.items.liquidMetal.name",
-      "zh": "一颗按钮，全是算出来的",
-      "en": "A button, computed all the way down",
+      "zh": "液态金属按钮",
+      "en": "Liquid-metal button",
       "note": null
     },
     {
@@ -4209,8 +4209,8 @@
     },
     {
       "key": "lab.items.meltingText.name",
-      "zh": "融化式文字",
-      "en": "Melting type",
+      "zh": "文字融化显现",
+      "en": "Text melting into place",
       "note": null
     },
     {
@@ -4257,8 +4257,8 @@
     },
     {
       "key": "lab.items.scrollVideo.name",
-      "zh": "滚动即播放",
-      "en": "Scroll as playhead",
+      "zh": "滚动逐帧播放",
+      "en": "Frames played by scroll",
       "note": null
     },
     {
@@ -4287,8 +4287,8 @@
     },
     {
       "key": "lab.items.workstation.name",
-      "zh": "一台可以拖着转的工作台",
-      "en": "A desk you can spin",
+      "zh": "可拖动旋转的 3D 工位",
+      "en": "A 3D desk you can drag to spin",
       "note": null
     },
     {
