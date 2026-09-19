@@ -42,6 +42,22 @@ export function StudyPanel({ accent, label, lede, hint, note, children, classNam
   );
 }
 
+/**
+ * The panel's lede on its own, for the studies that mount a site component
+ * as it is — the approach, the changelog, the screening room — and so have
+ * no panel to put it in. Same sentence, same voice, above the component.
+ */
+export function StudyLede({ children }: { children: string }) {
+  return (
+    <>
+      <style href="lab-panel" precedence="medium">
+        {PANEL_CSS}
+      </style>
+      <p className="spn-body spn-lede">{children}</p>
+    </>
+  );
+}
+
 const PANEL_CSS = `
 .spn { border-block-start: 1px solid var(--line); }
 
