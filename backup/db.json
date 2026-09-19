@@ -4220,24 +4220,6 @@
       "note": null
     },
     {
-      "key": "lab.items.meltingText.sampleOne",
-      "zh": "融化显现",
-      "en": "Melt it",
-      "note": null
-    },
-    {
-      "key": "lab.items.meltingText.sampleThree",
-      "zh": "滚动即显影。",
-      "en": "Scroll to reveal.",
-      "note": null
-    },
-    {
-      "key": "lab.items.meltingText.sampleTwo",
-      "zh": "Melting Type",
-      "en": "Melting Type",
-      "note": null
-    },
-    {
       "key": "lab.items.meltingText.summary",
       "zh": "文字先糊成一团黏连的液体，再融化收敛成清晰字形。",
       "en": "Letters congeal into one sticky liquid, then melt down into clean glyphs.",

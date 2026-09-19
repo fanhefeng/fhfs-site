@@ -221,12 +221,9 @@
         "tagline": "SVG filter + per-character stagger",
         "summary": "Letters congeal into one sticky liquid, then melt down into clean glyphs.",
         "note": "A gaussian blur bleeds each glyph outward and an alpha threshold pushes anything past 30% opacity back to solid — where two blurred neighbours overlap, they fuse.",
-        "sampleOne": "Melt it",
-        "sampleTwo": "Melting Type",
-        "sampleThree": "Scroll to reveal.",
-        "labelLoad": "On mount",
-        "labelInView": "On enter",
-        "labelScrub": "Tied to scroll"
+        "label": "Melt · once, on entering",
+        "replay": "Again",
+        "sample": "Melt it"
       },
       "grove": {
         "name": "Grown, not modelled",
@@ -454,6 +451,7 @@
         "name": "The approach",
         "tagline": "CSS sticky + clip-path window + WebGL2 wash",
         "summary": "The cover's second and third acts, as they are: the scroll opens a window in the paper onto a grove still being drawn, two paper cards standing in it — one under the canvas, one in front — holds a beat, and the next page's paper comes back down along the dissolve's front.",
+        "lede": "Scroll down about three screens: a window opens in the paper onto moss still being drawn, holds a beat, and the next page's paper comes back down along the front. Move the pointer inside the window and watch how differently the two paper cards ride.",
         "note": "What is pinned here is a window, not a line, so it uses CSS sticky rather than ScrollTrigger's pin: a pin-spacer has to be measured against a page whose height Lenis is smoothing, and a sticky element needs nothing measured. ScrollTrigger only reports progress — one 320svh section, the first 42% walking in (the clip-path's rounded frame opening on outQuad, the scene scaling 1.16 → 1), a hold, and from 62% the paper coming down, along the same threshold field as the dissolve study, painting paper instead of picture. Two paper cards stand in the window, one root apart. A card cannot stand behind a photograph of a grove, only behind a grove that is still being drawn, and the whole trick is one rule: card a carries no z-index, so it paints under the canvas and the trunk crosses the empty corner at its lower right; card b sits at z 3, in front of the root. The pair stands at 860 × 160 and 1237 × 482 on the stage's 1600 × 880 grid, and it is the pair that carries the depth: two sheets of the same paper at the same size, one in front of the moss and one behind it. Under the pointer the two ride by different amounts, and that difference is the distance between them. Between the window and the wash the frame is all moss; body carries data-grove-immersed then, and the masthead's paper scrim stands down for it.",
         "kicker": "Study {ordinal}",
         "title": "A window onto the moss",
@@ -516,12 +514,14 @@
         "name": "Version history",
         "tagline": "ScrollTrigger snap · tooltips",
         "summary": "The life numbered like software from /about. The year on the left is a window one row tall; when an entry passes the middle of the viewport it rolls to the next year.",
-        "note": "The rows are the ones on /about, read from the database. Both pieces of motion are wayfinding, not decoration: the year rail is a stack of years behind a one-row window, and as each entry crosses the middle of the viewport ScrollTrigger snaps the stack to that entry's year, so the reader always knows when they are; each node pops the exact date on hover or focus, entering on back.out and leaving on the reversed ease at 2.2× — arrive generously, leave briskly. The rail folds away on narrow screens."
+        "lede": "Scroll down: as each entry crosses the middle of the viewport, the year on the left rolls to it. Rest the pointer on a dot, or reach it with Tab, and the exact date of that version pops up.",
+        "note": "The rows are the ones on /about, read from the database. Both pieces of motion are wayfinding, not decoration: the year rail is a stack of years behind a one-row window, and as each entry crosses the middle of the viewport ScrollTrigger snaps the stack to that entry's year, so the reader always knows when they are; each node pops the exact date on hover or focus, entering on back.out and leaving on the reversed ease at 2.2× — arrive generously, leave briskly. On /about the rail folds away on narrow screens; here it shows at every width."
       },
       "screening": {
         "name": "The screening room",
         "tagline": "Native dialog · six-column wall",
         "summary": "The film pages' move: stills hung six columns wide on paper, and a click opens the screening room — a native dialog, the still as large as the viewport allows, arrow keys, buttons or a swipe to move along.",
+        "lede": "Press any still to enter the screening room; the arrow keys, the buttons either side or a swipe move along, and Escape, the backdrop or the close button bring you out.",
         "note": "Every still is a link to its own file, so with no JavaScript a click still opens the picture. With it, the click opens the room: dialog.showModal() takes focus and makes the page inert behind it, scrolling goes through the shared lock (Lenis stop + overflow hidden, then scrollTo → start → refresh on the way out), and focus returns to the print that opened it. Opening is a 0.35s fade with the frame settling 0.96 → 1; a step slides the next still in 24px from the side it came from; leaving fades on power2.in and then calls close() — the state is unwound only in the native close event, so Escape, the backdrop and the button all take the same road. The stills and their captions are the 大话西游 room's, rights line included."
       },
       "lights": {

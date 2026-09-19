@@ -67,7 +67,7 @@ const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
     "captionTwoBody",
   ],
   dissolve: ["headline", "body", "tail", "fallback", "saveData"],
-  meltingText: ["sampleOne", "sampleTwo", "sampleThree", "labelLoad", "labelInView", "labelScrub"],
+  meltingText: ["label", "replay", "sample"],
   // The spec table is not here: the page renders it itself, below, and what
   // is listed here is serialized into the study's props.
   grove: [
@@ -117,7 +117,7 @@ const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
   scatter: ["label", "pointerHint", "text", "touchNote"],
   dotName: ["label", "pointerHint", "text", "touchNote"],
   // The kicker carries the study's own ordinal, filled in below.
-  approach: ["title", "linkLabel"],
+  approach: ["lede", "title", "linkLabel"],
   segmented: ["label", "ariaLabel", "all", "writing", "software", "lab", "selected", "keyNote"],
   // The two readouts carry the demo's own placeholders; set below, raw.
   reshuffle: [
@@ -158,8 +158,8 @@ const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
     "stateIdle",
     "frameNote",
   ],
-  changelog: [],
-  screening: [],
+  changelog: ["lede"],
+  screening: ["lede"],
 };
 
 /**

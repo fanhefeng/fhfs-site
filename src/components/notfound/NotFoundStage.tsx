@@ -191,8 +191,10 @@ export function NotFoundStage({ blocks, sticker }: Props) {
               )}
               <p className="mt-4 text-body text-fg-secondary">{b.description}</p>
 
-              {/* Two ways out — home, or straight into the writing. */}
-              <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
+              {/* Two ways out — home, or straight into the writing. The row
+                  gap outreaches the magnet's hit ring (MAGNET_REACH, 20px):
+                  at 12px a wrapped link lost the top of its tap target to it. */}
+              <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-6">
                 <Magnetic strength={0.3}>
                   <a
                     href={b.homeHref}
