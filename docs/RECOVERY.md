@@ -144,7 +144,23 @@ rm -rf .next/dev/cache/fetch-cache && pnpm dev
 
 ## 演练记录
 
-一份没验证过的备份不算备份。这条路径最后一次走通是：
+**这条路径还没有被完整走通过。** `db:import` 本身每次导内容都在用，是可靠的；
+没验证过的是「空库 → 完整站点」的全程——`pnpm db:migrate` 在一个真正干净的库上
+跑完 12 个迁移，然后 `db:import` 把 12 张表填回去，行数对得上。
 
-- **2026-09-20** —— 在 Neon 建沙箱分支，`DROP SCHEMA public CASCADE` 清成空库，
-  走 `pnpm db:migrate` + `pnpm db:import`，逐表比对行数一致。（情形二全程）
+练一次的成本很低，Neon 建分支是一键的事：
+
+```bash
+# Neon console → Branches → New Branch（叫 restore-drill 之类），
+# 把它不带 -pooler 的连接串填进 DATABASE_URL_UNPOOLED，然后：
+psql "$DATABASE_URL_UNPOOLED" -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
+pnpm db:migrate
+pnpm db:import
+pnpm db:check          # 跟 backup/db.json 里的行数逐表对
+# 验完把沙箱分支删掉，生产分支全程没被碰过
+```
+
+走通了就把日期记在下面，并且**记上那次花了多久**——真出事的时候，知道这件事要
+二十分钟还是两小时，比什么都重要。
+
+- （还没有过）
