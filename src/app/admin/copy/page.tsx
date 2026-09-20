@@ -3,7 +3,13 @@ import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { copyBlocks } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
-import { COPY_GROUPS, COPY_NOTES, namespaceOf, type CopyEntry } from "@/lib/copy";
+import {
+  COPY_GROUPS,
+  COPY_NOTES,
+  isScreenReaderOnly,
+  namespaceOf,
+  type CopyEntry,
+} from "@/lib/copy";
 import { copyCatalogues } from "@/lib/copyCatalogue";
 import { AdminChrome } from "../AdminChrome";
 import { cardClass, metaClass } from "../styles";
@@ -57,6 +63,7 @@ export default async function CopyPage({ searchParams }: PageProps<"/admin/copy"
           {COPY_GROUPS.map((candidate) => {
             const keys = Object.keys(zh).filter((key) => namespaceOf(key) === candidate.id);
             const edited = keys.filter((key) => overrides.has(key)).length;
+            const spoken = keys.filter(isScreenReaderOnly).length;
             return (
               <Link
                 key={candidate.id}
@@ -72,7 +79,12 @@ export default async function CopyPage({ searchParams }: PageProps<"/admin/copy"
                     {edited > 0 && <span className="text-accent"> · 改过 {edited}</span>}
                   </span>
                 </p>
-                <p className="mt-1.5 text-caption text-fg-tertiary">{candidate.blurb}</p>
+                <p className="mt-1.5 text-caption text-fg-tertiary">
+                  {candidate.blurb}
+                  {/* Worth saying on the way in: a group that is mostly alt
+                      text reads as a wall of prose nobody can find on screen. */}
+                  {spoken > 0 && <span className="opacity-70">（其中 {spoken} 条只给读屏）</span>}
+                </p>
               </Link>
             );
           })}
@@ -97,6 +109,7 @@ export default async function CopyPage({ searchParams }: PageProps<"/admin/copy"
         zhDefault,
         enDefault,
         overridden: Boolean(row),
+        screenReader: isScreenReaderOnly(key),
         note: COPY_NOTES[key],
       };
     });

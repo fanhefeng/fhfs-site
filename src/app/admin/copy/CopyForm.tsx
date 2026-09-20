@@ -25,14 +25,17 @@ import { useSaveAction } from "../ui/useSaveAction";
 export function CopyForm({ namespace, entries }: { namespace: string; entries: CopyEntry[] }) {
   const { state, pending, formProps } = useSaveAction(saveCopy);
   const [query, setQuery] = useState("");
-  const [onlyEdited, setOnlyEdited] = useState(false);
+  const [only, setOnly] = useState<"all" | "edited" | "sr">("all");
 
   const needle = query.trim().toLowerCase();
   const matches = (entry: CopyEntry) =>
-    (!onlyEdited || entry.overridden) &&
+    (only === "all" ||
+      (only === "edited" && entry.overridden) ||
+      (only === "sr" && entry.screenReader)) &&
     (!needle || `${entry.key} ${entry.zh} ${entry.en}`.toLowerCase().includes(needle));
   const hits = entries.filter(matches).length;
   const edited = entries.filter((entry) => entry.overridden).length;
+  const spoken = entries.filter((entry) => entry.screenReader).length;
 
   return (
     <form {...formProps}>
@@ -63,23 +66,32 @@ export function CopyForm({ namespace, entries }: { namespace: string; entries: C
           />
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOnlyEdited((value) => !value)}
-          aria-pressed={onlyEdited}
-          className={`rounded-chip border px-2.5 py-1 font-mono text-meta transition-colors ${
-            onlyEdited
-              ? "border-accent bg-accent/10 text-accent"
-              : "border-line text-fg-tertiary hover:text-fg"
-          }`}
+        <Only
+          active={only === "edited"}
+          onPress={() => setOnly((v) => (v === "edited" ? "all" : "edited"))}
         >
           只看改过的 {edited}
-        </button>
+        </Only>
+        {spoken > 0 && (
+          <Only active={only === "sr"} onPress={() => setOnly((v) => (v === "sr" ? "all" : "sr"))}>
+            只看读屏的 {spoken}
+          </Only>
+        )}
 
         <span className={`${metaClass} tabular-nums`}>
           {hits} / {entries.length} 条
         </span>
       </div>
+
+      {spoken > 0 && (
+        <p className={`mt-3 max-w-[70ch] ${hintClass}`}>
+          标着
+          <ScreenReaderBadge />
+          的那几条屏幕上看不见——图片的替代文字、按钮和区域的无障碍名称， 只有读屏软件会念出来。写它
+          <b>是什么</b>（「招牌的灯」），别写按下去会怎样（「关灯」）：
+          名字跟着状态变，读出来就成了「把招牌关掉，已按下」。也不用为版面迁就长度，它没有版面。
+        </p>
+      )}
 
       <div className={`${cardClass} mt-4 divide-y divide-line`}>
         {entries.map((entry) => (
@@ -93,6 +105,7 @@ export function CopyForm({ namespace, entries }: { namespace: string; entries: C
                   改过
                 </span>
               )}
+              {entry.screenReader && <ScreenReaderBadge />}
             </p>
             {entry.note && <p className={`mt-1 max-w-[70ch] ${hintClass}`}>{entry.note}</p>}
 
@@ -114,12 +127,51 @@ export function CopyForm({ namespace, entries }: { namespace: string; entries: C
 
       {hits === 0 && (
         <p className={`mt-6 ${hintClass}`}>
-          {onlyEdited && !needle ? "这一组还没有改过的文案。" : `没有匹配「${query}」的文案。`}
+          {only === "edited" && !needle
+            ? "这一组还没有改过的文案。"
+            : `没有匹配「${query}」的文案。`}
         </p>
       )}
 
       <SaveControls state={state} pending={pending} label="保存这一组" sticky />
     </form>
+  );
+}
+
+/** One of the two filters over the group. They are exclusive rather than
+ *  additive: "edited" and "spoken" answer different questions, and crossing
+ *  them mostly returns nothing. */
+function Only({
+  active,
+  onPress,
+  children,
+}: {
+  active: boolean;
+  onPress: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      aria-pressed={active}
+      className={`rounded-chip border px-2.5 py-1 font-mono text-meta transition-colors ${
+        active
+          ? "border-accent bg-accent/10 text-accent"
+          : "border-line text-fg-tertiary hover:text-fg"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/** The mark on a line nobody sees. Quiet — it is a category, not a warning. */
+function ScreenReaderBadge() {
+  return (
+    <span className="mx-0.5 rounded-chip border border-line px-1.5 font-mono text-meta text-fg-tertiary">
+      读屏
+    </span>
   );
 }
 

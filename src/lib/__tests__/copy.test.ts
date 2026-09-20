@@ -4,9 +4,11 @@ import { describe, expect, it } from "vitest";
 import {
   COPY_GROUPS,
   COPY_NOTES,
+  COPY_SR_EXTRA,
   copyError,
   flattenCopy,
   icuTokens,
+  isScreenReaderOnly,
   namespaceOf,
   type Catalogue,
 } from "@/lib/copy";
@@ -64,6 +66,41 @@ describe("COPY_NOTES", () => {
   it("only annotates lines the catalogue has", () => {
     const keys = flattenCopy(catalogue("zh"));
     expect(Object.keys(COPY_NOTES).filter((key) => !(key in keys))).toEqual([]);
+  });
+});
+
+describe("isScreenReaderOnly", () => {
+  it("reads the house suffixes", () => {
+    expect(isScreenReaderOnly("software.mockAlt")).toBe(true);
+    expect(isScreenReaderOnly("films.lala.stills.piano.alt")).toBe(true);
+    expect(isScreenReaderOnly("blog.yearAria")).toBe(true);
+  });
+
+  it("marks the ones named for what they say", () => {
+    expect(isScreenReaderOnly("splash.sign")).toBe(true);
+    expect(isScreenReaderOnly("nav.menu")).toBe(true);
+  });
+
+  it("leaves the visible lines alone", () => {
+    // `specVariants` contains "aria"; `cardLabLabel`, `deskHint` and
+    // `linkLabel` are printed on the page. A rule keyed on the last segment's
+    // ending is what keeps all four out.
+    for (const key of [
+      "lab.items.grove.specVariants",
+      "grove.cardLabLabel",
+      "lab.items.workstation.deskHint",
+      "lab.items.approach.linkLabel",
+      "grove.headline1",
+    ]) {
+      expect([key, isScreenReaderOnly(key)]).toEqual([key, false]);
+    }
+  });
+
+  it("only lists keys the catalogue has, and none the suffix already covers", () => {
+    const keys = flattenCopy(catalogue("zh"));
+    const extra = [...COPY_SR_EXTRA];
+    expect(extra.filter((key) => !(key in keys))).toEqual([]);
+    expect(extra.filter((key) => /(?:Aria|Alt|\.alt)$/.test(key))).toEqual([]);
   });
 });
 
