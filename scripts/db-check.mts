@@ -74,7 +74,7 @@ for (const r of await rows(`select href, surfaces, nav_group from nav_items orde
   );
 }
 
-console.log("\ncopy_blocks (first line of each namespace)");
+console.log("\ncopy_blocks (overrides per namespace — the rest reads from messages/*.json)");
 for (const r of await rows(
   `select split_part(key, '.', 1) as ns, count(*)::int as n
    from copy_blocks group by 1 order by 1`,

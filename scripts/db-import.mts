@@ -153,12 +153,12 @@ for (const [table, rows] of keyed) {
 }
 
 // Replaced wholesale rather than upserted. The two positional lists have no
-// key to upsert on; copy_blocks has one, but it is a closed set — every key
-// names a line in messages/*.json — and /admin can edit those rows but not
-// delete them, so a key retired from the catalogue would otherwise sit in the
-// table for good, the one thing "additive" must not mean here. Delete and
-// insert share the one batch, so a failed insert cannot leave the table empty
-// — an empty nav_items is a site with no header.
+// key to upsert on; copy_blocks has one, but every row is an override of a
+// line in messages/*.json, and a backup that no longer carries a row is saying
+// that line went back to the file — upserting would leave the old override in
+// place instead, which is the one thing "additive" must not mean here. Delete
+// and insert share the one batch, so a failed insert cannot leave the table
+// empty — an empty nav_items is a site with no header.
 const replaced = [
   [schema.chips, data.chips],
   [schema.navItems, data.navItems],

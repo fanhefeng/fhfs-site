@@ -131,9 +131,12 @@ export const SECTION_GROUPS: AdminGroup[] = [
       {
         href: "/admin/copy",
         label: "站点文案",
-        blurb: "覆盖 messages/*.json 的默认文案。写什么就是什么——清空一条，站上那处就是空的。",
+        blurb:
+          "全站每一行字，按页面分组。默认在 messages/*.json，这里只存改过的——清空一条就回到默认。",
         view: null,
-        unit: "条",
+        // The count is how many lines have been edited away from the files,
+        // not how many there are: 885 of those, and none of them a row.
+        unit: "条改过",
       },
       {
         href: "/admin/nav",

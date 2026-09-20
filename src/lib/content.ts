@@ -686,7 +686,9 @@ export const getResumeExperiences = unstable_cache(
  *
  * This is an *override layer*: the JSON files remain the defaults and this is
  * merged on top in `i18n/request.ts`. An empty table therefore reads exactly
- * like the site did before any of this existed.
+ * like the site did before any of this existed — and so does a row whose
+ * column for this language is null, which is how a line edited in one language
+ * leaves the other one following the file.
  */
 const loadCopyOverrides = unstable_cache(
   async (locale: Locale): Promise<Record<string, unknown>> => {
@@ -701,6 +703,8 @@ const loadCopyOverrides = unstable_cache(
     const out: Record<string, unknown> = Object.create(null);
     const unsafe = new Set(["__proto__", "constructor", "prototype"]);
     for (const row of rows) {
+      const value = row[locale];
+      if (value === null) continue;
       const path = row.key.split(".");
       if (path.some((segment) => !segment || unsafe.has(segment))) {
         console.error(`copy override skipped, unsafe key: ${row.key}`);
@@ -713,7 +717,7 @@ const loadCopyOverrides = unstable_cache(
         }
         node = node[segment] as Record<string, unknown>;
       }
-      node[path.at(-1)!] = row[locale];
+      node[path.at(-1)!] = value;
     }
     return out;
   },
