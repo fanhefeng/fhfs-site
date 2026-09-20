@@ -37,11 +37,20 @@ const data = JSON.parse(await readFile(path.join(ROOT, "backup", "db.json"), "ut
   any[]
 >;
 
-/** One request for the whole table; an empty table sends nothing. */
-async function batch(label: string, statements: BatchItem<"pg">[]) {
+/**
+ * One request for the whole table; an empty table sends nothing.
+ *
+ * `rows` is what gets printed, and it is worth the extra parameter. For the
+ * keyed tables the statement count *is* the row count — one upsert each — but
+ * the replaced tables below travel as a delete plus one multi-row insert, so
+ * the count of statements is always 1 or 2. Printing `nav_items 2` at the end
+ * of a restore reads as a site that came back with two links in its header,
+ * which is exactly the sentence nobody wants to misread while recovering.
+ */
+async function batch(label: string, statements: BatchItem<"pg">[], rows = statements.length) {
   const [first, ...rest] = statements;
   if (first) await db.batch([first, ...rest]);
-  console.log(`  ${label.padEnd(20)}${statements.length}`);
+  console.log(`  ${label.padEnd(20)}${rows}`);
 }
 
 // Both derived columns are re-derived: HTML is always this pipeline's output
@@ -177,7 +186,7 @@ for (const [table, rows] of replaced) {
   }
   const statements: BatchItem<"pg">[] = [db.delete(table as any)];
   if (rows.length) statements.push(db.insert(table as any).values(rows));
-  await batch(name, statements);
+  await batch(name, statements, rows.length);
 }
 
 console.log("restored");

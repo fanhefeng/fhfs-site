@@ -15,8 +15,8 @@
 
 前两份是同一个 `backup/db.json`，`pnpm db:import` 读的就是它。第三份是 Neon 的
 point-in-time restore，**只在情形一里有用**：它和库存在同一个账号里，账号没了它
-一起没。它的保留期去 Neon console 的 Settings → History retention 看（Free 计划
-通常是 6 小时），过了就回不去了。
+一起没。这个项目的保留期实测是 **21600 秒，正好 6 小时**（Free 计划），过了就回
+不去了——也就是说，超过六小时才发现的误删，只能靠上面两份快照。
 
 **没有备份、也不需要备份的东西**：`AUTH_SECRET` 和 `ADMIN_PASSWORD_HASH` 丢了
 跑 `pnpm admin:password` 重新生成一对，填回 Vercel 就是了——它们不锁任何数据。
@@ -24,6 +24,10 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 也在 git 里：就算 `copy_blocks` 整张表没了，站点照文件显示，不会白屏。
 
 真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那 12 张表。
+
+库里还有一个 `neon_auth` schema（`user`、`session`、`account`、`jwks` 等 9 张表），
+那是 Neon 自己的托管认证功能建的，**站点代码一个字都没碰过**（后台登录走的是
+`AUTH_SECRET` 签的 jose JWT）。恢复时不用管它，也不用重建。
 
 ## 情形一：删错了、改错了，库还在
 
@@ -146,11 +150,27 @@ rm -rf .next/dev/cache/fetch-cache && pnpm dev
 
 ## 演练记录
 
-**这条路径还没有被完整走通过。** `db:import` 本身每次导内容都在用，是可靠的；
-没验证过的是「空库 → 完整站点」的全程——`pnpm db:migrate` 在一个真正干净的库上
-跑完 12 个迁移，然后 `db:import` 把 12 张表填回去，行数对得上。
+**2026-09-20：走通了，核心步骤 46 秒。**
 
-练一次的成本很低，Neon 建分支是一键的事。
+在 Neon 建沙箱分支 → `DROP SCHEMA public + drizzle` 清成真空库（站点 12 张表和
+迁移记录全部消失）→ `pnpm db:migrate` **34 秒**跑完 12 个迁移 → `pnpm db:import`
+**12 秒**灌回 12 张表 → 逐表比对行数，13 张全部一致 → 再从恢复出来的库
+`pnpm db:export` 一次，与原 `backup/` **逐字节相同**（`diff -r` 零差异，含
+db.json 和全部 markdown 副本）→ 删掉沙箱分支。
+
+连建分支、清库、比对在内，全程 **298 秒**。真出事时照这份文档做，数据库这一段
+五分钟以内，剩下的时间都花在 Vercel 改环境变量和重新部署上。
+
+演练逮到的问题（都已修）：
+
+- 清库只 drop `public` 不够，`drizzle` schema 里的迁移记录会让 `db:migrate`
+  跳过建表——上面那段已经写明。
+- 文档原来用 `psql`，这台机器没有。
+- `db:import` 结束时对 `chips` / `nav_items` / `copy_blocks` 打印的是**语句数**
+  而不是行数，屏幕上会显示 `nav_items 2`。演练时我自己先当成了「恢复丢了数据」。
+  真出事时更容易误判，已经改成打印行数。
+
+下次再练还是这一套，成本很低，Neon 建分支是一键的事。
 
 先在 Neon console → Branches → New Branch 建一个沙箱（叫 `restore-drill` 之类），
 然后在它的 **SQL Editor** 里把库清成真空的：
@@ -179,7 +199,7 @@ DATABASE_URL="$DRILL" DATABASE_URL_UNPOOLED="$DRILL" pnpm db:check
 # 验完把沙箱分支删掉，生产分支全程没被碰过
 ```
 
-走通了就把日期记在下面，并且**记上那次花了多久**——真出事的时候，知道这件事要
-二十分钟还是两小时，比什么都重要。
+再走通一次就把日期和耗时记在下面——真出事的时候，知道这件事要五分钟还是两小时，
+比知道它可行更重要。
 
-- （还没有过）
+- **2026-09-20** — 全程 298 秒，migrate 34s + import 12s，往返导出零差异。
