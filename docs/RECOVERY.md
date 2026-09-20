@@ -76,7 +76,9 @@ Development 三个环境都要），重新部署一次。GitHub 那个叫 `DATAB
 secret 也要换成新库的只读角色，否则每天的自动备份会一直失败——那正是它该失败
 的方式，别忽略它。
 
-别忘了在新库上重建只读角色，CI 的 build 和每日备份都用它：
+别忘了在新库上重建只读角色，CI 的 build 和每日备份都用它。这几句 SQL 在
+**Neon console 的 SQL Editor** 里跑——这台机器没有 `psql`（`vp` 只管 JS 工具链），
+而恢复的时候不该再去装一个：
 
 ```sql
 CREATE ROLE ci_readonly WITH LOGIN PASSWORD '…';
@@ -148,15 +150,32 @@ rm -rf .next/dev/cache/fetch-cache && pnpm dev
 没验证过的是「空库 → 完整站点」的全程——`pnpm db:migrate` 在一个真正干净的库上
 跑完 12 个迁移，然后 `db:import` 把 12 张表填回去，行数对得上。
 
-练一次的成本很低，Neon 建分支是一键的事：
+练一次的成本很低，Neon 建分支是一键的事。
+
+先在 Neon console → Branches → New Branch 建一个沙箱（叫 `restore-drill` 之类），
+然后在它的 **SQL Editor** 里把库清成真空的：
+
+```sql
+DROP SCHEMA IF EXISTS public CASCADE;
+DROP SCHEMA IF EXISTS drizzle CASCADE;   -- ← 别漏这句，理由见下
+CREATE SCHEMA public;
+```
+
+⚠️ **`drizzle` 那句是整个演练最容易漏的一步。** drizzle-kit 的迁移记录表
+（`__drizzle_migrations`）不在 `public` 里，而在它自己的 `drizzle` schema 里。
+只清 `public` 的话，`db:migrate` 会看到 12 条迁移记录还在、认为都跑过，**直接
+跳过建表**；接着 `db:import` 撞上一堆不存在的表报错——而错误信息指向 import，
+不指向真正的原因。真出事那天在这里卡住是很贵的。
+
+清完之后，用沙箱那个不带 `-pooler` 的连接串跑（`process.loadEnvFile` 不覆盖已有
+的环境变量，所以这样前缀着写不会动到 `.env.local`）：
 
 ```bash
-# Neon console → Branches → New Branch（叫 restore-drill 之类），
-# 把它不带 -pooler 的连接串填进 DATABASE_URL_UNPOOLED，然后：
-psql "$DATABASE_URL_UNPOOLED" -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
-pnpm db:migrate
-pnpm db:import
-pnpm db:check          # 跟 backup/db.json 里的行数逐表对
+export DRILL=postgresql://…   # 沙箱的直连串
+DATABASE_URL="$DRILL" DATABASE_URL_UNPOOLED="$DRILL" pnpm db:migrate
+DATABASE_URL="$DRILL" DATABASE_URL_UNPOOLED="$DRILL" pnpm db:import
+DATABASE_URL="$DRILL" DATABASE_URL_UNPOOLED="$DRILL" pnpm db:check
+# 跟 backup/db.json 里的行数逐表对上，就算通过
 # 验完把沙箱分支删掉，生产分支全程没被碰过
 ```
 
