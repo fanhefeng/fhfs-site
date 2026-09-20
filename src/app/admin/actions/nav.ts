@@ -45,8 +45,9 @@ export async function saveNavItems(_prev: ActionState, form: FormData): Promise<
     }
   }
 
-  // A label key that neither the catalogues nor copy_blocks knows renders as
-  // raw "nav.xxx" in the header of every page — refuse it here instead.
+  // A label key the catalogues don't have renders as raw "nav.xxx" in the
+  // header of every page — refuse it here instead. The catalogues are the
+  // whole list: `copy_blocks` only overrides lines the files already have.
   // `Object.hasOwn`, not `in`: "constructor" is `in` every object.
   const [zhNav, enNav] = await Promise.all(
     (["zh", "en"] as const).map((locale) =>
@@ -55,16 +56,10 @@ export async function saveNavItems(_prev: ActionState, form: FormData): Promise<
       ),
     ),
   );
-  const overrides = new Set(
-    (await db.select({ key: schema.copyBlocks.key }).from(schema.copyBlocks)).map((row) => row.key),
-  );
   for (const row of rows) {
-    const known =
-      (Object.hasOwn(zhNav!, row.labelKey) && Object.hasOwn(enNav!, row.labelKey)) ||
-      overrides.has(`nav.${row.labelKey}`);
-    if (!known) {
+    if (!Object.hasOwn(zhNav!, row.labelKey) || !Object.hasOwn(enNav!, row.labelKey)) {
       return {
-        error: `文案 key 不存在：nav.${row.labelKey} 在语言文件和站点文案里都找不到。`,
+        error: `文案 key 不存在：nav.${row.labelKey} 在语言文件里找不到。`,
       };
     }
   }

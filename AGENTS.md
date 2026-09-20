@@ -34,7 +34,8 @@ checks the session first and invalidates last, every ease is an `EASE`
 token), `asset.test.ts`,
 `media.test.ts` (sizes written in code against the files), `tables.test.ts`
 (every schema table named in db:check / export / import / backup),
-`env.test.ts`, `messages.test.ts`, `lab.test.ts` (every lab study's
+`env.test.ts`, `messages.test.ts`, `copy.test.ts` (every namespace in the
+catalogue has a card in `COPY_GROUPS`), `lab.test.ts` (every lab study's
 `sources` exist under `src/`, and it has copy in both catalogues). When you
 add a rule of that kind to this file, add its check there. There is no component suite; `pnpm smoke` is the
 end-to-end pass. The scripts share `scripts/connect.mts` (env, unpooled URL,
@@ -185,9 +186,23 @@ off: a cached scope cannot see values passed through `React.cache`, which is
 exactly how next-intl's `setRequestLocale` works, so `getTranslations()` inside
 one throws.
 
-`messages/*.json` holds the defaults for *all* copy. The `copy_blocks` table is
-an override layer merged in `src/i18n/request.ts` — an empty or unreachable
-table must always leave the site reading as the files say.
+`messages/*.json` holds the defaults for *all* copy — every one of the 885
+lines. The `copy_blocks` table is an override layer merged in
+`src/i18n/request.ts`, and it holds **only the lines that have been edited**:
+no row means the file's line, and `zh` / `en` are nullable so a line rewritten
+in one language leaves the other one following the file. An empty or
+unreachable table must always leave the site reading as the files say.
+
+`/admin/copy` is therefore built from the catalogue, not from the table
+(`src/lib/copy.ts`, `copyCatalogue.ts`): every line is editable, grouped by
+namespace, and **clearing a field restores the default** — it does not blank
+the line. To make somewhere genuinely empty, the default itself has to be
+empty (the footer's two time fragments are). A save writes the difference —
+equal to the file means null, both languages null means the row is deleted —
+and refuses a value whose ICU arguments or tags the default does not have,
+since those throw on the public page, not in the editor. A new namespace in
+the catalogue needs a card in `COPY_GROUPS`; `copy.test.ts` fails otherwise.
+Rows left behind by a key renamed in the files are swept from the index page.
 
 `pnpm db:export` writes the database back out to `backup/`, which is committed.
 Content keeps a diffable history that way; keep it current after bulk edits.
