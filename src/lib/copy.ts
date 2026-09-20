@@ -29,6 +29,8 @@ export type CopyEntry = {
   enDefault: string;
   /** True when a row exists, i.e. this line has been edited away from the file. */
   overridden: boolean;
+  /** Read aloud in place of something, never drawn — see `isScreenReaderOnly`. */
+  screenReader: boolean;
   note?: string;
 };
 
@@ -105,6 +107,61 @@ export const COPY_NOTES: Record<string, string> = {
     "和 footer.timeSuffix 是一对语序：中文把城市放在钟前面，英文放后面。两条一起改。",
   "footer.timeSuffix": "见 footer.timePrefix。",
 };
+
+/**
+ * Lines nobody sees: a control's accessible name, an image's alternative text,
+ * a live region's heading.
+ *
+ * Worth marking in the editor because they are edited by a different measure.
+ * Nothing on the page shows them, so they can't be checked by looking; they
+ * are read aloud in place of something — a switch, a photograph — so they say
+ * what it *is*, not what pressing it would do (a name that flips with state
+ * gets read as "turn the sign off, pressed"); and they must not be trimmed
+ * for the layout's sake, because they have no layout.
+ *
+ * The house naming convention carries most of it: `…Aria` for an accessible
+ * name, `…Alt` / `.alt` for alternative text — so a new one named that way
+ * marks itself. `COPY_SR_EXTRA` is the rest, the ones named for what they say
+ * rather than for where they go (`splash.sign` is the neon's accessible name,
+ * `nav.menu` names the hamburger). Add to it when a line lands in an
+ * `aria-label`, an `alt` or an `sr-only` node under some other name;
+ * `copy.test.ts` checks these keys exist and that none of them is one the
+ * suffix rule already covers.
+ */
+export const COPY_SR_EXTRA = new Set([
+  "splash.label",
+  "splash.sign",
+  "nav.ariaLabel",
+  "nav.menu",
+  "common.lightSwitch",
+  "common.music",
+  "grove.cardLabLink",
+  "grove.cardPostLink",
+  "about.changelogDot",
+  "intro.resumeRegion",
+  "lab.studyNav",
+  "lab.items.lensSlider.prev",
+  "lab.items.lensSlider.next",
+  "lab.items.segmented.ariaLabel",
+  "lab.items.reshuffle.ariaLabel",
+  "lab.items.neon.signOn",
+  "lab.items.workstation.turnLeft",
+  "lab.items.workstation.turnRight",
+  "lab.items.grove.dressLegend",
+  "films.viewer.open",
+  "films.viewer.prev",
+  "films.viewer.next",
+  "idols.kobe.turnLeft",
+  "idols.kobe.turnRight",
+  "software.railPrev",
+  "software.railNext",
+]);
+
+/** True when this line is only ever read aloud — never drawn on the page. */
+export function isScreenReaderOnly(key: string): boolean {
+  const last = key.slice(key.lastIndexOf(".") + 1);
+  return last === "alt" || /(?:Aria|Alt)$/.test(last) || COPY_SR_EXTRA.has(key);
+}
 
 /**
  * The `{name}` arguments and `<tag>` names an ICU message carries.

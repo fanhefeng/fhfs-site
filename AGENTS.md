@@ -202,6 +202,11 @@ equal to the file means null, both languages null means the row is deleted —
 and refuses a value whose ICU arguments or tags the default does not have,
 since those throw on the public page, not in the editor. A new namespace in
 the catalogue needs a card in `COPY_GROUPS`; `copy.test.ts` fails otherwise.
+Lines nobody sees — an `aria-label`, an `alt`, an `sr-only` node — are marked
+「读屏」 in the editor, because they are edited by a different measure (name
+the thing, not the action; a name that flips with state reads as nonsense).
+Keep the naming convention — `…Aria`, `…Alt` / `.alt` — and a new one marks
+itself; a line that lands in one under another name goes in `COPY_SR_EXTRA`.
 Rows left behind by a key renamed in the files are swept from the index page.
 
 `pnpm db:export` writes the database back out to `backup/`, which is committed.
