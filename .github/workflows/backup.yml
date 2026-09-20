@@ -1,0 +1,90 @@
+name: backup
+
+# A snapshot of the database, taken by the clock rather than by whoever
+# remembers.
+#
+# `backup/` on main is a real backup, but it only ever moves when someone
+# opens a pull request — every one of its commits rides along with code. The
+# content, meanwhile, is edited in a browser: a line of copy, a moment, a
+# résumé entry. Those live in Postgres alone until the next time somebody
+# happens to run `pnpm db:export`, and the gap between the two has been weeks.
+# This closes it without touching how main works: the snapshot lands on its
+# own branch, `db-snapshots`, one commit a day, only when something changed.
+#
+# Restoring from it is the same `pnpm db:import` as always — the file is the
+# same file. docs/RECOVERY.md is the whole procedure.
+
+on:
+  schedule:
+    # 19:00 UTC — 03:00 in Asia/Shanghai, when nobody is editing. GitHub runs
+    # scheduled workflows late under load; for a daily backup that is fine.
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+
+# Only to push the snapshot branch. Nothing here reads a pull request.
+permissions:
+  contents: write
+
+# Two snapshots pushing the same branch would race for no reason; a late run
+# waits rather than fights.
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    env:
+      # The same read-only role CI builds with (`ci_readonly`). Export is all
+      # SELECTs, and the one table it must not read — login_attempts — is the
+      # one that role cannot read either. Absent means the secret is gone:
+      # fail rather than push an empty snapshot.
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm db:export
+
+      # A table that had rows and came back empty is an alarm, not a snapshot.
+      # This is the step that must fail the run (src/lib/backup.ts says why).
+      - run: pnpm tsx scripts/db-snapshot-guard.mts
+
+      - name: Commit the snapshot, if it says anything new
+        env:
+          REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
+        run: |
+          set -euo pipefail
+          SNAP="$RUNNER_TEMP/snapshot"
+
+          # The branch holds nothing but backup/, and carries none of main's
+          # history — an orphan on the first run, a shallow clone after that.
+          if git clone --depth 1 --branch db-snapshots "$REMOTE" "$SNAP" 2>/dev/null; then
+            rm -rf "$SNAP/backup"
+          else
+            mkdir -p "$SNAP"
+            git -C "$SNAP" init --initial-branch=db-snapshots
+            git -C "$SNAP" remote add origin "$REMOTE"
+          fi
+
+          cp -R backup "$SNAP/backup"
+          cp docs/RECOVERY.md "$SNAP/RECOVERY.md"
+
+          git -C "$SNAP" config user.name "github-actions[bot]"
+          git -C "$SNAP" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$SNAP" add -A
+
+          # Nothing changed since yesterday: leave the branch alone, so its log
+          # reads as the list of days the site actually said something new.
+          if git -C "$SNAP" diff --cached --quiet; then
+            echo "no change since the last snapshot"
+            exit 0
+          fi
+
+          git -C "$SNAP" commit -m "Snapshot of $(date -u +%Y-%m-%d)"
+          git -C "$SNAP" push origin db-snapshots

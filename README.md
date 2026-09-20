@@ -114,6 +114,15 @@ pnpm db:studio   # 表格界面
 `backup/` 跟着仓库走，所以内容仍然有 diff、有历史、有一份能离线读的纯文本副本 ——
 这是从文件搬进数据库时唯一真正会丢的东西，用 `db:export` 换回来了。
 
+但 main 上的 `backup/` 只在开 PR 时才动，而内容是在浏览器里改的。补这个窗口的是
+每天 03:00 的 `.github/workflows/backup.yml`：跑一次 `db:export`，内容有变就往
+`db-snapshots` 分支提交一个快照。中间有一道守门（`scripts/db-snapshot-guard.mts`），
+**任何一张有行的表变成空表就拒绝提交并让 job 失败** —— 一份空备份盖掉好备份，是
+定时任务最容易犯又最没人发现的错。这个 workflow 变红要去看。
+
+库真出事了照 **[docs/RECOVERY.md](docs/RECOVERY.md)** 做：删错一行、项目没了、
+Neon 账号整个没了，三级各有一份能照着敲的操作单。
+
 `messages/*.json` 仍是**全部**文案的默认值；库里的 `copy_blocks` 只是叠在上面的
 覆盖层，而且只存**改过的那几行**（两列各自可空，中文改了英文还能照文件走）。
 表空了或者连不上库，站点就照 JSON 显示，不会白屏。
