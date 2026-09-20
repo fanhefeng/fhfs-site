@@ -366,17 +366,23 @@ export const navItems = pgTable("nav_items", {
 });
 
 /**
- * Loose site copy lifted out of messages/*.json — hero lines, the manifesto,
- * the self-introduction. The JSON files stay as the default values; rows here
- * are an override layer merged in `src/i18n/request.ts`, so an empty table
- * means the site reads exactly as it does today.
+ * The site's copy, where it differs from the files.
+ *
+ * `messages/*.json` holds every line and stays the default; a row here is an
+ * override merged over it in `src/i18n/request.ts`, so an empty table means
+ * the site reads exactly as the files say. Only edited lines get a row, which
+ * is what lets the admin's "clear the field" mean *restore the default*.
+ *
+ * Both columns are nullable, and null means "this language is not overridden".
+ * A headline rewritten in Chinese must not pin the English line to whatever
+ * the file happened to say that day — the two languages are edited, and given
+ * up, one at a time. A row with both columns null carries nothing and is
+ * deleted instead (`src/app/admin/actions/copy.ts`).
  */
 export const copyBlocks = pgTable("copy_blocks", {
   key: text().primaryKey(),
-  zh: text().notNull(),
-  en: text().notNull(),
-  // A reminder to self about what this string is load-bearing for.
-  note: text(),
+  zh: text(),
+  en: text(),
 });
 
 /*
