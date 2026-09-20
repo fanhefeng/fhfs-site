@@ -211,3 +211,13 @@ Rows left behind by a key renamed in the files are swept from the index page.
 
 `pnpm db:export` writes the database back out to `backup/`, which is committed.
 Content keeps a diffable history that way; keep it current after bulk edits.
+
+That copy only moves when someone opens a pull request, so a nightly workflow
+(`.github/workflows/backup.yml`) exports on its own and commits a snapshot to
+the `db-snapshots` branch when the content changed. It is gated on
+`scripts/db-snapshot-guard.mts`: a table that had rows and came back empty
+fails the run rather than overwriting the last good snapshot — the reasoning,
+and the pure function it calls, are in `src/lib/backup.ts`. A red `backup` run
+is a real alarm. Restoring — a wrong edit, a lost project, a lost Neon account
+and the three files that would have to change to move off Neon — is
+`docs/RECOVERY.md`.
