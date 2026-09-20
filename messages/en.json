@@ -43,9 +43,9 @@
   "splash": {
     "label": "Welcome to fhf's",
     "welcome": "Welcome to",
-    "sign": "The sign's light",
-    "enter": "Come in",
-    "enterHint": "or press Enter · scrolling works too"
+    "sign": "The neon sign's light",
+    "enter": "Go in",
+    "enterHint": "or press Enter, or scroll down the page"
   },
   "home": {
     "slogan": "Slow down, and the world starts to speak.",
@@ -61,7 +61,7 @@
     "aboutLink": "More about me",
     "nowTitle": "Recently",
     "nowBadge": "Now",
-    "contactTitle": "Elsewhere"
+    "contactTitle": "Find me"
   },
   "grove": {
     "headline1": "Tech changes the world",
@@ -73,9 +73,9 @@
     "statApps": "Software",
     "statAppsValue": "{count, plural, one {# app} other {# apps}}",
     "cardLabLabel": "Motion lab",
-    "cardLabTitle": "Grown, not modelled.",
+    "cardLabTitle": "A procedurally grown mossy root",
     "cardLabAlt": "A still of the moss root this page renders for itself",
-    "cardLabLink": "Open: grown, not modelled",
+    "cardLabLink": "Open: a procedurally grown mossy root",
     "cardPostLabel": "Recently",
     "cardPostFallback": "Nothing written yet",
     "cardPostAlt": "A dirt track running through a pine forest",
@@ -144,12 +144,12 @@
     "outroBody": "If you got this far, the stickers did their job.",
     "linkAbout": "About me",
     "linkWriting": "Read something",
-    "resumeRegion": "Résumé in text — the same content as the 3D scene"
+    "resumeRegion": "Résumé in text, the same content as the 3D scene"
   },
   "resume": {
     "title": "Resume",
     "subtitle": "The formal page: who I am and what I've done.",
-    "backToAbout": "About",
+    "backToAbout": "Back to About",
     "summaryTitle": "Summary",
     "skillsTitle": "Skills",
     "experienceTitle": "Experience",
@@ -262,7 +262,7 @@
       "liquidMetal": {
         "name": "Liquid-metal button",
         "tagline": "A WebGL2 dispersion shader in five passes",
-        "summary": "No gradient, no texture, no image behind it. A scalar field is painted through a soft plateau, sampled at a slightly different height for every wavelength — which is where the rainbow edge comes from.",
+        "summary": "No gradient, no texture, no image behind it. A scalar field is painted through a smooth step, sampled at a slightly different height for every wavelength — which is where the rainbow edge comes from.",
         "note": "Here the scrollbar is not a timeline but a way through the pipeline: act one is the bare dispersion field, razor-etched; act two pours the softening blur over it and lights the travelling rim; act three adds the bloom and the contrast curve that put the metal back. The button stays live the whole way down — hover it, hold it, tab to it. The clock only turns while you are touching it, or while it is still settling. The two controls on the home page's cover are this button.",
         "headline": "Solved, not drawn",
         "body": "Fringe width falls out as dispersion over the magnitude of the field's gradient. So one shader gives razor-thin rainbow lines where the field is pinched, and broad navy-to-cyan washes where it is not.",
@@ -638,10 +638,10 @@
       "statueTitle": "The finger pointed at the sky",
       "statueBody": "January 22, 2006, against the Raptors: 81 points. At the buzzer he pointed his right hand at the sky. On February 8, 2024 the Lakers raised a 19-foot bronze outside Crypto.com Arena in exactly that pose — the number 8 jersey, the game's box score cut into the base. The one here is built in code: not the sculptor's work, but a homage after the same gesture.",
       "statueHint": "Drag · turn it around",
-      "loading": "Casting",
+      "loading": "Loading the statue",
       "turnLeft": "Turn a little to the left",
       "turnRight": "Turn a little to the right",
-      "statueFallback": "No WebGL available here, so a photograph stands in for the statue.",
+      "statueFallback": "This device has no 3D support (WebGL), so a photograph stands in for the statue.",
       "statueQuote": "Leave the game better than you found it. And when it comes time for you to leave, leave a legend.",
       "statueQuoteMeta": "Cut into the base of the statue",
       "statuePlaque": "81 · 2006.01.22 · vs TOR",
@@ -825,7 +825,7 @@
       "prev": "Previous",
       "next": "Next",
       "counter": "{index} / {count}",
-      "hint": "← → to move · Esc to close"
+      "hint": "Arrow keys to flip · Esc to close"
     },
     "odyssey": {
       "kicker": "A Chinese Odyssey · 1995",
@@ -1156,7 +1156,7 @@
     "download": "Visit site",
     "play": "Play in browser",
     "open": "Open website",
-    "deviceTitle": "On the screen",
+    "deviceTitle": "On a device",
     "deviceSub": "Framed on a Mac and an iPhone — flip through them one by one.",
     "deviceAria": "Choose which app to preview"
   },
@@ -1175,10 +1175,10 @@
   "common": {
     "localeSwitch": "中文",
     "localeSwitchAria": "Switch to Chinese",
-    "lightSwitch": "Lights on / after hours",
-    "lightsOn": "Lights on",
-    "lightsOff": "After hours",
-    "loaderAria": "Turning on the lights",
+    "lightSwitch": "Light / dark mode",
+    "lightsOn": "Lights on · switch to light mode",
+    "lightsOff": "Lights off · switch to dark mode",
+    "loaderAria": "Playing the opening animation",
     "music": "Background music",
     "musicPlay": "Play the background music",
     "musicPause": "Stop the background music",
