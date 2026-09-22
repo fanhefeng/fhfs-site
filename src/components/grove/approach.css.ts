@@ -217,6 +217,9 @@ body[data-grove-live] header .glass-thick {
 .ga-card > * { pointer-events: var(--ga-card-hit, none); }
 
 .ga-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
   background: var(--ga-paper);
   border-radius: calc(46 * var(--ga-u));
   box-shadow: 0 calc(30 * var(--ga-u)) calc(70 * var(--ga-u)) rgba(16, 21, 13, 0.3);
@@ -263,6 +266,7 @@ body[data-grove-live] header .glass-thick {
 .ga-card-label,
 .ga-card-title {
   position: absolute;
+  display: block;
   left: calc(38 * var(--ga-u));
   margin: 0;
 }
@@ -390,10 +394,48 @@ body[data-grove-live] header .glass-thick {
   display: block;
   color: #3f453a;
 }
-.ga-knob:hover { transform: scale(1.1) rotate(8deg); background: #fff; }
-.ga-knob:focus-visible {
-  outline: 2px solid rgba(28, 34, 22, 0.9);
-  outline-offset: calc(3 * var(--ga-u));
+.ga-card:hover .ga-knob { transform: scale(1.1) rotate(8deg); background: #fff; }
+.ga-card:focus-visible {
+  outline: 2px solid rgba(251, 252, 248, 0.95);
+  outline-offset: calc(6 * var(--ga-u));
+}
+
+/* A window can hold text instead of a photograph — a line from the moments
+   board, or what a lab study is: the same dark glass the photographs sit in,
+   the words set on it the way the board sets them, line breaks kept and cut
+   off where the window ends, and the day or minute under them. */
+.ga-plate--note .ga-plate-media {
+  background: #2b3328;
+}
+.ga-note {
+  position: absolute;
+  inset: calc(9 * var(--ga-u));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(22 * var(--ga-u)) calc(88 * var(--ga-u)) calc(20 * var(--ga-u)) calc(24 * var(--ga-u));
+  color: #eef1e8;
+}
+.ga-note-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--ga-note-lines, 4);
+  overflow: hidden;
+  white-space: pre-line;
+  font-size: calc(15 * var(--ga-u));
+  line-height: calc(24 * var(--ga-u));
+}
+/* Card a's window is the short one at its head. */
+.ga-card--a .ga-note { --ga-note-lines: 3; padding-top: calc(18 * var(--ga-u)); padding-bottom: calc(16 * var(--ga-u)); }
+/* A card with no title gives the room to its window, which grows up to just
+   under the label and holds more of the line. */
+.ga-card--b:not(:has(.ga-card-title)) .ga-plate { height: calc(214 * var(--ga-u)); }
+.ga-card--b:not(:has(.ga-card-title)) .ga-note { --ga-note-lines: 6; }
+.ga-note-stamp {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: calc(11.5 * var(--ga-u));
+  letter-spacing: 0.04em;
+  color: rgba(238, 241, 232, 0.55);
 }
 
 /* ── pointer parallax ──────────────────────────────────────────────────
@@ -518,9 +560,8 @@ body[data-grove-live] header .glass-thick {
      branch and be clipped by its edge. Portrait has no beside: the near root
      fills the middle third from edge to edge, so a card placed behind it is not
      draped over, it is buried, and two cards leave nowhere for the moss to be
-     seen between them. So the one that survives is the one the caption does not
-     already say (the caption is the lab card, in words), and it stands in
-     front, over the crest. */
+     seen between them. So the one that survives is the one in front, over the
+     crest (on /lab/approach the caption already says the other). */
   .ga-card--a { display: none; }
 
   .ga-card { border-radius: calc(40 * var(--ga-u)); }
@@ -540,6 +581,14 @@ body[data-grove-live] header .glass-thick {
     width: calc(330 * var(--ga-u));
   }
   .ga-card--b .ga-plate { height: calc(240 * var(--ga-u)); }
+  .ga-card--b:not(:has(.ga-card-title)) .ga-plate { height: calc(330 * var(--ga-u)); }
+  /* The unit is half what it is on a laptop here, so the window's type is
+     set in it at about twice the count — the same size on the glass. */
+  .ga-note {
+    padding: calc(34 * var(--ga-u)) calc(150 * var(--ga-u)) calc(30 * var(--ga-u)) calc(38 * var(--ga-u));
+  }
+  .ga-note-text { font-size: calc(28 * var(--ga-u)); line-height: calc(44 * var(--ga-u)); }
+  .ga-note-stamp { font-size: calc(20 * var(--ga-u)); }
   .ga-card--b .ga-card-label { top: calc(44 * var(--ga-u)); }
   .ga-card--b .ga-card-title { top: calc(78 * var(--ga-u)); width: calc(520 * var(--ga-u)); }
 

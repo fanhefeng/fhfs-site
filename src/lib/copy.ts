@@ -136,7 +136,7 @@ export const COPY_SR_EXTRA = new Set([
   "common.lightSwitch",
   "common.music",
   "grove.cardLabLink",
-  "grove.cardPostLink",
+  "grove.cardNoteLink",
   "about.changelogDot",
   "intro.resumeRegion",
   "lab.studyNav",

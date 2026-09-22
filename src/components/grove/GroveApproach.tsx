@@ -22,12 +22,16 @@ import { APPROACH_CSS } from "./approach.css";
 const GroveScene = dynamic(() => import("./GroveScene").then((m) => m.GroveScene), { ssr: false });
 
 type Props = {
-  /** Small mono line above the caption — which study this is. */
-  kicker: string;
-  /** The study's own title, spoken from inside it. */
-  title: string;
-  /** Where the caption's link goes, and what it says. */
-  link: { label: string; href: string };
+  /** The line spoken over the grove while the reader stands in it. The lab
+   *  study names itself this way; the home page leaves the moss to the cards. */
+  caption?: {
+    /** Small mono line above the title — which study this is. */
+    kicker: string;
+    /** The study's own title, spoken from inside it. */
+    title: string;
+    /** Where the caption's link goes, and what it says. */
+    link: { label: string; href: string };
+  };
   /** The two plates standing in the grove: the first goes behind the moss, the
    *  second in front of it. */
   cards: [GroveCardData, GroveCardData];
@@ -78,7 +82,7 @@ const span = (a: number, b: number, x: number) => clamp01((x - a) / (b - a));
  * — a sticky element needs neither. ScrollTrigger is here only to report where
  * in the section the reader is.
  */
-export function GroveApproach({ kicker, title, link, cards }: Props) {
+export function GroveApproach({ caption, cards }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -207,7 +211,7 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
             // The paper passes over the cards rather than removing them, so
             // without this the knobs stay clickable under a page they are no
             // longer visible on.
-            pin.style.setProperty("--ga-card-hit", card > 0.85 ? "auto" : "none");
+            pin.style.setProperty("--ga-card-hit", card > 0.7 ? "auto" : "none");
             pin.style.setProperty("--ga-card-vis", card > 0.02 ? "visible" : "hidden");
           }
 
@@ -239,7 +243,11 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
         {APPROACH_CSS}
       </style>
 
-      <section ref={sectionRef} className="ga" aria-labelledby="ga-cap-title">
+      <section
+        ref={sectionRef}
+        className="ga"
+        aria-labelledby={caption ? "ga-cap-title" : undefined}
+      >
         <div ref={pinRef} className="ga-pin">
           <div className="ga-window">
             <div ref={sceneRef} className="ga-scene" data-ready={ready || undefined}>
@@ -263,32 +271,34 @@ export function GroveApproach({ kicker, title, link, cards }: Props) {
               {/* The floor the caption stands on. It used to be the pin's own
                   ::after, but it has to pass *under* the card in front and over
                   the one behind, which only works from inside the scene. */}
-              <div className="ga-floor" aria-hidden="true" />
+              {caption && <div className="ga-floor" aria-hidden="true" />}
               <PaperDissolve progressRef={washRef} className="ga-dissolve" />
             </div>
           </div>
 
-          <div className="ga-cap">
-            <span className="ga-cap-kicker">{kicker}</span>
-            <p id="ga-cap-title" className="ga-cap-title">
-              {title}
-            </p>
-            <a className="ga-cap-link" href={link.href}>
-              {link.label}
-              <svg
-                viewBox="0 0 16 16"
-                width="13"
-                height="13"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="M3.5 8h9M9 4.5 12.5 8 9 11.5" />
-              </svg>
-            </a>
-          </div>
+          {caption && (
+            <div className="ga-cap">
+              <span className="ga-cap-kicker">{caption.kicker}</span>
+              <p id="ga-cap-title" className="ga-cap-title">
+                {caption.title}
+              </p>
+              <a className="ga-cap-link" href={caption.link.href}>
+                {caption.link.label}
+                <svg
+                  viewBox="0 0 16 16"
+                  width="13"
+                  height="13"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3.5 8h9M9 4.5 12.5 8 9 11.5" />
+                </svg>
+              </a>
+            </div>
+          )}
         </div>
       </section>
     </>
