@@ -56,11 +56,10 @@
     "featuredWorks": "Software I make",
     "viewAllSoftware": "All software",
     "aboutTitle": "About",
-    "aboutLead1": "I'm fhf — from Hejin, Shanxi, by way of Beijing and Qingdao, now in Shanghai.",
-    "aboutLead2": "Front-end by day; violin, games and films by night. The shelf of small software is what curiosity left behind.",
+    "aboutLead": "I'm fhf, living in Shanghai, China. I like music, games and films.",
     "aboutLink": "More about me",
-    "nowTitle": "Recently",
-    "nowBadge": "Now",
+    "chibiAria": "Little fhf",
+    "chibiHint": "Poke him · pat his hair",
     "contactTitle": "Find me"
   },
   "grove": {

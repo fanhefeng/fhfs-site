@@ -6,7 +6,7 @@ import { pageLocale } from "@/i18n/page";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
-import { getPosts, getApps, getTimeline } from "@/lib/content";
+import { getPosts, getApps } from "@/lib/content";
 import { getLatestReleases } from "@/lib/github";
 import { toSoftwareApp } from "@/components/software/appMeta";
 import { Opening, type OpeningMeta } from "@/components/home/Opening";
@@ -15,7 +15,7 @@ import { GroveApproach } from "@/components/grove/GroveApproach";
 import { groveCards } from "@/components/grove/cards";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
-import { AboutTeaser, type ContactLink, type NowItem } from "@/components/home/AboutTeaser";
+import { AboutTeaser, type ContactLink } from "@/components/home/AboutTeaser";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -26,7 +26,6 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">): Prom
 /** How many entries each section of the issue carries. */
 const POST_COUNT = 4;
 const APP_COUNT = 6;
-const NOW_COUNT = 3;
 
 /**
  * The cover of the issue, in three movements.
@@ -46,10 +45,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const ts = await getTranslations("software");
   const td = await getTranslations("splash");
 
-  const [allPosts, allApps, timeline, cards] = await Promise.all([
+  const [allPosts, allApps, cards] = await Promise.all([
     getPosts(locale),
     getApps(),
-    getTimeline(),
     groveCards(locale),
   ]);
   const releases = await getLatestReleases(allApps.map((app) => app.repo));
@@ -77,15 +75,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       stat: wide ? [version, ...app.platforms].filter(Boolean).join(" · ") : undefined,
     };
   });
-
-  // The cover's short version of the /about changelog: newest three releases,
-  // dates trimmed to year.month the way the mono column likes them.
-  const nowItems: NowItem[] = timeline.slice(0, NOW_COUNT).map((entry) => ({
-    key: entry.key,
-    version: entry.version,
-    title: entry.title[locale],
-    date: entry.date ? entry.date.slice(0, 7).replace("-", ".") : (entry.dateLabel?.[locale] ?? ""),
-  }));
 
   const contacts: ContactLink[] = [
     { label: "GitHub", href: site.social.github, external: true },
@@ -151,14 +140,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <AboutTeaser
             title={t("aboutTitle")}
             index="03"
-            lead1={t("aboutLead1")}
-            lead2={t("aboutLead2")}
+            lead={t("aboutLead")}
             linkLabel={t("aboutLink")}
-            nowItems={nowItems}
-            nowTitle={t("nowTitle")}
-            nowBadge={t("nowBadge")}
             contactTitle={t("contactTitle")}
             contacts={contacts}
+            chibi={{ label: t("chibiAria"), hint: t("chibiHint") }}
           />
         </div>
       </main>
