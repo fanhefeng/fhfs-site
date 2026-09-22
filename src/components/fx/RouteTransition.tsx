@@ -27,7 +27,7 @@ type Phase = "idle" | "covering" | "covered" | "revealing";
 const VEIL_LABEL = site.signName;
 
 /**
- * Glass materialize between routes ("The Quiet Issue" curtain).
+ * Glass materialize between routes.
  *
  * Clicks on in-site links are caught in the capture phase; a full-screen
  * glass veil frosts over the old page (opacity in + backdrop blur 0→thick,

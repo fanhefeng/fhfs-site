@@ -83,7 +83,7 @@ export const COPY_GROUPS: CopyGroup[] = [
   { id: "films", label: "电影 /films", blurb: "每个房间的介绍与画面说明。" },
   { id: "idols", label: "偶像 /idols", blurb: "每位的生平、数字与注脚。" },
   { id: "life", label: "人生 /life", blurb: "版本履历那一页的框架文字。" },
-  { id: "moments", label: "说说 /moments", blurb: "峰言疯语那面板子上的固定字。" },
+  { id: "moments", label: "说说 /moments", blurb: "峰言峰语那面板子上的固定字。" },
   { id: "secrets", label: "秘密 /secrets", blurb: "随笔与播客列表周围的字。" },
   { id: "about", label: "关于 /about", blurb: "自述页的标题、副题与贴纸墙提示。" },
   { id: "resume", label: "简历 /resume", blurb: "简历页的抬头与段落标题。" },
