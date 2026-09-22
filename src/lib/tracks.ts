@@ -4,7 +4,7 @@ import { asset } from "@/lib/asset";
  * The records the site owns, by the room that plays them.
  *
  * One player (`components/fx/Jukebox`), several tunes: the front door and the
- * neon study play the theme; 峰言疯语 plays Lovely Day, 《不能说的秘密》 plays
+ * neon study play the theme; 峰言峰语 plays Lovely Day, 《不能说的秘密》 plays
  * 路小雨 — the piano piece from the film's own soundtrack, shared by the
  * essays and the film — and the 大话西游 room plays the film's closing song.
  * A room asks for its record through `setTrack` in `lib/jukebox`; which file
@@ -35,7 +35,7 @@ export type Track = { src: string };
 const TRACKS: Record<TrackId, Track> = {
   /** Mia & Sebastian's Theme — Justin Hurwitz, La La Land (2016). */
   theme: { src: asset("/music/mia-and-sebastians-theme.mp3") },
-  /** Lovely Day — Jurrivh. 峰言疯语's record. */
+  /** Lovely Day — Jurrivh. 峰言峰语's record. */
   lovely: { src: asset("/music/lovely-day.mp3") },
   /** 路小雨 — 周杰倫, from the 不能說的秘密 soundtrack (2007). */
   secret: { src: asset("/music/lu-xiaoyu.mp3") },

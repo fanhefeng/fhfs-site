@@ -1,5 +1,5 @@
 /**
- * Open Graph image toolkit — "The Quiet Issue" paper palette.
+ * Open Graph image toolkit — the paper palette.
  *
  * Satori (the renderer behind next/og) only implements flexbox, so every
  * container in an OG route must set `display: "flex"` explicitly. It also

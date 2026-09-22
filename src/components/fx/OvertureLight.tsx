@@ -20,7 +20,7 @@ const END_AT = 0.9;
 type Phase = "pending" | "playing" | "done";
 
 /**
- * Opening ritual for "The Quiet Issue": the gallery lights turn on.
+ * Opening ritual: the gallery lights turn on.
  *
  * 0.9s, once per session: blackout → a cord drops and a small lamp warms
  * up in two steps (dim, then full) → its glow floods outward as a growing
