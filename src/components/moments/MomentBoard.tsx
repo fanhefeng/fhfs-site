@@ -40,7 +40,16 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
     () => (notebook ? items.filter((item) => item.collection === notebook) : items),
     [items, notebook],
   );
-  const groups = groupByYear(filtered, (item) => item.year);
+  // A pinned line stands above the years rather than in its own, so it is
+  // read once, first — the way the old QQ 空间 held one at the top.
+  const pinned = filtered.filter((item) => item.pinned);
+  const groups = [
+    ...(pinned.length > 0 ? [{ key: "pinned", heading: t("pinned"), items: pinned }] : []),
+    ...groupByYear(
+      filtered.filter((item) => !item.pinned),
+      (item) => item.year,
+    ).map(({ year, items }) => ({ key: year, heading: year, items })),
+  ];
 
   const toggle = (key: string) =>
     setOpen((prev) => {
@@ -79,10 +88,14 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
         </div>
       )}
 
-      {groups.map(({ year, items: yearItems }) => (
-        <section key={year} aria-label={t("yearAria", { year })} className="mb-14 last:mb-0">
+      {groups.map(({ key, heading, items: yearItems }) => (
+        <section
+          key={key}
+          aria-label={key === "pinned" ? t("pinnedAria") : t("yearAria", { year: heading })}
+          className="mb-14 last:mb-0"
+        >
           <h2 className="mb-2 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
-            {year}
+            {heading}
           </h2>
           <Reveal as="ol" stagger={0.05} className="border-t border-line">
             {yearItems.map((item) => (

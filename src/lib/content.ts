@@ -456,10 +456,12 @@ export type Moment = {
   attribution: string | null;
   source: string | null;
   mood: string | null;
+  pinned: boolean;
 };
 
-/** The whole board, newest first. One entry: the page filters and pages
- *  through it on the client, and the home page takes the top of it. */
+/** The whole board, pinned lines first and then newest first. One entry: the
+ *  page filters and pages through it on the client, and the home page's card
+ *  picks the newest line out of it by the clock, pinned or not. */
 export const getMoments = unstable_cache(
   async (): Promise<Moment[]> => {
     const rows = await db
@@ -472,12 +474,13 @@ export const getMoments = unstable_cache(
         attribution: moments.attribution,
         source: moments.source,
         mood: moments.mood,
+        pinned: moments.pinned,
       })
       .from(moments)
       .where(eq(moments.draft, false))
       // Two lines posted in the same second still need a fixed order — the
       // key breaks the tie, same reason as every list below.
-      .orderBy(desc(moments.postedAt), asc(moments.key));
+      .orderBy(desc(moments.pinned), desc(moments.postedAt), asc(moments.key));
     return rows.map((row) => ({ ...row, postedAt: row.postedAt.toISOString() }));
   },
   ["moments"],

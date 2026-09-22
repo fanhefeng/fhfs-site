@@ -596,6 +596,8 @@
     "original": "Original",
     "quoted": "Quoted",
     "yearAria": "Moments from {year}",
+    "pinned": "Pinned",
+    "pinnedAria": "Pinned moments",
     "expand": "Read it all",
     "collapse": "Fold",
     "empty": "Nothing said yet.",

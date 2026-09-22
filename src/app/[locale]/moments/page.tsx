@@ -12,7 +12,7 @@ import { MomentBoard } from "@/components/moments/MomentBoard";
 export const generateMetadata = sectionMetadata("moments", "/moments");
 
 /**
- * 峰言疯语 — the board. A 720px column like the rest of the issue, and its own
+ * 峰言峰语 — the board. A 720px column like the rest of the issue, and its own
  * record on while the reader is here (`RoomMusic`): Lovely Day, which is
  * about the mood of the page rather than its name. The instants are formatted
  * here, in the site's zone, so the board never has to know what a Date is.
@@ -34,6 +34,7 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
     original: row.original,
     attribution: row.attribution,
     source: row.source,
+    pinned: row.pinned,
   }));
   const langNotice = t("langNotice");
 

@@ -31,13 +31,13 @@ describe("momentKey", () => {
 describe("collections", () => {
   it("counts the notebooks in order of first appearance", () => {
     const rows = [
-      { collection: "峰言疯语" },
+      { collection: "峰言峰语" },
       { collection: "默认文集" },
-      { collection: "峰言疯语" },
+      { collection: "峰言峰语" },
       { collection: null },
     ];
     expect(collections(rows)).toEqual([
-      { name: "峰言疯语", count: 2 },
+      { name: "峰言峰语", count: 2 },
       { name: "默认文集", count: 1 },
     ]);
   });
