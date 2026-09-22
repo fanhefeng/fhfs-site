@@ -18,7 +18,7 @@ type Props = {
   headline: string[];
   lede: string;
   cta: { label: string; href: string };
-  /** The mono line under the fold: place, craft, and what the database holds. */
+  /** The mono line under the fold: where the author is. */
   meta: OpeningMeta[];
 };
 
@@ -82,8 +82,7 @@ function useEntrance() {
  * Everything that used to compete with the manifesto — the dock, the two
  * floating cards, the stat pair, the play button — is gone from this screen.
  * What is left is the sentence, who is saying it, the single primary control
- * on the site, and one mono line of facts that are true because the database
- * says so.
+ * on the site, and one mono line saying where the author is.
  */
 export function Opening({ headline, lede, cta, meta }: Props) {
   const locale = useLocale();

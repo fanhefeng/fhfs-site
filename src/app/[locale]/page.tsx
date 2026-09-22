@@ -1,4 +1,3 @@
-import { asset } from "@/lib/asset";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -13,6 +12,7 @@ import { toSoftwareApp } from "@/components/software/appMeta";
 import { Opening, type OpeningMeta } from "@/components/home/Opening";
 import { NeonSplash } from "@/components/home/NeonSplash";
 import { GroveApproach } from "@/components/grove/GroveApproach";
+import { groveCards } from "@/components/grove/cards";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
 import { AboutTeaser, type ContactLink, type NowItem } from "@/components/home/AboutTeaser";
@@ -46,15 +46,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const ts = await getTranslations("software");
   const td = await getTranslations("splash");
 
-  const [allPosts, allApps, timeline] = await Promise.all([
+  const [allPosts, allApps, timeline, cards] = await Promise.all([
     getPosts(locale),
     getApps(),
     getTimeline(),
+    groveCards(locale),
   ]);
   const releases = await getLatestReleases(allApps.map((app) => app.repo));
-
-  /** The plate in front of the moss is whatever was written last. */
-  const latest = allPosts[0];
 
   const posts: WritingItem[] = allPosts.slice(0, POST_COUNT).map((post) => ({
     slug: post.slug,
@@ -95,14 +93,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     ...(site.social.email ? [{ label: "Email", href: `mailto:${site.social.email}` }] : []),
   ];
 
-  /* The counts on the masthead are the same two the stat pair used to carry,
-     read off the database rather than typed. */
-  const meta: OpeningMeta[] = [
-    { label: th("metaPlaceLabel"), value: th("metaPlace") },
-    { label: th("metaCraftLabel"), value: th("metaCraft") },
-    { label: th("statPosts"), value: th("statPostsValue", { count: allPosts.length }) },
-    { label: th("statApps"), value: th("statAppsValue", { count: allApps.length }) },
-  ];
+  const meta: OpeningMeta[] = [{ label: th("metaPlaceLabel"), value: th("metaPlace") }];
 
   return (
     <>
@@ -136,29 +127,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           meta={meta}
         />
 
-        <GroveApproach
-          kicker={th("cardLabLabel")}
-          title={th("cardLabTitle")}
-          link={{ label: th("approachLink"), href: `/${locale}/lab/grove` }}
-          cards={[
-            {
-              label: th("cardLabLabel"),
-              title: th("cardLabTitle"),
-              href: `/${locale}/lab/grove`,
-              src: asset("/grove/moss-plate.webp"),
-              alt: th("cardLabAlt"),
-              linkLabel: th("cardLabLink"),
-            },
-            {
-              label: th("cardPostLabel"),
-              title: latest?.title ?? th("cardPostFallback"),
-              href: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
-              src: asset("/lab/dissolve/forest.jpg"),
-              alt: th("cardPostAlt"),
-              linkLabel: th("cardPostLink"),
-            },
-          ]}
-        />
+        {/* The two cards are rooms the issue below does not reach (see
+            components/grove/cards.ts). */}
+        <GroveApproach cards={cards} />
 
         {/* The issue itself, at the site's 720px reading measure. */}
         <div

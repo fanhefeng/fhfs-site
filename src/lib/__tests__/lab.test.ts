@@ -2,7 +2,13 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { LAB_ENTRIES, LAB_GROUPS, labNeighbours, sourceUrl } from "@/components/lab/entries";
+import {
+  LAB_ENTRIES,
+  LAB_GROUPS,
+  labNeighbours,
+  newestLabEntry,
+  sourceUrl,
+} from "@/components/lab/entries";
 
 /**
  * The lab's table of contents against what is actually there: a study that
@@ -34,6 +40,23 @@ describe("LAB_ENTRIES", () => {
     const groups = LAB_ENTRIES.map((e) => e.group);
     const runs = groups.filter((group, i) => group !== groups[i - 1]);
     expect(runs).toEqual([...LAB_GROUPS]);
+  });
+
+  // The grove's lab card picks the newest by comparing these as strings, which
+  // only orders dates correctly while every one is a real YYYY-MM-DD.
+  it("date every study as a real YYYY-MM-DD, and pick the newest by it", () => {
+    for (const e of LAB_ENTRIES) {
+      expect([e.slug, /^\d{4}-\d{2}-\d{2}$/.test(e.added)]).toEqual([e.slug, true]);
+      expect([e.slug, new Date(`${e.added}T00:00:00Z`).toISOString().slice(0, 10)]).toEqual([
+        e.slug,
+        e.added,
+      ]);
+    }
+    const latest = LAB_ENTRIES.map((e) => e.added)
+      .sort()
+      .at(-1);
+    expect(newestLabEntry().added).toBe(latest);
+    expect(newestLabEntry()).toBe(LAB_ENTRIES.findLast((e) => e.added === latest));
   });
 
   it("hand a study its neighbours in index order, none past either end", () => {

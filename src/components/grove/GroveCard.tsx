@@ -1,15 +1,26 @@
 import Image from "next/image";
 
+/** What fills a card's window: a photograph, or a line of text. */
+type Window =
+  | { src: string; alt: string; note?: never }
+  | {
+      /** Text shown in the window as it was written — a line from the moments
+       *  board, or what a lab study is — with the day or minute under it. */
+      note: { text: string; stamp: string; lang?: string };
+      src?: never;
+      alt?: never;
+    };
+
 export type GroveCardData = {
   /** Small grey line above the title — what kind of thing this is. */
   label: string;
-  title: string;
+  /** Left out when the window says it all; the window then takes the room. */
+  title?: string;
   href: string;
-  src: string;
-  alt: string;
-  /** Spoken label for the knob, which is an icon on its own. */
+  /** The card's accessible name. The whole card is the link, and what it
+   *  says out loud is where it goes, not everything printed on it. */
   linkLabel: string;
-};
+} & Window;
 
 type Props = GroveCardData & {
   /** `a` is the plate that the moss drapes over, `b` the one in front of it. */
@@ -41,39 +52,44 @@ const Sprout = () => (
  * card cannot be behind a photograph of a grove, only behind a grove that is
  * still being drawn.
  *
- * Each card carries its own knob, on the corner of its photograph. The first
- * version of this composition floated card a's knob out of the card so it
- * could sit *over* the trunk that covers the card's lower corner — and that is
- * exactly what read wrong: a control in front of the moss belonging to a sheet
- * behind it. Now the knob stays with its card, and the trunk is left to cross
- * the corner it does not sit on.
+ * The whole card is the link. It used to be only the knob, a 54-unit circle on
+ * a card five times its size, and a reader who clicked the title or the
+ * picture got nothing. The knob stays as the card's mark of being a way in —
+ * on the photograph's outer corner, the corner the trunk never reaches.
  */
-export function GroveCard({ slot, label, title, href, src, alt, linkLabel }: Props) {
+export function GroveCard({ slot, label, title, href, linkLabel, ...view }: Props) {
   const plate = (
-    <figure className="ga-plate">
+    <figure className={`ga-plate${view.note ? " ga-plate--note" : ""}`}>
       <span className="ga-plate-media">
-        {/* Deliberately not preloaded: the cards are a screen down and the
-            first paper above them is the one that has to arrive fast. Lazy
-            loading starts them as the pin comes into view, which is well
-            before --ga-card lifts them off zero. */}
-        <Image src={src} alt={alt} fill sizes="(max-width: 900px) 84vw, 22vw" />
+        {view.note ? (
+          <span className="ga-note" lang={view.note.lang}>
+            <span className="ga-note-text">{view.note.text}</span>
+            <span className="ga-note-stamp">{view.note.stamp}</span>
+          </span>
+        ) : (
+          /* Deliberately not preloaded: the cards are a screen down and the
+             first paper above them is the one that has to arrive fast. Lazy
+             loading starts them as the pin comes into view, which is well
+             before --ga-card lifts them off zero. */
+          <Image src={view.src} alt={view.alt} fill sizes="(max-width: 900px) 84vw, 22vw" />
+        )}
       </span>
     </figure>
   );
 
   return (
-    <article className={`ga-card ga-card--${slot}`}>
-      {/* The lab card reads plate → label → title, the field note the other way
-          up. Same frame, mirrored — which is also what keeps each card's
-          photograph on the side of it the moss is not covering, and its knob
-          on the photograph's outer corner. */}
+    <a className={`ga-card ga-card--${slot}`} href={href} aria-label={linkLabel}>
+      {/* Card a reads plate → label → title, card b the other way up. Same
+          frame, mirrored — which is also what keeps each card's window on the
+          side of it the moss is not covering, and its knob on the window's
+          outer corner. */}
       {slot === "a" && plate}
-      <p className="ga-card-label">{label}</p>
-      <p className="ga-card-title">{title}</p>
+      <span className="ga-card-label">{label}</span>
+      {title && <span className="ga-card-title">{title}</span>}
       {slot === "b" && plate}
-      <a className="ga-knob" href={href} aria-label={linkLabel}>
+      <span className="ga-knob" aria-hidden="true">
         <Sprout />
-      </a>
-    </article>
+      </span>
+    </a>
   );
 }
