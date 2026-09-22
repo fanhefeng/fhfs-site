@@ -56,11 +56,10 @@
     "featuredWorks": "自研软件",
     "viewAllSoftware": "全部软件",
     "aboutTitle": "关于",
-    "aboutLead1": "我是 fhf，山西河津人，北京、青岛走过，如今在上海。",
-    "aboutLead2": "白天写前端，夜里拉琴、打游戏、看电影；一架子小软件，是好奇心攒下来的。",
+    "aboutLead": "我是 fhf，现居中国上海。喜欢音乐、游戏、电影。",
     "aboutLink": "关于我",
-    "nowTitle": "近况",
-    "nowBadge": "此刻",
+    "chibiAria": "小人 fhf",
+    "chibiHint": "戳一戳 · 摸摸头",
     "contactTitle": "找到我"
   },
   "grove": {

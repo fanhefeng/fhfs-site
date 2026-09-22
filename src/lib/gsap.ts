@@ -65,6 +65,9 @@ export const EASE = {
   stretch: "back.out(2)",
   /** A changelog year bubble swelling as the rail reaches it. */
   bubble: "back.out(2.4)",
+  /** An idle rise and fall at rest at both ends: the chibi breathing, its
+   *  tuft swaying, its dizzy head rolling. */
+  breathe: "sine.inOut",
   /** A sticker's shiver on hover — needs CustomWiggle from `./gsap-extras`. */
   shiver: "wiggle({ wiggles: 7, type: easeOut })",
 } as const;
