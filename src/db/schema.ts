@@ -160,6 +160,8 @@ export const moments = pgTable("moments", {
   /** An optional one-word mood — the board's equivalent of a tag. */
   mood: text(),
   draft: boolean().notNull().default(false),
+  /** Held at the top of the board, and on the home page's card, whatever its date. */
+  pinned: boolean().notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

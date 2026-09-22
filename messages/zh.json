@@ -596,6 +596,8 @@
     "original": "原创",
     "quoted": "摘录",
     "yearAria": "{year} 年的说说",
+    "pinned": "置顶",
+    "pinnedAria": "置顶的说说",
     "expand": "展开全文",
     "collapse": "收起",
     "empty": "还没有说说。",

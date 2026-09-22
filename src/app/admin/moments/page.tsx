@@ -47,7 +47,7 @@ const FIELDS: Field[] = [
     name: "collection",
     label: "文集（可空）",
     kind: "text",
-    placeholder: "峰言疯语",
+    placeholder: "峰言峰语",
     group: "出处",
   },
   {
@@ -68,6 +68,17 @@ const FIELDS: Field[] = [
     ],
     group: "状态",
   },
+  {
+    name: "pinned",
+    label: "置顶",
+    kind: "select",
+    options: [
+      { value: "no", label: "不置顶" },
+      { value: "yes", label: "置顶" },
+    ],
+    hint: "置顶的排在板子最上面，不止一条时按时间排。首页卡片不看置顶，只显示最新发的一条。",
+    group: "状态",
+  },
 ];
 
 /** A new line, dated now to the minute in the site's zone, and keyed by the
@@ -86,12 +97,16 @@ function blank() {
     mood: "",
     source: "",
     draft: "no",
+    pinned: "no",
   };
 }
 
 export default async function MomentsAdminPage() {
   await requireAdminPage();
-  const rows = await db.select().from(moments).orderBy(desc(moments.postedAt), asc(moments.key));
+  const rows = await db
+    .select()
+    .from(moments)
+    .orderBy(desc(moments.pinned), desc(moments.postedAt), asc(moments.key));
 
   return (
     <AdminChrome title="说说" section="/admin/moments">
@@ -113,12 +128,13 @@ export default async function MomentsAdminPage() {
           return {
             id: row.key,
             label: firstLine.length > 40 ? `${firstLine.slice(0, 40)}…` : firstLine,
-            meta: `${time}${row.collection ? ` · ${row.collection}` : ""}${row.draft ? " · 草稿" : ""}`,
+            meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${row.draft ? " · 草稿" : ""}`,
             data: {
               ...row,
               postedAt: `${day!.replaceAll(".", "-")} ${clock}`,
               original: row.original ? "yes" : "no",
               draft: row.draft ? "yes" : "no",
+              pinned: row.pinned ? "yes" : "no",
             },
           };
         })}

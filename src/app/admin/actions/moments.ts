@@ -27,6 +27,10 @@ export async function saveMoment(_prev: ActionState, form: FormData): Promise<Ac
   if (draft !== "no" && draft !== "yes") {
     return { error: "草稿只能选 yes 或 no。" };
   }
+  const pinned = str(form, "pinned");
+  if (pinned !== "no" && pinned !== "yes") {
+    return { error: "置顶只能选 yes 或 no。" };
+  }
 
   const row = {
     key,
@@ -38,6 +42,7 @@ export async function saveMoment(_prev: ActionState, form: FormData): Promise<Ac
     source: str(form, "source") || null,
     mood: str(form, "mood") || null,
     draft: draft === "yes",
+    pinned: pinned === "yes",
   };
 
   const exists = await upsertKeyed(schema.moments, row, Boolean(form.get("isNew")));

@@ -1,0 +1,1 @@
+ALTER TABLE "moments" ADD COLUMN "pinned" boolean DEFAULT false NOT NULL;
