@@ -21,6 +21,7 @@ export type BoardMoment = {
   original: boolean;
   attribution: string | null;
   source: string | null;
+  pinned: boolean;
 };
 
 /**
