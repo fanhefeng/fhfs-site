@@ -10,6 +10,7 @@ import { LALA_STILLS } from "@/components/films/lalaStills";
 import { filmEntry } from "@/components/films/entries";
 import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
 import type { ChangelogEntry } from "@/components/about/Changelog";
+import type { GroveCardData } from "@/components/grove/GroveCard";
 import { DeskFallback, SceneGate, StageFallback } from "./SceneGate";
 import { StudyLede } from "./StudyPanel";
 
@@ -117,9 +118,11 @@ type Props = {
   text: StudyText;
   /** The changelog study's rows — the real ones, localized by the page. */
   entries?: ChangelogEntry[];
+  /** The approach study's two cards — the home page's, built by the page. */
+  cards?: [GroveCardData, GroveCardData];
 };
 
-export function LabStudy({ slug, accent, text, entries }: Props) {
+export function LabStudy({ slug, accent, text, entries, cards }: Props) {
   // The page fills `text` key by key from a list it keeps by hand. A key it
   // forgot used to arrive here as `undefined` and render as a blank; every
   // study is prerendered, so throwing turns that into a failed build instead.
@@ -389,33 +392,19 @@ export function LabStudy({ slug, accent, text, entries }: Props) {
         />
       );
     case "approach":
+      if (!cards) throw new Error(`lab study "${slug}" needs its cards, which the page never set`);
       return (
         <>
           <div className="mx-auto w-full max-w-[720px] px-6 pb-10">
             <StudyLede>{s("lede")}</StudyLede>
           </div>
           <GroveApproach
-            kicker={s("kicker")}
-            title={s("title")}
-            link={{ label: s("linkLabel"), href: s("linkHref") }}
-            cards={[
-              {
-                label: s("cardALabel"),
-                title: s("cardATitle"),
-                href: s("cardAHref"),
-                src: asset("/grove/moss-plate.webp"),
-                alt: s("cardAAlt"),
-                linkLabel: s("cardALink"),
-              },
-              {
-                label: s("cardBLabel"),
-                title: s("cardBTitle"),
-                href: s("cardBHref"),
-                src: asset("/lab/dissolve/forest.jpg"),
-                alt: s("cardBAlt"),
-                linkLabel: s("cardBLink"),
-              },
-            ]}
+            caption={{
+              kicker: s("kicker"),
+              title: s("title"),
+              link: { label: s("linkLabel"), href: s("linkHref") },
+            }}
+            cards={cards}
           />
         </>
       );

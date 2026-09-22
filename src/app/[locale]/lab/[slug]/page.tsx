@@ -27,7 +27,9 @@ import { LALA_STILLS } from "@/components/films/lalaStills";
 import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
 import type { ChangelogEntry } from "@/components/about/Changelog";
-import { getPosts, getTimeline } from "@/lib/content";
+import { getTimeline } from "@/lib/content";
+import { groveCards } from "@/components/grove/cards";
+import type { GroveCardData } from "@/components/grove/GroveCard";
 
 /** A fixed set of studies — the whole list is known at build time. */
 export const dynamicParams = false;
@@ -181,23 +183,13 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
   }
   let entries: ChangelogEntry[] | undefined;
 
-  // The two cards standing in the approach are the home page's: the same
-  // copy, and the plate in front is whatever was written last.
+  // The two cards standing in the approach are the home page's, built by the
+  // same function — two copies of them are how the study's drifted before.
+  let cards: [GroveCardData, GroveCardData] | undefined;
   if (entry.slug === "approach") {
-    const tg = await getTranslations("grove");
-    const latest = (await getPosts(locale))[0];
+    cards = await groveCards(locale);
     Object.assign(text, {
       kicker: t(`${ns}.kicker`, { ordinal: entry.ordinal }),
-      cardALabel: tg("cardLabLabel"),
-      cardATitle: tg("cardLabTitle"),
-      cardAHref: `/${locale}/lab/grove`,
-      cardAAlt: tg("cardLabAlt"),
-      cardALink: tg("cardLabLink"),
-      cardBLabel: tg("cardPostLabel"),
-      cardBTitle: latest?.title ?? tg("cardPostFallback"),
-      cardBHref: latest ? `/${locale}/blog/${latest.slug}` : `/${locale}/blog`,
-      cardBAlt: tg("cardPostAlt"),
-      cardBLink: tg("cardPostLink"),
       linkHref: `/${locale}/lab/grove`,
     });
   }
@@ -350,7 +342,13 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
         </a>
       </header>
 
-      <LabStudy slug={entry.slug} accent={entry.accent} text={text} entries={entries} />
+      <LabStudy
+        slug={entry.slug}
+        accent={entry.accent}
+        text={text}
+        entries={entries}
+        cards={cards}
+      />
 
       <section className="mx-auto w-full max-w-[720px] px-6 pb-28 pt-20">
         <p className="text-body text-fg-secondary">{t(`${ns}.note`)}</p>

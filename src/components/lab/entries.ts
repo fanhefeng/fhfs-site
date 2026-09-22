@@ -108,6 +108,10 @@ export type LabEntry = {
   group: LabGroup;
   /** Index number printed beside the name, editorial-style. */
   ordinal: string;
+  /** The day the study went up (YYYY-MM-DD) — first commit of its demo file
+   *  for the ones that predate the field. The grove's lab card shows the
+   *  newest; on a tie, the one later in this list. */
+  added: string;
   /** Dot + rule colour, from the muted gallery hues used across the site. */
   accent: string;
   /**
@@ -126,6 +130,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "scrollVideo",
     group: "piece",
     ordinal: "01",
+    added: "2026-08-17",
     accent: "#3e6d93",
     sources: ["components/lab/ScrollVideoDemo.tsx", "lib/scrollVideo.ts"],
   },
@@ -134,6 +139,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "dissolve",
     group: "piece",
     ordinal: "02",
+    added: "2026-08-17",
     accent: "#4c7a5b",
     sources: ["components/lab/DissolveDemo.tsx", "lib/three/guards.ts", "lib/three/release.ts"],
   },
@@ -142,6 +148,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "meltingText",
     group: "piece",
     ordinal: "03",
+    added: "2026-08-17",
     accent: "#6b5ba8",
     sources: ["components/lab/MeltingTextDemo.tsx", "components/lab/MeltingText.tsx"],
   },
@@ -150,6 +157,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "grove",
     group: "piece",
     ordinal: "04",
+    added: "2026-08-20",
     accent: "#4a5d3a",
     sources: [
       "components/lab/GroveDemo.tsx",
@@ -165,6 +173,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "liquidMetal",
     group: "piece",
     ordinal: "05",
+    added: "2026-08-20",
     accent: "#8a93a8",
     sources: [
       "components/lab/LiquidMetalDemo.tsx",
@@ -179,6 +188,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "workstation",
     group: "piece",
     ordinal: "06",
+    added: "2026-07-31",
     accent: "#b45309",
     sources: ["components/about/Workstation.tsx", "lib/three/draco.ts"],
   },
@@ -189,6 +199,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "lensSlider",
     group: "piece",
     ordinal: "07",
+    added: "2026-08-28",
     accent: "#5b7f8a",
     sources: [
       "components/lab/LensSliderDemo.tsx",
@@ -204,6 +215,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "neon",
     group: "piece",
     ordinal: "08",
+    added: "2026-09-04",
     accent: "#3f5fd6",
     sources: [
       "components/lab/NeonSignDemo.tsx",
@@ -223,6 +235,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "sideways",
     group: "site",
     ordinal: "09",
+    added: "2026-09-19",
     accent: "#a0522d",
     sources: [
       "components/lab/SidewaysDemo.tsx",
@@ -236,6 +249,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "masthead",
     group: "site",
     ordinal: "10",
+    added: "2026-09-19",
     accent: "#5c6b73",
     sources: ["components/lab/MastheadDemo.tsx", "components/home/Opening.tsx"],
   },
@@ -245,6 +259,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "reveal",
     group: "site",
     ordinal: "11",
+    added: "2026-09-19",
     accent: "#6b7a68",
     sources: ["components/lab/RevealDemo.tsx", "components/fx/Reveal.tsx"],
   },
@@ -254,6 +269,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "headline",
     group: "site",
     ordinal: "12",
+    added: "2026-09-19",
     accent: "#7a6a5c",
     sources: ["components/lab/HeadlineDemo.tsx", "components/blog/PostTitle.tsx"],
   },
@@ -264,6 +280,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "unmask",
     group: "site",
     ordinal: "13",
+    added: "2026-09-19",
     accent: "#6e6458",
     sources: ["components/lab/UnmaskDemo.tsx", "components/blog/PostTitle.tsx"],
   },
@@ -274,6 +291,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "magnetic",
     group: "site",
     ordinal: "14",
+    added: "2026-09-19",
     accent: "#8b6f3e",
     sources: [
       "components/lab/MagneticDemo.tsx",
@@ -289,6 +307,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "glint",
     group: "site",
     ordinal: "15",
+    added: "2026-09-19",
     accent: "#9a8a6a",
     sources: [
       "components/lab/GlintDemo.tsx",
@@ -302,6 +321,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "dieCut",
     group: "site",
     ordinal: "16",
+    added: "2026-09-19",
     accent: "#c2410c",
     sources: ["components/lab/DieCutDemo.tsx", "components/ui/Sticker.tsx"],
   },
@@ -311,6 +331,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "stickerWall",
     group: "site",
     ordinal: "17",
+    added: "2026-09-19",
     accent: "#b4532a",
     sources: ["components/lab/StickerWallDemo.tsx", "components/about/StickerWall.tsx"],
   },
@@ -320,6 +341,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "peel",
     group: "site",
     ordinal: "18",
+    added: "2026-09-19",
     accent: "#a05a3c",
     sources: [
       "components/lab/PeelDemo.tsx",
@@ -333,6 +355,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "scatter",
     group: "site",
     ordinal: "19",
+    added: "2026-09-19",
     accent: "#475569",
     sources: [
       "components/lab/ScatterDemo.tsx",
@@ -346,6 +369,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "dotName",
     group: "site",
     ordinal: "20",
+    added: "2026-09-19",
     accent: "#5a6478",
     sources: [
       "components/lab/DotNameDemo.tsx",
@@ -362,6 +386,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "approach",
     group: "site",
     ordinal: "21",
+    added: "2026-08-28",
     accent: "#3f5a3a",
     sources: [
       "components/grove/GroveApproach.tsx",
@@ -377,6 +402,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "segmented",
     group: "site",
     ordinal: "22",
+    added: "2026-09-19",
     accent: "#2f6f8f",
     sources: ["components/lab/SegmentedDemo.tsx", "components/software/SegmentedFilter.tsx"],
   },
@@ -387,6 +413,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "reshuffle",
     group: "site",
     ordinal: "23",
+    added: "2026-09-19",
     accent: "#3a7a8a",
     sources: [
       "components/lab/ReshuffleDemo.tsx",
@@ -401,6 +428,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "statue",
     group: "site",
     ordinal: "24",
+    added: "2026-09-19",
     accent: "#8a6a2e",
     sources: [
       "components/lab/StatueDemo.tsx",
@@ -414,6 +442,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "changelog",
     group: "site",
     ordinal: "25",
+    added: "2026-07-31",
     accent: "#4b6b8a",
     sources: ["components/about/Changelog.tsx"],
   },
@@ -423,6 +452,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "screening",
     group: "site",
     ordinal: "26",
+    added: "2026-09-16",
     accent: "#b8552e",
     sources: [
       "components/films/FilmStills.tsx",
@@ -439,6 +469,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "lights",
     group: "shell",
     ordinal: "27",
+    added: "2026-09-19",
     accent: "#6d5d4b",
     sources: [
       "components/lab/LightsDemo.tsx",
@@ -453,6 +484,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "readingChip",
     group: "shell",
     ordinal: "28",
+    added: "2026-09-19",
     accent: "#7d6b55",
     sources: ["components/lab/ReadingChipDemo.tsx", "components/fx/ProgressHud.tsx"],
   },
@@ -462,6 +494,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "radialFan",
     group: "shell",
     ordinal: "29",
+    added: "2026-09-19",
     accent: "#8a6d4e",
     sources: ["components/lab/RadialFanDemo.tsx", "components/fx/RadialFab.tsx"],
   },
@@ -471,6 +504,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "overture",
     group: "shell",
     ordinal: "30",
+    added: "2026-09-19",
     accent: "#5e5246",
     sources: [
       "components/lab/OvertureDemo.tsx",
@@ -484,6 +518,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "door",
     group: "shell",
     ordinal: "31",
+    added: "2026-09-19",
     accent: "#4b5a7a",
     sources: ["components/lab/DoorDemo.tsx", "components/home/NeonSplash.tsx", "lib/splash.ts"],
   },
@@ -493,6 +528,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "veil",
     group: "shell",
     ordinal: "32",
+    added: "2026-09-19",
     accent: "#6f7a86",
     sources: ["components/lab/VeilDemo.tsx", "components/fx/RouteTransition.tsx", "lib/veil.ts"],
   },
@@ -502,10 +538,15 @@ export const LAB_ENTRIES: LabEntry[] = [
     key: "island",
     group: "shell",
     ordinal: "33",
+    added: "2026-09-19",
     accent: "#585f6b",
     sources: ["components/lab/IslandDemo.tsx", "components/layout/Header.tsx"],
   },
 ];
+
+/** The study that went up last; on a tie, the one later in the list. */
+export const newestLabEntry = (): LabEntry =>
+  LAB_ENTRIES.reduce((newest, entry) => (entry.added >= newest.added ? entry : newest));
 
 export const labEntry = (slug: string): LabEntry | undefined =>
   LAB_ENTRIES.find((entry) => entry.slug === slug);
