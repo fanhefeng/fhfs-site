@@ -119,9 +119,12 @@ Failures resolve to `null` and the badge is simply absent.
   short no-stop-button list documented there. Lenis inertial scrolling shares
   GSAP's clock (`gsap.ticker` drives `lenis.raf`).
 - **3D**: `/intro` and the statue on `/idols/kobe` use @react-three/fiber +
-  drei; the moss on the home page (`components/grove`) and the workbench —
-  now a lab study, `/lab/workstation`, no longer on `/about` — are imperative
-  three.js. Every scene sits behind `next/dynamic`, and the component that
+  drei; the moss (`components/grove` — two lab studies, `/lab/grove` and
+  `/lab/approach`; it left the home page's cover on 2026-09-24) and the
+  workbench — now a lab study, `/lab/workstation`, no longer on `/about` —
+  are imperative three.js. The home page mounts no three.js at all, and its
+  script budget in `scripts/smoke.mts` is the ordinary page's; keep it that
+  way. Every scene sits behind `next/dynamic`, and the component that
   mounts it asks `prefersSaveData()` / `hasWebGL()` (`src/lib/three/guards.ts`)
   *before* mounting: a guard inside the chunk runs after three.js has already
   been downloaded.

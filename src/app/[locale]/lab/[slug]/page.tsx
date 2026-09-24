@@ -183,8 +183,10 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
   }
   let entries: ChangelogEntry[] | undefined;
 
-  // The two cards standing in the approach are the home page's, built by the
-  // same function — two copies of them are how the study's drifted before.
+  // The two cards standing in the approach, built by the one function that
+  // used to build the home page's too — two hand-kept copies of them are how
+  // the study drifted before. The cover no longer mounts the approach, so
+  // this is the only place they stand.
   let cards: [GroveCardData, GroveCardData] | undefined;
   if (entry.slug === "approach") {
     cards = await groveCards(locale);

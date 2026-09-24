@@ -6,16 +6,17 @@ import { pageLocale } from "@/i18n/page";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
-import { getPosts, getApps } from "@/lib/content";
-import { getLatestReleases } from "@/lib/github";
+import { getPosts, getApps, getMoments, type Moment } from "@/lib/content";
+import { getLatestReleases, type Release } from "@/lib/github";
+import { stampInZone } from "@/lib/moments";
 import { toSoftwareApp } from "@/components/software/appMeta";
-import { Opening, type OpeningMeta } from "@/components/home/Opening";
+import { newestLabEntry } from "@/components/lab/entries";
+import { Chibi } from "@/components/chibi/Chibi";
+import { Opening, type OpeningMeta, type ContactLink } from "@/components/home/Opening";
 import { NeonSplash } from "@/components/home/NeonSplash";
-import { GroveApproach } from "@/components/grove/GroveApproach";
-import { groveCards } from "@/components/grove/cards";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
-import { AboutTeaser, type ContactLink } from "@/components/home/AboutTeaser";
+import { NowStrip, type NowItem } from "@/components/home/NowStrip";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
@@ -28,14 +29,14 @@ const POST_COUNT = 4;
 const APP_COUNT = 6;
 
 /**
- * The cover of the issue, in three movements.
+ * The cover, and the issue.
  *
- * First paper: the manifesto alone on a full screen, the site's one primary
- * control under it, and a mono line of facts the database can vouch for.
- * Then the approach — a window the scrollbar opens onto the grove, and the
- * paper of the issue coming back down over it. Then the issue itself at the
- * 720px measure: what was written, what was built, and where to find the
- * person who did it.
+ * First paper: the manifesto on a full screen with the person beside it —
+ * one line on who he is, the site's one primary control, and a mono line of
+ * where he lives and where to find him. Then the issue itself at the 720px
+ * measure: what was built (the primary control points there, so it comes
+ * first), what was written, and what is newest in the rooms the issue does
+ * not otherwise reach.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await pageLocale(params);
@@ -44,11 +45,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const th = await getTranslations("grove");
   const ts = await getTranslations("software");
   const td = await getTranslations("splash");
+  const tn = await getTranslations("nav");
+  const tl = await getTranslations("lab");
 
-  const [allPosts, allApps, cards] = await Promise.all([
+  const [allPosts, allApps, moments] = await Promise.all([
     getPosts(locale),
     getApps(),
-    groveCards(locale),
+    getMoments(),
   ]);
   const releases = await getLatestReleases(allApps.map((app) => app.repo));
 
@@ -75,6 +78,55 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       stat: wide ? [version, ...app.platforms].filter(Boolean).join(" · ") : undefined,
     };
   });
+
+  // Now: the newest thing in each room. The newest line on the board by the
+  // clock — not the pinned one, which getMoments puts first for the board's
+  // own sake; the study that went up last; and the most recent release,
+  // which only exists when GitHub answered and dated it.
+  const said = moments.reduce<Moment | undefined>(
+    (newest, moment) => (!newest || moment.postedAt > newest.postedAt ? moment : newest),
+    undefined,
+  );
+  const study = newestLabEntry();
+  let latest: { name: string; release: Release } | undefined;
+  for (const app of allApps) {
+    const release = app.repo ? releases.get(app.repo) : undefined;
+    if (!release?.publishedAt) continue;
+    if (!latest || release.publishedAt > latest.release.publishedAt!) {
+      latest = { name: app.name, release };
+    }
+  }
+  const now: NowItem[] = [
+    ...(said
+      ? [
+          {
+            label: tn("moments"),
+            title: said.content,
+            // The board is written in Chinese only.
+            lang: locale === "zh" ? undefined : htmlLang("zh"),
+            stamp: stampInZone(said.postedAt, site.timeZone).time,
+            href: "/moments",
+          },
+        ]
+      : []),
+    {
+      label: tn("lab"),
+      title: tl(`items.${study.key}.name`),
+      stamp: study.added.replaceAll("-", "."),
+      href: `/lab/${study.slug}`,
+    },
+    ...(latest
+      ? [
+          {
+            label: tn("software"),
+            title: `${latest.name} ${latest.release.version}`,
+            stamp: stampInZone(latest.release.publishedAt!, site.timeZone).time.slice(0, 10),
+            href: latest.release.url,
+            external: true,
+          },
+        ]
+      : []),
+  ];
 
   const contacts: ContactLink[] = [
     { label: "GitHub", href: site.social.github, external: true },
@@ -114,38 +166,30 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           lede={th("lede")}
           cta={{ label: th("cta"), href: `/${locale}/software` }}
           meta={meta}
+          contactTitle={t("contactTitle")}
+          contacts={contacts}
+          aboutLink={{ label: t("aboutLink") }}
+          avatar={<Chibi label={t("chibiAria")} hint={t("chibiHint")} />}
         />
-
-        {/* The two cards are rooms the issue below does not reach (see
-            components/grove/cards.ts). */}
-        <GroveApproach cards={cards} />
 
         {/* The issue itself, at the site's 720px reading measure. */}
         <div
           id="issue"
-          className="mx-auto flex w-full max-w-[720px] scroll-mt-24 flex-col gap-20 px-6 pt-24 pb-24 md:gap-24 md:pt-32 md:pb-32"
+          className="mx-auto flex w-full max-w-[720px] scroll-mt-24 flex-col gap-20 px-6 pt-8 pb-24 md:gap-24 md:pt-12 md:pb-32"
         >
-          <RecentWriting
-            items={posts}
-            title={t("latestPosts")}
-            viewAllLabel={t("viewAllPosts")}
-            index="01"
-          />
           <MiniBento
             items={apps}
             title={t("featuredWorks")}
             viewAllLabel={t("viewAllSoftware")}
+            index="01"
+          />
+          <RecentWriting
+            items={posts}
+            title={t("latestPosts")}
+            viewAllLabel={t("viewAllPosts")}
             index="02"
           />
-          <AboutTeaser
-            title={t("aboutTitle")}
-            index="03"
-            lead={t("aboutLead")}
-            linkLabel={t("aboutLink")}
-            contactTitle={t("contactTitle")}
-            contacts={contacts}
-            chibi={{ label: t("chibiAria"), hint: t("chibiHint") }}
-          />
+          <NowStrip items={now} title={t("nowTitle")} index="03" />
         </div>
       </main>
     </>
