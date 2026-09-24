@@ -151,6 +151,10 @@ Failures resolve to `null` and the badge is simply absent.
   player in the layout (`components/fx/Jukebox.tsx`) driven by the store in
   `src/lib/jukebox.ts`; the signs (splash, `/lab/neon`, the island's note)
   only write `wanted`. The sign's drawing lives in `src/components/neon/`.
+  The player is also the site's one rule about sound — never two things at
+  once: it catches every `<audio>`/`<video>` `play` at the document, pauses
+  the rest and steps aside (`held`), and comes back when the last one stops.
+  A new player anywhere gets this for free; do not add a second copy.
 - **Design source of truth**: `docs/DESIGN.md` — §5 (工程规则) is required
   reading before implementation work; `docs/INTRO3D.md` covers the `/intro`
   scene.

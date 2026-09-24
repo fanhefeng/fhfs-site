@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  holdMusic,
   jukebox,
+  releaseMusic,
   reportFailure,
   reportGesture,
   reportPlayback,
@@ -22,7 +24,24 @@ describe("the jukebox store", () => {
       gestured: false,
       track: DEFAULT_TRACK,
       silenced: false,
+      held: false,
     });
+  });
+
+  // A voice note on the board takes the floor: the switch stays on and the
+  // sign stays lit, but the record waits — and neither the reader's "no" nor
+  // the switch is touched on the way back.
+  it("steps aside for another player and comes back with the switch untouched", () => {
+    wantMusic();
+    holdMusic();
+    expect(jukebox()).toMatchObject({ wanted: true, held: true, silenced: false });
+    releaseMusic();
+    expect(jukebox()).toMatchObject({ wanted: true, held: false });
+    stopMusic();
+    holdMusic();
+    expect(jukebox()).toMatchObject({ wanted: false, held: true, silenced: true });
+    releaseMusic();
+    expect(jukebox()).toMatchObject({ wanted: false, held: false, silenced: true });
   });
 
   it("remembers a reader's no, and forgets it when they switch the music on", () => {
