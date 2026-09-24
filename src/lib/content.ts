@@ -20,6 +20,7 @@ import {
   type SkillGroup,
 } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
+import type { MomentMedia } from "@/lib/moments";
 import { isNavGroup, type NavGroup } from "@/lib/nav";
 
 /**
@@ -456,6 +457,8 @@ export type Moment = {
   attribution: string | null;
   source: string | null;
   mood: string | null;
+  /** Site paths and Blob addresses as stored — the page resolves the hashed ones. */
+  media: MomentMedia[];
   pinned: boolean;
 };
 
@@ -474,6 +477,7 @@ export const getMoments = unstable_cache(
         attribution: moments.attribution,
         source: moments.source,
         mood: moments.mood,
+        media: moments.media,
         pinned: moments.pinned,
       })
       .from(moments)

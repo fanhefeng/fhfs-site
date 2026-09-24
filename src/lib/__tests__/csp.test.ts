@@ -13,12 +13,16 @@ describe("contentSecurityPolicy", () => {
   const prod = parse(contentSecurityPolicy({ dev: false }));
   const dev = parse(contentSecurityPolicy({ dev: true }));
 
-  it("lets nothing load from another origin", () => {
+  // The one exception is named here as well as in csp.ts, so adding a second
+  // host — or letting this one into another directive — fails the test.
+  const BLOB_HOST = "https://oaq2x6wu11ne1ol7.public.blob.vercel-storage.com";
+
+  it("lets nothing load from another origin, save the board's videos", () => {
     for (const [name, values] of Object.entries(prod)) {
       expect(
         values.filter((value) => /^https?:|^\*|^wss?:/.test(value)),
         name,
-      ).toEqual([]);
+      ).toEqual(name === "media-src" ? [BLOB_HOST] : []);
     }
   });
 

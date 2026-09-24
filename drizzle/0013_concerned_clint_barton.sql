@@ -1,0 +1,1 @@
+ALTER TABLE "moments" ADD COLUMN "media" jsonb DEFAULT '[]'::jsonb NOT NULL;

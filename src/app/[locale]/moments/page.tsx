@@ -1,8 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
+import { asset } from "@/lib/asset";
 import { getMoments } from "@/lib/content";
-import { stampInZone, type BoardMoment } from "@/lib/moments";
+import { stampInZone, type BoardMoment, type MomentMedia } from "@/lib/moments";
 import { sectionMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { RadialFab } from "@/components/fx/RadialFab";
@@ -10,6 +11,14 @@ import { RoomMusic } from "@/components/fx/RoomMusic";
 import { MomentBoard } from "@/components/moments/MomentBoard";
 
 export const generateMetadata = sectionMetadata("moments", "/moments");
+
+/** The files under a line, at the addresses the browser fetches: hashed for
+ *  the ones in `public/`, as they are for a video in the Blob store (`asset()`
+ *  hands back anything outside the immutable folders unchanged). */
+const resolveMedia = (item: MomentMedia): MomentMedia =>
+  item.kind === "video"
+    ? { ...item, src: asset(item.src), poster: asset(item.poster) }
+    : { ...item, src: asset(item.src) };
 
 /**
  * 峰言峰语 — the board. A 720px column like the rest of the issue, and its own
@@ -27,6 +36,7 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
   const items: BoardMoment[] = rows.map((row) => ({
     key: row.key,
     content: row.content,
+    media: row.media.map(resolveMedia),
     // Year and hour in the site's zone — the one the lines were written in.
     ...stampInZone(row.postedAt, site.timeZone),
     dateTime: row.postedAt,

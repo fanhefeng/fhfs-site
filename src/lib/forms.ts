@@ -1,3 +1,4 @@
+import type { MomentMedia } from "@/lib/moments";
 import { lines } from "@/lib/resume";
 
 /**
@@ -138,3 +139,86 @@ export function intField<Fallback extends number | null>(
   if (n < INT4_MIN || n > INT4_MAX) return { ok: false, error: `${label}超出范围了。` };
   return { ok: true, value: n };
 }
+
+const SIZE_RE = /^(\d+)x(\d+)$/;
+const DURATION_RE = /^(\d+(?:\.\d+)?)s$/;
+const MEDIA_KINDS = new Set(["image", "audio", "video"]);
+
+export type MediaParse = { ok: true; value: MomentMedia[] } | { ok: false; error: string };
+
+/**
+ * The board's media field, one file per line: the kind, its address, then
+ * what that kind needs, in any order — `1080x1440` for a picture or a video,
+ * `90s` for a voice note or a video, `poster=/moments/x.jpg` for a video.
+ *
+ *   image /moments/soul-1-1.jpg 1080x1440
+ *   audio /moments/soul-2-1.m4a 90s
+ *   video https://…/soul-3-1.mp4 720x1280 30s poster=/moments/soul-3-1.jpg
+ *
+ * `formatMedia` writes the same lines back, so a row round-trips through the
+ * editor unchanged. Errors name the line: this field is a list, and a
+ * "看不懂" without a line number sends the author reading all of it.
+ */
+export function parseMedia(text: string): MediaParse {
+  const out: MomentMedia[] = [];
+  const rows = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  for (const [i, line] of rows.entries()) {
+    const at = `第 ${i + 1} 行`;
+    const [kind, src, ...rest] = line.split(/\s+/);
+    if (!kind || !MEDIA_KINDS.has(kind)) {
+      return { ok: false, error: `${at}：开头要是 image、audio 或 video。` };
+    }
+    if (!src || !validLink(src)) {
+      return {
+        ok: false,
+        error: `${at}：第二项要是文件地址——站内以单个 / 开头，或完整的 http(s):// 地址。`,
+      };
+    }
+    let size: [number, number] | undefined;
+    let duration: number | undefined;
+    let poster: string | undefined;
+    for (const token of rest) {
+      const s = SIZE_RE.exec(token);
+      const d = DURATION_RE.exec(token);
+      if (s && Number(s[1]) > 0 && Number(s[2]) > 0) size = [Number(s[1]), Number(s[2])];
+      else if (d && Number(d[1]) > 0) duration = Number(d[1]);
+      else if (token.startsWith("poster=") && validPath(token.slice("poster=".length))) {
+        poster = token.slice("poster=".length);
+      } else {
+        return {
+          ok: false,
+          error: `${at}：看不懂「${token}」。尺寸写 1080x1440，时长写 90s，封面写 poster=/moments/x.jpg。`,
+        };
+      }
+    }
+    if (kind === "image") {
+      if (!size) return { ok: false, error: `${at}：图片要写尺寸，如 1080x1440。` };
+      out.push({ kind, src, width: size[0], height: size[1] });
+    } else if (kind === "audio") {
+      if (!duration) return { ok: false, error: `${at}：语音要写时长，如 90s。` };
+      out.push({ kind, src, duration });
+    } else {
+      if (!size || !duration || !poster) {
+        return {
+          ok: false,
+          error: `${at}：视频要写尺寸、时长和封面，如 720x1280 30s poster=/moments/x.jpg。`,
+        };
+      }
+      out.push({ kind: "video", src, poster, width: size[0], height: size[1], duration });
+    }
+  }
+  return { ok: true, value: out };
+}
+
+/** The lines `parseMedia` reads, written back for the editor. */
+export const formatMedia = (media: MomentMedia[]): string =>
+  media
+    .map((item) => {
+      if (item.kind === "image") return `image ${item.src} ${item.width}x${item.height}`;
+      if (item.kind === "audio") return `audio ${item.src} ${item.duration}s`;
+      return `video ${item.src} ${item.width}x${item.height} ${item.duration}s poster=${item.poster}`;
+    })
+    .join("\n");

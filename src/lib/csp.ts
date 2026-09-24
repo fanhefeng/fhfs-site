@@ -7,10 +7,11 @@
  * third-party script would be the wrong bargain. So scripts and styles keep
  * `'unsafe-inline'`, which Next's own bootstrap and the splash decision script
  * (src/lib/splash.ts) need, and the policy earns its keep everywhere else:
- * nothing loads from another origin, nothing is framed or frames, no plugin,
- * no `<base>` hijack, no form posting elsewhere. If a stored article ever did
- * carry markup past lib/markdown.ts, it could not phone home or pull a script
- * from outside.
+ * nothing loads from another origin — save the board's videos, from the one
+ * Blob host named under `media-src` — nothing is framed or frames, no
+ * plugin, no `<base>` hijack, no form posting elsewhere. If a stored article
+ * ever did carry markup past lib/markdown.ts, it could not phone home or pull
+ * a script from outside.
  *
  * Pure, and imported by next.config.ts — no `fs`, no `@/` imports.
  */
@@ -30,7 +31,10 @@ export function contentSecurityPolicy({ dev }: { dev: boolean }): string {
     // data: for next/image's blur placeholders and inline SVG; blob: for the
     // textures three.js unpacks out of a GLB.
     "img-src": ["'self'", "data:", "blob:"],
-    "media-src": ["'self'"],
+    // The one thing served from elsewhere: the board's videos, too big for
+    // the repository, in the Vercel Blob store `fhfs-media` (AGENTS.md, Board
+    // media). Nothing else — not scripts, not images — comes from there.
+    "media-src": ["'self'", "https://oaq2x6wu11ne1ol7.public.blob.vercel-storage.com"],
     "font-src": ["'self'"],
     // blob: because GLTFLoader fetches those unpacked textures; the dev
     // server adds its hot-reload socket.

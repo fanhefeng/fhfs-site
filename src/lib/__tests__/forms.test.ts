@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   KEY_PATTERN,
+  formatMedia,
   intField,
   list,
   localized,
   localizedLines,
   parseLocale,
+  parseMedia,
   parseMomentTime,
   raw,
   str,
@@ -146,6 +148,62 @@ describe("validGithubUser", () => {
     expect(validGithubUser("@fanhefeng")).toBe(false);
     expect(validGithubUser("github.com/fanhefeng")).toBe(false);
     expect(validGithubUser("")).toBe(false);
+  });
+});
+
+describe("parseMedia / formatMedia", () => {
+  it("reads one file per line, the extras in any order", () => {
+    const text = [
+      "image /pics/soul-1-1.jpg 1080x1440",
+      "",
+      "  audio /pics/soul-2-1.m4a 90s  ",
+      "video https://blob.example/soul-3-1.mp4 poster=/pics/soul-3-1.jpg 30s 720x1280",
+    ].join("\n");
+    expect(parseMedia(text)).toEqual({
+      ok: true,
+      value: [
+        { kind: "image", src: "/pics/soul-1-1.jpg", width: 1080, height: 1440 },
+        { kind: "audio", src: "/pics/soul-2-1.m4a", duration: 90 },
+        {
+          kind: "video",
+          src: "https://blob.example/soul-3-1.mp4",
+          poster: "/pics/soul-3-1.jpg",
+          width: 720,
+          height: 1280,
+          duration: 30,
+        },
+      ],
+    });
+  });
+
+  it("an empty field is an empty list", () => {
+    expect(parseMedia("")).toEqual({ ok: true, value: [] });
+    expect(parseMedia("\n  \n")).toEqual({ ok: true, value: [] });
+  });
+
+  it("round-trips through formatMedia", () => {
+    const text =
+      "image /pics/a.jpg 10x20\naudio /pics/b.m4a 12.5s\nvideo https://x/c.mp4 720x1280 30s poster=/pics/c.jpg";
+    const parsed = parseMedia(text);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) expect(formatMedia(parsed.value)).toBe(text);
+    expect(formatMedia([])).toBe("");
+  });
+
+  it("names the line that is wrong", () => {
+    const wrong = (text: string) => {
+      const parsed = parseMedia(text);
+      return parsed.ok ? "" : parsed.error;
+    };
+    expect(wrong("image /pics/a.jpg 10x20\nphoto /pics/b.jpg 10x20")).toMatch(/^第 2 行/);
+    expect(wrong("image //evil/a.jpg 10x20")).toMatch(/文件地址/);
+    expect(wrong("image javascript:alert(1) 10x20")).toMatch(/文件地址/);
+    expect(wrong("image /pics/a.jpg")).toMatch(/尺寸/);
+    expect(wrong("image /pics/a.jpg 0x20")).toMatch(/看不懂「0x20」/);
+    expect(wrong("audio /pics/a.m4a 10x20")).toMatch(/时长/);
+    expect(wrong("video https://x/c.mp4 720x1280 30s")).toMatch(/封面/);
+    expect(wrong("video https://x/c.mp4 720x1280 30s poster=//x/c.jpg")).toMatch(/看不懂/);
+    expect(wrong("image /pics/a.jpg 10x20 huge")).toMatch(/看不懂「huge」/);
   });
 });
 
