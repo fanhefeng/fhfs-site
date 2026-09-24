@@ -32,10 +32,10 @@ const APP_COUNT = 6;
  * The cover, and the issue.
  *
  * First paper: the manifesto on a full screen with the person beside it —
- * one line on who he is, the site's one primary control, and a mono line of
- * where he lives and where to find him. Then the issue itself at the 720px
- * measure: what was built (the primary control points there, so it comes
- * first), what was written, and what is newest in the rooms the issue does
+ * one line on who he is, the site's one primary control (to the lab, the
+ * wing this page shows least of), and a mono line of where he lives and
+ * where to find him. Then the issue itself at the 720px measure: what was
+ * built, what was written, and what is newest in the rooms the issue does
  * not otherwise reach.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
@@ -164,7 +164,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <Opening
           headline={[th("headline1"), th("headline2")]}
           lede={th("lede")}
-          cta={{ label: th("cta"), href: `/${locale}/software` }}
+          // The one primary control goes to the lab: the wing the issue below
+          // only touches in a single row, and the one thing on the site nobody
+          // else has. It used to go to /software, which then turned out to be
+          // the very next section — a button standing in for the scrollbar.
+          cta={{ label: th("cta"), href: `/${locale}/lab` }}
           meta={meta}
           contactTitle={t("contactTitle")}
           contacts={contacts}
