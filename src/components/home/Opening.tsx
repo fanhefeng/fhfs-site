@@ -102,6 +102,13 @@ function useEntrance() {
  * where the author is and where to find them. Nothing else competes with the
  * masthead — no dock, no cards, no scene; the grove that used to open under
  * this screen now lives in the lab (/lab/approach, /lab/grove).
+ *
+ * It sits on the issue's own 720px measure. The cover used to be 1080 wide
+ * while three viewports of grove stood between it and the issue; with the
+ * two now a hairline apart, a wider cover read as the page suddenly
+ * narrowing. One left edge from the masthead to the footer, like every
+ * other page's header; the headline may still run past the measure on the
+ * right (it is held on one line), which is the one break-out the cover keeps.
  */
 export function Opening({
   headline,
@@ -121,139 +128,145 @@ export function Opening({
 
   return (
     <section
-      className="op relative flex min-h-svh flex-col justify-center px-6 pt-32 pb-24"
+      className="op relative flex min-h-svh flex-col justify-center pt-32 pb-24"
       data-in={entered || undefined}
     >
       <style href="home-opening" precedence="medium">
         {CSS}
       </style>
 
-      {/* Below lg the drawing stands above the words (column-reverse keeps
-          the words first in the DOM, so the tab order starts on the
-          headline's neighbours, not on him); from lg up he takes a fixed
-          column on the right and the words keep the rest. */}
-      <div className="mx-auto flex w-full max-w-[1080px] flex-col-reverse gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-x-16">
-        <div className="min-w-0">
-          {/* Each line of the manifesto is a line the writer chose, so none of
-              them may wrap: the type is sized off the viewport and held on one
-              line at every width. `ch` would have been the obvious measure and
-              is the wrong one here — it is the width of a "0", about half an em,
-              so a CJK line of nine characters overflows a 13ch box.
-              That holds from the md breakpoint up, where min() — not clamp() —
-              keeps the size purely proportional, so no width can push the
-              longest line off the screen; from lg the drawing's column takes
-              a fixed 224px of it, which the 6.4vw scale still clears at 1024.
-              Below md it stops being worth it: a line held on one line at
-              320px lands at about 20px, which is not a masthead any more.
-              There the lines are allowed to wrap and the type goes back up to
-              a size worth reading, balanced so the halves come out even. */}
-          <h1
-            className={`font-display text-fg text-[clamp(1.9rem,8.4vw,3rem)] leading-[1.12] font-[650] text-balance whitespace-normal md:text-[min(5.4rem,6.4vw)] md:leading-[1.08] md:whitespace-nowrap ${
-              zh ? "tracking-[0]" : "tracking-[-0.03em]"
-            }`}
-          >
-            {/* A line left empty in the copy is not a blank line — the
-                manifesto is simply shorter. */}
-            {headline.filter(Boolean).map((line, i) => (
-              <span
-                key={line}
-                className="op-line"
-                style={{ "--d": `${i * 110}ms` } as React.CSSProperties}
-              >
-                <i>{line}</i>
-              </span>
-            ))}
-          </h1>
-
-          <p
-            className="op-fade mt-9 max-w-[46ch] text-body text-fg-secondary"
-            style={{ "--d": "300ms" } as React.CSSProperties}
-          >
-            {lede}
-          </p>
-
-          {/* The pill's canvas IS its bloom pad — a 90px halo of empty room on
-              every side that the flow would otherwise read as a gap the size of
-              a paragraph. The negative margins take the pad back out of the
-              layout so the spacing above and below is the spacing that was
-              asked for. */}
-          <div
-            className="op-fade"
-            style={
-              {
-                "--d": "420ms",
-                marginTop: `calc(2.75rem - ${PILL_PAD})`,
-                marginBottom: `calc(-1 * ${PILL_PAD})`,
-                // Left too, or the button hangs a pad's width inside the measure
-                // and stops lining up with the type above it.
-                marginLeft: `calc(-1 * ${PILL_PAD})`,
-              } as React.CSSProperties
-            }
-          >
-            <LiquidPill height={PILL_H} base={0} href={cta.href} label={cta.label}>
-              <svg className="lp-ico" viewBox="0 0 115 115" aria-hidden="true">
-                <g stroke="currentColor" strokeWidth="11" strokeLinecap="round">
-                  <path d="M14 34.5 H101" />
-                  <path d="M14 57.5 H101" />
-                  <path d="M14 80.5 H68" />
-                </g>
-              </svg>
-              <span className="lp-lbl">{cta.label}</span>
-            </LiquidPill>
-          </div>
-
-          {/* One mono line: where he is, where to find him, and the door to
-              the rest of him. The dl holds the facts; the link stands beside
-              it, pushed to the line's end where there is room. */}
-          <div
-            className="op-fade mt-[4.5rem] flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-line pt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
-            style={{ "--d": "540ms" } as React.CSSProperties}
-          >
-            <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-3">
-              {meta.map((item) => (
-                <div key={item.label} className="flex items-baseline gap-2">
-                  <dt>{item.label}</dt>
-                  <dd className="text-fg-secondary tabular-nums">{item.value}</dd>
-                </div>
-              ))}
-              {contacts.length > 0 ? (
-                <div className="flex flex-wrap items-baseline gap-x-4">
-                  <dt>{contactTitle}</dt>
-                  {contacts.map((contact) => (
-                    <dd key={contact.href}>
-                      <a
-                        href={contact.href}
-                        {...(contact.external
-                          ? { target: "_blank", rel: "noreferrer" }
-                          : { "data-no-transition": "" })}
-                        className="hit-ext text-fg-secondary transition-colors hover:text-accent"
-                      >
-                        {contact.label}
-                        <span aria-hidden="true"> ↗</span>
-                      </a>
-                    </dd>
-                  ))}
-                </div>
-              ) : null}
-            </dl>
-            <Link
-              href="/about"
-              className="hit-ext text-fg-secondary underline decoration-accent/60 decoration-1 underline-offset-4 transition-colors hover:text-accent sm:ml-auto"
+      {/* The same box as the issue's (`#issue` on page.tsx): 720 wide with
+          the gutter inside it, so the words here and the words there share
+          one left edge at every width. */}
+      <div className="mx-auto w-full max-w-[720px] px-6">
+        {/* Each line of the manifesto is a line the writer chose, so none of
+            them may wrap: the type is sized off the viewport and held on one
+            line at every width. `ch` would have been the obvious measure and
+            is the wrong one here — it is the width of a "0", about half an em,
+            so a CJK line of nine characters overflows a 13ch box.
+            That holds from the md breakpoint up, where min() — not clamp() —
+            keeps the size purely proportional, so no width can push the
+            longest line off the screen; the measure is narrower than the
+            screen, and a long line is allowed past its right edge.
+            Below md it stops being worth it: a line held on one line at
+            320px lands at about 20px, which is not a masthead any more.
+            There the lines are allowed to wrap and the type goes back up to
+            a size worth reading, balanced so the halves come out even. */}
+        <h1
+          className={`font-display text-fg text-[clamp(1.9rem,8.4vw,3rem)] leading-[1.12] font-[650] text-balance whitespace-normal md:text-[min(5.4rem,6.4vw)] md:leading-[1.08] md:whitespace-nowrap ${
+            zh ? "tracking-[0]" : "tracking-[-0.03em]"
+          }`}
+        >
+          {/* A line left empty in the copy is not a blank line — the
+              manifesto is simply shorter. */}
+          {headline.filter(Boolean).map((line, i) => (
+            <span
+              key={line}
+              className="op-line"
+              style={{ "--d": `${i * 110}ms` } as React.CSSProperties}
             >
-              {aboutLink.label}
-              <span aria-hidden="true"> →</span>
-            </Link>
+              <i>{line}</i>
+            </span>
+          ))}
+        </h1>
+
+        {/* Under the headline, the words on the left and the drawing on the
+            right, his feet on the button's baseline. On a phone he stands
+            between the headline and the words instead (column-reverse keeps
+            the words first in the DOM, so the tab order reaches the button
+            before him). */}
+        <div className="mt-9 flex flex-col-reverse gap-8 sm:flex-row sm:items-end sm:justify-between sm:gap-10">
+          <div className="min-w-0 flex-1">
+            <p
+              className="op-fade max-w-[46ch] text-body text-fg-secondary"
+              style={{ "--d": "300ms" } as React.CSSProperties}
+            >
+              {lede}
+            </p>
+
+            {/* The pill's canvas IS its bloom pad — a 90px halo of empty room
+                on every side that the flow would otherwise read as a gap the
+                size of a paragraph. The negative margins take the pad back
+                out of the layout so the spacing above and below is the
+                spacing that was asked for. */}
+            <div
+              className="op-fade"
+              style={
+                {
+                  "--d": "420ms",
+                  marginTop: `calc(2.75rem - ${PILL_PAD})`,
+                  marginBottom: `calc(-1 * ${PILL_PAD})`,
+                  // Left too, or the button hangs a pad's width inside the
+                  // measure and stops lining up with the type above it.
+                  marginLeft: `calc(-1 * ${PILL_PAD})`,
+                } as React.CSSProperties
+              }
+            >
+              <LiquidPill height={PILL_H} base={0} href={cta.href} label={cta.label}>
+                <svg className="lp-ico" viewBox="0 0 115 115" aria-hidden="true">
+                  <g stroke="currentColor" strokeWidth="11" strokeLinecap="round">
+                    <path d="M14 34.5 H101" />
+                    <path d="M14 57.5 H101" />
+                    <path d="M14 80.5 H68" />
+                  </g>
+                </svg>
+                <span className="lp-lbl">{cta.label}</span>
+              </LiquidPill>
+            </div>
           </div>
+
+          {avatar ? (
+            <div
+              className="op-fade w-28 shrink-0 sm:w-36 md:w-44"
+              style={{ "--d": "200ms" } as React.CSSProperties}
+            >
+              {avatar}
+            </div>
+          ) : null}
         </div>
 
-        {avatar ? (
-          <div
-            className="op-fade w-28 shrink-0 sm:w-32 lg:w-56"
-            style={{ "--d": "200ms" } as React.CSSProperties}
+        {/* One mono line: where he is, where to find him, and the door to
+            the rest of him. The dl holds the facts; the link stands beside
+            it, pushed to the line's end where there is room. */}
+        <div
+          className="op-fade mt-[4.5rem] flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-line pt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
+          style={{ "--d": "540ms" } as React.CSSProperties}
+        >
+          <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-3">
+            {meta.map((item) => (
+              <div key={item.label} className="flex items-baseline gap-2">
+                <dt>{item.label}</dt>
+                <dd className="text-fg-secondary tabular-nums">{item.value}</dd>
+              </div>
+            ))}
+            {contacts.length > 0 ? (
+              <div className="flex flex-wrap items-baseline gap-x-4">
+                <dt>{contactTitle}</dt>
+                {contacts.map((contact) => (
+                  <dd key={contact.href}>
+                    <a
+                      href={contact.href}
+                      {...(contact.external
+                        ? { target: "_blank", rel: "noreferrer" }
+                        : { "data-no-transition": "" })}
+                      className="hit-ext text-fg-secondary transition-colors hover:text-accent"
+                    >
+                      {contact.label}
+                      <span aria-hidden="true"> ↗</span>
+                    </a>
+                  </dd>
+                ))}
+              </div>
+            ) : null}
+          </dl>
+          <Link
+            href="/about"
+            className="hit-ext text-fg-secondary underline decoration-accent/60 decoration-1 underline-offset-4 transition-colors hover:text-accent sm:ml-auto"
           >
-            {avatar}
-          </div>
-        ) : null}
+            {aboutLink.label}
+            <span aria-hidden="true"> →</span>
+          </Link>
+        </div>
       </div>
     </section>
   );
