@@ -143,7 +143,10 @@ export const secrets = pgTable(
  * The first 242 came over from the 一言 app (`source` = "yiyan"), where they
  * sat in two notebooks — `collection` keeps the notebook's name. `original`
  * and `attribution` are that app's own distinction: a line of one's own, or a
- * line worth keeping and who said it.
+ * line worth keeping and who said it. Another 254 came from Soul's 瞬间
+ * (`source` = "soul", `collection` = "Soul", keyed `soul-<post id>`): the
+ * text of every post that had any, the pictures, videos and voice notes left
+ * behind, and the ones Soul itself had hidden imported as drafts.
  */
 export const moments = pgTable("moments", {
   id: serial().primaryKey(),
@@ -155,7 +158,7 @@ export const moments = pgTable("moments", {
   original: boolean().notNull().default(true),
   /** Who said it, for a line that is not the author's own. */
   attribution: text(),
-  /** Where the line came from: "yiyan" for the imported ones, null for the board's own. */
+  /** Where the line came from: "yiyan" or "soul" for the imported ones, null for the board's own. */
   source: text(),
   /** An optional one-word mood — the board's equivalent of a tag. */
   mood: text(),
