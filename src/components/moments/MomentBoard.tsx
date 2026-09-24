@@ -1,10 +1,17 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { site } from "@/config/site";
 import { groupByYear } from "@/lib/byYear";
-import { collections, FOLD_LINES, shouldFold, type BoardMoment } from "@/lib/moments";
+import {
+  collections,
+  FOLD_LINES,
+  shouldFold,
+  type BoardMoment,
+  type MomentMedia,
+} from "@/lib/moments";
 import { gsap, EASE } from "@/lib/gsap";
 import { useUrlChoice } from "@/lib/useUrlChoice";
 import { Reveal } from "@/components/fx/Reveal";
@@ -110,6 +117,113 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
         </section>
       ))}
     </>
+  );
+}
+
+/** How a wall of several pictures is cut: pairs in two columns, the rest in three. */
+const wallColumns = (count: number) => (count === 2 || count === 4 ? "grid-cols-2" : "grid-cols-3");
+
+/** Pictures at 720 wide are a column wide; on a phone, the screen. */
+const PICTURE_SIZES = "(min-width: 768px) 672px, 100vw";
+
+/** The column is 672px across and a print may stand 512px tall. */
+const COLUMN = 672;
+const TALLEST = 512;
+
+/**
+ * The width a lone picture or a video is drawn at: its own, shrunk to fit
+ * the column and the height. Set as a style rather than left to `auto` —
+ * the file's `width`/`height` give the browser the ratio, but with both
+ * sides auto an unloaded image is 0×0 and the page jumps when it arrives;
+ * with the width settled, the ratio settles the height before a byte lands.
+ * `max-w-full` and `h-auto` still shrink it on a narrower screen.
+ */
+const fit = (width: number, height: number) =>
+  Math.round(width * Math.min(1, COLUMN / width, TALLEST / height));
+
+/**
+ * What hangs under a line. Pictures first, as one print at its own size or a
+ * wall of squares when there are several — every one a link to its file, so
+ * with no JavaScript a tap still opens it. Then each voice note and video on
+ * its own row, in the browser's own player (the same choice /secrets made for
+ * its podcast: no player library), fetching nothing until pressed — a page of
+ * two hundred entries must not start two hundred downloads. A video's poster
+ * is a frame in `public/`, so the box is drawn before anything else loads.
+ */
+function Attachments({ media }: { media: MomentMedia[] }) {
+  const t = useTranslations("moments");
+  const pictures = media.filter((item) => item.kind === "image");
+  const players = media.filter((item) => item.kind !== "image");
+  let videos = 0;
+  let voices = 0;
+  const numbered = players.map((item) => ({
+    item,
+    index: item.kind === "video" ? ++videos : ++voices,
+  }));
+  const single = pictures.length === 1;
+
+  return (
+    <div className="mt-4 space-y-3">
+      {pictures.length > 0 && (
+        <ul className={single ? "" : `grid gap-2 ${wallColumns(pictures.length)}`}>
+          {pictures.map((picture, i) => (
+            <li key={picture.src} className="min-w-0">
+              <a
+                href={picture.src}
+                target="_blank"
+                rel="noreferrer"
+                // A file, not a route — see FilmStills.
+                data-no-transition=""
+                className={`overflow-hidden rounded-card bg-surface ${
+                  single ? "inline-block max-w-full align-top" : "block"
+                }`}
+              >
+                <Image
+                  src={picture.src}
+                  width={picture.width}
+                  height={picture.height}
+                  alt={t("imageAlt", { index: i + 1 })}
+                  sizes={single ? PICTURE_SIZES : "(min-width: 768px) 224px, 33vw"}
+                  style={single ? { width: fit(picture.width, picture.height) } : undefined}
+                  className={single ? "h-auto max-w-full" : "aspect-square w-full object-cover"}
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      {/* No caption track exists for a voice note or a phone video from
+          2020 — the line above each one is what there is to read. */}
+      {numbered.map(({ item, index }) =>
+        item.kind === "video" ? (
+          // oxlint-disable-next-line jsx-a11y/media-has-caption
+          <video
+            key={item.src}
+            controls
+            preload="none"
+            playsInline
+            poster={item.poster}
+            width={item.width}
+            height={item.height}
+            aria-label={t("videoAria", { index })}
+            style={{ width: fit(item.width, item.height) }}
+            className="h-auto max-w-full rounded-card bg-surface"
+          >
+            <source src={item.src} type="video/mp4" />
+          </video>
+        ) : (
+          // oxlint-disable-next-line jsx-a11y/media-has-caption
+          <audio
+            key={item.src}
+            controls
+            preload="none"
+            src={item.src}
+            aria-label={t("audioAria", { index })}
+            className="block w-full max-w-[28rem]"
+          />
+        ),
+      )}
+    </div>
   );
 }
 
@@ -243,17 +357,21 @@ function MomentCard({
 
         {/* The clamp counts the same lines `shouldFold` does — one number, or
             a card could carry a "read all" button with nothing hidden behind
-            it. */}
-        <p
-          ref={bodyRef}
-          lang="zh-CN"
-          style={clamped ? ({ "--fold-lines": FOLD_LINES } as CSSProperties) : undefined}
-          className={`whitespace-pre-line text-body text-fg ${
-            clamped ? "line-clamp-[var(--fold-lines)]" : ""
-          }`}
-        >
-          {item.content}
-        </p>
+            it. A line that is only a picture has no paragraph at all. */}
+        {item.content && (
+          <p
+            ref={bodyRef}
+            lang="zh-CN"
+            style={clamped ? ({ "--fold-lines": FOLD_LINES } as CSSProperties) : undefined}
+            className={`whitespace-pre-line text-body text-fg ${
+              clamped ? "line-clamp-[var(--fold-lines)]" : ""
+            }`}
+          >
+            {item.content}
+          </p>
+        )}
+
+        {item.media.length > 0 && <Attachments media={item.media} />}
 
         {(item.attribution || folds) && (
           <footer className="mt-3 flex items-baseline justify-between gap-4">

@@ -3,8 +3,9 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { asset } from "@/lib/asset";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { parseMomentTime, raw, str, validKey } from "@/lib/forms";
+import { parseMedia, parseMomentTime, raw, str, validKey } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, KEY_ERROR, upsertKeyed, type ActionState } from "./shared";
 
@@ -14,7 +15,25 @@ export async function saveMoment(_prev: ActionState, form: FormData): Promise<Ac
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
   const content = raw(form, "content").replace(/\r\n/g, "\n").trim();
-  if (!content) return { error: "正文不能为空。" };
+  const parsedMedia = parseMedia(raw(form, "media"));
+  if (!parsedMedia.ok) return { error: parsedMedia.error };
+  const media = parsedMedia.value;
+  if (!content && media.length === 0) return { error: "正文和媒体不能都是空的。" };
+  // A file under public/ is reached by its hashed address, and asset() throws
+  // for one the manifest does not know — better here, beside the field, than
+  // on the public page.
+  for (const item of media) {
+    for (const path of item.kind === "video" ? [item.src, item.poster] : [item.src]) {
+      if (!path.startsWith("/")) continue;
+      try {
+        asset(path);
+      } catch {
+        return {
+          error: `${path} 不在 assets.gen.json 里——文件放进 public/moments/ 后跑 pnpm assets，再存一次。`,
+        };
+      }
+    }
+  }
   const postedAt = parseMomentTime(str(form, "postedAt"));
   if (!postedAt) {
     return { error: "时间要写成 YYYY-MM-DD HH:mm（上海时间），而且得是真实存在的一刻。" };
@@ -41,6 +60,7 @@ export async function saveMoment(_prev: ActionState, form: FormData): Promise<Ac
     attribution: str(form, "attribution") || null,
     source: str(form, "source") || null,
     mood: str(form, "mood") || null,
+    media,
     draft: draft === "yes",
     pinned: pinned === "yes",
   };

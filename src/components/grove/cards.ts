@@ -19,9 +19,11 @@ export async function groveCards(locale: Locale): Promise<[GroveCardData, GroveC
   const study = newestLabEntry();
   const studyName = tl(`items.${study.key}.name`);
   /** The newest line on the board by the clock — not the pinned one, which
-   *  getMoments puts first for the board's own sake. */
+   *  getMoments puts first for the board's own sake, and not one that is only
+   *  a picture: the card quotes words. */
   const said = (await getMoments()).reduce<Moment | undefined>(
-    (newest, moment) => (!newest || moment.postedAt > newest.postedAt ? moment : newest),
+    (newest, moment) =>
+      moment.content && (!newest || moment.postedAt > newest.postedAt) ? moment : newest,
     undefined,
   );
   return [

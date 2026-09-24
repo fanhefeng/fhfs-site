@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { moments } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { site } from "@/config/site";
+import { formatMedia } from "@/lib/forms";
 import { momentKey, stampInZone } from "@/lib/moments";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
@@ -25,7 +26,20 @@ const FIELDS: Field[] = [
     kind: "text",
     placeholder: "2026-09-07 23:15",
   },
-  { name: "content", label: "正文", kind: "area", rows: 8, hint: "换行会照原样显示。" },
+  {
+    name: "content",
+    label: "正文",
+    kind: "area",
+    rows: 8,
+    hint: "换行会照原样显示。只有图或语音的一条可以留空。",
+  },
+  {
+    name: "media",
+    label: "图片 / 语音 / 视频（可空）",
+    kind: "area",
+    rows: 4,
+    hint: "一行一个：image /moments/x.jpg 1080x1440 · audio /moments/x.m4a 90s · video https://… 720x1280 30s poster=/moments/x.jpg。站内文件放 public/moments/ 后先跑 pnpm assets。",
+  },
   {
     name: "original",
     label: "这句是谁的",
@@ -91,6 +105,7 @@ function blank() {
     key: momentKey(now, site.timeZone),
     postedAt: `${day!.replaceAll(".", "-")} ${clock}`,
     content: "",
+    media: "",
     collection: "",
     original: "yes",
     attribution: "",
@@ -125,12 +140,17 @@ export default async function MomentsAdminPage() {
           const { time } = stampInZone(row.postedAt.toISOString(), site.timeZone);
           const [day, clock] = time.split(" ");
           const firstLine = row.content.split("\n").find(Boolean) ?? "";
+          const files = row.media.length ? `${row.media.length} 个文件` : "";
           return {
             id: row.key,
-            label: firstLine.length > 40 ? `${firstLine.slice(0, 40)}…` : firstLine,
-            meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${row.draft ? " · 草稿" : ""}`,
+            label:
+              firstLine.length > 40
+                ? `${firstLine.slice(0, 40)}…`
+                : firstLine || `（只有${files}）`,
+            meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${files ? ` · ${files}` : ""}${row.draft ? " · 草稿" : ""}`,
             data: {
               ...row,
+              media: formatMedia(row.media),
               postedAt: `${day!.replaceAll(".", "-")} ${clock}`,
               original: row.original ? "yes" : "no",
               draft: row.draft ? "yes" : "no",

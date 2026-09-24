@@ -26,6 +26,7 @@ export const IMMUTABLE_DIRS = [
   "/idols",
   "/films",
   "/music",
+  "/moments",
 ] as const;
 
 /**
