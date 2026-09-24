@@ -7,11 +7,12 @@ import { newestLabEntry } from "@/components/lab/entries";
 import type { GroveCardData } from "./GroveCard";
 
 /**
- * The two cards standing in the grove, built once for both places the grove
- * is mounted — the home page and the lab study of its approach. They are rooms
- * the issue below the cover does not reach, each shown by one real thing from
+ * The two cards standing in the grove — now only in the lab study of its
+ * approach, since the grove left the home page's cover (2026-09-24). They
+ * were the rooms the issue did not reach, each shown by one real thing from
  * inside it rather than a count of what is there: the newest study in the
- * lab, and the newest line on the moments board.
+ * lab, and the newest line on the moments board. The home page says the same
+ * two things as rows in its "now" strip.
  */
 export async function groveCards(locale: Locale): Promise<[GroveCardData, GroveCardData]> {
   const th = await getTranslations({ locale, namespace: "grove" });

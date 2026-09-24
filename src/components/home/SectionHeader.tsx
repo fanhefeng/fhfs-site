@@ -4,10 +4,11 @@ import { Reveal } from "@/components/fx/Reveal";
 
 /**
  * The home page's section masthead: title on the baseline, a quiet mono
- * "view all" link at the right, one hairline under both. The `id` is the
- * anchor for the section's `aria-labelledby`. `index` numbers the section
- * the way a magazine numbers its table of contents — purely visual, so it
- * stays out of the accessible name.
+ * "view all" link at the right when the section has an "all" to go to, one
+ * hairline under both. The `id` is the anchor for the section's
+ * `aria-labelledby`. `index` numbers the section the way a magazine numbers
+ * its table of contents — purely visual, so it stays out of the accessible
+ * name.
  */
 export function SectionHeader({
   id,
@@ -18,8 +19,8 @@ export function SectionHeader({
 }: {
   id: string;
   title: string;
-  href: ComponentProps<typeof Link>["href"];
-  viewAllLabel: string;
+  href?: ComponentProps<typeof Link>["href"];
+  viewAllLabel?: string;
   index?: string;
 }) {
   return (
@@ -36,12 +37,14 @@ export function SectionHeader({
           ) : null}
           {title}
         </h2>
-        <Link
-          href={href}
-          className="hit-ext font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
-        >
-          {viewAllLabel}
-        </Link>
+        {href && viewAllLabel ? (
+          <Link
+            href={href}
+            className="hit-ext font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
+          >
+            {viewAllLabel}
+          </Link>
+        ) : null}
       </div>
     </Reveal>
   );

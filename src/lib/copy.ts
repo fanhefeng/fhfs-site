@@ -75,8 +75,12 @@ export type CopyGroup = {
  */
 export const COPY_GROUPS: CopyGroup[] = [
   { id: "splash", label: "首页 · 霓虹开场", blurb: "进站时那面墙：招牌、推门进去。" },
-  { id: "grove", label: "首页 · 开场大字", blurb: "满屏的那句话、下面一行小字与两张卡。" },
-  { id: "home", label: "首页 · 正文三节", blurb: "最近写的、做过的、关于我这三节的标题。" },
+  {
+    id: "grove",
+    label: "首页 · 开场大字",
+    blurb: "满屏的那句话、下面那句自我介绍与主按钮；两张卡的字如今只在实验室的推近那则里。",
+  },
+  { id: "home", label: "首页 · 正文三节", blurb: "做过的、最近写的、此刻这三节的标题与找到我。" },
   { id: "blog", label: "文章 /blog", blurb: "列表页与每篇文章周围的字。" },
   { id: "software", label: "软件 /software", blurb: "卡片以外的标题、分类和那台设备。" },
   { id: "lab", label: "实验室 /lab", blurb: "每一则研究的名字、导语与台词。" },
