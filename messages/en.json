@@ -589,6 +589,9 @@
     "pinnedAria": "Pinned moments",
     "expand": "Read it all",
     "collapse": "Fold",
+    "imageAlt": "Picture {index}",
+    "videoAria": "Video {index}",
+    "audioAria": "Voice note {index}",
     "empty": "Nothing said yet.",
     "langNotice": "These lines were written in Chinese, and stay that way — there is no English version of a moment."
   },

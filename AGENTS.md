@@ -144,6 +144,15 @@ Failures resolve to `null` and the badge is simply absent.
   Only `src/app/[locale]/not-found.tsx` loads its stage through
   `next/dynamic`; a not-found boundary is bundled with its layout, so
   anything it imports statically ships with every page.
+- **Board media**: a moment's pictures, voice notes and video posters are
+  files in `public/moments/` (`moments.media`, a jsonb list — see
+  `MomentMedia` in `src/lib/moments.ts`), named by their site path and
+  hashed by `asset()` when the page renders; the videos themselves are too
+  big for the repository and live in the Vercel Blob store `fhfs-media`,
+  whose host is the one cross-origin entry in `csp.ts` (`media-src`). The
+  admin writes the list one file per line (`parseMedia` in `src/lib/forms.ts`,
+  unit-tested), and the save action refuses a site path the manifest does
+  not know — put the file in `public/moments/`, run `pnpm assets`, then save.
 - **Front door and music**: the home page opens with `NeonSplash` once per
   session, on a hard landing only — decided before first paint by the inline
   script in `src/lib/splash.ts` (`<html data-splash>`), which is also what

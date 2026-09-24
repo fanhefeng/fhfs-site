@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import type { MomentMedia } from "../lib/moments";
 import {
   boolean,
   check,
@@ -162,6 +163,16 @@ export const moments = pgTable("moments", {
   source: text(),
   /** An optional one-word mood — the board's equivalent of a tag. */
   mood: text(),
+  /**
+   * The pictures, voice notes and videos under the line, in order — see
+   * `MomentMedia`. Empty for a line that is only words, which most are; a
+   * line may also be only this, with `content` empty. The Soul import is
+   * where nearly all of these came from.
+   */
+  media: jsonb()
+    .$type<MomentMedia[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
   draft: boolean().notNull().default(false),
   /** Held at the top of the board, and on the home page's card, whatever its date. */
   pinned: boolean().notNull().default(false),

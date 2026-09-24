@@ -8,9 +8,32 @@
  * secrets index, so it lives in `lib/byYear`.
  */
 
+/**
+ * What hangs under a line: a picture, a voice note, a video. `src` is a site
+ * path for a file in public/moments/ — soul-1-2.jpg there is /moments/soul-1-2.jpg,
+ * and `asset()` hashes it when the page is drawn — or, for a video too large
+ * for the repository, the address in the Blob store. Sizes are the file's
+ * own, so the card can reserve the box before the bytes arrive; durations
+ * are in seconds.
+ */
+export type MomentMedia =
+  | { kind: "image"; src: string; width: number; height: number }
+  | { kind: "audio"; src: string; duration: number }
+  | {
+      kind: "video";
+      src: string;
+      /** A frame of the video, in `public/moments/` like a picture. */
+      poster: string;
+      width: number;
+      height: number;
+      duration: number;
+    };
+
 export type BoardMoment = {
   key: string;
   content: string;
+  /** Already resolved to the addresses the browser fetches — hashed for the files in `public/`. */
+  media: MomentMedia[];
   /** The calendar year the line was posted in, already in the site's zone. */
   year: string;
   /** The instant, formatted for the mono column: `2017.07.29 19:28`. */

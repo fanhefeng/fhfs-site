@@ -589,6 +589,9 @@
     "pinnedAria": "置顶的说说",
     "expand": "展开全文",
     "collapse": "收起",
+    "imageAlt": "第 {index} 张图片",
+    "videoAria": "第 {index} 段视频",
+    "audioAria": "第 {index} 段语音",
     "empty": "还没有说说。",
     "langNotice": ""
   },
