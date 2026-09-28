@@ -121,8 +121,9 @@ let problems: string[] = [];
  * Only a production build is weighed: a dev server ships unminified modules.
  */
 const SCRIPT_BUDGET_KB: [RegExp, number][] = [
-  // The home page: the moss (three.js) behind the fold. Measured 597.
-  [/^\/(zh|en)$/, 660],
+  // The home page, since the moss went back to the lab (2026-09-24): the neon
+  // door, the liquid pill's shader and the chibi, no three.js. Measured 4xx.
+  [/^\/(zh|en)$/, 450],
   // Every page that mounts a three.js scene. Measured 579–668, the statue heaviest.
   [
     /^\/(zh|en)\/(intro|idols\/kobe|lab\/(statue|approach|grove|workstation|lens-slider|dissolve))$/,

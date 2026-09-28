@@ -296,7 +296,6 @@ export const LAB_ENTRIES: LabEntry[] = [
     sources: [
       "components/lab/MagneticDemo.tsx",
       "components/fx/Magnetic.tsx",
-      "components/home/AboutTeaser.tsx",
       "components/notfound/NotFoundStage.tsx",
     ],
   },

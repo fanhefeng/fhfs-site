@@ -19,6 +19,9 @@ export type Release = {
   version: string;
   /** The release page, or the tag's tree when the repo only has tags. */
   url: string;
+  /** When the release was published, ISO 8601; null for a bare tag, which
+   *  GitHub does not date. The home page's "now" strip sorts on it. */
+  publishedAt: string | null;
 };
 
 const REVALIDATE_SECONDS = 60 * 60;
@@ -52,14 +55,26 @@ async function getJson<T>(path: string): Promise<T | null> {
 async function getLatestRelease(repo: string | null): Promise<Release | null> {
   if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
 
-  const release = await getJson<{ tag_name: string; html_url: string }>(
+  const release = await getJson<{ tag_name: string; html_url: string; published_at?: string }>(
     `/repos/${repo}/releases/latest`,
   );
-  if (release?.tag_name) return { version: release.tag_name, url: release.html_url };
+  if (release?.tag_name) {
+    return {
+      version: release.tag_name,
+      url: release.html_url,
+      publishedAt: release.published_at ?? null,
+    };
+  }
 
   const tags = await getJson<{ name: string }[]>(`/repos/${repo}/tags?per_page=1`);
   const tag = tags?.[0]?.name;
-  if (tag) return { version: tag, url: `https://github.com/${repo}/releases/tag/${tag}` };
+  if (tag) {
+    return {
+      version: tag,
+      url: `https://github.com/${repo}/releases/tag/${tag}`,
+      publishedAt: null,
+    };
+  }
 
   return null;
 }
