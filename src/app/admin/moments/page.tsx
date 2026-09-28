@@ -148,6 +148,7 @@ export default async function MomentsAdminPage() {
                 ? `${firstLine.slice(0, 40)}…`
                 : firstLine || `（只有${files}）`,
             meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${files ? ` · ${files}` : ""}${row.draft ? " · 草稿" : ""}`,
+            draft: row.draft,
             data: {
               ...row,
               media: formatMedia(row.media),

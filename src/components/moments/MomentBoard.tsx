@@ -174,10 +174,38 @@ function Attachments({ media }: { media: MomentMedia[] }) {
                 rel="noreferrer"
                 // A file, not a route — see FilmStills.
                 data-no-transition=""
-                className={`overflow-hidden rounded-card bg-surface ${
+                className={`relative overflow-hidden rounded-card bg-surface ring-1 ring-line ring-inset ${
                   single ? "inline-block max-w-full align-top" : "block"
                 }`}
               >
+                {/* Behind the picture, so the picture covers it once it has
+                    loaded. Until then — and a first visit waits on the image
+                    optimizer, slower still far from Vercel — the box reads as a
+                    picture on its way, not a card with nothing in it. */}
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                  className="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2 text-fg-tertiary/50"
+                >
+                  <rect
+                    x="3.5"
+                    y="5"
+                    width="17"
+                    height="14"
+                    rx="2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                  />
+                  <circle cx="9" cy="10" r="1.6" fill="currentColor" />
+                  <path
+                    d="m4 17 5-4.5 3.5 3 3-2.5 4.5 4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 <Image
                   src={picture.src}
                   width={picture.width}
@@ -185,7 +213,9 @@ function Attachments({ media }: { media: MomentMedia[] }) {
                   alt={t("imageAlt", { index: i + 1 })}
                   sizes={single ? PICTURE_SIZES : "(min-width: 768px) 224px, 33vw"}
                   style={single ? { width: fit(picture.width, picture.height) } : undefined}
-                  className={single ? "h-auto max-w-full" : "aspect-square w-full object-cover"}
+                  className={`relative ${
+                    single ? "h-auto max-w-full" : "aspect-square w-full object-cover"
+                  }`}
                 />
               </a>
             </li>

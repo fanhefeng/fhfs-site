@@ -12,8 +12,19 @@ type ListRow = {
   label: string;
   /** The dimmer line beside it. */
   meta?: string;
+  /** Not on the public page yet. A list with any such row can show only those. */
+  draft?: boolean;
   data: RecordData;
 };
+
+/** Which rows the list shows, by whether they are out front. */
+type View = "all" | "public" | "draft";
+
+const VIEWS: { view: View; label: string }[] = [
+  { view: "all", label: "全部" },
+  { view: "public", label: "已公开" },
+  { view: "draft", label: "草稿" },
+];
 
 /**
  * A list where each row opens into its own form.
@@ -23,7 +34,10 @@ type ListRow = {
  * to change a word. Everything is on the page already; opening a row just
  * reveals it. The filter box is what makes that scale: it matches the row's
  * headline, its dim line and its key, which between them carry the date, the
- * collection and the first words of the text.
+ * collection and the first words of the text. Where some rows are drafts, a
+ * row of three buttons beside it narrows the list to the published ones or
+ * the drafts — an import can bring in dozens of drafts, each waiting on a
+ * decision, and a text match on "草稿" also finds a line that says the word.
  *
  * Rows arrive with their labels already composed. A server component may hand
  * a Server Action across this boundary but not an ordinary function, so
@@ -55,14 +69,22 @@ export function RecordList({
   const [open, setOpen] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [query, setQuery] = useState("");
+  const [view, setView] = useState<View>("all");
+
+  const drafts = useMemo(() => rows.filter((row) => row.draft).length, [rows]);
+  // With no drafts left the buttons are gone, so a stale choice must not keep
+  // hiding the list behind them.
+  const current = drafts ? view : "all";
 
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    if (!needle) return rows;
-    return rows.filter((row) =>
-      `${row.id} ${row.label} ${row.meta ?? ""}`.toLowerCase().includes(needle),
+    return rows.filter(
+      (row) =>
+        (current === "all" || (current === "draft") === Boolean(row.draft)) &&
+        (!needle || `${row.id} ${row.label} ${row.meta ?? ""}`.toLowerCase().includes(needle)),
     );
-  }, [rows, query]);
+  }, [rows, query, current]);
+  const narrowed = Boolean(query) || current !== "all";
 
   return (
     <>
@@ -93,9 +115,30 @@ export function RecordList({
           </div>
         )}
 
+        {drafts > 0 && (
+          <div role="group" aria-label="按公开状态筛选" className="flex gap-1.5">
+            {VIEWS.map(({ view: value, label }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setView(value)}
+                aria-pressed={current === value}
+                className={`inline-flex min-h-10 items-center gap-1.5 rounded-chip border px-3 text-caption transition-colors ${
+                  current === value
+                    ? "border-fg bg-fg text-bg"
+                    : "border-line bg-surface-raised text-fg-secondary hover:border-fg-tertiary/40 hover:text-fg"
+                }`}
+              >
+                {label}
+                {value === "draft" && <span className="font-mono tabular-nums">{drafts}</span>}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* The plain total is already beside the page title — this line only
             has something to add once the list is being filtered. */}
-        {query && (
+        {narrowed && (
           <span className={`${metaClass} tabular-nums`}>
             {shown.length} / {rows.length} {unit}
           </span>
@@ -147,7 +190,11 @@ export function RecordList({
                 >
                   {isOpen ? "−" : "+"}
                 </span>
-                <span className="flex-1 truncate text-body group-hover:text-accent">
+                <span
+                  className={`flex-1 truncate text-body group-hover:text-accent ${
+                    row.draft ? "text-fg-secondary" : ""
+                  }`}
+                >
                   {row.label || <span className="text-fg-tertiary">（空）</span>}
                 </span>
                 {row.meta && (
@@ -172,7 +219,11 @@ export function RecordList({
 
       {shown.length === 0 && (
         <p className={`mt-6 ${hintClass}`}>
-          {rows.length === 0 ? "还没有内容。" : `没有匹配「${query}」的。`}
+          {rows.length === 0
+            ? "还没有内容。"
+            : query
+              ? `没有匹配「${query}」的。`
+              : "这一栏是空的。"}
         </p>
       )}
     </>
