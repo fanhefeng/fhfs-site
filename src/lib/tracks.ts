@@ -1,5 +1,3 @@
-import { asset } from "@/lib/asset";
-
 /**
  * The records the site owns, by the room that plays them.
  *
@@ -19,8 +17,12 @@ import { asset } from "@/lib/asset";
  * only to serve a record nothing played. Bringing it back means bringing back
  * the player's second path with it.
  *
- * `public/music` is immutable (`next.config.ts`), so a re-encode gets a new
- * file name rather than overwriting one of these.
+ * The files are addressed through `asset()`, which hashes them — and that
+ * resolves against the whole manifest, so it happens on the server:
+ * `trackFiles()` is called by the locale layout, which hands the four
+ * addresses to the player. This module, which the rooms import on the client
+ * for `TrackId`, stays free of the manifest; importing `asset` here put all
+ * 288 entries of it into every page's scripts.
  *
  * What a room prints is the recording that actually plays, not the room's own
  * name: 《不能说的秘密》's record is 路小雨, and the page says so. Titles and
@@ -29,22 +31,8 @@ import { asset } from "@/lib/asset";
  */
 export type TrackId = "theme" | "lovely" | "secret" | "odyssey";
 
-/** Ours to serve: a file under `public/music`, played by a plain `<audio>`. */
-export type Track = { src: string };
-
-const TRACKS: Record<TrackId, Track> = {
-  /** Mia & Sebastian's Theme — Justin Hurwitz, La La Land (2016). */
-  theme: { src: asset("/music/mia-and-sebastians-theme.mp3") },
-  /** Lovely Day — Jurrivh. 峰言峰语's record. */
-  lovely: { src: asset("/music/lovely-day.mp3") },
-  /** 路小雨 — 周杰倫, from the 不能說的秘密 soundtrack (2007). */
-  secret: { src: asset("/music/lu-xiaoyu.mp3") },
-  /** 一生所愛 — 盧冠廷, the 1995 original. */
-  odyssey: { src: asset("/music/a-lifetime-of-love.mp3") },
-};
-
-/** The file this record plays. */
-export const trackFile = (track: TrackId): string => TRACKS[track].src;
+/** The address each record plays from — built by `trackFiles()`. */
+export type TrackFiles = Record<TrackId, string>;
 
 /** The record that plays when no room has asked for another. */
 export const DEFAULT_TRACK: TrackId = "theme";

@@ -10,6 +10,7 @@ import { getAllNavItems, getNavItems, type NavItem } from "@/lib/content";
 import { CLIENT_NAMESPACES, pick } from "@/lib/messages";
 import type { NavLink } from "@/lib/nav";
 import { feedTypes } from "@/lib/seo";
+import { trackFiles } from "@/lib/trackFiles";
 import { THEME_COLOR } from "@/lib/theme";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -132,7 +133,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <ProgressHud />
           {/* The background music's player, behind every page: the signs
               (front door, /lab/neon, the note on the island) only switch it. */}
-          <Jukebox />
+          <Jukebox files={trackFiles()} />
           <AuroraLayer />
           <GrainLayer />
           {/* First tab stop on every page: a keyboard reader gets past the

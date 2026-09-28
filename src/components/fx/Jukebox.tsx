@@ -11,7 +11,7 @@ import {
   reportPlayback,
   useJukebox,
 } from "@/lib/jukebox";
-import { trackFile } from "@/lib/tracks";
+import type { TrackFiles } from "@/lib/tracks";
 
 /** Players whose file would not load: `paused` still reads false on them. */
 const failed = new WeakSet<HTMLMediaElement>();
@@ -56,11 +56,14 @@ const nextSource = (source: HTMLSourceElement) => {
  * This used to be two players — a Spotify embed with a NetEase stand-in
  * behind it — and both are gone now that every record is a file of ours
  * (`lib/tracks` has the note).
+ *
+ * `files` arrives from the layout already hashed (`lib/trackFiles`): resolving
+ * them here would put the whole asset manifest in every page's scripts.
  */
-export function Jukebox() {
+export function Jukebox({ files }: { files: TrackFiles }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const { wanted, held, track } = useJukebox();
-  const file = trackFile(track);
+  const file = files[track];
   const pathname = usePathname();
 
   // Browsers only let a page make sound once the reader has touched it.
