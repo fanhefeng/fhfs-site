@@ -70,6 +70,12 @@ const optionLabel = (option: string | SelectOption) =>
  * That is the whole of the layout logic — a table with six fields doesn't need
  * headings, and one with fifteen is unreadable without them.
  *
+ * `foldEmpty` folds a group whose every field is empty behind its heading —
+ * for the tables that carry more ways to say a thing than the content uses
+ * (the resume keeps two), where a screen of blank boxes reads as lost data.
+ * A folded field still submits: a closed <details> hides its inputs, it does
+ * not take them out of the form.
+ *
  * `isNew` turns the form into a "create" form: read-only fields (the key)
  * open up, and the action is told so it can refuse to overwrite an existing
  * row. `deleteAction` adds the delete control underneath, keyed by
@@ -81,12 +87,14 @@ export function RecordForm({
   record,
   isNew = false,
   deleteAction,
+  foldEmpty = false,
 }: {
   action: (prev: ActionState, form: FormData) => Promise<ActionState>;
   fields: Field[];
   record: RecordData;
   isNew?: boolean;
   deleteAction?: (form: FormData) => Promise<void>;
+  foldEmpty?: boolean;
 }) {
   const { state, pending, formProps } = useSaveAction(action);
   const formId = useId();
@@ -105,6 +113,17 @@ export function RecordForm({
   };
 
   const key = value("key");
+
+  const hasValue = (field: Field): boolean => {
+    if (field.kind === "lines") {
+      const pair = record[field.name] as { [locale: string]: string[] } | undefined;
+      return Boolean(pair?.zh?.some(Boolean) || pair?.en?.some(Boolean));
+    }
+    if (field.kind === "localized" || field.kind === "localizedArea") {
+      return Boolean(value(`${field.name}.zh`) || value(`${field.name}.en`));
+    }
+    return Boolean(value(field.name));
+  };
 
   // Grouped, in first-seen order, with the ungrouped block first.
   const groups: { name: string | null; fields: Field[] }[] = [];
@@ -259,14 +278,24 @@ export function RecordForm({
       <form {...formProps} className="space-y-6" {...check.formProps}>
         {isNew && <input type="hidden" name="isNew" value="1" />}
 
-        {groups.map((group) => (
-          <div key={group.name ?? "_"} className="space-y-5">
-            {group.name && (
-              <h3 className={`${metaClass} border-b border-line pb-2`}>{group.name}</h3>
-            )}
-            {group.fields.map(renderField)}
-          </div>
-        ))}
+        {groups.map((group) =>
+          foldEmpty && !isNew && group.name && !group.fields.some(hasValue) ? (
+            <details key={group.name}>
+              <summary className={`${metaClass} cursor-pointer border-b border-line pb-2`}>
+                {group.name}
+                <span className="ml-2 text-fg-tertiary normal-case">都空着 · 点开填写</span>
+              </summary>
+              <div className="mt-5 space-y-5">{group.fields.map(renderField)}</div>
+            </details>
+          ) : (
+            <div key={group.name ?? "_"} className="space-y-5">
+              {group.name && (
+                <h3 className={`${metaClass} border-b border-line pb-2`}>{group.name}</h3>
+              )}
+              {group.fields.map(renderField)}
+            </div>
+          ),
+        )}
 
         <SaveControls state={state} pending={pending} />
       </form>

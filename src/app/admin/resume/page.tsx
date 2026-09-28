@@ -11,6 +11,7 @@ import { Note } from "../ui/Note";
 import { cardClass, metaClass } from "../styles";
 
 const INLINE_HINT = "一行一条。**粗体** 和 `代码` 会按样式渲染，其余原样。";
+const OLD_WAY = "另一种写法：概述、要点与技能表（可空）";
 
 const PROFILE_FIELDS: Field[] = [
   { name: "name", label: "名字", kind: "localized" },
@@ -23,11 +24,16 @@ const PROFILE_FIELDS: Field[] = [
     group: "正文各节",
     hint: "页面的主体，显示在个人信息之后、其余各节之前。以「# 标题」起一节（我是谁 / 我做过什么 / 我怎么工作……），下面一行一段，节之间空一行。段落里 **粗体** 和 `代码` 会按样式渲染。",
   },
+  { name: "projects", label: "开源与项目", kind: "lines", hint: INLINE_HINT, group: "正文各节" },
+  { name: "education", label: "教育背景", kind: "lines", hint: "一行一条。", group: "正文各节" },
+  // The other way to write the page — a summary, its bullets and a skills
+  // table — which the sectioned prose above replaced. Kept, since the page
+  // still renders whatever is here; folded while empty.
   {
     name: "intro",
-    label: "概述（可空）",
+    label: "概述",
     kind: "lines",
-    group: "正文各节",
+    group: OLD_WAY,
     hint: "一行一段，空行忽略。有分节正文时通常留空。",
   },
   {
@@ -35,17 +41,15 @@ const PROFILE_FIELDS: Field[] = [
     label: "概述下的要点",
     kind: "lines",
     hint: INLINE_HINT,
-    group: "正文各节",
+    group: OLD_WAY,
   },
   {
     name: "skills",
     label: "技能表",
     kind: "lines",
-    group: "正文各节",
+    group: OLD_WAY,
     hint: "一行一组，写成「方向 | 内容」：竖线前是左栏的小标题，没有竖线就只显示内容。",
   },
-  { name: "projects", label: "开源与项目", kind: "lines", hint: INLINE_HINT, group: "正文各节" },
-  { name: "education", label: "教育背景", kind: "lines", hint: "一行一条。", group: "正文各节" },
   {
     name: "email",
     label: "邮箱（可空）",
@@ -73,15 +77,14 @@ const PROFILE_FIELDS: Field[] = [
 export default async function ResumeAdminPage() {
   await requireAdminPage();
 
-  const [profile] = await db
-    .select()
-    .from(resumeProfiles)
-    .where(eq(resumeProfiles.key, "main"))
-    .limit(1);
-  const rows = await db
-    .select()
-    .from(resumeExperiences)
-    .orderBy(asc(resumeExperiences.sort), asc(resumeExperiences.key));
+  // Two reads, one wait: over HTTP each is its own round trip.
+  const [[profile], rows] = await Promise.all([
+    db.select().from(resumeProfiles).where(eq(resumeProfiles.key, "main")).limit(1),
+    db
+      .select()
+      .from(resumeExperiences)
+      .orderBy(asc(resumeExperiences.sort), asc(resumeExperiences.key)),
+  ]);
 
   const blank: ExperienceDraft = {
     key: "",
@@ -137,7 +140,12 @@ export default async function ResumeAdminPage() {
       <section className={`${cardClass} p-5 sm:p-6`}>
         <h2 className={metaClass}>个人信息</h2>
         <div className="mt-4">
-          <RecordForm action={saveResumeProfile} fields={PROFILE_FIELDS} record={record} />
+          <RecordForm
+            action={saveResumeProfile}
+            fields={PROFILE_FIELDS}
+            record={record}
+            foldEmpty
+          />
         </div>
       </section>
 
