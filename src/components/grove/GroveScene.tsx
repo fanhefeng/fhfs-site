@@ -618,17 +618,16 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
 
     let sprayHead = 0;
     let sprayDirty = false;
-    const spawnGrain = (p: THREE.Vector3, boost = 1) => {
+    const spawnGrain = (p: THREE.Vector3) => {
       const i = sprayHead;
       sprayHead = (sprayHead + 1) % SPRAY_N;
       const o = i * 3;
-      const k = boost;
-      sprayPos[o] = p.x + (Math.random() - 0.5) * 0.16 * k;
-      sprayPos[o + 1] = p.y + (Math.random() - 0.5) * 0.16 * k;
+      sprayPos[o] = p.x + (Math.random() - 0.5) * 0.16;
+      sprayPos[o + 1] = p.y + (Math.random() - 0.5) * 0.16;
       sprayPos[o + 2] = p.z + (Math.random() - 0.5) * 0.48;
-      sprayVel[o] = (Math.random() - 0.5) * 0.4 * k;
-      sprayVel[o + 1] = (0.012 + Math.random() * 0.33 + 0.12 * (k - 1)) * k;
-      sprayVel[o + 2] = (Math.random() - 0.5) * 0.28 * k;
+      sprayVel[o] = (Math.random() - 0.5) * 0.4;
+      sprayVel[o + 1] = 0.012 + Math.random() * 0.33;
+      sprayVel[o + 2] = (Math.random() - 0.5) * 0.28;
       sprayBirth[i] = clock;
       sprayRnd[i * 2] = 0.5 + Math.random() * 0.65;
       sprayRnd[i * 2 + 1] = Math.random();
@@ -1096,28 +1095,6 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       flushGrains();
     };
 
-    /** A pressed control throws a handful of pollen off itself. */
-    const burstNdc = new THREE.Vector2();
-    const burstAt = new THREE.Vector3();
-    const burst = (clientX: number, clientY: number) => {
-      if (calm.matches) return;
-      const r = hero.getBoundingClientRect();
-      burstNdc.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
-      raycaster.setFromCamera(burstNdc, camera);
-      if (!raycaster.ray.intersectPlane(crownPlane, burstAt)) return;
-      nearBuilt.group.worldToLocal(burstAt);
-      for (let i = 0; i < 52; i++) spawnGrain(burstAt, 2.5);
-      flushGrains();
-      needsRender = true;
-    };
-    // The dock's pills ask for this by event, so nothing has to be threaded
-    // through half the component tree to reach the emitter.
-    const onBurst = (e: Event) => {
-      const d = (e as CustomEvent<{ x: number; y: number }>).detail;
-      if (d) burst(d.x, d.y);
-    };
-    hero.addEventListener("grove:burst", onBurst as EventListener);
-
     /* The last time the reader did anything — see FPS_IDLE. */
     let lastInput = performance.now();
     const markInput = () => {
@@ -1353,7 +1330,6 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       gsap.ticker.remove(frame);
       setLive(false);
       io.disconnect();
-      hero.removeEventListener("grove:burst", onBurst as EventListener);
       for (const type of [
         "wheel",
         "scroll",
