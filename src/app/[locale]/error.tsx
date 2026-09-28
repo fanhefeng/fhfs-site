@@ -16,16 +16,17 @@ import { site } from "@/config/site";
  * English error page.
  *
  * Kept plain on purpose — no GSAP, no canvas, nothing that could itself be
- * the thing that failed. `reset` re-renders the segment, which is the right
- * remedy for a cold database. Plain <a> for the way home, so the route
- * transition and the i18n Link are both out of the loop.
+ * the thing that failed. `retry` fetches the segment again and re-renders it,
+ * which is the remedy for a cold database — `reset` would only re-render the
+ * payload that already failed, and fail the same way. Plain <a> for the way
+ * home, so the route transition and the i18n Link are both out of the loop.
  */
 export default function LocaleError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   const t = useTranslations("error");
   const locale = useLocale();
@@ -64,7 +65,7 @@ export default function LocaleError({
           <p className="mt-6 font-mono text-meta text-fg-tertiary">{error.digest}</p>
         )}
         <div className="mt-10 flex flex-wrap gap-4">
-          <button type="button" onClick={reset} className={`${action} cursor-pointer`}>
+          <button type="button" onClick={() => retry()} className={`${action} cursor-pointer`}>
             {t("retry")}
           </button>
           <a href={`/${locale}`} className={action}>

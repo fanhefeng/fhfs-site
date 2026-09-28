@@ -16,10 +16,10 @@ import { buttonClass, ghostButtonClass } from "./styles";
  */
 export default function AdminError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   useEffect(() => {
     console.error(error);
@@ -39,7 +39,7 @@ export default function AdminError({
       </div>
       {error.digest && <p className="mt-4 font-mono text-meta text-fg-tertiary">{error.digest}</p>}
       <div className="mt-8 flex flex-wrap items-center gap-4">
-        <button type="button" onClick={reset} className={buttonClass}>
+        <button type="button" onClick={() => retry()} className={buttonClass}>
           再试一次
         </button>
         <Link href="/admin/login" className={ghostButtonClass}>

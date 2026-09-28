@@ -25,10 +25,10 @@ import "./globals.css";
  */
 export default function GlobalError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   useEffect(() => {
     console.error(error);
@@ -56,7 +56,11 @@ export default function GlobalError({
               <h1 className="mt-4 text-display-sm text-fg">{block.title}</h1>
               <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{block.description}</p>
               <div className="mt-8 flex flex-wrap gap-4">
-                <button type="button" onClick={reset} className={`${action} cursor-pointer`}>
+                <button
+                  type="button"
+                  onClick={() => retry()}
+                  className={`${action} cursor-pointer`}
+                >
                   {block.retry}
                 </button>
                 <a href={`/${block.locale}`} className={action}>
