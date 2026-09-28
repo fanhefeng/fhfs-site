@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
 import { SECRET_STILLS } from "@/components/films/secretStills";
 import { LALA_STILLS } from "@/components/films/lalaStills";

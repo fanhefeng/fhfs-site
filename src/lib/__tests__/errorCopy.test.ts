@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { ERROR_COPY } from "@/lib/errorCopy";
 import zh from "../../../messages/zh.json";
 import en from "../../../messages/en.json";

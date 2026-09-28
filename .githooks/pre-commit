@@ -17,17 +17,20 @@ fi
 
 # Format and lint what is being committed, not the tree. A check, not a
 # rewrite: a hook that edits files under a commit in progress is a surprise.
-formatted=$(printf '%s\n' "$staged" | while read -r f; do [ -f "$f" ] && printf '%s\n' "$f"; done)
+# The filter loops end on an `if`, not `[ -f ] && …`: with a deleted file last
+# in the list that form leaves the loop's status at 1, and `set -e` then ends
+# the hook, and the commit, without a word.
+formatted=$(printf '%s\n' "$staged" | while read -r f; do if [ -f "$f" ]; then printf '%s\n' "$f"; fi; done)
 if [ -n "$formatted" ]; then
   # shellcheck disable=SC2086
-  pnpm -s exec prettier --check --ignore-unknown $formatted || {
+  pnpm -s exec vp fmt --check --no-error-on-unmatched-pattern $formatted || {
     echo "pre-commit: run \`pnpm format\` and stage the result." >&2
     exit 1
   }
 fi
 
-files=$(printf '%s\n' "$staged" | grep -E '\.(m?ts|tsx)$' | while read -r f; do [ -f "$f" ] && printf '%s\n' "$f"; done)
+files=$(printf '%s\n' "$staged" | grep -E '\.(m?ts|tsx)$' | while read -r f; do if [ -f "$f" ]; then printf '%s\n' "$f"; fi; done)
 if [ -n "$files" ]; then
   # shellcheck disable=SC2086
-  pnpm -s exec oxlint -c .oxlintrc.json $files
+  pnpm -s exec vp lint $files
 fi

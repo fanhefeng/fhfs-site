@@ -168,7 +168,8 @@ type Cell = {
 };
 
 function buildCells(text: string): { cells: Cell[]; blocks: number } {
-  const chars = [...text];
+  // One cell per code point, which is what a dot-matrix letter is here.
+  const chars = Array.from(text);
   const cells: Cell[] = [];
   const mid = (FIELD - 1) / 2;
 
@@ -258,7 +259,7 @@ export function DotDoodle({ text, className }: Props) {
 
   // Drives the CSS box, so it has to agree with the layout the loop computes.
   const aspect = useMemo(() => {
-    const n = Math.max([...text].length, 1);
+    const n = Math.max(Array.from(text).length, 1);
     return (n * FIELD + (n - 1) * LETTER_GAP) / FIELD;
   }, [text]);
 

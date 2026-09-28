@@ -12,7 +12,13 @@ import { lines } from "@/lib/resume";
  * that needs Next.
  */
 
-export const str = (form: FormData, key: string): string => String(form.get(key) ?? "").trim();
+/** A text field's value; a file (which no admin form sends) or a missing field reads as "". */
+const text = (form: FormData, key: string): string => {
+  const value = form.get(key);
+  return typeof value === "string" ? value : "";
+};
+
+export const str = (form: FormData, key: string): string => text(form, key).trim();
 
 /**
  * Verbatim, including leading and trailing spaces.
@@ -23,7 +29,7 @@ export const str = (form: FormData, key: string): string => String(form.get(key)
  * gap, and nothing downstream notices: the markup still renders, HTML collapses
  * the whitespace, and the line just reads slightly wrong forever.
  */
-export const raw = (form: FormData, key: string): string => String(form.get(key) ?? "");
+export const raw = (form: FormData, key: string): string => text(form, key);
 
 /** Narrows to the locale union — excluding literals off `string` does not. */
 export const parseLocale = (value: string): "zh" | "en" | null =>

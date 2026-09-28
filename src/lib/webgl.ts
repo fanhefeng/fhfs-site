@@ -81,7 +81,8 @@ export function compileProgram(
 export type ContextWatch = {
   /** True from the moment the context is lost until the effect rebuilds. */
   readonly lost: boolean;
-  dispose(): void;
+  /** An arrow, not a method: effects return it as their cleanup directly. */
+  readonly dispose: () => void;
 };
 
 /**
@@ -115,7 +116,7 @@ export function watchContextLoss(canvas: HTMLCanvasElement, onRestored: () => vo
     get lost() {
       return lost;
     },
-    dispose() {
+    dispose: () => {
       canvas.removeEventListener("webglcontextlost", onLost);
       canvas.removeEventListener("webglcontextrestored", onRestore);
     },

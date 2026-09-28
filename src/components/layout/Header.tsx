@@ -483,7 +483,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   // to on a locale switch; a rebuild at progress(1) is invisible.
   useEffect(() => {
     let live = true;
-    document.fonts.ready.then(() => {
+    void document.fonts.ready.then(() => {
       if (live) refit();
     });
     return () => {

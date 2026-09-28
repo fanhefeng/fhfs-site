@@ -16,5 +16,37 @@ allowBuilds:
 # comes in through next; this floor can go once next's own range is past it.
 overrides:
   sharp: ">=0.35.4"
+  # Vite+ ships its own Vite and pins the Vitest it was built against; every
+  # copy in the tree resolves to those two (catalog below).
+  vite@*: "catalog:"
+  vitest@*: "catalog:"
 patchedDependencies:
   "@react-three/fiber@9.7.0": patches/@react-three__fiber@9.7.0.patch
+# The toolchain moves as one: vite-plus, and the Vite and Vitest it pins.
+# Bump them together, to what the new vite-plus lists as its dependencies.
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
+  vitest: 5.0.1
+  vite-plus: 1.0.0
+  "@vitest/coverage-v8": 5.0.1
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"
+# vite-plus 1.0.0 came out the day the toolchain moved to it (2026-09-28),
+# inside pnpm's release-age window. These entries let exactly that version
+# through; once it is old enough they do nothing, and the next bump drops them.
+minimumReleaseAgeExclude:
+  - "@voidzero-dev/vite-plus-core@1.0.0"
+  - "@voidzero-dev/vite-plus-darwin-arm64@1.0.0"
+  - "@voidzero-dev/vite-plus-darwin-x64@1.0.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.0.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.0.0"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.0.0"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@1.0.0"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.0.0"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.0.0"
+  - vite-plus@1.0.0

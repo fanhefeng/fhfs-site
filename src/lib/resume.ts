@@ -93,7 +93,8 @@ export const formatSkillLines = (groups: SkillGroup[]): string =>
 const MARKER = /^[-–—•*]\s+/;
 
 export type ParsedProjects =
-  { projects: ResumeProject[]; error: null } | { projects: null; error: string };
+  | { projects: ResumeProject[]; error: null }
+  | { projects: null; error: string };
 
 /**
  * A heading line starts with `#`; what follows is the title and, after a

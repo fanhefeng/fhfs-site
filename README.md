@@ -92,7 +92,7 @@ fhf 的个人网站：收录文章、自研软件与动效实验。
 pnpm dev             # 开发
 pnpm build           # 生产构建（构建期读库预渲染，需要 DATABASE_URL）
 pnpm start           # 预览生产构建
-pnpm check           # tsc --noEmit + oxlint + vitest
+pnpm check           # tsc --noEmit + vp lint + vp fmt --check + vp test
 pnpm test            # 只跑 src/lib 的纯函数测试
 pnpm admin:password  # 生成 ADMIN_PASSWORD_HASH 与 AUTH_SECRET
 pnpm db:generate     # schema 改动后生成迁移

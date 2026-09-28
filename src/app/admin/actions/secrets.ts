@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { intField, parseLocale, str, validDate, validKey, validLink } from "@/lib/forms";
+import { intField, parseLocale, raw, str, validDate, validKey, validLink } from "@/lib/forms";
 import { renderMarkdown } from "@/lib/markdown";
 import { readingMinutes } from "@/lib/reading";
 import { TAGS } from "@/lib/content";
@@ -23,7 +23,7 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
 
   const slug = str(form, "slug");
   const locale = parseLocale(str(form, "locale"));
-  const bodyMd = String(form.get("bodyMd") ?? "");
+  const bodyMd = raw(form, "bodyMd");
 
   if (!validKey(slug)) {
     return { error: "slug 只能用小写字母、数字和连字符。" };

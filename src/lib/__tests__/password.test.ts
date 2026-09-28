@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 
 describe("hashPassword", () => {

@@ -98,6 +98,9 @@ export function RecordForm({
     for (const part of parts) {
       node = (node as RecordData | undefined)?.[part];
     }
+    // The leaves are strings, numbers, dates and string arrays (tags), and
+    // String() is the form each one is edited in; nothing nests deeper.
+    // oxlint-disable-next-line typescript/no-base-to-string
     return node == null ? "" : String(node);
   };
 

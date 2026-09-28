@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
 #
 # CodeRabbit config for fhfs-site. Three jobs:
-#   1. Silence what CI already runs (`pnpm check` = tsc + oxlint + vitest).
+#   1. Silence what CI already runs (`pnpm check` = tsc + vp lint + vp fmt + vp test).
 #   2. Turn off the default docstring pre-merge gate — an 80% docstring
 #      threshold is a library's standard, not a Next.js site's.
 #   3. Record the settled design decisions as path instructions, so reviews
@@ -89,7 +89,7 @@ reviews:
           second render path or feeds it non-pipeline HTML.
 
   tools:
-    # `pnpm check` (tsc + oxlint + vitest) runs locally and in CI — a second
+    # `pnpm check` (tsc + vp lint/fmt/test) runs locally and in CI — a second
     # report of the same findings is noise.
     eslint:
       enabled: false

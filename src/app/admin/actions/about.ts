@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession } from "@/lib/auth/session";
-import { parseLocale, str } from "@/lib/forms";
+import { parseLocale, raw, str } from "@/lib/forms";
 import { renderMarkdown } from "@/lib/markdown";
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
@@ -13,7 +13,7 @@ export async function saveAbout(_prev: ActionState, form: FormData): Promise<Act
 
   const locale = parseLocale(str(form, "locale"));
   if (!locale) return { error: "语言只能是 zh 或 en。" };
-  const bodyMd = String(form.get("bodyMd") ?? "");
+  const bodyMd = raw(form, "bodyMd");
 
   const row = {
     locale,

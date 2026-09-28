@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { validKey } from "@/lib/forms";
 import { collections, momentKey, shouldFold, stampInZone } from "@/lib/moments";
 

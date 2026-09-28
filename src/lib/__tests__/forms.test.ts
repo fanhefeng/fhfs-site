@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { MEDIA_ORIGIN } from "@/lib/csp";
 import {
   KEY_PATTERN,
@@ -34,6 +34,13 @@ describe("str / raw", () => {
 
   it("raw keeps the spaces copy depends on", () => {
     expect(raw(form({ prefix: "青岛 · " }), "prefix")).toBe("青岛 · ");
+  });
+
+  it("reads a file entry as empty, not as [object File]", () => {
+    const data = new FormData();
+    data.set("bodyMd", new File(["x"], "x.md"));
+    expect(raw(data, "bodyMd")).toBe("");
+    expect(str(data, "bodyMd")).toBe("");
   });
 });
 

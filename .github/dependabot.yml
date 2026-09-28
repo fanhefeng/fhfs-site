@@ -14,6 +14,10 @@ updates:
       timezone: Asia/Shanghai
     open-pull-requests-limit: 5
     groups:
+      # vite-plus pins the Vitest it was built against (the catalog in
+      # pnpm-workspace.yaml); they only work moved together, majors included.
+      vite-plus:
+        patterns: ["vite-plus", "vitest", "@vitest/*", "@voidzero-dev/*"]
       minor-and-patch:
         update-types: [minor, patch]
     ignore:

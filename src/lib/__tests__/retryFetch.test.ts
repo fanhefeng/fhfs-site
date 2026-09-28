@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { isConnectionFailure, withConnectionRetry } from "@/lib/retryFetch";
 
 /** What Node's fetch throws when the socket never connected. */

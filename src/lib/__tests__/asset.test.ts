@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { asset } from "@/lib/asset";
 import { buildManifest, hashCssUrls, serializeManifest } from "@/lib/assetManifest";
 import { IMMUTABLE_DIRS, type AssetManifest } from "@/lib/immutable";

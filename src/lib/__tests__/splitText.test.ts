@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { splitText, type SplitLine } from "@/lib/splitText";
 
 /** The words of a line as plain strings — what a test wants to compare. */

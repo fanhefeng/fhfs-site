@@ -11,9 +11,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Commands
 
 ```bash
-pnpm check        # tsc + oxlint + prettier --check + vitest with its coverage floor — the gate
-pnpm test         # vitest over src/lib (src/lib/__tests__); test:coverage adds the floor
-pnpm format       # prettier --write (pinned version, printWidth 100)
+pnpm check        # tsc + vp lint + vp fmt --check + vp test with its coverage floor — the gate
+pnpm test         # vp test (Vitest) over src/lib (src/lib/__tests__); test:coverage adds the floor
+pnpm format       # vp fmt (Oxfmt, printWidth 100)
 pnpm dev          # dev server
 pnpm build        # prerenders from the DB — fails loudly on a missing/malformed env var (src/lib/env.ts)
 pnpm smoke [url]  # every page in the sitemap, in this machine's Chrome: 4xx, exceptions, console/CSP errors
@@ -40,8 +40,13 @@ catalogue has a card in `COPY_GROUPS`), `lab.test.ts` (every lab study's
 add a rule of that kind to this file, add its check there. There is no component suite; `pnpm smoke` is the
 end-to-end pass. The scripts share `scripts/connect.mts` (env, unpooled URL,
 the same connection-level retry as the site, with more patient delays); a new
-script calls `connect()` rather than building its own handle. `pnpm lint` runs
-the project-local oxlint (`.oxlintrc.json`); `gsap` may only be imported via
+script calls `connect()` rather than building its own handle. The toolchain is
+Vite+ (`vite-plus`, the project-local `vp`): lint rules, format settings and
+ignores, and the test config are all in `vite.config.ts` — there is no
+`.oxlintrc.json`, `.prettierrc` or `vitest.config` — and tests import from
+`vite-plus/test`, not `vitest` (a lint rule). `vp` does not build anything
+here; `next build` does. Lint is type-aware (floating promises, unbound
+methods, …); the type check itself stays `tsc`. `gsap` may only be imported via
 `@/lib/gsap` (a lint rule). TypeScript runs with `noUncheckedIndexedAccess`:
 use `!` where a loop bound or a fixed table proves the index, narrow
 otherwise. CI (`.github/workflows/check.yml`) runs `pnpm check` and

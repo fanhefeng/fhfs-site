@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { ENV_RULES, envProblems } from "@/lib/env";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -93,7 +93,7 @@ describe("the variables the code reads", () => {
   it("are the ones .env.example documents, no more and no fewer", () => {
     const documented = [
       ...readFileSync(path.join(root, ".env.example"), "utf8").matchAll(/^([A-Z][A-Z0-9_]*)=/gm),
-    ].map((m) => m[1]);
+    ].map((m) => m[1]!);
     expect(documented.sort()).toEqual(Object.keys(ENV_RULES).sort());
   });
 });
