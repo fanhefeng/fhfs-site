@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { site } from "@/config/site";
 import { groupByYear } from "@/lib/byYear";
+import { YearSection } from "@/components/ui/YearIndex";
 import {
   collections,
   FOLD_LINES,
@@ -96,25 +97,20 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
       )}
 
       {groups.map(({ key, heading, items: yearItems }) => (
-        <section
+        <YearSection
           key={key}
-          aria-label={key === "pinned" ? t("pinnedAria") : t("yearAria", { year: heading })}
-          className="mb-14 last:mb-0"
+          label={key === "pinned" ? t("pinnedAria") : t("yearAria", { year: heading })}
+          heading={heading}
         >
-          <h2 className="mb-2 font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
-            {heading}
-          </h2>
-          <Reveal as="ol" stagger={0.05} className="border-t border-line">
-            {yearItems.map((item) => (
-              <MomentCard
-                key={item.key}
-                item={item}
-                expanded={open.has(item.key)}
-                onToggle={() => toggle(item.key)}
-              />
-            ))}
-          </Reveal>
-        </section>
+          {yearItems.map((item) => (
+            <MomentCard
+              key={item.key}
+              item={item}
+              expanded={open.has(item.key)}
+              onToggle={() => toggle(item.key)}
+            />
+          ))}
+        </YearSection>
       ))}
     </>
   );
