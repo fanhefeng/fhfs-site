@@ -6,7 +6,7 @@ import { routing, htmlLang } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { getAdjacentPosts, getAllSlugs, getPost, getPostEditions } from "@/lib/content";
-import { HAS_CJK } from "@/lib/reading";
+import { ArticleNeighbours, ArticleSummary, FallbackNotice } from "@/components/blog/ArticleParts";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
 import { TagPill } from "@/components/blog/TagPill";
@@ -165,67 +165,25 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
 
             <PostTitle title={post.title} className="text-title md:text-display-sm" />
 
-            {post.summary && (
-              <p
-                className={`mt-5 font-serif text-[1.1875rem] leading-relaxed text-fg-secondary ${
-                  // Serif italic is the editorial voice change — but CJK has
-                  // no true italic, and the synthesised slant reads as broken.
-                  HAS_CJK.test(post.summary) ? "" : "italic"
-                }`}
-              >
-                {post.summary}
-              </p>
-            )}
+            {post.summary && <ArticleSummary>{post.summary}</ArticleSummary>}
           </header>
 
           {post.isFallback && (
-            <p
-              lang={htmlLang(locale)}
-              className="glass-thin vibrancy mb-10 rounded-card px-4 py-3 text-caption"
-            >
-              {t("fallbackNotice")}
-            </p>
+            <FallbackNotice locale={locale}>{t("fallbackNotice")}</FallbackNotice>
           )}
 
           <Mdx html={post.html} />
         </article>
 
-        {(older || newer) && (
-          <nav
-            aria-label={t("postNavAria")}
-            className="mt-20 grid gap-8 border-t border-line pt-8 sm:grid-cols-2"
-          >
-            {older && (
-              <Link href={`/blog/${older.slug}`} className="group flex flex-col gap-1.5">
-                <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                  ← {t("prevPost")}
-                </span>
-                <span
-                  lang={older.locale !== locale ? htmlLang(older.locale) : undefined}
-                  className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
-                >
-                  {older.title}
-                </span>
-              </Link>
-            )}
-            {newer && (
-              <Link
-                href={`/blog/${newer.slug}`}
-                className="group flex flex-col gap-1.5 sm:col-start-2 sm:items-end sm:text-right"
-              >
-                <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                  {t("nextPost")} →
-                </span>
-                <span
-                  lang={newer.locale !== locale ? htmlLang(newer.locale) : undefined}
-                  className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
-                >
-                  {newer.title}
-                </span>
-              </Link>
-            )}
-          </nav>
-        )}
+        <ArticleNeighbours
+          base="/blog"
+          locale={locale}
+          older={older}
+          newer={newer}
+          label={t("postNavAria")}
+          prev={t("prevPost")}
+          next={t("nextPost")}
+        />
 
         <p className="mt-14">
           <Link

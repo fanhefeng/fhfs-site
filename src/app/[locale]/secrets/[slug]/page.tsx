@@ -6,7 +6,7 @@ import { routing, htmlLang } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { getAdjacentSecrets, getAllSecretSlugs, getSecret, getSecretEditions } from "@/lib/content";
-import { HAS_CJK } from "@/lib/reading";
+import { ArticleNeighbours, ArticleSummary, FallbackNotice } from "@/components/blog/ArticleParts";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
 import { RoomMusic } from "@/components/fx/RoomMusic";
@@ -112,15 +112,7 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
 
           <PostTitle title={secret.title} className="text-title md:text-display-sm" />
 
-          {secret.summary && (
-            <p
-              className={`mt-5 font-serif text-[1.1875rem] leading-relaxed text-fg-secondary ${
-                HAS_CJK.test(secret.summary) ? "" : "italic"
-              }`}
-            >
-              {secret.summary}
-            </p>
-          )}
+          {secret.summary && <ArticleSummary>{secret.summary}</ArticleSummary>}
 
           {!isPodcast && (
             <RoomMusic
@@ -134,12 +126,7 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
         </header>
 
         {secret.isFallback && (
-          <p
-            lang={htmlLang(locale)}
-            className="glass-thin vibrancy mb-10 rounded-card px-4 py-3 text-caption"
-          >
-            {t("fallbackNotice")}
-          </p>
+          <FallbackNotice locale={locale}>{t("fallbackNotice")}</FallbackNotice>
         )}
 
         {isPodcast && secret.audio && (
@@ -164,42 +151,15 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
         {secret.html && <Mdx html={secret.html} />}
       </article>
 
-      {(older || newer) && (
-        <nav
-          aria-label={t("postNavAria")}
-          className="mt-20 grid gap-8 border-t border-line pt-8 sm:grid-cols-2"
-        >
-          {older && (
-            <Link href={`/secrets/${older.slug}`} className="group flex flex-col gap-1.5">
-              <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                ← {t("prevPost")}
-              </span>
-              <span
-                lang={older.locale !== locale ? htmlLang(older.locale) : undefined}
-                className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
-              >
-                {older.title}
-              </span>
-            </Link>
-          )}
-          {newer && (
-            <Link
-              href={`/secrets/${newer.slug}`}
-              className="group flex flex-col gap-1.5 sm:col-start-2 sm:items-end sm:text-right"
-            >
-              <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                {t("nextPost")} →
-              </span>
-              <span
-                lang={newer.locale !== locale ? htmlLang(newer.locale) : undefined}
-                className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
-              >
-                {newer.title}
-              </span>
-            </Link>
-          )}
-        </nav>
-      )}
+      <ArticleNeighbours
+        base="/secrets"
+        locale={locale}
+        older={older}
+        newer={newer}
+        label={t("postNavAria")}
+        prev={t("prevPost")}
+        next={t("nextPost")}
+      />
 
       <p className="mt-14">
         <Link
