@@ -106,6 +106,12 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
       }
       setPhase("up");
       const debug = splashDebug();
+      // The door is a modal, so focus starts inside it — on the dialog itself,
+      // which a screen reader announces by its name (the sign), rather than on
+      // a control: the switch is not the first thing to do here, and the way
+      // in is still dark. Tab moves on to the switch; the trap below keeps it
+      // on the wall. The dialog is not a control, so it draws no ring.
+      root.focus({ preventScroll: true });
 
       lockScroll();
       let locked = true;
@@ -299,7 +305,14 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
         suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: `<script>${SPLASH_INIT_SCRIPT}</script>` }}
       />
-      <div ref={rootRef} className="ns" role="dialog" aria-modal="true" aria-label={label}>
+      <div
+        ref={rootRef}
+        className="ns"
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        tabIndex={-1}
+      >
         <style href="home-neon-splash" precedence="medium">
           {WALL_CSS + CSS}
         </style>
@@ -365,6 +378,9 @@ html[data-js][data-splash="due"] { background-color: #0a0a0f; }
   z-index: 96;
   color: #f3f1ea;
 }
+/* Focused on open so a screen reader starts inside the door; the wall is not
+   something to press, so it wears no focus ring. */
+.ns:focus { outline: none; }
 .ns-stage {
   position: absolute;
   inset: 0;
