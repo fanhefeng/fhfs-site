@@ -75,18 +75,26 @@ export const EASE = {
 /**
  * The one motion signal the site still branches on, and a deliberately narrow
  * one: everybody gets the full-motion version (DESIGN.md §1.5). What this gates
- * is the short list that has no stop button otherwise — six places in all:
- * three endless CSS loops (`.aurora-blob`, `.grain-layer`, `.pulse-stepped`,
- * all in one media block in globals.css), the endless dot-matrix canvas
- * (DotDoodle), the inertial scroll hijack (SmoothScroll) and the opening
- * blackout (OvertureLight). Entrances, reveals, curtains and hover effects
- * are not on it.
+ * is motion with no stop button otherwise:
+ *
+ * - endless loops: three in CSS (`.aurora-blob`, `.grain-layer`,
+ *   `.pulse-stepped`, one media block in globals.css), the dot-matrix canvas
+ *   (DotDoodle), the 404's particle line (ParticleLine holds still);
+ * - scrolling the reader did not do: the inertial scroll (SmoothScroll), and
+ *   the smooth jumps the site makes for them (RadialFab's back to top,
+ *   LensSliderDemo's jump to a slide) — instant instead;
+ * - the opening blackout (OvertureLight).
+ *
+ * Entrances, reveals, curtains and hover effects are not on it. Three lab
+ * studies branch as well, because showing the reduced version is part of the
+ * study (OvertureDemo, ScrollVideoDemo, MeltingText).
  *
  * The grove is the same exception under the same test — the moss is an endless
- * full-screen loop — and the one place that does not call this: `GroveScene`
- * and `LiquidPill` hold the MediaQueryList itself, because they read it every
- * frame (the clock stands still while it matches) and a setting changed
- * mid-visit has to land without a remount.
+ * full-screen loop — and holds the MediaQueryList itself (`GroveScene`, the
+ * liquid-metal pipeline), because it reads it every frame (the clock stands
+ * still while it matches) and a setting changed mid-visit has to land without
+ * a remount. Its cards (GroveApproach) and its camera stop following the
+ * pointer together.
  *
  * Reads the live browser, so it belongs in an effect, never in a render path
  * that also runs on the server.

@@ -1222,6 +1222,7 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
        and never quite arrives; below this (in NDC — 1e-4 is 0.0026px of
        camera travel at the 26px scale) it is treated as arrived. */
     const SETTLED = 1e-4;
+    const CENTRE = { x: 0, y: 0 };
     /* Written per unit of time rather than per frame so that the moss and the
        cards agree at any refresh rate, and at either of the two rates below —
        `GroveApproach`'s pointer tick eases by the same 0.055 per sixtieth. */
@@ -1265,19 +1266,24 @@ export function GroveScene({ heroRef, stageRef, coveredRef, onReady }: Props) {
       const dt = Math.min(pending / 1000, 0.05);
       pending = 0;
 
+      // Under reduced motion the cards in front (GroveApproach) do not follow
+      // the pointer, so the camera behind them does not either: the two
+      // parallaxes are one coordinate system, and one moving alone pulled the
+      // cards off the moss they stand on. The camera eases home and stays.
+      const target = calm.matches ? CENTRE : pointer;
       const dirty =
         needsRender ||
         !calm.matches ||
         scanning ||
-        Math.abs(pointer.x - smooth.x) > SETTLED ||
-        Math.abs(pointer.y - smooth.y) > SETTLED;
+        Math.abs(target.x - smooth.x) > SETTLED ||
+        Math.abs(target.y - smooth.y) > SETTLED;
       if (!calm.matches) clock += dt;
       shared.uPhase.value = clock;
       sprayUniforms.uNow.value = clock;
 
       const k = ease(dt);
-      smooth.x += (pointer.x - smooth.x) * k;
-      smooth.y += (pointer.y - smooth.y) * k;
+      smooth.x += (target.x - smooth.x) * k;
+      smooth.y += (target.y - smooth.y) * k;
 
       camera.position.x = -smooth.x * 26;
       camera.position.y = smooth.y * 16;
