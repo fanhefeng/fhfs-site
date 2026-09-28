@@ -1,22 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
+import { useRef, useState } from "react";
+import { gsap, useGSAP, EASE } from "@/lib/gsap";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { announceOvertureDone, markOvertureSeen } from "@/lib/overture";
 import { SPLASH_INIT_SCRIPT, SPLASH_SEEN_KEY, splashDebug, splashDue } from "@/lib/splash";
-import { stopMusic, wantMusic } from "@/lib/jukebox";
-import {
-  NeonSignArt,
-  RING,
-  LETTER_SEGS,
-  STUTTER,
-  score,
-  writeLightScore,
-  writeOffScore,
-  type SegName,
-} from "@/components/neon/NeonSignArt";
-import { layoutWall, WALL_CSS } from "@/components/neon/wall";
+import { NeonSignArt, RING, score } from "@/components/neon/NeonSignArt";
+import { useBrickWall, wireNeonSign } from "@/components/neon/sign";
+import { WALL_CSS } from "@/components/neon/wall";
 
 type Props = {
   /** The dialog's accessible name: what the sign says. */
@@ -81,28 +72,7 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
   const enterRefFn = useRef<(() => void) | null>(null);
 
   /* ---- the wall ---- */
-  useEffect(() => {
-    if (phase !== "up") return;
-    const stage = stageRef.current;
-    const wall = wallRef.current;
-    const sign = switchRef.current;
-    if (!stage || !wall || !sign) return;
-    let frame = 0;
-    const layout = () => {
-      frame = 0;
-      layoutWall(stage, wall, sign);
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(layout);
-    };
-    const observer = new ResizeObserver(schedule);
-    observer.observe(stage);
-    schedule();
-    return () => {
-      observer.disconnect();
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [phase]);
+  useBrickWall(stageRef, wallRef, switchRef, phase === "up");
 
   /* ---- the choreography ---- */
   useGSAP(
@@ -145,88 +115,34 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
         unlockScroll({ refresh: true });
       };
 
-      const q = gsap.utils.selector(svg);
-      const seg = (name: SegName) => q(`.neon-seg[data-seg="${name}"]`);
+      let entering = false;
+      const neon = wireNeonSign({
+        svg,
+        spill,
+        sign,
+        stage,
+        welcome: [welcomeEl, foot],
+        welcomeStagger: 0.25,
+        poweredRef,
+        setPowered,
+        held: () => entering,
+        // The wall is the whole viewport.
+        pointer: (e) => ({
+          nx: e.clientX / window.innerWidth - 0.5,
+          ny: e.clientY / window.innerHeight - 0.5,
+        }),
+      });
+      const { seg, letters, main } = neon;
       const ring = seg("ring");
       const bar = seg("bar");
       const note = seg("note");
-      const letters = LETTER_SEGS.map(seg);
-      const lit = q(".neon-lit");
-
-      const main = gsap.timeline({ paused: true });
-      writeLightScore(main, seg, [spill]);
-      const off = gsap.timeline({ paused: true });
-      writeOffScore(off, lit, [spill], EASE.exit);
-
-      let welcomed = false;
-      let entering = false;
-      const powerOn = () => {
-        if (poweredRef.current || entering) return;
-        poweredRef.current = true;
-        setPowered(true);
-        off.pause(0);
-        gsap.set(lit, { opacity: 1 });
-        if (!welcomed) {
-          welcomed = true;
-          gsap.fromTo(
-            [welcomeEl, foot],
-            { autoAlpha: 0, filter: "blur(6px)" },
-            { autoAlpha: 1, filter: "blur(0px)", duration: 1.1, ease: EASE.default, stagger: 0.25 },
-          );
-        }
-        wantMusic();
-        main.restart();
-      };
-      const powerOff = () => {
-        if (!poweredRef.current || entering) return;
-        poweredRef.current = false;
-        setPowered(false);
-        main.pause();
-        off.restart();
-        stopMusic();
-      };
-      toggleRef.current = contextSafe(() => (poweredRef.current ? powerOff() : powerOn()));
-
-      // One tube loses its nerve for a moment under the pointer.
-      let stutter: gsap.core.Timeline | null = null;
-      stutterRef.current = contextSafe(() => {
-        if (
-          !poweredRef.current ||
-          entering ||
-          main.isActive() ||
-          stutter?.isActive() ||
-          !isFinePointer()
-        )
-          return;
-        const i = Math.floor(Math.random() * letters.length);
-        stutter = gsap.timeline();
-        score(stutter, letters[i]!, 0, STUTTER);
-      });
-
-      // The sign hangs a little in front of the wall: it rides the pointer
-      // more than the light it throws does.
-      let onMove: ((e: PointerEvent) => void) | null = null;
-      if (isFinePointer()) {
-        const signX = gsap.quickTo(sign, "x", { duration: 0.7, ease: EASE.default });
-        const signY = gsap.quickTo(sign, "y", { duration: 0.7, ease: EASE.default });
-        const spillX = gsap.quickTo(spill, "x", { duration: 0.9, ease: EASE.default });
-        const spillY = gsap.quickTo(spill, "y", { duration: 0.9, ease: EASE.default });
-        onMove = (e) => {
-          if (entering) return;
-          const nx = e.clientX / window.innerWidth - 0.5;
-          const ny = e.clientY / window.innerHeight - 0.5;
-          signX(nx * 16);
-          signY(ny * 12);
-          spillX(nx * 9);
-          spillY(ny * 7);
-        };
-        stage.addEventListener("pointermove", onMove, { passive: true });
-      }
+      toggleRef.current = contextSafe(neon.toggle);
+      stutterRef.current = contextSafe(neon.stutter);
 
       // Initial states, set in JS so the SSR markup stays a finished, dark wall.
       gsap.set([welcomeEl, foot], { autoAlpha: 0 });
       // A beat of dark wall, then the transformer warms up.
-      const lightsCall = gsap.delayedCall(LIGHTS_AT, powerOn);
+      const lightsCall = gsap.delayedCall(LIGHTS_AT, neon.powerOn);
 
       /* ---- the way in ---- */
       let exit: gsap.core.Timeline | null = null;
@@ -255,9 +171,7 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
         if (entering) return;
         entering = true;
         lightsCall.kill();
-        stutter?.kill();
-        main.pause();
-        if (onMove) stage.removeEventListener("pointermove", onMove);
+        neon.freeze();
 
         // The door lights to let the reader through, whatever the switch says.
         gsap.set([ring, note], { opacity: 1 });
@@ -352,14 +266,11 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
 
       return () => {
         lightsCall.kill();
-        main.kill();
-        off.kill();
-        stutter?.kill();
+        neon.kill();
         exit?.kill();
         toggleRef.current = null;
         stutterRef.current = null;
         enterRefFn.current = null;
-        if (onMove) stage.removeEventListener("pointermove", onMove);
         document.removeEventListener("focusin", onFocusIn);
         window.removeEventListener("keydown", onKeyDown);
         window.removeEventListener("wheel", onWheel);

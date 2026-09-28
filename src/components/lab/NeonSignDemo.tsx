@@ -2,19 +2,12 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE, isFinePointer } from "@/lib/gsap";
+import { useGSAP, ScrollTrigger } from "@/lib/gsap";
 import { Reveal } from "@/components/fx/Reveal";
-import { jukebox, stopMusic, useJukebox, wantMusic } from "@/lib/jukebox";
-import {
-  NeonSignArt,
-  LETTER_SEGS,
-  STUTTER,
-  score,
-  writeLightScore,
-  writeOffScore,
-  type SegName,
-} from "@/components/neon/NeonSignArt";
-import { layoutWall, WALL_CSS } from "@/components/neon/wall";
+import { jukebox, useJukebox } from "@/lib/jukebox";
+import { NeonSignArt } from "@/components/neon/NeonSignArt";
+import { useBrickWall, wireNeonSign } from "@/components/neon/sign";
+import { WALL_CSS } from "@/components/neon/wall";
 import type { StillSpan } from "@/components/films/entries";
 
 /** A print on the wall — the La La Land room's still, with its caption translated. */
@@ -85,29 +78,7 @@ export function NeonSignDemo({
   const stutterRef = useRef<(() => void) | null>(null);
 
   /* ---- the wall ---- */
-  useEffect(() => {
-    const stage = stageRef.current;
-    const wall = wallRef.current;
-    const sign = switchRef.current;
-    if (!stage || !wall || !sign) return;
-
-    let frame = 0;
-    const layout = () => {
-      frame = 0;
-      layoutWall(stage, wall, sign);
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(layout);
-    };
-    const observer = new ResizeObserver(schedule);
-    observer.observe(stage);
-    schedule();
-
-    return () => {
-      observer.disconnect();
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, []);
+  useBrickWall(stageRef, wallRef, switchRef);
 
   // The sign follows the jukebox as much as the jukebox follows the sign: the
   // note on the island can stop the music from up there, and the sign must
@@ -132,60 +103,32 @@ export function NeonSignDemo({
       const sign = switchRef.current;
       if (!stage || !svg || !spill || !welcomeEl || !sign || !contextSafe) return;
 
-      const q = gsap.utils.selector(svg);
-      const seg = (name: SegName) => q(`.neon-seg[data-seg="${name}"]`);
-      const letters = LETTER_SEGS.map(seg);
-      const lit = q(".neon-lit");
-
-      const main = gsap.timeline({ paused: true });
-      writeLightScore(main, seg, [spill]);
-      const off = gsap.timeline({ paused: true });
-      writeOffScore(off, lit, [spill], EASE.exit);
-
-      let welcomed = false;
-      const powerOn = () => {
-        if (poweredRef.current) return;
-        poweredRef.current = true;
-        setPowered(true);
-        off.pause(0);
-        gsap.set(lit, { opacity: 1 });
-        if (!welcomed) {
-          welcomed = true;
-          gsap.fromTo(
-            welcomeEl,
-            { autoAlpha: 0, filter: "blur(6px)" },
-            { autoAlpha: 1, filter: "blur(0px)", duration: 1.1, ease: EASE.default },
-          );
-        }
-        wantMusic();
-        main.restart();
-      };
-      const powerOff = () => {
-        if (!poweredRef.current) return;
-        poweredRef.current = false;
-        setPowered(false);
-        main.pause();
-        off.restart();
-        stopMusic();
-      };
-      toggleRef.current = contextSafe(() => (poweredRef.current ? powerOff() : powerOn()));
-
-      // One tube loses its nerve for a moment under the pointer.
-      let stutter: gsap.core.Timeline | null = null;
-      stutterRef.current = contextSafe(() => {
-        if (!poweredRef.current || main.isActive() || stutter?.isActive() || !isFinePointer())
-          return;
-        const i = Math.floor(Math.random() * letters.length);
-        stutter = gsap.timeline();
-        score(stutter, letters[i]!, 0, STUTTER);
+      const neon = wireNeonSign({
+        svg,
+        spill,
+        sign,
+        stage,
+        welcome: [welcomeEl],
+        poweredRef,
+        setPowered,
+        // The wall is a section of the page, its first screen the door.
+        pointer: (e) => {
+          const r = stage.getBoundingClientRect();
+          return {
+            nx: (e.clientX - r.left) / r.width - 0.5,
+            ny: (e.clientY - r.top) / Math.min(r.height, window.innerHeight) - 0.5,
+          };
+        },
       });
+      toggleRef.current = contextSafe(neon.toggle);
+      stutterRef.current = contextSafe(neon.stutter);
 
       // Lights come on as the reader arrives, once.
       const trigger = ScrollTrigger.create({
         trigger: stage,
         start: "top 70%",
         once: true,
-        onEnter: () => powerOn(),
+        onEnter: () => neon.powerOn(),
       });
 
       // While the wall is the top of the frame, the island's paper scrim
@@ -201,36 +144,13 @@ export function NeonSignDemo({
         },
       });
 
-      // The sign hangs a little in front of the wall: it rides the pointer
-      // more than the light it throws does.
-      let onMove: ((e: PointerEvent) => void) | null = null;
-      if (isFinePointer()) {
-        const signX = gsap.quickTo(sign, "x", { duration: 0.7, ease: EASE.default });
-        const signY = gsap.quickTo(sign, "y", { duration: 0.7, ease: EASE.default });
-        const spillX = gsap.quickTo(spill, "x", { duration: 0.9, ease: EASE.default });
-        const spillY = gsap.quickTo(spill, "y", { duration: 0.9, ease: EASE.default });
-        onMove = (e) => {
-          const r = stage.getBoundingClientRect();
-          const nx = (e.clientX - r.left) / r.width - 0.5;
-          const ny = (e.clientY - r.top) / Math.min(r.height, window.innerHeight) - 0.5;
-          signX(nx * 16);
-          signY(ny * 12);
-          spillX(nx * 9);
-          spillY(ny * 7);
-        };
-        stage.addEventListener("pointermove", onMove, { passive: true });
-      }
-
       return () => {
         trigger.kill();
         immersed.kill();
         delete document.body.dataset.neonImmersed;
-        main.kill();
-        off.kill();
-        stutter?.kill();
+        neon.kill();
         toggleRef.current = null;
         stutterRef.current = null;
-        if (onMove) stage.removeEventListener("pointermove", onMove);
         // The lights belong to this run: a re-run (dev's double mount, a
         // remount) starts dark again, or its trigger would find the switch
         // already thrown and never light the sign.
