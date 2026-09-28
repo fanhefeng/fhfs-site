@@ -17,6 +17,7 @@ import {
   validKey,
   validLink,
   validPath,
+  validPlayableSrc,
 } from "@/lib/forms";
 
 const form = (entries: Record<string, string>) => {
@@ -146,6 +147,17 @@ describe("validPath / validLink", () => {
     expect(validLink("mailto:a@b.c")).toBe(false);
     expect(validLink("https://has space")).toBe(false);
     expect(validLink("")).toBe(false);
+  });
+});
+
+describe("validPlayableSrc", () => {
+  it("is a file on this site or in the Blob store — the two places media-src allows", () => {
+    expect(validPlayableSrc("/secrets/episode-1.mp3")).toBe(true);
+    expect(validPlayableSrc(`${MEDIA_ORIGIN}/secrets/episode-1.mp3`)).toBe(true);
+    expect(validPlayableSrc("https://podcasts.example.com/episode-1.mp3")).toBe(false);
+    expect(validPlayableSrc(`${MEDIA_ORIGIN}.evil.com/episode-1.mp3`)).toBe(false);
+    expect(validPlayableSrc("//evil.com/episode-1.mp3")).toBe(false);
+    expect(validPlayableSrc("")).toBe(false);
   });
 });
 

@@ -119,6 +119,15 @@ export const validPath = (value: string): boolean =>
 export const validLink = (value: string): boolean =>
   /^https?:\/\/\S+$/.test(value) || validPath(value);
 
+/**
+ * Where a voice note, a podcast episode or a video can play from: a file on
+ * this site, or the Blob store. Those are the two places the CSP's
+ * `media-src` names (lib/csp.ts), so anything else would save fine and then
+ * be blocked out front, with nothing on the page to say why.
+ */
+export const validPlayableSrc = (value: string): boolean =>
+  validPath(value) || value.startsWith(`${MEDIA_ORIGIN}/`);
+
 /** A GitHub account name — it is spliced into a URL path on /resume. */
 export const validGithubUser = (value: string): boolean => /^[A-Za-z0-9-]{1,39}$/.test(value);
 
@@ -183,7 +192,7 @@ export function parseMedia(text: string): MediaParse {
     if (!kind || !MEDIA_KINDS.has(kind)) {
       return { ok: false, error: `${at}：开头要是 image、audio 或 video。` };
     }
-    if (!src || !(validPath(src) || (kind === "video" && src.startsWith(`${MEDIA_ORIGIN}/`)))) {
+    if (!src || !(kind === "video" ? validPlayableSrc(src) : validPath(src))) {
       return {
         ok: false,
         error: `${at}：第二项要是站内文件地址，以单个 / 开头；只有视频可以放在 Blob（${MEDIA_ORIGIN}/…）。`,

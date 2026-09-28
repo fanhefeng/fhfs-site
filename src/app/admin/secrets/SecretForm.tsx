@@ -119,11 +119,11 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
 
         <div className="grid gap-5 sm:grid-cols-[1fr_8rem_auto]">
           <label className="space-y-1.5">
-            <span className={labelClass}>音频地址（播客必填；完整 URL 或站内路径）</span>
+            <span className={labelClass}>音频地址（播客必填；站内路径或 Blob 地址）</span>
             <input
               name="audio"
               defaultValue={secret.audio}
-              placeholder="https://…/episode-1.mp3"
+              placeholder="/secrets/episode-1.mp3"
               className={inputClass}
             />
           </label>

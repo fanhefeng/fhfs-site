@@ -5,18 +5,20 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { intField, parseLocale, raw, str, validDate, validKey, validLink } from "@/lib/forms";
+import {
+  intField,
+  parseLocale,
+  raw,
+  str,
+  validDate,
+  validKey,
+  validPlayableSrc,
+} from "@/lib/forms";
+import { MEDIA_ORIGIN } from "@/lib/csp";
 import { renderMarkdown } from "@/lib/markdown";
 import { readingMinutes } from "@/lib/reading";
 import { TAGS } from "@/lib/content";
-import {
-  invalidate,
-  SESSION_EXPIRED,
-  DATE_ERROR,
-  goneError,
-  linkError,
-  type ActionState,
-} from "./shared";
+import { invalidate, SESSION_EXPIRED, DATE_ERROR, goneError, type ActionState } from "./shared";
 
 export async function saveSecret(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
@@ -39,9 +41,14 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
   const date = str(form, "date");
   if (!validDate(date)) return DATE_ERROR;
 
-  // Rendered as the <audio> src — the same belt every href wears.
+  // Rendered as the <audio> src, so it has to be somewhere the CSP lets a
+  // page play from — any other host saves fine and then stays silent.
   const audio = str(form, "audio") || null;
-  if (audio && !validLink(audio)) return linkError("音频地址");
+  if (audio && !validPlayableSrc(audio)) {
+    return {
+      error: `音频地址要是站内文件（以单个 / 开头，放在 public/ 下），或 Blob 存储里的文件（${MEDIA_ORIGIN}/…）。别的网站的地址会被页面的安全策略拦下，放不出来。`,
+    };
+  }
   if (kind === "podcast" && !audio) {
     return { error: "播客得有音频地址；没有的话先存成随笔。" };
   }
