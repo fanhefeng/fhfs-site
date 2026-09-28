@@ -267,6 +267,7 @@
         "summary": "The 3D desk left over from the old portfolio: it swings round to face you on entry, its screens breathe, and a drag leaves it coasting on inertia.",
         "note": "The model came in at 8.5 MB and was compressed to 1.1 MB with gltf-transform (Draco + 1024px WebP); the Draco decoder is self-hosted. It loads only once scrolled near, samples at 30 fps while idle and runs flat out during a drag, and skips itself entirely under Save-Data. The wheel only takes over zoom in the band right above the desk — everywhere else the page scrolls as usual. The two arrows in the corner make the same turn, an eighth at a press — for a keyboard, and for a thumb that is busy scrolling the page.",
         "deskHint": "Drag to orbit · scroll to zoom · double-click to reset",
+        "deskAria": "A 3D model of a gaming PC desk",
         "deskSaveData": "Data Saver is on, so the 3D desk (a 1.1 MB model) was never loaded.",
         "deskFallback": "The 3D desk could not be shown here: either no WebGL is available, or the model did not arrive.",
         "turnLeft": "Turn a little to the left",

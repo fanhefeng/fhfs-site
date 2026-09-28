@@ -47,6 +47,8 @@ const TURN_STEP = Math.PI / 4;
 
 type Props = {
   hint: string;
+  /** What the canvas is, for a screen reader — a name, not the instructions. */
+  label: string;
   /** Labels for the two arrows — the turn, for a keyboard or a thumb. */
   turnLeft: string;
   turnRight: string;
@@ -64,10 +66,11 @@ type Props = {
  * lab); the check below is only a second line. There is one version of this
  * scene and everybody gets it — see the note in lib/three/guards.ts.
  */
-export function Workstation({ hint, turnLeft, turnRight, fallbackNote, className }: Props) {
+export function Workstation({ hint, label, turnLeft, turnRight, fallbackNote, className }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<"idle" | "ready" | "skipped">("idle");
+  const teardownRef = useRef<(() => void) | null>(null);
   /** The scene's own turn, handed out of the effect that owns the angles. */
   const turnRef = useRef<((delta: number) => void) | null>(null);
 
@@ -515,7 +518,10 @@ export function Workstation({ hint, turnLeft, turnRight, fallbackNote, className
     };
     window.addEventListener("resize", onResize);
 
-    return () => {
+    // Idempotent: it runs when the model gives up (below) and again at
+    // unmount, and only the first call does anything.
+    const teardown = () => {
+      if (disposed) return;
       disposed = true;
       turnRef.current = null;
       io.disconnect();
@@ -536,7 +542,17 @@ export function Workstation({ hint, turnLeft, turnRight, fallbackNote, className
       groundTex.dispose();
       releaseRenderer(renderer);
     };
+    teardownRef.current = teardown;
+    return teardown;
   }, []);
+
+  // A model that never arrived collapses the stage to its fallback note, but
+  // the effect above belongs to the component, not the canvas: until the
+  // whole study unmounted, the renderer, its context and every listener stayed
+  // up behind a note saying there was nothing to show.
+  useEffect(() => {
+    if (status === "skipped") teardownRef.current?.();
+  }, [status]);
 
   // The renderer threw or the model never arrived. Collapsing to nothing
   // pulled the notes under the stage up into its place with no word said.
@@ -558,7 +574,7 @@ export function Workstation({ hint, turnLeft, turnRight, fallbackNote, className
             real link that has to stay reachable. A canvas cannot be an <img>,
             hence the lint override. */}
         {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role */}
-        <canvas ref={canvasRef} role="img" aria-label={hint} className="h-full w-full" />
+        <canvas ref={canvasRef} role="img" aria-label={label} className="h-full w-full" />
         {/* Minimal loading state: a gold ring that quietly spins until the
             model lands, then fades away.
 

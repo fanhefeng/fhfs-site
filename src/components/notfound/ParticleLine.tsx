@@ -438,12 +438,17 @@ export function ParticleLine({ text, lang, decorative, className }: Props) {
 
     readPalette();
     buildSprites();
+    // A first sample can fail — the box has no size yet at mount. That used to
+    // return before any of the wiring below, the ResizeObserver included, so
+    // the line never got a second chance; now it simply waits for the first
+    // real size, which the observer reports (`sampledW` is still 0).
     ready = sample(null);
-    if (!ready) return;
-    setDotted(true);
-    redraw();
-    // Scattered on the first frame, then it pulls itself together.
-    start();
+    if (ready) {
+      setDotted(true);
+      redraw();
+      // Scattered on the first frame, then it pulls itself together.
+      start();
+    }
 
     const onPointerMove = (e: PointerEvent) => {
       if (!ready) return;

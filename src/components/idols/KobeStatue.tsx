@@ -281,6 +281,15 @@ function Figure({
 }
 
 export default function KobeStatue({ spin, onScreen, onReady, wire, onFrame }: Props) {
+  // Back on screen, the loop goes from "never" to "demand" — and "demand"
+  // draws only when asked, while an `invalidate()` made under "never" is
+  // dropped. Ask once on the way back in, as AvatarCanvas does, so the
+  // statue is not left on whatever frame it had when it scrolled away. (It
+  // came back before only because every re-render rebuilt each Bone.)
+  useEffect(() => {
+    if (onScreen) invalidate();
+  }, [onScreen]);
+
   return (
     <Canvas
       dpr={[1, 1.75]}

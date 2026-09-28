@@ -237,6 +237,7 @@ export function LabStudy({ slug, accent, text, entries, cards }: Props) {
         >
           <Workstation
             hint={s("deskHint")}
+            label={s("deskAria")}
             turnLeft={s("turnLeft")}
             turnRight={s("turnRight")}
             fallbackNote={s("deskFallback")}
