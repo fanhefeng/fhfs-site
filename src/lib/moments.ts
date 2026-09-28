@@ -43,7 +43,6 @@ export type BoardMoment = {
   collection: string | null;
   original: boolean;
   attribution: string | null;
-  source: string | null;
   pinned: boolean;
 };
 

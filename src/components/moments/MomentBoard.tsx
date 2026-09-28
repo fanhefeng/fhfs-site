@@ -34,7 +34,6 @@ import { Reveal } from "@/components/fx/Reveal";
  */
 export function MomentBoard({ items }: { items: BoardMoment[] }) {
   const t = useTranslations("moments");
-  const [open, setOpen] = useState<Set<string>>(() => new Set());
 
   const notebooks = useMemo(() => collections(items), [items]);
   // In the address bar (`?nb=…`): the chips sit at the top of two hundred
@@ -58,14 +57,6 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
       (item) => item.year,
     ).map(({ year, items }) => ({ key: year, heading: year, items })),
   ];
-
-  const toggle = (key: string) =>
-    setOpen((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
 
   return (
     <>
@@ -103,12 +94,7 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
           heading={heading}
         >
           {yearItems.map((item) => (
-            <MomentCard
-              key={item.key}
-              item={item}
-              expanded={open.has(item.key)}
-              onToggle={() => toggle(item.key)}
-            />
+            <MomentCard key={item.key} item={item} />
           ))}
         </YearSection>
       ))}
@@ -289,17 +275,13 @@ function Chip({
  * One line on the board. The header is the part that says QQ 空间 — a small
  * round avatar, the name, the hour — and it is deliberately quiet, so that
  * on a page of two hundred entries the words are what the eye lands on.
+ *
+ * Whether it is unfolded is its own business: the state used to sit on the
+ * board, so pressing "read all" on one line re-rendered all five hundred.
  */
-function MomentCard({
-  item,
-  expanded,
-  onToggle,
-}: {
-  item: BoardMoment;
-  expanded: boolean;
-  onToggle: () => void;
-}) {
+function MomentCard({ item }: { item: BoardMoment }) {
   const t = useTranslations("moments");
+  const [expanded, setExpanded] = useState(false);
   const folds = shouldFold(item.content);
   const clamped = folds && !expanded;
 
@@ -310,7 +292,7 @@ function MomentCard({
 
   const press = () => {
     pressedAt.current = bodyRef.current?.getBoundingClientRect().height ?? null;
-    onToggle();
+    setExpanded((open) => !open);
   };
 
   /**

@@ -43,7 +43,6 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
     collection: row.collection,
     original: row.original,
     attribution: row.attribution,
-    source: row.source,
     pinned: row.pinned,
   }));
   const langNotice = t("langNotice");
