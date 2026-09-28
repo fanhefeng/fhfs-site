@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vite-plus/test";
 import { validKey } from "@/lib/forms";
-import { collections, momentKey, shouldFold, stampInZone } from "@/lib/moments";
+import {
+  collections,
+  describeMedia,
+  momentKey,
+  shouldFold,
+  stampInZone,
+  type MomentMedia,
+} from "@/lib/moments";
 
 describe("stampInZone", () => {
   it("prints the instant in the given zone, dots and a 24-hour clock", () => {
@@ -56,5 +63,33 @@ describe("shouldFold", () => {
   it("folds a long paragraph even on one line", () => {
     expect(shouldFold("字".repeat(361))).toBe(true);
     expect(shouldFold("字".repeat(360))).toBe(false);
+  });
+});
+
+describe("describeMedia", () => {
+  const image: MomentMedia = { kind: "image", src: "/moments/a.jpg", width: 10, height: 20 };
+  const audio: MomentMedia = { kind: "audio", src: "/moments/b.m4a", duration: 65.4 };
+  const video: MomentMedia = {
+    kind: "video",
+    src: "/moments/c.mp4",
+    poster: "/moments/c.jpg",
+    width: 720,
+    height: 1280,
+    duration: 30,
+  };
+
+  it("names a lone file by its kind, with the length of anything that plays", () => {
+    expect(describeMedia([image])).toBe("图片");
+    expect(describeMedia([audio])).toBe("语音 1:05");
+    expect(describeMedia([video])).toBe("视频 0:30");
+  });
+
+  it("counts a kind that repeats, and keeps the kinds in the order they appear", () => {
+    expect(describeMedia([image, image, image])).toBe("图片 ×3");
+    expect(describeMedia([audio, image, image])).toBe("语音 1:05 · 图片 ×2");
+  });
+
+  it("is empty for a line with nothing under it", () => {
+    expect(describeMedia([])).toBe("");
   });
 });

@@ -125,3 +125,35 @@ export const FOLD_LINES = 10;
 export function shouldFold(content: string): boolean {
   return content.split("\n").length > FOLD_LINES || content.length > 360;
 }
+
+const MEDIA_NAMES: Record<MomentMedia["kind"], string> = {
+  image: "图片",
+  audio: "语音",
+  video: "视频",
+};
+
+const clock = (seconds: number) => {
+  const whole = Math.round(seconds);
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+};
+
+/**
+ * What hangs under a line, in the admin's words: "图片 ×3", "视频 0:30",
+ * "语音 1:05 · 图片". A line that is only a file has no words to list it by,
+ * and "（只有1 个文件）" read as if the row were empty — this names the file
+ * instead. One kind at a time, in the order they first appear; a lone voice
+ * note or video carries its length, which is what tells two of them apart.
+ */
+export function describeMedia(media: readonly MomentMedia[]): string {
+  const kinds: MomentMedia["kind"][] = [];
+  for (const item of media) if (!kinds.includes(item.kind)) kinds.push(item.kind);
+  return kinds
+    .map((kind) => {
+      const items = media.filter((item) => item.kind === kind);
+      const name = MEDIA_NAMES[kind];
+      if (items.length > 1) return `${name} ×${items.length}`;
+      const only = items[0]!;
+      return only.kind === "image" ? name : `${name} ${clock(only.duration)}`;
+    })
+    .join(" · ");
+}

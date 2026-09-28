@@ -4,7 +4,7 @@ import { moments } from "@/db/schema";
 import { requireAdminPage } from "@/lib/auth/session";
 import { site } from "@/config/site";
 import { formatMedia } from "@/lib/forms";
-import { momentKey, stampInZone } from "@/lib/moments";
+import { describeMedia, momentKey, stampInZone } from "@/lib/moments";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { deleteMoment, saveMoment } from "../actions/moments";
@@ -140,14 +140,20 @@ export default async function MomentsAdminPage() {
           const { time } = stampInZone(row.postedAt.toISOString(), site.timeZone);
           const [day, clock] = time.split(" ");
           const firstLine = row.content.split("\n").find(Boolean) ?? "";
-          const files = row.media.length ? `${row.media.length} 个文件` : "";
+          // A line that is only a file is listed by what the file is — the
+          // row is not empty, it just has nothing to quote.
+          const files = describeMedia(row.media);
+          const label = firstLine
+            ? firstLine.length > 40
+              ? `${firstLine.slice(0, 40)}…`
+              : firstLine
+            : files
+              ? `［${files}］`
+              : "";
           return {
             id: row.key,
-            label:
-              firstLine.length > 40
-                ? `${firstLine.slice(0, 40)}…`
-                : firstLine || `（只有${files}）`,
-            meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${files ? ` · ${files}` : ""}${row.draft ? " · 草稿" : ""}`,
+            label,
+            meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${firstLine && files ? ` · ${files}` : ""}${row.draft ? " · 草稿" : ""}`,
             draft: row.draft,
             data: {
               ...row,
