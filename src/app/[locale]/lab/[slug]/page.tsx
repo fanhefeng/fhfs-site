@@ -20,7 +20,7 @@ import {
   BLADES_NEAR_SMALL,
   BLADES_FAR_WIDE,
   BLADES_FAR_SMALL,
-} from "@/lib/grove/geometry";
+} from "@/lib/grove/blades";
 import { LENS_SLIDES } from "@/components/lab/lensSlides";
 import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
 import { LALA_STILLS } from "@/components/films/lalaStills";
