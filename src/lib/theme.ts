@@ -9,8 +9,8 @@
 
 export type Theme = "dark" | "light";
 
-/** The localStorage key. The pre-paint script in `app/themeInit.ts` must
- *  repeat this string literally — it is inlined raw into the HTML. */
+/** The localStorage key — also spliced into the pre-paint script in
+ *  `app/themeInit.ts`, which is inlined raw into the HTML. */
 export const THEME_STORAGE_KEY = "fhfs-theme";
 
 /** `--bg` in each theme (globals.css), for the browser's own chrome: the

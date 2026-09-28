@@ -57,10 +57,11 @@ const nextConfig: NextConfig = {
   },
   redirects() {
     return [
-      // The grove was folded into the home page; old links still land.
+      // The grove had a page of its own, then the home page's cover, and now
+      // lives in the lab (2026-09-24); old links land on the study.
       {
         source: "/:locale(zh|en)/grove",
-        destination: "/:locale",
+        destination: "/:locale/lab/grove",
         permanent: true,
       },
       // The portfolio never had a work to hang; its device frames went back

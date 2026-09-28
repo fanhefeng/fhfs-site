@@ -136,7 +136,12 @@ export function KobeStatueStage({
         ) : (
           <>
             {mode === "3d" && (
+              // The photo says what it shows through its alt; the model it
+              // stands in for says the same, or a screen reader meets a
+              // blank canvas where the statue is.
               <div
+                role="img"
+                aria-label={fallback.alt}
                 className={`absolute inset-0 transition-opacity duration-700 ${ready ? "opacity-100" : "opacity-0"}`}
               >
                 <KobeStatue

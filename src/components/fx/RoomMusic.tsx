@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { jukebox, roomStart, roomStop, setTrack } from "@/lib/jukebox";
+import { jukebox, roomStart, roomStop, setTrack, useJukebox } from "@/lib/jukebox";
 import { DEFAULT_TRACK, type TrackId } from "@/lib/tracks";
 import { JukeboxSwitch } from "./JukeboxSwitch";
 
@@ -33,6 +33,15 @@ type Props = {
 export function RoomMusic({ track, tonight, title, artist, className = "" }: Props) {
   /** Whether this room was the one that put the music on. */
   const startedHere = useRef(false);
+  const { silenced } = useJukebox();
+
+  // The reader turning the music off here takes it out of the room's hands:
+  // if they turn it back on, that is their music, and it should outlast the
+  // room — the promise below. Without this the room still believed it had
+  // started it, and stopped it on the way out.
+  useEffect(() => {
+    if (silenced) startedHere.current = false;
+  }, [silenced]);
 
   useEffect(() => {
     setTrack(track);

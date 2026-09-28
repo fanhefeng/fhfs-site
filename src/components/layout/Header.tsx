@@ -96,6 +96,9 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   const [expanded, setExpanded] = useState(false);
   /** Mobile full-screen nav sheet. */
   const [navOpen, setNavOpen] = useState(false);
+  // Stable, because FullNav's open/close effect lists it: an inline arrow re-ran
+  // that effect on every render of the header.
+  const closeNav = useCallback(() => setNavOpen(false), []);
   const [scrolled, setScrolled] = useState(false);
 
   const rootRef = useRef<HTMLElement>(null);
@@ -646,12 +649,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
         </div>
       </header>
 
-      <FullNav
-        links={menuLinks}
-        open={navOpen}
-        onClose={() => setNavOpen(false)}
-        triggerRef={burgerRef}
-      />
+      <FullNav links={menuLinks} open={navOpen} onClose={closeNav} triggerRef={burgerRef} />
     </>
   );
 }

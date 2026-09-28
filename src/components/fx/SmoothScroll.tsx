@@ -1,22 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
-
-/**
- * Lenis must exist before any layout effect that wants to pause scrolling —
- * useGSAP is a layout effect, so a passive effect here would let the opening
- * curtain call stop() on an instance that does not exist yet.
- */
-const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
-
-declare global {
-  interface Window {
-    /** Shared Lenis instance so overlays (loader) can pause scrolling. */
-    __lenis?: Lenis | null;
-  }
-}
 
 /**
  * Global inertial scrolling. Lenis and GSAP must share one clock:
@@ -24,7 +10,12 @@ declare global {
  * Lenis' raf — otherwise pinned animations lag a frame behind.
  */
 export function SmoothScroll() {
-  useIsomorphicLayoutEffect(() => {
+  // A layout effect: Lenis must exist before any layout effect that wants to
+  // pause scrolling — useGSAP is one, so a passive effect here would let the
+  // opening curtain call stop() on an instance that does not exist yet. (React
+  // 19 no longer warns about one on the server, so the isomorphic wrapper this
+  // used to need is gone.) `window.__lenis` is declared in types/global.d.ts.
+  useLayoutEffect(() => {
     // The one thing on this site that takes the scroll away from the reader,
     // and the highest vestibular risk on it. Reduce-motion keeps the browser's
     // own scrolling: every consumer of `window.__lenis` is written to fall back

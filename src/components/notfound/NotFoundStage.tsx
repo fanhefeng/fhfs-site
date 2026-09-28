@@ -222,9 +222,12 @@ export function NotFoundStage({ blocks, sticker }: Props) {
             {/* Sized and parked so the whole line clears the crease at
                 full peel: everything below the corner-to-corner diagonal. */}
             <div className="absolute inset-0 flex items-end justify-end rounded-[14px] border border-dashed border-line bg-surface p-3">
+              {/* Hidden from a screen reader until the sticker is torn, the
+                  way it is hidden from the eye — or it gives the egg away. */}
               <p
                 data-secret
                 lang={sticker.lang}
+                aria-hidden={!peeled}
                 className="no-cjk-oblique max-w-[76%] text-right font-serif text-[12px] italic leading-snug text-fg-secondary"
               >
                 {sticker.secret}

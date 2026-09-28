@@ -6,6 +6,10 @@ import { site } from "@/config/site";
 import { getPosts } from "@/lib/content";
 
 export const dynamic = "force-static";
+// Two feeds, and nothing else. The proxy's matcher skips paths with a dot in
+// them, so without this /fr/rss.xml or /admin/rss.xml reached GET, fell back
+// to the Chinese feed and was cached under its own address.
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
