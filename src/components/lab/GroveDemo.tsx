@@ -8,7 +8,6 @@ import { releaseRenderer } from "@/lib/three/release";
 import { watchContextLoss } from "@/lib/webgl";
 import {
   buildGrove,
-  buildMotes,
   BOX_W,
   BLADES_NEAR_WIDE,
   BLADES_NEAR_SMALL,
@@ -33,37 +32,24 @@ type Props = {
   dressNames: Record<string, string>;
 };
 
-import {
-  BARK_VERT,
-  BARK_FRAG,
-  GRASS_VERT,
-  GRASS_FRAG,
-  FERN_VERT,
-  FERN_FRAG,
-  FLOWER_VERT,
-  FLOWER_FRAG,
-  WIRE_VERT,
-  WIRE_FRAG,
-  MOTE_VERT,
-  MOTE_FRAG,
-  SPRAY_VERT,
-  SPRAY_FRAG,
-  WING_VERT,
-  WING_FRAG,
-  BODY_VERT,
-  BODY_FRAG,
-} from "@/lib/grove/shaders";
 import { bakeBarkPlates } from "@/lib/grove/bark";
-
+import { flowerTexture, moteTexture, poolTexture } from "@/lib/grove/plates";
 import {
-  flowerTexture,
-  moteTexture,
-  poolTexture,
-  radialTexture,
-  wingTexture,
-  wingGeometry,
-  bodyGeometry,
-} from "@/components/grove/plates";
+  allocations,
+  assembleRoot,
+  bendWings,
+  buildButterfly,
+  contactShadowTexture,
+  createMotes,
+  createSpray,
+  disposeAll,
+  groveRenderer,
+  pointScale,
+  poseWings,
+  rootUniforms,
+  sharedUniforms,
+  SPRAY_LIFE,
+} from "@/lib/grove/scene";
 import {
   grovePalette,
   GROVE_PALETTE_KEYS,
@@ -188,30 +174,18 @@ export function GroveDemo({
       // asked for less motion gets the new colours on the next frame instead.
       const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+      // Transparent clear, and the backdrop comes from CSS instead. Clearing to
+      // a colour would hand it to three as a *linear* value under the output
+      // colour space and paint it several stops too dark; letting CSS own it
+      // also means the degraded path and the live path share one backdrop
+      // rather than two that have to be kept in sync.
       let renderer: THREE.WebGLRenderer;
       try {
-        renderer = new THREE.WebGLRenderer({
-          canvas,
-          antialias: !small,
-          alpha: true,
-          // The default power preference, not "high-performance": that one
-          // switches a two-GPU Mac onto the discrete chip (and its fan) for as
-          // long as the page is open; the moss holds its frame rate without it.
-          stencil: false,
-        });
+        renderer = groveRenderer(canvas, { antialias: !small, stencil: false });
       } catch {
         setDegraded(true);
         return;
       }
-      // The shaders tone-map and encode their own output, so three must not do
-      // it a second time on the way to the canvas.
-      renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
-      // Transparent clear, and the backdrop comes from CSS instead. Clearing to
-      // a colour here would hand it to three as a *linear* value under the
-      // colour space above and paint it several stops too dark; letting CSS own
-      // it also means the degraded path and the live path share one backdrop
-      // rather than two that have to be kept in sync.
-      renderer.setClearColor(0x000000, 0);
 
       // The bark's own picture, baked once — see lib/grove/bark.ts.
       const barkPlates = bakeBarkPlates(renderer, small);
@@ -239,9 +213,7 @@ export function GroveDemo({
         bladeScale: 0.28,
       });
 
-      const geometries: THREE.BufferGeometry[] = [];
-      const materials: THREE.Material[] = [];
-      const textures: THREE.Texture[] = [];
+      const into = allocations();
 
       /* ---- uniforms ----
          Everything the whole scene agrees on is shared BY REFERENCE, so one
@@ -252,36 +224,18 @@ export function GroveDemo({
          rebuild after a lost context comes back the colour it went away. */
       const dress0 = grovePalette(dressRef.current);
 
-      const shared = {
-        uKeyDir: { value: new THREE.Vector3(-0.3, 0.92, 0.28).normalize() },
-        uKeyCol: { value: new THREE.Color(...dress0.keyCol) },
-        uFillDir: { value: new THREE.Vector3(0.12, -0.86, 0.5).normalize() },
-        uFillCol: { value: new THREE.Color(...dress0.fillCol) },
-        uAmbCol: { value: new THREE.Color(...dress0.ambCol) },
-        uMossDeep: { value: new THREE.Color(...dress0.mossDeep) },
-        uMossLit: { value: new THREE.Color(...dress0.mossLit) },
-        uLichen: { value: new THREE.Color(...dress0.lichen) },
-        uGrassDeep: { value: new THREE.Color(...dress0.grassDeep) },
-        uGrassMid: { value: new THREE.Color(...dress0.grassMid) },
-        uGrassTip: { value: new THREE.Color(...dress0.grassTip) },
-        uGrassTipHi: { value: new THREE.Color(...dress0.grassTipHi) },
-        uFernDeep: { value: new THREE.Color(...dress0.fernDeep) },
-        uFernLit: { value: new THREE.Color(...dress0.fernLit) },
-        uScanGlow: { value: new THREE.Color(...dress0.scanGlow) },
-        uScanRim: { value: new THREE.Color(...dress0.scanRim) },
-        uPhase: { value: 0 },
-        uScanO: { value: new THREE.Vector3(-BOX_W * 0.75, -1.4, 2.2) },
-        uScanR: { value: 0 },
-        // This study measures the world in root widths, so the front's wobble
-        // and the cage's own distances are already in the units they were
-        // written in; the hero, which measures it in CSS pixels, is what these
-        // exist for.
-        uScanW: { value: new THREE.Vector2(1, 1) },
-        uScanLag: { value: 0.55 },
-        uWire: { value: 0 },
-        uGrow: { value: 0 },
-        uBloom: { value: 0 },
-      };
+      // This study measures the world in root widths, so the front's wobble
+      // and the cage's own distances are already in the units they were
+      // written in; and the root grows on the scrollbar, from nothing.
+      const shared = sharedUniforms(
+        dress0,
+        {
+          origin: new THREE.Vector3(-BOX_W * 0.75, -1.4, 2.2),
+          wobble: new THREE.Vector2(1, 1),
+          lag: 0.55,
+        },
+        false,
+      );
 
       type Air = {
         hazeCol: RGB;
@@ -293,18 +247,6 @@ export function GroveDemo({
         /** local midpoint, kept half-extent, feather — see endFade() */
         cut: [number, number, number];
       };
-      const groupUniforms = (air: Air) => ({
-        ...shared,
-        uHazeCol: { value: new THREE.Color(...air.hazeCol) },
-        uHaze: { value: air.haze },
-        uFog: { value: air.fog },
-        uHazeLift: { value: air.hazeLift },
-        uBoxH: { value: air.boxH },
-        uCut: { value: new THREE.Vector3(...air.cut) },
-        uMouse: { value: new THREE.Vector3(9999, 9999, 9999) },
-        uMouseR: { value: air.mouseR },
-      });
-
       /* The painted plates are the one part of a dress that is not a uniform:
          they are canvases, so changing colour means drawing a new one. These
          are collected rather than pushed straight onto `textures` because the
@@ -316,192 +258,25 @@ export function GroveDemo({
       let flowerMap = flowerTexture(dress0.petal, dress0.heart);
       let moteMap = moteTexture(dress0.moteCore, dress0.moteEdge);
 
-      /* ---- one root, assembled ---- */
-      type Built = {
-        group: THREE.Group;
-        uniforms: ReturnType<typeof groupUniforms>;
-        wire: THREE.LineSegments;
-      };
-
-      const assemble = (grove: ReturnType<typeof buildGrove>, air: Air): Built => {
-        const group = new THREE.Group();
-        const uniforms = groupUniforms(air);
-        // A form that dissolves has to blend, but it still writes depth: the
-        // fade is a sliver at each end, and letting it skip the depth buffer
-        // would put the ridge's own far flank in front of its near one.
-        const soft = air.cut[1] < 1e5;
-
-        const barkGeo = new THREE.BufferGeometry();
-        barkGeo.setAttribute("position", new THREE.BufferAttribute(grove.bark.position, 3));
-        barkGeo.setAttribute("normal", new THREE.BufferAttribute(grove.bark.normal, 3));
-        barkGeo.setAttribute("aInfo", new THREE.BufferAttribute(grove.bark.info, 3));
-        barkGeo.setIndex(new THREE.BufferAttribute(grove.bark.index, 1));
-        const barkMat = new THREE.ShaderMaterial({
-          uniforms: { ...uniforms, ...barkPlates.uniforms },
-          vertexShader: BARK_VERT,
-          fragmentShader: BARK_FRAG,
-          transparent: soft,
-          depthWrite: true,
-          side: THREE.DoubleSide,
+      /* ---- one root, assembled ----
+         Nothing here settles — the survey is the scrollbar's, and it can be
+         scrolled back — so no discard-free twins. A root whose ends are cut
+         dissolves, and blends. */
+      const assemble = (grove: ReturnType<typeof buildGrove>, air: Air) => {
+        const root = assembleRoot({
+          scene,
+          grove,
+          uniforms: rootUniforms(shared, air),
+          bark: barkPlates.uniforms,
+          flowerMap,
+          soft: air.cut[1] < 1e5,
+          settledTwins: false,
+          orders: { bark: 0, grass: 1, fern: 2, flower: 3 },
+          wireK: [0.42, 7.5, 5.2],
+          into,
         });
-        const bark = new THREE.Mesh(barkGeo, barkMat);
-        bark.frustumCulled = false;
-        group.add(bark);
-        geometries.push(barkGeo);
-        materials.push(barkMat);
-
-        /* fur: four rungs pinched to a point, instanced */
-        const bladeGeo = new THREE.InstancedBufferGeometry();
-        {
-          const segs = 3;
-          const verts: number[] = [];
-          const uvs: number[] = [];
-          const idx: number[] = [];
-          for (let i = 0; i <= segs; i++) {
-            const t = i / segs;
-            const w = 0.5 * (1 - t * t);
-            verts.push(-w, t, 0, w, t, 0);
-            uvs.push(0, t, 1, t);
-          }
-          verts[verts.length - 6] = 0;
-          verts[verts.length - 3] = 0;
-          for (let i = 0; i < segs; i++) {
-            const a = i * 2;
-            idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
-          }
-          bladeGeo.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
-          bladeGeo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
-          bladeGeo.setIndex(idx);
-        }
-        bladeGeo.setAttribute(
-          "aOffset",
-          new THREE.InstancedBufferAttribute(grove.blades.offset, 3),
-        );
-        bladeGeo.setAttribute(
-          "aNormal",
-          new THREE.InstancedBufferAttribute(grove.blades.normal, 3),
-        );
-        bladeGeo.setAttribute(
-          "aRandom",
-          new THREE.InstancedBufferAttribute(grove.blades.random, 4),
-        );
-        bladeGeo.setAttribute("aClump", new THREE.InstancedBufferAttribute(grove.blades.clump, 1));
-        bladeGeo.instanceCount = grove.blades.count;
-        const grassMat = new THREE.ShaderMaterial({
-          uniforms,
-          vertexShader: GRASS_VERT,
-          fragmentShader: GRASS_FRAG,
-          transparent: soft,
-          depthWrite: true,
-          side: THREE.DoubleSide,
-        });
-        const grass = new THREE.Mesh(bladeGeo, grassMat);
-        grass.frustumCulled = false;
-        grass.renderOrder = 1;
-        group.add(grass);
-        geometries.push(bladeGeo);
-        materials.push(grassMat);
-
-        /* ferns */
-        if (grove.ferns.count > 0) {
-          const fernGeo = new THREE.InstancedBufferGeometry();
-          fernGeo.setAttribute("position", new THREE.BufferAttribute(grove.ferns.position, 3));
-          fernGeo.setAttribute("normal", new THREE.BufferAttribute(grove.ferns.normal, 3));
-          fernGeo.setAttribute("uv", new THREE.BufferAttribute(grove.ferns.uv, 2));
-          fernGeo.setIndex(new THREE.BufferAttribute(grove.ferns.index, 1));
-          fernGeo.setAttribute(
-            "aOffset",
-            new THREE.InstancedBufferAttribute(grove.ferns.offset, 3),
-          );
-          fernGeo.setAttribute("aQuat", new THREE.InstancedBufferAttribute(grove.ferns.quat, 4));
-          fernGeo.setAttribute(
-            "aRandom",
-            new THREE.InstancedBufferAttribute(grove.ferns.random, 2),
-          );
-          fernGeo.instanceCount = grove.ferns.count;
-          const fernMat = new THREE.ShaderMaterial({
-            uniforms,
-            vertexShader: FERN_VERT,
-            fragmentShader: FERN_FRAG,
-            transparent: soft,
-            depthWrite: true,
-            side: THREE.DoubleSide,
-          });
-          const fern = new THREE.Mesh(fernGeo, fernMat);
-          fern.frustumCulled = false;
-          fern.renderOrder = 2;
-          group.add(fern);
-          geometries.push(fernGeo);
-          materials.push(fernMat);
-        }
-
-        /* flowers */
-        if (grove.flowers.count > 0) {
-          const flowerGeo = new THREE.InstancedBufferGeometry();
-          flowerGeo.setAttribute(
-            "position",
-            new THREE.Float32BufferAttribute(
-              [-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0],
-              3,
-            ),
-          );
-          flowerGeo.setAttribute(
-            "uv",
-            new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2),
-          );
-          flowerGeo.setIndex([0, 1, 2, 0, 2, 3]);
-          flowerGeo.setAttribute(
-            "aOffset",
-            new THREE.InstancedBufferAttribute(grove.flowers.offset, 3),
-          );
-          flowerGeo.setAttribute(
-            "aRandom",
-            new THREE.InstancedBufferAttribute(grove.flowers.random, 2),
-          );
-          flowerGeo.instanceCount = grove.flowers.count;
-          const flowerMat = new THREE.ShaderMaterial({
-            uniforms: { ...uniforms, uMap: { value: flowerMap } },
-            vertexShader: FLOWER_VERT,
-            fragmentShader: FLOWER_FRAG,
-            transparent: true,
-            depthWrite: false,
-            side: THREE.DoubleSide,
-          });
-          const flowers = new THREE.Mesh(flowerGeo, flowerMat);
-          flowers.frustumCulled = false;
-          flowers.renderOrder = 3;
-          group.add(flowers);
-          geometries.push(flowerGeo);
-          materials.push(flowerMat);
-          flowerMats.push(flowerMat);
-        }
-
-        /* the survey cage */
-        const wireGeo = new THREE.BufferGeometry();
-        wireGeo.setAttribute("position", new THREE.BufferAttribute(grove.wire, 3));
-        const wireMat = new THREE.ShaderMaterial({
-          uniforms: {
-            uScanO: shared.uScanO,
-            uScanR: shared.uScanR,
-            uWire: shared.uWire,
-            uPhase: shared.uPhase,
-            uWireK: { value: new THREE.Vector3(0.42, 7.5, 5.2) },
-          },
-          vertexShader: WIRE_VERT,
-          fragmentShader: WIRE_FRAG,
-          transparent: true,
-          depthWrite: false,
-          depthTest: false,
-          blending: THREE.AdditiveBlending,
-        });
-        const wire = new THREE.LineSegments(wireGeo, wireMat);
-        wire.frustumCulled = false;
-        wire.renderOrder = 8;
-        group.add(wire);
-        geometries.push(wireGeo);
-        materials.push(wireMat);
-
-        return { group, uniforms, wire };
+        flowerMats.push(...root.flowerMats);
+        return root;
       };
 
       const nearBuilt = assemble(near, {
@@ -511,7 +286,6 @@ export function GroveDemo({
         // The near root is framed whole, so nothing of it is ever cut.
         cut: [0, 1e6, 1],
       });
-      scene.add(nearBuilt.group);
 
       /* The ridge is washed into lit air rather than into the backdrop: mixing
          distance toward the background colour is how a far object turns into a
@@ -529,19 +303,14 @@ export function GroveDemo({
         // Both ends gone well before the tube's own caps, over a long feather.
         cut: [FAR_MID_X, 3.7, 1.9],
       });
-      scene.add(farBuilt.group);
 
       /* ---- light pool and contact shadow ---- */
       const plane = new THREE.PlaneGeometry(1, 1);
-      geometries.push(plane);
+      into.geometries.push(plane);
 
       let glowMap = poolTexture(dress0.poolInner, dress0.poolOuter);
-      const shadowMap = radialTexture(256, [
-        [0, "rgba(12,16,10,0.62)"],
-        [0.45, "rgba(12,16,10,0.26)"],
-        [1, "rgba(12,16,10,0)"],
-      ]);
-      textures.push(shadowMap);
+      const shadowMap = contactShadowTexture();
+      into.textures.push(shadowMap);
 
       const glowMat = new THREE.MeshBasicMaterial({
         map: glowMap,
@@ -555,7 +324,7 @@ export function GroveDemo({
       glow.position.set(-1.6, -0.6, -11);
       glow.renderOrder = -1;
       scene.add(glow);
-      materials.push(glowMat);
+      into.materials.push(glowMat);
 
       const shadowMat = new THREE.MeshBasicMaterial({
         map: shadowMap,
@@ -567,191 +336,22 @@ export function GroveDemo({
       shadow.position.set(0.2, -3.1, -2.4);
       shadow.renderOrder = 0;
       scene.add(shadow);
-      materials.push(shadowMat);
+      into.materials.push(shadowMat);
 
       /* ---- drifting pollen ---- */
-      const motes = buildMotes(small ? 1200 : 3600);
-      const moteGeo = new THREE.BufferGeometry();
-      moteGeo.setAttribute("position", new THREE.BufferAttribute(motes.position, 3));
-      moteGeo.setAttribute("aSeed", new THREE.BufferAttribute(motes.seed, 4));
-      const moteUniforms = {
-        uPhase: shared.uPhase,
-        uMap: { value: moteMap },
-        uSize: { value: 0.055 },
-        uScale: { value: 400 },
-        uClimb: { value: motes.climb },
-      };
-      const moteMat = new THREE.ShaderMaterial({
-        uniforms: moteUniforms,
-        vertexShader: MOTE_VERT,
-        fragmentShader: MOTE_FRAG,
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      });
-      const moteField = new THREE.Points(moteGeo, moteMat);
-      moteField.frustumCulled = false;
-      moteField.renderOrder = 6;
-      scene.add(moteField);
-      geometries.push(moteGeo);
-      materials.push(moteMat);
-      moteMats.push(moteMat);
+      const motes = createMotes(small ? 1200 : 3600, moteMap, shared.uPhase, 0.055, into);
+      scene.add(motes.points);
+      moteMats.push(motes.material);
 
       /* ---- the pointer's pollen trail ---- */
-      const SPRAY_N = 620;
-      const SPRAY_LIFE = 1.6;
-      const sprayPos = new Float32Array(SPRAY_N * 3);
-      const sprayVel = new Float32Array(SPRAY_N * 3);
-      const sprayBirth = new Float32Array(SPRAY_N).fill(-999);
-      const sprayRnd = new Float32Array(SPRAY_N * 2);
-      const sprayGeo = new THREE.BufferGeometry();
-      sprayGeo.setAttribute("position", new THREE.BufferAttribute(sprayPos, 3));
-      sprayGeo.setAttribute("aVel", new THREE.BufferAttribute(sprayVel, 3));
-      sprayGeo.setAttribute("aBirth", new THREE.BufferAttribute(sprayBirth, 1));
-      sprayGeo.setAttribute("aRnd", new THREE.BufferAttribute(sprayRnd, 2));
-      const sprayUniforms = {
-        uNow: { value: 0 },
-        uMap: { value: moteMap },
-        uSize: { value: 0.075 },
-        uScale: moteUniforms.uScale,
-        uLife: { value: SPRAY_LIFE },
-      };
-      const sprayMat = new THREE.ShaderMaterial({
-        uniforms: sprayUniforms,
-        vertexShader: SPRAY_VERT,
-        fragmentShader: SPRAY_FRAG,
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-        blending: THREE.AdditiveBlending,
-      });
-      const sprayField = new THREE.Points(sprayGeo, sprayMat);
-      sprayField.frustumCulled = false;
-      sprayField.renderOrder = 7;
-      scene.add(sprayField);
-      geometries.push(sprayGeo);
-      materials.push(sprayMat);
-      moteMats.push(sprayMat);
-
-      let sprayHead = 0;
-      let sprayDirty = false;
+      const spray = createSpray(moteMap, motes.uniforms.uScale, 0.075, into);
+      scene.add(spray.points);
+      moteMats.push(spray.material);
       /** The live clock. It only advances while something is actually alive. */
       let now = 0;
-      let lastBirth = -999;
-
-      const spawnGrain = (p: THREE.Vector3) => {
-        const i = sprayHead;
-        sprayHead = (sprayHead + 1) % SPRAY_N;
-        const o = i * 3;
-        sprayPos[o] = p.x + (Math.random() - 0.5) * 0.16;
-        sprayPos[o + 1] = p.y + (Math.random() - 0.5) * 0.16;
-        sprayPos[o + 2] = p.z + (Math.random() - 0.5) * 0.48;
-        sprayVel[o] = (Math.random() - 0.5) * 0.4;
-        sprayVel[o + 1] = 0.012 + Math.random() * 0.33;
-        sprayVel[o + 2] = (Math.random() - 0.5) * 0.28;
-        sprayBirth[i] = now;
-        sprayRnd[i * 2] = 0.5 + Math.random() * 0.65;
-        sprayRnd[i * 2 + 1] = Math.random();
-        sprayDirty = true;
-        lastBirth = now;
-      };
-
-      const flushGrains = () => {
-        if (!sprayDirty) return;
-        const at = sprayGeo.attributes;
-        at.position!.needsUpdate = true;
-        at.aVel!.needsUpdate = true;
-        at.aBirth!.needsUpdate = true;
-        at.aRnd!.needsUpdate = true;
-        sprayDirty = false;
-      };
 
       /* ---- butterfly ---- */
-      const wingMap = wingTexture();
-      textures.push(wingMap);
-      const bendFore = { value: 0 };
-      const bendHind = { value: 0 };
-      const wingMaterial = (hind: boolean, bend: { value: number }) =>
-        new THREE.ShaderMaterial({
-          uniforms: {
-            uKeyDir: shared.uKeyDir,
-            uKeyCol: shared.uKeyCol,
-            uAmbCol: shared.uAmbCol,
-            uBend: bend,
-            uHind: { value: hind ? 1 : 0 },
-            uTex: { value: wingMap },
-          },
-          vertexShader: WING_VERT,
-          fragmentShader: WING_FRAG,
-          side: THREE.DoubleSide,
-        });
-
-      const foreMat = wingMaterial(false, bendFore);
-      const hindMat = wingMaterial(true, bendHind);
-      const bodyMat = new THREE.ShaderMaterial({
-        uniforms: {
-          uKeyDir: shared.uKeyDir,
-          uKeyCol: shared.uKeyCol,
-          uAmbCol: shared.uAmbCol,
-        },
-        vertexShader: BODY_VERT,
-        fragmentShader: BODY_FRAG,
-      });
-      const antMat = new THREE.MeshBasicMaterial({ color: 0x171208 });
-      materials.push(foreMat, hindMat, bodyMat, antMat);
-
-      const foreGeo = wingGeometry(false);
-      const hindGeo = wingGeometry(true);
-      const trunkGeo = bodyGeometry();
-      const tegulaGeo = new THREE.SphereGeometry(0.052, 12, 9);
-      const clubGeo = new THREE.SphereGeometry(0.013, 8, 6);
-      geometries.push(foreGeo, hindGeo, trunkGeo, tegulaGeo, clubGeo);
-
-      const butterfly = new THREE.Group();
-      // Mirrored by a negative X scale rather than a second geometry. That
-      // flips the winding, which is why the wing material is DoubleSide and
-      // flips its own normal on back faces.
-      const foreR = new THREE.Mesh(foreGeo, foreMat);
-      const foreL = new THREE.Mesh(foreGeo, foreMat);
-      const hindR = new THREE.Mesh(hindGeo, hindMat);
-      const hindL = new THREE.Mesh(hindGeo, hindMat);
-      foreL.scale.x = -1;
-      hindL.scale.x = -1;
-      foreR.position.set(0.012, 0.012, 0);
-      foreL.position.copy(foreR.position);
-      hindR.position.set(0.01, 0, 0);
-      hindL.position.copy(hindR.position);
-      butterfly.add(foreR, foreL, hindR, hindL);
-      butterfly.add(new THREE.Mesh(trunkGeo, bodyMat));
-
-      for (const sx of [1, -1] as const) {
-        // tegulae — the scaled shoulder pads that weld wing to thorax
-        const teg = new THREE.Mesh(tegulaGeo, bodyMat);
-        teg.position.set(0.03 * sx, 0.026, 0.02);
-        teg.scale.set(1.15, 0.62, 1.5);
-        teg.rotation.z = -0.35 * sx;
-        butterfly.add(teg);
-
-        // antennae: thin, swept back, clubbed at the tip
-        const curve = new THREE.QuadraticBezierCurve3(
-          new THREE.Vector3(0.01 * sx, 0.02, 0.15),
-          new THREE.Vector3(0.062 * sx, 0.075, 0.3),
-          new THREE.Vector3(0.105 * sx, 0.11, 0.43),
-        );
-        const antGeo = new THREE.TubeGeometry(curve, 12, 0.0042, 5, false);
-        geometries.push(antGeo);
-        butterfly.add(new THREE.Mesh(antGeo, antMat));
-        const club = new THREE.Mesh(clubGeo, antMat);
-        club.position.copy(curve.getPointAt(1));
-        club.scale.z = 1.9;
-        butterfly.add(club);
-      }
-
-      butterfly.scale.setScalar(0.21);
-      butterfly.renderOrder = 5;
-      butterfly.traverse((o) => {
-        o.frustumCulled = false;
-      });
+      const { group: butterfly, wings } = buildButterfly(shared, 0.21, into);
       butterfly.visible = false;
       nearBuilt.group.add(butterfly);
 
@@ -798,10 +398,7 @@ export function GroveDemo({
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
-        // Match three's own size attenuation: a mote of world size s at
-        // distance d has to come out s * uScale / d pixels across.
-        const buf = renderer.getDrawingBufferSize(new THREE.Vector2());
-        moteUniforms.uScale.value = (buf.y * 0.5) / Math.tan((camera.fov * Math.PI) / 180 / 2);
+        motes.uniforms.uScale.value = pointScale(renderer, camera);
         placeRidge();
         dirtyRef.current = true;
       };
@@ -962,18 +559,8 @@ export function GroveDemo({
           // Wings beat hard on the way in, settle to a slow display once the
           // feet are down, and flare open as the hand closes in.
           const flap = clamped * 150 + now * (1.7 + 46 * spook) * settle;
-          const raw = Math.sin(flap);
-          const shaped = Math.sign(raw) * Math.pow(Math.abs(raw), 0.72);
-          const flyPhi = 20 + 48 * shaped;
-          const restPhi = 15 + 7 * shaped + spook * 30;
-          const phi = THREE.MathUtils.lerp(flyPhi, restPhi, settle) * THREE.MathUtils.DEG2RAD;
-          foreR.rotation.z = phi;
-          foreL.rotation.z = -phi;
-          hindR.rotation.z = phi * 0.95 - 0.03;
-          hindL.rotation.z = -(phi * 0.95 - 0.03);
-          const flapVel = Math.cos(flap) * 8.6 * (1 - 0.9 * settle * (1 - spook));
-          bendFore.value = -flapVel * 0.01;
-          bendHind.value = -flapVel * 0.013;
+          poseWings(wings, flap, settle, spook);
+          bendWings(wings, Math.cos(flap) * 8.6 * (1 - 0.9 * settle * (1 - spook)));
 
           butterfly.position.y += Math.sin(flap - 0.9) * 0.022 * (1 - settle * (1 - spook));
           butterfly.scale.setScalar(0.21 * (0.78 + 0.22 * land));
@@ -1014,43 +601,16 @@ export function GroveDemo({
         return true;
       };
 
-      /* Emission by DISTANCE rather than by time, spread along the segment the
-         pointer covered since the last frame: a fast sweep lays a trail instead
-         of stacking a clump wherever the cursor happened to land, and a hand
-         that has stopped trickles instead of pumping. */
-      const sprayLast = new THREE.Vector3(9999, 0, 0);
-      const sprayStep = new THREE.Vector3();
-      let sprayIdle = 0;
-
       const emitSpray = (dt: number, moving: boolean) => {
         // The trickle is for a pointer creeping too slowly to trip the distance
         // test, not for one that has been put down. Letting a parked cursor go
         // on shedding a grain every 55ms keeps the live layer awake for ever —
         // which is exactly the cost this study is built to avoid.
         if (!hovering || mouseTarget.x > 999 || !moving) {
-          sprayLast.x = 9999; // re-entering should not lay a streak across the frame
+          spray.trail.lift();
           return;
         }
-        if (sprayLast.x > 9000) {
-          sprayLast.copy(mouseTarget);
-          return;
-        }
-        const n = Math.min(14, Math.floor(mouseTarget.distanceTo(sprayLast) / 0.037));
-        for (let k = 1; k <= n; k++) {
-          sprayStep.lerpVectors(sprayLast, mouseTarget, k / n);
-          spawnGrain(sprayStep);
-        }
-        if (n > 0) {
-          sprayLast.copy(mouseTarget);
-          sprayIdle = 0;
-        } else {
-          sprayIdle += dt;
-          if (sprayIdle > 0.055) {
-            spawnGrain(mouseTarget);
-            sprayIdle = 0;
-          }
-        }
-        flushGrains();
+        spray.trail.at(mouseTarget, dt, now);
       };
 
       const onPointerMove = (e: PointerEvent) => {
@@ -1117,14 +677,14 @@ export function GroveDemo({
            the stage — measured, and the reason this reads the way it does.
            Every term here is finite: grains expire, the lean reaches its target,
            the startle eases out, and the grace window closes. */
-        const grainsAlive = now < lastBirth + SPRAY_LIFE;
+        const grainsAlive = now < spray.lastBirth() + SPRAY_LIFE;
         const leaning =
           Math.abs(par.x - parTarget.x) > 2e-4 || Math.abs(par.y - parTarget.y) > 2e-4;
         const startling = Math.abs(spook - spookTarget) > 1e-3;
         const justMoved = now - lastMove < 0.25;
         if (grainsAlive || leaning || startling || justMoved) {
           now += dt;
-          sprayUniforms.uNow.value = now;
+          spray.uniforms.uNow.value = now;
 
           // Frame-rate independent easing, so the lean lands the same on a
           // 60Hz panel and a 144Hz one.
@@ -1286,9 +846,7 @@ export function GroveDemo({
         // Collected as they were made rather than walked off the graph: the
         // wings share two geometries and two materials across four meshes, and
         // a traverse would dispose each of those several times over.
-        for (const g of geometries) g.dispose();
-        for (const m of materials) m.dispose();
-        for (const t of textures) t.dispose();
+        disposeAll(into);
         // The painted plates are held in `let`s because a repaint swaps them,
         // so the set to release is whichever dress is on at teardown — the
         // same three the repaint drops, plus the bark.

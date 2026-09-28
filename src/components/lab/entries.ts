@@ -161,7 +161,8 @@ export const LAB_ENTRIES: LabEntry[] = [
     accent: "#4a5d3a",
     sources: [
       "components/lab/GroveDemo.tsx",
-      "components/grove/plates.ts",
+      "lib/grove/scene.ts",
+      "lib/grove/plates.ts",
       "lib/grove/geometry.ts",
       "lib/grove/shaders.ts",
       "lib/grove/bark.ts",
@@ -394,6 +395,7 @@ export const LAB_ENTRIES: LabEntry[] = [
       "components/grove/PaperDissolve.tsx",
       "components/grove/approach.css.ts",
       "components/grove/GroveScene.tsx",
+      "lib/grove/scene.ts",
     ],
   },
   // The segmented control's pill: one element Flipping from slot to slot.
