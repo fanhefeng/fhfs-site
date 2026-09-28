@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
@@ -26,15 +26,19 @@ const rand = (seed: number) => {
  * container). Wraps any content (image, emoji, text chip) in an SVG
  * feMorphology dilate filter that grows the alpha into a white die-cut
  * border, plus a warm contact shadow. Zero JS and SSR-safe: the filter is
- * declared inline with a deterministic id, so duplicate declarations across
- * instances are identical and url(#…) always resolves to a matching one.
+ * declared inline under an id of its own (`useId`, stable between server and
+ * client). The id used to be shared by every sticker of a thickness, and
+ * `url(#…)` resolves to the first in the document — on /software's narrow
+ * layout that first one sat inside the hidden grid, and a filter in a
+ * `display: none` subtree paints nothing, so the carousel's stickers lost
+ * their edge.
  *
  * The tilt uses the standalone CSS `rotate` property on purpose: GSAP's
  * Draggable writes `transform`, so a dragged sticker keeps its lean.
  */
 export function Sticker({ children, seed = 0, border = 3, className }: Props) {
   const tilt = Math.round((rand(seed) * 6 - 3) * 10) / 10;
-  const filterId = `sticker-edge-${border}`;
+  const filterId = `sticker-edge-${useId()}`;
 
   const style: CSSProperties = {
     filter: `url(#${filterId}) drop-shadow(0 2px 8px var(--sticker-shadow-color))`,

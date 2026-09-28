@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { toggleMusic, useJukebox } from "@/lib/jukebox";
@@ -40,6 +40,14 @@ export function JukeboxSwitch({ className = "" }: { className?: string }) {
   const t = useTranslations("common");
   const { wanted } = useJukebox();
   const litRef = useRef<SVGGElement>(null);
+  // The island and a room's music line each draw one of these, so the ids are
+  // per instance: `url(#…)` resolves to the first match in the document, and a
+  // fixed id made every switch borrow the island's filters — which stop
+  // painting the moment that copy sits in a hidden subtree.
+  const uid = useId();
+  const noteId = `${uid}note`;
+  const litId = `${uid}lit`;
+  const darkId = `${uid}dark`;
 
   useGSAP(
     () => {
@@ -79,15 +87,15 @@ export function JukeboxSwitch({ className = "" }: { className?: string }) {
         focusable="false"
       >
         <defs>
-          <NeonFilter id="isl-note-lit" x="-60%" y="-30%" width="220%" height="160%" />
-          <IconGlassFilter id="isl-note-dark" />
-          <path id="isl-note" d={NOTE_D} transform={NOTE_T} fill="#000" />
+          <NeonFilter id={litId} x="-60%" y="-30%" width="220%" height="160%" />
+          <IconGlassFilter id={darkId} />
+          <path id={noteId} d={NOTE_D} transform={NOTE_T} fill="#000" />
         </defs>
-        <g filter="url(#isl-note-dark)">
-          <use href="#isl-note" />
+        <g filter={`url(#${darkId})`}>
+          <use href={`#${noteId}`} />
         </g>
-        <g ref={litRef} filter="url(#isl-note-lit)" style={{ opacity: 0 }}>
-          <use href="#isl-note" />
+        <g ref={litRef} filter={`url(#${litId})`} style={{ opacity: 0 }}>
+          <use href={`#${noteId}`} />
         </g>
       </svg>
     </button>

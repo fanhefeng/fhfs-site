@@ -112,74 +112,86 @@ type ArtProps = {
 export function NeonSignArt({ id, svgRef, className }: ArtProps) {
   const sh = (name: string) => `${id}-sh-${name}`;
   return (
-    <svg ref={svgRef} className={className} viewBox={VIEW_BOX} aria-hidden="true" focusable="false">
+    <>
+      {/* Beside the <svg>, not in it: React hoists and dedupes a <style
+          href precedence> into <head> only in the HTML namespace. Inside the
+          svg it was printed in place, `href` and `precedence` as attributes,
+          once per sign on the page. */}
       <style href="neon-sign-art" precedence="medium">
         {NEON_ART_CSS}
       </style>
-      <defs>
-        <NeonFilter id={`${id}-lit`} x="-40%" y="-15%" width="180%" height="130%" />
-        <NeonFilter id={`${id}-lit-ring`} x="-15%" y="-15%" width="130%" height="130%" />
-        <NeonFilter id={`${id}-lit-bar`} x="-15%" y="-15%" width="130%" height="130%" />
-        <NeonFilter id={`${id}-lit-note`} x="-40%" y="-20%" width="180%" height="140%" />
-        <DarkGlassFilter id={`${id}-dark`} />
+      <svg
+        ref={svgRef}
+        className={className}
+        viewBox={VIEW_BOX}
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <NeonFilter id={`${id}-lit`} x="-40%" y="-15%" width="180%" height="130%" />
+          <NeonFilter id={`${id}-lit-ring`} x="-15%" y="-15%" width="130%" height="130%" />
+          <NeonFilter id={`${id}-lit-bar`} x="-15%" y="-15%" width="130%" height="130%" />
+          <NeonFilter id={`${id}-lit-note`} x="-40%" y="-20%" width="180%" height="140%" />
+          <DarkGlassFilter id={`${id}-dark`} />
 
-        <path
-          id={sh("ring")}
-          d={ARC_L}
-          fill="none"
-          stroke="#000"
-          strokeWidth={RING_TUBE}
-          strokeLinecap="round"
-        />
-        <path
-          id={sh("bar")}
-          d={ARC_R_BAR}
-          fill="none"
-          stroke="#000"
-          strokeWidth={RING_TUBE}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path id={sh("note")} d={NOTE_D} transform={NOTE_T} fill="#000" />
-        {WORD.map((l, i) => (
           <path
-            key={i}
-            id={sh(`l${i}`)}
-            d={GLYPH[l.g]}
-            transform={`translate(${l.x} ${l.y})`}
-            fill="#000"
+            id={sh("ring")}
+            d={ARC_L}
+            fill="none"
+            stroke="#000"
+            strokeWidth={RING_TUBE}
+            strokeLinecap="round"
           />
-        ))}
-      </defs>
+          <path
+            id={sh("bar")}
+            d={ARC_R_BAR}
+            fill="none"
+            stroke="#000"
+            strokeWidth={RING_TUBE}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path id={sh("note")} d={NOTE_D} transform={NOTE_T} fill="#000" />
+          {WORD.map((l, i) => (
+            <path
+              key={i}
+              id={sh(`l${i}`)}
+              d={GLYPH[l.g]}
+              transform={`translate(${l.x} ${l.y})`}
+              fill="#000"
+            />
+          ))}
+        </defs>
 
-      {/* Unlit, always there. */}
-      <g filter={`url(#${id}-dark)`}>
-        <use href={`#${sh("ring")}`} />
-        <use href={`#${sh("bar")}`} />
-        <use href={`#${sh("note")}`} />
-        {WORD.map((_, i) => (
-          <use key={i} href={`#${sh(`l${i}`)}`} />
-        ))}
-      </g>
-
-      {/* Lit, one segment at a time. */}
-      <g className="neon-lit">
-        <g className="neon-seg" data-seg="ring" filter={`url(#${id}-lit-ring)`}>
+        {/* Unlit, always there. */}
+        <g filter={`url(#${id}-dark)`}>
           <use href={`#${sh("ring")}`} />
-        </g>
-        <g className="neon-seg" data-seg="bar" filter={`url(#${id}-lit-bar)`}>
           <use href={`#${sh("bar")}`} />
-        </g>
-        <g className="neon-seg" data-seg="note" filter={`url(#${id}-lit-note)`}>
           <use href={`#${sh("note")}`} />
+          {WORD.map((_, i) => (
+            <use key={i} href={`#${sh(`l${i}`)}`} />
+          ))}
         </g>
-        {WORD.map((_, i) => (
-          <g key={i} className="neon-seg" data-seg={`l${i}`} filter={`url(#${id}-lit)`}>
-            <use href={`#${sh(`l${i}`)}`} />
+
+        {/* Lit, one segment at a time. */}
+        <g className="neon-lit">
+          <g className="neon-seg" data-seg="ring" filter={`url(#${id}-lit-ring)`}>
+            <use href={`#${sh("ring")}`} />
           </g>
-        ))}
-      </g>
-    </svg>
+          <g className="neon-seg" data-seg="bar" filter={`url(#${id}-lit-bar)`}>
+            <use href={`#${sh("bar")}`} />
+          </g>
+          <g className="neon-seg" data-seg="note" filter={`url(#${id}-lit-note)`}>
+            <use href={`#${sh("note")}`} />
+          </g>
+          {WORD.map((_, i) => (
+            <g key={i} className="neon-seg" data-seg={`l${i}`} filter={`url(#${id}-lit)`}>
+              <use href={`#${sh(`l${i}`)}`} />
+            </g>
+          ))}
+        </g>
+      </svg>
+    </>
   );
 }
 
