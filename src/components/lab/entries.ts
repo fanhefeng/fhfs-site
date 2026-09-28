@@ -177,8 +177,9 @@ export const LAB_ENTRIES: LabEntry[] = [
     accent: "#8a93a8",
     sources: [
       "components/lab/LiquidMetalDemo.tsx",
-      "components/grove/LiquidPill.tsx",
+      "lib/grove/liquidMetalMount.ts",
       "lib/grove/liquidMetal.ts",
+      "components/grove/LiquidPill.tsx",
     ],
   },
   // The 3D desk from the old portfolio — it lived on /about until the page
