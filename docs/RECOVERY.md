@@ -25,6 +25,11 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 
 真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那 12 张表。
 
+**草稿不进备份。** 仓库和 `db-snapshots` 分支都是公开的，导出草稿等于当晚就把它
+发出去，所以 `db:export` 只写已发布的文章、秘密和说说。草稿只在库里（和 Neon 那
+6 小时的 history 里）；库整个没了，没发布的草稿也跟着没了。`db:import` 对这三张表
+只做 upsert，恢复备份不会删掉库里现有的草稿。
+
 库里还有一个 `neon_auth` schema（`user`、`session`、`account`、`jwks` 等 9 张表），
 那是 Neon 自己的托管认证功能建的，**站点代码一个字都没碰过**（后台登录走的是
 `AUTH_SECRET` 签的 jose JWT）。恢复时不用管它，也不用重建。

@@ -17,12 +17,19 @@
  *
  * db:import reads only db.json — the markdown copies exist for the diff.
  *
+ * Drafts stay out. The repository is public, and so is the `db-snapshots`
+ * branch the nightly workflow commits this to: a draft exported here would
+ * be readable on GitHub the same night, which is exactly what marking it a
+ * draft was meant to prevent. A draft therefore lives only in the database
+ * (and Neon's own history) until it is published — and since db:import only
+ * upserts posts, secrets and moments, restoring a backup never deletes one.
+ *
  *   pnpm db:export
  */
 import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { stringify as toYaml } from "yaml";
 import * as schema from "../src/db/schema";
 import { connect } from "./connect.mjs";
@@ -50,15 +57,18 @@ const data = {
   posts: await db
     .select()
     .from(schema.posts)
+    .where(eq(schema.posts.draft, false))
     .orderBy(asc(schema.posts.slug), asc(schema.posts.locale)),
   abouts: await db.select().from(schema.abouts).orderBy(asc(schema.abouts.locale)),
   secrets: await db
     .select()
     .from(schema.secrets)
+    .where(eq(schema.secrets.draft, false))
     .orderBy(asc(schema.secrets.slug), asc(schema.secrets.locale)),
   moments: await db
     .select()
     .from(schema.moments)
+    .where(eq(schema.moments.draft, false))
     .orderBy(asc(schema.moments.postedAt), asc(schema.moments.key)),
   timelineEntries: await db
     .select()
@@ -114,7 +124,6 @@ try {
       date: post.date,
       tags: post.tags,
       summary: post.summary,
-      ...(post.draft ? { draft: true } : {}),
     });
     await writeFile(
       path.join(STAGE, "posts", `${post.slug}.${post.locale}.md`),
@@ -133,7 +142,6 @@ try {
       summary: secret.summary,
       ...(secret.audio ? { audio: secret.audio } : {}),
       ...(secret.duration != null ? { duration: secret.duration } : {}),
-      ...(secret.draft ? { draft: true } : {}),
     });
     await writeFile(
       path.join(STAGE, "secrets", `${secret.slug}.${secret.locale}.md`),
@@ -163,4 +171,4 @@ await rename(STAGE, OUT);
 const counts = Object.entries(data).map(
   ([table, rows]) => `${table} ${(rows as unknown[]).length}`,
 );
-console.log(`backup/ written — ${counts.join(", ")}`);
+console.log(`backup/ written — ${counts.join(", ")} (drafts left out)`);
