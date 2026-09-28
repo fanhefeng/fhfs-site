@@ -10,10 +10,12 @@ import { DEFAULT_TRACK, type TrackId } from "./tracks";
  *
  * Signs write `wanted`; the player reads it and reports back `playing`.
  * Rooms write `track` — the board and the secrets each play the
- * song they are named after, and hand the theme back on the way out. Nothing
- * here touches the DOM — the module is plain state, so the front door, the
- * lab study, the rooms and the note on the island all read the same snapshot
- * without a provider.
+ * song they are named after, and hand the theme back on the way out. The
+ * player alone writes `held`: while a voice note, a video or the podcast is
+ * playing, the record waits (there is never more than one thing sounding
+ * at once). Nothing here touches the DOM — the module is plain state, so
+ * the front door, the lab study, the rooms and the note on the island all
+ * read the same snapshot without a provider.
  */
 export type JukeboxState = {
   /** A sign is lit somewhere: the reader wants music. */
@@ -31,6 +33,15 @@ export type JukeboxState = {
    * Switching the music on again clears it.
    */
   silenced: boolean;
+  /**
+   * Another player on the page has the floor — a voice note or a video on
+   * the board, the podcast — and the record waits. Not a "no" and not a
+   * change to the switch: `wanted` stays as it was, the sign stays lit, and
+   * the music comes back by itself when that player stops. The player
+   * (`components/fx/Jukebox`) is what sets and clears this, from the play
+   * and pause events of every media element on the page.
+   */
+  held: boolean;
 };
 
 const INITIAL: JukeboxState = {
@@ -39,6 +50,7 @@ const INITIAL: JukeboxState = {
   gestured: false,
   track: DEFAULT_TRACK,
   silenced: false,
+  held: false,
 };
 
 let state: JukeboxState = INITIAL;
@@ -93,6 +105,10 @@ export const roomStop = () => set({ wanted: false });
 /** For the player only. */
 export const reportPlayback = (patch: Pick<JukeboxState, "playing">) => set(patch);
 export const reportGesture = () => set({ gestured: true });
+/** Something else on the page started playing: the record steps aside. */
+export const holdMusic = () => set({ held: true });
+/** Nothing else is playing any more: the record may go on again, if it is wanted. */
+export const releaseMusic = () => set({ held: false });
 /**
  * The record would not load. Every sign reads `wanted`, so leaving it on is a
  * lit sign over silence — the one state that tells the reader the opposite of

@@ -1,8 +1,30 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { jukebox, reportFailure, reportGesture, reportPlayback, useJukebox } from "@/lib/jukebox";
+import { usePathname } from "next/navigation";
+import {
+  holdMusic,
+  jukebox,
+  releaseMusic,
+  reportFailure,
+  reportGesture,
+  reportPlayback,
+  useJukebox,
+} from "@/lib/jukebox";
 import { trackFile } from "@/lib/tracks";
+
+/** Players whose file would not load: `paused` still reads false on them. */
+const failed = new WeakSet<HTMLMediaElement>();
+
+/** Actually making sound, or about to — not a play request over a dead file. */
+const sounding = (media: HTMLMediaElement) => !media.paused && !media.error && !failed.has(media);
+
+const nextSource = (source: HTMLSourceElement) => {
+  for (let el = source.nextElementSibling; el; el = el.nextElementSibling) {
+    if (el instanceof HTMLSourceElement) return el;
+  }
+  return null;
+};
 
 /**
  * The record player behind the wall.
@@ -21,21 +43,33 @@ import { trackFile } from "@/lib/tracks";
  * different — nothing will ever come of it — so the player switches `wanted`
  * back off and every sign goes dark with it (`reportFailure`).
  *
+ * It is also the page's one rule about sound: never two things at once.
+ * Every `<audio>` and `<video>` on the site — the voice notes and videos on
+ * the board, the podcast — fires `play` and `pause` events that do not
+ * bubble but can be caught at the document in the capture phase, and this
+ * component is the one place that is always mounted to catch them. When one
+ * starts, every other player is paused and the record steps aside (`held`);
+ * when the last of them stops, the record comes back on its own, if it was
+ * wanted. A route change takes the old page's players with it without a
+ * pause event, so the hold is checked again there.
+ *
  * This used to be two players — a Spotify embed with a NetEase stand-in
  * behind it — and both are gone now that every record is a file of ours
  * (`lib/tracks` has the note).
  */
 export function Jukebox() {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const { wanted, track } = useJukebox();
+  const { wanted, held, track } = useJukebox();
   const file = trackFile(track);
+  const pathname = usePathname();
 
   // Browsers only let a page make sound once the reader has touched it.
   useEffect(() => {
     const onGesture = () => {
       reportGesture();
       const el = audioRef.current;
-      if (jukebox().wanted && el?.paused) void el.play().catch(() => {});
+      const { wanted, held } = jukebox();
+      if (wanted && !held && el?.paused) void el.play().catch(() => {});
     };
     document.addEventListener("pointerdown", onGesture, true);
     document.addEventListener("keydown", onGesture, true);
@@ -44,6 +78,71 @@ export function Jukebox() {
       document.removeEventListener("keydown", onGesture, true);
     };
   }, []);
+
+  // One thing at a time. The record itself is not one of "the others": it is
+  // paused through `held`, so that it knows to come back.
+  useEffect(() => {
+    const others = () =>
+      [...document.querySelectorAll<HTMLMediaElement>("audio, video")].filter(
+        (media) => media !== audioRef.current,
+      );
+    const isOther = (target: EventTarget | null): target is HTMLMediaElement =>
+      target instanceof HTMLMediaElement && target !== audioRef.current;
+    const settle = () => {
+      if (!others().some(sounding)) releaseMusic();
+    };
+    const onStop = (e: Event) => {
+      if (isOther(e.target)) settle();
+    };
+    const onPlay = (e: Event) => {
+      if (!isOther(e.target)) return;
+      for (const media of others()) {
+        if (media !== e.target && !media.paused) media.pause();
+      }
+      // A player taken out of the page mid-play — a card the filter hid —
+      // is paused by the browser, and says so on the element itself, but
+      // that `pause` never reaches the document. So listen on the element.
+      e.target.addEventListener("pause", onStop, { once: true });
+      holdMusic();
+    };
+    // A file that will not load never pauses: the element keeps `paused`
+    // false over silence, and the record would wait for it forever. The
+    // failure lands on the element (`src`) or on its last `<source>` — the
+    // earlier ones only mean the browser tries the next.
+    const onFail = (e: Event) => {
+      const target = e.target;
+      const media =
+        target instanceof HTMLSourceElement && !nextSource(target) ? target.parentElement : target;
+      if (!isOther(media)) return;
+      failed.add(media);
+      settle();
+    };
+    // A new load is a new chance — the reader pressing play again.
+    const onRetry = (e: Event) => {
+      if (e.target instanceof HTMLMediaElement) failed.delete(e.target);
+    };
+    document.addEventListener("play", onPlay, true);
+    document.addEventListener("pause", onStop, true);
+    document.addEventListener("emptied", onStop, true);
+    document.addEventListener("error", onFail, true);
+    document.addEventListener("loadstart", onRetry, true);
+    return () => {
+      document.removeEventListener("play", onPlay, true);
+      document.removeEventListener("pause", onStop, true);
+      document.removeEventListener("emptied", onStop, true);
+      document.removeEventListener("error", onFail, true);
+      document.removeEventListener("loadstart", onRetry, true);
+    };
+  }, []);
+
+  // A player that left with its page never said it stopped.
+  useEffect(() => {
+    if (!jukebox().held) return;
+    const playing = [...document.querySelectorAll<HTMLMediaElement>("audio, video")].some(
+      (media) => media !== audioRef.current && sounding(media),
+    );
+    if (!playing) releaseMusic();
+  }, [pathname]);
 
   // The element is the source of truth for `playing` — and `playing` is the
   // event that means sound, where `play` only means the request was accepted.
@@ -68,11 +167,12 @@ export function Jukebox() {
     };
   }, [file]);
 
-  // The switch.
+  // The switch — and the hold, which is the switch left on with the sound
+  // off for a while.
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
-    if (!wanted) {
+    if (!wanted || held) {
       el.pause();
       return;
     }
@@ -80,7 +180,7 @@ export function Jukebox() {
     // fetching again. `load()` is what makes the next press a real retry.
     if (el.error) el.load();
     void el.play().catch(() => {});
-  }, [wanted, file]);
+  }, [wanted, held, file]);
 
   return (
     <div className="jukebox" aria-hidden="true" inert>
