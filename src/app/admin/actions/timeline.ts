@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { intField, localized, str, validDate, validKey } from "@/lib/forms";
+import { filled, intField, localized, str, validDate, validKey } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
 import {
   invalidate,
@@ -21,6 +21,11 @@ export async function saveTimelineEntry(_prev: ActionState, form: FormData): Pro
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
 
+  const version = str(form, "version");
+  if (!version) return { error: "版本号不能为空——这一条在页面上就是用它来称呼的。" };
+  const title = localized(form, "title");
+  if (!filled(title)) return { error: "标题至少写一种语言。" };
+
   const date = str(form, "date");
   const dateLabel = localized(form, "dateLabel");
   const hasLabel = Boolean(dateLabel.zh || dateLabel.en);
@@ -36,10 +41,10 @@ export async function saveTimelineEntry(_prev: ActionState, form: FormData): Pro
 
   const row = {
     key,
-    version: str(form, "version"),
+    version,
     date: date || null,
     dateLabel: hasLabel ? dateLabel : null,
-    title: localized(form, "title"),
+    title,
     note: localized(form, "note"),
     sort: sort.value,
   };

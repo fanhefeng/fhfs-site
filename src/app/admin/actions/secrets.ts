@@ -7,6 +7,7 @@ import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
 import {
   intField,
+  oneOf,
   parseLocale,
   raw,
   str,
@@ -33,11 +34,10 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
   if (!locale) return { error: "语言只能是 zh 或 en。" };
   if (!str(form, "title")) return { error: "标题不能为空。" };
 
-  const kindField = str(form, "kind");
-  if (kindField !== "essay" && kindField !== "podcast") {
+  const kind = str(form, "kind");
+  if (!oneOf(schema.secretKindEnum.enumValues, kind)) {
     return { error: "类型只能是 essay（随笔）或 podcast（播客）。" };
   }
-  const kind: "essay" | "podcast" = kindField;
   const date = str(form, "date");
   if (!validDate(date)) return DATE_ERROR;
 

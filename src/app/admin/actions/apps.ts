@@ -6,7 +6,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
 
-import { intField, list, localized, str, validKey, validLink } from "@/lib/forms";
+import { intField, list, localized, oneOf, str, validKey, validLink } from "@/lib/forms";
 
 import { TAGS } from "@/lib/content";
 
@@ -25,9 +25,13 @@ export async function saveApp(_prev: ActionState, form: FormData): Promise<Actio
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
 
+  const name = str(form, "name");
+  if (!name) return { error: "名字不能为空——卡片上最大的那行字就是它。" };
+
+  const categories = schema.appCategoryEnum.enumValues;
   const category = str(form, "category");
-  if (!["desktop", "tool", "game", "website"].includes(category)) {
-    return { error: "分类只能是 desktop / tool / game / website。" };
+  if (!oneOf(categories, category)) {
+    return { error: `分类只能是 ${categories.join(" / ")}。` };
   }
 
   // Rendered as the card's outbound link on three pages.
@@ -48,10 +52,10 @@ export async function saveApp(_prev: ActionState, form: FormData): Promise<Actio
 
   const row = {
     key,
-    name: str(form, "name"),
+    name,
     tagline: localized(form, "tagline"),
     description: localized(form, "description"),
-    category: category as "desktop" | "tool" | "game" | "website",
+    category,
     website,
     repo,
     platforms: list(form, "platforms"),

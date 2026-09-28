@@ -5,7 +5,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession } from "@/lib/auth/session";
 
-import { str } from "@/lib/forms";
+import { oneOf, str } from "@/lib/forms";
 
 import { TAGS } from "@/lib/content";
 
@@ -14,25 +14,18 @@ import { invalidate, SESSION_EXPIRED, collectRows, type ActionState } from "./sh
 export async function saveChips(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
-  const rows = collectRows(form, "chip")
-    .map((i, index) => ({
-      label: {
-        zh: str(form, `chip.${i}.label.zh`),
-        en: str(form, `chip.${i}.label.en`),
-      },
-      tone: str(form, `chip.${i}.tone`) as "paper" | "ink" | "accent",
-      sort: index,
-    }))
+  const tones = schema.chipToneEnum.enumValues;
+  const rows: (typeof schema.chips.$inferInsert)[] = [];
+  for (const [index, i] of collectRows(form, "chip").entries()) {
+    const label = { zh: str(form, `chip.${i}.label.zh`), en: str(form, `chip.${i}.label.en`) };
     // An emptied pair is how a row is deleted — there is no separate button.
-    .filter((row) => row.label.zh || row.label.en);
-
-  for (const row of rows) {
-    if (!["paper", "ink", "accent"].includes(row.tone)) {
-      return { error: "纸色只能是 paper / ink / accent。" };
-    }
+    if (!label.zh && !label.en) continue;
+    const tone = str(form, `chip.${i}.tone`);
+    if (!oneOf(tones, tone)) return { error: `纸色只能是 ${tones.join(" / ")}。` };
     // Proper nouns read the same either way, so one side may stand for both.
-    row.label.zh ||= row.label.en;
-    row.label.en ||= row.label.zh;
+    label.zh ||= label.en;
+    label.en ||= label.zh;
+    rows.push({ label, tone, sort: index });
   }
 
   // Delete and insert travel in one `db.batch()` — a single atomic request —

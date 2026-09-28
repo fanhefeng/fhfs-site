@@ -31,6 +31,18 @@ export const str = (form: FormData, key: string): string => text(form, key).trim
  */
 export const raw = (form: FormData, key: string): string => text(form, key);
 
+/**
+ * Narrows a submitted value to one of a column's enum values. Hand it the
+ * schema's own list (`appCategoryEnum.enumValues`), never a copy: a list
+ * typed out again in an action is a second answer, and it drifts the day the
+ * enum grows.
+ */
+export const oneOf = <T extends string>(values: readonly T[], value: string): value is T =>
+  (values as readonly string[]).includes(value);
+
+/** A bilingual pair with at least one side written — a title that exists. */
+export const filled = (pair: { zh: string; en: string }): boolean => Boolean(pair.zh || pair.en);
+
 /** Narrows to the locale union — excluding literals off `string` does not. */
 export const parseLocale = (value: string): "zh" | "en" | null =>
   value === "zh" || value === "en" ? value : null;

@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { intField, list, localized, str, validKey, validLink } from "@/lib/forms";
+import { filled, intField, list, localized, str, validKey, validLink } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
 import {
   invalidate,
@@ -20,6 +20,8 @@ export async function saveWork(_prev: ActionState, form: FormData): Promise<Acti
 
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
+  const title = localized(form, "title");
+  if (!filled(title)) return { error: "标题至少写一种语言。" };
   const year = intField(form, "year", "年份", null);
   if (!year.ok) return year;
   if (year.value === null || year.value < 1990 || year.value > 2100) {
@@ -34,7 +36,7 @@ export async function saveWork(_prev: ActionState, form: FormData): Promise<Acti
 
   const row = {
     key,
-    title: localized(form, "title"),
+    title,
     description: localized(form, "description"),
     year: year.value,
     cover,

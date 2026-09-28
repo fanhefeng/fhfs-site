@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { intField, localized, localizedLines, str, validKey } from "@/lib/forms";
+import { filled, intField, localized, localizedLines, str, validKey } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
 import { invalidate, SESSION_EXPIRED, KEY_ERROR, upsertKeyed, type ActionState } from "./shared";
 
@@ -14,6 +14,8 @@ export async function saveIntroNode(_prev: ActionState, form: FormData): Promise
   const key = str(form, "key");
   if (!validKey(key)) return KEY_ERROR;
 
+  const title = localized(form, "title");
+  if (!filled(title)) return { error: "标题至少写一种语言。" };
   const period = localized(form, "period");
   const sort = intField(form, "sort", "排序", 0);
   if (!sort.ok) return sort;
@@ -21,7 +23,7 @@ export async function saveIntroNode(_prev: ActionState, form: FormData): Promise
   const row = {
     key,
     kicker: localized(form, "kicker"),
-    title: localized(form, "title"),
+    title,
     period: period.zh || period.en ? period : null,
     body: localized(form, "body"),
     bullets: localizedLines(form, "bullets"),

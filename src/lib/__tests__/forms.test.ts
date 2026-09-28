@@ -2,11 +2,13 @@ import { describe, expect, it } from "vite-plus/test";
 import { MEDIA_ORIGIN } from "@/lib/csp";
 import {
   KEY_PATTERN,
+  filled,
   formatMedia,
   intField,
   list,
   localized,
   localizedLines,
+  oneOf,
   parseLocale,
   parseMedia,
   parseMomentTime,
@@ -147,6 +149,21 @@ describe("validPath / validLink", () => {
     expect(validLink("mailto:a@b.c")).toBe(false);
     expect(validLink("https://has space")).toBe(false);
     expect(validLink("")).toBe(false);
+  });
+});
+
+describe("oneOf / filled", () => {
+  it("narrows to a value the enum actually has", () => {
+    const tones = ["paper", "ink", "accent"] as const;
+    expect(oneOf(tones, "ink")).toBe(true);
+    expect(oneOf(tones, "Ink")).toBe(false);
+    expect(oneOf(tones, "")).toBe(false);
+  });
+
+  it("calls a pair filled when either side is written", () => {
+    expect(filled({ zh: "标题", en: "" })).toBe(true);
+    expect(filled({ zh: "", en: "Title" })).toBe(true);
+    expect(filled({ zh: "", en: "" })).toBe(false);
   });
 });
 
