@@ -28,18 +28,72 @@ describe("isConnectionFailure", () => {
 describe("withConnectionRetry", () => {
   it("retries a connection failure and returns the response that follows", async () => {
     const calls: unknown[] = [];
-    const response = new Response("ok");
     const retrying = withConnectionRetry(
       async (input) => {
         calls.push(input);
         if (calls.length === 1) throw networkError();
-        return response;
+        return new Response('{"rows":[]}', { status: 200, headers: { "x-neon": "1" } });
       },
       [1, 2],
       noSleep,
     );
-    await expect(retrying(url)).resolves.toBe(response);
+    const response = await retrying(url);
+    await expect(response.text()).resolves.toBe('{"rows":[]}');
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-neon")).toBe("1");
     expect(calls).toEqual([url, url]);
+  });
+
+  it("retries a reply whose body breaks off halfway", async () => {
+    let calls = 0;
+    const retrying = withConnectionRetry(
+      async () => {
+        calls++;
+        if (calls > 1) return new Response("whole");
+        // Headers arrived, then the proxy closed the socket mid-body.
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(new TextEncoder().encode("hal"));
+              controller.error(
+                new TypeError("terminated", { cause: new Error("other side closed") }),
+              );
+            },
+          }),
+        );
+      },
+      [1, 2],
+      noSleep,
+    );
+    await expect((await retrying(url)).text()).resolves.toBe("whole");
+    expect(calls).toBe(2);
+  });
+
+  it("hands back an HTTP error status as it came, without retrying", async () => {
+    let calls = 0;
+    const retrying = withConnectionRetry(
+      async () => {
+        calls++;
+        return new Response('{"message":"syntax error"}', { status: 400 });
+      },
+      [1, 2],
+      noSleep,
+    );
+    const response = await retrying(url);
+    expect(response.status).toBe(400);
+    await expect(response.text()).resolves.toBe('{"message":"syntax error"}');
+    expect(calls).toBe(1);
+  });
+
+  it("keeps a bodiless status bodiless", async () => {
+    const retrying = withConnectionRetry(
+      async () => new Response(null, { status: 204 }),
+      [],
+      noSleep,
+    );
+    const response = await retrying(url);
+    expect(response.status).toBe(204);
+    expect(response.body).toBeNull();
   });
 
   it("gives up with the last error once the delays run out", async () => {

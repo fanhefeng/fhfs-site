@@ -33,13 +33,13 @@ if (!url) {
  * Every statement is one HTTP request, and the driver makes it with this
  * function: the global `fetch` — looked up per call, so the one Next has
  * instrumented is the one used — wrapped to try again when the connection
- * itself failed (src/lib/retryFetch.ts). That is the failure a proxied dev
- * network produces a few times an hour, and each one used to be a 500 on
- * whichever page was rendering. Retrying is safe here because everything
- * this site sends is a select, a keyed upsert, a keyed delete, or a
- * `db.batch()` that travels as a single request — none of them changes
- * anything when repeated. Keep the writes that way; a plain insert into a
- * serial-keyed table would not be.
+ * itself failed, or the reply broke off before its end (src/lib/retryFetch.ts).
+ * Those are the failures a proxied dev network produces a few times an hour,
+ * and each one used to be a 500 on whichever page was rendering. Retrying is
+ * safe here because everything this site sends is a select, a keyed upsert,
+ * a keyed delete, or a `db.batch()` that travels as a single request — none
+ * of them changes anything when repeated. Keep the writes that way; a plain
+ * insert into a serial-keyed table would not be.
  */
 neonConfig.fetchFunction = withConnectionRetry((input, init) => fetch(input, init));
 
