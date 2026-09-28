@@ -79,19 +79,12 @@ export const SECTION_GROUPS: AdminGroup[] = [
         view: "/secrets",
         unit: "篇",
       },
-      {
-        href: "/admin/timeline",
-        label: "版本履历",
-        blurb: "/life 上那串版本号——一生按软件发布来记。",
-        view: "/life",
-        unit: "版",
-      },
     ],
   },
   {
     id: "me",
     label: "关于我",
-    caption: "同一个人的三种讲法：一页自述、一幕 3D、一份简历。",
+    caption: "同一个人的几种讲法：一页自述和它的版本履历、一幕 3D、一份简历。",
     sections: [
       {
         href: "/admin/about",
@@ -99,6 +92,13 @@ export const SECTION_GROUPS: AdminGroup[] = [
         blurb: "/about 的正文，中英各一份。",
         view: "/about",
         unit: "份",
+      },
+      {
+        href: "/admin/timeline",
+        label: "版本履历",
+        blurb: "/about 页上那串版本号——一生按软件发布来记。",
+        view: "/about",
+        unit: "版",
       },
       {
         href: "/admin/intro",

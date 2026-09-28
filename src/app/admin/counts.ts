@@ -9,7 +9,7 @@ import { SECTIONS, type SectionCounts } from "./sections";
 /**
  * How many rows each section holds, for the sidebar and the dashboard.
  *
- * One statement, not fourteen: the sidebar is on every admin page, and over
+ * One statement, not twelve: the sidebar is on every admin page, and over
  * Neon's HTTP driver each `select count(*)` is its own round trip. They fold
  * into a single row of scalar subqueries instead — `select (select count(*)
  * from posts) as "/admin/posts", …` — which is one request whatever the
@@ -42,10 +42,15 @@ const TABLES: Record<string, PgTable> = {
 export type { SectionCounts };
 
 export const sectionCounts = cache(async (): Promise<SectionCounts> => {
-  const columns = SECTIONS.map(
-    (section) =>
-      sql`(select count(*)::int from ${TABLES[section.href]}) as ${sql.identifier(section.href)}`,
-  );
+  // A section added to `./sections` without a table here gets no count rather
+  // than an `undefined` spliced into the SQL — which would 500 every admin
+  // page, the sidebar being on all of them.
+  const columns = SECTIONS.flatMap((section) => {
+    const table = TABLES[section.href];
+    return table
+      ? [sql`(select count(*)::int from ${table}) as ${sql.identifier(section.href)}`]
+      : [];
+  });
   const result = await db.execute<Record<string, number>>(
     sql`select ${sql.join(columns, sql`, `)}`,
   );

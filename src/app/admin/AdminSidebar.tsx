@@ -10,11 +10,11 @@ import { metaClass } from "./styles";
 /**
  * The standing table of contents, grouped the way the front of the site is.
  *
- * Thirteen sections in one flat row of links (what the header used to be) told
+ * A dozen sections in one flat row of links (what the header used to be) told
  * you nothing about where you were; four named groups of three or four tell you
  * both that and what else lives next door. The count beside each one is read in
  * a single statement for the whole sidebar (`./counts`), so this costs one
- * round trip per page, not thirteen.
+ * round trip per page, not twelve.
  *
  * `next/navigation`'s usePathname, not the i18n one: /admin sits outside the
  * locale tree, so there is no locale to strip and the next-intl router would
@@ -23,8 +23,12 @@ import { metaClass } from "./styles";
  * Below `lg` it collapses into a bar with a drawer behind it. The drawer closes
  * on every navigation — soft navigation keeps this component mounted, so
  * without that it would stay open over the page you just asked for.
+ *
+ * `counts` is left out by the loading state (`./loading.tsx`), which draws the
+ * same sidebar before the page has read anything: no numbers rather than a
+ * column of zeros that would say every table had emptied.
  */
-export function AdminSidebar({ counts }: { counts: SectionCounts }) {
+export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -79,9 +83,14 @@ export function AdminSidebar({ counts }: { counts: SectionCounts }) {
                       }`}
                     />
                     <span className="flex-1 truncate">{section.label}</span>
-                    <span className="font-mono text-meta text-fg-tertiary tabular-nums">
-                      {counts[section.href] ?? 0}
-                    </span>
+                    {/* With its unit: a bare "0" beside 站点文案 read as "no copy",
+                        when it counts the lines edited away from the files. */}
+                    {counts && (
+                      <span className="font-mono text-meta text-fg-tertiary tabular-nums">
+                        {counts[section.href] ?? 0}
+                        <span className="ml-1 font-sans">{section.unit}</span>
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

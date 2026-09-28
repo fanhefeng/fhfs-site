@@ -9,7 +9,7 @@ import { cardClass, metaClass } from "./styles";
  * The front page of the workbench: every section, in the site's own four
  * groups, each saying how much is in it and what it changes out front.
  *
- * The counts come from `sectionCounts()` — one statement for all thirteen,
+ * The counts come from `sectionCounts()` — one statement for all twelve,
  * shared with the sidebar through `React.cache`, and read straight from the
  * tables rather than through the cached getters. The point of the number is
  * that it says what is stored right now.
