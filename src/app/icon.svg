@@ -2,7 +2,7 @@
   <!--
     Site mark — the ring off the neon over the door, with the note in its
     gap, lit, on the bricks' near-black. The paths are the sign's own
-    (components/neon/geometry.ts: the ring's two arcs, broken at the top
+    (lib/neon/geometry.ts: the ring's two arcs, broken at the top
     right where the note's stem leaves it, and the traced note), so the
     favicon is the same drawing as the door and the island, not a redraw.
 

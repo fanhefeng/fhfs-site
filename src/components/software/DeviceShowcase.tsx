@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { gsap, useGSAP, EASE } from "@/lib/gsap";
-import { SegmentedFilter, type Segment } from "./SegmentedFilter";
+import { SegmentedFilter, type Segment } from "@/components/ui/SegmentedFilter";
 import { DeviceFrame } from "./DeviceFrame";
 import { AppMock } from "./AppMock";
 import type { SoftwareApp } from "./appMeta";

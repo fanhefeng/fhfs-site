@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ARC_L, ARC_R, NEON, RING_VIEW_BOX } from "./geometry";
+import { ARC_L, ARC_R, NEON, RING_VIEW_BOX } from "@/lib/neon/geometry";
 
 /** Stroke widths in drawing units — the ring is 700 units across, so at the
  *  island's 36px one unit is about a twentieth of a pixel. */

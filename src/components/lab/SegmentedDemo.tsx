@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SegmentedFilter, type Segment } from "@/components/software/SegmentedFilter";
+import { SegmentedFilter, type Segment } from "@/components/ui/SegmentedFilter";
 import { StudyPanel } from "./StudyPanel";
 
 type Props = {

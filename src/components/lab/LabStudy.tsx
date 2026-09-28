@@ -62,7 +62,7 @@ const LiquidMetalDemo = dynamic(() => import("./LiquidMetalDemo").then((m) => m.
   loading: stageHold,
 });
 const Workstation = dynamic(
-  () => import("@/components/about/Workstation").then((m) => m.Workstation),
+  () => import("@/components/lab/Workstation").then((m) => m.Workstation),
   { ssr: false, loading: deskHold },
 );
 const LensSliderDemo = dynamic(() => import("./LensSliderDemo").then((m) => m.LensSliderDemo), {

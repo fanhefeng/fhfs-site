@@ -149,7 +149,7 @@ Neon 账号整个没了，三级各有一份能照着敲的操作单。
   同一块招牌也是首页的大门（`components/home/NeonSplash.tsx`，硬着陆时每 session 一次，
   推门是从圆环里穿过去），它的圆环与音符也是站标：favicon（`app/icon.svg`）、灵动岛和
   页脚上套着 `fhf` 的圆环（`components/neon/SignRing.tsx`）、OG 卡题头（`lib/ogMark.tsx`）
-  都从同一份几何（`components/neon/geometry.ts`）画出来。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
+  都从同一份几何（`lib/neon/geometry.ts`）画出来。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
   `lib/jukebox.ts` 是它的 store），开关是招牌本身和灵动岛上的音符。门口这首 Mia & Sebastian's
   Theme（Justin Hurwitz，《爱乐之城》原声，2016）**自托管**在
   `public/music/mia-and-sebastians-theme.mp3`——一个 `<audio loop preload="none">` 直接放，

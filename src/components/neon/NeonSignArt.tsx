@@ -14,7 +14,7 @@ import {
   VIEW_BOX,
   WORD,
   type SegName,
-} from "./geometry";
+} from "@/lib/neon/geometry";
 
 /* ------------------------------------------------------------------ */
 /* The sign: the drawing lives in ./geometry (plain data, so the mark   */
@@ -25,7 +25,7 @@ import {
 /* so those keep one import.                                            */
 /* ------------------------------------------------------------------ */
 
-export * from "./geometry";
+export * from "@/lib/neon/geometry";
 
 /**
  * The neon, made from a painted shape.

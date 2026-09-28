@@ -6,8 +6,8 @@ import { gsap, useGSAP, EASE } from "@/lib/gsap";
 import { captureGrid, playGrid, type GridState } from "@/lib/flipGrid";
 import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
 import { useUrlChoice } from "@/lib/useUrlChoice";
-import { AppCard } from "@/components/cards/AppCard";
-import { SegmentedFilter, type Segment } from "./SegmentedFilter";
+import { AppCard } from "./AppCard";
+import { SegmentedFilter, type Segment } from "@/components/ui/SegmentedFilter";
 import { MobileAppRail } from "./MobileAppRail";
 import { APP_CATEGORIES, type AppFilter, type SoftwareApp } from "./appMeta";
 

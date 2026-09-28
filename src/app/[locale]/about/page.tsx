@@ -15,7 +15,7 @@ import { sectionMetadata } from "@/lib/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
 import { Reveal } from "@/components/fx/Reveal";
-import { ManifestoBand } from "@/components/home/ManifestoBand";
+import { ManifestoBand } from "@/components/about/ManifestoBand";
 import { StickerWall } from "@/components/about/StickerWall";
 import { Changelog, type ChangelogEntry } from "@/components/about/Changelog";
 import { Colophon } from "@/components/about/Colophon";

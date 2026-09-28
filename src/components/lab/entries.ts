@@ -191,7 +191,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "06",
     added: "2026-07-31",
     accent: "#b45309",
-    sources: ["components/about/Workstation.tsx", "lib/three/draco.ts"],
+    sources: ["components/lab/Workstation.tsx", "lib/three/draco.ts"],
   },
   // Four photographs and a lens: the next picture arrives inside a growing
   // circle of glass, magnified at the rim, then settles flat.
@@ -221,7 +221,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     sources: [
       "components/lab/NeonSignDemo.tsx",
       "components/neon/NeonSignArt.tsx",
-      "components/neon/geometry.ts",
+      "lib/neon/geometry.ts",
       "components/neon/wall.ts",
       "components/home/NeonSplash.tsx",
     ],
@@ -241,7 +241,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     sources: [
       "components/lab/SidewaysDemo.tsx",
       "components/fx/SidewaysBand.tsx",
-      "components/home/ManifestoBand.tsx",
+      "components/about/ManifestoBand.tsx",
     ],
   },
   // The masthead's line mask: each line rises from behind its own clip.
@@ -404,7 +404,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "22",
     added: "2026-09-19",
     accent: "#2f6f8f",
-    sources: ["components/lab/SegmentedDemo.tsx", "components/software/SegmentedFilter.tsx"],
+    sources: ["components/lab/SegmentedDemo.tsx", "components/ui/SegmentedFilter.tsx"],
   },
   // The grid whose survivors slide to their new places — Flip, captured
   // before React re-renders and replayed in the layout phase.
