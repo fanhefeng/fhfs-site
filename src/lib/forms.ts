@@ -1,3 +1,4 @@
+import { MEDIA_ORIGIN } from "@/lib/csp";
 import type { MomentMedia } from "@/lib/moments";
 import { lines } from "@/lib/resume";
 
@@ -155,6 +156,11 @@ export type MediaParse = { ok: true; value: MomentMedia[] } | { ok: false; error
  *   audio /moments/app-2-1.m4a 90s
  *   video https://…/app-3-1.mp4 720x1280 30s poster=/moments/app-3-1.jpg
  *
+ * A picture, a voice note and a poster are files on this site; a video may
+ * also be in the Blob store, and nowhere else. Any other host would save
+ * fine and then fail out front: next/image refuses a host it was not given
+ * (and throws, taking the board with it), and the CSP blocks the rest.
+ *
  * `formatMedia` writes the same lines back, so a row round-trips through the
  * editor unchanged. Errors name the line: this field is a list, and a
  * "看不懂" without a line number sends the author reading all of it.
@@ -171,10 +177,10 @@ export function parseMedia(text: string): MediaParse {
     if (!kind || !MEDIA_KINDS.has(kind)) {
       return { ok: false, error: `${at}：开头要是 image、audio 或 video。` };
     }
-    if (!src || !validLink(src)) {
+    if (!src || !(validPath(src) || (kind === "video" && src.startsWith(`${MEDIA_ORIGIN}/`)))) {
       return {
         ok: false,
-        error: `${at}：第二项要是文件地址——站内以单个 / 开头，或完整的 http(s):// 地址。`,
+        error: `${at}：第二项要是站内文件地址，以单个 / 开头；只有视频可以放在 Blob（${MEDIA_ORIGIN}/…）。`,
       };
     }
     let size: [number, number] | undefined;

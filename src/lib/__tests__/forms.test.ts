@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { MEDIA_ORIGIN } from "@/lib/csp";
 import {
   KEY_PATTERN,
   formatMedia,
@@ -157,7 +158,7 @@ describe("parseMedia / formatMedia", () => {
       "image /pics/app-1-1.jpg 1080x1440",
       "",
       "  audio /pics/app-2-1.m4a 90s  ",
-      "video https://blob.example/app-3-1.mp4 poster=/pics/app-3-1.jpg 30s 720x1280",
+      `video ${MEDIA_ORIGIN}/app-3-1.mp4 poster=/pics/app-3-1.jpg 30s 720x1280`,
     ].join("\n");
     expect(parseMedia(text)).toEqual({
       ok: true,
@@ -166,7 +167,7 @@ describe("parseMedia / formatMedia", () => {
         { kind: "audio", src: "/pics/app-2-1.m4a", duration: 90 },
         {
           kind: "video",
-          src: "https://blob.example/app-3-1.mp4",
+          src: `${MEDIA_ORIGIN}/app-3-1.mp4`,
           poster: "/pics/app-3-1.jpg",
           width: 720,
           height: 1280,
@@ -182,8 +183,7 @@ describe("parseMedia / formatMedia", () => {
   });
 
   it("round-trips through formatMedia", () => {
-    const text =
-      "image /pics/a.jpg 10x20\naudio /pics/b.m4a 12.5s\nvideo https://x/c.mp4 720x1280 30s poster=/pics/c.jpg";
+    const text = `image /pics/a.jpg 10x20\naudio /pics/b.m4a 12.5s\nvideo ${MEDIA_ORIGIN}/c.mp4 720x1280 30s poster=/pics/c.jpg`;
     const parsed = parseMedia(text);
     expect(parsed.ok).toBe(true);
     if (parsed.ok) expect(formatMedia(parsed.value)).toBe(text);
@@ -201,9 +201,28 @@ describe("parseMedia / formatMedia", () => {
     expect(wrong("image /pics/a.jpg")).toMatch(/尺寸/);
     expect(wrong("image /pics/a.jpg 0x20")).toMatch(/看不懂「0x20」/);
     expect(wrong("audio /pics/a.m4a 10x20")).toMatch(/时长/);
-    expect(wrong("video https://x/c.mp4 720x1280 30s")).toMatch(/封面/);
-    expect(wrong("video https://x/c.mp4 720x1280 30s poster=//x/c.jpg")).toMatch(/看不懂/);
+    expect(wrong(`video ${MEDIA_ORIGIN}/c.mp4 720x1280 30s`)).toMatch(/封面/);
+    expect(wrong(`video ${MEDIA_ORIGIN}/c.mp4 720x1280 30s poster=//x/c.jpg`)).toMatch(/看不懂/);
     expect(wrong("image /pics/a.jpg 10x20 huge")).toMatch(/看不懂「huge」/);
+  });
+
+  it("takes files from this site, and a video from the Blob store too — nowhere else", () => {
+    const wrong = (text: string) => {
+      const parsed = parseMedia(text);
+      return parsed.ok ? "" : parsed.error;
+    };
+    // next/image throws on a host it was not configured for; the CSP blocks the rest.
+    expect(wrong(`image ${MEDIA_ORIGIN}/a.jpg 10x20`)).toMatch(/站内文件地址/);
+    expect(wrong("image https://example.com/a.jpg 10x20")).toMatch(/站内文件地址/);
+    expect(wrong("audio https://example.com/a.m4a 9s")).toMatch(/站内文件地址/);
+    expect(wrong("video https://example.com/c.mp4 720x1280 30s poster=/pics/c.jpg")).toMatch(
+      /站内文件地址/,
+    );
+    // The origin alone as a prefix is not enough: a lookalike host is another host.
+    expect(wrong(`video ${MEDIA_ORIGIN}.evil.com/c.mp4 720x1280 30s poster=/pics/c.jpg`)).toMatch(
+      /站内文件地址/,
+    );
+    expect(wrong("video /pics/c.mp4 720x1280 30s poster=/pics/c.jpg")).toBe("");
   });
 });
 

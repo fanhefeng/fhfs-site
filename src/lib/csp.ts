@@ -15,6 +15,12 @@
  *
  * Pure, and imported by next.config.ts — no `fs`, no `@/` imports.
  */
+
+/** The Vercel Blob store `fhfs-media`, where the board's videos live. The
+ *  admin's media field accepts a video from here and from nowhere else
+ *  (`parseMedia` in lib/forms.ts), so what it saves is what the page may load. */
+export const MEDIA_ORIGIN = "https://oaq2x6wu11ne1ol7.public.blob.vercel-storage.com";
+
 export function contentSecurityPolicy({ dev }: { dev: boolean }): string {
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
@@ -34,7 +40,7 @@ export function contentSecurityPolicy({ dev }: { dev: boolean }): string {
     // The one thing served from elsewhere: the board's videos, too big for
     // the repository, in the Vercel Blob store `fhfs-media` (AGENTS.md, Board
     // media). Nothing else — not scripts, not images — comes from there.
-    "media-src": ["'self'", "https://oaq2x6wu11ne1ol7.public.blob.vercel-storage.com"],
+    "media-src": ["'self'", MEDIA_ORIGIN],
     "font-src": ["'self'"],
     // blob: because GLTFLoader fetches those unpacked textures; the dev
     // server adds its hot-reload socket.
