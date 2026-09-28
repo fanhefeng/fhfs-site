@@ -97,8 +97,22 @@ export const COPY_GROUPS: CopyGroup[] = [
   { id: "footer", label: "页脚", blurb: "版权、时钟两侧的词、贴纸提示。" },
   { id: "tracks", label: "背景音乐", blurb: "四首曲子在界面上显示的名字。" },
   { id: "common", label: "通用按钮", blurb: "返回、展开、复制这类到处都在用的词。" },
-  { id: "error", label: "报错页", blurb: "页面塌了时那一屏说的话。" },
-  { id: "notFound", label: "404", blurb: "找不到的那一页。" },
+  {
+    id: "error",
+    label: "报错页",
+    // global-error.tsx renders above the layout, with no provider to carry an
+    // override — it reads ERROR_COPY, a copy of the files' `error` lines.
+    blurb:
+      "页面塌了时那一屏说的话。只管页面里的报错；整站布局都塌了时的那一屏读的是代码里的副本，这里改了它看不见。",
+  },
+  {
+    id: "notFound",
+    label: "404",
+    // global-not-found.tsx, for addresses outside /zh and /en, imports the
+    // JSON files directly for the same reason.
+    blurb:
+      "找不到的那一页。/zh、/en 下的地址用这里的字；连语言都对不上的地址落到全局 404，那一页直接读语言文件。",
+  },
   { id: "layout", label: "站点标题", blurb: "浏览器标签页上的那一行。" },
 ];
 
