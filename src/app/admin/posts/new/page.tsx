@@ -1,3 +1,4 @@
+import { site } from "@/config/site";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../../AdminChrome";
 import { PostForm } from "../PostForm";
@@ -19,9 +20,9 @@ export default async function NewPost() {
           locale: "zh",
           title: "",
           // Today, as a starting point rather than a claim — it is editable.
-          // sv-SE formats as YYYY-MM-DD in the server's local zone; the ISO
-          // string would be UTC, i.e. yesterday for a Qingdao morning.
-          date: new Intl.DateTimeFormat("sv-SE").format(new Date()),
+          // sv-SE formats as YYYY-MM-DD, in the site's zone: the server's own is
+          // UTC on Vercel, which before 08:00 in Shanghai is still yesterday.
+          date: new Intl.DateTimeFormat("sv-SE", { timeZone: site.timeZone }).format(new Date()),
           summary: "",
           tags: [],
           draft: false,

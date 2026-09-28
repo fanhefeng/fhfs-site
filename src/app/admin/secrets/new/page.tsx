@@ -1,3 +1,4 @@
+import { site } from "@/config/site";
 import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../../AdminChrome";
 import { SecretForm } from "../SecretForm";
@@ -19,8 +20,8 @@ export default async function NewSecret() {
           locale: "zh",
           kind: "essay",
           title: "",
-          // Today in the server's local zone — a starting point, editable.
-          date: new Intl.DateTimeFormat("sv-SE").format(new Date()),
+          // Today in the site's zone (the server's is UTC) — a starting point, editable.
+          date: new Intl.DateTimeFormat("sv-SE", { timeZone: site.timeZone }).format(new Date()),
           summary: "",
           audio: "",
           duration: "",

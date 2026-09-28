@@ -17,7 +17,7 @@ export function AboutForm({
       <input type="hidden" name="locale" value={about.locale} />
 
       <label className="block space-y-1.5">
-        <span className={labelClass}>标题</span>
+        <span className={labelClass}>标题（暂未生效）</span>
         <input name="title" defaultValue={about.title} className={inputClass} />
       </label>
 

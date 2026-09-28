@@ -15,7 +15,7 @@ export default async function AboutPage() {
   return (
     <AdminChrome title="关于页" section="/admin/about">
       <Note>
-        上面的标题字段目前页面并不显示——页面用的是「站点文案」里的 <code>about.title</code>。
+        下面每份的「标题」目前页面并不显示——页面用的是「站点文案」里的 <code>about.title</code>。
       </Note>
       <div className="space-y-6">
         {/* Both locales render whether or not a row exists yet — saveAbout is
