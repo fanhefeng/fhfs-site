@@ -205,7 +205,13 @@ images together. Two rules follow:
 Cache Components (`cacheComponents: true` / `'use cache'`) is deliberately
 off: a cached scope cannot see values passed through `React.cache`, which is
 exactly how next-intl's `setRequestLocale` works, so `getTranslations()` inside
-one throws.
+one throws. That reason has a shelf life: next-intl 4.14 marks
+`setRequestLocale` and `requestLocale` deprecated in favour of
+`next/root-params`, which Next 16.3 can read inside `'use cache'`, and Next
+16 calls `unstable_cache` replaced by `'use cache'`. Moving over is known
+debt, not a quick switch — root params are unavailable in route handlers
+(`rss.xml`), Server Actions and `unstable_cache`, and with two root layouts
+(`[locale]`, `admin`) `locale()` is `string | undefined`.
 
 `messages/*.json` holds the defaults for *all* copy — every one of the 885
 lines. The `copy_blocks` table is an override layer merged in

@@ -1192,7 +1192,8 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 - fetch 与 GET Route Handler 默认**不缓存**；静态化要显式 `force-static`（rss.xml 已是）。
 - 本项目未开启 cacheComponents：**禁止 `'use cache'`/cacheLife/cacheTag**。
 - `next/image`：`priority` 已废弃 → 用 `preload`/`fetchPriority`；远程图必须 remotePatterns。
-- root layout 是 `src/app/[locale]/layout.tsx`，勿建顶层 layout；勿手写 `<head>`。
+- root layout 有两个：`src/app/[locale]/layout.tsx`（站点）和 `src/app/admin/layout.tsx`（后台，
+  在 locale 树之外）；勿建顶层 `app/layout.tsx`；勿手写 `<head>`。
 - 勿给 html 加 CSS smooth-scroll（与 Lenis 冲突）。
 - `next lint` 已删除。
 - 动态路由：`generateStaticParams` 预渲染构建时已知的那些，**不要**加
@@ -1221,11 +1222,13 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 
 ### 5.3 性能预算
 
-LCP ≤1.8s（hero 纯文字）；INP <200ms；滚动 60fps：只动 transform/opacity，backdrop-filter 仅入退场瞬时；脚本体积按 `scripts/smoke.mts` 的 `SCRIPT_BUDGET_KB` 卡（生产构建、网络上的字节数、懒加载的块也算；2026-09-19 实测 +一成：首页 660KB、three.js 场景页 740KB、其余 450KB——原先写的「首页 JS <180KB gz」从没量过，实际是它的三倍，作废）；aurora 纯 CSS；canvas 增强层「静止停在最后一帧、零持续开销」（评审嫁接的通用验收项）。
+LCP ≤1.8s（hero 纯文字）；INP <200ms；滚动 60fps：只动 transform/opacity，backdrop-filter 仅入退场瞬时；脚本体积按 `scripts/smoke.mts` 的 `SCRIPT_BUDGET_KB` 卡（生产构建、网络上的字节数、懒加载的块也算；数字以那张表为准：首页 450KB（2026-09-24 苔藓回实验室后首页不再挂 three.js，从 660 降回普通页）、three.js 场景页 740KB、其余 450KB、后台 230KB——原先写的「首页 JS <180KB gz」从没量过，实际是它的三倍，作废）；aurora 纯 CSS；canvas 增强层「静止停在最后一帧、零持续开销」（评审嫁接的通用验收项）。
 
 ### 5.4 HTML-in-Canvas（P4 纯增强）
 
-SSR 永远输出完整 DOM；`src/lib/htmlInCanvas.ts` 导出 `supportsHtmlInCanvas()`（检测 `drawElementImage`/`getElementTransform`/`texElementImage2D`），客户端 useEffect 通过后才挂 canvas 层并由 JS 添加 `layoutsubtree`。兜底链：liquid glass→CSS backdrop-filter；elastic card→GSAP hover；翻页→View Transitions→opacity。Origin Trial token 需用户自行注册（Vercel 域 + localhost），placeholder 留 TODO。
+> 2026-09-28：`lib/htmlInCanvas.ts` 早已随 LiquidLens 删除（见文首补记里删除 LiquidLens 的那一条），本节只作历史。
+
+SSR 永远输出完整 DOM；（已删的）`src/lib/htmlInCanvas.ts` 导出 `supportsHtmlInCanvas()`（检测 `drawElementImage`/`getElementTransform`/`texElementImage2D`），客户端 useEffect 通过后才挂 canvas 层并由 JS 添加 `layoutsubtree`。兜底链：liquid glass→CSS backdrop-filter；elastic card→GSAP hover；翻页→View Transitions→opacity。Origin Trial token 需用户自行注册（Vercel 域 + localhost），placeholder 留 TODO。
 
 ## 6. 实现顺序
 
