@@ -1,3 +1,4 @@
+import "server-only";
 import { neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { withConnectionRetry } from "../lib/retryFetch";
