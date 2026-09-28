@@ -4,7 +4,9 @@ import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   abouts,
+  appCategoryEnum,
   apps,
+  chipToneEnum,
   chips,
   copyBlocks,
   introNodes,
@@ -13,6 +15,7 @@ import {
   posts,
   resumeExperiences,
   resumeProfiles,
+  secretKindEnum,
   secrets,
   timelineEntries,
   type Localized,
@@ -108,7 +111,7 @@ export type App = {
   name: string;
   tagline: Localized;
   description: Localized;
-  category: "desktop" | "tool" | "game" | "website";
+  category: (typeof appCategoryEnum.enumValues)[number];
   website: string;
   /** GitHub "owner/name", when the app has a public repo. */
   repo: string | null;
@@ -322,7 +325,7 @@ export const getPostsByTag = unstable_cache(
 // Secrets — 《不能说的秘密》, the essays and episodes
 // ---------------------------------------------------------------------------
 
-export type SecretKind = "essay" | "podcast";
+export type SecretKind = (typeof secretKindEnum.enumValues)[number];
 
 export type SecretSummary = {
   slug: string;
@@ -567,7 +570,7 @@ export const getApps = unstable_cache(
 // What used to be hard-coded in components
 // ---------------------------------------------------------------------------
 
-export type Chip = { label: Localized; tone: "paper" | "ink" | "accent" };
+export type Chip = { label: Localized; tone: (typeof chipToneEnum.enumValues)[number] };
 
 export const getChips = unstable_cache(
   async (): Promise<Chip[]> =>

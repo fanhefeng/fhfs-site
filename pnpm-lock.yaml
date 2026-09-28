@@ -240,7 +240,7 @@ importers:
         specifier: ^10.7.8
         version: 10.7.8(@react-three/fiber@9.7.0(patch_hash=615fd215cfa8ad262b97b7e2850e9293c54d2b79236b196780a8dccd2de7673d)(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.185.1))(@types/react@19.3.0)(@types/three@0.185.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.185.1)
       '@react-three/fiber':
-        specifier: ^9.7.0
+        specifier: 9.7.0
         version: 9.7.0(patch_hash=615fd215cfa8ad262b97b7e2850e9293c54d2b79236b196780a8dccd2de7673d)(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.185.1)
       client-only:
         specifier: 0.0.1
