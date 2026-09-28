@@ -95,7 +95,7 @@ const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
     "stageMolten",
     "stageBloom",
   ],
-  workstation: ["deskHint", "turnLeft", "turnRight", "deskSaveData", "deskFallback"],
+  workstation: ["deskHint", "deskAria", "turnLeft", "turnRight", "deskSaveData", "deskFallback"],
   lensSlider: [
     "fallback",
     "saveData",
