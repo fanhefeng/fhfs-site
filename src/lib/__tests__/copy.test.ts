@@ -107,8 +107,25 @@ describe("isScreenReaderOnly", () => {
 describe("icuTokens", () => {
   it("finds arguments and tags", () => {
     expect(icuTokens("读 {minutes} 分钟")).toEqual({ args: ["minutes"], tags: [] });
-    expect(icuTokens("{count, plural, other {# 篇}}").args).toEqual(["count"]);
-    expect(icuTokens("看 <b>这里</b> 和 <i/>")).toEqual({ args: [], tags: ["b", "i"] });
+    expect(icuTokens("{count, plural, other {# 篇}}")?.args).toEqual(["count"]);
+    expect(icuTokens("看 <b>这里</b> 和 <i></i>")).toEqual({ args: [], tags: ["b", "i"] });
+  });
+
+  it("reads a branch's words as words, and what a branch holds as tokens", () => {
+    expect(icuTokens("{count, plural, =0 {no apps} one {# app} other {# apps}}")).toEqual({
+      args: ["count"],
+      tags: [],
+    });
+    expect(icuTokens("{kind, select, podcast {听 {minutes} 分钟} other {读 <b>全文</b>}}")).toEqual(
+      {
+        args: ["kind", "minutes"],
+        tags: ["b"],
+      },
+    );
+  });
+
+  it("is null for a line that is not ICU", () => {
+    expect(icuTokens("{count, plural, other}")).toBeNull();
   });
 });
 
@@ -133,6 +150,17 @@ describe("copyError", () => {
     expect(copyError("看 <b>这里</b>", "看这里")).toMatch("b");
   });
 
+  it("lets a plural's branch be reworded", () => {
+    const fallback = "{count, plural, =0 {no apps} other {# apps}}";
+    expect(copyError("{count, plural, =0 {nothing yet} other {# apps}}", fallback)).toBeNull();
+  });
+
+  it("refuses a plural whose branches do not parse", () => {
+    expect(
+      copyError("{count, plural, =0 no apps}", "{count, plural, =0 {no apps} other {# apps}}"),
+    ).not.toBeNull();
+  });
+
   it("refuses braces that do not parse", () => {
     expect(copyError("{count 篇", "{count} 篇")).not.toBeNull();
     expect(copyError("count} 篇", "{count} 篇")).not.toBeNull();
@@ -144,6 +172,18 @@ describe("the catalogues", () => {
   // line. A missing counterpart would make "equals the default" compare a
   // string with undefined — and `messages.test.ts` already keeps the two in
   // step, so this is the copy editor's half of the same promise.
+  // The copy editor measures an edit against its default's arguments and
+  // tags, read by the ICU parser. A default that did not parse would leave
+  // nothing to measure against — and would already be throwing out front.
+  it("parse as ICU, every line of both", () => {
+    const broken = (["zh", "en"] as const).flatMap((locale) =>
+      Object.entries(flattenCopy(catalogue(locale)))
+        .filter(([, line]) => icuTokens(line) === null)
+        .map(([key]) => `${locale} ${key}`),
+    );
+    expect(broken).toEqual([]);
+  });
+
   it("carry the same lines, and only strings", () => {
     const zh = flattenCopy(catalogue("zh"));
     const en = flattenCopy(catalogue("en"));

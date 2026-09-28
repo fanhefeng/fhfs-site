@@ -1,3 +1,4 @@
+import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messageformat-parser";
 /**
  * The rules of the copy overlay, in one place.
  *
@@ -168,17 +169,42 @@ export function isScreenReaderOnly(key: string): boolean {
 }
 
 /**
- * The `{name}` arguments and `<tag>` names an ICU message carries.
+ * The `{name}` arguments and `<tag>` names an ICU message carries, or null
+ * when the line does not parse as ICU at all.
  *
  * next-intl formats every line through ICU, so these are not decoration: an
  * argument the call site does not pass, or a tag `t.rich` has no function for,
  * throws at render time — on the public page, not here.
+ *
+ * Read with the ICU parser next-intl's own formatter is built on, not with a
+ * pattern: in `{count, plural, =0 {no apps} other {# apps}}` the braces also
+ * hold the branches, and a regex took the `no` of "no apps" for an argument —
+ * so rewording a branch was refused for an argument the default "lacked".
  */
-export function icuTokens(value: string): { args: string[]; tags: string[] } {
+export function icuTokens(value: string): { args: string[]; tags: string[] } | null {
+  let ast: MessageFormatElement[];
+  try {
+    ast = parse(value);
+  } catch {
+    return null;
+  }
   const args = new Set<string>();
   const tags = new Set<string>();
-  for (const match of value.matchAll(/\{\s*([A-Za-z0-9_]+)/g)) args.add(match[1]!);
-  for (const match of value.matchAll(/<\/?\s*([A-Za-z][A-Za-z0-9]*)\s*\/?>/g)) tags.add(match[1]!);
+  const walk = (elements: MessageFormatElement[]) => {
+    for (const el of elements) {
+      if (el.type === TYPE.literal || el.type === TYPE.pound) continue;
+      if (el.type === TYPE.tag) {
+        tags.add(el.value);
+        walk(el.children);
+      } else if (el.type === TYPE.plural || el.type === TYPE.select) {
+        args.add(el.value);
+        for (const option of Object.values(el.options)) walk(option.value);
+      } else {
+        args.add(el.value);
+      }
+    }
+  };
+  walk(ast);
   return { args: [...args], tags: [...tags] };
 }
 
@@ -201,7 +227,8 @@ export function copyError(value: string, fallback: string): string | null {
   if (depth > 0) return "有 { 没有关上。";
 
   const here = icuTokens(value);
-  const base = icuTokens(fallback);
+  if (!here) return "这一行的 ICU 写法看不懂——多半是 plural / select 的分支格式不对，站上会报错。";
+  const base = icuTokens(fallback) ?? { args: [], tags: [] };
   const extraArg = here.args.find((arg) => !base.args.includes(arg));
   if (extraArg)
     return `默认文案里没有 {${extraArg}}，站上会报错。可以用的：${listOf(base.args, "{", "}")}`;
