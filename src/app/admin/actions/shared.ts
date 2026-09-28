@@ -1,13 +1,19 @@
 import "server-only";
 import { updateTag } from "next/cache";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import type { AnyPgColumn, PgInsertValue, PgTable, PgUpdateSetSource } from "drizzle-orm/pg-core";
 
 import { db } from "@/db";
 
 import { TAGS } from "@/lib/content";
+
+import { parseLocale, raw, str, validDate, validKey } from "@/lib/forms";
+
+import { renderMarkdown } from "@/lib/markdown";
+
+import { readingMinutes } from "@/lib/reading";
 
 /**
  * Every write the admin can make.
@@ -102,6 +108,98 @@ export async function upsertKeyed<T extends KeyedTable>(
     .where(eq(table.key, row.key))
     .returning({ id: table.id });
   return updated.length ? null : goneError(row.key);
+}
+
+/** A long-form table — posts and secrets — addressed by `(slug, locale)`. */
+export type LongformTable = PgTable & { slug: AnyPgColumn; locale: AnyPgColumn; id: AnyPgColumn };
+
+/** The part every long-form save reads the same way. */
+export type LongformFields = {
+  slug: string;
+  locale: "zh" | "en";
+  title: string;
+  date: string;
+  summary: string;
+  draft: boolean;
+  bodyMd: string;
+  bodyHtml: string;
+  readingMinutes: number;
+};
+
+/**
+ * Reads what a post and a secret share — the address, the title, the date,
+ * the draft switch and the body — and renders the body once, here, rather
+ * than on every read. The table's own fields (tags; kind, audio, duration)
+ * are the action's to add.
+ */
+export async function readLongform(
+  form: FormData,
+): Promise<{ ok: true; value: LongformFields } | { ok: false; error: string }> {
+  const slug = str(form, "slug");
+  if (!validKey(slug)) return { ok: false, error: "slug 只能用小写字母、数字和连字符。" };
+  const locale = parseLocale(str(form, "locale"));
+  if (!locale) return { ok: false, error: "语言只能是 zh 或 en。" };
+  const title = str(form, "title");
+  if (!title) return { ok: false, error: "标题不能为空。" };
+  const date = str(form, "date");
+  if (!validDate(date)) return { ok: false, error: DATE_ERROR.error! };
+
+  const bodyMd = raw(form, "bodyMd");
+  return {
+    ok: true,
+    value: {
+      slug,
+      locale,
+      title,
+      date,
+      summary: str(form, "summary"),
+      draft: form.get("draft") === "on",
+      bodyMd,
+      bodyHtml: await renderMarkdown(bodyMd),
+      readingMinutes: readingMinutes(bodyMd),
+    },
+  };
+}
+
+/**
+ * `upsertKeyed` for the long-form tables, keyed by `(slug, locale)`. A new
+ * piece must not land on an existing one — an upsert would replace whatever
+ * was there with no way to notice — so a conflict comes back as an error.
+ * An edit is an UPDATE: the form's promise is that the row exists, and a
+ * form left open past a delete in another tab gets told rather than quietly
+ * bringing the piece back (published, if draft was off).
+ */
+export async function upsertLongform<T extends LongformTable>(
+  table: T,
+  row: PgInsertValue<T> & { slug: string; locale: "zh" | "en" },
+  isNew: boolean,
+): Promise<ActionState | null> {
+  if (isNew) {
+    const inserted = await db
+      .insert(table)
+      .values(row)
+      .onConflictDoNothing({ target: [table.slug, table.locale] })
+      .returning({ id: table.id });
+    return inserted.length
+      ? null
+      : {
+          error: `slug 已存在：${row.locale} 下已经有「${row.slug}」了，换一个或去编辑原文。`,
+        };
+  }
+  const updated = await db
+    .update(table)
+    .set({ ...row, updatedAt: new Date() } as PgUpdateSetSource<T>)
+    .where(and(eq(table.slug, row.slug), eq(table.locale, row.locale)))
+    .returning({ id: table.id });
+  return updated.length ? null : goneError(`${row.slug}.${row.locale}`);
+}
+
+/** Deletes the piece a delete form names, if it names one. */
+export async function deleteLongform(table: LongformTable, form: FormData): Promise<void> {
+  const slug = str(form, "slug");
+  const locale = parseLocale(str(form, "locale"));
+  if (!slug || !locale) return;
+  await db.delete(table).where(and(eq(table.slug, slug), eq(table.locale, locale)));
 }
 
 /**

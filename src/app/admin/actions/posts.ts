@@ -1,85 +1,40 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { and, eq } from "drizzle-orm";
-import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/auth/session";
-import { list, parseLocale, raw, str, validDate, validKey } from "@/lib/forms";
-import { renderMarkdown } from "@/lib/markdown";
-import { readingMinutes } from "@/lib/reading";
+import { list } from "@/lib/forms";
 import { TAGS } from "@/lib/content";
-import { invalidate, SESSION_EXPIRED, DATE_ERROR, goneError, type ActionState } from "./shared";
+import {
+  deleteLongform,
+  invalidate,
+  readLongform,
+  SESSION_EXPIRED,
+  upsertLongform,
+  type ActionState,
+} from "./shared";
 
 export async function savePost(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
-  const slug = str(form, "slug");
-  const locale = parseLocale(str(form, "locale"));
-  const bodyMd = raw(form, "bodyMd");
-
-  if (!validKey(slug)) {
-    return { error: "slug 只能用小写字母、数字和连字符。" };
-  }
-  if (!locale) return { error: "语言只能是 zh 或 en。" };
-  if (!str(form, "title")) return { error: "标题不能为空。" };
-
-  const date = str(form, "date");
-  if (!validDate(date)) return DATE_ERROR;
-
-  const row = {
-    slug,
-    locale,
-    title: str(form, "title"),
-    date,
-    summary: str(form, "summary"),
-    tags: list(form, "tags"),
-    draft: form.get("draft") === "on",
-    bodyMd,
-    // Rendered once, here, rather than on every read.
-    bodyHtml: await renderMarkdown(bodyMd),
-    readingMinutes: readingMinutes(bodyMd),
-  };
+  const doc = await readLongform(form);
+  if (!doc.ok) return doc;
+  const row = { ...doc.value, tags: list(form, "tags") };
 
   const isNew = Boolean(form.get("isNew"));
-  if (isNew) {
-    // A new post must not land on an existing one: an upsert would silently
-    // replace whatever was there, with no way to notice.
-    const inserted = await db
-      .insert(schema.posts)
-      .values(row)
-      .onConflictDoNothing({ target: [schema.posts.slug, schema.posts.locale] })
-      .returning({ id: schema.posts.id });
-    if (!inserted.length) {
-      return { error: `slug 已存在：${locale} 下已经有「${slug}」了，换一个或去编辑原文。` };
-    }
-  } else {
-    // The edit form's promise is that the row exists — so an UPDATE, not an
-    // upsert: a form left open past a delete in another tab gets told, rather
-    // than quietly bringing the post back (published, if draft was off).
-    const updated = await db
-      .update(schema.posts)
-      .set({ ...row, updatedAt: new Date() })
-      .where(and(eq(schema.posts.slug, slug), eq(schema.posts.locale, locale)))
-      .returning({ id: schema.posts.id });
-    if (!updated.length) return goneError(`${slug}.${locale}`);
-  }
+  const problem = await upsertLongform(schema.posts, row, isNew);
+  if (problem) return problem;
 
   invalidate(TAGS.posts);
   // A first save leaves the "new post" page behind: its props are a blank
   // draft, and a saved form resets to its props (`useSaveAction`).
-  if (isNew) redirect(`/admin/posts/${slug}/${locale}`);
+  if (isNew) redirect(`/admin/posts/${row.slug}/${row.locale}`);
   return { ok: true };
 }
 
 export async function deletePost(form: FormData): Promise<void> {
   await requireAdmin();
-  const slug = str(form, "slug");
-  const locale = parseLocale(str(form, "locale"));
-  if (!locale) return;
-  await db
-    .delete(schema.posts)
-    .where(and(eq(schema.posts.slug, slug), eq(schema.posts.locale, locale)));
+  await deleteLongform(schema.posts, form);
   // A deleted post's page is cached like any other — without this it would go
   // on being served from the edge.
   invalidate(TAGS.posts);
