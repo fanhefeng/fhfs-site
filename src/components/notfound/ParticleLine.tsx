@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { parseColor, type Rgb } from "@/lib/canvasColor";
-import { isFinePointer, prefersReducedMotion } from "@/lib/gsap";
+import { isFinePointer, prefersReducedMotion } from "@/lib/client/gsap";
 
 /* ---- motion, calibrated against the reference capture ---- */
 

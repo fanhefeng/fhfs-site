@@ -1,4 +1,4 @@
-import { MEDIA_ORIGIN } from "@/lib/csp";
+import { MEDIA_ORIGIN } from "@/config/csp";
 import type { MomentMedia } from "@/lib/moments";
 import { lines } from "@/lib/resume";
 
@@ -125,7 +125,7 @@ export const validPath = (value: string): boolean =>
 /**
  * Anything a page renders as an `href` or `src`: a full http(s) URL, or a
  * path on this site. Everything else with a scheme — `javascript:`, `data:`
- * — is refused, the same belt the markdown pipeline wears (lib/markdown.ts).
+ * — is refused, the same belt the markdown pipeline wears (lib/server/markdown.ts).
  * Only the author writes here; this is for the day that stops being true.
  */
 export const validLink = (value: string): boolean =>
@@ -134,7 +134,7 @@ export const validLink = (value: string): boolean =>
 /**
  * Where a voice note, a podcast episode or a video can play from: a file on
  * this site, or the Blob store. Those are the two places the CSP's
- * `media-src` names (lib/csp.ts), so anything else would save fine and then
+ * `media-src` names (config/csp.ts), so anything else would save fine and then
  * be blocked out front, with nothing on the page to say why.
  */
 export const validPlayableSrc = (value: string): boolean =>

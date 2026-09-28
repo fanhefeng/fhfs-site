@@ -2,10 +2,10 @@
 
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { adminSession } from "@/lib/auth/session";
+import { adminSession } from "@/lib/server/auth/session";
 import { parseLocale, raw, str } from "@/lib/forms";
-import { renderMarkdown } from "@/lib/markdown";
-import { TAGS } from "@/lib/content";
+import { renderMarkdown } from "@/lib/server/markdown";
+import { TAGS } from "@/lib/server/content";
 import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
 
 export async function saveAbout(_prev: ActionState, form: FormData): Promise<ActionState> {

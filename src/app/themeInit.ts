@@ -20,6 +20,6 @@ import { THEME_STORAGE_KEY } from "@/lib/theme";
  * why it goes through a wrapper element rather than a React <script>.
  * The script cannot import, but the module that builds it can: the storage
  * key is spliced in from `lib/theme.ts` when this string is made, the way
- * `lib/splash.ts` splices its own — one key, never two spellings of it.
+ * `lib/client/splash.ts` splices its own — one key, never two spellings of it.
  */
 export const THEME_INIT_SCRIPT = `(function(){var d=document.documentElement;d.dataset.js="";try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}d.dataset.theme=t}catch(e){}})()`;

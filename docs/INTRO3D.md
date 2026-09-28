@@ -74,13 +74,13 @@
 - **Canvas 透明**，不再自己画背景：页面的纸、极光、颗粒直接透过来，亮暗主题的过渡完全交给 CSS。真正跟着主题走的只剩灯光强度，按帧阻尼逼近，切主题不会闪。
 
   雾也按同样的方式接了 `--bg`，但**目前一个像素都没染到**：three 的雾按视深度算，而 `buildStops` 给出的每一个机位下模型最远角只到 5.45（竖屏顶到 `nodeDistanceScale` 上限时 5.82），`fog.near` 是 6。想让它生效就是把 `near` 降到 4.5 左右——那是个要拿眼睛定的效果，不是顺手改掉的 bug，所以线留在那儿没动。
-- **不再自己注册 GSAP 插件**：`@/lib/gsap` 是全站唯一注册点，ScrollTrigger 已经和 Lenis 接好了。
+- **不再自己注册 GSAP 插件**：`@/lib/client/gsap` 是全站唯一注册点，ScrollTrigger 已经和 Lenis 接好了。
 - **原型顶部的四角信息删掉了**：Header 的滚动渐变会把它洗掉，且身份标识与灵动岛重复。相关信息并进了首屏。
 - **文字层整体 `aria-hidden`**，语义交给同页那份 `sr-only` 的完整简历（`IntroResume variant="seo"`）——canvas 里的东西爬虫和读屏都读不到，两份都可见则会被读两遍。
 - **整个 WebGL 子树挂在 `next/dynamic` 后面**：R3F、drei 和那颗 GLB 只在确定要渲染 3D 之后才开始下载，降级路径拿到的是 `IntroResume variant="visible"`（站点窄栏排版的一份正常简历）。实测降级路径 475 KB / 3D 路径 561 KB，模型和 fiber+drei 那个 chunk 确实一个字节都没取。
 
   但**three 核心那 ~184 KB 照样会下**，且跟本页无关：App Router 会预取 `/about`，而 `/about` 的 `Workstation` 是静态 import 的 `three`——随便开一个 `/zh/blog` 也会拉到同样两个 chunk。要把这段也省掉得去改 `Workstation` 的加载方式，不在本页范围内。
-- **两种情况直接走简历**：没有 WebGL、以及浏览器报了 Save-Data。Save-Data 是明说「我在省流量」，一个几百 KB 的模型加上整套 3D 运行时正好是它指的那种东西。（`prefers-reduced-motion` 曾是第三条，2026-08-04 移除——理由见 `docs/DESIGN.md` §1.5 与 `src/lib/three/guards.ts` 的文件头。该信号后来补回了一条窄例外，只管无限循环 / 大面积 / 滚动劫持三类，这张脸不在其中。）
+- **两种情况直接走简历**：没有 WebGL、以及浏览器报了 Save-Data。Save-Data 是明说「我在省流量」，一个几百 KB 的模型加上整套 3D 运行时正好是它指的那种东西。（`prefers-reduced-motion` 曾是第三条，2026-08-04 移除——理由见 `docs/DESIGN.md` §1.5 与 `src/lib/client/three/guards.ts` 的文件头。该信号后来补回了一条窄例外，只管无限循环 / 大面积 / 滚动劫持三类，这张脸不在其中。）
 
   判定发生在客户端 effect 里（服务端猜不到），`mode` 的初始值是 `probing`，**这一态什么都不画**。所以首屏 HTML 是一条 `1000dvh` 的空轨道加一份 `sr-only` 的简历：给爬虫和读屏是全的，给眼睛是空的。JS 没跑起来（禁用、或包挂了）就一直是这个样子——已知的降级缺口，要补得让 `probing` 直接渲染可见简历再换成 3D，代价是所有人首屏闪一下。
 - **模型加载失败不再把页面带走**：GLB 取不到（网断了、CDN 挂了、文件被换坏了）时 error boundary 接住，落回同一份可见简历。信息本来就是同一套，3D 只是它的一种讲法，讲不了就换一种，而不是给一片空白。

@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/client/gsap";
 // Registers Draggable + Inertia for the drag and CustomWiggle for the
 // `wiggle(…)` hover ease.
-import { Draggable } from "@/lib/gsap-extras";
+import { Draggable } from "@/lib/client/gsap-extras";
 import { Sticker } from "@/components/ui/Sticker";
 
 /**

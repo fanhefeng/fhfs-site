@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
-import { sectionMetadata } from "@/lib/seo";
-import { getIntroNodes } from "@/lib/content";
+import { sectionMetadata } from "@/lib/server/seo";
+import { getIntroNodes } from "@/lib/server/content";
 import { INTRO_STICKERS, type IntroCopy, type IntroLink } from "@/lib/intro/stickers";
 import { IntroStage } from "@/components/intro/IntroStage";
 

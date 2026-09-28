@@ -2,9 +2,9 @@ import { ImageResponse } from "next/og";
 import { hasLocale } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getAllSlugs, getPost } from "@/lib/content";
-import { loadOgFonts, OG, OG_BG, OG_FONT_FAMILY, OG_SIZE } from "@/lib/og";
-import { OgSignMark } from "@/lib/ogMark";
+import { getAllSlugs, getPost } from "@/lib/server/content";
+import { loadOgFonts, OG, OG_BG, OG_FONT_FAMILY, OG_SIZE } from "@/lib/server/og";
+import { OgSignMark } from "@/lib/server/ogMark";
 
 export const dynamic = "force-static";
 export const size = OG_SIZE;

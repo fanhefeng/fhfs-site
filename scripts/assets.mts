@@ -9,7 +9,7 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { buildManifest, hashCssUrls, serializeManifest } from "../src/lib/assetManifest";
+import { buildManifest, hashCssUrls, serializeManifest } from "../src/lib/node/assetManifest";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const manifestFile = `${root}src/lib/assets.gen.json`;

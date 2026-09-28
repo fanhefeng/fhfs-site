@@ -1,7 +1,7 @@
 "use client";
 
 import type { Ref } from "react";
-import { EASE } from "@/lib/gsap";
+import { EASE } from "@/lib/client/gsap";
 import {
   ARC_L,
   ARC_R_BAR,

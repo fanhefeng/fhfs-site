@@ -37,7 +37,7 @@ reviews:
     - "!drizzle/meta/**"
 
   path_instructions:
-    - path: "src/lib/content.ts"
+    - path: "src/lib/server/content.ts"
       instructions: |
         Every read the site does lives here, cached with tags.
         - `unstable_cache` keys on arguments, not closures: anything
@@ -79,11 +79,11 @@ reviews:
 
     - path: "src/components/**"
       instructions: |
-        - Motion policy (DESIGN.md §1.5, src/lib/gsap.ts): only what has no
+        - Motion policy (DESIGN.md §1.5, src/lib/client/gsap.ts): only what has no
           stop button — endless CSS/canvas loops, the scroll hijack, the
           opening blackout — branches on prefers-reduced-motion. Entrances,
           reveals and hover effects deliberately do not; do not flag them.
-        - Article HTML is rendered once at save time by `lib/markdown.ts`
+        - Article HTML is rendered once at save time by `lib/server/markdown.ts`
           (URL sanitizer, no `allowDangerousHtml`); `Mdx` stays a plain
           container with `dangerouslySetInnerHTML`. Flag anything that adds a
           second render path or feeds it non-pipeline HTML.

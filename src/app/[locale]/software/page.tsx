@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
-import { getApps } from "@/lib/content";
-import { getLatestReleases } from "@/lib/github";
-import { sectionMetadata } from "@/lib/seo";
+import { getApps } from "@/lib/server/content";
+import { getLatestReleases } from "@/lib/server/github";
+import { sectionMetadata } from "@/lib/server/seo";
 import { SoftwareGallery } from "@/components/software/SoftwareGallery";
 import { DeviceShowcase } from "@/components/software/DeviceShowcase";
 import { toSoftwareApp } from "@/components/software/appMeta";

@@ -26,7 +26,7 @@ import { fileURLToPath } from "node:url";
 import { getTableName } from "drizzle-orm";
 import type { BatchItem } from "drizzle-orm/batch";
 import * as schema from "../src/db/schema";
-import { renderMarkdown } from "../src/lib/markdown";
+import { renderMarkdown } from "../src/lib/server/markdown";
 import { readingMinutes } from "../src/lib/reading";
 import { connect } from "./connect.mjs";
 

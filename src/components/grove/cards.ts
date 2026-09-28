@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { htmlLang, type Locale } from "@/i18n/routing";
-import { getMoments } from "@/lib/content";
+import { getMoments } from "@/lib/server/content";
 import { newestSaid, stampInZone } from "@/lib/moments";
 import { site } from "@/config/site";
 import { newestLabEntry } from "@/components/lab/entries";

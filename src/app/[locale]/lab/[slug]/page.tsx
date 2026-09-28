@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates } from "@/lib/server/seo";
 import {
   LAB_ENTRIES,
   labEntry,
@@ -27,7 +27,7 @@ import { LALA_STILLS } from "@/components/films/lalaStills";
 import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
 import type { ChangelogEntry } from "@/components/about/Changelog";
-import { getTimeline } from "@/lib/content";
+import { getTimeline } from "@/lib/server/content";
 import { groveCards } from "@/components/grove/cards";
 import type { GroveCardData } from "@/components/grove/GroveCard";
 

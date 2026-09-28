@@ -2,9 +2,9 @@
 
 import { redirect } from "next/navigation";
 import * as schema from "@/db/schema";
-import { adminSession, requireAdmin } from "@/lib/auth/session";
+import { adminSession, requireAdmin } from "@/lib/server/auth/session";
 import { list } from "@/lib/forms";
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 import {
   deleteLongform,
   invalidate,

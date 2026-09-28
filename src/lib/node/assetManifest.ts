@@ -13,7 +13,7 @@ import {
   assetSetOf,
   isImmutable,
   resolveAsset,
-} from "./immutable";
+} from "../../config/immutable";
 
 /** URL paths (`/lab/lens/sea.jpg`) of every file under `<root>/public`, sorted. */
 export function publicFiles(root: string): string[] {

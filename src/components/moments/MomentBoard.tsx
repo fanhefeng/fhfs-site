@@ -13,8 +13,8 @@ import {
   type BoardMoment,
   type MomentMedia,
 } from "@/lib/moments";
-import { gsap, EASE } from "@/lib/gsap";
-import { useUrlChoice } from "@/lib/useUrlChoice";
+import { gsap, EASE } from "@/lib/client/gsap";
+import { useUrlChoice } from "@/lib/client/useUrlChoice";
 import { Reveal } from "@/components/fx/Reveal";
 
 /**

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { MEDIA_ORIGIN } from "@/lib/csp";
+import { MEDIA_ORIGIN } from "@/config/csp";
 import {
   KEY_PATTERN,
   filled,

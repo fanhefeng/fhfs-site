@@ -3,13 +3,13 @@
 import { db } from "@/db";
 
 import * as schema from "@/db/schema";
-import { adminSession } from "@/lib/auth/session";
+import { adminSession } from "@/lib/server/auth/session";
 
 import { str, validPath } from "@/lib/forms";
 
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 
-import { copyCatalogues } from "@/lib/copyCatalogue";
+import { copyCatalogues } from "@/lib/server/copyCatalogue";
 
 import { isNavGroup, NAV_GROUPS } from "@/lib/nav";
 

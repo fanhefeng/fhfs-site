@@ -1,4 +1,4 @@
-import type { App } from "@/lib/content";
+import type { App } from "@/lib/server/content";
 import type { Locale } from "@/i18n/routing";
 
 /** The four buckets the segmented filter offers, in display order — the same

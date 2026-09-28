@@ -2,7 +2,7 @@
 
 import { useRef, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/client/gsap";
 
 type Props = {
   children: ReactNode;

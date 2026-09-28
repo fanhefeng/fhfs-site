@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useLocalClock } from "@/lib/useLocalClock";
+import { useLocalClock } from "@/lib/client/useLocalClock";
 
 /** The page's last line: where and when it was written. No motion — only
  *  the clock ticks, once a minute. */

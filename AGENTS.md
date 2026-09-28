@@ -15,7 +15,7 @@ pnpm check        # tsc + vp lint + vp fmt --check + vp test with its coverage f
 pnpm test         # vp test (Vitest) over src/lib (src/lib/__tests__); test:coverage adds the floor
 pnpm format       # vp fmt (Oxfmt, printWidth 100)
 pnpm dev          # dev server
-pnpm build        # prerenders from the DB — fails loudly on a missing/malformed env var (src/lib/env.ts)
+pnpm build        # prerenders from the DB — fails loudly on a missing/malformed env var (src/config/env.ts)
 pnpm smoke [url]  # every page in the sitemap, in this machine's Chrome: 4xx, exceptions, console/CSP errors
 pnpm assets       # after touching public/: re-hash, rewrite assets.gen.json + yozai.css
 pnpm media:music <src> <name>   # encode a record the way the others were, report loop silence
@@ -47,7 +47,7 @@ ignores, and the test config are all in `vite.config.ts` — there is no
 `vite-plus/test`, not `vitest` (a lint rule). `vp` does not build anything
 here; `next build` does. Lint is type-aware (floating promises, unbound
 methods, …); the type check itself stays `tsc`. `gsap` may only be imported via
-`@/lib/gsap` (a lint rule). TypeScript runs with `noUncheckedIndexedAccess`:
+`@/lib/client/gsap` (a lint rule). TypeScript runs with `noUncheckedIndexedAccess`:
 use `!` where a loop bound or a fixed table proves the index, narrow
 otherwise. CI (`.github/workflows/check.yml`) runs `pnpm check` and
 `pnpm audit`, then a second job builds against a read-only database role
@@ -57,13 +57,25 @@ regenerates the asset manifest when `public/` changed and checks format and
 lint on staged files; pre-push runs `pnpm check`. This machine's Node and
 global JS CLIs are managed by `vp`, not npm/nvm.
 
-The one read from outside the database is `src/lib/github.ts`: each app's
+The one read from outside the database is `src/lib/server/github.ts`: each app's
 version badge is its repo's latest GitHub release, cached through `fetch`
 (`next: { revalidate: 3600 }`), so pages that show one regenerate hourly.
 Failures resolve to `null` and the badge is simply absent.
 
 # Architecture
 
+- **Where a module lives says where it runs.** `src/lib/server/` never reaches
+  the browser (the read layer, auth, OG images, markdown, SEO, the message
+  cut); `src/lib/client/` never runs on the server (GSAP, the jukebox, scroll
+  lock, the splash and overture, three's guards, the hooks); `src/lib/node/`
+  is for scripts and tests (it reads the file system); the root of `src/lib`
+  and its domain folders (`grove/`, `intro/`, `neon/`) are plain functions
+  and data either side can import. `src/config/` is what `next.config.ts`
+  reads as well (`site`, `env`, `csp`, `immutable`). Client modules import
+  `client-only` and server modules `server-only`, so a module imported on the
+  wrong side is a build error — except the server ones a test, a script or the
+  proxy loads directly (`markdown`, `messages`, `seo`, `auth/password`,
+  `auth/token`), where `server-only` would throw; the folder is their marker.
 - **Routing**: public pages live under `src/app/[locale]/` (locales `zh`/`en`,
   default `zh`, `localePrefix: "always"`). Every page starts with
   `const locale = await pageLocale(params)` (`src/i18n/page.ts`): it 404s an
@@ -71,7 +83,7 @@ Failures resolve to `null` and the badge is simply absent.
   turns dynamic. `/admin` sits *outside* the locale tree and is a
   browser-based editor for all content; admin sessions are jose-signed JWTs.
 - **Client messages**: the layout hands `NextIntlClientProvider` only the
-  namespaces in `CLIENT_NAMESPACES` (`src/lib/messages.ts`); without the cut
+  namespaces in `CLIENT_NAMESPACES` (`src/lib/server/messages.ts`); without the cut
   every page carried the whole catalogue in its RSC payload. A client
   component that reads a new namespace with `useTranslations` must add it
   there — `messages.test.ts` scans the source and fails otherwise. Server
@@ -96,11 +108,11 @@ Failures resolve to `null` and the badge is simply absent.
   `conventions.test.ts` checks the session-first, invalidate-last shape of
   every action.
 - **Environment and origin**: every variable is described in
-  `src/lib/env.ts` and documented in `.env.example` (a test keeps them in
+  `src/config/env.ts` and documented in `.env.example` (a test keeps them in
   step); a new `process.env.X` needs a rule there. `site.url` comes from the
   deployment (`src/lib/siteUrl.ts`: `SITE_URL`, else Vercel's production
   domain) — never hard-code the origin.
-- **Security headers**: the CSP lives in `src/lib/csp.ts` and is sent from
+- **Security headers**: the CSP lives in `src/config/csp.ts` and is sent from
   `next.config.ts`. It allows nothing cross-origin; a new third-party script,
   font, frame or fetch has to be added there, and `pnpm smoke` is how you find
   out you forgot.
@@ -116,7 +128,7 @@ Failures resolve to `null` and the badge is simply absent.
   `fetch failed` a proxied network throws now and then); that is only safe
   because every statement is idempotent — keep writes as keyed upserts or
   deletes, never a plain insert into a serial-keyed table.
-- **Animation**: all GSAP plugins are registered once in `src/lib/gsap.ts` —
+- **Animation**: all GSAP plugins are registered once in `src/lib/client/gsap.ts` —
   import `gsap` and plugins from there, never from `"gsap"` directly. Eases
   come from its `EASE` token table, named by use — a new curve gets a token
   there first; an `ease: "…"` string anywhere else fails
@@ -130,7 +142,7 @@ Failures resolve to `null` and the badge is simply absent.
   are imperative three.js. The home page mounts no three.js at all, and its
   script budget in `scripts/smoke.mts` is the ordinary page's; keep it that
   way. Every scene sits behind `next/dynamic`, and the component that
-  mounts it asks `prefersSaveData()` / `hasWebGL()` (`src/lib/three/guards.ts`)
+  mounts it asks `prefersSaveData()` / `hasWebGL()` (`src/lib/client/three/guards.ts`)
   *before* mounting: a guard inside the chunk runs after three.js has already
   been downloaded.
 - **Admin forms** submit through `useSaveAction` (`src/app/admin/ui/`), never
@@ -144,7 +156,7 @@ Failures resolve to `null` and the badge is simply absent.
   (`src/lib/asset.ts`), which puts the file's content hash in the address —
   `/lab/lens/sea.c694b7cb.jpg`; a rewrite in `next.config.ts` serves it from
   the plain file, and only the hashed address is cached for a year
-  (`src/lib/immutable.ts` has the folder lists and the address shapes). After
+  (`src/config/immutable.ts` has the folder lists and the address shapes). After
   adding, replacing or removing a file there, run `pnpm assets` and commit
   `src/lib/assets.gen.json` (and `src/app/yozai.css`, whose font URLs it
   rewrites); a new top-level folder goes into `IMMUTABLE_DIRS`. Tests fail on
@@ -163,10 +175,10 @@ Failures resolve to `null` and the badge is simply absent.
   not know — put the file in `public/moments/`, run `pnpm assets`, then save.
 - **Front door and music**: the home page opens with `NeonSplash` once per
   session, on a hard landing only — decided before first paint by the inline
-  script in `src/lib/splash.ts` (`<html data-splash>`), which is also what
+  script in `src/lib/client/splash.ts` (`<html data-splash>`), which is also what
   `OvertureLight` and `Opening` consult. The background music is one hidden
   player in the layout (`components/fx/Jukebox.tsx`) driven by the store in
-  `src/lib/jukebox.ts`; the signs (splash, `/lab/neon`, the island's note)
+  `src/lib/client/jukebox.ts`; the signs (splash, `/lab/neon`, the island's note)
   only write `wanted`. The sign's drawing lives in `src/components/neon/`.
   The player is also the site's one rule about sound — never two things at
   once: it catches every `<audio>`/`<video>` `play` at the document, pauses
@@ -188,7 +200,7 @@ Two scroll gotchas that cost real debugging time (details in README.md):
 
 # Content lives in Postgres
 
-`src/lib/content.ts` is the only place the site reads content. Every getter is
+`src/lib/server/content.ts` is the only place the site reads content. Every getter is
 wrapped in `unstable_cache` with tags and `revalidate: false`, which is what
 lets a page stay statically prerendered while still being invalidatable — in a
 prerender those tags are collected into the page's ISR entry, so `updateTag`

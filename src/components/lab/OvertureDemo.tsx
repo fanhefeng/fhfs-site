@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { prefersReducedMotion } from "@/lib/gsap";
-import { forgetOverture } from "@/lib/overture";
+import { prefersReducedMotion } from "@/lib/client/gsap";
+import { forgetOverture } from "@/lib/client/overture";
 import { StudyPanel } from "./StudyPanel";
 
 type Props = {

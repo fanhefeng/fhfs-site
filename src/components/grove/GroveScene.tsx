@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import * as THREE from "three";
-import { gsap } from "@/lib/gsap";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
-import { releaseRenderer } from "@/lib/three/release";
-import { watchContextLoss } from "@/lib/webgl";
+import { gsap } from "@/lib/client/gsap";
+import { hasWebGL, prefersSaveData } from "@/lib/client/three/guards";
+import { releaseRenderer } from "@/lib/client/three/release";
+import { watchContextLoss } from "@/lib/client/webgl";
 import { buildGrove, BOX_W } from "@/lib/grove/geometry";
 import { bakeBarkPlates } from "@/lib/grove/bark";
 import { flowerTexture, moteTexture, radialTexture } from "@/lib/grove/plates";

@@ -1,7 +1,7 @@
 import { asc, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { moments } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { site } from "@/config/site";
 import { formatMedia } from "@/lib/forms";
 import { describeMedia, momentKey, stampInZone } from "@/lib/moments";

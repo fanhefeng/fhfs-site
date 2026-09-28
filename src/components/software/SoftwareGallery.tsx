@@ -2,10 +2,10 @@
 
 import { useCallback, useMemo, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP, EASE } from "@/lib/gsap";
-import { captureGrid, playGrid, type GridState } from "@/lib/flipGrid";
+import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
+import { captureGrid, playGrid, type GridState } from "@/lib/client/flipGrid";
 import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
-import { useUrlChoice } from "@/lib/useUrlChoice";
+import { useUrlChoice } from "@/lib/client/useUrlChoice";
 import { AppCard } from "./AppCard";
 import { SegmentedFilter, type Segment } from "@/components/ui/SegmentedFilter";
 import { MobileAppRail } from "./MobileAppRail";
@@ -96,7 +96,7 @@ export function SoftwareGallery({ apps }: { apps: SoftwareApp[] }) {
     },
     // No `revertOnUpdate`: a half-played reshuffle is finished and cleared by
     // `captureGrid` in the click handler, and reverting a finished one put
-    // stale inline styles back on the cards (see src/lib/flipGrid.ts).
+    // stale inline styles back on the cards (see src/lib/client/flipGrid.ts).
     { dependencies: [filter], scope: gridRef },
   );
 

@@ -1,7 +1,7 @@
 import "client-only";
 
 import { useSyncExternalStore } from "react";
-import { DEFAULT_TRACK, type TrackId } from "./tracks";
+import { DEFAULT_TRACK, type TrackId } from "../tracks";
 
 /**
  * The site's one record player, as a store: every sign on the site is a

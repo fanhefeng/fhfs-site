@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { gsap } from "@/lib/gsap";
-import { releaseRenderer } from "@/lib/three/release";
+import { gsap } from "@/lib/client/gsap";
+import { releaseRenderer } from "@/lib/client/three/release";
 import { LENS_VERT, LENS_FRAG } from "@/lib/lensSlider";
 
 /** How far the rim's rings displace, in device pixels. Zero is the reference's own look. */

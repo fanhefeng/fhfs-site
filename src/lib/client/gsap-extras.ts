@@ -21,7 +21,7 @@ import { gsap } from "./gsap";
  *   GSAP 3.15 never resolves the `"expoScale(1,5)"` string form.
  *
  * A component that needs one of these imports it from here and keeps
- * importing `gsap` / `useGSAP` / `EASE` from `@/lib/gsap`.
+ * importing `gsap` / `useGSAP` / `EASE` from `@/lib/client/gsap`.
  */
 gsap.registerPlugin(Draggable, InertiaPlugin, ScrambleTextPlugin, CustomWiggle, ExpoScaleEase);
 

@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
-import { getSecrets } from "@/lib/content";
-import { sectionMetadata } from "@/lib/seo";
+import { getSecrets } from "@/lib/server/content";
+import { sectionMetadata } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { RoomMusic } from "@/components/fx/RoomMusic";
 import { SecretIndex } from "@/components/secrets/SecretIndex";

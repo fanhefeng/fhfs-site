@@ -10,7 +10,7 @@
  * stored anywhere.
  */
 import { randomBytes } from "node:crypto";
-import { hashPassword } from "../src/lib/auth/password";
+import { hashPassword } from "../src/lib/server/auth/password";
 
 if (process.argv.length > 2) {
   console.error(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef } from "react";
-import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/client/gsap";
 import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
 import { StudyPanel } from "./StudyPanel";
 

@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { useGSAP, ScrollTrigger } from "@/lib/client/gsap";
 import { Reveal } from "@/components/fx/Reveal";
-import { jukebox, useJukebox } from "@/lib/jukebox";
+import { jukebox, useJukebox } from "@/lib/client/jukebox";
 import { NeonSignArt } from "@/components/neon/NeonSignArt";
 import { useBrickWall, wireNeonSign } from "@/components/neon/sign";
 import { WALL_CSS } from "@/components/neon/wall";
@@ -48,7 +48,7 @@ type Props = {
  * blur — four layers merged back into one (`components/neon`). Lighting up
  * is a fixed score of blinks, after which nothing is repainted. The sign is
  * the bar's switch: lights and music together — and the music is the site's
- * background music, played by the jukebox behind every page (`lib/jukebox`),
+ * background music, played by the jukebox behind every page (`lib/client/jukebox`),
  * so there is no player under the sign, and nothing written under it either:
  * the sign is the whole first screen.
  */

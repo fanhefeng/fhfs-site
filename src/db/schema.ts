@@ -223,7 +223,7 @@ export const apps = pgTable("apps", {
   category: appCategoryEnum().notNull(),
   website: text().notNull(),
   // "owner/name" on GitHub. The version shown beside an app is read from
-  // this repo's latest release at render time (src/lib/github.ts), so a new
+  // this repo's latest release at render time (src/lib/server/github.ts), so a new
   // release updates the site without anyone retyping a number here.
   repo: text(),
   platforms: text()

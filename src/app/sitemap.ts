@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { localeLanguages } from "@/lib/seo";
+import { localeLanguages } from "@/lib/server/seo";
 import {
   getAllSecretSlugs,
   getAllSlugs,
@@ -9,7 +9,7 @@ import {
   getNavItems,
   getPostEditions,
   getSecretEditions,
-} from "@/lib/content";
+} from "@/lib/server/content";
 import { LAB_ENTRIES } from "@/components/lab/entries";
 import { IDOLS } from "@/components/idols/entries";
 import { FILMS } from "@/components/films/entries";

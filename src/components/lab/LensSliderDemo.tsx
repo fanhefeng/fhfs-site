@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE, prefersReducedMotion } from "@/lib/gsap";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { gsap, useGSAP, ScrollTrigger, EASE, prefersReducedMotion } from "@/lib/client/gsap";
+import { hasWebGL, prefersSaveData } from "@/lib/client/three/guards";
 import { splitText } from "@/lib/splitText";
 import { LENS_DURATION, slideIndexAt, bandCentre } from "@/lib/lensSlider";
 

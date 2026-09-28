@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getPosts } from "@/lib/content";
+import { getPosts } from "@/lib/server/content";
 
 export const dynamic = "force-static";
 // Two feeds, and nothing else. The proxy's matcher skips paths with a dot in

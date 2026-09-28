@@ -1,8 +1,8 @@
 import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { site } from "@/config/site";
-import { getCopyOverrides } from "@/lib/content";
-import { merge, type Messages } from "@/lib/messages";
+import { getCopyOverrides } from "@/lib/server/content";
+import { merge, type Messages } from "@/lib/server/messages";
 import { routing } from "./routing";
 
 /**

@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { KobeStatueStage } from "@/components/idols/KobeStatueStage";
 import { KobeGallery, type GalleryPhoto } from "@/components/idols/KobeGallery";

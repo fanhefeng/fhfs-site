@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
-import { Flip, gsap, useGSAP, EASE } from "@/lib/gsap";
+import { Flip, gsap, useGSAP, EASE } from "@/lib/client/gsap";
 
 export type Segment = { value: string; label: string };
 

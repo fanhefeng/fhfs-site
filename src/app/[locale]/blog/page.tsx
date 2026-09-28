@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
-import { getPosts, getAllTags } from "@/lib/content";
-import { sectionMetadata } from "@/lib/seo";
+import { getPosts, getAllTags } from "@/lib/server/content";
+import { sectionMetadata } from "@/lib/server/seo";
 import { YearIndex } from "@/components/blog/PostCard";
 import { TagPill } from "@/components/blog/TagPill";
 import { Reveal } from "@/components/fx/Reveal";

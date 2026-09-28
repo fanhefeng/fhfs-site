@@ -4,7 +4,7 @@ import { useEffect, useMemo, type MutableRefObject } from "react";
 import { Canvas, invalidate, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
-import { gsap, EASE } from "@/lib/gsap";
+import { gsap, EASE } from "@/lib/client/gsap";
 
 /**
  * The statue, built in code.

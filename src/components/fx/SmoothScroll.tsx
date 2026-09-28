@@ -2,7 +2,7 @@
 
 import { useLayoutEffect } from "react";
 import Lenis from "lenis";
-import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, ScrollTrigger, prefersReducedMotion } from "@/lib/client/gsap";
 
 /**
  * Global inertial scrolling. Lenis and GSAP must share one clock:

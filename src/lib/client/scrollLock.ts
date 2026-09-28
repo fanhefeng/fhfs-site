@@ -1,6 +1,6 @@
 import "client-only";
 
-import { ScrollTrigger } from "@/lib/gsap";
+import { ScrollTrigger } from "@/lib/client/gsap";
 
 /**
  * The site-wide scroll-lock contract, in one place. Overlays that must hold

@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
-import { useLocalClock } from "@/lib/useLocalClock";
+import { useLocalClock } from "@/lib/client/useLocalClock";
 import {
   attachMembers,
   isActivePath,

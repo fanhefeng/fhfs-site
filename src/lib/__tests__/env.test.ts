@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
-import { ENV_RULES, envProblems } from "@/lib/env";
+import { ENV_RULES, envProblems } from "@/config/env";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 

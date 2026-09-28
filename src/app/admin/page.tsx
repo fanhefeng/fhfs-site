@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "./AdminChrome";
 import { sectionCounts } from "./counts";
 import { SECTION_GROUPS } from "./sections";

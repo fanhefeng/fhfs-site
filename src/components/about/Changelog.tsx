@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
 import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
 
 /** One release of a person. The page localizes before handing it over. */

@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
 import { REVEAL_START } from "@/components/fx/Reveal";
 import { StudyPanel } from "./StudyPanel";
 
-// Referenced so bundlers keep the plugin; registration lives in @/lib/gsap.
+// Referenced so bundlers keep the plugin; registration lives in @/lib/client/gsap.
 void ScrollTrigger;
 
 type Props = {

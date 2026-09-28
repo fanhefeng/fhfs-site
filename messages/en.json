@@ -551,7 +551,7 @@
         "name": "Walking in through the sign",
         "tagline": "A hard landing · through the ring",
         "summary": "On a hard landing at the cover you meet the brick wall and the neon first, and the way in is through the ring: the letters go dark, the ring holds, the paper shows through it, and the wall pushes past you.",
-        "note": "Whether the sign plays is decided on a hard landing at the cover, before the first paint, by the inline script in lib/splash (a data-splash attribute on the html element), once per session; an in-site navigation never plays it. So this study can only send you back to the door: forgetSplash() hands the sessionStorage key back and the page does a full load of the cover. How the sign is drawn and lit is study 08; this is the push through it.",
+        "note": "Whether the sign plays is decided on a hard landing at the cover, before the first paint, by the inline script in lib/client/splash (a data-splash attribute on the html element), once per session; an in-site navigation never plays it. So this study can only send you back to the door: forgetSplash() hands the sessionStorage key back and the page does a full load of the cover. How the sign is drawn and lit is study 08; this is the push through it.",
         "label": "The way in",
         "body": "The brick wall and the neon on a hard landing at the cover. The way in is through the ring.",
         "action": "Back to the door"

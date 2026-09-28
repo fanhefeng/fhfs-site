@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { gsap, useGSAP, EASE } from "@/lib/gsap";
-import { Draggable } from "@/lib/gsap-extras";
+import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
+import { Draggable } from "@/lib/client/gsap-extras";
 import { Magnetic } from "@/components/fx/Magnetic";
 import { ParticleLine } from "@/components/notfound/ParticleLine";
 

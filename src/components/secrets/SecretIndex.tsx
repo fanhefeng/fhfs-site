@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import type { SecretSummary } from "@/lib/content";
+import type { SecretSummary } from "@/lib/server/content";
 import { groupByYear, yearOfDate } from "@/lib/byYear";
 import { htmlLang } from "@/i18n/routing";
 import { IndexRow, YearSection } from "@/components/ui/YearIndex";

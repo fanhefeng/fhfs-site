@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { hashPassword, verifyPassword } from "@/lib/server/auth/password";
 
 describe("hashPassword", () => {
   it("produces salt:hash, both hex, with a 16-byte salt and a 64-byte key", () => {

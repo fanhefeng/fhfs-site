@@ -1,5 +1,5 @@
 import { site } from "@/config/site";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../../AdminChrome";
 import { PostForm } from "../PostForm";
 

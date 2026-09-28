@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { contentSecurityPolicy } from "@/lib/csp";
+import { contentSecurityPolicy } from "@/config/csp";
 
 const parse = (policy: string): Record<string, string[]> =>
   Object.fromEntries(

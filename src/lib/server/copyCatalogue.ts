@@ -1,6 +1,6 @@
 import "server-only";
 
-import { flattenCopy, type Catalogue } from "./copy";
+import { flattenCopy, type Catalogue } from "../copy";
 
 /**
  * Both message catalogues, flattened to `a.b.c` → string.
@@ -17,7 +17,7 @@ export async function copyCatalogues(): Promise<{
 }> {
   const [zh, en] = await Promise.all(
     (["zh", "en"] as const).map((locale) =>
-      import(`../../messages/${locale}.json`).then((m) => flattenCopy(m.default as Catalogue)),
+      import(`../../../messages/${locale}.json`).then((m) => flattenCopy(m.default as Catalogue)),
     ),
   );
   return { zh: zh!, en: en! };

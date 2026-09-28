@@ -1,3 +1,4 @@
+import "client-only";
 /**
  * The front door's handshake, shared by the door itself (`NeonSplash`), the
  * opening ritual it stands in for (`OvertureLight`) and the masthead that

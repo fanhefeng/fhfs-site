@@ -9,8 +9,8 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { gsap, EASE, isFinePointer } from "@/lib/gsap";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { gsap, EASE, isFinePointer } from "@/lib/client/gsap";
+import { hasWebGL, prefersSaveData } from "@/lib/client/three/guards";
 
 /** three, fiber, drei: fetched only once the probe has said the reader will see it. */
 const KobeStatue = dynamic(() => import("./KobeStatue"), { ssr: false });

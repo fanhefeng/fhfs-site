@@ -1,7 +1,7 @@
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { resumeExperiences, resumeProfiles } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { formatProjects, formatSkillLine } from "@/lib/resume";
 import { AdminChrome } from "../AdminChrome";
 import { RecordForm, type Field } from "../RecordForm";

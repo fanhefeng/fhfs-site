@@ -3,9 +3,9 @@
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
-import { lockScroll, unlockScroll } from "@/lib/scrollLock";
-import { VEIL_REPLAY_EVENT } from "@/lib/veil";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
+import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
+import { VEIL_REPLAY_EVENT } from "@/lib/client/veil";
 import { site } from "@/config/site";
 
 /** Veil frosting over the outgoing page. */

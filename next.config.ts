@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } from "next/constants";
-import { contentSecurityPolicy } from "./src/lib/csp";
-import { envProblems } from "./src/lib/env";
-import { HASHED_ROUTES } from "./src/lib/immutable";
+import { contentSecurityPolicy } from "./src/config/csp";
+import { envProblems } from "./src/config/env";
+import { HASHED_ROUTES } from "./src/config/immutable";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
         ],
       },
       // A year, and only on an address with the content's hash in it — the
-      // plain path to the same file revalidates (src/lib/immutable.ts).
+      // plain path to the same file revalidates (src/config/immutable.ts).
       ...HASHED_ROUTES.map(({ source }) => ({
         source,
         headers: [
@@ -99,7 +99,7 @@ const nextConfig: NextConfig = {
 
 /**
  * A production build or server refuses to start on a missing or mangled
- * variable, naming all of them at once (src/lib/env.ts). Left to themselves
+ * variable, naming all of them at once (src/config/env.ts). Left to themselves
  * they surface one by one — the admin's two not until somebody tries to log
  * in. `next dev` is another phase and is left alone. `next typegen` is not —
  * it loads this file as a production build — so it is told apart by name:

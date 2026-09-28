@@ -15,7 +15,7 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { IMMUTABLE_DIRS } from "../src/lib/immutable";
+import { IMMUTABLE_DIRS } from "../src/config/immutable";
 
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
 const PORT = 9333;

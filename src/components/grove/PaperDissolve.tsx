@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { gsap } from "@/lib/gsap";
-import { hasWebGL } from "@/lib/three/guards";
-import { compileProgram, FULLSCREEN_VERT, watchContextLoss } from "@/lib/webgl";
+import { gsap } from "@/lib/client/gsap";
+import { hasWebGL } from "@/lib/client/three/guards";
+import { compileProgram, FULLSCREEN_VERT, watchContextLoss } from "@/lib/client/webgl";
 
 type Props = {
   /** 0 = nothing painted, 1 = the whole frame turned to paper. Read every

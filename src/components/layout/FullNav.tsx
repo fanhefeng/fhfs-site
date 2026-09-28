@@ -3,9 +3,9 @@
 import { Fragment, useCallback, useEffect, useRef, type RefObject } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { gsap, useGSAP, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
 import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/nav";
-import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
 import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
@@ -46,7 +46,7 @@ export type FullNavProps = {
  * over from wherever things are (raMQBVQ's clear() + rebuild pattern:
  * entrances are fromTo, exits are to).
  *
- * Scroll is locked while open via the shared contract in lib/scrollLock,
+ * Scroll is locked while open via the shared contract in lib/client/scrollLock,
  * unlocking with a ScrollTrigger refresh. On a route commit the layer
  * resets instantly — RouteTransition already owns the screen, so animating
  * here would play to nobody.

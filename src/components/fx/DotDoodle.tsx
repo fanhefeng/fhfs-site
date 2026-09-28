@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { GLYPH_GRID, glyphFor } from "@/lib/dotGlyphs";
 import { parseColor, type Rgb } from "@/lib/canvasColor";
-import { isFinePointer, prefersReducedMotion } from "@/lib/gsap";
+import { isFinePointer, prefersReducedMotion } from "@/lib/client/gsap";
 
 /** Gap between two glyph fields, in grid cells. Tighter than it looks: the
  *  rim below starves each field's edge, so the visual gutter runs wider than
@@ -329,7 +329,7 @@ export function DotDoodle({ text, className }: Props) {
     let visible = false;
 
     // An endless canvas loop owes the same reduce-motion contract as the CSS
-    // loops and the scroll hijack (see lib/gsap.ts): here the field holds
+    // loops and the scroll hijack (see lib/client/gsap.ts): here the field holds
     // still and hover snaps between its two settled states. A device with no
     // hovering pointer gets the same still field, and no hover at all.
     const hoverable = isFinePointer();

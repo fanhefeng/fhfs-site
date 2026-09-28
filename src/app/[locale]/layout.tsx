@@ -6,11 +6,11 @@ import { fontVariables } from "../fonts";
 import { ThemeInitScript } from "../ThemeInitScript";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getAllNavItems, getNavItems, type NavItem } from "@/lib/content";
-import { CLIENT_NAMESPACES, pick } from "@/lib/messages";
+import { getAllNavItems, getNavItems, type NavItem } from "@/lib/server/content";
+import { CLIENT_NAMESPACES, pick } from "@/lib/server/messages";
 import type { NavLink } from "@/lib/nav";
-import { feedTypes } from "@/lib/seo";
-import { trackFiles } from "@/lib/trackFiles";
+import { feedTypes } from "@/lib/server/seo";
+import { trackFiles } from "@/lib/server/trackFiles";
 import { THEME_COLOR } from "@/lib/theme";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { default: site.title[l], template: `%s | ${site.signName}` },
     description: site.description[l],
     // A page that sets `alternates` replaces this object rather than merging
-    // into it, which is why `localeAlternates()` in lib/seo.ts carries the
+    // into it, which is why `localeAlternates()` in lib/server/seo.ts carries the
     // same feed link — this copy is for the pages that set none.
     alternates: { types: feedTypes(l) },
     openGraph: {

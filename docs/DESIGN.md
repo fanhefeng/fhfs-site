@@ -5,7 +5,7 @@
 > 研究底稿（GSAP demo 拆解、推文实勘、apple-design skill、HTML-in-Canvas、趋势）见文末「参考材料」。
 >
 > **视觉设计仍然照本文档执行；内容管线已经不是了。** 后来内容从 `content/` 下的
-> MDX/YAML 迁进了 Neon Postgres（Drizzle 读取，`src/lib/content.ts` 是唯一读取层），
+> MDX/YAML 迁进了 Neon Postgres（Drizzle 读取，`src/lib/server/content.ts` 是唯一读取层），
 > content-collections 已移除，`dynamicParams = false` 也全部删掉——新文章要能不重新
 > 部署就访问。下文凡提到内容文件、content-collections、全静态策略的段落，读作历史。
 > 现状见 README「内容存在哪」。
@@ -22,14 +22,14 @@
 > - `/about` 的 3D 工作台搬到 `/lab/workstation`（第六则研究）；`/lab/[slug]` 各研究改为
 >   `next/dynamic` 按路由拆包（`LabStudy`）。
 > - 主导航只留 文章 / 软件 / 关于 / 实验室；作品、简历进页脚与全屏菜单，/intro 仍只在 sitemap。
-> - 软件版本号不再手写：`apps.repo` 列 + `src/lib/github.ts` 读 GitHub 最新 release
+> - 软件版本号不再手写：`apps.repo` 列 + `src/lib/server/github.ts` 读 GitHub 最新 release
 >   （`fetch` 缓存 1h，失败即不显示）。
 > - 贴纸/履历/简历/about/文案全部换成用户本人的信息（上海、河津、北京、青岛；小提琴、游戏、
 >   电影、球场、旅行、好奇心）；/intro 七枚贴纸主题随之改为 FRONTEND / VIOLIN / PLAYER 1 /
 >   CINEMA / GAME ON / WANDER / CURIOUS（`stickers.ts` 的角度未动，只换 id/label/icon）。
 > - 字体：Noto Sans/Serif SC 改 `weight: "variable"`（每页少 ~100 KB gz 的 `@font-face`）。
 >   GSAP：核心只注册 ScrollTrigger/SplitText/Flip/CustomEase；Draggable/Inertia/ScrambleText/
->   CustomWiggle/ExpoScale 在 `src/lib/gsap-extras.ts`，谁用谁引。
+>   CustomWiggle/ExpoScale 在 `src/lib/client/gsap-extras.ts`，谁用谁引。
 
 > **2026-08-26 修订（首页拆幕 · 推近回来了）**，覆盖上一次修订里与之相悖的段落：
 > - 首页不再由 `GroveHero` 一屏承担全部。它拆成**三幕**：
@@ -231,7 +231,7 @@
 >   （`components/home/NeonSplash.tsx`）、灵动岛上的音符（`components/fx/JukeboxSwitch.tsx`，
 >   只取音符那一段，同一套 `NeonFilter`）。滤镜 id 按实例加前缀，同页可挂两块。
 > - **大门（`NeonSplash`）**：只在**硬着陆首页**时出现、每 session 一次。判定由页面自带的
->   inline script（`lib/splash.ts` 的 `SPLASH_INIT_SCRIPT`，走 ThemeInitScript 那种 innerHTML
+>   inline script（`lib/client/splash.ts` 的 `SPLASH_INIT_SCRIPT`，走 ThemeInitScript 那种 innerHTML
 >   包壳）在首绘前写到 `<html data-splash="due"|"seen">`；CSS 按它隐藏（`seen`、以及无 JS 时
 >   `html:not([data-js])`），所以回访者看不到墙闪一下，站内导航回首页的人根本不会撞上门
 >   （inline script 在软导航时不会执行，属性不是 `due` 组件就直接 `null`）。开发期 `?splash`
@@ -255,7 +255,7 @@
 > - **音乐成了全站背景音乐**：播放器从招牌下面撤走，改成挂在 locale layout 里的
 >   `components/fx/Jukebox.tsx`（`opacity: 0` 的固定角落盒，`inert`；留在视口内是因为 Chrome
 >   会节流滚出视口的跨域 iframe 的计时器，播放器的缓冲靠它们），跨路由不断。状态在
->   `lib/jukebox.ts` 的外部 store（`useSyncExternalStore`，无 provider）：招牌写 `wanted`，
+>   `lib/client/jukebox.ts` 的外部 store（`useSyncExternalStore`，无 provider）：招牌写 `wanted`，
 >   播放器读它、回报 `playing`/`fallback`；`gestured` 由播放器在 document 捕获阶段记下。
 >   Spotify 脚本**只在第一次有人要音乐时**才加载（`armed` 单向闩），之后跟着 `wanted`
 >   play/resume/pause；网易云退路同前，但只在 `wanted && gestured` 时带 `auto=1` 挂载。
@@ -323,7 +323,7 @@
 >   `invalidate()`），此后只有拖拽（细指针）与两枚箭头按钮（键盘 / 触屏，触屏上拖拽会吃掉
 >   页面滚动）才画帧；滚出视口 `frameloop="never"`；无 WebGL / Save-Data 退回照片。
 >   宽版心 1040px，只为铜像与照片墙，文字仍是 720px。
-> - **一个房间一张唱片**：`lib/jukebox` 的 store 多了 `track`（`lib/tracks.ts` 注册表：Spotify
+> - **一个房间一张唱片**：`lib/client/jukebox` 的 store 多了 `track`（`lib/tracks.ts` 注册表：Spotify
 >   曲目 + 网易云退路）与 `silenced`。页面挂 `components/fx/RoomMusic` 即换上自己的唱片：
 >   Spotify 走 `loadUri`，网易云退路换 id 重挂。**是否自动开始放是读者的事**：已经在放就只换
 >   曲；读者从未按过「关」就替他放上；读者在站上任何一处关过音乐（`silenced`），房间就不出声，
@@ -423,7 +423,7 @@
 >   砖墙近黑上（16px 处圆环是一根 1px 的管、音符是一个亮点，字留给大门；原 fhf 三字母站标退役）；
 >   `components/neon/SignRing.tsx` 是只有圆环的徽章，套在灵动岛与页脚的 `fhf` 字标外面，音乐想放时
 >   随岛上的音符一起点亮——描边画的，不走 morphology 滤镜（这个尺寸下 erode 13 单位只有三十分之一
->   像素）；`lib/ogMark.tsx` 把同一枚标画进两种 OG 卡的题头，代替原来的琥珀圆点（satori 无滤镜，
+>   像素）；`lib/server/ogMark.tsx` 把同一枚标画进两种 OG 卡的题头，代替原来的琥珀圆点（satori 无滤镜，
 >   四层描边：halo / glow / tube / core）。灵动岛从此读作招牌的零件：圆环套着名字，音符在旁边。
 > - **宽屏导航常开**：≥1024px（`Header` 的 `WIDE`）灵动岛默认展开露出六扇门，挂载时不播开合动画
 >   （`instantRef`，直接 `progress(1)`）；向下滚过 48px 折回字标，向上滚 48px 再展开，滚动位置
@@ -456,7 +456,7 @@
 > - **整本翻译文案不再随每页下发**：`NextIntlClientProvider` 不传 `messages` 时会把 `getRequestConfig`
 >   合并后的整本目录（19 KB JSON，转义后更大）塞进每一页的 RSC 载荷，也塞进每一次预取。现在 layout 用
 >   `pick(await getMessages(), CLIENT_NAMESPACES)` 只给客户端组件真正 `useTranslations` 的 11 个命名空间
->   （`src/lib/messages.ts`）；`messages.test.ts` 扫描 `src` 里所有 `useTranslations("…")` 调用，漏一个
+>   （`src/lib/server/messages.ts`）；`messages.test.ts` 扫描 `src` 里所有 `useTranslations("…")` 调用，漏一个
 >   命名空间测试就红，而不是等浏览器报 MISSING_MESSAGE。服务端组件照旧 `getTranslations` 读全本。
 >   **新加客户端组件读新命名空间，先把它加进 `CLIENT_NAMESPACES`。**
 > - **404 边界拆包**：段的 `not-found.tsx` 与 layout 打在一起，于是 `NotFoundStage`（粒子画布、可撕贴纸）
@@ -468,7 +468,7 @@
 >   覆盖 GB2312，Apple 上 PingFang 兜底。字体栈只留系统字：`"PingFang SC", "Hiragino Sans GB",
 >   "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC"`；衬线 `"Songti SC", "SimSun",
 >   "Noto Serif CJK SC", "Source Han Serif SC"`（Windows 的衬线点缀从此落在 SimSun 上）。OG 图不受
->   影响（`lib/og.ts` 构建期另拉 Google Noto）。
+>   影响（`lib/server/og.ts` 构建期另拉 Google Noto）。
 > - **Yozai 切片加 immutable 缓存头**（`next.config` 的 `IMMUTABLE_PATHS` 加 `/fonts/:path*`）：此前每次访问
 >   都要为三五十个切片各发一次条件请求。规矩：**重新切片要换文件夹名**，不能原地覆盖。
 > - **页脚与全屏菜单的链接 `prefetch={false}`**：全屏菜单在每一页的 DOM 里（隐藏），隐藏的链接在预取器
@@ -652,7 +652,7 @@
 > - **做法**：`pnpm assets` 给长缓存目录下每个文件算 sha256 前 8 位，写进 `src/lib/assets.gen.json`
 >   （入库）；代码里一律 `asset("/lab/lens/sea.jpg")` → `/lab/lens/sea.c694b7cb.jpg`。`next.config.ts`
 >   的 `beforeFiles` rewrite 把带 hash 的地址映回原文件，**只有带 hash 的地址**发一年 `immutable`，
->   原地址回到默认的每次再验证。地址形状、目录清单都在 `src/lib/immutable.ts`。
+>   原地址回到默认的每次再验证。地址形状、目录清单都在 `src/config/immutable.ts`。
 > - **三个目录按整目录算一个 hash**，放在路径段里（`/draco/_b84c9890/draco_decoder.wasm`）：draco
 >   的文件名是 three.js 定的，改不了；90 帧和 174 个字体切片逐个列 hash 会把清单送进客户端包。
 >   `yozai.css` 里的地址由 `pnpm assets` 一并改写。
@@ -677,7 +677,7 @@
 >   阅读胶囊 / 扇形菜单 / 开灯仪式与招牌的重放按钮 / 换页的雾 / 灵动岛）、铜像、空气（光晕与纸纹
 >   放大五倍）、版本履历（读真实数据）、放映厅（大话西游的墙）。推近、铜像、履历、放映厅直接挂
 >   站点组件，不写 demo 壳；其余八则各一个 `components/lab/*Demo.tsx`。为此 `PostTitle` 加了
->   `as` / `lang`，`ProgressHud` 导出 `ReadingChip`，`lib/overture` / `lib/splash` 各加一个
+>   `as` / `lang`，`ProgressHud` 导出 `ReadingChip`，`lib/client/overture` / `lib/client/splash` 各加一个
 >   `forget*()` 交回 sessionStorage 钥匙。索引页副标题的数量改成 `{count}` 读表长。
 > - **每则页尾一节「源码」**：`LabEntry.sources` 列出它由哪些文件写成（相对 `src/`），逐个链到
 >   `site.repo/blob/main/src/<path>`（`site.repo` 新增）。`lab.test.ts` 查：序号连续、slug/key 不
@@ -736,7 +736,7 @@
 >   `zoom: 2.5`；撕纸 `zoom: 1.6`；阅读胶囊 `zoom: 1.75`（`ReadingChip` 加 `className`）；扇形菜单
 >   桌面上 `md:hidden` 根本不显示，`RadialFab` 加 `always` 让则里所有宽度都挂；换页的雾原来是一个
 >   去关于页的链接，点了就离开——`RouteTransition` 对指向本页的链接直接放行，所以加了
->   `lib/veil.ts` 的 `fhfs:veil-replay` 事件：只在 idle 时受理，cover → 停 350ms → reveal，就地演、
+>   `lib/client/veil.ts` 的 `fhfs:veil-replay` 事件：只在 idle 时受理，cover → 停 350ms → reveal，就地演、
 >   不 push、不滚回顶部；糊上的途中若点了站内链接，链接赢——转成一次真的换页，照常回顶（实测）。用 `zoom` 而不是 `transform: scale`：CSS 过渡随之缩放且不占错布局；
 >   GSAP 动的东西（Flip、SplitText）不用 zoom，getBoundingClientRect 与 transform 在 zoom 下不同尺。
 >   **源码**：页头摘要下加「源码 · GitHub ↗」链到 `sources[0]`（demo 自己的文件），页尾清单照旧。
@@ -752,7 +752,7 @@
 >   虚线空位，能看出从哪格滑到哪格，下面的内容也不再跳。
 > - **重排 bug（线上也有）**：`/software` 选「桌面应用 → 工具 → 全部」后有一张卡片留着
 >   `visibility: hidden` 和位移——网格里一个看不见的洞。根因是 `revertOnUpdate`：回滚一个**已播完**的
->   Flip 时，进场那条 `fromTo` 把它创建时（Flip 中途）记下的内联样式写了回来。改法在 `src/lib/flipGrid.ts`：
+>   Flip 时，进场那条 `fromTo` 把它创建时（Flip 中途）记下的内联样式写了回来。改法在 `src/lib/client/flipGrid.ts`：
 >   `captureGrid` 在点击里先 `Flip.killFlipsOf(items, true)` 走完、`killTweensOf`、`clearProps`，再
 >   `getState`；`playGrid` 播放；两处都不再用 `revertOnUpdate`。高度那条 tween 由 `SoftwareGallery` 自己
 >   `killTweensOf(grid)`。顺序、慢放、关动画、中途切换、连点都实测回到原位。
@@ -958,14 +958,14 @@
 > `pathname` 变化时再查一遍。手势兜底同样看 `held`。规矩只有这一处，别在各个播放器里各写一份。
 > - **同一类问题的排查结论**：两样东西必须一致、却只靠人保持一致的地方，当时全部是对的，但没有一处
 >   有东西盯着。现在盯着的：代码里写的图片宽高 ↔ 真实文件、剧照清单 ↔ 目录、帧数 ↔ 帧文件
->   （`media.test.ts`）；zh/en 文案键对齐；`gsap` 只能经 `@/lib/gsap`（oxlint 规则，`GSDevTools` 的
+>   （`media.test.ts`）；zh/en 文案键对齐；`gsap` 只能经 `@/lib/client/gsap`（oxlint 规则，`GSDevTools` 的
 >   调试用动态 import 是唯一显式豁免）；页面以 `pageLocale` 开头、读库只在 `content.ts` 且只在
 >   `unstable_cache` 里、每个 action 先验会话后失效缓存（`conventions.test.ts`）；schema 里每张表都在
 >   db:check / export / import / 备份里登记（`tables.test.ts`）。
-> - **环境与域名**：`src/lib/env.ts` 一处描述全部变量，生产构建/启动时一次性报出所有缺失或畸形的
+> - **环境与域名**：`src/config/env.ts` 一处描述全部变量，生产构建/启动时一次性报出所有缺失或畸形的
 >   （此前 admin 两个密钥要到部署后第一次登录才暴露）；`.env.example` 与之由测试保持一致。`site.url`
 >   改从部署读（`SITE_URL` > Vercel 生产域名 > 回落值），绑域名不用再记得改代码。
-> - **CSP**（`src/lib/csp.ts`）：脚本与样式保留 `'unsafe-inline'`——nonce 方案要求全站动态渲染，与全量
+> - **CSP**（`src/config/csp.ts`）：脚本与样式保留 `'unsafe-inline'`——nonce 方案要求全站动态渲染，与全量
 >   预渲染冲突，Next 文档明说；其余全部收紧为同源。`'wasm-unsafe-eval'` 与 `blob:` worker 是 Draco
 >   解码器要的，去掉后 `/intro` 当场失败（验证过）。**以后加任何第三方脚本/字体/iframe/请求都要先改这里。**
 > - **`pnpm smoke`**：不引测试框架、不下浏览器，用本机 Chrome 走 CDP 把 sitemap 里每一页开一遍，
@@ -1025,7 +1025,7 @@
 - 正文：Nunito 400，16–18px / 1.7。
 - 元信息：**Geist Mono** 11–12px uppercase `tracking +0.08em`（版本号/日期/kicker）。
 - ZH：**悠哉字体 Yozai**（圆体，OFL；`public/fonts/yozai/` 自托管，GB2312 子集 + cn-font-split 按 unicode-range 分片，400 / 500 两字重，500 面声明为 500–900 免合成粗体，`src/app/yozai.css`）优先，PingFang SC → **Noto Sans SC** 可变字重兜底（`preload: false`）；中文标题不做负字距（tracking 0～+0.01em）；引语点缀沿用 Noto Serif SC。
-- **删除 Monoton / Poiret_One**。`lib/og.ts` 的 OG 字体为 Nunito + Noto Sans SC 子集（Yozai 不在 Google Fonts 上，卡片仍用 Noto）。
+- **删除 Monoton / Poiret_One**。`lib/server/og.ts` 的 OG 字体为 Nunito + Noto Sans SC 子集（Yozai 不在 Google Fonts 上，卡片仍用 Noto）。
 - CJK 字体 `display: swap`；CLS 目标 <0.05。
 
 ### 1.3 玻璃材质 · 三档制
@@ -1046,7 +1046,7 @@ CSS 变量双套（亮/暗随 `data-theme` 切换），类名 `.glass-thin` / `.
 圆角：10px（chip/按钮）/ 16px（卡片）/ 24px（面板）/ full（胶囊岛）。
 阴影动画一律**双层伪元素 opacity 交叉淡化**，禁止 tween box-shadow。
 
-### 1.5 动效 token（`src/lib/gsap.ts` 唯一中心）
+### 1.5 动效 token（`src/lib/client/gsap.ts` 唯一中心）
 
 ```ts
 gsap.defaults({ duration: 0.35, ease: 'power3.out' })  // 临界阻尼
@@ -1062,18 +1062,18 @@ export const EASE = {
 - materialize（面板出现）：`--panel-blur 20→0`（@property 注册）+ `scale .96→1`，0.4s，仅入退场瞬时 tween backdrop-filter。
 - 开灯/主题切换：**1.2s `cubic-bezier(.42,0,.58,1)`**，包 `document.startViewTransition`，≥300ms 防亮度跳变。
 - press 反馈基类：`a, button { active: scale-[0.97], 100ms ease-out, touch-action: manipulation }`。
-- hover tween 硬规则 `overwrite: 'auto'`；插件注册分两层：`src/lib/gsap.ts` 只注册全站都要的 ScrollTrigger / SplitText / Flip / CustomEase；Draggable + InertiaPlugin / ScrambleTextPlugin / CustomWiggle / ExpoScaleEase 在 `src/lib/gsap-extras.ts`，只由用到它们的组件引入（贴纸墙、移动端软件横滑、404、文章标题）。
+- hover tween 硬规则 `overwrite: 'auto'`；插件注册分两层：`src/lib/client/gsap.ts` 只注册全站都要的 ScrollTrigger / SplitText / Flip / CustomEase；Draggable + InertiaPlugin / ScrambleTextPlugin / CustomWiggle / ExpoScaleEase 在 `src/lib/client/gsap-extras.ts`，只由用到它们的组件引入（贴纸墙、移动端软件横滑、404、文章标题）。
 - **全站单一动效版本，不再按 `prefers-reduced-motion` 分档**（2026-08-04 决策，取代原「每个动效组件内建 reduce 分支」的规则）。
   原因是实测的误伤面：Windows 上该信号写作「显示动画」，被「轻松使用」开关、**性能选项 →「调整为最佳性能」**、节电模式任意一个关掉都会置为 `reduce`。这批访客从未表达过「少一点动效」，却拿到一个残缺版本且无从察觉——`/intro` 直接退化成纯文字简历，而这张脸就是那一页的全部内容。
   这条规则覆盖**所有**表达方式，包括 Tailwind 的 `motion-reduce:` 变体——它编译出来就是 `@media (prefers-reduced-motion: reduce)`。首次执行时漏掉了这一类（只 grep 了 `prefers-reduced-motion` 字面量），复查时补删 9 处；以后加动效不要再引入。
-- **唯一例外：停不下来的那几处**（2026-08-05 补回）。判据只有三个字：**循环、大面积、夺走滚动**。WCAG 2.2.2（Pause, Stop, Hide）要求超过 5s 的自动运动必须可停，而浏览器只给了 `prefers-reduced-motion` 这一个信号——全删等于把「不能停」写死。当前落在例外里的就是下面这几类，不要再扩（`src/lib/gsap.ts` 的注释按「处」数是六处：三条 CSS 循环、DotDoodle、SmoothScroll、OvertureLight；2026-09-18 补记：首页苔藓上线后，它按同一判据也在其内，见末条）：
+- **唯一例外：停不下来的那几处**（2026-08-05 补回）。判据只有三个字：**循环、大面积、夺走滚动**。WCAG 2.2.2（Pause, Stop, Hide）要求超过 5s 的自动运动必须可停，而浏览器只给了 `prefers-reduced-motion` 这一个信号——全删等于把「不能停」写死。当前落在例外里的就是下面这几类，不要再扩（`src/lib/client/gsap.ts` 的注释按「处」数是六处：三条 CSS 循环、DotDoodle、SmoothScroll、OvertureLight；2026-09-18 补记：首页苔藓上线后，它按同一判据也在其内，见末条）：
   - CSS，globals.css 里同一个 media block：`.aurora-blob`、`.grain-layer`、`.pulse-stepped` → `animation: none`。光、纸和滚动提示都还在，只是不动。
   - `DotDoodle`：无尽的点阵 canvas，命中时停在静帧。
   - `SmoothScroll`：Lenis 惯性滚动是全站唯一的滚动劫持，前庭风险最高。命中时直接不创建实例；所有 `window.__lenis` 消费方本来就写了原生滚动回退。
     但**回退本身必须是中性的**：没有 lenis 就等于命中了 reduce，此时 `window.scrollTo({behavior:'smooth'})` 反而比被拒掉的惯性走得更远（长文回顶是整页扫过）。`RadialFab.toTop` 因此显式给 `behavior: prefersReducedMotion() ? 'auto' : 'smooth'`——这不是第六处例外，是这一处例外的落地补正，别照着它往别处加分支。`RouteTransition` 的 `window.scrollTo(0, 0)` 是两参数瞬时形式，本来就中性；全站没有 CSS `scroll-behavior: smooth`，加之前先确认这一点还成立。
   - `OvertureLight`：0.9s 不透明全屏黑幕 + 滚动锁 + 抢焦点。命中时走 `finishInstant()`，并**顺手写掉 session key**——HomeHero 靠这把钥匙判断接力不会来了，不写就会空等 8s 安全超时，首屏一片空白。
   - 首页苔藓（`components/grove`）：整屏、无尽循环，按判据就在例外里——`GroveScene` 与 `LiquidPill` 命中时时钟不走（风、蝴蝶、花粉停住，画面还在）。这两处**不**调 `prefersReducedMotion()`，而是自己握着 MediaQueryList：它们每帧都读，访客中途改系统设置也要立刻生效，不能靠重挂。`GroveApproach` 的卡片指针视差是一次性判断，走统一谓词。
-  入场、揭幕、路由帘幕、hover、pin/视差**一律不在例外里**：它们是一次性的，不属于「停不下来」那一类。`/intro` 的 3D 也不在（那张脸就是那一页的全部内容）。谓词统一用 `prefersReducedMotion()`（`src/lib/gsap.ts`），别在组件里再散写 media query。
+  入场、揭幕、路由帘幕、hover、pin/视差**一律不在例外里**：它们是一次性的，不属于「停不下来」那一类。`/intro` 的 3D 也不在（那张脸就是那一页的全部内容）。谓词统一用 `prefersReducedMotion()`（`src/lib/client/gsap.ts`），别在组件里再散写 media query。
   仍然保留的降级信号（它们是明确意图，不是提速副作用）：`navigator.connection.saveData`（JS 侧，跳过两个 3D 场景，即真正的流量大头）、`hasWebGL()`、`(hover: hover) and (pointer: fine)`（悬停类效果）、`(min-width: 768px)`（pin/视差）。
   CSS 侧的 `prefers-reduced-data` 已删掉：MDN 明说 not supported by any user agent，那条规则从未生效过，留着只会让人以为 aurora 有开关。省流量归 `prefersSaveData()`。
 - GSAP 组件不需要 `gsap.matchMedia()` 包壳：`useGSAP` 本身就跑在 `gsap.context` 里，回调签名同为 `(context, contextSafe)`，返回的函数就是 teardown。需要多个各自持有 cleanup 的作用域时，用嵌套的 `gsap.context()`（见 `HomeHero` 的 `isolate()`），**不要**写 `mm.add("all", …)`：GSAP 会把字符串条件包成 `{matches: "all"}`，真的去调 `window.matchMedia("all")` 并把 context 挂上全局 `_media`，此后任何一处真实查询翻转都要把它重算一遍。带真实断点/指针查询的 matchMedia 照常使用。
@@ -1163,9 +1163,9 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 
 ## 3. 组件处置清单
 
-**原样保留**：src/i18n/* + proxy.ts、lib/content.ts、lib/seo.ts、sitemap/robots/rss、JsonLd、SmoothScroll（lenis + `window.__lenis` 契约）、Magnetic（quickTo 校准，azmKBBJ）、lib/gsap.ts 注册点模式、layout.tsx 主题预置 script。（原文这里还列了 content-collections.ts 与「全静态策略 dynamicParams=false」——两者都已随内容迁库删除，见 §5.1。）
+**原样保留**：src/i18n/* + proxy.ts、lib/server/content.ts、lib/server/seo.ts、sitemap/robots/rss、JsonLd、SmoothScroll（lenis + `window.__lenis` 契约）、Magnetic（quickTo 校准，azmKBBJ）、lib/client/gsap.ts 注册点模式、layout.tsx 主题预置 script。（原文这里还列了 content-collections.ts 与「全静态策略 dynamicParams=false」——两者都已随内容迁库删除，见 §5.1。）
 
-**重写视觉、保留机制**：RouteTransition、CinematicLoader→OvertureLight、ProgressHud、FullNav、Footer、Header、PullCord→LightSwitch（三件套契约迁移）、Timeline→Changelog、Mdx/prose、PostCard/TagPill/AppCard/WorkCard、SectionTitle、not-found、两处 opengraph-image + lib/og.ts 视觉、icon.svg 新站标（简约 monogram）。
+**重写视觉、保留机制**：RouteTransition、CinematicLoader→OvertureLight、ProgressHud、FullNav、Footer、Header、PullCord→LightSwitch（三件套契约迁移）、Timeline→Changelog、Mdx/prose、PostCard/TagPill/AppCard/WorkCard、SectionTitle、not-found、两处 opengraph-image + lib/server/og.ts 视觉、icon.svg 新站标（简约 monogram）。
 
 **删除**（页面重写完成后统一删文件+资产）：NeonSign、MarqueeLights、FilmGrain（→GrainLayer）、NoteTrail、Atmosphere（→AuroraLayer）、ClubWindow、NotesDeck、PoemInterlude、TourRoad、AppsSlider、PosterWall、PosterLightbox、PlanetStage（+public/models/planet + footer 署名）、Starfield、SplitFlap、NeonLogo、ArtDecoDivider、PullCord、SpotlightReveal（被新 Reveal 取代则删）。
 
@@ -1214,11 +1214,11 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 - Loader 握手：sessionStorage `'fhfs-overture-seen'` + `'fhfs:overture-done'` 事件。
 - RouteTransition 捕获阶段拦截 `<a>`：外链/锚点/`data-no-transition`/modifier 键放行。
 - `html { scrollbar-gutter: stable; overflow-x: clip }` hack 保留（globals.css 有详注）。
-- 内容管线：全部在 Neon Postgres 里，`src/lib/content.ts` 是唯一读取层（每个
+- 内容管线：全部在 Neon Postgres 里，`src/lib/server/content.ts` 是唯一读取层（每个
   getter 带缓存标签，写入侧 `updateTag`）。长文（posts / secrets / abouts）一语言一行、
   按 `(slug, locale)` 建键；短字段是 `{zh,en}` 的 jsonb 列。locale fallback +
   isFallback 提示条行为保留。**不要在这个文件之外读库，也不要留未缓存的读。**
-- OG 图构建期联网拉 Google Fonts（lib/og.ts）——换字体先本地跑通 build。
+- OG 图构建期联网拉 Google Fonts（lib/server/og.ts）——换字体先本地跑通 build。
 
 ### 5.3 性能预算
 
@@ -1232,7 +1232,7 @@ SSR 永远输出完整 DOM；（已删的）`src/lib/htmlInCanvas.ts` 导出 `su
 
 ## 6. 实现顺序
 
-- **P0 基础层**：globals.css @theme 换代（色板/字阶/玻璃三档/圆角/motion 变量/reduced-transparency variant/press 基类）+ lib/gsap.ts（defaults/EASE/补注册 ScrambleText+Flip+Draggable+Inertia+CustomWiggle）+ layout.tsx 字体换代 + AuroraLayer/GrainLayer + `<Sticker>` + messages/site.ts 文案换代。
+- **P0 基础层**：globals.css @theme 换代（色板/字阶/玻璃三档/圆角/motion 变量/reduced-transparency variant/press 基类）+ lib/client/gsap.ts（defaults/EASE/补注册 ScrambleText+Flip+Draggable+Inertia+CustomWiggle）+ layout.tsx 字体换代 + AuroraLayer/GrainLayer + `<Sticker>` + messages/site.ts 文案换代。
 - **P1 壳层**：Header 灵动岛 + FullNav + Footer + LightSwitch + RouteTransition + OvertureLight loader + ProgressHud。
 - **P2 页面**（纪律：**先静态布局跑通类型检查，动效后补**——评审嫁接的交付纪律）：首页、About、Blog×3、Portfolio、Software、404。
 - **P3 记忆点收口**：specular 描边、撕纸、开灯音效+震动、logo Flip 形变、bento scrub 调优。

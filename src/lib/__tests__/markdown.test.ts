@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { isSafeUrl, renderMarkdown } from "@/lib/markdown";
+import { isSafeUrl, renderMarkdown } from "@/lib/server/markdown";
 
 describe("isSafeUrl", () => {
   it("passes relative paths, anchors and the four protocols", () => {

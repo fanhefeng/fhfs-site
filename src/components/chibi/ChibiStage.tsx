@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { ReactNode } from "react";
-import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, isFinePointer } from "@/lib/client/gsap";
 
 type Eye = "open" | "happy" | "shut" | "round" | "spiral" | "heart" | "squeeze";
 type Mouth = "smile" | "grin" | "o" | "snore" | "cat" | "wave";

@@ -4,13 +4,13 @@ import { inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 
 import * as schema from "@/db/schema";
-import { adminSession, requireAdmin } from "@/lib/auth/session";
+import { adminSession, requireAdmin } from "@/lib/server/auth/session";
 
 import { raw, str } from "@/lib/forms";
 
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 import { COPY_GROUPS, copyError, namespaceOf } from "@/lib/copy";
-import { copyCatalogues } from "@/lib/copyCatalogue";
+import { copyCatalogues } from "@/lib/server/copyCatalogue";
 
 import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
 

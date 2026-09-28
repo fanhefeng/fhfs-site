@@ -7,11 +7,11 @@ import type { AnyPgColumn, PgInsertValue, PgTable, PgUpdateSetSource } from "dri
 
 import { db } from "@/db";
 
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 
 import { parseLocale, raw, str, validDate, validKey } from "@/lib/forms";
 
-import { renderMarkdown } from "@/lib/markdown";
+import { renderMarkdown } from "@/lib/server/markdown";
 
 import { readingMinutes } from "@/lib/reading";
 

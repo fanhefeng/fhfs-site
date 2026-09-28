@@ -3,10 +3,10 @@
 import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { gsap, EASE } from "@/lib/gsap";
-import { prefersSaveData } from "@/lib/three/guards";
-import { releaseRenderer } from "@/lib/three/release";
-import { DRACO_DECODER_PATH } from "@/lib/three/draco";
+import { gsap, EASE } from "@/lib/client/gsap";
+import { prefersSaveData } from "@/lib/client/three/guards";
+import { releaseRenderer } from "@/lib/client/three/release";
+import { DRACO_DECODER_PATH } from "@/lib/client/three/draco";
 import { DeskFallback } from "@/components/lab/SceneGate";
 
 /* "Gaming Desktop PC" by Yolala1232 (sketchfab.com/Yolala1232), CC-BY-4.0 —
@@ -64,7 +64,7 @@ type Props = {
  * Loads only when scrolled near and renders only while visible. Save-Data and
  * a missing WebGL are asked before this chunk is fetched (`SceneGate` in the
  * lab); the check below is only a second line. There is one version of this
- * scene and everybody gets it — see the note in lib/three/guards.ts.
+ * scene and everybody gets it — see the note in lib/client/three/guards.ts.
  */
 export function Workstation({ hint, label, turnLeft, turnRight, fallbackNote, className }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);

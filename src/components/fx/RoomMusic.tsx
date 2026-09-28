@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { jukebox, roomStart, roomStop, setTrack, useJukebox } from "@/lib/jukebox";
+import { jukebox, roomStart, roomStop, setTrack, useJukebox } from "@/lib/client/jukebox";
 import { DEFAULT_TRACK, type TrackId } from "@/lib/tracks";
 import { JukeboxSwitch } from "./JukeboxSwitch";
 

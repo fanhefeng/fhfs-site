@@ -4,11 +4,11 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 
 import * as schema from "@/db/schema";
-import { adminSession, requireAdmin } from "@/lib/auth/session";
+import { adminSession, requireAdmin } from "@/lib/server/auth/session";
 
 import { intField, list, localized, oneOf, str, validKey, validLink } from "@/lib/forms";
 
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 
 import {
   invalidate,
@@ -38,7 +38,7 @@ export async function saveApp(_prev: ActionState, form: FormData): Promise<Actio
   const website = str(form, "website");
   if (!validLink(website)) return linkError("网址");
 
-  // "owner/name" — src/lib/github.ts builds an API URL out of it, so it has
+  // "owner/name" — src/lib/server/github.ts builds an API URL out of it, so it has
   // to be exactly two path segments and nothing that could escape them.
   const repo = str(form, "repo") || null;
   if (repo && !/^[\w.-]+\/[\w.-]+$/.test(repo)) {

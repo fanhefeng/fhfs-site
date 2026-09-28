@@ -63,7 +63,7 @@ describe("the database", () => {
   // /admin reads the tables directly on purpose: the workbench shows what is
   // stored, not what the cache says. The login throttle is a write path.
   it("is imported only by the read layer, the admin and the login throttle", () => {
-    const allowed = /^(lib\/content\.ts|lib\/auth\/throttle\.ts|app\/admin\/|db\/)/;
+    const allowed = /^(lib\/server\/content\.ts|lib\/server\/auth\/throttle\.ts|app\/admin\/|db\/)/;
     const importsDb = /from\s+"(@\/db|(\.\.?\/)+db)(\/[^"]*)?"/;
     const strays = files
       .filter(({ file, text }) => !allowed.test(file) && importsDb.test(text))
@@ -75,7 +75,7 @@ describe("the database", () => {
   });
 
   it("is read in content.ts only from inside unstable_cache", () => {
-    const content = files.find(({ file }) => file === "lib/content.ts");
+    const content = files.find(({ file }) => file === "lib/server/content.ts");
     expect(content).toBeDefined();
     const uncached = declarations(content!.text)
       .filter((d) => /\bdb\s*\.\s*(select|query|execute|batch|\$count)/.test(d))
@@ -85,7 +85,7 @@ describe("the database", () => {
   });
 
   it("is never cached with a revalidate window in content.ts", () => {
-    const content = files.find(({ file }) => file === "lib/content.ts")!;
+    const content = files.find(({ file }) => file === "lib/server/content.ts")!;
     expect(content.text.match(/revalidate:\s*\d+/g) ?? []).toEqual([]);
   });
 });
@@ -189,7 +189,7 @@ describe("Flip animations", () => {
   // Reverting a flip that has *finished* puts back the inline styles its
   // entrance tweens recorded mid-flight: /software went A → B → all and kept
   // one of B's cards in the grid, hidden and displaced, with no error. What
-  // replaces the revert is `captureGrid` in src/lib/flipGrid.ts.
+  // replaces the revert is `captureGrid` in src/lib/client/flipGrid.ts.
   it("are never played in a useGSAP that reverts on update", () => {
     const flips = files.filter(({ text }) => /\b(Flip\.from|playGrid)\(/.test(text));
     expect(flips.length).toBeGreaterThan(2);
@@ -201,11 +201,11 @@ describe("Flip animations", () => {
 describe("eases", () => {
   // An ease written as a string still animates — it just stops being the
   // site's motion language, one call site at a time, and nothing says so.
-  // Every curve is a named token in src/lib/gsap.ts's EASE table.
+  // Every curve is a named token in src/lib/client/gsap.ts's EASE table.
   it("come from the EASE table, never as a string at the call site", () => {
     const literal = /\bease\w*\s*[:=]\s*["'`]/;
     const offenders = files
-      .filter(({ file }) => file !== "lib/gsap.ts")
+      .filter(({ file }) => file !== "lib/client/gsap.ts")
       .flatMap(({ file, text }) =>
         text
           // Comments may name a curve; blank them, keeping the line count.

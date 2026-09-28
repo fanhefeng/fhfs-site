@@ -2,7 +2,7 @@ import Link from "next/link";
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { copyBlocks } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import {
   COPY_GROUPS,
   COPY_NOTES,
@@ -10,7 +10,7 @@ import {
   namespaceOf,
   type CopyEntry,
 } from "@/lib/copy";
-import { copyCatalogues } from "@/lib/copyCatalogue";
+import { copyCatalogues } from "@/lib/server/copyCatalogue";
 import { AdminChrome } from "../AdminChrome";
 import { cardClass, metaClass } from "../styles";
 import { Note } from "../ui/Note";

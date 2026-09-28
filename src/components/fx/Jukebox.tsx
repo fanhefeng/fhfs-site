@@ -10,7 +10,7 @@ import {
   reportGesture,
   reportPlayback,
   useJukebox,
-} from "@/lib/jukebox";
+} from "@/lib/client/jukebox";
 import type { TrackFiles } from "@/lib/tracks";
 
 /** Players whose file would not load: `paused` still reads false on them. */
@@ -30,7 +30,7 @@ const nextSource = (source: HTMLSourceElement) => {
  * The record player behind the wall.
  *
  * Mounted once in the locale layout and never seen: one `<audio loop>`,
- * playing whatever record the signs ask for (`lib/jukebox`, `lib/tracks`).
+ * playing whatever record the signs ask for (`lib/client/jukebox`, `lib/tracks`).
  * `preload="none"` until someone actually wants music, so a reader who never
  * touches a sign never fetches a megabyte of it; `loop` keeps the tune going,
  * so there is nothing to restart; pausing and resuming is the element's own
@@ -57,7 +57,7 @@ const nextSource = (source: HTMLSourceElement) => {
  * behind it — and both are gone now that every record is a file of ours
  * (`lib/tracks` has the note).
  *
- * `files` arrives from the layout already hashed (`lib/trackFiles`): resolving
+ * `files` arrives from the layout already hashed (`lib/server/trackFiles`): resolving
  * them here would put the whole asset manifest in every page's scripts.
  */
 export function Jukebox({ files }: { files: TrackFiles }) {

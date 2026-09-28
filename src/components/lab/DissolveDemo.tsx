@@ -4,8 +4,8 @@ import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
-import { releaseRenderer } from "@/lib/three/release";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
+import { releaseRenderer } from "@/lib/client/three/release";
 
 type Props = {
   accent: string;

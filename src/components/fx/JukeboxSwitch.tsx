@@ -2,8 +2,8 @@
 
 import { useId, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP } from "@/lib/gsap";
-import { toggleMusic, useJukebox } from "@/lib/jukebox";
+import { gsap, useGSAP } from "@/lib/client/gsap";
+import { toggleMusic, useJukebox } from "@/lib/client/jukebox";
 import {
   NeonFilter,
   NOTE_D,

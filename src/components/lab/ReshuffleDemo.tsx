@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState, type CSSProperties } from "react";
-import { useGSAP } from "@/lib/gsap";
-import { captureGrid, playGrid, type GridState } from "@/lib/flipGrid";
+import { useGSAP } from "@/lib/client/gsap";
+import { captureGrid, playGrid, type GridState } from "@/lib/client/flipGrid";
 import { StudyPanel } from "./StudyPanel";
 
 type Props = {

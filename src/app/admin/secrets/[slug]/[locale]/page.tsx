@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { secrets } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../../../AdminChrome";
 import { SecretForm } from "../../SecretForm";
 

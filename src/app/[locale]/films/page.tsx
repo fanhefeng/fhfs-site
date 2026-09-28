@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import { sectionMetadata } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/server/seo";
 import { FILMS, filmCover, stillSrc } from "@/components/films/entries";
 import { Reveal } from "@/components/fx/Reveal";
 

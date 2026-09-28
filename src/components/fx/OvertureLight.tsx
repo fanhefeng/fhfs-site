@@ -2,10 +2,10 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/gsap";
-import { lockScroll, unlockScroll } from "@/lib/scrollLock";
-import { splashDue } from "@/lib/splash";
-import { announceOvertureDone, markOvertureSeen, overtureSeen } from "@/lib/overture";
+import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/client/gsap";
+import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
+import { splashDue } from "@/lib/client/splash";
+import { announceOvertureDone, markOvertureSeen, overtureSeen } from "@/lib/client/overture";
 
 /** Where the lamp hangs — cord length, glow flood and circle reveal all
  * share this origin so the light reads as one source. */
@@ -81,7 +81,7 @@ export function OvertureLight() {
          remounts on a locale switch) skips the terminal callback, and the next
          mount then replays the whole opaque blackout, scroll lock included.
 
-         `overtureSeen()` reads a throw as "seen" — see lib/overture. */
+         `overtureSeen()` reads a throw as "seen" — see lib/client/overture. */
       let seen = overtureSeen();
       /** Development only: `?overture` on the URL replays the ritual on every
        *  load, never spends the session key, and hangs GSDevTools off the
@@ -216,7 +216,7 @@ export function OvertureLight() {
       let alive = true;
       let devtools: { kill(): void } | null = null;
       if (debug) {
-        // The one import that goes round @/lib/gsap: registering it there
+        // The one import that goes round @/lib/client/gsap: registering it there
         // would put a debugging tool in every page's bundle.
         // oxlint-disable-next-line no-restricted-imports
         void import("gsap/GSDevTools").then(({ GSDevTools }) => {

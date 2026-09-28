@@ -8,7 +8,11 @@ import { defineConfig } from "vite-plus";
  * `next build`, and next.config.ts.
  */
 
-const lib = fileURLToPath(new URL("./src/lib/", import.meta.url));
+const src = fileURLToPath(new URL("./src/", import.meta.url));
+
+/** Where a tested module may live: the isomorphic root of src/lib, its
+ *  server-, browser- and Node-only halves, and the config next.config reads. */
+const MODULE_DIRS = ["lib", "lib/server", "lib/server/auth", "lib/client", "lib/node", "config"];
 
 /**
  * What coverage is measured over: the modules that have a test file of their
@@ -17,12 +21,12 @@ const lib = fileURLToPath(new URL("./src/lib/", import.meta.url));
  * were never meant to reach, and a number averaged over those says nothing
  * about the ones that are. A module joins by getting a test.
  */
-const tested = readdirSync(`${lib}__tests__`)
+const tested = readdirSync(`${src}lib/__tests__`)
   .map((file) => file.replace(/\.test\.ts$/, ""))
-  .flatMap((name) => [`${name}.ts`, `auth/${name}.ts`])
-  .filter((file) => existsSync(lib + file))
-  .concat(["assetManifest.ts", "immutable.ts"])
-  .map((file) => `src/lib/${file}`);
+  .flatMap((name) => MODULE_DIRS.map((dir) => `${dir}/${name}.ts`))
+  .filter((file) => existsSync(src + file))
+  .concat(["lib/node/assetManifest.ts", "config/immutable.ts"])
+  .map((file) => `src/${file}`);
 
 export default defineConfig({
   lint: {
@@ -38,11 +42,12 @@ export default defineConfig({
           paths: [
             {
               name: "gsap",
-              message: "Import gsap from @/lib/gsap — the plugins are registered there, once.",
+              message:
+                "Import gsap from @/lib/client/gsap — the plugins are registered there, once.",
             },
-            { name: "@gsap/react", message: "Import useGSAP from @/lib/gsap." },
+            { name: "@gsap/react", message: "Import useGSAP from @/lib/client/gsap." },
           ],
-          patterns: [{ group: ["gsap/*"], message: "Import GSAP plugins from @/lib/gsap." }],
+          patterns: [{ group: ["gsap/*"], message: "Import GSAP plugins from @/lib/client/gsap." }],
         },
       ],
       "react/exhaustive-deps": "error",
@@ -59,7 +64,7 @@ export default defineConfig({
     },
     overrides: [
       {
-        files: ["src/lib/gsap.ts", "src/lib/gsap-extras.ts"],
+        files: ["src/lib/client/gsap.ts", "src/lib/client/gsap-extras.ts"],
         rules: { "eslint/no-restricted-imports": "off" },
       },
       {

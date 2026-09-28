@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/gsap";
+import { gsap, useGSAP, EASE, prefersReducedMotion } from "@/lib/client/gsap";
 import { toggleTheme } from "@/lib/theme";
 
 /** Quarter-circle sweep: 180° (due left) → 270° (straight up). */

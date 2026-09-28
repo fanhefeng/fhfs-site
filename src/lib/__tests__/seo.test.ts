@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { feedTypes, localeAlternates, localeLanguages } from "@/lib/seo";
+import { feedTypes, localeAlternates, localeLanguages } from "@/lib/server/seo";
 import { site } from "@/config/site";
 
 describe("localeLanguages", () => {

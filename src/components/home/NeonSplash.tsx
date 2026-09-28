@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { gsap, useGSAP, EASE } from "@/lib/gsap";
-import { lockScroll, unlockScroll } from "@/lib/scrollLock";
-import { announceOvertureDone, markOvertureSeen } from "@/lib/overture";
-import { SPLASH_INIT_SCRIPT, SPLASH_SEEN_KEY, splashDebug, splashDue } from "@/lib/splash";
+import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
+import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
+import { announceOvertureDone, markOvertureSeen } from "@/lib/client/overture";
+import { SPLASH_INIT_SCRIPT, SPLASH_SEEN_KEY, splashDebug, splashDue } from "@/lib/client/splash";
 import { NeonSignArt, RING, score } from "@/components/neon/NeonSignArt";
 import { useBrickWall, wireNeonSign } from "@/components/neon/sign";
 import { WALL_CSS } from "@/components/neon/wall";
@@ -36,7 +36,7 @@ const PUSH_FOR = 1.0;
  * The neon over the door of Seb's, re-lettered, on a brick wall the size of
  * the viewport — the first thing a reader landing on the cover sees, once
  * per session. The sign lights up by itself and asks for the music; the sign
- * is the switch for both (`lib/jukebox` — the player is behind the wall, in
+ * is the switch for both (`lib/client/jukebox` — the player is behind the wall, in
  * the layout, so the tune follows the reader inside). The way in is through
  * the ring: the letters go dark, the ring holds, the paper of the cover
  * shows through it as an iris opens, and the wall pushes past the reader
@@ -45,7 +45,7 @@ const PUSH_FOR = 1.0;
  * this door stands in for the opening ritual on the cover.
  *
  * Mechanics: the "due" decision is made before first paint by an inline
- * script (`lib/splash`), so a returning reader never sees the wall flash and
+ * script (`lib/client/splash`), so a returning reader never sees the wall flash and
  * a reader arriving by client navigation never sees it at all; scroll is
  * locked under the lenis contract while the door is up; the way in is the
  * button, Enter/Space/Escape, a wheel or a swipe once the sign holds; the

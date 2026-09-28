@@ -15,7 +15,7 @@ import {
   type StickerOverride,
 } from "@/lib/intro/store";
 import { createStickerTexture } from "@/lib/intro/stickerTexture";
-import { DRACO_DECODER_PATH } from "@/lib/three/draco";
+import { DRACO_DECODER_PATH } from "@/lib/client/three/draco";
 import {
   dirVector,
   vectorToDir,

@@ -1,7 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { navItems } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { isNavGroup } from "@/lib/nav";
 import { AdminChrome } from "../AdminChrome";
 import { NavForm } from "./NavForm";
@@ -17,7 +17,7 @@ export default async function NavPage() {
       group: navItems.group,
     })
     .from(navItems)
-    // The getter's own order (lib/content.ts), so the form lists the rows the
+    // The getter's own order (lib/server/content.ts), so the form lists the rows the
     // way the site shows them.
     .orderBy(asc(navItems.sort), asc(navItems.id));
 

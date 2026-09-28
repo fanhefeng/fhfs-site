@@ -1,5 +1,5 @@
 import "client-only";
-import { EASE, Flip, gsap } from "@/lib/gsap";
+import { EASE, Flip, gsap } from "@/lib/client/gsap";
 
 /**
  * A grid that reshuffles when it is filtered — /software's bento, and the lab

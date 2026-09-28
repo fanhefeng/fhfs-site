@@ -132,7 +132,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "01",
     added: "2026-08-17",
     accent: "#3e6d93",
-    sources: ["components/lab/ScrollVideoDemo.tsx", "lib/scrollVideo.ts"],
+    sources: ["components/lab/ScrollVideoDemo.tsx", "lib/client/scrollVideo.ts"],
   },
   {
     slug: "dissolve",
@@ -141,7 +141,11 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "02",
     added: "2026-08-17",
     accent: "#4c7a5b",
-    sources: ["components/lab/DissolveDemo.tsx", "lib/three/guards.ts", "lib/three/release.ts"],
+    sources: [
+      "components/lab/DissolveDemo.tsx",
+      "lib/client/three/guards.ts",
+      "lib/client/three/release.ts",
+    ],
   },
   {
     slug: "melting-text",
@@ -192,7 +196,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "06",
     added: "2026-07-31",
     accent: "#b45309",
-    sources: ["components/lab/Workstation.tsx", "lib/three/draco.ts"],
+    sources: ["components/lab/Workstation.tsx", "lib/client/three/draco.ts"],
   },
   // Four photographs and a lens: the next picture arrives inside a growing
   // circle of glass, magnified at the rim, then settles flat.
@@ -419,7 +423,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     accent: "#3a7a8a",
     sources: [
       "components/lab/ReshuffleDemo.tsx",
-      "lib/flipGrid.ts",
+      "lib/client/flipGrid.ts",
       "components/software/SoftwareGallery.tsx",
     ],
   },
@@ -458,7 +462,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     accent: "#b8552e",
     sources: [
       "components/films/FilmStills.tsx",
-      "lib/scrollLock.ts",
+      "lib/client/scrollLock.ts",
       "components/films/entries.ts",
     ],
   },
@@ -511,7 +515,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     sources: [
       "components/lab/OvertureDemo.tsx",
       "components/fx/OvertureLight.tsx",
-      "lib/overture.ts",
+      "lib/client/overture.ts",
     ],
   },
   // The way in through the sign on a hard landing at the cover.
@@ -522,7 +526,11 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "31",
     added: "2026-09-19",
     accent: "#4b5a7a",
-    sources: ["components/lab/DoorDemo.tsx", "components/home/NeonSplash.tsx", "lib/splash.ts"],
+    sources: [
+      "components/lab/DoorDemo.tsx",
+      "components/home/NeonSplash.tsx",
+      "lib/client/splash.ts",
+    ],
   },
   // The veil between routes, played in place by a replay event.
   {
@@ -532,7 +540,11 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "32",
     added: "2026-09-19",
     accent: "#6f7a86",
-    sources: ["components/lab/VeilDemo.tsx", "components/fx/RouteTransition.tsx", "lib/veil.ts"],
+    sources: [
+      "components/lab/VeilDemo.tsx",
+      "components/fx/RouteTransition.tsx",
+      "lib/client/veil.ts",
+    ],
   },
   // The island overhead, folding on 48px of scroll — no mounting needed.
   {

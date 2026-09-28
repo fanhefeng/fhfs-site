@@ -2,9 +2,9 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { verifyPassword } from "@/lib/auth/password";
-import { clearAttempts, recordAttempt } from "@/lib/auth/throttle";
-import { clearSessionCookie, createSession, setSessionCookie } from "@/lib/auth/session";
+import { verifyPassword } from "@/lib/server/auth/password";
+import { clearAttempts, recordAttempt } from "@/lib/server/auth/throttle";
+import { clearSessionCookie, createSession, setSessionCookie } from "@/lib/server/auth/session";
 
 export type LoginState = { error?: string };
 
@@ -14,7 +14,7 @@ export type LoginState = { error?: string };
  * The failure messages are deliberately uninformative — a wrong password and a
  * missing one say the same thing — and every attempt is recorded before the
  * password is even looked at, so the throttle counts guesses rather than
- * successes. The record and the verdict travel as one request (lib/auth/
+ * successes. The record and the verdict travel as one request (lib/server/auth/
  * throttle.ts), so a burst of concurrent guesses cannot all slip under the
  * same count.
  */

@@ -1,6 +1,6 @@
 "use client";
 
-import { replayVeil } from "@/lib/veil";
+import { replayVeil } from "@/lib/client/veil";
 import { StudyPanel } from "./StudyPanel";
 
 type Props = {

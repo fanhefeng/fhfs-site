@@ -2,7 +2,7 @@
 
 import { useCallback, useId, useMemo, useRef } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
 import { splitText } from "@/lib/splitText";
 
 export type MeltingTextMode = "load" | "inView" | "scrub";

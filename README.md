@@ -30,7 +30,7 @@ fhf 的个人网站：收录文章、自研软件与动效实验。
   拆包，页头链到 demo 自己的文件、页尾列出它由哪些文件写成，逐个链到 GitHub 上的源码
   （`components/lab/entries.ts` 的 `sources`，`lab.test.ts` 查文件存在），再给出上一则 /
   下一则。单效果的小则共用 `components/lab/StudyPanel.tsx` 这一个框；站上本来看不清的
-  小件在则里放大（`zoom`）或在所有宽度上挂出来，换页的雾靠 `lib/veil.ts` 的事件就地重演。
+  小件在则里放大（`zoom`）或在所有宽度上挂出来，换页的雾靠 `lib/client/veil.ts` 的事件就地重演。
 - **/intro** —— R3F 的 3D 头像：滚动带镜头绕头飞行，每张贴纸停一站，
   即一份滚动叙事的简历（`docs/INTRO3D.md`）。
 - **/resume** —— 正式的一页简历：左栏编号标签、右栏概述 / 技能 / 经历 / 开源 / 教育，
@@ -58,9 +58,9 @@ fhf 的个人网站：收录文章、自研软件与动效实验。
 
 - Next.js 16 (App Router) + React 19 + TypeScript strict
 - Tailwind CSS 4 · next-intl（zh/en 双语，`messages/*.json`）
-- GSAP 3.15（核心 ScrollTrigger / SplitText / Flip / CustomEase 在 `src/lib/gsap.ts`
+- GSAP 3.15（核心 ScrollTrigger / SplitText / Flip / CustomEase 在 `src/lib/client/gsap.ts`
   注册；Draggable / Inertia / ScrambleText / CustomWiggle / ExpoScale 在
-  `src/lib/gsap-extras.ts`，只由用到的组件引入）
+  `src/lib/client/gsap-extras.ts`，只由用到的组件引入）
 - Lenis 1.3 惯性滚动，与 GSAP 时钟统一（`gsap.ticker` 驱动 `lenis.raf`）
 - three.js：/intro 用 @react-three/fiber + drei，/about 工作台为命令式 three。
   `@react-three/fiber` 带一个 pnpm patch（`patches/`）：three r183 起 `THREE.Clock`
@@ -73,7 +73,7 @@ fhf 的个人网站：收录文章、自研软件与动效实验。
 
 全站单一动效版本，`prefers-reduced-motion` 只关掉停不下来的那几处——三条
 无限 CSS 循环、点阵画布、惯性滚动、开场黑幕（清单与理由见
-`src/lib/gsap.ts` 与 `docs/DESIGN.md` §1.5）；SSR 输出完整内容，无 JS 也可读。
+`src/lib/client/gsap.ts` 与 `docs/DESIGN.md` §1.5）；SSR 输出完整内容，无 JS 也可读。
 
 两个踩过的坑，改动相关代码前先读：
 
@@ -101,7 +101,7 @@ pnpm db:migrate      # 应用迁移
 
 ## 内容存在哪
 
-内容全部在数据库里，日常编辑走 `/admin`。`src/lib/content.ts` 是唯一的读取层：
+内容全部在数据库里，日常编辑走 `/admin`。`src/lib/server/content.ts` 是唯一的读取层：
 每个 getter 都带缓存标签，页面照旧全静态预渲染，保存时 `updateTag` 让相关页面
 失效即可，不必重新部署。
 
@@ -148,18 +148,18 @@ Neon 账号整个没了，三级各有一份能照着敲的操作单。
   页面上有署名），F 由原版的 E 去掉底横而来、H 是照它的笔画新造的，不用字体；砖墙是 canvas 画的。
   同一块招牌也是首页的大门（`components/home/NeonSplash.tsx`，硬着陆时每 session 一次，
   推门是从圆环里穿过去），它的圆环与音符也是站标：favicon（`app/icon.svg`）、灵动岛和
-  页脚上套着 `fhf` 的圆环（`components/neon/SignRing.tsx`）、OG 卡题头（`lib/ogMark.tsx`）
+  页脚上套着 `fhf` 的圆环（`components/neon/SignRing.tsx`）、OG 卡题头（`lib/server/ogMark.tsx`）
   都从同一份几何（`lib/neon/geometry.ts`）画出来。音乐是全站背景音乐：播放器藏在 layout 里（`components/fx/Jukebox.tsx`，
-  `lib/jukebox.ts` 是它的 store），开关是招牌本身和灵动岛上的音符。门口这首 Mia & Sebastian's
+  `lib/client/jukebox.ts` 是它的 store），开关是招牌本身和灵动岛上的音符。门口这首 Mia & Sebastian's
   Theme（Justin Hurwitz，《爱乐之城》原声，2016）**自托管**在
   `public/music/mia-and-sebastians-theme.mp3`——一个 `<audio loop preload="none">` 直接放，
   3 分 19 秒整首，不嵌任何第三方播放器，大陆网络照样能听。文件由本地 320kbps 源（8.0MB）经
   `pnpm media:music <源文件> <名字>`（`scripts/encode-music.mts`：去元数据、LAME `-q:a 5`、44.1kHz，
   并报告首尾静音）重编码到 2.8MB（约 112kbps VBR）；
-  页面引用的是带内容 hash 的地址（`asset()`，见 `src/lib/immutable.ts`），只有它缓存一年；重编码后跑
+  页面引用的是带内容 hash 的地址（`asset()`，见 `src/config/immutable.ts`），只有它缓存一年；重编码后跑
   `pnpm assets` 即可，不必改文件名。
   招牌下的剧照墙就是 /films/lala 那面（`public/films/lala/`，出处见 /films/lala 一条）。
-- 软件版本号：`apps.repo`（owner/name）+ `src/lib/github.ts` 读 GitHub 最新 release，
+- 软件版本号：`apps.repo`（owner/name）+ `src/lib/server/github.ts` 读 GitHub 最新 release，
   `fetch` 缓存一小时；未登录配额 60 次/小时足够，设 `GITHUB_TOKEN` 可放宽。
 - /moments 的头 242 条说说来自用户在「一言 YAN」App（com.jhyan.yan，深圳宜言网络）里
   的两本文集。App 没有导出功能：在安卓模拟器里登录后读它的本地数据库

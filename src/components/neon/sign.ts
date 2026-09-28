@@ -1,6 +1,6 @@
 import { useEffect, type RefObject } from "react";
-import { gsap, EASE, isFinePointer } from "@/lib/gsap";
-import { stopMusic, wantMusic } from "@/lib/jukebox";
+import { gsap, EASE, isFinePointer } from "@/lib/client/gsap";
+import { stopMusic, wantMusic } from "@/lib/client/jukebox";
 import {
   LETTER_SEGS,
   STUTTER,
@@ -69,7 +69,7 @@ export type NeonSign = {
 
 /**
  * Wires the sign inside a GSAP context: the lighting score and its reverse,
- * the switch (which is also the bar's music — `lib/jukebox`), the stutter,
+ * the switch (which is also the bar's music — `lib/client/jukebox`), the stutter,
  * and the parallax that has the sign hang a little in front of the wall.
  *
  * `held` answers true while the sign must not respond — the door is being

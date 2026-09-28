@@ -6,11 +6,11 @@
  * last page; trading that away to police a site with one author and no
  * third-party script would be the wrong bargain. So scripts and styles keep
  * `'unsafe-inline'`, which Next's own bootstrap and the splash decision script
- * (src/lib/splash.ts) need, and the policy earns its keep everywhere else:
+ * (src/lib/client/splash.ts) need, and the policy earns its keep everywhere else:
  * nothing loads from another origin — save the board's videos, from the one
  * Blob host named under `media-src` — nothing is framed or frames, no
  * plugin, no `<base>` hijack, no form posting elsewhere. If a stored article
- * ever did carry markup past lib/markdown.ts, it could not phone home or pull
+ * ever did carry markup past lib/server/markdown.ts, it could not phone home or pull
  * a script from outside.
  *
  * Pure, and imported by next.config.ts — no `fs`, no `@/` imports.

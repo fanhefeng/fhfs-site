@@ -1,10 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, ScrollTrigger, SplitText, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, ScrollTrigger, SplitText, EASE } from "@/lib/client/gsap";
 import { REVEAL_VARS } from "@/components/fx/Reveal";
 
-// Referenced so bundlers keep the plugins; registration lives in @/lib/gsap.
+// Referenced so bundlers keep the plugins; registration lives in @/lib/client/gsap.
 void ScrollTrigger;
 
 /** The band only takes over the screen where a pin is comfortable: wide

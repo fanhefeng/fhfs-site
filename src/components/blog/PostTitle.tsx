@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP, SplitText, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, SplitText, EASE } from "@/lib/client/gsap";
 // Registers ScrambleTextPlugin, which the `scrambleText:` tween below needs.
-import "@/lib/gsap-extras";
+import "@/lib/client/gsap-extras";
 // Any CJK ideograph/kana in the headline means "do not scramble".
 import { HAS_CJK } from "@/lib/reading";
 

@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import { sectionMetadata } from "@/lib/seo";
+import { sectionMetadata } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { LAB_ENTRIES, LAB_GROUPS } from "@/components/lab/entries";
 import type { CSSProperties } from "react";

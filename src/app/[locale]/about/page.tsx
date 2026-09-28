@@ -10,8 +10,8 @@ import {
   getResumeExperiences,
   getResumeProfile,
   getTimeline,
-} from "@/lib/content";
-import { sectionMetadata } from "@/lib/seo";
+} from "@/lib/server/content";
+import { sectionMetadata } from "@/lib/server/seo";
 import { Mdx } from "@/components/blog/Mdx";
 import { DotDoodle } from "@/components/fx/DotDoodle";
 import { Reveal } from "@/components/fx/Reveal";

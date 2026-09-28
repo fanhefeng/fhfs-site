@@ -1,5 +1,5 @@
-import { gsap } from "@/lib/gsap";
-import { watchContextLoss } from "@/lib/webgl";
+import { gsap } from "@/lib/client/gsap";
+import { watchContextLoss } from "@/lib/client/webgl";
 import {
   VERT,
   FRAG_SCENE,

@@ -1,6 +1,6 @@
 "use client";
 
-import { forgetSplash } from "@/lib/splash";
+import { forgetSplash } from "@/lib/client/splash";
 import { StudyPanel } from "./StudyPanel";
 
 type Props = {

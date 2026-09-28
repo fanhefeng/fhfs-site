@@ -5,7 +5,7 @@
  * neon study play the theme; 峰言峰语 plays Lovely Day, 《不能说的秘密》 plays
  * 路小雨 — the piano piece from the film's own soundtrack, shared by the
  * essays and the film — and the 大话西游 room plays the film's closing song.
- * A room asks for its record through `setTrack` in `lib/jukebox`; which file
+ * A room asks for its record through `setTrack` in `lib/client/jukebox`; which file
  * that is lives here, and only here.
  *
  * Every record is a file we serve ourselves, under `public/music`: it plays

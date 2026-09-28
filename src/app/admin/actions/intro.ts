@@ -3,9 +3,9 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { adminSession, requireAdmin } from "@/lib/auth/session";
+import { adminSession, requireAdmin } from "@/lib/server/auth/session";
 import { filled, intField, localized, localizedLines, str, validKey } from "@/lib/forms";
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 import { invalidate, SESSION_EXPIRED, KEY_ERROR, upsertKeyed, type ActionState } from "./shared";
 
 export async function saveIntroNode(_prev: ActionState, form: FormData): Promise<ActionState> {

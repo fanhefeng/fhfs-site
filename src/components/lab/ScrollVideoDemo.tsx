@@ -3,8 +3,8 @@
 import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
-import { ScrollVideo } from "@/lib/scrollVideo";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
+import { ScrollVideo } from "@/lib/client/scrollVideo";
 // Bundled rather than fetched: it is a few hundred bytes that used to cost a
 // round trip before the first frame could even be asked for.
 import manifest from "../../../public/lab/scroll-video/manifest.json";

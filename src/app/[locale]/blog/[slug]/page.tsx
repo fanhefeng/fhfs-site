@@ -5,13 +5,13 @@ import { getTranslations, getFormatter } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import { getAdjacentPosts, getAllSlugs, getPost, getPostEditions } from "@/lib/content";
+import { getAdjacentPosts, getAllSlugs, getPost, getPostEditions } from "@/lib/server/content";
 import { ArticleNeighbours, ArticleSummary, FallbackNotice } from "@/components/blog/ArticleParts";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
 import { TagPill } from "@/components/blog/TagPill";
 import { RadialFab } from "@/components/fx/RadialFab";
-import { localeAlternates } from "@/lib/seo";
+import { localeAlternates } from "@/lib/server/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
 

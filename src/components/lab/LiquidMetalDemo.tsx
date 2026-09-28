@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
-import { prefersSaveData } from "@/lib/three/guards";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
+import { prefersSaveData } from "@/lib/client/three/guards";
 import { COMPOSITE } from "@/lib/grove/liquidMetal";
 import { mountLiquidMetal, type LiquidMetal, type LiquidMix } from "@/lib/grove/liquidMetalMount";
 

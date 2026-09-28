@@ -1,7 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { abouts } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { AboutForm } from "./AboutForm";
 import { Note } from "../ui/Note";

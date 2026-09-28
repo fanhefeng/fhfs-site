@@ -3,11 +3,11 @@
 import { db } from "@/db";
 
 import * as schema from "@/db/schema";
-import { adminSession } from "@/lib/auth/session";
+import { adminSession } from "@/lib/server/auth/session";
 
 import { oneOf, str } from "@/lib/forms";
 
-import { TAGS } from "@/lib/content";
+import { TAGS } from "@/lib/server/content";
 
 import { invalidate, SESSION_EXPIRED, collectRows, type ActionState } from "./shared";
 

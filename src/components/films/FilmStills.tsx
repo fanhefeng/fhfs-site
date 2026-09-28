@@ -12,8 +12,8 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from "react";
-import { EASE, gsap } from "@/lib/gsap";
-import { lockScroll, unlockScroll } from "@/lib/scrollLock";
+import { EASE, gsap } from "@/lib/client/gsap";
+import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
 import { Reveal } from "@/components/fx/Reveal";
 import type { FilmRatio, FilmStill, StillSpan } from "./entries";
 

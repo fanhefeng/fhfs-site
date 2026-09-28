@@ -104,7 +104,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ci_readonly;
 `backup/db.json` 是唯一剩下的东西——它在 GitHub 上，也在你本机的 clone 里。
 
 好消息是代码对 Neon 的绑定很浅：**Neon 专有的代码只有三个文件**，schema、12 个
-迁移、所有查询、`drizzle.config.ts`（`dialect: "postgresql"`）、`src/lib/env.ts`
+迁移、所有查询、`drizzle.config.ts`（`dialect: "postgresql"`）、`src/config/env.ts`
 的校验（只认 `postgres://`）全都不用动。
 
 换成任意一家标准 Postgres（Supabase、Railway、Render、自己的机器都行），改这三处：

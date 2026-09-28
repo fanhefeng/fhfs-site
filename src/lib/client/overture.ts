@@ -5,7 +5,7 @@ import "client-only";
  * in for it on the cover (`components/home/NeonSplash`), and the masthead that
  * waits behind either (`components/home/Opening`).
  *
- * It lives here rather than in the lamp for the same reason `lib/splash.ts`
+ * It lives here rather than in the lamp for the same reason `lib/client/splash.ts`
  * does: a contract two other components read is not the lamp's private
  * business, and importing constants *out of* a component is how the copies
  * start. Storage access is here too — the "blocked storage reads as seen" rule

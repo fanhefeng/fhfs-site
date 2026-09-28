@@ -2,7 +2,7 @@ import { statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
-import { publicFiles } from "@/lib/assetManifest";
+import { publicFiles } from "@/lib/node/assetManifest";
 import {
   ASSET_SETS,
   type AssetManifest,
@@ -14,7 +14,7 @@ import {
   unclassified,
   withFileHash,
   withSetHash,
-} from "@/lib/immutable";
+} from "@/config/immutable";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 

@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from "@/lib/gsap";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from "@/lib/client/gsap";
+import { hasWebGL, prefersSaveData } from "@/lib/client/three/guards";
 import { PaperDissolve } from "./PaperDissolve";
 import { GroveCard, type GroveCardData } from "./GroveCard";
 import { APPROACH_CSS } from "./approach.css";
@@ -96,7 +96,7 @@ export function GroveApproach({ caption, cards }: Props) {
   /** Whether the scene is mounted at all — and with it, whether its chunk is
    *  fetched. Decided out here: the scene makes the same two checks itself,
    *  but by then three.js has already been downloaded to run them, and
-   *  Save-Data is a refusal to spend exactly those bytes (lib/three/guards). */
+   *  Save-Data is a refusal to spend exactly those bytes (lib/client/three/guards). */
   const [live, setLive] = useState(false);
 
   const onReady = useCallback(() => setReady(true), []);

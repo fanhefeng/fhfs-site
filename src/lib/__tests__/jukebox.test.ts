@@ -12,7 +12,7 @@ import {
   stopMusic,
   toggleMusic,
   wantMusic,
-} from "../jukebox";
+} from "../client/jukebox";
 import { DEFAULT_TRACK } from "../tracks";
 
 // One module-level store, so these run in order and each leaves it switched off.

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { hasWebGL, prefersSaveData } from "@/lib/client/three/guards";
 
 /** Why a scene was never mounted — the note under the fallback says which. */
 export type SceneRefusal = "save-data" | "no-webgl";

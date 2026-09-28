@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { ReactNode, Ref } from "react";
-import { gsap, useGSAP, EASE } from "@/lib/gsap";
+import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
 
 type Props = {
   children: ReactNode;

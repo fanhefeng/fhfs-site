@@ -2,7 +2,7 @@ import Link from "next/link";
 import { asc, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { secrets } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { ghostButtonClass } from "../styles";
 import { Note } from "../ui/Note";

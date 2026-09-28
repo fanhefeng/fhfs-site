@@ -3,8 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
 import { asset } from "@/lib/asset";
-import { buildManifest, hashCssUrls, serializeManifest } from "@/lib/assetManifest";
-import { IMMUTABLE_DIRS, type AssetManifest } from "@/lib/immutable";
+import { buildManifest, hashCssUrls, serializeManifest } from "@/lib/node/assetManifest";
+import { IMMUTABLE_DIRS, type AssetManifest } from "@/config/immutable";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const read = (file: string) => readFileSync(path.join(root, file), "utf8");
@@ -81,7 +81,10 @@ describe("asset", () => {
     for (const file of sourceFiles(path.join(root, "src"))) {
       // The three modules that define the scheme quote addresses in their
       // comments, as examples.
-      if (file.endsWith(".css") || /\/lib\/(asset|assetManifest|immutable)\.ts$/.test(file))
+      if (
+        file.endsWith(".css") ||
+        /\/(lib\/asset|lib\/node\/assetManifest|config\/immutable)\.ts$/.test(file)
+      )
         continue;
       for (const m of readFileSync(file, "utf8").matchAll(literal)) {
         seen++;

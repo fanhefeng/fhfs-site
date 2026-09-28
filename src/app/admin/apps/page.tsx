@@ -1,7 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { apps } from "@/db/schema";
-import { requireAdminPage } from "@/lib/auth/session";
+import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { RecordList } from "../RecordList";
 import { deleteApp, saveApp } from "../actions/apps";

@@ -11,7 +11,7 @@ import "client-only";
  * purpose: the site serves a single full-motion version to everyone, and a 3D
  * scene is never gated on that signal (DESIGN.md §1.5 — the narrow exception
  * that remains covers endless background loops and the scroll hijack, and
- * lives in `lib/gsap.ts`). The reason is empirical, not ideological. On
+ * lives in `lib/client/gsap.ts`). The reason is empirical, not ideological. On
  * Windows the signal is spelled "Show animations in Windows", and it is
  * switched off by anything
  * that chases speed — the Ease of Access toggle, "Adjust for best

@@ -5,7 +5,7 @@
  * pages never grow prose styling of their own.
  *
  * The HTML arrives already rendered: prose is turned into markup once, when
- * it is saved, by the unified pipeline in `lib/markdown.ts`. Nothing here
+ * it is saved, by the unified pipeline in `lib/server/markdown.ts`. Nothing here
  * parses or evaluates anything, and the page ships no markdown runtime.
  *
  * `dangerouslySetInnerHTML` is sound in this direction: the source is the

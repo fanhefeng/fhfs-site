@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
-import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/gsap";
-import { releaseRenderer } from "@/lib/three/release";
-import { watchContextLoss } from "@/lib/webgl";
+import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
+import { releaseRenderer } from "@/lib/client/three/release";
+import { watchContextLoss } from "@/lib/client/webgl";
 import {
   buildGrove,
   BOX_W,

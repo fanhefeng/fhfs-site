@@ -62,7 +62,7 @@ jobs:
       # Dependabot, which get no secrets — the steps below skip themselves
       # there, and the push to main after the merge runs them.
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      # The build refuses to start without these two (src/lib/env.ts). Nobody
+      # The build refuses to start without these two (src/config/env.ts). Nobody
       # logs in to a CI build; they only have to be well-formed.
       AUTH_SECRET: ci-only-not-a-secret-ci-only-not-a-secret-00
       ADMIN_PASSWORD_HASH: 00000000000000000000000000000000:0000000000000000000000000000000000000000000000000000000000000000

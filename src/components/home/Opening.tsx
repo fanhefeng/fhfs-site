@@ -4,8 +4,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LiquidPill } from "@/components/grove/LiquidPill";
-import { OVERTURE_DONE_EVENT, overtureSeen } from "@/lib/overture";
-import { splashDue } from "@/lib/splash";
+import { OVERTURE_DONE_EVENT, overtureSeen } from "@/lib/client/overture";
+import { splashDue } from "@/lib/client/splash";
 
 export type OpeningMeta = { label: string; value: string };
 

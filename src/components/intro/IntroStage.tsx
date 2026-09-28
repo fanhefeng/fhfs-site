@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { useGSAP, ScrollTrigger } from "@/lib/gsap";
+import { useGSAP, ScrollTrigger } from "@/lib/client/gsap";
 
 import {
   INTRO_STICKERS,
@@ -11,7 +11,7 @@ import {
   type IntroText,
 } from "@/lib/intro/stickers";
 import { renderOnDemand, scrollState, useIntroStore } from "@/lib/intro/store";
-import { hasWebGL, prefersSaveData } from "@/lib/three/guards";
+import { hasWebGL, prefersSaveData } from "@/lib/client/three/guards";
 import { readTheme } from "@/lib/theme";
 // Type-only, and therefore erased before bundling — importing the value would
 // drag the entire 3D graph back into this chunk and undo the split below.
@@ -76,7 +76,7 @@ function useThemeTone() {
  * Progress is written to a plain module object, never React state: it changes
  * every frame and would otherwise re-render the tree into a slideshow.
  *
- * No GSAP plugin is registered here — `@/lib/gsap` is the site's single
+ * No GSAP plugin is registered here — `@/lib/client/gsap` is the site's single
  * registration point, and it has already wired ScrollTrigger to Lenis.
  */
 export function IntroStage({ text, copy, links, loadingLabel }: Props) {
@@ -115,7 +115,7 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
     // refuse, and the résumé says the same things in text.
     //
     // prefers-reduced-motion is deliberately absent — see the note in
-    // lib/three/guards.ts. The face is the page; gating it on a signal most
+    // lib/client/three/guards.ts. The face is the page; gating it on a signal most
     // Windows visitors trip while chasing speed cost far more people the
     // whole point of /intro than it ever protected.
     setMode(prefersSaveData() || !hasWebGL() ? "fallback" : "webgl");
