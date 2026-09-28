@@ -97,6 +97,8 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   const openerRef = useRef<HTMLElement | null>(null);
   /** Which way the last step went, so the next still slides in from that side. */
   const dirRef = useRef(0);
+  // Whether this viewer holds the page's scroll lock right now.
+  const lockedRef = useRef(false);
   const swipeRef = useRef<{ x: number; y: number } | null>(null);
   /** Set when a swipe stepped: a mouse drag ends in a click on the backdrop,
    *  which would otherwise close the room right after turning the page. */
@@ -156,6 +158,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
     if (!dialog.open) {
       dialog.showModal();
       lockScroll();
+      lockedRef.current = true;
       gsap.fromTo(dialog, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, ease: EASE.default });
       gsap.fromTo(
         frame,
@@ -180,10 +183,14 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
     );
   }, [current]);
 
-  // Whatever happens, an unmount must never leave the page unscrollable.
+  // Whatever happens, an unmount must never leave the page unscrollable. The
+  // lock is remembered in a ref of its own: by the time an unmount's cleanup
+  // runs, React has already let go of `dialogRef`, so asking the dialog
+  // whether it is open would always answer no — and the back button would
+  // leave the next page locked.
   useEffect(
     () => () => {
-      if (dialogRef.current?.open) unlockScroll();
+      if (lockedRef.current) unlockScroll();
     },
     [],
   );
@@ -191,6 +198,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
   const onClosed = () => {
     setCurrent(null);
     unlockScroll();
+    lockedRef.current = false;
     openerRef.current?.focus({ preventScroll: true });
     openerRef.current = null;
   };
