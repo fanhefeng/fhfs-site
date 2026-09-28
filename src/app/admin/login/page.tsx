@@ -5,11 +5,7 @@ import { cardClass, metaClass } from "../styles";
  * One field. There is one account, so there is nothing to identify — only
  * something to prove.
  */
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string | string[] }>;
-}) {
+export default async function LoginPage({ searchParams }: PageProps<"/admin/login">) {
   const { next } = await searchParams;
 
   return (

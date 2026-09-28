@@ -136,7 +136,7 @@ export default async function MomentsAdminPage() {
         blank={blank()}
         blankLabel="写一条"
         unit="条"
-        rows={rows.map((row) => {
+        rows={rows.map(({ id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...row }) => {
           const { time } = stampInZone(row.postedAt.toISOString(), site.timeZone);
           const [day, clock] = time.split(" ");
           const firstLine = row.content.split("\n").find(Boolean) ?? "";

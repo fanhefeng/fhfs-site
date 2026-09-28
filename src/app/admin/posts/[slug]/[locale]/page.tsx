@@ -6,11 +6,7 @@ import { requireAdminPage } from "@/lib/auth/session";
 import { AdminChrome } from "../../../AdminChrome";
 import { PostForm } from "../../PostForm";
 
-export default async function EditPost({
-  params,
-}: {
-  params: Promise<{ slug: string; locale: string }>;
-}) {
+export default async function EditPost({ params }: PageProps<"/admin/posts/[slug]/[locale]">) {
   await requireAdminPage();
   const { slug, locale } = await params;
   if (locale !== "zh" && locale !== "en") notFound();
