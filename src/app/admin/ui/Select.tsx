@@ -62,6 +62,19 @@ export function Select({
   const [active, setActive] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
+  const hidden = useRef<HTMLInputElement>(null);
+
+  // A form reset puts every native field back to its default, and this one is
+  // state — so it listens for the reset and does the same. Without it the
+  // "new" row under a list kept the last category it saved with.
+  const initial = defaultValue ?? fallback;
+  useEffect(() => {
+    const form = hidden.current?.form;
+    if (!form || controlledValue !== undefined) return;
+    const onReset = () => setInner(initial);
+    form.addEventListener("reset", onReset);
+    return () => form.removeEventListener("reset", onReset);
+  }, [initial, controlledValue]);
   const generatedId = useId();
   const listId = `${generatedId}-list`;
 
@@ -167,7 +180,7 @@ export function Select({
 
   return (
     <div ref={root} className="relative">
-      <input type="hidden" name={name} value={value} />
+      <input ref={hidden} type="hidden" name={name} value={value} />
       <button
         id={id}
         type="button"

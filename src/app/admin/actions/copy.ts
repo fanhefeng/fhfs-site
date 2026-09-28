@@ -70,16 +70,28 @@ export async function saveCopy(_prev: ActionState, form: FormData): Promise<Acti
     else rows.push({ key, zh: zhOverride, en: enOverride });
   }
 
-  if (gone.length) await db.delete(schema.copyBlocks).where(inArray(schema.copyBlocks.key, gone));
-  if (rows.length) {
-    await db
-      .insert(schema.copyBlocks)
-      .values(rows)
-      .onConflictDoUpdate({
-        target: schema.copyBlocks.key,
-        set: { zh: sql`excluded.zh`, en: sql`excluded.en` },
-      });
-  }
+  // The lines cleared back to their default and the lines rewritten go in one
+  // `db.batch()` — a single request, applied together — so a save that fails
+  // halfway cannot leave half a group reset and the other half not. The same
+  // contract ChipsForm and NavForm save under.
+  const writes = [
+    ...(gone.length
+      ? [db.delete(schema.copyBlocks).where(inArray(schema.copyBlocks.key, gone))]
+      : []),
+    ...(rows.length
+      ? [
+          db
+            .insert(schema.copyBlocks)
+            .values(rows)
+            .onConflictDoUpdate({
+              target: schema.copyBlocks.key,
+              set: { zh: sql`excluded.zh`, en: sql`excluded.en` },
+            }),
+        ]
+      : []),
+  ];
+  const [first, ...rest] = writes;
+  if (first) await db.batch([first, ...rest]);
 
   invalidate(TAGS.copy);
   return { ok: true };
