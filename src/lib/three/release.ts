@@ -1,3 +1,4 @@
+import "client-only";
 import type * as THREE from "three";
 
 /**

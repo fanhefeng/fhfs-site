@@ -1,9 +1,9 @@
-"use client";
+import "client-only";
 
 /**
  * The two decisions every WebGL scene on this site has to make before it
  * spends a visitor's battery or bandwidth. They used to live twice — once in
- * `components/about/Workstation.tsx`, once in `components/intro/IntroStage.tsx`
+ * `components/lab/Workstation.tsx`, once in `components/intro/IntroStage.tsx`
  * — and had already drifted: the intro never checked Save-Data, which is the
  * one setting a multi-megabyte model is most obliged to respect.
  *

@@ -1,3 +1,4 @@
+import "client-only";
 import { EASE, Flip, gsap } from "@/lib/gsap";
 
 /**

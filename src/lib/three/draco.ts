@@ -1,3 +1,4 @@
+import "client-only";
 import { asset } from "@/lib/asset";
 
 /**

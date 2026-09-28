@@ -1,3 +1,4 @@
+import "client-only";
 /**
  * A frame-sequence player: paints one image of a sequence onto a canvas, with
  * the frame number chosen by a caller-supplied progress value.

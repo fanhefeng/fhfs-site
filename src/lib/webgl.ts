@@ -1,4 +1,4 @@
-"use client";
+import "client-only";
 
 /**
  * What every raw-WebGL2 layer on this site has to do besides its own shader.

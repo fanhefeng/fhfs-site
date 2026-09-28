@@ -1,4 +1,5 @@
-import { ARC_L, ARC_R, MARK_VIEW_BOX, NEON, NOTE_D, NOTE_T } from "@/components/neon/geometry";
+import "server-only";
+import { ARC_L, ARC_R, MARK_VIEW_BOX, NEON, NOTE_D, NOTE_T } from "@/lib/neon/geometry";
 
 /**
  * The site's mark for the Open Graph cards: the ring off the neon sign with

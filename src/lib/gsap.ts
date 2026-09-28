@@ -1,4 +1,4 @@
-"use client";
+import "client-only";
 
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";

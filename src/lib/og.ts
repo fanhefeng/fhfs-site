@@ -1,3 +1,4 @@
+import "server-only";
 /**
  * Open Graph image toolkit — the paper palette.
  *

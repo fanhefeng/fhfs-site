@@ -1,3 +1,4 @@
+import "client-only";
 /**
  * The opening ritual's handshake, shared by the three components that speak it:
  * the lamp itself (`components/fx/OvertureLight`), the front door that stands

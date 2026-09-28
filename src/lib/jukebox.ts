@@ -1,4 +1,4 @@
-"use client";
+import "client-only";
 
 import { useSyncExternalStore } from "react";
 import { DEFAULT_TRACK, type TrackId } from "./tracks";

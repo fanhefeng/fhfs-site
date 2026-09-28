@@ -1,3 +1,4 @@
+import "client-only";
 /**
  * The route veil's replay hook.
  *
