@@ -144,10 +144,11 @@ export const secrets = pgTable(
  * The first 242 came over from the 一言 app (`source` = "yiyan"), where they
  * sat in two notebooks — `collection` keeps the notebook's name. `original`
  * and `attribution` are that app's own distinction: a line of one's own, or a
- * line worth keeping and who said it. Another 254 came from another app's posts
+ * line worth keeping and who said it. Another 337 came from another app's posts
  * (`source` = "app", `collection` = "app", keyed `app-<post id>`): the
- * text of every post that had any, the pictures, videos and voice notes left
- * behind, and the ones app itself had hidden imported as drafts.
+ * text of every post that had any, and the pictures, videos and voice notes
+ * under them. The ones app itself had hidden came in as drafts and were
+ * published after a read-through (2026-09-28).
  */
 export const moments = pgTable("moments", {
   id: serial().primaryKey(),

@@ -42,8 +42,11 @@ export default async function proxy(request: NextRequest) {
     const session = await readSession(request.cookies.get(SESSION_COOKIE)?.value);
     if (!session) {
       const url = new URL("/admin/login", request.nextUrl);
-      // So a bookmarked edit page comes back after signing in.
-      if (pathname !== "/admin") url.searchParams.set("next", pathname);
+      // So a bookmarked edit page comes back after signing in — query and all:
+      // /admin/copy?ns=blog is a different page from /admin/copy.
+      if (pathname !== "/admin") {
+        url.searchParams.set("next", pathname + request.nextUrl.search);
+      }
       return NextResponse.redirect(url);
     }
     return NextResponse.next();

@@ -59,9 +59,9 @@ const withIds = (rows: NavRow[]): FormRow[] => rows.map((row) => ({ ...row, id: 
  * These used to be four separate lists in four files, and they had drifted:
  * /intro reached only the sitemap, home reached only the full-screen menu.
  * Ticking boxes across one row is what stops that happening again. The
- * group says which wing a row belongs to — the footer clusters by it, the
- * full-screen menu hangs a group's rows under its door (the row of the
- * group that is on the header surface), and /life lists the rooms.
+ * group says which wing a row belongs to — the full-screen menu hangs a
+ * group's rows under its door (the row of the group that is on the header
+ * surface), and /life lists the rooms.
  *
  * Inputs are controlled and re-synced from the server after a save — the save
  * rewrites the whole table, so stale values would silently overwrite it.

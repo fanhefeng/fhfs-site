@@ -9,6 +9,8 @@ import { str, validPath } from "@/lib/forms";
 
 import { TAGS } from "@/lib/content";
 
+import { copyCatalogues } from "@/lib/copyCatalogue";
+
 import { isNavGroup, NAV_GROUPS } from "@/lib/nav";
 
 import { invalidate, SESSION_EXPIRED, collectRows, type ActionState } from "./shared";
@@ -49,15 +51,10 @@ export async function saveNavItems(_prev: ActionState, form: FormData): Promise<
   // header of every page — refuse it here instead. The catalogues are the
   // whole list: `copy_blocks` only overrides lines the files already have.
   // `Object.hasOwn`, not `in`: "constructor" is `in` every object.
-  const [zhNav, enNav] = await Promise.all(
-    (["zh", "en"] as const).map((locale) =>
-      import(`../../../../messages/${locale}.json`).then(
-        (m) => (m.default as { nav?: Record<string, unknown> }).nav ?? {},
-      ),
-    ),
-  );
+  const { zh, en } = await copyCatalogues();
   for (const row of rows) {
-    if (!Object.hasOwn(zhNav!, row.labelKey) || !Object.hasOwn(enNav!, row.labelKey)) {
+    const key = `nav.${row.labelKey}`;
+    if (!Object.hasOwn(zh, key) || !Object.hasOwn(en, key)) {
       return {
         error: `文案 key 不存在：nav.${row.labelKey} 在语言文件里找不到。`,
       };

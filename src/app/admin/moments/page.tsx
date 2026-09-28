@@ -68,7 +68,7 @@ const FIELDS: Field[] = [
     name: "source",
     label: "来源标记",
     kind: "text",
-    hint: "从一言 App 搬来的那 242 条是 yiyan，从 另一个 App 的动态搬来的 254 条是 app，自己在这里写的留空。",
+    hint: "从一言 App 搬来的那 242 条是 yiyan，从 另一个 App 的动态搬来的 337 条是 app，自己在这里写的留空。",
     group: "出处",
   },
   { name: "mood", label: "心情 / 标签（可空）", kind: "text", group: "状态" },

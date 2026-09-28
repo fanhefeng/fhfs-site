@@ -27,7 +27,9 @@ export default async function WorksPage() {
 
   return (
     <AdminChrome title="作品集" section="/admin/works">
-      <Note>这里一条都没有时，旧的作品页会显示「正在布展」的空状态——那是有意的，不是坏了。</Note>
+      <Note>
+        /portfolio 已经 308 到 /software，前台没有页面读这张表——这里存的东西目前不会出现在站上。
+      </Note>
 
       <div className="space-y-12">
         {rows.map((work) => (

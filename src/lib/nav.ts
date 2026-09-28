@@ -63,25 +63,6 @@ export const isActiveDoor = (
 ): boolean =>
   isActivePath(pathname, door.href) || members.some((m) => isActivePath(pathname, m.href));
 
-export type NavCluster<T> = { group: NavGroup | null; items: T[] };
-
-/**
- * Consecutive rows of the same group, in table order — the footer's three
- * clusters with a hairline between them. Rows without a group cluster with
- * each other the same way, so nothing is ever dropped for lacking one.
- */
-export function clusterNav<T extends { group: NavGroup | null }>(
-  items: readonly T[],
-): NavCluster<T>[] {
-  const clusters: NavCluster<T>[] = [];
-  for (const item of items) {
-    const last = clusters[clusters.length - 1];
-    if (last && last.group === item.group) last.items.push(item);
-    else clusters.push({ group: item.group, items: [item] });
-  }
-  return clusters;
-}
-
 export type NavBranch<T> = { door: T; members: T[] };
 
 /**

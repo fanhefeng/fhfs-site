@@ -17,18 +17,20 @@ export default async function NavPage() {
       group: navItems.group,
     })
     .from(navItems)
-    .orderBy(asc(navItems.sort), asc(navItems.href));
+    // The getter's own order (lib/content.ts), so the form lists the rows the
+    // way the site shows them.
+    .orderBy(asc(navItems.sort), asc(navItems.id));
 
   return (
     <AdminChrome title="导航" section="/admin/nav">
       <Note>
         <p>
           一条链接可以同时出现在好几个地方。文案 key 指向 <code>messages</code> 里的
-          <code> nav.&lt;key&gt;</code>——那些界面标签不在数据库里，加新条目要顺手在 两个 JSON
-          里补上对应的词，否则显示出来的会是 key 本身。清空路径即删除。
+          <code> nav.&lt;key&gt;</code>——那些界面标签不在数据库里，加新条目要先在两个 JSON
+          里补上对应的词，语言文件里没有的 key 存不进去。清空路径即删除。
         </p>
         <p>
-          分组决定页脚成簇、全屏菜单里挂在哪扇门下（门 = 同组里勾了顶栏的那一行）、 以及是否上{" "}
+          分组决定全屏菜单里挂在哪扇门下（门 = 同组里勾了顶栏的那一行），以及是否上{" "}
           <code>/life</code> 这页目录：新房间一律选「房间」，勾 页脚 / 全屏菜单 /
           sitemap，插在房间一段的末尾即可，顶栏不用动。
         </p>

@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import {
-  attachMembers,
-  clusterNav,
-  isActiveDoor,
-  isActivePath,
-  isNavGroup,
-  type NavLink,
-} from "@/lib/nav";
+import { attachMembers, isActiveDoor, isActivePath, isNavGroup, type NavLink } from "@/lib/nav";
 
 describe("isActivePath", () => {
   it("home is current on the home page only", () => {
@@ -57,30 +50,6 @@ describe("isNavGroup", () => {
     expect(isNavGroup("")).toBe(false);
     expect(isNavGroup(null)).toBe(false);
     expect(isNavGroup("Rooms")).toBe(false);
-  });
-});
-
-describe("clusterNav", () => {
-  it("cuts the table into runs of one group, in order", () => {
-    const clusters = clusterNav(TABLE.filter((row) => row.href !== "/"));
-    expect(clusters.map((c) => c.group)).toEqual(["issue", "rooms", "me"]);
-    expect(clusters[1]!.items.map((i) => i.href)).toEqual([
-      "/life",
-      "/moments",
-      "/idols",
-      "/films",
-      "/secrets",
-    ]);
-  });
-
-  it("keeps ungrouped rows rather than dropping them", () => {
-    const clusters = clusterNav(TABLE);
-    expect(clusters[0]).toEqual({ group: null, items: [TABLE[0]] });
-  });
-
-  it("a group that recurs after another starts a new cluster", () => {
-    const clusters = clusterNav([link("/a", "issue"), link("/b", "me"), link("/c", "issue")]);
-    expect(clusters.map((c) => c.group)).toEqual(["issue", "me", "issue"]);
   });
 });
 
