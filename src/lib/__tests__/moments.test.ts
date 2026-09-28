@@ -3,6 +3,7 @@ import { validKey } from "@/lib/forms";
 import {
   collections,
   describeMedia,
+  newestSaid,
   momentKey,
   shouldFold,
   stampInZone,
@@ -91,5 +92,26 @@ describe("describeMedia", () => {
 
   it("is empty for a line with nothing under it", () => {
     expect(describeMedia([])).toBe("");
+  });
+});
+
+describe("newestSaid", () => {
+  const line = (content: string, postedAt: string) => ({ content, postedAt });
+
+  it("is the newest line with words, whatever order the board keeps", () => {
+    const pinned = line("置顶的旧话", "2024-01-01T00:00:00.000Z");
+    const newest = line("最新的一句", "2026-09-20T08:00:00.000Z");
+    const older = line("早一点的", "2026-09-01T08:00:00.000Z");
+    expect(newestSaid([pinned, older, newest])).toBe(newest);
+  });
+
+  it("passes over a line that is only a picture", () => {
+    const words = line("有字", "2026-09-01T00:00:00.000Z");
+    expect(newestSaid([words, line("", "2026-09-28T00:00:00.000Z")])).toBe(words);
+  });
+
+  it("is undefined for a board with nothing to quote", () => {
+    expect(newestSaid([])).toBeUndefined();
+    expect(newestSaid([line("", "2026-09-28T00:00:00.000Z")])).toBeUndefined();
   });
 });

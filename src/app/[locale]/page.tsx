@@ -6,9 +6,9 @@ import { pageLocale } from "@/i18n/page";
 import { localeAlternates } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
-import { getPosts, getApps, getMoments, type Moment } from "@/lib/content";
+import { getPosts, getApps, getMoments } from "@/lib/content";
 import { getLatestReleases, type Release } from "@/lib/github";
-import { stampInZone } from "@/lib/moments";
+import { newestSaid, stampInZone } from "@/lib/moments";
 import { toSoftwareApp } from "@/components/software/appMeta";
 import { newestLabEntry } from "@/components/lab/entries";
 import { Chibi } from "@/components/chibi/Chibi";
@@ -84,11 +84,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   // own sake, and not one that is only a picture, since the row quotes words;
   // the study that went up last; and the most recent release, which only
   // exists when GitHub answered and dated it.
-  const said = moments.reduce<Moment | undefined>(
-    (newest, moment) =>
-      moment.content && (!newest || moment.postedAt > newest.postedAt) ? moment : newest,
-    undefined,
-  );
+  const said = newestSaid(moments);
   const study = newestLabEntry();
   let latest: { name: string; release: Release } | undefined;
   for (const app of allApps) {

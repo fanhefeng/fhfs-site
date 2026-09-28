@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { htmlLang, type Locale } from "@/i18n/routing";
-import { getMoments, type Moment } from "@/lib/content";
-import { stampInZone } from "@/lib/moments";
+import { getMoments } from "@/lib/content";
+import { newestSaid, stampInZone } from "@/lib/moments";
 import { site } from "@/config/site";
 import { newestLabEntry } from "@/components/lab/entries";
 import type { GroveCardData } from "./GroveCard";
@@ -19,14 +19,7 @@ export async function groveCards(locale: Locale): Promise<[GroveCardData, GroveC
   const tl = await getTranslations({ locale, namespace: "lab" });
   const study = newestLabEntry();
   const studyName = tl(`items.${study.key}.name`);
-  /** The newest line on the board by the clock — not the pinned one, which
-   *  getMoments puts first for the board's own sake, and not one that is only
-   *  a picture: the card quotes words. */
-  const said = (await getMoments()).reduce<Moment | undefined>(
-    (newest, moment) =>
-      moment.content && (!newest || moment.postedAt > newest.postedAt) ? moment : newest,
-    undefined,
-  );
+  const said = newestSaid(await getMoments());
   return [
     {
       label: th("cardLabLabel"),

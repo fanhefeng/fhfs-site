@@ -126,6 +126,22 @@ export function shouldFold(content: string): boolean {
   return content.split("\n").length > FOLD_LINES || content.length > 360;
 }
 
+/**
+ * The newest line on the board by the clock that has words in it — not the
+ * pinned one, which `getMoments` puts first for the board's own sake, and not
+ * one that is only a picture: whatever quotes it quotes words. The home
+ * page's "now" strip and the grove study's card both ask this.
+ */
+export function newestSaid<T extends { content: string; postedAt: string }>(
+  items: readonly T[],
+): T | undefined {
+  let newest: T | undefined;
+  for (const item of items) {
+    if (item.content && (!newest || item.postedAt > newest.postedAt)) newest = item;
+  }
+  return newest;
+}
+
 const MEDIA_NAMES: Record<MomentMedia["kind"], string> = {
   image: "图片",
   audio: "语音",
