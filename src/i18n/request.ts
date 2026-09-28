@@ -1,3 +1,4 @@
+import * as rootParams from "next/root-params";
 import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { site } from "@/config/site";
@@ -19,9 +20,19 @@ import { routing } from "./routing";
  * are what let `updateTag` invalidate the pages afterwards. An uncached read
  * here would still render the right words on a cold build and then never
  * update again — no error, just a site that ignores its own editor.
+ *
+ * Which language: a locale passed explicitly (`getTranslations({ locale })`)
+ * wins — the feed passes one, because root params do not reach a Route
+ * Handler. Otherwise it is the `[locale]` segment, read as a root param
+ * (`next/root-params`, Next 16.3), which is what lets a page call
+ * `getTranslations()` with no argument and still prerender — the job
+ * `setRequestLocale` used to do by hand on every page, and which next-intl
+ * has deprecated. The admin's root layout has no such segment (undefined),
+ * and an unknown one has already 404'd in the locale layout; either falls
+ * back to the default rather than throwing here.
  */
-export default getRequestConfig(async ({ requestLocale }) => {
-  const requested = await requestLocale;
+export default getRequestConfig(async ({ locale: explicit }) => {
+  const requested = explicit ?? (await rootParams.locale());
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
   const [catalogue, overrides] = await Promise.all([

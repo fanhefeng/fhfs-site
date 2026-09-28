@@ -79,8 +79,12 @@ Failures resolve to `null` and the badge is simply absent.
 - **Routing**: public pages live under `src/app/[locale]/` (locales `zh`/`en`,
   default `zh`, `localePrefix: "always"`). Every page starts with
   `const locale = await pageLocale(params)` (`src/i18n/page.ts`): it 404s an
-  unknown locale and calls `setRequestLocale` — skip it and the page quietly
-  turns dynamic. `/admin` sits *outside* the locale tree and is a
+  unknown locale and returns it narrowed. next-intl reads the locale itself
+  as a root param (`next/root-params`, in `src/i18n/request.ts`), so pages
+  prerender without handing it over — `setRequestLocale` is deprecated and a
+  test keeps it out. Root params do not reach Route Handlers, Server Actions
+  or `unstable_cache`: pass `getTranslations({ locale })` there (the feed
+  does), and never translate inside a cached getter. `/admin` sits *outside* the locale tree and is a
   browser-based editor for all content; admin sessions are jose-signed JWTs.
 - **Client messages**: the layout hands `NextIntlClientProvider` only the
   namespaces in `CLIENT_NAMESPACES` (`src/lib/server/messages.ts`); without the cut
@@ -214,16 +218,15 @@ images together. Two rules follow:
   `unstable_cache` keys on arguments but not on closures, so a shared constant
   bleeds across cache entries.
 
-Cache Components (`cacheComponents: true` / `'use cache'`) is deliberately
-off: a cached scope cannot see values passed through `React.cache`, which is
-exactly how next-intl's `setRequestLocale` works, so `getTranslations()` inside
-one throws. That reason has a shelf life: next-intl 4.14 marks
-`setRequestLocale` and `requestLocale` deprecated in favour of
-`next/root-params`, which Next 16.3 can read inside `'use cache'`, and Next
-16 calls `unstable_cache` replaced by `'use cache'`. Moving over is known
-debt, not a quick switch — root params are unavailable in route handlers
-(`rss.xml`), Server Actions and `unstable_cache`, and with two root layouts
-(`[locale]`, `admin`) `locale()` is `string | undefined`.
+Cache Components (`cacheComponents: true` / `'use cache'`) is off. What
+used to rule it out — next-intl passing the locale through `React.cache`,
+which a cached scope cannot see — is gone since the move to root params
+(2026-09-29), which `'use cache'` can read. What remains is the switch
+itself: every getter in `content.ts` is `unstable_cache` with tags and
+`revalidate: false`, and Next 16 names `'use cache'` + `cacheTag` its
+replacement. That is one deliberate change of the whole read layer, verified
+against the route table (every public page must stay prerendered), not
+something to start one getter at a time.
 
 `messages/*.json` holds the defaults for *all* copy — every one of the 885
 lines. The `copy_blocks` table is an override layer merged in

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages, setRequestLocale, getTranslations } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { fontVariables } from "../fonts";
 import { ThemeInitScript } from "../ThemeInitScript";
 import { routing, htmlLang, type Locale } from "@/i18n/routing";
@@ -79,7 +79,6 @@ export default async function LocaleLayout({ children, params }: Props) {
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
-  setRequestLocale(locale);
   const t = await getTranslations("layout");
   // Only the namespaces client components read cross the wire; the rest of
   // the catalogue stays on the server (see CLIENT_NAMESPACES).

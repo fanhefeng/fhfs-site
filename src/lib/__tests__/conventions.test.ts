@@ -45,14 +45,23 @@ function body(declaration: string): string {
 }
 
 describe("public pages", () => {
-  // Without it the page renders all the same — dynamically, on every request.
-  // The layout does by hand what pageLocale does for a page.
+  // Without it a page under an unknown segment renders anyway, in no language
+  // the site has. The layout checks the segment by hand, as pageLocale does.
   it("all start from pageLocale(params)", () => {
     const pages = files.filter(({ file }) => /^app\/\[locale\]\/.*(page|layout)\.tsx$/.test(file));
     expect(pages.length).toBeGreaterThan(10);
     expect(
       pages
-        .filter(({ text }) => !/await pageLocale\(|\bsetRequestLocale\(/.test(text))
+        .filter(({ text }) => !/await pageLocale\(|\bhasLocale\(routing\.locales/.test(text))
+        .map(({ file }) => file),
+    ).toEqual([]);
+  });
+
+  // Deprecated by next-intl in favour of next/root-params (i18n/request.ts).
+  it("never hand the locale to next-intl by hand", () => {
+    expect(
+      files
+        .filter(({ text }) => /\bsetRequestLocale\s*\(|\{\s*requestLocale\b/.test(text))
         .map(({ file }) => file),
     ).toEqual([]);
   });

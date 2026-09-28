@@ -1203,7 +1203,9 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
   例外只有两个：`/lab/[slug]` 与 `/films/[slug]`——都是写死在代码里的清单，
   不从库里长，它们确实关掉了 dynamicParams。
 - 导航一律 `@/i18n/navigation` 的 Link/useRouter/usePathname（勿直接 next/link）。
-- 每个 page/generateMetadata：`hasLocale` 校验 + `setRequestLocale(locale)`；翻译用 `getTranslations`/`getFormatter`。
+- 每个 page：`pageLocale(params)`（`hasLocale` 校验 + 404，返回收窄的 `Locale`）；翻译用 `getTranslations`/`getFormatter`。
+  locale 由 `i18n/request.ts` 读 root param（`next/root-params`）拿到，**不再**调 `setRequestLocale`（已弃用，
+  测试拦截）。Route Handler / Server Action / `unstable_cache` 里读不到 root param：显式传 `getTranslations({ locale })`。
 - `'use client'` 只加在交互/GSAP 组件；页面文件保持 Server Component。
 - 完整规则与出处：研究底稿 r05（见 §7）。
 
