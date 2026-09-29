@@ -55,8 +55,10 @@ reviews:
 
     - path: "src/app/admin/**"
       instructions: |
-        - Every server action starts with `requireAdmin()` and ends with
-          `updateTag` (not `revalidateTag`) — flag an action missing either.
+        - Every server action starts with a session check — `adminSession()`
+          returning `SESSION_EXPIRED` where it reports to a form, the throwing
+          `requireAdmin()` in the deletes — and ends with `updateTag` (not
+          `revalidateTag`). Flag an action missing either.
         - Admin pages read STRAIGHT from the tables on purpose: the workbench
           shows what is stored right now, not what the cache says. Do not
           suggest moving these reads into the cached getters.
@@ -115,6 +117,7 @@ knowledge_base:
       - "**/CLAUDE.md"
       - "AGENTS.md"
       - "docs/DESIGN.md"
+      - "docs/DESIGN-LOG.md"
 
 code_generation:
   docstrings:

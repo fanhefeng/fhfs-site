@@ -79,7 +79,7 @@
 - **文字层整体 `aria-hidden`**，语义交给同页那份 `sr-only` 的完整简历（`IntroResume variant="seo"`）——canvas 里的东西爬虫和读屏都读不到，两份都可见则会被读两遍。
 - **整个 WebGL 子树挂在 `next/dynamic` 后面**：R3F、drei 和那颗 GLB 只在确定要渲染 3D 之后才开始下载，降级路径拿到的是 `IntroResume variant="visible"`（站点窄栏排版的一份正常简历）。实测降级路径 475 KB / 3D 路径 561 KB，模型和 fiber+drei 那个 chunk 确实一个字节都没取。
 
-  但**three 核心那 ~184 KB 照样会下**，且跟本页无关：App Router 会预取 `/about`，而 `/about` 的 `Workstation` 是静态 import 的 `three`——随便开一个 `/zh/blog` 也会拉到同样两个 chunk。要把这段也省掉得去改 `Workstation` 的加载方式，不在本页范围内。
+  但**three 核心那 ~184 KB 照样会下**，且跟本页无关：App Router 会预取 `/about`，而 `/about` 的 `Workstation` 是静态 import 的 `three`——随便开一个 `/zh/blog` 也会拉到同样两个 chunk。要把这段也省掉得去改 `Workstation` 的加载方式，不在本页范围内。（已过时：工作台后来搬进 `/lab/workstation`，由 `LabStudy` 经 `next/dynamic` 按需加载，`/about` 不再带 three。）
 - **两种情况直接走简历**：没有 WebGL、以及浏览器报了 Save-Data。Save-Data 是明说「我在省流量」，一个几百 KB 的模型加上整套 3D 运行时正好是它指的那种东西。（`prefers-reduced-motion` 曾是第三条，2026-08-04 移除——理由见 `docs/DESIGN.md` §1.5 与 `src/lib/client/three/guards.ts` 的文件头。该信号后来补回了一条窄例外，只管无限循环 / 大面积 / 滚动劫持三类，这张脸不在其中。）
 
   判定发生在客户端 effect 里（服务端猜不到），`mode` 的初始值是 `probing`，**这一态什么都不画**。所以首屏 HTML 是一条 `1000dvh` 的空轨道加一份 `sr-only` 的简历：给爬虫和读屏是全的，给眼睛是空的。JS 没跑起来（禁用、或包挂了）就一直是这个样子——已知的降级缺口，要补得让 `probing` 直接渲染可见简历再换成 3D，代价是所有人首屏闪一下。
@@ -95,4 +95,4 @@
 - 舞台滚出视口后 `frameloop` 停掉，不空烧 GPU。
 - 进度条只盖住舞台那一屏，不铺满视口：Header 灵动岛在它上面，模型还在下载的时候也得点得到。它读的是 drei 的 `useProgress`，只有走 3D 那条路才会出现——降级路径直接就是成品简历，没有「正在加载」这一说。
 - **代码分包和模型都是晚到的**，轨道量完之后长度还会变（字体也一样），所以 3D 挂上来之后要 `ScrollTrigger.refresh()`，否则最后一个停靠点对不上文档真正的底部。
-- 本页与 `/about` 互相链接：about 页头部有入口 chip，intro 页尾屏有回链。
+- 本页与 `/about` 互相链接：about 页「同一个人，另外两种讲法」一节列着它，intro 页首有回「关于」的路、尾屏有回链。

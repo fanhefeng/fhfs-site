@@ -70,7 +70,10 @@ Failures resolve to `null` and the badge is simply absent.
   lock, the splash and overture, three's guards, the hooks); `src/lib/node/`
   is for scripts and tests (it reads the file system); the root of `src/lib`
   and its domain folders (`grove/`, `intro/`, `neon/`) are plain functions
-  and data either side can import. `src/config/` is what `next.config.ts`
+  and data either side can import — except the few domain modules that draw
+  on a canvas or mount WebGL (`grove/scene`, `grove/plates`,
+  `grove/liquidMetalMount`, `intro/stickerTexture`), which stay beside their
+  data and mark themselves with `client-only`. `src/config/` is what `next.config.ts`
   reads as well (`site`, `env`, `csp`, `immutable`). Client modules import
   `client-only` and server modules `server-only`, so a module imported on the
   wrong side is a build error — except the server ones a test, a script or the
@@ -187,8 +190,10 @@ Failures resolve to `null` and the badge is simply absent.
   `pnpm assets`, then save.
 - **Draft preview**: `/admin/preview` turns on Draft Mode for the signed-in
   browser and opens a post, secret, film or idol on its own page; those pages
-  pass `(await draftMode()).isEnabled` to their getter as `drafts`, and the
-  mode skips every cache, so a draft never lands in one. The banner
+  pass `await showDrafts()` (`lib/server/auth/session.ts`: the mode is on *and*
+  the session still holds — the mode's cookie outlives a session) to their
+  getter as `drafts`, and the mode skips every cache, so a draft never lands
+  in one. Logging out turns the mode off. The banner
   (`components/layout/PreviewBanner.tsx`) posts to `/admin/preview/exit`.
 - **Search (⌘K, `/`)**: `components/search/SearchLauncher.tsx` in the
   layout listens for the keys and loads the palette as its own chunk on
@@ -218,8 +223,11 @@ Failures resolve to `null` and the badge is simply absent.
   the rest and steps aside (`held`), and comes back when the last one stops.
   A new player anywhere gets this for free; do not add a second copy.
 - **Design source of truth**: `docs/DESIGN.md` — §5 (工程规则) is required
-  reading before implementation work; `docs/INTRO3D.md` covers the `/intro`
-  scene.
+  reading before implementation work. Every revision since the original spec
+  is dated in `docs/DESIGN-LOG.md` and overrides what it contradicts there;
+  a comment citing "DESIGN.md, 09-14" means that log's entry. `docs/INTRO3D.md`
+  covers the `/intro` scene; `docs/CREDITS.md` is where every third-party
+  picture, recording, model and typeface is credited.
 
 Two scroll gotchas that cost real debugging time (details in README.md):
 
@@ -242,7 +250,10 @@ images together. Two rules follow:
 
 - **Never read the database outside that file**, and never leave a read
   uncached. An uncached read still renders correctly and then ignores every
-  later edit, with no error to notice.
+  later edit, with no error to notice. The two deliberate exceptions are the
+  admin, which shows what is stored right now rather than what the cache
+  says, and the login throttle, a write path; `conventions.test.ts` names
+  exactly those.
 - **Never capture anything from module scope inside those cached functions.**
   `unstable_cache` keys on arguments but not on closures, so a shared constant
   bleeds across cache entries.

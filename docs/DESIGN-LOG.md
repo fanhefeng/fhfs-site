@@ -1,0 +1,1008 @@
+# 设计修订记录
+
+[`DESIGN.md`](DESIGN.md) 的 §0–§7 是 2026-08 定下的原始规格。此后每一次改动的决定、理由与
+量出来的数字都记在这里，大体按日期排；**每一条都覆盖正文里与之相悖的段落**，后一条覆盖
+前一条。代码里写着「DESIGN.md, 09-14」之类的注释，指的就是这里对应日期的那一条。
+
+> **2026-08-25 修订（简化 + 实验室效果回流站内）**，覆盖下文与之相悖的段落：
+> - 首页封面是 **grove**（`/lab/grove` 的程序化苔藓场景，`GroveHero`）：宣言站在苔藓前，
+>   自带 dock；滚过 hero 后灵动岛顶栏才出现（`hero.css.ts` 的 `data-grove-header`）。
+>   原 `HomeHero`（插电亮灯机关）与独立的 `/grove` 页已退役，`/grove` 308 到首页。
+> - **横向 pin 标语段（`ManifestoBand`）搬到 `/about`**，位于引子与正文之间；仍是全站唯一 pin。
+> - `/portfolio` 的 bento scrub（`BentoHero`，vYMzKZx）**删除**——用户明确不要「滚动放大」。
+>   封面改为 `DissolveHero`：一张暗室台灯的照片（Unsplash，Sixteen Miles Out）随滚动溶解成
+>   当前主题的纸色（复用 `/lab/dissolve` 的标量场阈值着色器，纸色跟随 `fhfs:theme`）。
+>   「上机看看」设备框段从 `/software` 搬到这里；`/software` 只剩 bento。
+> - `/about` 的 3D 工作台搬到 `/lab/workstation`（第六则研究）；`/lab/[slug]` 各研究改为
+>   `next/dynamic` 按路由拆包（`LabStudy`）。
+> - 主导航只留 文章 / 软件 / 关于 / 实验室；作品、简历进页脚与全屏菜单，/intro 仍只在 sitemap。
+> - 软件版本号不再手写：`apps.repo` 列 + `src/lib/server/github.ts` 读 GitHub 最新 release
+>   （`fetch` 缓存 1h，失败即不显示）。
+> - 贴纸/履历/简历/about/文案全部换成用户本人的信息（上海、河津、北京、青岛；小提琴、游戏、
+>   电影、球场、旅行、好奇心）；/intro 七枚贴纸主题随之改为 FRONTEND / VIOLIN / PLAYER 1 /
+>   CINEMA / GAME ON / WANDER / CURIOUS（`stickers.ts` 的角度未动，只换 id/label/icon）。
+> - 字体：Noto Sans/Serif SC 改 `weight: "variable"`（每页少 ~100 KB gz 的 `@font-face`）。
+>   GSAP：核心只注册 ScrollTrigger/SplitText/Flip/CustomEase；Draggable/Inertia/ScrambleText/
+>   CustomWiggle/ExpoScale 在 `src/lib/client/gsap-extras.ts`，谁用谁引。
+
+> **2026-08-26 修订（首页拆幕 · 推近回来了）**，覆盖上一次修订里与之相悖的段落：
+> - 首页不再由 `GroveHero` 一屏承担全部。它拆成**三幕**：
+>   1. **开卷**（`components/home/Opening.tsx`）——纸白、纯排印。宣言两行行级 mask-reveal、
+>      一段 lede、全站唯一主 CTA（`LiquidPill`），和一条 mono 事实线（现居/前端/写下的 N 篇/
+>      自研 N 个，后两个数字读自数据库）。这一屏没有 3D、没有卡片、没有 dock。
+>   2. **推近**（`components/grove/GroveApproach.tsx`）——`/lab/grove` 的场景以全视口尺寸
+>      渲染在一个 CSS sticky 框里，滚动条打开框前的 `clip-path` 窗口（31%/29% → 0），
+>      场景同时反向 scale 1.16 → 1。**这就是被删掉的「滚动视口放大」，换了个落点回来**：
+>      它补的是纸白与林下之间那道材质断裂。canvas 尺寸全程不变，所以推近不会让场景
+>      每帧重解相机。
+>   3. **溶回**（`components/grove/PaperDissolve.tsx`）——`/lab/dissolve` 的标量场阈值，
+>      反过来当纸色覆盖层用：不采样图，只按 `1 - mask` 输出纸的 alpha，让合成器去混。
+>      裸 WebGL2，一个三角形一个 shader。
+> - **灵动岛全程常驻**。`GroveHero` 的 dock、两张浮动玻璃卡、两枚统计、圆形播放钮、
+>   竖排滚动提示全部退役（信息去处见下），`hero.css.ts` 里那条让 header 让位的
+>   `body:has(.gh-hero) > header` 规则随之删除。唯一保留的例外：读者站在林子里时
+>   （`body[data-grove-immersed]`）header 的纸色 scroll-edge scrim 暂时隐身。
+> - `LiquidPill` 的样式从 grove 的表里搬进 `components/grove/pill.css.ts`，由组件自带；
+>   plate 默认改为**实色近黑**（`--lp-plate`），因为它现在站在纸上而不是林子里，
+>   暗色下抬到 `#262a22`；阴影按 §1.1 换成暖色。
+> - **`/about` 的横向 pin 段改纵向**（`ManifestoBand`）。全站唯一的 pin 从此是首页的推近段：
+>   一段读者正在**阅读**的页面里再插一个 pin，只会打断栏目节奏。字符散落回弹保留，
+>   改为进视口时一次性播放。
+> - `/portfolio`：`works` 为空时渲染「正在布展」玻璃卡（原 `emptyTitle/empty/emptyCta`
+>   三个键一直在 messages 里没接上）；craft 列表在 `experiments` 为空时回落到
+>   `LAB_ENTRIES` 全部条目，用 `lab.items.*` 自己的名字与摘要，每行链到那则研究——
+>   不编造，也不再只剩一个标题。CraftList 的 `href` 现在按是否以 `/` 开头区分站内/站外。
+> - **两张纸卡回到推近段里**（`components/grove/GroveCard.tsx`），覆盖上面那条「两张浮动
+>   玻璃卡退役」——退役的是 `GroveHero` 的**玻璃**卡与它整套 dock/统计/播放钮，回来的是
+>   另一样东西：一张站在苔藓**后面**、一张站在**前面**的纸卡。这是这一段唯一能做而照片
+>   做不到的事——卡片不可能站在一张树林照片的后面，只可能站在一片还在被画出来的树林
+>   后面。做法沿用 `PortalCard` 留下的那条：卡 a 不带 z-index（`z-index: auto` 不开层叠
+>   上下文，于是它画在 canvas 之下，根从它底边横过去），卡 b 在 z 3；卡 a 的旋钮因此
+>   不能长在卡里，单独渲染成 `GroveKnob` 骑在苔藓上。**两张卡是一对**，沿一条对角线角挨
+>   角地站着——层次是这两张同样大小的纸互相比出来的，把它们拆到画面两角，各自也压着苔藓，
+>   但没有参照物了。
+>   位置**照抄旧版坐标**（2026-08-26 晚改回；卡 a 与旋钮 2026-08-28 又改，见下方补记）：
+>   卡 a `890 × 200`、卡 b `1237 × 482`、
+>   浮动旋钮 `1142 × 427`——树干从卡 a 右下象限斜穿过去（压角、让开标题），卡 b 站在
+>   树干根部前面、三面露苔藓。此前一版以为挂点从 `-440u` 改到 `-593u` 后树干在 stage
+>   坐标里挪了位，把卡对挪到了 `950 × 380 / 610 × 575`，结果卡 b 压在 caption 上方、
+>   树干只擦过卡 a 一角，前后层级读不出来。浏览器里把旧坐标注回去对照过：根是按 stage
+>   坐标摆的，stage 挂在哪里树干都从卡的同一处穿过，挂点只决定整组在画幅里的高低。
+>   扁画幅不再单开 media query：`.ga-stage` 的 `margin-top` 取
+>   `max(-593u, 70px - 50svh - 200u)`，一旦卡 a 顶边会顶到画幅顶 70px 以内，整组
+>   （苔藓 + 卡对）一起下移，构图不变。指针视差会让树干的穿越点左右滑几十像素，
+>   所以卡角压进树干的量留得比「刚好碰到」多。
+>   节奏是滚动的纯函数：`--ga-card` 比 caption 早到晚走，`round(down, …)` 让相片分十二级
+>   显影（这是 `PortalCard` 那台低带宽接收机，把时钟换成了滚动条），纸洗从上面盖过去时
+>   `--ga-card-hit` 一并收掉命中区。**竖屏只留后写的那张**：窄画幅里近根从边到边占满
+>   中段，卡片放它后面不是被垂过肩膀而是被活埋，且 caption 本身就是实验室那张卡的文字版。
+> - **实验室第五则 `/lab/grove-stage`**（`components/lab/GroveStageDemo.tsx`）：同一片苔藓
+>   加两张纸卡的构图本身，作为一则研究单独陈列。复用推近段的 DOM 与 `approach.css.ts`
+>   （同一套 `.ga-*` 规则，`--ga-open` 钉死为 1），只改两处：stage 按参考构图**居中挂**
+>   （`-440u`，参考的卡片坐标就是对着这个挂点描的），卡片的升起与相片十二级显影不再由
+>   滚动条驱动，改为场景就绪后用 GSAP 播一次。卡片坐标与首页同一组（同一张样式表，
+>   首页改了这里就跟着改）。窄画幅两张都留（首页只留一张）：stage 上提 400u，
+>   近拱的脚压过卡 a 顶边，卡 b 在下面站在前面，框随内容长高而不裁切。实验室从此七则，
+>   液态金属与工作台顺延为 06 / 07。参考构图的出处：仓库里（注释、文档、提交记录）
+>   都没有记下链接，只留了「the reference」这个指代和从它描下来的坐标。
+> - **推近段的性能账**（2026-08-26 晚实测，Chrome + Apple GPU，1440 × 900，读者站在林子里
+>   静止不动；指标是 `ioreg` 的 GPU Device Utilization 与 Chrome GPU 进程的 CPU）：
+>   改前 GPU ~38%、GPU 进程 CPU ~26%；改后静止 GPU ~10%、CPU ~12%。钱花在哪里，
+>   和直觉相反：把草从 19 万根砍到 5 千根、像素预算从 3.4M 降到 2.5M、关掉 MSAA，
+>   GPU 进程的 CPU 一个点都不动——**着色器不是大头，每帧把画布呈现出来、再把整页
+>   合成一遍才是**，而且是按帧计费。所以做的是：
+>   1. `body[data-grove-live]`——`GroveScene` 在真正画帧的那段打上，`approach.css.ts`
+>      让 grain（一张 300% 大的 `mix-blend-mode: overlay` 层）隐身、aurora 淡出、
+>      灵动岛的 backdrop blur 换成 reduced-transparency 那套不透明纸色。这三样在静止页面
+>      上免费，在每秒 60 次变化的画布上每帧都要重做，合起来约占一帧开销的三分之一。
+>   2. 指针 / 滚轮 / 键盘 2.5s 没动静就降到 30fps（`FPS_IDLE`），一动立刻回 60；失焦仍是 30。
+>   3. 近根的 bark / grass / fern 在扫描结束后换成 `#define SETTLED` 的副本，把两处
+>      `discard` 编译掉：带 discard 的片元着色器让 tile-based GPU 无法做隐藏面剔除，
+>      一层层草全都得着色。副本在扫描期间用 `renderer.compile()` 预先链好，换材质那帧不卡。
+>   4. 纸洗盖满（`coveredRef`）后场景停画；`PaperDissolve` 没有纸要画时把自己的画布
+>      `visibility: hidden`，不再让合成器每帧多混一张透明全屏层；视差 `--px/--py` 只在
+>      段落可见时写。
+>   5. 像素预算 3.4M → 2.8M（1440 × 900 上 dpr 1.62 → 1.47）。MSAA 保留：关掉只省 ~8 个点
+>      GPU，草边缘会毛。
+> - 未动的两项，理由记在这里免得重来：**融化式文字没有进 404**（那个数字上已经有粒子
+>   彩蛋在讲「解码成型」，两个叙事叠在同一个数字上只会互相打架——§2.7 记过这一条）；
+>   **滚动即播放没有进 `/software`**，因为设备框段需要每个 app 一段操作录屏拆帧，
+>   现有的 34 帧是森林素材，缺素材。
+
+> **2026-08-26 补记（第八则研究：镜头畸变滑块）**：
+> - `/lab/lens-slider`（`components/lab/LensSliderDemo.tsx`，着色器与滚动算术在
+>   `lib/lensSlider.ts`）：四张照片的全视口滑块，换页是一颗从画面中心长出来的透镜——
+>   圆内是下一张图，像素朝圆心拉的量是「到圆边有多近」的五次方，所以只有贴边一圈在放大；
+>   圆过半对角线即盖满画幅，其余进度都在让这圈松开。蓝本是 Oscar Pico 的作品滑块，
+>   按抖音 TTTISE 的拆解复刻，只多加了一圈随进度散去的水波纹（`RIPPLE`，置 0 即原样）。
+> - 交互仍是实验室的规矩：stage 按每张一屏 pin 住，滚动条跨进哪一格就朝哪一张开透镜；
+>   过渡是真 tween（`LENS_DURATION` 1.7s，`power2.inOut`）而不是 scrub——开一半停住的透镜
+>   只是一张坏图。开到一半往回滚，tween 与文字时间线一起 `reverse()`；一次滚过两格，第二颗
+>   透镜排队在第一颗落地后开。左下角一对箭头把页面滚到目标格的中点（`bandCentre`），
+>   交给 pin 触发。画布只在透镜在动或尺寸变化时画帧，停在两张之间零开销（§5.3）。
+> - 文案四段都在 DOM 里（无 JS 也整页可读），标题用 `lib/splitText` 在服务端拆字，
+>   按词做 overflow mask，字符沿 y 进出。纹理不设 colorSpace：这段着色器没有 colorspace
+>   pass，让 three 解码只会输出线性值。四张照片来源见 `docs/CREDITS.md`（当时写在 README「内容与模型从哪来」）。
+
+> **2026-08-28 补记（卡 a 让开标题，旋钮回到卡里）**，覆盖上面关于卡 a 坐标与 `GroveKnob` 的段落：
+> - **首页的根系此前根本没钉在 stage 上**。`GroveScene.layout()` 用 `getBoundingClientRect()`
+>   量 stage 与 hero，而首页刚挂载时 `.ga-scene` 还带着推近段的 `scale(1.16)`（`--ga-open`
+>   为 0），两只 rect 都被放大了 16%，根按放大后的单位摆——树干比实验室那页大一圈、偏向
+>   右上，「从卡 a 右下象限穿过」在首页从未成立，两张卡都悬在天上。`layout()` 现在用
+>   `hero rect 宽 / clientWidth` 求出祖先缩放并除掉，首页与 `/lab/grove-stage` 从此同一构图。
+> - **卡 a 从 `890 × 200` 挪到 `860 × 160`**（卡 b 不动）。修好上一条后，树干的边缘正好压在
+>   标题最后两个字上，指针视差一晃就盖住；上移左移之后树干只穿过标题下方那块空角——
+>   右边从约 200u 往下、底边从约 250u 往右——压角不压字。对子的「角挨角」松成一段小台阶，
+>   前后关系照旧靠这两张同尺寸的纸互相比出来。
+> - **旋钮不再浮在苔藓前面**。`GroveKnob` 删除：一张站在苔藓后面的卡，它的按钮却骑在树干
+>   前面，是整幅构图里唯一自相矛盾的地方。两张卡各自带旋钮，都放在照片的外侧角上——
+>   卡 b 照片在脚下所以右下，卡 a 照片在头上所以右上，各 26u——卡 a 的旋钮跟着卡一起
+>   画在 canvas 之下，而它所在的角树干永远碰不到。窄画幅（只在 `/lab/grove-stage` 有卡 a）
+>   近拱的脚把卡 a 的整个右半边连照片一起压住，旋钮改放左上角、label 上方的空白里。
+> - `.ga-stage` 的扁画幅地板从 70px 抬到 84px（公式里的 200u 随之改为 160u）：灵动岛到
+>   67px，卡 a 的左上角正好站在它右下角旁边，70px 太挤。1440 × 810 这种带浏览器 chrome
+>   的笔记本视口本来就走地板分支，所以用户日常看到的高度由这条决定。
+>   1440 × 900 / 1440 × 810 / 1920 × 1080 / 2:1 / 390 × 844 各截图核对过，标题在指针三个
+>   极端位置都没被碰到。
+
+> **2026-09-03 补记（第九则研究：欢迎来到 fhf's）**：
+> - `/lab/neon`（`components/lab/NeonSignDemo.tsx`）：用户点名要的《爱乐之城》一角——Seb's
+>   门口那块蓝色霓虹，字换成 fhf's，配 Spotify 嵌入的《Mia & Sebastian's Theme》。§0 里
+>   「霓虹时代只留下灯」的判断没有变：这是实验室里一则**致敬**，不是俱乐部主题回潮，
+>   所以它是一整页全黑的舞台（100svh、自带砖墙），不进纸白的任何一页。
+> - 招牌没有位图，也**没有字体**（2026-09-04 按原版重画）：字形取自 Wikimedia Commons 上
+>   Espandero 对着电影原版描摹的矢量 `File:Seb's.svg`（CC BY-SA 4.0，页脚 credit 有署名）。
+>   在无头 Chrome 里对那份 SVG 做了几何测量（`getPointAtLength` 采样 + 最小二乘拟合圆）：
+>   圆环圆心 (401, 595)、半径 323、管宽 15.6；字母管宽 12.7、cap ≈ 343，字母**直立**、
+>   基线向右上爬 9.5°；圆环在右上 −60°…−30° 之间断开让音符的杆穿出，左弧到 155° 就停，
+>   右弧从 −30° 顺时针绕到 135° 后折回成横杠（一根管子，`ARC_R_BAR`），横杠自由端在 S
+>   下面 (616, 738)。S 与音符直接用描摹的外轮廓；原版没有 F 和 H：F = E 去掉底横（E 的
+>   轮廓走到左下角，竖笔用横臂末端的圆角收口，再接回 E 自己的中横与顶横，保留中横向左
+>   探出竖笔的那一截），H = 两根竖笔 + 一道 E 中横那么重的横梁，横向边缘沿用同一斜度
+>   （圆角多边形，顶点写死）。音符为了让开第二个 F 的顶横上抬了 60，杆相应截短 50，
+>   露出圆环的高度与原版相当。整幅 SVG 直接用描摹图的坐标（`viewBox="0 150 802 802"`），
+>   不再有 `skewX` / `rotate` / `scale`。用户先后否掉了字体描边（Kaushan Script）、直角
+>   多边形、自由手绘三版，要的是「精确还原电影原版」——再改字形改路径，别回头找字体。
+>   **管子是滤镜从实心字形上找出来的**（`NeonFilter`）：`feMorphology` erode 13 后与
+>   `SourceAlpha` 相减得到等宽的描边带，erode 3.7 与 8.9 相减得到居中的白芯，带再
+>   dilate + blur 出 glow 与 halo，`feMerge` 四层——一份形状，一套滤镜，就是霓虹作坊沿字边
+>   弯管的做法，也是原版 SEB'S 双线描边的来历；圆环与横杠是 14 宽的描边路径，erode 13
+>   把它整根吃掉，剩下的带就是整根管。同一份形状再过 `#nb-dark` 得到白天熄着的玻璃管。
+>   每段（左弧 / 右弧+横杠 / 音符 / 四个字母）各自一个滤镜实例，滤镜区域按段的 bbox 给
+>   百分比，闪烁只改段的 `opacity`。
+> - **HTML in Canvas 不用于这一页**（2026-09-04 评估）：那是 Chromium 的提案（`<canvas
+>   layoutsubtree>` + 子元素 `drawable` + `paint` 事件 + `ctx.drawElementImage()` /
+>   WebGL `texElementSubImage2D`），2026-09 仍只在 Chrome 148–151 的 origin trial 里，
+>   Safari / Firefox 无；明文规定跨域 `<iframe>` 画不进去——Spotify 播放器正是跨域；而这一页
+>   的招牌是 SVG 滤镜、砖墙是画一次的 canvas，没有需要 shader 后处理的 HTML。将来若要给
+>   WELCOME TO 或剧照做玻璃反光一类效果，可作为渐进增强接入，但要过§1.5 的空转循环关。
+> - **音乐的退路**（2026-09-04）：这条网络对 `open.spotify.com` 是 TLS 重置（大陆常态），iFrame
+>   API 脚本 `onerror`、退回的普通 iframe 也一样空白——于是原来的「退回 Spotify iframe」改成
+>   退回**网易云音乐官方外链播放器**（`music.163.com/outchain/player?type=2&id=3420987569`，
+>   Hurwitz 2026 十周年重录版，`player/url` 接口确认匿名给 128k；原声带版本 fee=1 需 VIP，
+>   匿名拿不到 url）。触发条件：脚本 `onerror`，或 `SPOTIFY_TIMEOUT` 12s 内没等到 API（丢包
+>   型阻断会让脚本挂一分钟）。外链播放器没有控制接口，所以它跟着总闸**挂载/卸载**（灯灭即停），
+>   `auto=` 只在每次上电时决定一次——上电前 document 上有过 `pointerdown`/`keydown`（浏览器
+>   此时才允许出声）就 `auto=1`，纯靠滚动点亮的第一次是 `auto=0` 等读者按播放；`fallbackSrc`
+>   固定在 state 里，手势晚到不改 URL，否则会在读者听着的时候重载。样式上 iframe 86 高居中在
+>   152 的盒子里，`filter: invert(0.9) hue-rotate(180deg)` 把它的浅色主题翻成深色（封面也会
+>   反色，接受）。文案 `fallbackTrackArtist`/`fallbackHint` 说明换了录音、要按一下播放。
+>   **不下载/自托管商业录音**：Spotify 流有 DRM，且公开站点自动播放该录音属未授权分发，
+>   用户两次问过，两次都是这个答复。
+>   砖墙由 canvas 一次性画完（逐块色相/明度、上沿高光、下沿阴影、噪点、首屏暗角，第二屏
+>   以下整体压暗；resize 才重画）。
+> - 点亮是一份写死的闪烁谱（`score()`：每段「保持 n 秒、亮度 v」的序列），圆环→横杠→
+>   逐字→音符，末尾两次回抖，2.7s 后停稳且不再重绘；砖上的蓝光是一层 `mix-blend-mode:
+>   screen` 的径向渐变，透明度跟着谱走，停稳后是静止层——按§1.5「推近段的性能账」的
+>   判据，静止页面上它免费。招牌是这家店的**总闸**（`aria-pressed`）：关灯 0.06s 一暗、
+>   音乐同时暂停；再开重放整份谱、音乐接着放。亮着时指针悬停让随机一根管子闪一下
+>   （`isFinePointer` 门控）。**没有空转循环**：不扩§1.5 的例外名单。
+> - 音乐走 Spotify **iFrame API**（`open.spotify.com/embed/iframe-api/v1`，脚本只在这一页
+>   按需插入；`createController` 会替换掉传入的元素，所以给它一个 React 之外临时建的
+>   div）。用户要求自动播放：谱走完（`main.onComplete`）即 `play()`；浏览器拒绝时（访客
+>   尚未与站点交互）靠 document 捕获阶段的第一次 `pointerdown`/`keydown` 再试；读者自己
+>   按了暂停就不再抢（`userPaused`），拨一次开关才重来。**循环**：曲子（或 30s 试听）
+>   放完时 `playback_update` 不报 paused，只是停在最后一毫秒且仍标 playing，而且播放器
+>   一旦进入自己的结束态就弹「Get Spotify」推广层并无视 `restart()`——所以按进度判定、
+>   提前 1.5s（更新约每秒一条）`restart()`，实测 28.6s 处回 0 接上第二轮、无推广层。
+>   API 对象只经 `onSpotifyIframeApiReady` 回调到达一次，存到 `window.__spotifyIframeApi`
+>   复用：二次挂载（站内往返、dev 的 Fast Refresh）若再插一遍脚本，回调永远不会再来。
+>   编排 effect 卸载时把 `poweredRef` 复位：StrictMode 的双跑里第一趟的 ScrollTrigger 已经
+>   把开关拨上，第二趟不复位就永远不亮。脚本加载失败退回普通 iframe。未登录 Spotify 的
+>   访客只有 30s 试听，Spotify 端的限制，绕不过。`next.config.ts` 的 `X-Frame-Options:
+>   DENY` 管的是别人嵌我们，不影响我们嵌 Spotify。
+> - 招牌下面沿着同一面墙挂六张剧照（`neonStills.ts`，`public/lab/neon/`，已列入
+>   `IMMUTABLE_PATHS`）：六列网格，Seb's 弹琴那张占四列，旁边 Griffith Park 那张裁成 5:6
+>   竖幅与它齐高（`tall`），尾声琴键路占整行 21:9；黑色卡纸框 + 顶沿一线蓝色反光，
+>   `Reveal` 依次浮现；≤899px 两列（竖幅回 16:9），≤559px 一列。
+> - 这一则的 `LabStudy` 动态导入**保留 SSR**（其余八则都 `ssr: false`）：它没有 three.js，
+>   无 JS 时页面也能读到 WELCOME TO、剧照和暗着的招牌。
+
+> **2026-09-04 补记（大门：招牌成了站点的启动页，音乐成了背景音乐）**，覆盖上面与之相悖的句子：
+> - **招牌抽成共享模块** `components/neon/`：`NeonSignArt.tsx`（字形、滤镜、`score()` 与
+>   点亮/熄灭两份谱、`RING` 圆环几何）、`wall.ts`（砖墙 `paintWall` + `layoutWall` +
+>   `.nb-stage/.nb-wall/.nb-spill` 样式）。挂在三处：`/lab/neon`（`NeonSignDemo`）、首页大门
+>   （`components/home/NeonSplash.tsx`）、灵动岛上的音符（`components/fx/JukeboxSwitch.tsx`，
+>   只取音符那一段，同一套 `NeonFilter`）。滤镜 id 按实例加前缀，同页可挂两块。
+> - **大门（`NeonSplash`）**：只在**硬着陆首页**时出现、每 session 一次。判定由页面自带的
+>   inline script（`lib/client/splash.ts` 的 `SPLASH_INIT_SCRIPT`，走 ThemeInitScript 那种 innerHTML
+>   包壳）在首绘前写到 `<html data-splash="due"|"seen">`；CSS 按它隐藏（`seen`、以及无 JS 时
+>   `html:not([data-js])`），所以回访者看不到墙闪一下，站内导航回首页的人根本不会撞上门
+>   （inline script 在软导航时不会执行，属性不是 `due` 组件就直接 `null`）。开发期 `?splash`
+>   每次都开门、不记 key。门是 `fixed` 全屏（z 96，压过灵动岛 80、路由帘 95），渲染在 `<main>`
+>   **旁边**而不是里面——RouteTransition 揭幕时会给 `<main>` 加 transform，会把 fixed 层钉住。
+>   门开着时按 lenis 契约锁滚动，`focusin` 守卫把跑到墙后面的焦点拉回「推门进去」。
+> - **大门与开灯仪式的握手**：门就是首页的开场。`OvertureLight` 看到 `splashDue()` 直接站到
+>   一边（既不派 done 事件也不写 key）；`Opening.useEntrance` 在门未开时**不设 2s 安全超时**
+>   （masthead 反正在不透明的墙后面）；读者推门时由门派 `fhfs:overture-done`、写
+>   `fhfs-splash-seen` 与 `fhfs-overture-seen` 两把 key、把 `data-splash` 改成 `seen`。
+> - **进门的效果：穿过圆环**。总长约 1.75s，一条 GSAP 时间线：0–0.25s 文字淡出；字母与横杠
+>   各闪两下熄灭，圆环与音符**保持亮着**（门亮着才看得见门，开关关着也会为此点亮环）；
+>   0.3–0.75s **虹膜**——墙上以圆环圆心为中心开一个洞，半径 0 → 环内径，纸白从环里透出来；
+>   0.8s 派 done 事件让 masthead 开始升起；0.75–1.75s **推进**——整面墙以圆心为 transform-origin
+>   `scale(1 → S)`，`S = 最远视口角到圆心的距离 / 环内径 × 1.06 + 0.1`，管子的内沿扫过最后一个
+>   角就卸载。洞用 `mask-image: radial-gradient(...)` 开在 `.ns-stage` 自己的坐标系里，所以推进
+>   阶段**只有一个 transform 在动**（`will-change: transform`，合成器完成，滤镜不重栅格化），
+>   洞跟着环一起长；只有虹膜那 0.45s 在改 mask 半径（`--ns-hole`）。圆心/内径按 `RING`
+>   从 svg 的 `getBoundingClientRect` 现算，含指针视差的偏移。按钮、Enter/Space/Escape/↓/PageDown、
+>   招牌停稳后的滚轮下滚或上滑手势都能推门。1440×900 明暗两主题、390×844 都截图核过。
+> - **音乐成了全站背景音乐**：播放器从招牌下面撤走，改成挂在 locale layout 里的
+>   `components/fx/Jukebox.tsx`（`opacity: 0` 的固定角落盒，`inert`；留在视口内是因为 Chrome
+>   会节流滚出视口的跨域 iframe 的计时器，播放器的缓冲靠它们），跨路由不断。状态在
+>   `lib/client/jukebox.ts` 的外部 store（`useSyncExternalStore`，无 provider）：招牌写 `wanted`，
+>   播放器读它、回报 `playing`/`fallback`；`gestured` 由播放器在 document 捕获阶段记下。
+>   Spotify 脚本**只在第一次有人要音乐时**才加载（`armed` 单向闩），之后跟着 `wanted`
+>   play/resume/pause；网易云退路同前，但只在 `wanted && gestured` 时带 `auto=1` 挂载。
+>   三处开关同一个 store：大门与 `/lab/neon` 的招牌（灯与音乐一起）、进站后灵动岛上的音符
+>   （亮 = 想放，暗 = 停；点亮走三步小闪烁）。招牌反向也跟 store：`useEffect([wanted])` 里
+>   比较的是 `jukebox().wanted` **而不是渲染拿到的 `wanted`**——ScrollTrigger 在 layout effect
+>   里就把招牌点亮了，被动 effect 那一趟看到的还是旧值，照旧值行事会把灯立刻关回去
+>   （实测踩过）。`/lab/neon` 的 `fallbackHint`/`playerTitle` 文案随播放器一起删除。
+> - 大门不进 §1.5 的 reduce-motion 例外名单：它不循环、由读者自己推开，等同一个模态页。
+
+> **2026-09-04 补记（`/resume` 从空壳变成一份真的简历）**：
+> - 版式是「左栏编号标签 + 右栏正文」的极简简历（`components/resume/ResumeSection.tsx`）：
+>   概述 / 专业技能 / 工作经历 / 开源与项目 / 教育背景，编号按实际出现的段落现发；桌面上
+>   标签 `sticky` 跟着段落走，窄屏与纸上叠成一栏。版心 880px，比其余页宽一档，给左栏让位。
+>   要点的项目符号是一段 10px 的细横线挂在左侧空白里，正文保持一条左边缘；每份工作下按
+>   项目分组（`# 项目名 | 时间段` + 要点），项目标题带 2px 琥珀左边。仍然只有全站那一种
+>   进场 reveal，没有别的动效——这是一页给人读、给人打印的纸。
+> - **打印即导出**：右上「打印 / 存为 PDF」按钮只调 `window.print()`，`globals.css` 的
+>   `@media print` 负责其余：`@page` A4、灵动岛 / 页脚 / aurora / grain 不上纸、两套主题的
+>   token 都改成白纸黑字（暗色选择器要点名，否则它的特异性更高）、`[data-resume]` 下各字阶
+>   降到简历尺寸（正文 10pt）。不生成 PDF 文件，纸上就是页面本身。
+> - **数据**：`resume_profiles` 加 `highlights` / `skills` / `projects` / `education` 四列，
+>   `resume_experiences` 加 `summary` / `projects`（迁移 0005）。要点里允许 `**粗体**` 与
+>   `` `代码` ``，由 `lib/resume.ts` 的 `parseInline` 拆成元素渲染，不走 HTML；技能表与项目
+>   在 `/admin/resume` 用 textarea 编辑，语法（`方向 | 内容`、`# 项目 | 时间段`）与解析 / 反解析
+>   都在 `lib/resume.ts`，有单测。`getResumeProfile` 顺带带出 `updatedAt`，页脚印「更新于 某年某月」；
+>   `db:import` 因此对带 `updatedAt` 的键表也盖当前时间戳。
+> - **脱敏是内容层面的决定，不是代码**：这一页公开，所以入库的这份把电话与邮箱去掉（`email`
+>   留空，页脚贴纸下的邮箱不受影响）、雇主与产品改成描述（「某央企旗下数字科技公司」
+>   「Web3 社交 IM App」，不出现公司名与域名）、学校只留学历与年份；名字沿用站点的 `fhf`。
+>   用户随后又去掉了远程那段的「兼职」标注、所在地只留城市（不公开求职意向），并要了一句
+>   「欢迎老板砸 JD / offer」——为此 `resume_profiles` 再加 `note`（联系方式那一行末尾的一句，
+>   衬线斜体）与 `website`（Linktree 一类的链接页，迁移 0006）。
+>   要恢复任何一项，在 `/admin/resume` 改那一格即可，页面对内容没有假设。
+
+> **2026-09-06 补记（`/resume` 进主导航）**，覆盖 08-25 修订里「作品、简历进页脚与全屏菜单」的半句：
+> - 主导航现为 文章 / 软件 / 关于 / 实验室 / **简历** 五项。理由：简历已是一份完整的真简历，
+>   且自带「欢迎老板砸 JD / offer」——这一页是站点对最要紧的那位访客（招人的人）的答复，
+>   而桌面端汉堡展开的是灵动岛托盘、不是 FullNav，只勾 `fullnav` 的页面在桌面上除了页脚
+>   没有任何入口。一份邀人来看的简历不该只藏在首页三幕滚到底之后。
+> - **作品仍不进主导航**：`works` 表为空，`/portfolio` 目前只有封面、指向 `/software` 的空态卡、
+>   同一批 app 的设备框与实验室条目的复述，没有一件独有内容。挂上作品之日再议。
+> - 首页靠角标回，`/intro` 是 3D 体验、`/resume` 是它的等价文本，两者都不占位。
+> - 五项在灵动岛里实测能容纳（1440 宽下托盘中文 376px / 英文 410px，整岛 520 / 554px，
+>   离 768px 断点尚远），§2.0 的「4 个导航项」读作当时的数字。
+> - 导航表在库里（`nav_items.surfaces`），改动经 `/admin/nav` 或脚本 + `db:export`；这里只记决定。
+
+> **2026-09-07 补记（三个新栏目：说说 / 秘密 / 偶像，与「一个房间一张唱片」）**：
+> - **`/moments`《多的是你不知道的事》**（`components/moments/MomentBoard.tsx`）：QQ 空间式的
+>   说说板，收进纸白的杂志版式——680px 单栏、按年分组的 mono 年份、每条一个小圆头像 + 名字 +
+>   到分钟的时间、正文 `whitespace-pre-line`。文集筛选、每 40 条一页、超过 10 行或 360 字的
+>   折叠都在客户端；SSR 输出全部条目，无 JS 整页可读。表 `moments`：单语正文（说说是当时
+>   说的话，不翻译），`collection` / `original` / `attribution` / `source` 四列来自一言 App 的
+>   分类。用户的 242 条一言创作**并进这一栏而不是另开一栏**：它们本来就是 2017–2024 年间带时间
+>   的短句，正是这块板要放的东西；两本文集作为筛选保留，`source: yiyan` 让它们随时能被单独
+>   拿出来。往后的说说走 `/admin/moments`。
+> - **`/secrets`《不能说的秘密》**：posts 的孪生表 `secrets`（多 `kind` / `audio` / `duration`），
+>   目录页与单篇页照 /blog 的版式；播客单篇放浏览器原生 `<audio>`，不引播放器库。目前为空，
+>   页面显示空态而不编造内容。
+> - **`/idols` 与 `/idols/kobe`**：偶像墙的第一位。三幕：名字与号码；一尊**用代码搭的铜像**
+>   （`components/idols/KobeStatue.tsx`，R3F，胶囊体 + 球体，一种青铜 `MeshStandardMaterial`，
+>   `Environment` 内三块 Lightformer 现算环境贴图、不取 HDR 文件）；十二张 Commons 授权照片
+>   按原比例挂在 CSS columns 里；生涯节点。铜像照 2024 年 Star Plaza 那尊 81 分雕像的姿势，
+>   §5.3 的规矩照旧：`frameloop="demand"`，入场一次 GSAP 时间线（升起 + 转正，每 tick
+>   `invalidate()`），此后只有拖拽（细指针）与两枚箭头按钮（键盘 / 触屏，触屏上拖拽会吃掉
+>   页面滚动）才画帧；滚出视口 `frameloop="never"`；无 WebGL / Save-Data 退回照片。
+>   宽版心 1040px，只为铜像与照片墙，文字仍是 720px。
+> - **一个房间一张唱片**：`lib/client/jukebox` 的 store 多了 `track`（`lib/tracks.ts` 注册表：Spotify
+>   曲目 + 网易云退路）与 `silenced`。页面挂 `components/fx/RoomMusic` 即换上自己的唱片：
+>   Spotify 走 `loadUri`，网易云退路换 id 重挂。**是否自动开始放是读者的事**：已经在放就只换
+>   曲；读者从未按过「关」就替他放上；读者在站上任何一处关过音乐（`silenced`），房间就不出声，
+>   直到他自己再打开。房间自己开的音乐出门时自己关，进门时本来就在放的就留着，出门换回主题曲。
+>   播客单篇不挂 RoomMusic——两样声音一起放不是秘密，是噪音。
+> - **主导航**：文章 / 说说 / 软件 / 关于 / 实验室 / 简历 六项。说说进 header 是因为它一上线就有
+>   242 条真内容；秘密（空）与偶像进页脚、全屏菜单与 sitemap，秘密有了第一篇再议 header。
+
+> **2026-09-07 补记（第四个房间：《大话西游》；招牌下面不再写字；宣言换句）**：
+> - **`/odyssey`《大话西游》**（`app/[locale]/odyssey`，`components/odyssey/`）：用户点名要的电影
+>   房间。四幕：片名与班底；上下两部（`ODYSSEY_FILMS`，与 /idols/kobe 生涯节点同一种
+>   `9rem_1fr` 列表）；记得的三句台词（琥珀左边的引语块，衬线，只在英文下 italic——中文没有
+>   真斜体，不合成）；十二张剧照（`OdysseyStills`：六列墙，一张 span 4 配一张 5:6 竖裁的
+>   span 2，之后三张一行，收尾一张 21:9 通栏——构图照 /lab/neon 的剧照墙，材质照纸：无黑卡、
+>   无蓝色反光，就是全站那种圆角卡）。版心 1040px 只给剧照，文字仍 720px。
+>   剧照取自 TMDB（两部片各自的 backdrops），来源与许可记在 README；`focus` 字段只给两张
+>   裁过的（眨眼那张往左，城楼那张往右）。
+> - **音乐**：挂 `RoomMusic`，曲目 `odyssey` 注册在 `lib/tracks.ts`——Spotify 是 1995 年的
+>   原版录音；网易云上卢冠廷的各个版本都要会员（`player/url` 返回 -110），退路照另两首的
+>   规矩放匿名可播的钢琴版，标题旁如实写「钢琴版」。仍然不下载、不自托管。
+> - **导航**：进页脚、全屏菜单与 sitemap（`nav_items` sort 8，作品 / 简历 / intro 顺延），
+>   不进 header——和偶像同一个理由：一个房间一页内容，header 六项已经是灵动岛能容的上限。
+> - **招牌下面的两行字删了**：大门与 `/lab/neon` 的「点一下招牌 · 灯和音乐一起关，一起开」
+>   与「今晚 · 台上放的是 …」都去掉（用户明确不要）。招牌本身仍是总闸，`aria-label` 还在
+>   （打开 / 关掉招牌），只是不再用一行小字解释它；曲目信息在各房间的 `RoomMusic` 一行里
+>   还有，那里带着开关，读者能看见为什么换了歌、也能就地关掉。`NeonSignDemo` 的第一屏从
+>   `1fr auto` 两行变成一格，`nb-foot` / `nb-hint` / `nb-track*` 与 `ns-*` 对应样式一并删除；
+>   `splash.*` 与 `lab.items.neon.*` 里的五个 key（toggleHint / tonight / trackTitle /
+>   trackArtist / fallbackTrackArtist）从两份语言文件删掉，`STUDY_KEYS.neon` 同步。
+> - **首页宣言换句，且只剩一行**：「以代码为弓，/ 向世界拉一曲好奇。」用户否掉，先改成
+>   「先把世界看清楚，/ 再把它写成代码。」，用户又要参考米哈游「技术宅拯救世界」那种口号，
+>   最终定为**一句「科技改变世界」**（英文 Tech changes the world），不要第二行、不带标点。
+>   `Opening` 从此 `headline.filter(Boolean)`：第二行留空就是一行的宣言，不是一行空白——
+>   `grove.headline2` 在 `messages/*.json` 与 `copy_blocks` 里都置空但保留，往后要加回第二行
+>   在 /admin 填上即可。改在 `messages/*.json` 与库里 `copy_blocks` 两处（后者才是线上读到
+>   的那份），`backup/db.json` 已随 `db:export` 更新；线上要在 /admin 保存一次刷掉 `copy`
+>   标签的缓存才会换。
+
+> **2026-09-07 补记（导航分三翼：灵动岛只放门，房间收进「生活」）**，覆盖 09-06 / 09-07 两条
+> 补记里关于导航的句子：
+> - **起因**：用户说「很多页面我找不到入口」。核实下来是机制问题：桌面端只有灵动岛托盘和页脚
+>   两个面（汉堡在桌面端展开的是托盘，FullNav 只在 <768px 出现），所以没进 header 的页在桌面上
+>   只剩页脚一行 13px 小字；偶像 / 大话西游 / 秘密三页站内零链接，/intro 连页脚都没有；手机菜单
+>   11 项平铺在 667px 高的机型已溢出且不能滚。header 六项是上限而房间还会加，「再挤一格」不是解。
+>   四套方案（零代码重排 / 枢纽页 / 分组目录 / 访客动线）经三位评审（访客 / 美编 / 工程）打分，
+>   两位选枢纽页，一位选零代码；终审取枢纽页为骨架，嫁接其余方案的点子。
+> - **规则**：`nav_items` 多一列 `nav_group`（`issue` 正刊 / `rooms` 房间 / `me` 作者，或空），
+>   `src/lib/nav.ts` 是唯一解释它的地方。**门 = 同组里勾了 header 的行**；灵动岛只放门。
+>   页脚按组成簇、簇间一条与岛上同款的 hairline，组名只做 aria；FullNav 变两级——门是编号大字
+>   行，同组未勾 header 的行以小字挂在它前面最近的门下（`attachMembers`），无组或前面没有门的行
+>   自成一行（今天只有首页），所以后台填错也只会错位、不会消失；nav 列加 `overflow-y-auto` **并
+>   `data-lenis-prevent`**（菜单开着时 Lenis 处于 stop，会把没有这个属性的元素上的滚轮与触摸
+>   一律 preventDefault，样式上能滚、实际滚不动——评审实测过），Tab 循环先 `scrollIntoView` 再
+>   聚焦，焦点在首个字亮出来之后（0.3s）才进对话框（autoAlpha 0 的链接 focus 是空操作）。
+>   门的成员关系按 group 从整张表算（layout 多传一份 `allLinks` 给 Header），不看房间勾了哪些面。
+>   灵动岛在房间里点亮那扇门（`isActiveDoor`：本页用 `aria-current="page"`，门用 `"true"`，
+>   胶囊指示器认 `a[aria-current]`）。
+> - **表**：0 首页(无组) · 1 文章 · 2 软件 · 3 作品 · 4 实验室（正刊）· 5 **生活** · 6 说说 · 7 偶像 ·
+>   8 大话西游 · 9 秘密（房间，空的排最后）· 10 关于 · 11 3D 自我介绍 · 12 简历（作者）。
+>   header 六项：文章 / 软件 / 实验室 / 生活 / 关于 / 简历。**说说退出 header**（覆盖 09-07
+>   「一上线就有 242 条真内容」那句）：按站点自己的定义它就是一个房间，条数印在目录行上；桌面端
+>   多一跳，换来每一间房从「只在页脚」变成两跳。**/intro 进页脚与菜单**（覆盖 09-06「不占位」
+>   的页脚部分，header 部分照旧），标签改「3D 自我介绍 / 3D Intro」免得和「关于」并排打架。
+>   作品仍不进 header（works 空）。
+> - **`/life`「生活」**（`app/[locale]/life`）：房间的目录，720px 版心，一行一间——序号、房名
+>   （读 `life.items.<key>.title`，缺则退回 `nav.<key>`）、一句话、mono 元信息行（条数 + 「唱片 ·
+>   曲名」）、偶像行内列出每位偶像的子链接（/idols/kobe 从 header 出发仍是两步）、右侧 96px 缩略图。
+>   成员与顺序读 `nav_items`（group=rooms 且未勾 header），配图 / 唱片 / 颜色在
+>   `components/life/rooms.ts`，查不到就是素行——后台加一行即上目录，配图是可选的第二步。
+>   **不挂 RoomMusic**：走廊不是房间，主题曲照放。名字用「生活」而不用「房间」：访客一眼能懂，
+>   隐喻留给 kicker「屋子里的几个房间」。
+> - **关于页**升格为作者这一翼的门：头部并排两颗按钮，「走近这张脸 →」（/intro）与「看简历 →」
+>   （/resume）。
+> - **后台** `/admin/nav`：每行多一个分组下拉、↑ ↓ 换序钮（顺序仍 = 行序）；「+ 加一间房」默认
+>   group=rooms、勾 页脚 / 全屏菜单 / sitemap。分组只接受三个值之一或空。**部署顺序**：迁移 0008 →
+>   部署带 `nav.life` 的代码与 /life 页 → 后台存表（或脚本）→ `pnpm db:export`；
+>   `/admin/copy` 建不了新 key（只 UPDATE），所以 nav 标签必须先随代码上线。
+> - **两步核对（桌面 / 手机）**，往后加房间的验收项：/ 角标 1 / 1；/blog /software /lab /life
+>   /about /resume 1 / 1；/portfolio 首页主按钮或页脚 1、菜单 1；/moments /idols /odyssey /secrets
+>   页脚 1 或 生活→房间 2、菜单 1；/idols/kobe 生活行内 2、菜单 2；/intro 页脚 1 或 关于→按钮 2、
+>   菜单 1；/secrets/[slug] 目录→秘密→篇 3（有内容后目录行可列最近一篇，降到 2）。
+> - **首页不加「房间」一节**：封面是三幕加三节精心排过的节奏，顶栏「生活」一格已在每页常驻；
+>   房间多到五六间再议。
+> - 顺手清掉 `Header.tsx` / `Footer.tsx` 两处「四项导航」的旧注释；§2.0 的「4 个导航项」读作
+>   当时数字。
+
+> **2026-09-14 补记（整理：一个站标、六扇常开的门、两个空页面退场）**，覆盖上文与之相悖的句子：
+> - **起因**：用户看别人的个人站「都有自己设计的元素，简洁明了」，觉得本站「杂乱、条理不清」，
+>   但对特效满意。逐页走查（1440 × 900 与 390 × 844 截图）的结论：单页都干净，乱在页与页之间——
+>   13 行导航在桌面上全藏在汉堡后面；「我是谁」（首页第三节 / about / intro / resume）与「我做的
+>   东西」（software / portfolio / 首页第二节）各有三四处在讲；/portfolio（works 空）与 /secrets
+>   （0 篇）挂在导航上而首页唯一的主按钮指向前者；五套隐喻（杂志、霓虹、森林、房间与唱片、灵动岛）
+>   并存；版心五种；没有一个贯穿全站的形象。整理的原则：**不删特效，只挪位置、收入口、统一口径**。
+> - **站标 = 招牌的圆环与音符**（三个方向「从 /intro 的脸提炼线稿小人 / 霓虹招牌 / 先不做」里用户
+>   选了霓虹）。招牌几何抽到 `lib/neon/geometry.ts`（纯数据、无 `"use client"`；
+>   `NeonSignArt` 再导出，三个老引用方不变），因为服务端要画它：`app/icon.svg` 是圆环 + 音符点亮在
+>   砖墙近黑上（16px 处圆环是一根 1px 的管、音符是一个亮点，字留给大门；原 fhf 三字母站标退役）；
+>   `components/neon/SignRing.tsx` 是只有圆环的徽章，套在灵动岛与页脚的 `fhf` 字标外面，音乐想放时
+>   随岛上的音符一起点亮——描边画的，不走 morphology 滤镜（这个尺寸下 erode 13 单位只有三十分之一
+>   像素）；`lib/server/ogMark.tsx` 把同一枚标画进两种 OG 卡的题头，代替原来的琥珀圆点（satori 无滤镜，
+>   四层描边：halo / glow / tube / core）。灵动岛从此读作招牌的零件：圆环套着名字，音符在旁边。
+> - **宽屏导航常开**：≥1024px（`Header` 的 `WIDE`）灵动岛默认展开露出六扇门，挂载时不播开合动画
+>   （`instantRef`，直接 `progress(1)`）；向下滚过 48px 折回字标，向上滚 48px 再展开，滚动位置
+>   <64px 时总是开着；折叠只对滚动**行程**做反应，不看位置，所以读者按关的岛不会在同一处反复弹。
+>   展开时汉堡随时间线折掉（一枚常驻的 X 会问「关什么」），折回时再出现；Escape 关闭后焦点在汉堡
+>   回来那一刻才交还（隐藏元素上 `focus()` 是空操作）。768–1023px 仍按一下才开，手机照旧。
+> - **/portfolio 下线**：页面、`components/portfolio/`（DissolveHero / CraftList / LiquidLens）、
+>   `cards/WorkCard`、`lib/htmlInCanvas`（LiquidLens 是它唯一的消费者，§5.4 从此读作历史）、
+>   `public/portfolio/lamp.jpg`、`messages` 的 `portfolio.*` 与库里同名 copy 行一并删除；
+>   `next.config` 把 `/:locale/portfolio` 308 到 `/software`。「上机看看」设备框段搬回 `/software`
+>   页尾（08-25 修订里搬走的那段）。`works` 表与 `/admin/works` 保留，挂上第一件作品之日再议页面。
+>   暗室台灯照片随页面退役——它是站上唯一一张要读者进暗室的纸白页。
+> - **/secrets 摘出导航**：`nav_items` 删掉该行（页面仍可直达；/life 因此不再列一间空房；有第一篇
+>   时在 /admin/nav「+ 加一间房」挂回）。导航表现为 11 行，门仍是六扇。
+> - **首页主按钮**改指 `/software`，文案「看看我做的东西 / See what I've made」（`grove.cta`，
+>   messages 与 copy_blocks 两处）。实验室副标「九则」改「十则」（影集是第十则，之前漏改）。
+> - **版心两档**：正文 720（`/lab`、`/lab/[slug]`、`/moments`、首页正刊、error 页从 680 提到 720），
+>   宽版 1040（`/software` 从 `max-w-5xl` 1024 改 1040，与 /idols/kobe、/odyssey 同）；`/resume`
+>   的 880 是 720 正文加左栏标签，不算第三档。
+> - 未做、理由记在这里免得重来：404 不加站标（数字上已有粒子彩蛋，§2.7 的判断照旧）；空态不加站标
+>   （秘密页已出导航，软件页的分类空态一年见不到一次）；首页不加「生活」一节（09-07 的决定照旧）；
+>   隐喻只留纸、灯、贴纸三样——森林是封面画，霓虹只做大门、音乐开关与站标，房间的说法只在
+>   「生活」一翼里出现。
+
+> **2026-09-15 补记（整体优化：先量再改，只改量得出来的）**，覆盖上文与之相悖的句子：
+> - **量法**：`pnpm build && pnpm start`，浏览器里按 `performance.getEntriesByType("resource")` 分类求和
+>   `encodedBodySize`（压缩后字节），HTML 用 `curl -H 'Accept-Encoding: gzip, br'` 看 `size_download`。
+>   改前 /zh/blog：HTML 30 KB、JS 356 KB / 29 个、CSS 122 KB / 3 个、字体 991 KB / 33 个、链接预取
+>   148 KB / 47 次；一个空白路由（/zh/lab/grove）HTML 也有 27.6 KB。
+> - **整本翻译文案不再随每页下发**：`NextIntlClientProvider` 不传 `messages` 时会把 `getRequestConfig`
+>   合并后的整本目录（19 KB JSON，转义后更大）塞进每一页的 RSC 载荷，也塞进每一次预取。现在 layout 用
+>   `pick(await getMessages(), CLIENT_NAMESPACES)` 只给客户端组件真正 `useTranslations` 的 11 个命名空间
+>   （`src/lib/server/messages.ts`）；`messages.test.ts` 扫描 `src` 里所有 `useTranslations("…")` 调用，漏一个
+>   命名空间测试就红，而不是等浏览器报 MISSING_MESSAGE。服务端组件照旧 `getTranslations` 读全本。
+>   **新加客户端组件读新命名空间，先把它加进 `CLIENT_NAMESPACES`。**
+> - **404 边界拆包**：段的 `not-found.tsx` 与 layout 打在一起，于是 `NotFoundStage`（粒子画布、可撕贴纸）
+>   连同整份 `gsap-extras`（Draggable / Inertia / ScrambleText / CustomWiggle）进了每一页的 JS。
+>   改为 `next/dynamic` 按需加载，SSR 照旧输出完整 404。§1.5 里「gsap-extras 只由用到的组件引入」的
+>   规矩这才真正成立。
+> - **Noto Sans SC / Noto Serif SC 网络字体删除**（覆盖 §1.2）：两份 next/font 声明各生成 120 / 102 条
+>   `@font-face`，两个 CSS 文件 67 KB（压缩后）每页必载，而实测没有一页真的下载过一个 Noto 切片——Yozai
+>   覆盖 GB2312，Apple 上 PingFang 兜底。字体栈只留系统字：`"PingFang SC", "Hiragino Sans GB",
+>   "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC"`；衬线 `"Songti SC", "SimSun",
+>   "Noto Serif CJK SC", "Source Han Serif SC"`（Windows 的衬线点缀从此落在 SimSun 上）。OG 图不受
+>   影响（`lib/server/og.ts` 构建期另拉 Google Noto）。
+> - **Yozai 切片加 immutable 缓存头**（`next.config` 的 `IMMUTABLE_PATHS` 加 `/fonts/:path*`）：此前每次访问
+>   都要为三五十个切片各发一次条件请求。规矩：**重新切片要换文件夹名**，不能原地覆盖。
+> - **页脚与全屏菜单的链接 `prefetch={false}`**：全屏菜单在每一页的 DOM 里（隐藏），隐藏的链接在预取器
+>   眼里照样「在视口内」；连页脚十一条在内，每页一进来就预取二十多条路由。悬停仍会预取，点击不慢。
+> - **改后** /zh/blog：HTML 15 KB、JS 298 KB / 21 个、CSS 55 KB / 2 个、预取 80 KB / 35 次；
+>   /zh/lab/grove HTML 14.8 KB；首页预取 99 KB → 31 KB。字体没动（见下）。
+> - **仍然最大、这次没动的一项：Yozai 本身**。一页要 31–53 个切片、1–2 MB（首访，之后有缓存），因为切片是按
+>   GB2312 码位顺序（一级字按拼音）切的，常用字散在所有切片里。按字频重切（cn-font-split 默认策略，
+>   常用字集中在前几片）估计能把一页的切片数压到十个上下；需要 Yozai 400 / 500 的源字体与重切工具链，
+>   输出进新文件夹（缓存头的规矩），另开一轮做。另一个更狠的选项——去掉 500 字重、标题合成加粗——
+>   会改变标题的样子，是设计决定，没有替用户做。
+> - **健壮性与简洁**：`jwtVerify` 限定 `algorithms: ["HS256"]`；十七个页面开头的
+>   `hasLocale + notFound + setRequestLocale` 三行收进 `src/i18n/page.ts` 的 `pageLocale(params)`
+>   （返回值已是窄化的 `Locale`，漏掉 `setRequestLocale` 让页面悄悄变动态的事从此不可能）；
+>   `admin/actions.ts` 六处一模一样的「新建不覆盖 / 编辑即 upsert」块收成 `upsertKeyed(table, row, isNew)`
+>   （996 → 926 行）；简历打印样式加 `orphans / widows: 3`。审过没改的：`RouteTransition` 状态机与兜底、
+>   `scrollLock` 契约、`Jukebox` 的 Spotify → 网易云退路、`SmoothScroll` 的 ResizeObserver、登录限流、
+>   `db-import` 的批处理——都立得住。
+
+> **2026-09-16 补记（电影成栏目：`/films`，大话西游搬进去，加《不能说的秘密》；偶像不动）**，覆盖
+> 09-07 补记里「第四个房间 /odyssey」的路由与文件位置：
+> - **起因**：用户要一个专放电影的板块——把《大话西游》归进去、再加《不能说的秘密》；科比归「偶像」，
+>   不与电影混排。科比本来就在 /idols，这次不动；变的是电影从「一部片一间房」变成「一间房、几部片」。
+> - **路由**：`/films` 是房间（目录卡片：3:2 的剧照、片名、年份、一句话、「N 张剧照 · 唱片」），
+>   `/films/[slug]` 一部一页（`generateStaticParams` 读 `components/films/entries.ts` 的 `FILMS`，
+>   `dynamicParams=false`，与 /lab/[slug] 同一套）。`/odyssey` 在 `next.config` 里 308 到
+>   `/films/odyssey`；`public/odyssey/` 整目录 `git mv` 到 `public/films/odyssey/`（rename，不复制
+>   blob；`IMMUTABLE_PATHS` 把 `/odyssey/:path*` 换成 `/films/:path*`）。导航表 `/odyssey` 行改成
+>   `/films`（labelKey `films`，sort 8 不变），`backup/db.json` 已改并已 `db:import`。**这次是先切库后部署**，
+>   与 09-07 的顺序相反但同样安全：线上页面全是静态预渲染，导航表读在 `unstable_cache` 里，`db:import`
+>   不调 `updateTag`，旧部署照样端着缓存里的老行直到新部署整体重建——所以 `nav.odyssey` 不必留过渡，
+>   已随本次一并删掉。反过来（先部署后切库）才需要过渡标签，因为新代码会在切库前就读到老行。
+> - **一页的节奏**（`app/[locale]/films/[slug]/page.tsx`，宽版心 1040 只给剧照）：片名与班底 +
+>   `RoomMusic`（每部片自己的唱片，`FilmEntry.track`）→ 事实条（导演 / 主演 / 上映 / 片长 / 豆瓣，
+>   `9rem_1fr` 的 dl）→ 简介（`story1..n`，有几段读几段）→ 上下两部（仅 `parts` 非空的片）→ 影评
+>   （`review1..n`）→ 台词 → 剧照墙 → 署名。简介与影评是站主的话，写在 `messages` 里（`films.<slug>.*`，
+>   与其他房间同）；豆瓣分数写死在事实条里，不抓。文案命名空间从顶层 `odyssey` 收成 `films.odyssey`，
+>   `films.secret` 并列，影集那则实验室读 `films.odyssey`。
+> - **剧照墙 + 放映厅**（`components/films/FilmStills.tsx`，一个客户端组件）：墙照 09-07 的六列构图不变
+>   （span 4 + 5:6 竖裁的 span 2、三张一行、21:9 通栏收尾），多了一个 `ratio` 开关——大话西游是 16:9
+>   的视频帧，不能说的秘密是 3:2 的片场照，各按各的框裁。**看过 film-grab / shot.cafe / Awwwards 画廊
+>   合集之后的取舍**：那类站的主流是「网格 + 灯箱」（masonry 或 justified 行，点开全屏看单张，
+>   前后翻页），横向胶片带与 sticky 逐张放大是作品集站的做法，对一面剧照墙来说太重。所以只加灯箱：
+>   每张剧照本来就是指向原文件的 `<a>`（无 JS 点开就是图），有 JS 则打开原生 `<dialog>`——黑底、
+>   图撑到视口、图下标题与元信息、左上计数、方向键 / 两枚按钮 / 横滑翻页、Esc / 关闭钮 / 点背景退出；
+>   开着时走 `scrollLock` 契约，关掉焦点回到点开它的那张。进场 0.35s 淡入 + 0.5s 从 0.96 撑开，
+>   翻页从来的方向滑 24px 进来，退场 0.25s `EASE.exit`；文案由页面翻好传进去，不进 `CLIENT_NAMESPACES`。
+> - **《不能说的秘密》的素材**：TMDB 只有六张 backdrop 且四张是同一镜头，主体改取豆瓣「官方剧照」
+>   （3:2 片场照）+ 两帧电影截图（裁掉黑边，带字幕的不用），来源与抓法记在 README。曲目复用
+>   `tracks.secret`（与 /secrets 同一首）——同名的歌配同名的片，不另注册。
+> - **/life 的电影行**：条数印「2 部」，行内列出每部片的子链接（与偶像行同），缩略图是第一部片的封面剧照，
+>   不挂唱片（走廊里的目录行不放唱片，每部片进门自己放）。`life.countStills` 退役，换 `countFilms`。
+> - **未做**：不做电影的分类筛选（两部片不需要）；不做豆瓣/IMDb 的实时抓取（分数写死，一年变不了
+>   0.1）；不做 justified 行或横向胶片带（理由见上）。
+
+> **2026-09-16 补记（门口那首歌改成自己的文件）**，覆盖 09-04 补记里「**不下载/自托管商业录音**」
+> 那句、以及它下面关于主题曲走 Spotify / 网易云退路的全部句子（三首房间曲不变）：
+> - **起因**：用户拿来一份本地的 Mia & Sebastian's Theme（320kbps、3'19"），要求把音源换成它。
+>   换来的是整首而不是 30s 试听、不必等 Spotify 的脚本、大陆网络不再走那条 12s 超时 → 网易云
+>   退路的路；代价是仓库里多 2.8MB 和一份自担的版权判断（站主自己的决定，只在门口这一首上）。
+> - **编码**：`ffmpeg -map_metadata -1 -c:a libmp3lame -q:a 5 -ar 44100`，8.0MB → 2.8MB
+>   （约 112kbps VBR），落在 `public/music/mia-and-sebastians-theme.mp3`；`/music/:path*` 进
+>   `IMMUTABLE_PATHS`，所以**重编码要换新文件名**，不许原地覆盖。
+> - **唱片有了两种**（`lib/tracks.ts`）：`{ src }` 是自己服务的文件，`{ spotify, netease }` 是
+>   别人服务的流；`trackFile` / `trackUri` / `trackStandIn` 三个取数函数替掉了原来直接读字段的写法。
+> - **播放器**（`components/fx/Jukebox.tsx`）照唱片选机器：自家文件用一个 `<audio loop
+>   preload="none">`——`loop` 天然循环，省掉 Spotify 那套「提前 1.5s `restart()`」，暂停/继续就是
+>   元素自己的位置；`playing` 只认元素的 `play`/`pause`/`error` 事件，浏览器拒掉的那次自动播放
+>   不会点亮招牌，等 document 上第一次 `pointerdown`/`keydown` 再试（与流媒体那条路同一个处理）。
+>   Spotify 的 embed 只在**要放流媒体唱片时**才挂（`streaming = armed && !file && !fallback`）：
+>   只听门口这首的读者从头到尾不加载 Spotify 的脚本；走进房间才建，走回门口连 embed 一起拆掉
+>   （原来是留着 pause）——代价是再进房间要重建一次 controller，脚本已缓存，可接受。
+> - **替身文案**：`RoomMusic` 现在看的是「这首是不是流媒体」而非全局 `fallback`，自托管的唱片
+>   永远印原唱那一行。
+> - **验证**（headless Chrome + chrome-devtools MCP）：首页推门即放，mp3 走 206，`loop=true`、
+>   `duration=198.9`；开关能停能续（26.7s → 27.9s）；进 /moments 时 `<audio>` 卸载、Spotify host
+>   接手，回首页重新挂上从头放；控制台无错。
+> - 顺带改掉 `/lab/neon` 那则研究的 note：里面还写着「未登录 Spotify 只有 30 秒试听」「到不了就退回
+>   网易云」，与门口这首的实现已经不符，改成自托管那一版的说法（双语）。
+
+> **2026-09-16 补记（电影页去掉影评，只留简介与台词）**，覆盖同日「电影成栏目」补记里「一页的节奏」
+> 那一句：
+> - **起因**：用户说每部电影的点评文字太多，「只需要有个大致影片的简介，然后放一些经典台词」。
+> - **去掉**：整个影评乐章（`reviewKicker` / `reviewTitle` / `review1..n`，页面上的 section 连同
+>   `paragraphs(tf, "review")` 一起删）。节奏变成：片名与唱片 → 事实条 → 简介 → 上下两部（仅
+>   大话西游）→ 台词 → 剧照墙 → 署名。
+> - **简介收成一段**：原来两到三段（每段约 100 字）合成一段——大话西游讲到「戴上金箍就不能再有
+>   七情六欲，上下两部就是这一个选择」为止；不能说的秘密讲到「琴房要拆的那天他坐到琴前」为止，
+>   穿越的规则与结局不写进简介，留给台词和剧照。`story1..n` 的渲染保持多段能力，只是现在各只有一段。
+> - `films.subtitle`（列表页那句）删掉「几句我的看法」；README 的栏目清单同步。
+
+> **2026-09-16 补记（Spotify 那条路退役，播放器只剩一个 `<audio>`）**，覆盖 09-04 补记里
+> 整段关于 iFrame API、`restart()` 循环、12s 超时与网易云外链退路的做法：
+> - 四首唱片都有了自己的文件之后，流媒体那条路只剩《你不知道的事》一张没人放的唱片撑着，
+>   用户让它一起退役。删掉的是：`tracks.unknown` 与 `Track` 的 `{spotify, netease}` 分支、
+>   `trackUri` / `trackStandIn`、Jukebox 里整套 iFrame API（脚本注入、`window.__spotifyIframeApi`、
+>   controller、`playback_update` 提前 1.5s `restart()`、`SPOTIFY_TIMEOUT`、`armed` / `streaming`
+>   闩）、网易云 iframe 与 `fallbackSrc`、store 的 `fallback` 状态、`RoomMusic` 的
+>   `fallbackArtist`（四个页面的传参一并删）、`messages` 里每条 `tracks.*.fallbackArtist` 与
+>   `common.musicTitle`（那是给网易云 iframe 的 title）。Jukebox 从 380 行降到 100 行。
+> - 留下的播放器就是**一个 `<audio loop preload="none">`**：`loop` 天然循环所以没有重启逻辑，
+>   暂停/继续是元素自己的位置，`playing` 只认 `play`/`pause`/`error` 事件，浏览器拒掉的第一次
+>   自动播放仍靠 document 上捕获阶段的第一次 `pointerdown`/`keydown` 补救。`.jukebox` 盒子
+>   从 320×152 缩成 0×0：没有跨域 iframe 要养，就不用再为「离屏被节流」留在视口里了。
+> - **要放回一首没有文件的歌**，得把这两条路一起请回来——tracks.ts 顶部的注释写着这句话。
+
+> **2026-09-16 补记（说说板改叫「峰言峰语」，唱片换成 Lovely Day）**，覆盖 09-07 补记里
+> 「说说 · 《多的是你不知道的事》」那个栏目名：
+> - **名字**：栏目标题改成「峰言峰语」——取自「疯言疯语」，两个疯都换成用户名字里的峰；
+>   一言 App 里那本文集本来就叫这个。**只改标题与导航标签，条目本身照旧叫「说说」**
+>   （`count`、`yearAria`、`empty`、/admin 的标题都还是说说），地址仍是 `/moments`。
+> - **英文名 Peak Talk**（用户从 Peak Talk / Peak Nonsense / Loose Talk / 双语并置四个里选的）：
+>   peak 直译那个峰，英文里 peak talk 又读得出「巅峰时刻的胡话」的自嘲，和原梗的语气最近。
+>   英文 subtitle 里用一句把这个双关讲明白，免得英文读者只看到一个没来由的名字。
+> - **唱片**：`tracks.lovely`（Jurrivh 的 Lovely Day，4:01，自托管 3.7MB）。
+>   `ROOM_META["/moments"].track` 与页面一起改。《你不知道的事》因此空了出来，当天晚些时候
+>   连同流媒体那条路一起退役（见上一条补记）。
+
+> **2026-09-16 补记（另外两间房也放自己的录音）**，接着当天「门口那首歌改成自己的文件」那条：
+> - 用户又拿来两份音源：《不能说的秘密》房间的 `周杰伦 - 路小雨.flac`、大话西游房间的
+>   `一生所爱-卢冠廷.mp3`。同一套 `-q:a 5` 重编码进 `public/music/`（`lu-xiaoyu.mp3` 1.3MB、
+>   `a-lifetime-of-love.mp3` 4.0MB），`lib/tracks.ts` 里这两张唱片从 `{spotify, netease}` 改成
+>   `{src}`。四张唱片现在三张是自己的，只剩《你不知道的事》还走 Spotify + 网易云退路——
+>   Jukebox 的两条路都还在用，一条也不能删。
+> - **曲名跟着录音改**：拿到的是原声带里的钢琴曲《路小雨》，不是同名主题曲，所以
+>   `tracks.secret.title` 改成《路小雨》、artist 写「电影《不能说的秘密》原声带」，两处 credit
+>   也照实重写。房间名是电影名，唱片名是实际在放的那一份——不拿房间名去盖录音名。
+> - **源 flac 的坑**：尾部有 3.2 秒静音，`loop` 会在每轮之间空一拍；转码时 `-t 96.8` 截掉并
+>   `afade=t=out:st=96:d=0.8`。源文件本身有一处 `invalid sync code`，但输出与源的 RMS 差
+>   0.006dB（-17.338 / -17.332），内容没丢。门口那首开头有 2.5 秒留白，是原录音的呼吸，不动。
+
+> **2026-09-16 补记（简历收进「关于」：灵动岛从六扇门回到五扇）**，覆盖 09-06 补记「/resume 进主导航」
+> 与 09-14 补记里「六扇常开的门」的句子：
+> - **起因**：用户说「简历也应该是关于的一部分，关于中全部是对于我的介绍」。于是 `me` 这一翼与
+>   `rooms` 那一翼同构：**关于是门，3D 自我介绍与简历是门后的页**，正如生活是门、说说 / 偶像 /
+>   电影是房间。
+> - **只动导航归属，不动地址**：`nav_items` 里 `/resume` 的 surfaces 去掉 `header`（`backup/db.json`
+>   改完 `pnpm db:import`）。URL、外链、SEO、`/admin` 的编辑路径全不变——这是当时三个选项里代价最小
+>   而语义已经足够的那个；搬成 `/about/resume` 要动 sitemap / hreflang / OG 且只换来地址上的层级，
+>   把简历正文并进 /about 则会毁掉它自己的分享地址与打印版。
+> - **代码一行没改就对了**：`lib/nav.ts` 的 `attachMembers` 把同组非门的行挂到前一扇门下，
+>   `isActiveDoor` 让门在成员页上高亮——所以撤下 header 的那一刻，全屏菜单里「简历」自动缩进到
+>   「关于」下面，灵动岛在 /resume 和 /intro 上高亮「关于」。这套规则本来就是为房间写的，这次
+>   原样吃到了作者这一翼。
+> - **关于页多了一节目录**（`meKicker` / `meTitle` / `meItems`）：照生活走廊的行式排版——编号、
+>   页名、一句话、一行 mono 的实数（3D 自我介绍印 `getIntroNodes()` 的站数，简历印经历条数与
+>   `updatedAt` 的月份）。成员读导航表（`group === "me" && !surfaces.includes("header")`），以后
+>   往 `me` 里加页会自己列出来。原来头部那两枚小胶囊（`introTitle` / `introLink` / `resumeTitle` /
+>   `resumeLink`）退役——库里 `copy_blocks` 还留着 `about.introTitle` / `about.introLink` 两行孤儿
+>   覆盖，等在 /admin 里删。
+> - **简历页首加一条「← 关于」**（`print:hidden`：纸上没有返回键）；/intro 的出口本来就有「关于」。
+> - **踩到的坑**：改完 `nav_items` 后 dev 仍旧显示六扇门，`rm -rf .next/cache/fetch-cache` 不够——
+>   Next 16 的 dev 已经不往那儿写了（`.next/cache` 下只有 `images` / `turbopack`）。**要清整个
+>   `.next` 再重启**才看得到新的导航行。
+
+> **2026-09-17 补记（全局审查：`experiments` 表退役，两处后台说明改成实话）**，覆盖 08-26 修订里
+> 「craft 列表在 `experiments` 为空时回落到…」那一句：
+> - **`experiments` 整套删除**：09-14 `/portfolio` 下线时 `CraftList` 一起删了，此后这张表前台
+>   零读取——`/lab` 从头到尾读的是代码里的 `LAB_ENTRIES`——而 `/admin/experiments` 的说明还写着
+>   「这里只管它的说明与排序」，编辑器在改一张没人看的表。删的是：表与 `experiment_status` 枚举
+>   （迁移 `0010`）、`getExperiments`、两个 action、后台页、`counts` / `sections` / 三个脚本里的
+>   登记、`backup/db.json` 里那 4 行（git 历史里还有）。**部署顺序：先上代码，再 `pnpm db:migrate`**
+>   ——线上旧后台的行数查询还点着这张表，先删表会让 /admin 整个 500。
+> - **`works` 不同**：09-14 补记说了留着，所以表、`/admin/works`、`saveWork` 都在；只去掉了没人调
+>   的 `getWorks`，`content.ts` 原位留了一段注释说明第一件作品挂出来时 getter 放哪儿。
+> - **`/admin/copy` 的提示写反了**：原文「清空某一条它就回到文件里的写法」，实际 `merge()` 让空串
+>   覆盖默认值——`footer.timePrefix` / `timeSuffix` / `grove.headline2` 三行正是靠这一点留空的。
+>   改的是提示，不是行为。
+> - **`saveMoment` 归队 `upsertKeyed`**：它原来手写 upsert，是因为 `moments` 有 `updatedAt` 而
+>   `upsertKeyed` 的 UPDATE 不盖这个戳；代价是编辑页开着时那条在别处被删，保存会把它复活。现在
+>   `upsertKeyed` 对带 `updatedAt` 的表自己盖戳，说说和其余按 key 存的表一个契约：新建撞 key 报
+>   「已存在」，编辑遇到已删报「已经不在了」。
+> - **顺手清掉的**：`SpecularEdge.tsx`（零引用）、`nav.portfolio` 文案键、`LIGHT_SCORE_END`（死
+>   常量）、十几个只在本文件内用的符号上多余的 `export`、`gsap-extras` 里没人 import 的再导出
+>   （注册保留）、`retryFetch.ts` 头注释里一句过期的话；`yaml` 只有导出脚本用，挪到 devDependencies。
+
+> **2026-09-17 补记（`public/` 资源改成内容 hash 地址，「换文件名」那条规矩作废）**，覆盖 09-15 补记
+> 「重新切片要换文件夹名」、09-16 补记「重编码要换新文件名，不许原地覆盖」两句：
+> - **起因**：`public/` 不过打包器，文件名没有 hash，一年的 `immutable` 全靠「别原地覆盖」这条人记的
+>   规矩撑着；`/lab/lens` 四张图 08-28 进库时忘了进列表，三周没人发现。
+> - **做法**：`pnpm assets` 给长缓存目录下每个文件算 sha256 前 8 位，写进 `src/lib/assets.gen.json`
+>   （入库）；代码里一律 `asset("/lab/lens/sea.jpg")` → `/lab/lens/sea.c694b7cb.jpg`。`next.config.ts`
+>   的 `beforeFiles` rewrite 把带 hash 的地址映回原文件，**只有带 hash 的地址**发一年 `immutable`，
+>   原地址回到默认的每次再验证。地址形状、目录清单都在 `src/config/immutable.ts`。
+> - **三个目录按整目录算一个 hash**，放在路径段里（`/draco/_b84c9890/draco_decoder.wasm`）：draco
+>   的文件名是 three.js 定的，改不了；90 帧和 174 个字体切片逐个列 hash 会把清单送进客户端包。
+>   `yozai.css` 里的地址由 `pnpm assets` 一并改写。
+> - **不靠记的三道闸**（都在 `pnpm check` 里）：`public/` 下每个文件必须归进某个清单；
+>   `assets.gen.json` 与 `yozai.css` 必须和磁盘上的文件对得上（换了图没跑 `pnpm assets` 就挂）；
+>   源码里指向这些目录的带扩展名字面量必须包在 `asset(` 里。三道都反向验证过会挂。
+> - **没选的路**：静态 `import`（打包器自带 hash）——mp3 / glb / draco 目录 / 按序号拼的 90 帧都走不了，
+>   会变成两套机制；给文件物理改名——仓库里文件名跟着内容变，diff 和引用都难看。
+> - **验证**：dev 与 `next build && next start` 下逐类地址核对状态码与缓存头；headless Chrome 走了
+>   14 个页面，长缓存目录的请求全部带 hash、零 404；`next/image` 经优化器取带 hash 的地址正常。
+>   **Vercel 上优化器回源是否同样过 rewrite，本地验不了，上线后看一眼 `/films` 的剧照。**
+
+> **2026-09-18 补记（横向宣言回到 /about；实验室收下站点自己的效果，每则链源码）**，覆盖
+> 08-28「/about 的横向 pin 改成纵向段落，全站只留推近这一个 pin」那句：
+> - **横穿屏幕的一句话回来了**。08-28 为了「一站一 pin」把它改成原地翻字，但 README 和 §2.1
+>   一直写着它在，用户也点名要。机制抽成 `fx/SidewaysBand`（pin + `containerAnimation` +
+>   SplitText，≥768px 钉住、以下淡入，`resplitKey` 换 locale 重拆），`home/ManifestoBand` 只剩
+>   两行文案。规则改成：**推近钉的是一扇窗，宣言钉的是一句话，两者性质不同，各留一处**。
+> - **实验室从十则扩到二十二则**。第十一则起是站点在用的效果，单独拿出来看：横穿屏幕的一句话、
+>   三种进场（报头行遮罩 / Reveal / 标题解码）、磁吸与描边（后拆成两则）、贴纸（白边 / 墙 / 撕）、两片点阵
+>   （404 粒子 / 关于页点阵名）、推近（首页二三幕原样挂载）、Flip 筛选重排、壳层（开灯拨杆 /
+>   阅读胶囊 / 扇形菜单 / 开灯仪式与招牌的重放按钮 / 换页的雾 / 灵动岛）、铜像、空气（光晕与纸纹
+>   放大五倍）、版本履历（读真实数据）、放映厅（大话西游的墙）。推近、铜像、履历、放映厅直接挂
+>   站点组件，不写 demo 壳；其余八则各一个 `components/lab/*Demo.tsx`。为此 `PostTitle` 加了
+>   `as` / `lang`，`ProgressHud` 导出 `ReadingChip`，`lib/client/overture` / `lib/client/splash` 各加一个
+>   `forget*()` 交回 sessionStorage 钥匙。索引页副标题的数量改成 `{count}` 读表长。
+> - **每则页尾一节「源码」**：`LabEntry.sources` 列出它由哪些文件写成（相对 `src/`），逐个链到
+>   `site.repo/blob/main/src/<path>`（`site.repo` 新增）。`lab.test.ts` 查：序号连续、slug/key 不
+>   重、每个 source 文件存在、两份文案都有 name/tagline/summary/note。
+> - **没做的**：/intro 的 3D 头像、灵动岛、全屏菜单、唱片机不进实验室——前者本身就是一页，后三样
+>   每页都在，壳层那一则只写了它们在哪并链了源码。
+> - **同日补：第五则「两张纸」并入推近**（同日实验室又拆成三十三则，推近落在第 21 则）。`/lab/grove-stage` 与推近用的是同一个
+>   `GroveScene`、同样两张 `GroveCard`、同一组坐标，`page.tsx` 里两者本就共用一段取卡片文案的分支；
+>   它比推近多出来的只有三处构图差异（stage 居中挂 `-440u`、窄画幅保留两张卡、卡片入场播一次而非
+>   scrub），没有新机制。`GroveStageDemo.tsx` 删除，「卡 a 不带 z-index 所以画在 canvas 之下」那段
+>   讲法进了推近的 note，`GroveCard.tsx` 列进推近的源码；旧地址 308 到 `/lab/approach`，
+>   液态金属起序号各前移一位。上面 08-25 补记里关于第五则的段落作历史留着。
+>   第四则「长出来的」不并：它是同一片苔藓的另一份驱动（`GroveDemo.tsx`，相机按树根半径解距离、
+>   三幕挂滚动条、可换季），和首页那份（`GroveScene.tsx`，一世界单位 = 一 CSS 像素、钉在 stage
+>   网格上、跑在时钟上）坐标系不同，卡片钉不进去。**两份 1400 行的渲染代码是下一个该收拢的重复。**
+> - **同日补：「磁吸与描边」拆成两则，磁吸修了两个毛病，实验室二十二则**。`/lab/magnetic` 只剩
+>   三颗按钮，`/lab/glint`（第 13 则，`GlintDemo.tsx`）单独放那张卡；两者机制无关，合在一页只是
+>   都「跟指针」。磁吸的毛病用 CDP 驱动真鼠标量出来的：`Magnetic` 把监听挂在会被 transform 的那层，
+>   ×0.75 时盘子连内层走光标偏移的 1.2 倍、跑得比光标快，光标永远压在它身上，pointerleave 不来，
+>   一颗按钮被拖到离静止位 312px；临界处离开 / 进入来回翻就是抖。改成三层：最外层从不动，只监听
+>   和量盒子，外套 `MAGNET_REACH`（20px）的命中圈；盘子、内层各自 tween。「还在不在」在 pointermove
+>   里按静止盒子加圈算，出圈即松手，与盘子位置无关。demo 把这圈画成虚线。
+> - **同日补：一则只放一种效果，实验室三十三则**。用户定的规矩：**不同的效果不混在一页**——两片点阵、
+>   三种进场、贴纸的三态、壳层的七样，和先前的磁吸与描边一样，合在一页只是「都属于某一类」，机制
+>   互不相干，读者拿到的是一份没人要的对比。于是 `entrances` 拆成报头的行遮罩 / y:24 揭示 / 标题的
+>   解码与揭示（11–13），`stickers` 拆成模切白边 / 贴纸墙 / 撕开的贴纸（16–18），`particles` 拆成
+>   散开又聚回的字 / 噪点里的名字（19–20），`shell` 拆成开灯 / 阅读进度 / 扇形菜单 / 开灯仪式 /
+>   推门 / 换页的雾 / 灵动岛（23–29）；四个混合 demo 文件删除，十五个单效果 demo 共用一个
+>   `StudyPanel.tsx`（一屏高、带色点的标签、下方 hint 与触屏说明，以及 `.spn-btn` / `.spn-body` /
+>   `.spn-arrow` 三个小件）。壳层里的灵动岛以前是「不进实验室」，现在自己一则：它就在这一页头顶，
+>   面板做高一点让人有距离可滚，不用挂任何东西；推门（`forgetSplash` 后整页回首页）与第 08 则霓虹
+>   招牌分开——招牌是画法与点亮，推门是穿过圆环那一下。没拆的两则：Flip 筛选重排是同一个机制的
+>   两处用法，空气的光晕与纸纹本来就是一层叠一层出现的，控件用来把其中一层拿掉看另一层。旧地址
+>   `/lab/entrances`、`/lab/stickers`、`/lab/particles`、`/lab/shell` 从未上线，不留 308。
+> - **同日补：索引分三架、每则给上一则 / 下一则，两处小修**。三十三行平铺成一列（4800px）读不出
+>   目录里本来就有的三段，索引改按 `LabEntry.group`（`piece` / `site` / `shell`，`LAB_GROUPS` 定
+>   顺序）分三架，每架一个 mono 标题、一句话、右侧序号范围（01–09 / 10–26 / 27–33）；为此把铜像、
+>   空气、履历、放映厅四则挪到壳层之前（23–26），壳层七则落 27–33，slug 不变，旧序号的交叉引用
+>   （第 08 则、第 15 则、第 21 则）都不受影响；`lab.test.ts` 查每架连成一段、顺序同 `LAB_GROUPS`、
+>   两份文案都有 title / lede。研究页源码列表之下加 `labNeighbours()` 给的上一则 / 下一则（序号 +
+>   名字），系列能顺着读，不用回索引。两处修：`.lab-tagline` 的 `white-space: nowrap` 在 390px 上把
+>   副标裁掉（霓虹那则的英文副标 658px 宽，桌面 720 版心也放不下），改成能换行、
+>   `overflow-wrap: anywhere`；源码路径手机上不再截断。`sectionMetadata` 不给 subtitle 传值，
+>   `{count}` 版副标题一进库 description 就会变成 `lab.subtitle`，加了第三个参数。库里 `lab.subtitle`
+>   还是「十则」（备份已改、没导入），这次 `db:import` 了；线上要在 /admin 存一次冲缓存，或等下次部署。
+> - **同日补：三十六则，「同属一类也不混」，看不清的则做明显，页头链源码**。用户重申三条：一则一种
+>   效果、哪怕同属一类也不混；每则效果要明显；每则链到 GitHub 源码。据此把先前留着的三则拆开：Flip
+>   拆成「分段控件的药丸」（23，`SegmentedDemo`，只挂 `SegmentedFilter`）与「筛选重排」（24，
+>   `ReshuffleDemo`，筛选按钮故意是普通按钮，不带会滑的指示器）；空气拆成「光晕」（26）与「纸纹」
+>   （27，`GrainDemo`，台子铺一层柔和渐变，关掉纸纹看色带）；标题拆成「标题的解码」（13，只剩拉丁
+>   标题）与「中文标题的行遮罩」（14，`UnmaskDemo`，版心压到 11ch 保证换行）。壳层落 30–36，
+>   推近的 kicker 改成 `第 {ordinal} 则` 由页面填序号，岛的 note 里「第 15 则」改 16。**没拆的**：
+>   霓虹招牌下的剧照墙是那间房的陈设而不是第二种效果；贴纸墙的入场 / 抖 / 扔是一面墙的三种举动；
+>   推近是首页二三幕的一段编排；履历的气泡是年份轨道的一个细节——都还是一件东西。
+>   **效果不明显的五则**（headless 截了 33 则各两张拼板审的）：开灯的拨杆在面板上只是一个点，
+>   `zoom: 2.5`；撕纸 `zoom: 1.6`；阅读胶囊 `zoom: 1.75`（`ReadingChip` 加 `className`）；扇形菜单
+>   桌面上 `md:hidden` 根本不显示，`RadialFab` 加 `always` 让则里所有宽度都挂；换页的雾原来是一个
+>   去关于页的链接，点了就离开——`RouteTransition` 对指向本页的链接直接放行，所以加了
+>   `lib/client/veil.ts` 的 `fhfs:veil-replay` 事件：只在 idle 时受理，cover → 停 350ms → reveal，就地演、
+>   不 push、不滚回顶部；糊上的途中若点了站内链接，链接赢——转成一次真的换页，照常回顶（实测）。用 `zoom` 而不是 `transform: scale`：CSS 过渡随之缩放且不占错布局；
+>   GSAP 动的东西（Flip、SplitText）不用 zoom，getBoundingClientRect 与 transform 在 zoom 下不同尺。
+>   **源码**：页头摘要下加「源码 · GitHub ↗」链到 `sources[0]`（demo 自己的文件），页尾清单照旧。
+>   索引三架变成 01–09 / 10–29 / 30–36。
+
+> **2026-09-19 补记（实验室 24–27：让人看得懂每则在演什么；顺手修掉 /software 的重排 bug）**
+> - **来由**：筛选重排、铜像、光晕、纸纹四则打开只有一块台子和没名字的控件，看不出效果是什么、该做什么。
+> - **共用的三样东西**进了 `StudyPanel`：`lede`（标签下一句「在这里做什么、看什么」）、`.spn-field`
+>   （控件上方印名字）、`.spn-readout`（台子**上方**一行大白话，随当前设置变——说的是「现在看到的是什么」）。
+>   四则的 `summary` 同步改成不带术语的写法，术语留在 `note`。
+> - **24 筛选重排**：多一排「站上原速 / 慢放 4 倍 / 关掉动画」——不是第二个效果，是同一个效果的慢放和缺席
+>   （光晕、纸纹的「关掉」同理）；读数报上一次点击留下 / 淡入 / 淡出各几块；网格定成三行高、底下垫九个
+>   虚线空位，能看出从哪格滑到哪格，下面的内容也不再跳。
+> - **重排 bug（线上也有）**：`/software` 选「桌面应用 → 工具 → 全部」后有一张卡片留着
+>   `visibility: hidden` 和位移——网格里一个看不见的洞。根因是 `revertOnUpdate`：回滚一个**已播完**的
+>   Flip 时，进场那条 `fromTo` 把它创建时（Flip 中途）记下的内联样式写了回来。改法在 `src/lib/client/flipGrid.ts`：
+>   `captureGrid` 在点击里先 `Flip.killFlipsOf(items, true)` 走完、`killTweensOf`、`clearProps`，再
+>   `getState`；`playGrid` 播放；两处都不再用 `revertOnUpdate`。高度那条 tween 由 `SoftwareGallery` 自己
+>   `killTweensOf(grid)`。顺序、慢放、关动画、中途切换、连点都实测回到原位。
+> - **25 铜像**：两个卖点在偶像页上都看不见，所以 `KobeStatue` 加了两个只给实验室用的可选入参——
+>   `wire`（线框，能数出胶囊体）和 `onFrame`（每真画一帧回调一次）。`StatueDemo` 的帧数表直接写 DOM，
+>   不走 React 状态。实测：入场后停住，静止时一帧不涨，转一下才涨。
+> - **27 纸纹的放大镜**：台子的两层再摆一遍、绕小圆圈那点放大 4 倍。只放大尺寸不够——2.5% 的对比放大了
+>   也看不见——所以镜内纸纹强度再 ×8，标签如实写「放大 4 倍 · 对比 ×8」。台子用 `container-type` +
+>   固定宽高比，镜内复制品靠 `100cqw` 还原尺寸；`cqw` 量的是内容盒，所以台子不设 padding，由玻璃卡的 margin 顶。
+> - **顺带发现、没动**：纸纹的 SVG 没有固有尺寸、`background-size` 是 `auto`，浏览器按 contain 把它拉满
+>   整个 300% 的层再平铺——实际不是 250px 的小平铺，噪点被放大了约 10 倍（颗粒约 10–15px 的软斑）。
+>   改成 `background-size: 250px` 会变成细颗粒、位图也小得多，但这是全站观感的改动，留给下次决定。
+
+> **2026-09-19 补记之二（实验室撤掉三则，剩 33 则）**：用户看过之后觉得「翻得动的影集」（原 09）、
+> 「光晕」（原 26）、「纸纹」（原 27）没什么用，删。随之删掉 `AlbumDemo` / `AuroraDemo` / `GrainDemo`、
+> 只有影集在用的 `lib/pageCurl.ts` 及其测试、三则的中英文案；序号顺排，三架变成 01–08 / 09–26 / 27–33；
+> 旧地址 `/lab/album|aurora|grain` 在 `next.config.ts` 里 308 到 `/lab`。站上的光晕层和纸纹层本身
+> 没动——删的只是讲解它们的那两则。上一条补记里「26 光晕」「27 纸纹的放大镜」两段作历史留着；
+> 纸纹 SVG 被拉满平铺的那条发现仍然成立、仍未处理。
+
+> **2026-09-20 补记（实验室改名：标题说清「是什么效果」）**：用户嫌「壳层」这类名字读不懂。规矩：
+> 标题直说效果本身（「磁吸按钮」「跟随指针的边缘高光」「换页毛玻璃过渡」），不用内部代号（壳层、
+> 报头、药丸）、不用只有看过正文才懂的诗化短句（「长出来的，不是建模的」）、不用参数当名字
+> （「y:24 揭示」）；成对的两则用同一个句式分开（「首页大标题 / 中文文章标题逐行升起」）。三架改叫
+> 独立练习 / 页面里的效果 / 全站通用。slug、序号、`lab.items.*` 的 key 都没动；正文里「××那一则」
+> 的旧名同步换了；前六则的 `name` 在 `copy_blocks` 里有覆盖，一并改了 `backup/db.json` 并导库。
+> 以上补记里的旧名作历史留着。
+
+> **2026-09-20 补记之二（全站文案都进后台；清空 = 恢复默认，不再是「那处变空」）**：
+> 起因是「首页的文案在后台能改吗」——`grove.*` / `home.*` 能，`splash.*`（霓虹开场）、
+> 「现居 / 上海」那行 meta、带 `{count}` 的值都不能，因为旧的 `/admin/copy` 是照
+> `copy_blocks` 里现有的 102 行渲染的，表里没有就没有入口。现在反过来：**`messages/*.json`
+> 的 885 行是全集，表只存改过的**。
+> - 后台按命名空间分组进入（`COPY_GROUPS`，`src/lib/copy.ts`），组名按页面起（`grove` 叫
+>   「首页 · 开场大字」），新命名空间没起名字 `copy.test.ts` 会挂。一次编辑一组：885 行
+>   1770 个输入框放一页既慢又让「改一个词」重写全表。
+> - **清空输入框 = 把那行还给文件**，不再是把站上那处变成空白（旧口径作废，原来是靠
+>   `messages/*.json` 里也留空才没出事）。想真的留空，得把默认本身改成空的——页脚时钟
+>   两侧那两条就是。每条改过的行下面印着默认值。
+> - `copy_blocks.zh` / `.en` 改成可空，null = 这一语言照文件走：中文改了标题，英文不会被
+>   钉在当天文件里的那句上。两列都 null 的行直接删掉，所以「改过 N 条」是真数字。
+>   顺带删了 `note` 列——那 5 条提醒是工程知识，搬进 `COPY_NOTES` 常量。
+> - 存之前按默认值校验 ICU：默认没有的 `{参数}` 或 `<标签>` 会被挡下并说清能用哪些
+>   （写多了站上才报错，而且是公开页在报）。少写允许——那是一次真的改写。
+> - 迁移当天库里那 102 行与文件逐字相同（等于没改过任何东西），已清空；
+>   `backup/db.json` 的 `copyBlocks` 随之是 `[]`。这也一并修掉了「改文件默认会被库里的
+>   旧值悄悄盖住」那个老坑。
+
+> **2026-09-24 补记（森林退出封面：首页第一屏说清是谁，正刊改 软件 → 文章 → 此刻）**，覆盖
+> 08-25 修订「首页封面是 grove」、08-26 修订「首页拆成三幕」与「两张纸卡回到推近段里」、09-14
+> 补记「森林是封面画」的句子，以及 09-22 把两张卡换成「最新实验 / 最新说说」那一版：
+> - **起因**：用户说苔藓场景「有点鸡肋，而且和网站的设计风格和主题不符」。审核（线上实测 +
+>   十几个设计工程师个人站 + frontend-design / impeccable / Vercel 等审核清单）的结论与他一致：
+>   推近段在 1440 × 813 下高 2602px（3.2 屏，比正刊三节加起来还高一倍），390 宽下 2532px 只剩
+>   一张卡；灰绿与雾灰不在 §1.1 的色板里，森林与站主的身份（前端、上海、小提琴、电影）没有一处
+>   对得上，而霓虹对得上《爱乐之城》；两张卡装的东西在灵动岛与生活翼里都另有入口。案例侧：
+>   12 个前端 / 设计师名站里 10 个首屏纯文字，结构收敛为「自介 → 现况 → 作品 → 写作 → 联系」，
+>   lab / craft 一律与首页平级、首页只留一句话，没有一个把实验放到首屏。skill 侧最贴切的两句：
+>   frontend-design「boldness 只花在一处」（本站那一处已是霓虹大门），impeccable 的「移除测试」。
+> - **做法**：`page.tsx` 不再挂 `GroveApproach` / `PaperDissolve`；`components/grove/` 整目录保留，
+>   只由实验室两则引用（`/lab/grove` 是苔藓本身，`/lab/approach` 原样挂着旧的二三幕连同两张卡，
+>   `groveCards` 也只剩它一个调用方）。**隐喻从此只有纸、灯、贴纸三样，不再有「森林是封面画」
+>   这个例外。**
+> - **第一屏**（`Opening`）：大字照旧；lede 从「你_不知道的事」（那是说说板的名字，带下划线读起来
+>   像占位符）换成一句身份「我是 fhf，九年前端。写代码，拉小提琴，看很多遍的电影，对世界始终
+>   好奇。」（`grove.lede`，两份语言文件）；09-22 的小人从正刊末节提到第一屏——sm 以上站在导语与
+>   主按钮的右边、脚踩按钮的底线（sm 144px、md 176px），手机上站在大字与导语之间
+>   （`flex-col-reverse`，DOM 里仍在文字之后，Tab 序不先落到他身上）；小人由页面渲染后作
+>   `avatar` 传入，`ChibiArt` 的路径因此仍是服务端组件、不进客户端包。主按钮不动；折线下那行
+>   mono 从「现居」扩成「现居 · 找到我（GitHub / RSS / Email）· 关于我 →」，`AboutTeaser` 删除，
+>   它的三样东西都到了这里。**第一屏收进 720 版心**（同日第二版）：原来的 1080 是 08-26 给
+>   满幅苔藓当参照定的，苔藓一撤，1080 → 720 的收窄只隔一条线，1440 下左边缘从 180px 跳到
+>   360px，读作「第二屏突然变窄」。整页从此一条左边缘，和其它页的页头一样（容器与 `#issue`
+>   同一个盒子：`max-w-[720px] px-6`，gutter 在容器内——gutter 若留在 section 上，桌面上文字会
+>   比正刊靠左 24px、手机上又一致，两处对不齐）；大字仍按视口比例保持一行（1440 下实测约
+>   540px，放得下），写长了允许越过版心右边，这是封面留下的唯一破格。小人在 sm 以上站在导语与
+>   主按钮右边、脚踩按钮底线，手机上站在大字与导语之间。
+> - **主按钮改指实验室**（同日第四版，覆盖 09-14 补记「首页主按钮改指 /software」）：软件提到正刊
+>   第一节之后，用户指出「看看我做的东西」指向的 /software 就摊在按钮下面一屏，同一件事相邻两屏说
+>   两遍，按钮成了滚动条的替身——09-14 定它指软件时，中间还隔着三屏苔藓。三个解法（改指实验室 /
+>   拿掉按钮 / 正刊换回文章在前）里用户选了第一个：实验室是站上最有辨识度的东西，首页却只在
+>   「此刻」里有一行；软件、文章、说说都已各占一节。文案 `grove.cta` 改「去实验室看看 / Into the
+>   lab」，href `/lab`，液态金属那颗按钮留在第一屏。正刊顺序不动。
+> - **正刊**：01 自研软件 → 02 最近文章 → 03 **此刻**（`home/NowStrip.tsx`，
+>   `home.nowTitle`）：三行，各是一间房里最新的一样东西——峰言峰语按时钟最新的一条（不是置顶的
+>   那条）、实验室最后上架的一则（`newestLabEntry`）、GitHub 上最近一次发布（`Release` 多了
+>   `publishedAt`，只有 release 有日期，裸 tag 没有；GitHub 没答上来这一行就不出现）。行式与
+>   最近文章同：左 mono 房名（读 `nav.*`，和门上的字一样）、中间那样东西、右侧 mono 时间戳。
+>   这三行就是原来推近段里两张卡的内容加一行发布，换成正刊的行。`SectionHeader` 的「全部」
+>   链接改为可选——此刻没有一个「全部」可去。正刊顶部留白从 pt-24/32 收到 pt-8/12：第一屏到
+>   正刊之间不再需要材质转场，一条 hairline 加留白即可。
+> - **账**（本地生产构建，Chrome 153 headless 实测）：首页脚本 539KB → **296KB**，不再有 three
+>   的 chunk，`scripts/smoke.mts` 里首页预算从 660 回到普通页的 450（AGENTS.md 的 3D 一节改了
+>   口径：首页零 three.js，保持住）；1440 × 813 下整页 5052px → **2333px**，正刊起点 3415px →
+>   **813px**；390 × 844 下整页 5685px → **2999px**，正刊起点 844px。两种宽度都没有横向溢出。
+> - **页脚改成封底**（同日第三版，覆盖 §2.0「单行式极简」与 09-07「页脚按组成簇、组名只做 aria」）：
+>   用户要页脚「清晰条理，配合导航」。原来十一条链接排成一行、簇间一条 hairline、组名只读屏，
+>   桌面上是一行 13px 的小字，读不出三翼。现在三段：**封面行**（圆环字标 + `home.slogan` 那句
+>   标语，右角是撕开看看的贴纸——从绝对定位的角落改成行内，手机上自成一行，不再需要那条为它
+>   留边的 `clamp` padding，也不会在 1024 宽下压住底行的开关）；**地图**（`grid-cols-2 sm:grid-cols-4`：
+>   正刊 / 房间 / 作者三翼按灵动岛的顺序各一列，列头是 `nav.group*` 的翼名，列内按
+>   `attachMembers` 的顺序门在前、门后的页跟在下面，门用墨色、成员用次级灰——和岛上五扇门的
+>   顺序一致；第四列「找到我」放 GitHub 与 RSS；无组的行塞进第一列开头，后台填错也不会消失）；
+>   **版权行**（hairline 下一行 mono：© · 手工排版 · 上海时钟 · 开灯拨杆，`colophon` 那句 md 以下藏）。
+>   容器与正文同一个盒子 `max-w-[720px] px-6`，页脚的左边缘就是页面的左边缘。仍然没有入场动画、
+>   没有发光；`aria-current` 照旧用墨色加下划线。`footer.findMe` 新增于两份语言文件。
+> - **没做**：`GroveScene`（1385 行）与实验室第 04 则的 `GroveDemo`（1625 行）两份渲染器的合并，
+>   仍是下一个该收拢的重复；方案 B（苔藓缩成正刊后的一张 16:9 插画）与 C（换一个贴题的 3D 场景）
+>   都没采用，理由在审核报告里：B 只解决行程不解决色板与隐喻，C 会再造一套只在首页出现的材质。
+>   `grove.cardLab*` / `cardNote*` 五个键留在 `grove` 命名空间，只有推近那则在读。
+
+> **2026-09-24 补记（另一个 App 上的动态并进峰言峰语）**，接 09-07「242 条一言并进这一栏」的同一条理由：
+> 用户 2019-12 到 2026-08 在 另一个 App 发的 364 条瞬间，也是带时间的短句，放这块板。
+> - **拿法**：app 没有公开 API，走网页版扫码登录后它自己的 `/pc/profile/content/posts`
+>   接口翻页拉全（要带页面自己的几个请求头，细节在记忆里），不是手抄。
+> - **进了 254 条**（`source: app`，`collection: app`——筛选片上多一枚「app」，与两本文集
+>   并列；key 是 `app-<app 的 post id>`，时间取 app 的 `createTime`）。正文洗两样：话题
+>   `<innerTag>#x</innerTag>` 去壳留 `#x`（歌名、演唱会常只在标签里）；app 自家的 13 个
+>   表情占位 `[捂脸哭]` 换成最近的一个 emoji。`original` 一律 true——app 不分原创摘录，
+>   里面的鲁迅、王小波要用户自己在后台改成「摘录」。
+> - **没进的 110 条**：83 条没有字、或只有话题标签当图片题注（图 48 / 视频 20 / 语音 15）——
+>   板子是文字板，**没有为此加图片列**，媒体只在导出的 JSON 里留了 URL；27 条和一言里的
+>   逐字相同（2020 年前后两边同发），留一言那份。
+> - **38 条存成草稿**：app 标了 `ADMIN_LOCK` / `SYSTEM_LOCK` / `UNCHECK_LOCKED2`（平台锁掉、
+>   别人看不到的）和 1 条私密。内容都无害（诗句、引文、一句「没有一场战争是正义的」），
+>   但它们在 app 上本来就不公开，是否放出来是用户的决定，在 `/admin/moments` 逐条改「已公开」。
+> - 板子从 244 条到 **498 条**，仍是整页 SSR、不分页（09-07 的理由不变：几十 KB，一页说的就是
+>   它长）。文案 `moments.subtitle` 两份语言各加了一句 app 的来历。
+>
+> **同日续（图、语音、视频也搬了；板子从此有一列媒体）**，覆盖上面「没有为此加图片列」那句：
+> 用户看过文字版后要求媒体也进来。app 的 224 个附件（图 133 / 语音 34 / 视频 57，原样 920MB）
+> 不登录也能直接下，全部拿到。
+> - **表**：`moments.media` 一列 jsonb，`MomentMedia[]`（`src/lib/moments.ts`）：`image`
+>   带宽高、`audio` 带秒数、`video` 带宽高、秒数和 `poster`。`content` 允许为空——只有图的一条
+>   就是一条只有图的说说（后台的校验改成「正文和媒体不能都空」）。板子的前台仍然是文字优先：
+>   媒体挂在正文下面，图片一张按原比例（最高 32rem）、多张切成 2 或 3 列的方块墙，每张都是
+>   指向文件的链接（无 JS 也能点开）；语音和视频用浏览器原生播放器（同 /secrets 播客那条规矩，
+>   不引播放器库），`preload="none"`——五百条的板子不能一开页就起几十个下载；视频先画封面。
+> - **文件放哪**：图片（最长边 1400、q82、去元数据）、语音（AAC 64k 单声道）、视频封面（≤960 宽
+>   的一帧）进 `public/moments/`（37MB，`IMMUTABLE_DIRS` 多了 `/moments`，照 `asset()` 的规矩
+>   走 hash 地址）；**视频 851MB 进不了仓库也过不了部署**，只重封装（`+faststart`，码流不动）
+>   传到 Vercel Blob 的 `fhfs-media`（东京区，公开读，路径 `moments/app-<post>-<n>.mp4`，缓存
+>   一年）。这是站上**唯一的跨域来源**，只开在 CSP 的 `media-src`。Blob 的读写令牌只连到
+>   Vercel 项目的 development 环境——站点运行时不需要它，上传是本机一次性的事。
+> - **后台**：`/admin/moments` 多一个「图片 / 语音 / 视频」文本域，一行一个文件
+>   （`image /moments/x.jpg 1080x1440`、`audio … 90s`、`video https://… 720x1280 30s
+>   poster=/moments/x.jpg`），`parseMedia` / `formatMedia` 在 `forms.ts` 里，报错带行号；存的时候
+>   用 `asset()` 验一遍站内路径，文件不在清单里就在字段旁边说，而不是等公开页炸。
+> - **账**：文字版跳过的 83 条纯媒体（含 16 条只有话题标签当题注的）现在都进了（其中 9 条照
+>   锁定规则存成草稿），加上 2 条和一言重复但 app 那边带图的（媒体挂到一言那行上）；带媒体的
+>   共 197 条，板子 498 → **581 条**。首页「此刻」与推近段的卡片只引有字的最新一条。
+>
+> **09-28 续**：用户逐条看过那 47 条草稿（38 条锁定 / 私密 + 9 条纯媒体），全部放出，`backup/db.json`
+> 里一律 `draft: false`；板子 581 条全公开。媒体栏同时收紧：图、语音、封面只收站内路径，视频另外只收
+> Blob 那一个来源（`MEDIA_ORIGIN`，`csp.ts`）——别的地址存得进去，却会在公开页上被 next/image
+> 或 CSP 拦下。
+
+> **2026-09-29 补记（六件事：访客看得见的两件，后台顺手的四件）**，覆盖上文与之相悖的句子：
+> 用户从一份按性价比排的建议里挑了六条。
+> - **说说页顶的九年日历**：板子上方一行一年、一格一周（周一起，按含 1 月 1 日的那周算第 0 列，
+>   一年最多 54 格），颜色深浅按那周说了几条分四档，点一格跳到那周最新的一条（卡片有了 `id`）。
+>   服务端画成 SVG，`momentCalendar` 在 `lib/moments.ts` 里测过；没说话的年份也占一行——空着的
+>   那年也是形状的一部分。页面脚本不增加。
+> - **⌘K 全站搜索**：⌘K / Ctrl+K 或在输入框外按 `/` 打开，文章、秘密、软件、33 则研究、电影、
+>   偶像、说说和各个房间都搜得到，回车就去（说说跳到板子上那一条）。索引是每种语言一份的
+>   静态 JSON（`/[locale]/search.json`），弹层自己一个包，第一次打开才下载，不进任何页面的首屏。
+> - **编辑器里直接上传**：说说、文章、秘密、电影、偶像的编辑器都能拖文件进去，直传 Vercel Blob
+>   的 `fhfs-media`（服务端只签名、先验会话），宽高、时长和视频封面在浏览器里量好填上；手机照片
+>   长边压到 2560。09-24 那条「Blob 令牌只连 development 环境、站点运行时不需要它」**作废**：
+>   上传要在线上跑，生产环境要有 `BLOB_READ_WRITE_TOKEN`。CSP 的 `img-src` 也放行了 Blob 的域名，
+>   后台另外放行 Vercel 的上传接口。
+> - **文章预览与草稿预览**：编辑器的「预览」把正文交给保存时那条 markdown 管线渲染（不是第二个
+>   渲染器）；「在站上看」用 Draft Mode 打开真实页面，草稿也看得到，页脚一条横幅可退出。
+> - **手机上一键发说说**：后台首页顶上一个只有正文和图的输入框，时间和 key 按发出那一刻；后台
+>   有了 manifest 和图标，能「添加到主屏幕」。
+> - **电影、偶像搬进数据库**：`films` / `idols` 两张表，每部、每位一行，剧照和照片连同图注、出处都
+>   在行里；后台「房间」下多了「电影」「偶像」，重复的组（剧照、台词、时间线）一行一行地加、删、
+>   排。页面改读表（`/idols/kobe` 变成通用的 `/idols/[slug]`，地址不变），新的一部存成草稿、预览
+>   挂好再公开，不用改代码。科比的铜像仍是代码，只跟着 key `kobe` 出现。文案目录从 903 行减到
+>   634 行——每部片子自己的话搬进了表，留下的是各部共用的框架字。
+> - **顺手**：后台侧栏和首页拿掉了「作品集」（09-14 定的「表和编辑器留着」不变，`/admin/works`
+>   仍能按地址打开，只是不再占一个位置）。
+
+> **2026-09-18 补记（照「网页动效词典」过了一遍：补的是反馈与输入方式，不是新效果）**
+> - **来由**：Punk 的三篇《Vibe Coding 网页动效词典》（56 词，四层：工具 / 触发方式 / 动效类型 / UX 规则）。
+>   第三层的词站上几乎都已经有了（对照见下），所以没有加任何新效果；动的全在第四层——
+>   Feedback、Focus、Input modality——和两条第三层的「用法」（Stagger 别排队、布局过渡别让容器塌）。
+>   往后描述一个动效，按词典的四件事说：**谁触发 → 怎么动 → 结束/离开后怎样 → 键盘和触屏怎么替代**。
+> - **改了的**（每条都在浏览器里量过）：
+>   - `Reveal` / `REVEAL_VARS`：`autoAlpha` → `opacity`。autoAlpha 多出来的 `visibility: hidden` 把折线以下
+>     的内容全部踢出 Tab 序、无障碍树和页内查找（/moments 加载时 242 个元素、36 个控件里的 32 个）；
+>     键盘因此不滚动，不滚动就永不入场。§1.5 写的本来就是 `opacity:0`。
+>   - `Reveal` 的 stagger 只排前 12 个孩子（`STAGGER_TURNS`），其余跟在第 12 个后面一起进：列表只有
+>     一个触发点，78 条 × 0.05s 让跳到年尾的读者对着空白等 4.25s。
+>   - `SoftwareGallery`：Flip 的 `absolute: true` 期间网格高度是 **0**（实测），页脚先跳上来再弹回去。
+>     现在高度由一条补间端着（点击时先读高度、再 `getState`——后者会把还在跑的 flip 直接走完），由
+>     flip 自己的 `onComplete` 松手，因为 stagger 让 flip 比补间长。
+>   - `globals.css`：`:focus-visible` 的 `border-radius: 2px` 挪进 `@layer base`。未分层时它压过所有
+>     `rounded-*`——键盘一聚焦，圆按钮变方、药丸掉角。描边本身仍不分层。
+>   - `Header`：Esc 只在焦点位于岛内时才收岛。宽屏上岛默认展开，这个监听在每一页都活着：原先在任何
+>     地方按 Esc 都会收岛并把焦点抢到汉堡，它的 `preventDefault` 还会拦住放映厅 `<dialog>` 的关闭。
+>   - `RadialFab`：「链接已复制」除了 live region 再加一枚看得见的玻璃小签（加号左侧，两秒，重复复制
+>     只续时不叠加）；收扇时若焦点在四颗按钮上，交还给加号（它们收尾是 `visibility: hidden`）。
+>   - `MomentBoard`：全站唯一的展开/收起不再硬跳——高度 0.35s 补间，收起途中用内联
+>     `-webkit-line-clamp: unset` 把省略号留到落定；按钮加一枚会转向的 `↓`。
+>   - `Workstation`：右下角两颗箭头（一次 π/4，与拖拽同一个 `targetY`），给键盘和正在滚页面的拇指；
+>     从按钮/署名链接上起的按压不再开始拖拽；缩放顶到头之后滚轮还给页面（捏合除外）。
+>   - `FilmStills` 退场时画框缩回 0.96（进来的路倒着走）；`AlbumDemo` 的指针倾斜不理 touch；
+>     `AppCard` / `MiniBento` 的悬停抬升补上键盘的那一半（`group-has-[:focus-visible]` / `focus-visible`）。
+> - **看过、决定不动的**：Reduced motion（词典 55）不扩——§1.5 的例外清单照旧，工作台的空转因此
+>   仍无停止键，是已知的取舍；共享元素转场（50）会和 `RouteTransition` 的状态机抢同一次导航；
+>   数字滚动（44）、光标跟随/拖尾（31/34）、打字机（18）、跟随眼睛（33）站上没有合适的位置，
+>   不为凑词条而加；`FullNav` 那颗只在键盘聚焦时显形的关闭键是有意的；浏览器后退不走帘幕也是有意的。
+> - **词典 → 本站**（第三层，站上已有的）：Line reveal=报头/中文标题行遮罩 · Character reveal=横向宣言逐字 ·
+>   Scramble=拉丁标题解码 · Stagger/Fade/Slide=`Reveal` · Blur+Scale=帘幕与面板的 materialize ·
+>   Clip-path reveal=开灯仪式、推近的窗 · Mask reveal≈溶解着色器 · Horizontal scroll=横向宣言 ·
+>   Scroll zoom=推近 · Sticky scrollytelling=版本履历 · Image sequence=滚动即播放 · Scroll snap=手机软件横滑 ·
+>   Progress indicator=阅读胶囊 · Magnetic=磁吸 · Spotlight=描边的灯 · Pointer-reactive=散字、点阵名 ·
+>   3D（拖着转，不是跟着指针转）=工作台、铜像 · Modal=放映厅、全屏菜单 · Tab=分段药丸 ·
+>   Carousel=放映厅、镜头滑块、影集 · Icon morphing=汉堡→叉、加号→叉 · Layout animation=筛选重排 ·
+>   Page transition=换页的雾 · Toast=扇形菜单的小签 · Accordion=说说的折叠。
+
+> **2026-09-24 补记（一次只响一样东西）**：用户定的规矩——站里播语音或视频时，背景音乐先停；
+> 有一个音视频在播，其它音视频都自动停，不许叠着响。落在唱机上，因为它是全站唯一常驻的播放器：
+> `Jukebox` 在 document 上以捕获阶段听所有 `<audio>` / `<video>` 的 `play` / `pause` / `emptied`
+> （这两个事件不冒泡，但捕获能截到），谁开始播就把其它的都 `pause()`、给 store 写 `held`；最后一个
+> 停了就清 `held`，唱机若还 `wanted` 就自己接着放。`held` 不是「不要」——`wanted` 与 `silenced`
+> 都不动，霓虹灯照亮，只是暂时没声。换路由时旧页面的播放器随页面消失、不发 `pause`，所以唱机在
+> `pathname` 变化时再查一遍。手势兜底同样看 `held`。规矩只有这一处，别在各个播放器里各写一份。
+> - **同一类问题的排查结论**：两样东西必须一致、却只靠人保持一致的地方，当时全部是对的，但没有一处
+>   有东西盯着。现在盯着的：代码里写的图片宽高 ↔ 真实文件、剧照清单 ↔ 目录、帧数 ↔ 帧文件
+>   （`media.test.ts`）；zh/en 文案键对齐；`gsap` 只能经 `@/lib/client/gsap`（oxlint 规则，`GSDevTools` 的
+>   调试用动态 import 是唯一显式豁免）；页面以 `pageLocale` 开头、读库只在 `content.ts` 且只在
+>   `unstable_cache` 里、每个 action 先验会话后失效缓存（`conventions.test.ts`）；schema 里每张表都在
+>   db:check / export / import / 备份里登记（`tables.test.ts`）。
+> - **环境与域名**：`src/config/env.ts` 一处描述全部变量，生产构建/启动时一次性报出所有缺失或畸形的
+>   （此前 admin 两个密钥要到部署后第一次登录才暴露）；`.env.example` 与之由测试保持一致。`site.url`
+>   改从部署读（`SITE_URL` > Vercel 生产域名 > 回落值），绑域名不用再记得改代码。
+> - **CSP**（`src/config/csp.ts`）：脚本与样式保留 `'unsafe-inline'`——nonce 方案要求全站动态渲染，与全量
+>   预渲染冲突，Next 文档明说；其余全部收紧为同源。`'wasm-unsafe-eval'` 与 `blob:` worker 是 Draco
+>   解码器要的，去掉后 `/intro` 当场失败（验证过）。**以后加任何第三方脚本/字体/iframe/请求都要先改这里。**
+> - **`pnpm smoke`**：不引测试框架、不下浏览器，用本机 Chrome 走 CDP 把 sitemap 里每一页开一遍，
+>   抓 4xx、异常、控制台错误（CSP 违规就长这样）、以及没走 `asset()` 的资源请求。CI 第二个任务
+>   `build` 用只读库角色 `ci_readonly`（只能 SELECT，且读不了 `login_attempts`）构建后跑它。
+>   起因很具体：拆 actions 时一个相对 `import()` 少了一层 `../`，tsc 看不出来，只有构建抓到。
+> - **TypeScript 收紧**：加 `noUncheckedIndexedAccess` 等五项。约 340 处里绝大多数是循环边界/定长表
+>   保证有效的下标，用 `!`；WebGL uniform 查找确实可能落空，用 `?? null`（与 WebIDL 对 undefined 的
+>   处理逐位等价）。**唯一有意的行为变化**：`LabStudy` 取文案缺键时抛错——每个实验页都预渲染，所以是
+>   构建失败而不是线上一块空白。
+> - **其余**：`admin/actions.ts`（911 行）按表拆成 `actions/` 目录，函数原样搬；Prettier（钉死 3.9.6，
+>   行宽 100，是改动行数最少的设置；3.9.7 因 pnpm 的发布观察期策略没用）单独一个格式化提交并登记
+>   `.git-blame-ignore-revs`；`.githooks`（pre-commit 自动重算资源清单、查格式与 lint，pre-push 跑
+>   `pnpm check`）；覆盖率只算「有同名测试的模块」（98%，下限 93/88/90/93），顺带给 `markdown.ts` 的
+>   渲染管线补了端到端测试（原先只测了 URL 判定，XSS 防线本身没测）；Dependabot 周更、`sharp`
+>   设下限修掉 high 漏洞；sitemap 静态页不再填构建时间；`pnpm media:music` 取代 README 里那句
+>   ffmpeg；LICENSE 写明代码 MIT、文字与他人媒体不授权。
+> - **没做成的**：字体切分脚本。原始 cn-font-split 参数没留下记录，复现不了现有切片；该工具安装时
+>   还要从 GitHub 拉原生库、跑构建脚本，不适合进依赖。留给「Yozai 按字频重切」那一轮一并定参数。
+>   `three` r186 也没升——小版本常带破坏性改动，要看画面，Dependabot 里已排除并写了原因。
