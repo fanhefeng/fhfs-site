@@ -1,5 +1,5 @@
 import "server-only";
-import { cookies } from "next/headers";
+import { cookies, draftMode } from "next/headers";
 import { redirect } from "next/navigation";
 import { readSession, MAX_AGE_SECONDS, SESSION_COOKIE, type Session } from "./token";
 
@@ -78,4 +78,16 @@ export async function requireAdminPage(): Promise<Session> {
   const session = await adminSession();
   if (!session) redirect("/admin/login");
   return session;
+}
+
+/**
+ * Whether this request may read drafts: Draft Mode is on *and* the session
+ * that turned it on still holds. The mode's cookie lasts until the browser
+ * closes, a session eight hours or until a logout — on the mode alone, a
+ * shared computer went on showing drafts to whoever sat down next. In a
+ * prerender the mode is off and the session cookie is never read, so the
+ * pages that ask stay static.
+ */
+export async function showDrafts(): Promise<boolean> {
+  return (await draftMode()).isEnabled && (await adminSession()) !== null;
 }

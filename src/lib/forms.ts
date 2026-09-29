@@ -61,23 +61,30 @@ export const localizedLines = (form: FormData, key: string) => ({
 /**
  * A comma-separated field as a list: tags, platforms. Either comma — the
  * full-width one a Chinese keyboard produces is the same character to the
- * author, the same way the résumé's grammar takes either pipe.
+ * author, the same way the résumé's grammar takes either pipe. Each item
+ * once: a tag typed twice is one tag, not two pills with the same key and a
+ * post counted twice under it.
  */
-export const list = (form: FormData, key: string): string[] =>
-  str(form, key)
-    .split(/[,，]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+export const list = (form: FormData, key: string): string[] => [
+  ...new Set(
+    str(form, key)
+      .split(/[,，]/)
+      .map((item) => item.trim())
+      .filter(Boolean),
+  ),
+];
 
 /**
  * One row of a repeated group — the stills on a film's wall, the lines it
- * quotes — read the way the whole form is. The admin's `RowsField` names its
+ * quotes, a chip, a nav link — read the way the whole form is. The admin's `RowsField` names its
  * inputs `<group>.<position>.<field>`; the positions arrive in the order the
  * rows stand on the page, and only that order survives here.
  */
 export type FormRow = {
   str: (field: string) => string;
   localized: (field: string) => { zh: string; en: string };
+  /** A checkbox in the row: sent as "on" when ticked, not sent at all when not. */
+  checked: (field: string) => boolean;
 };
 
 /** The rows of one group, in order. A group with none sends no field at all. */
@@ -96,6 +103,7 @@ export function formRows(form: FormData, group: string): FormRow[] {
       return {
         str: (field) => str(form, at(field)),
         localized: (field) => localized(form, at(field)),
+        checked: (field) => form.get(at(field)) === "on",
       };
     });
 }
@@ -157,10 +165,10 @@ export function parseMomentTime(value: string): Date | null {
  * A site-relative path: one leading slash and no way off the site.
  * `//evil.com` also starts with "/" — a browser reads that as
  * protocol-relative — and so does `/\evil.com`, since URL parsing treats a
- * backslash as a slash.
+ * backslash as a slash. So does `/<tab>/evil.com`: the parser deletes every
+ * tab and newline before it reads anything, so no control character gets in.
  */
-export const validPath = (value: string): boolean =>
-  value.startsWith("/") && !value.startsWith("//") && !value.includes("\\");
+export const validPath = (value: string): boolean => /^\/(?!\/)[^\\\p{Cc}]*$/u.test(value);
 
 /**
  * Anything a page renders as an `href` or `src`: a full http(s) URL, or a

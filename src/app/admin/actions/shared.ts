@@ -1,7 +1,7 @@
 import "server-only";
 import { updateTag } from "next/cache";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, type SQL } from "drizzle-orm";
 
 import type { AnyPgColumn, PgInsertValue, PgTable, PgUpdateSetSource } from "drizzle-orm/pg-core";
 
@@ -91,6 +91,20 @@ export function unknownAsset(paths: readonly string[], folder: string): ActionSt
   return null;
 }
 
+/**
+ * Whether a row already answers to this address — asked before a "new" form's
+ * insert rather than read off the insert's result. The driver resends a
+ * statement whose reply broke off on the way back (src/db/index.ts), and the
+ * second try of an insert that did land finds its own row: `ON CONFLICT DO
+ * NOTHING` returns nothing, which used to read as "the key is taken" and left
+ * a saved piece uninvalidated behind an error. Between this look and the
+ * insert only a second editor could slip in, and there is one.
+ */
+async function taken(table: PgTable & { id: AnyPgColumn }, where: SQL | undefined) {
+  const [hit] = await db.select({ id: table.id }).from(table).where(where).limit(1);
+  return hit !== undefined;
+}
+
 /** A table saved by its `key` column — every record list the admin edits
  *  one row at a time. */
 export type KeyedTable = PgTable & { key: AnyPgColumn; id: AnyPgColumn };
@@ -101,9 +115,9 @@ export const goneError = (key: string): ActionState => ({
 
 /**
  * The one save behind every keyed "new / edit" form. `isNew` is the "new"
- * form's promise that it is not overwriting anything: the insert then does
- * nothing on a conflict, and the form gets the exists error back instead of
- * silently replacing whatever had the key. The edit form's promise is the
+ * form's promise that it is not overwriting anything: a key that is already
+ * there comes back as the exists error instead of silently replacing whatever
+ * had it (see `taken` for why that is asked first). The edit form's promise is the
  * opposite — the row exists — so it is an UPDATE by key, and a form left
  * open past a delete gets told rather than quietly resurrecting the row.
  * The columns a table keeps for itself (`id`, `createdAt`) never come from
@@ -117,12 +131,9 @@ export async function upsertKeyed<T extends KeyedTable>(
   isNew: boolean,
 ): Promise<ActionState | null> {
   if (isNew) {
-    const inserted = await db
-      .insert(table)
-      .values(row)
-      .onConflictDoNothing({ target: table.key })
-      .returning({ id: table.id });
-    return inserted.length ? null : existsError(row.key);
+    if (await taken(table, eq(table.key, row.key))) return existsError(row.key);
+    await db.insert(table).values(row).onConflictDoNothing({ target: table.key });
+    return null;
   }
   const set = "updatedAt" in table ? { ...row, updatedAt: new Date() } : row;
   const updated = await db
@@ -198,16 +209,16 @@ export async function upsertLongform<T extends LongformTable>(
   isNew: boolean,
 ): Promise<ActionState | null> {
   if (isNew) {
-    const inserted = await db
+    if (await taken(table, and(eq(table.slug, row.slug), eq(table.locale, row.locale)))) {
+      return {
+        error: `slug 已存在：${row.locale} 下已经有「${row.slug}」了，换一个或去编辑原文。`,
+      };
+    }
+    await db
       .insert(table)
       .values(row)
-      .onConflictDoNothing({ target: [table.slug, table.locale] })
-      .returning({ id: table.id });
-    return inserted.length
-      ? null
-      : {
-          error: `slug 已存在：${row.locale} 下已经有「${row.slug}」了，换一个或去编辑原文。`,
-        };
+      .onConflictDoNothing({ target: [table.slug, table.locale] });
+    return null;
   }
   const updated = await db
     .update(table)
@@ -223,22 +234,4 @@ export async function deleteLongform(table: LongformTable, form: FormData): Prom
   const locale = parseLocale(str(form, "locale"));
   if (!slug || !locale) return;
   await db.delete(table).where(and(eq(table.slug, slug), eq(table.locale, locale)));
-}
-
-/**
- * Chips and nav links are saved as whole lists.
- *
- * Neither has a natural key, both are short and ordered, and both are read as
- * a sequence — so the sequence is what gets edited. Rows arrive numbered by
- * their position in the form; the numbering is thrown away and the order in
- * the list becomes `sort`, which means reordering, adding and removing are all
- * the same operation and none of them can leave a gap behind.
- */
-export function collectRows(form: FormData, prefix: string): string[] {
-  const indices = new Set<string>();
-  for (const key of form.keys()) {
-    const match = new RegExp(`^${prefix}\\.(\\d+)\\.`).exec(key);
-    if (match) indices.add(match[1]!);
-  }
-  return [...indices].sort((a, b) => Number(a) - Number(b));
 }

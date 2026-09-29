@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, getFormatter } from "next-intl/server";
@@ -12,6 +11,7 @@ import {
   getSecret,
   getSecretEditions,
 } from "@/lib/server/content";
+import { showDrafts } from "@/lib/server/auth/session";
 import { ArticleNeighbours, ArticleSummary, FallbackNotice } from "@/components/blog/ArticleParts";
 import { Mdx } from "@/components/blog/Mdx";
 import { PostTitle } from "@/components/blog/PostTitle";
@@ -19,6 +19,7 @@ import { RoomMusic } from "@/components/fx/RoomMusic";
 import { localeAlternates } from "@/lib/server/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/config/site";
+import { asset } from "@/lib/asset";
 
 /** Prerendered for what exists at build time; a new piece renders on first
  *  request — the same contract as /blog/[slug], for the same reason. */
@@ -31,7 +32,7 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/secrets/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const secret = await getSecret(slug, locale, (await draftMode()).isEnabled);
+  const secret = await getSecret(slug, locale, await showDrafts());
   if (!secret) return {};
   const alternates = localeAlternates(
     `/secrets/${slug}`,
@@ -56,11 +57,13 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
   const tt = await getTranslations("tracks.secret");
   const tc = await getTranslations("common");
   const format = await getFormatter();
-  const secret = await getSecret(slug, locale, (await draftMode()).isEnabled);
+  const secret = await getSecret(slug, locale, await showDrafts());
   if (!secret) notFound();
 
   const { older, newer } = await getAdjacentSecrets(secret.slug, locale);
   const isPodcast = secret.kind === "podcast";
+  // A file in public/ by its hashed address; an upload is a Blob URL already.
+  const audio = secret.audio ? asset(secret.audio) : null;
 
   return (
     <main id="main" className="mx-auto w-full max-w-[68ch] flex-1 px-6 pb-28 pt-32 md:pt-40">
@@ -77,8 +80,14 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
           // render this prefix is not where the text lives, and two URLs each
           // claiming to be the article is the thing hreflang exists to avoid.
           url: `${site.url}/${secret.locale}/secrets/${secret.slug}`,
-          ...(isPodcast && secret.audio
-            ? { associatedMedia: { "@type": "MediaObject", contentUrl: secret.audio } }
+          // schema.org wants the file's full URL, not a path on this site.
+          ...(isPodcast && audio
+            ? {
+                associatedMedia: {
+                  "@type": "MediaObject",
+                  contentUrl: audio.startsWith("/") ? `${site.url}${audio}` : audio,
+                },
+              }
             : {}),
         }}
       />
@@ -135,7 +144,7 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
           <FallbackNotice locale={locale}>{t("fallbackNotice")}</FallbackNotice>
         )}
 
-        {isPodcast && secret.audio && (
+        {isPodcast && audio && (
           <figure className="mb-10 rounded-card border border-line bg-surface p-4">
             <figcaption className="mb-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
               {t("listen")}
@@ -145,9 +154,9 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
                 episode's text alternative is its notes, rendered right under
                 it — there is no caption track to point a <track> at. */}
             {/* oxlint-disable-next-line jsx-a11y/media-has-caption */}
-            <audio controls preload="none" src={secret.audio} className="w-full">
+            <audio controls preload="none" src={audio} className="w-full">
               {t("audioUnsupported")}
-              <a href={secret.audio} className="text-accent underline">
+              <a href={audio} className="text-accent underline">
                 {t("audioOpen")}
               </a>
             </audio>

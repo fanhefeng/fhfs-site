@@ -1,6 +1,6 @@
 "use server";
 
-import { headers } from "next/headers";
+import { draftMode, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyPassword } from "@/lib/server/auth/password";
 import { clearAttempts, recordAttempt } from "@/lib/server/auth/throttle";
@@ -51,7 +51,13 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   redirect(typeof next === "string" && next.startsWith("/admin") ? next : "/admin");
 }
 
+/**
+ * Sign out, and out of the draft preview too: its cookie would outlive the
+ * session otherwise (the pages check both, see `showDrafts`), and a preview
+ * banner left behind on a shared computer invites the next person to look.
+ */
 export async function logout(): Promise<void> {
   await clearSessionCookie();
+  (await draftMode()).disable();
   redirect("/admin/login");
 }

@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -11,6 +10,7 @@ import { asset } from "@/lib/asset";
 import { STATUE_IDOL } from "@/lib/idols";
 import { inLocale } from "@/lib/localized";
 import { getIdol, getIdols } from "@/lib/server/content";
+import { showDrafts } from "@/lib/server/auth/session";
 import { localeAlternates } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { KobeStatueStage } from "@/components/idols/KobeStatueStage";
@@ -27,7 +27,7 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/idols/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const idol = await getIdol(slug, (await draftMode()).isEnabled);
+  const idol = await getIdol(slug, await showDrafts());
   if (!idol) return {};
   return {
     title: inLocale(idol.name, locale),
@@ -45,7 +45,7 @@ export async function generateMetadata({
 export default async function IdolPage({ params }: PageProps<"/[locale]/idols/[slug]">) {
   const locale = await pageLocale(params);
   const { slug } = await params;
-  const row = await getIdol(slug, (await draftMode()).isEnabled);
+  const row = await getIdol(slug, await showDrafts());
   if (!row) notFound();
   const idol = inLocale(row, locale);
   const t = await getTranslations("idols");

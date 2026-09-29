@@ -5,7 +5,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession } from "@/lib/server/auth/session";
 
-import { str, validPath } from "@/lib/forms";
+import { formRows, validPath } from "@/lib/forms";
 
 import { TAGS } from "@/lib/server/content";
 
@@ -13,20 +13,20 @@ import { copyCatalogues } from "@/lib/server/copyCatalogue";
 
 import { isNavGroup, NAV_GROUPS } from "@/lib/nav";
 
-import { invalidate, SESSION_EXPIRED, collectRows, type ActionState } from "./shared";
+import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
 
 export async function saveNavItems(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
 
-  const rows = collectRows(form, "nav")
-    .map((i, index) => ({
-      href: str(form, `nav.${i}.href`),
-      labelKey: str(form, `nav.${i}.labelKey`),
-      surfaces: ["header", "footer", "fullnav", "sitemap"].filter(
-        (surface) => form.get(`nav.${i}.surface.${surface}`) === "on",
+  const rows = formRows(form, "nav")
+    .map((row, index) => ({
+      href: row.str("href"),
+      labelKey: row.str("labelKey"),
+      surfaces: ["header", "footer", "fullnav", "sitemap"].filter((surface) =>
+        row.checked(`surface.${surface}`),
       ),
       sort: index,
-      group: str(form, `nav.${i}.group`),
+      group: row.str("group"),
     }))
     .filter((row) => row.href);
 

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -10,6 +9,7 @@ import { asset } from "@/lib/asset";
 import { FILM_FACTS } from "@/lib/films";
 import { inLocale } from "@/lib/localized";
 import { getFilm, getFilms } from "@/lib/server/content";
+import { showDrafts } from "@/lib/server/auth/session";
 import { localeAlternates } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { RoomMusic } from "@/components/fx/RoomMusic";
@@ -29,7 +29,7 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/films/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const film = await getFilm(slug, (await draftMode()).isEnabled);
+  const film = await getFilm(slug, await showDrafts());
   if (!film) return {};
   return {
     title: inLocale(film.title, locale),
@@ -52,7 +52,7 @@ export async function generateMetadata({
 export default async function FilmPage({ params }: PageProps<"/[locale]/films/[slug]">) {
   const locale = await pageLocale(params);
   const { slug } = await params;
-  const row = await getFilm(slug, (await draftMode()).isEnabled);
+  const row = await getFilm(slug, await showDrafts());
   if (!row) notFound();
   const film = inLocale(row, locale);
   const t = await getTranslations("films");

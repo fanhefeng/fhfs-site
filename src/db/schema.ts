@@ -178,7 +178,8 @@ export const moments = pgTable("moments", {
     .notNull()
     .default(sql`'[]'::jsonb`),
   draft: boolean().notNull().default(false),
-  /** Held at the top of the board, and on the home page's card, whatever its date. */
+  /** Held at the top of the board whatever its date. The home page's card
+   *  ignores it: that one is always the newest line. */
   pinned: boolean().notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

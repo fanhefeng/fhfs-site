@@ -8,6 +8,22 @@ import { readSession, SESSION_COOKIE } from "./lib/server/auth/token";
 const intlProxy = createMiddleware(routing);
 
 /**
+ * The /admin paths the check below leaves alone. The login form, and leaving
+ * draft preview, which only takes something away (see its route). And the two
+ * routes the editor calls with `fetch` rather than visits: each checks the
+ * session itself and answers with a status and words the editor shows. A
+ * redirect reaches `fetch` as the login page — a 200 full of HTML — so an
+ * expired session drew the login form inside the preview, and an upload said
+ * only "Failed to retrieve the client token".
+ */
+const PASS_THROUGH = new Set([
+  "/admin/login",
+  "/admin/preview/exit",
+  "/admin/preview/markdown",
+  "/admin/upload",
+]);
+
+/**
  * Two things share this file, and the order matters.
  *
  * `/admin` has to be handled and returned *before* next-intl sees it: the
@@ -37,10 +53,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
-    // Leaving draft preview only takes something away; see its route.
-    if (pathname === "/admin/login" || pathname === "/admin/preview/exit") {
-      return NextResponse.next();
-    }
+    if (PASS_THROUGH.has(pathname)) return NextResponse.next();
 
     const session = await readSession(request.cookies.get(SESSION_COOKIE)?.value);
     if (!session) {

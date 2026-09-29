@@ -150,15 +150,35 @@ async function uploader(folder: UploadFolder, progress: (percent: number) => voi
   const { upload } = await import("@vercel/blob/client");
   return async (body, name, type) => {
     const day = new Date().toISOString().slice(0, 10);
-    const result = await upload(blobPathname(folder, name, type, day), body, {
-      access: "public",
-      handleUploadUrl: "/admin/upload",
-      contentType: type,
-      multipart: body.size > MULTIPART_FROM,
-      onUploadProgress: ({ percentage }) => progress(percentage),
-    });
-    return result.url;
+    try {
+      const result = await upload(blobPathname(folder, name, type, day), body, {
+        access: "public",
+        handleUploadUrl: "/admin/upload",
+        contentType: type,
+        multipart: body.size > MULTIPART_FROM,
+        onUploadProgress: ({ percentage }) => progress(percentage),
+      });
+      return result.url;
+    } catch (error) {
+      throw new Error((await refusal()) ?? (error instanceof Error ? error.message : "上传失败。"));
+    }
   };
+}
+
+/**
+ * Why the route would not sign an upload — an expired session, a deployment
+ * without the store's token — or null when it would. `upload()` reports every
+ * refusal with the same English line and drops the route's words; this asks
+ * for them.
+ */
+async function refusal(): Promise<string | null> {
+  try {
+    const response = await fetch("/admin/upload");
+    if (response.ok) return null;
+    return ((await response.json()) as { error?: string }).error ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function measureAndUpload(file: File, kind: UploadKind, put: Put): Promise<MomentMedia> {

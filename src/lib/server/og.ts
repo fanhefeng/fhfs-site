@@ -87,7 +87,10 @@ async function fetchWithRetry(
 /**
  * Fetches a text-subset font (TTF) from the Google Fonts CSS API for use in
  * ImageResponse (satori). The default fetch user agent receives truetype URLs.
- * Runs at build time only — every OG route is `force-static`.
+ * Runs wherever a card is drawn: at build, and again on the server when a
+ * save invalidates one — the OG routes are `force-static`, but their getters
+ * carry the `content` tag like every page's, so they regenerate the same way.
+ * Hence the retries: a failure there is a request that errors, not a build.
  */
 async function loadGoogleFont(family: string, text: string, weight = 400): Promise<ArrayBuffer> {
   const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(

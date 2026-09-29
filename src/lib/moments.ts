@@ -9,12 +9,13 @@
  */
 
 /**
- * What hangs under a line: a picture, a voice note, a video. `src` is a site
- * path for a file in public/moments/ — app-1-2.jpg there is /moments/app-1-2.jpg,
- * and `asset()` hashes it when the page is drawn — or, for a video too large
- * for the repository, the address in the Blob store. Sizes are the file's
- * own, so the card can reserve the box before the bytes arrive; durations
- * are in seconds.
+ * What hangs under a line: a picture, a voice note, a video. `src` is either
+ * a site path for a file in public/moments/ — app-1-2.jpg there is
+ * /moments/app-1-2.jpg, and `asset()` hashes it when the page is drawn — or
+ * an address in the Blob store: where the app import's videos went, and
+ * where everything uploaded from the editors goes. Sizes are the file's own,
+ * so the card can reserve the box before the bytes arrive; durations are in
+ * seconds.
  */
 export type MomentMedia =
   | { kind: "image"; src: string; width: number; height: number }
@@ -22,7 +23,8 @@ export type MomentMedia =
   | {
       kind: "video";
       src: string;
-      /** A frame of the video, in `public/moments/` like a picture. */
+      /** A frame of the video, stored the way a picture is: in `public/moments/`
+       *  or, for an upload, in the Blob store beside the video. */
       poster: string;
       width: number;
       height: number;

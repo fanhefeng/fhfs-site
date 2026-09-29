@@ -11,6 +11,7 @@ import {
   invalidate,
   readLongform,
   SESSION_EXPIRED,
+  unknownAsset,
   upsertLongform,
   type ActionState,
 } from "./shared";
@@ -36,6 +37,10 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
       error: `音频地址要是站内文件（以单个 / 开头，放在 public/ 下），或 Blob 存储里的文件（${MEDIA_ORIGIN}/…）。别的网站的地址会被页面的安全策略拦下，放不出来。`,
     };
   }
+  // A file under public/ is played from its hashed address, which the page
+  // cannot draw for a path the manifest does not know — see `unknownAsset`.
+  const missing = audio ? unknownAsset([audio], "music") : null;
+  if (missing) return missing;
   if (kind === "podcast" && !audio) {
     return { error: "播客得有音频地址；没有的话先存成随笔。" };
   }

@@ -16,19 +16,14 @@ import { ALL_UPLOAD_TYPES, MAX_UPLOAD_BYTES, validBlobPathname } from "@/lib/upl
  * saved stays in the store unused, which costs a few cents a year at most.
  */
 export async function POST(request: Request) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return Response.json(
-      { error: "这个部署没有配置 BLOB_READ_WRITE_TOKEN，上传不了。" },
-      { status: 503 },
-    );
-  }
+  const refusal = await refused();
+  if (refusal) return refusal;
   try {
     const body = (await request.json()) as HandleUploadBody;
     const json = await handleUpload({
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
-        if (!(await adminSession())) throw new Error("登录过期了，重新登录后再传。");
         if (!validBlobPathname(pathname)) throw new Error("文件名不对。");
         return {
           allowedContentTypes: [...ALL_UPLOAD_TYPES],
@@ -47,4 +42,27 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+}
+
+/**
+ * Whether an upload could start, asked by the editor after one fails:
+ * `upload()` turns any refusal of the POST into "Failed to retrieve the
+ * client token" and never reads the reason, so the reason is here to fetch.
+ */
+export async function GET() {
+  return (await refused()) ?? new Response(null, { status: 204 });
+}
+
+/** Why this request cannot have a token, as the answer to give it — or null. */
+async function refused(): Promise<Response | null> {
+  if (!(await adminSession())) {
+    return Response.json({ error: "登录过期了，重新登录后再传。" }, { status: 401 });
+  }
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return Response.json(
+      { error: "这个部署没有配置 BLOB_READ_WRITE_TOKEN，上传不了。" },
+      { status: 503 },
+    );
+  }
+  return null;
 }

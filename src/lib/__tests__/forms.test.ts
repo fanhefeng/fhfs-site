@@ -79,6 +79,10 @@ describe("list", () => {
     expect(list(form({ tags: "a, b，c,,  d " }), "tags")).toEqual(["a", "b", "c", "d"]);
     expect(list(form({ tags: "" }), "tags")).toEqual([]);
   });
+
+  it("keeps each item once, in the order it first came", () => {
+    expect(list(form({ tags: "notes, js，notes, js" }), "tags")).toEqual(["notes", "js"]);
+  });
 });
 
 describe("validKey", () => {
@@ -139,6 +143,10 @@ describe("validPath / validLink", () => {
     expect(validPath("/")).toBe(true);
     expect(validPath("//evil.com")).toBe(false);
     expect(validPath("/\\evil.com")).toBe(false);
+    // The URL parser drops tabs and newlines first: "/\t/evil.com" is "//evil.com".
+    expect(validPath("/\t/evil.com")).toBe(false);
+    expect(validPath("/\n/evil.com/a.mp3")).toBe(false);
+    expect(validPath("/music/a\u0000.mp3")).toBe(false);
     expect(validPath("blog")).toBe(false);
     expect(validPath("https://a.b")).toBe(false);
   });
@@ -325,6 +333,12 @@ describe("formRows", () => {
 
   it("finds nothing in a group that sent nothing", () => {
     expect(formRows(form({ "parts.x": "1" }), "parts")).toEqual([]);
+  });
+
+  it("reads a row's checkbox as ticked only when the browser sent it", () => {
+    const [row] = formRows(form({ "nav.0.href": "/blog", "nav.0.surface.header": "on" }), "nav");
+    expect(row!.checked("surface.header")).toBe(true);
+    expect(row!.checked("surface.footer")).toBe(false);
   });
 });
 
