@@ -1,5 +1,6 @@
+import "client-only";
 import { gsap } from "@/lib/client/gsap";
-import { watchContextLoss } from "@/lib/client/webgl";
+import { compileProgram, watchContextLoss } from "@/lib/client/webgl";
 import {
   VERT,
   FRAG_SCENE,
@@ -126,26 +127,14 @@ export function mountLiquidMetal({
 
   let disposed = false;
 
-  const shaders: WebGLShader[] = [];
+  // The shared compile (lib/client/webgl): it releases the shaders once
+  // linked, and everything it made when a stage fails. `position` sits at
+  // location 0 by the vertex shader's own layout qualifier.
   const programs: WebGLProgram[] = [];
-  const compile = (type: number, src: string) => {
-    const s = gl.createShader(type)!;
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
-      throw new Error(gl.getShaderInfoLog(s) ?? "shader");
-    shaders.push(s);
-    return s;
-  };
   type Prog = { p: WebGLProgram; u: Record<string, WebGLUniformLocation | null> };
-  const build = (frag: string): Prog => {
-    const p = gl.createProgram()!;
-    gl.attachShader(p, compile(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, frag));
-    gl.bindAttribLocation(p, 0, "position");
-    gl.linkProgram(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS))
-      throw new Error(gl.getProgramInfoLog(p) ?? "link");
+  const build = (frag: string): Prog | null => {
+    const p = compileProgram(gl, VERT, frag, "liquid-metal");
+    if (!p) return null;
     programs.push(p);
     const u: Record<string, WebGLUniformLocation | null> = {};
     const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS) as number;
@@ -158,14 +147,13 @@ export function mountLiquidMetal({
     return { p, u };
   };
 
-  let pScene: Prog, pRim: Prog, pDown: Prog, pBlur: Prog, pComp: Prog;
-  try {
-    pScene = build(FRAG_SCENE);
-    pRim = build(FRAG_RIM);
-    pDown = build(FRAG_DOWN);
-    pBlur = build(FRAG_BLUR);
-    pComp = build(FRAG_COMP);
-  } catch {
+  const pScene = build(FRAG_SCENE);
+  const pRim = build(FRAG_RIM);
+  const pDown = build(FRAG_DOWN);
+  const pBlur = build(FRAG_BLUR);
+  const pComp = build(FRAG_COMP);
+  if (!pScene || !pRim || !pDown || !pBlur || !pComp) {
+    for (const p of programs) gl.deleteProgram(p);
     return unavailable();
   }
 
@@ -603,7 +591,6 @@ export function mountLiquidMetal({
         gl.deleteFramebuffer(t.fbo);
       }
       for (const p of programs) gl.deleteProgram(p);
-      for (const s of shaders) gl.deleteShader(s);
       gl.deleteBuffer(vbo);
       gl.deleteVertexArray(vao);
     }

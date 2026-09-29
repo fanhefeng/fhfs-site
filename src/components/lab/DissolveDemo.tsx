@@ -1,6 +1,5 @@
 "use client";
 
-import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
@@ -8,6 +7,8 @@ import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
 import { releaseRenderer } from "@/lib/client/three/release";
 
 type Props = {
+  /** The photograph, already at its hashed address (the page resolves it). */
+  image: string;
   accent: string;
   hint: string;
   headline: string;
@@ -15,8 +16,6 @@ type Props = {
   tail: string;
   fallbackNote: string;
 };
-
-const IMAGE = asset("/lab/dissolve/forest.jpg");
 
 const VERT = /* glsl */ `
 varying vec2 vUv;
@@ -143,7 +142,7 @@ void main(){
  * four while the threshold is parked, which is what keeps a pinned WebGL
  * canvas from costing anything while the reader is not scrolling.
  */
-export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote }: Props) {
+export function DissolveDemo({ image, accent, hint, headline, body, tail, fallbackNote }: Props) {
   const scope = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
@@ -238,6 +237,19 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
     canvas.addEventListener("webglcontextrestored", onRestored);
 
     let disposed = false;
+    const teardown = () => {
+      if (disposed) return;
+      disposed = true;
+      gsap.ticker.remove(tick);
+      observer?.disconnect();
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVisibility);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
+      uniforms.uTex.value?.dispose();
+      geometry.dispose();
+      material.dispose();
+      releaseRenderer(renderer);
+    };
 
     // One clock for the whole site: gsap.ticker already drives Lenis, and
     // adding a second rAF loop here would fight it for frames.
@@ -267,7 +279,7 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
     loader.load(
-      IMAGE,
+      image,
       (texture) => {
         if (disposed) {
           texture.dispose();
@@ -287,23 +299,16 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
       },
       undefined,
       () => {
-        if (!disposed) setDegraded(true);
+        if (disposed) return;
+        // Nothing will ever be drawn: give the context back now rather than
+        // hold it, and its observers, until the reader leaves the page.
+        teardown();
+        setDegraded(true);
       },
     );
 
-    return () => {
-      disposed = true;
-      gsap.ticker.remove(tick);
-      observer?.disconnect();
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("visibilitychange", onVisibility);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-      uniforms.uTex.value?.dispose();
-      geometry.dispose();
-      material.dispose();
-      releaseRenderer(renderer);
-    };
-  }, []);
+    return teardown;
+  }, [image]);
 
   useGSAP(
     () => {
@@ -360,7 +365,10 @@ export function DissolveDemo({ accent, hint, headline, body, tail, fallbackNote 
   );
 
   return (
-    <div ref={scope} style={{ "--dz-accent": accent } as CSSProperties}>
+    <div
+      ref={scope}
+      style={{ "--dz-accent": accent, "--dz-image": `url("${image}")` } as CSSProperties}
+    >
       <style href="lab-dissolve" precedence="medium">
         {CSS}
       </style>
@@ -401,7 +409,7 @@ const CSS = `
 .dz-stage[data-degraded] .dz-sticky {
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.55) 100%),
-    url("${IMAGE}") center / cover no-repeat,
+    var(--dz-image) center / cover no-repeat,
     #16211a;
 }
 .dz-sticky {

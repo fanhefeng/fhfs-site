@@ -13,7 +13,8 @@ const RIPPLE = 5;
  * Without it the study is still a working slider, a plain change of picture.
  *
  * Returns the teardown, or `null` when no renderer could be built — `onFail`
- * has then already been called.
+ * has then already been called. If the pictures fail to load, it tears itself
+ * down before calling `onFail`; the teardown it returned is then a no-op.
  */
 export function mountLens({
   canvas,
@@ -171,11 +172,16 @@ export function mountLens({
       onLive(bind);
     },
     () => {
-      if (!disposed) onFail();
+      if (disposed) return;
+      // Nothing will be drawn: the context goes back now, not when the
+      // reader leaves the page. The slider carries on as a plain slider.
+      teardown();
+      onFail();
     },
   );
 
-  return () => {
+  function teardown() {
+    if (disposed) return;
     disposed = true;
     gsap.ticker.remove(tick);
     observer?.disconnect();
@@ -186,5 +192,6 @@ export function mountLens({
     geometry.dispose();
     material.dispose();
     releaseRenderer(renderer);
-  };
+  }
+  return teardown;
 }

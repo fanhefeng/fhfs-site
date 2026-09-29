@@ -37,10 +37,26 @@ describe("splitText", () => {
     expect(flatten(splitText("，").lines[0]!)).toEqual(["，"]);
   });
 
-  it("breaks a Latin run before CJK punctuation rather than into it", () => {
-    // "ab" is still in the pending buffer when "，" arrives, so there is no
-    // finished word to attach to; the run is flushed and "，" stands alone.
-    expect(flatten(splitText("ab，").lines[0]!)).toEqual(["ab", "，"]);
+  it("hangs CJK punctuation on a Latin run, and breaks after it", () => {
+    expect(flatten(splitText("ab，").lines[0]!)).toEqual(["ab，"]);
+    expect(flatten(splitText("React，好").lines[0]!)).toEqual(["React，", "好"]);
+  });
+
+  it("hangs the closing marks that are not CJK themselves", () => {
+    // ” … — are outside every CJK block, and used to open a word of their own.
+    expect(flatten(splitText("“你好”……").lines[0]!)).toEqual(["“", "你", "好”……"]);
+    expect(flatten(splitText("好——走").lines[0]!)).toEqual(["好——", "走"]);
+  });
+
+  it("keeps a Latin mark inside its word", () => {
+    expect(flatten(splitText("it’s 50%").lines[0]!)).toEqual(["it’s", " ", "50%"]);
+  });
+
+  it("does not take Hangul, or a compatibility ideograph's twin range, for CJK", () => {
+    // Korean breaks between words, not between syllables.
+    expect(flatten(splitText("안녕 하세요").lines[0]!)).toEqual(["안녕", " ", "하세요"]);
+    // U+F900 itself is still one.
+    expect(flatten(splitText("\uF900\uF901").lines[0]!)).toEqual(["\uF900", "\uF901"]);
   });
 
   it("treats a tab like a space", () => {
@@ -49,14 +65,19 @@ describe("splitText", () => {
   });
 
   it("keeps a surrogate pair as one glyph", () => {
-    // The emoji is one char with one index, never two halves. (Its high
-    // surrogate happens to satisfy the CJK test, so it also stands as its
-    // own word rather than gluing to the "a" — that is the current
-    // behaviour, pinned rather than endorsed.)
+    // The emoji is one char with one index, never two halves, and it is not
+    // CJK: it glues to the Latin run beside it.
     const { lines, total } = splitText("👍a");
-    expect(flatten(lines[0]!)).toEqual(["👍", "a"]);
-    expect(lines[0]![0]!.chars).toEqual([{ char: "👍", index: 0 }]);
+    expect(flatten(lines[0]!)).toEqual(["👍a"]);
+    expect(lines[0]![0]!.chars).toEqual([
+      { char: "👍", index: 0 },
+      { char: "a", index: 1 },
+    ]);
     expect(total).toBe(2);
+  });
+
+  it("splits an ideograph outside the BMP like any other", () => {
+    expect(flatten(splitText("𠀀好").lines[0]!)).toEqual(["𠀀", "好"]);
   });
 
   it("returns one empty line for the empty string", () => {

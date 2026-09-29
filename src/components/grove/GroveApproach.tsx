@@ -140,10 +140,14 @@ export function GroveApproach({ caption, cards }: Props) {
     });
     io.observe(pin);
 
-    const tick = () => {
+    // 0.055 of the way per sixtieth of a second, whatever the display's rate
+    // — the same curve GroveScene's camera eases by (`ease` there). Per tick,
+    // a 120 Hz screen moved the cards twice as fast as the moss they stand on.
+    const tick = (_time: number, deltaMs: number) => {
       if (!onScreen) return;
-      smooth.x += (pointer.x - smooth.x) * 0.055;
-      smooth.y += (pointer.y - smooth.y) * 0.055;
+      const k = 1 - Math.pow(1 - 0.055, deltaMs * 0.06);
+      smooth.x += (pointer.x - smooth.x) * k;
+      smooth.y += (pointer.y - smooth.y) * k;
       const nx = (Math.round(smooth.x * 1000) / 1000).toString();
       const ny = (Math.round(smooth.y * 1000) / 1000).toString();
       if (nx === lastX && ny === lastY) return;

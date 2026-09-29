@@ -4,8 +4,6 @@ import {
   jukebox,
   releaseMusic,
   reportFailure,
-  reportGesture,
-  reportPlayback,
   roomStart,
   roomStop,
   setTrack,
@@ -20,8 +18,6 @@ describe("the jukebox store", () => {
   it("starts dark, on the theme, with nobody having said no", () => {
     expect(jukebox()).toEqual({
       wanted: false,
-      playing: false,
-      gestured: false,
       track: DEFAULT_TRACK,
       silenced: false,
       held: false,
@@ -64,19 +60,19 @@ describe("the jukebox store", () => {
   });
 
   it("hands out a new snapshot only when something changed", () => {
-    reportGesture();
     const before = jukebox();
-    reportGesture();
+    releaseMusic();
     expect(jukebox()).toBe(before);
-    expect(before.gestured).toBe(true);
+    holdMusic();
+    expect(jukebox()).not.toBe(before);
+    releaseMusic();
   });
 
   // Every sign reads `wanted`: a record that will not load has to put the
   // lights out, or the sign stays lit over silence.
   it("switches off when the record fails to load, without calling it the reader's no", () => {
     wantMusic();
-    reportPlayback({ playing: true });
     reportFailure();
-    expect(jukebox()).toMatchObject({ wanted: false, playing: false, silenced: false });
+    expect(jukebox()).toMatchObject({ wanted: false, silenced: false });
   });
 });

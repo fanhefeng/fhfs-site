@@ -53,6 +53,10 @@ export function JukeboxSwitch({ className = "" }: { className?: string }) {
     () => {
       const lit = litRef.current;
       if (!lit) return;
+      // A flicker still running from the last press would go on writing its
+      // opacities over this one: switched off within a fifth of a second, the
+      // note ended lit over silence.
+      gsap.killTweensOf(lit);
       if (!wanted) {
         gsap.set(lit, { opacity: 0 });
         return;

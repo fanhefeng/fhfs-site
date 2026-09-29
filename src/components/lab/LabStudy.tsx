@@ -1,6 +1,5 @@
 "use client";
 
-import { asset } from "@/lib/asset";
 import dynamic from "next/dynamic";
 import type { LabSlug } from "./entries";
 import { LENS_SLIDES } from "./lensSlides";
@@ -121,9 +120,15 @@ type Props = {
   wall?: { ratio: FilmRatio; stills: StillItem[] };
   /** The photograph standing in for the statue, resolved by the page. */
   standIn?: { src: string; width: number; height: number };
+  /**
+   * The files in public/ a study draws, by name, already at their hashed
+   * addresses. Resolved by the page, not here: `asset()` in a client
+   * component bundles the whole manifest into the scripts of every study.
+   */
+  files?: Record<string, string>;
 };
 
-export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: Props) {
+export function LabStudy({ slug, accent, text, entries, cards, wall, standIn, files }: Props) {
   // The page fills `text` key by key from a list it keeps by hand. A key it
   // forgot used to arrive here as `undefined` and render as a blank; every
   // study is prerendered, so throwing turns that into a failed build instead.
@@ -139,10 +144,12 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: 
       throw new Error(`lab study "${slug}" needs ${name}, which the page never set`);
     return value;
   };
+  const file = (name: string): string => need(files?.[name], `files.${name}`);
   switch (slug) {
     case "scroll-video":
       return (
         <ScrollVideoDemo
+          frames={file("frames")}
           accent={accent}
           hint={s("hint")}
           loading={s("loading")}
@@ -160,7 +167,7 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: 
           fallback={(why) => (
             <StageFallback
               accent={accent}
-              image={asset("/lab/dissolve/forest.jpg")}
+              image={file("image")}
               backdrop="#16211a"
               headline={s("headline")}
               body={s("body")}
@@ -170,6 +177,7 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: 
           )}
         >
           <DissolveDemo
+            image={file("image")}
             accent={accent}
             hint={s("hint")}
             headline={s("headline")}
@@ -195,7 +203,7 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: 
           fallback={(why) => (
             <StageFallback
               accent={accent}
-              image={asset("/grove/moss-plate.webp")}
+              image={file("plate")}
               backdrop="#4a4d44"
               headline={s("headline")}
               body={s("body")}
@@ -263,7 +271,7 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: 
           prevLabel={s("prev")}
           nextLabel={s("next")}
           slides={LENS_SLIDES.map((name) => ({
-            src: asset(`/lab/lens/${name}.jpg`),
+            src: file(name),
             alt: s(`${name}Alt`),
             title: s(`${name}Title`),
             body: s(`${name}Body`),

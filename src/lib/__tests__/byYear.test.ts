@@ -33,7 +33,17 @@ describe("groupByYear", () => {
 describe("yearOfDate", () => {
   it("reads the year off the string, not through a Date", () => {
     expect(yearOfDate({ date: "2026-01-01" })).toBe("2026");
-    // A Date would move this one back a day — and a year — west of UTC.
-    expect(yearOfDate({ date: "2024-01-01" })).toBe("2024");
+    // A Date would move this one back a day — and a year — west of UTC. CI
+    // runs in UTC and this machine east of it, where a Date gets it right by
+    // luck; so the test goes west, and first checks that it got there.
+    const zone = process.env.TZ;
+    process.env.TZ = "America/Los_Angeles";
+    try {
+      expect(new Date("2024-01-01").getFullYear()).toBe(2023);
+      expect(yearOfDate({ date: "2024-01-01" })).toBe("2024");
+    } finally {
+      if (zone === undefined) delete process.env.TZ;
+      else process.env.TZ = zone;
+    }
   });
 });

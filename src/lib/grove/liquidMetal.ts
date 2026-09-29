@@ -196,7 +196,7 @@ export const RIPPLE_SLOTS = 3;
 
 /** A single oversized triangle. `#version` has to be byte one of the source. */
 export const VERT = `#version 300 es
-in vec2 position; void main(){ gl_Position = vec4(position, 0., 1.); }`;
+layout(location = 0) in vec2 position; void main(){ gl_Position = vec4(position, 0., 1.); }`;
 
 const HEAD = `#version 300 es
 precision highp float;

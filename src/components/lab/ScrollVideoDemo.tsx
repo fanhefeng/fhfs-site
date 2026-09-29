@@ -1,6 +1,5 @@
 "use client";
 
-import { asset } from "@/lib/asset";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
@@ -10,6 +9,10 @@ import { ScrollVideo } from "@/lib/client/scrollVideo";
 import manifest from "../../../public/lab/scroll-video/manifest.json";
 
 type Props = {
+  /** The frames' folder at its hashed address — one hash for the whole folder,
+   *  as a path segment (ninety file hashes would be ninety lines of manifest
+   *  shipped to draw one canvas). The page resolves it. */
+  frames: string;
   accent: string;
   hint: string;
   loading: string;
@@ -21,9 +24,6 @@ type Props = {
   failed?: string;
 };
 
-// One hash for the whole folder, as a path segment — ninety file hashes would
-// be ninety lines of manifest shipped to draw one canvas.
-const FRAMES = asset("/lab/scroll-video/frames/");
 /** First pass fetches every Nth frame; the loader ring tracks that pass only. */
 const WARMUP_STEP = 6;
 const FRAME_COUNT = manifest.frameCount;
@@ -38,6 +38,7 @@ const FRAME_COUNT = manifest.frameCount;
  * layer is pinned, so the canvas holds the viewport for five screens.
  */
 export function ScrollVideoDemo({
+  frames,
   accent,
   hint,
   loading,
@@ -69,7 +70,7 @@ export function ScrollVideoDemo({
       canvas,
       frameCount: FRAME_COUNT,
       src: (n) =>
-        `${FRAMES}${manifest.pattern.replace("%d", String(n).padStart(manifest.padding, "0"))}`,
+        `${frames}${manifest.pattern.replace("%d", String(n).padStart(manifest.padding, "0"))}`,
       warmupStep: WARMUP_STEP,
       onProgress: (loaded, total) => {
         if (cancelled) return;
@@ -97,7 +98,7 @@ export function ScrollVideoDemo({
       player.destroy();
       playerRef.current = null;
     };
-  }, []);
+  }, [frames]);
 
   useGSAP(
     () => {

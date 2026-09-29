@@ -83,8 +83,8 @@ function LoadingOverlay({ label, onStalled }: { label: string; onStalled: () => 
   // percentage it reached — nothing threw, so the boundary above never hears
   // about it. Latch on the queue having been busy, then treat "drained, still
   // no mesh" as the failure it is. The latch is what keeps a stale 100% left
-  // in drei's page-global progress store (the /about workstation writes to the
-  // same one) from firing this before our own load has even started.
+  // in drei's page-global progress store (it listens to three's default
+  // loading manager, which every scene the reader passed through wrote to) from firing this before our own load has even started.
   const [started, setStarted] = useState(false);
   useEffect(() => {
     if (active) setStarted(true);
@@ -157,10 +157,16 @@ export default function AvatarCanvas({ tone, onScreen, loadingLabel, onFailed }:
         // and rebuilds its state on `webglcontextrestored`. What it cannot do
         // is ask for the frame that would put the result on screen — under
         // "demand" no scroll or theme change is coming, so a recovered scene
-        // would sit on whatever image it had drawn before the loss. The
-        // listener dies with the canvas element R3F owns.
+        // would sit on whatever image it had drawn before the loss. Nor does
+        // it redraw the shadow map: it keeps `needsUpdate` as it was, and with
+        // `autoUpdate` off (AvatarScene) the face would come back lit as if
+        // wholly in shadow. The listener runs after three's own, and dies with
+        // the canvas element R3F owns.
         onCreated={({ gl }) => {
-          gl.domElement.addEventListener("webglcontextrestored", () => renderOnDemand.request());
+          gl.domElement.addEventListener("webglcontextrestored", () => {
+            gl.shadowMap.needsUpdate = true;
+            renderOnDemand.request();
+          });
         }}
         camera={{ position: [0, 0.2, 4.4], fov: 32, near: 0.1, far: 100 }}
       >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, type MutableRefObject } from "react";
+import { useEffect, useMemo, useState, type MutableRefObject } from "react";
 import { Canvas, invalidate, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
@@ -289,6 +289,10 @@ export default function KobeStatue({ spin, onScreen, onReady, wire, onFrame }: P
   useEffect(() => {
     if (onScreen) invalidate();
   }, [onScreen]);
+  // Bumped when a lost context comes back: the environment map is drawn once
+  // (`frames={1}`), its texture went with the context, and only a fresh
+  // <Environment> draws it again — without one the bronze came back dull.
+  const [restored, setRestored] = useState(0);
 
   return (
     <Canvas
@@ -302,7 +306,10 @@ export default function KobeStatue({ spin, onScreen, onReady, wire, onFrame }: P
         // Framed on the whole monument, finger to plinth, with a little air.
         camera.lookAt(0, 0.82, 0);
         // A recovered context has nothing to prompt a frame under "demand".
-        gl.domElement.addEventListener("webglcontextrestored", () => invalidate());
+        gl.domElement.addEventListener("webglcontextrestored", () => {
+          setRestored((n) => n + 1);
+          invalidate();
+        });
       }}
     >
       {/* Dusk on a plaza: a warm key from the front-right, a cool rim from
@@ -312,7 +319,7 @@ export default function KobeStatue({ spin, onScreen, onReady, wire, onFrame }: P
       <directionalLight position={[-4, 3, -3]} intensity={1.3} color="#bcd0ff" />
       {/* The bronze wants something to reflect. Three panels of light,
           rendered into an environment map once — no HDR file fetched. */}
-      <Environment resolution={128} frames={1}>
+      <Environment key={restored} resolution={128} frames={1}>
         <Lightformer intensity={2} position={[0, 5, -9]} scale={[10, 10, 1]} color="#fff4e0" />
         <Lightformer
           intensity={1.2}

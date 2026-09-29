@@ -8,8 +8,7 @@ import { DEFAULT_TRACK, type TrackId } from "../tracks";
  * switch for the same music, and the player itself (`components/fx/Jukebox`)
  * lives in the locale layout so the tune survives a route change.
  *
- * Signs write `wanted`; the player reads it and reports back `playing`.
- * Rooms write `track` — the board and the secrets each play the
+ * Signs write `wanted`, and the player reads it. Rooms write `track` — the board and the secrets each play the
  * song they are named after, and hand the theme back on the way out. The
  * player alone writes `held`: while a voice note, a video or the podcast is
  * playing, the record waits (there is never more than one thing sounding
@@ -20,10 +19,6 @@ import { DEFAULT_TRACK, type TrackId } from "../tracks";
 export type JukeboxState = {
   /** A sign is lit somewhere: the reader wants music. */
   wanted: boolean;
-  /** Sound is actually coming out (as far as the player can tell). */
-  playing: boolean;
-  /** The reader has clicked or typed on the page: a browser will allow sound now. */
-  gestured: boolean;
   /** Which record is on — see `lib/tracks`. */
   track: TrackId;
   /**
@@ -46,8 +41,6 @@ export type JukeboxState = {
 
 const INITIAL: JukeboxState = {
   wanted: false,
-  playing: false,
-  gestured: false,
   track: DEFAULT_TRACK,
   silenced: false,
   held: false,
@@ -102,10 +95,7 @@ export const roomStart = () => set({ wanted: true });
 /** The room's music off again on the way out — likewise not a "no" from the reader. */
 export const roomStop = () => set({ wanted: false });
 
-/** For the player only. */
-export const reportPlayback = (patch: Pick<JukeboxState, "playing">) => set(patch);
-export const reportGesture = () => set({ gestured: true });
-/** Something else on the page started playing: the record steps aside. */
+/** For the player only. Something else on the page started playing: the record steps aside. */
 export const holdMusic = () => set({ held: true });
 /** Nothing else is playing any more: the record may go on again, if it is wanted. */
 export const releaseMusic = () => set({ held: false });
@@ -115,4 +105,4 @@ export const releaseMusic = () => set({ held: false });
  * what happened. The light going out again is the message. Not the reader's
  * "no", so `silenced` stays as it was and the next press tries again.
  */
-export const reportFailure = () => set({ wanted: false, playing: false });
+export const reportFailure = () => set({ wanted: false });

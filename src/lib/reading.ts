@@ -1,5 +1,5 @@
 /** CJK ideographs and kana — counted per character, unlike Latin words. */
-const CJK = /[぀-ヿ㐀-鿿豈-﫿]/g;
+const CJK = /[\u3040-\u30FF\u3400-\u9FFF\uF900-\uFAFF]/g;
 
 /** The display-layer question — "is there any CJK in this string at all?" —
  *  which decides italics and title animations rather than reading speed. */

@@ -12,6 +12,7 @@ import {
   labNeighbours,
   sourceUrl,
   type LabEntry,
+  type LabSlug,
 } from "@/components/lab/entries";
 import { GROVE_PALETTE_KEYS, GROVE_PALETTES } from "@/lib/grove/palettes";
 import { StudySpec, type SpecRow } from "@/components/lab/StudySpec";
@@ -165,6 +166,19 @@ const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
   ],
   changelog: ["lede"],
   screening: ["lede"],
+};
+
+/**
+ * The files in public/ each study's client side draws, hashed here on the
+ * server and handed down by name (`LabStudy`'s `files`): an `asset()` call in
+ * the client bundles the whole manifest into every study's scripts.
+ */
+const STUDY_FILES: Partial<Record<LabSlug, () => Record<string, string>>> = {
+  "scroll-video": () => ({ frames: asset("/lab/scroll-video/frames/") }),
+  dissolve: () => ({ image: asset("/lab/dissolve/forest.jpg") }),
+  grove: () => ({ plate: asset("/grove/moss-plate.webp") }),
+  "lens-slider": () =>
+    Object.fromEntries(LENS_SLIDES.map((name) => [name, asset(`/lab/lens/${name}.jpg`)])),
 };
 
 /**
@@ -354,6 +368,7 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
         cards={cards}
         wall={wall}
         standIn={standIn}
+        files={STUDY_FILES[entry.slug]?.()}
       />
 
       <section className="mx-auto w-full max-w-[720px] px-6 pb-28 pt-20">

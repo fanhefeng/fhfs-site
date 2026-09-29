@@ -2,15 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import {
-  holdMusic,
-  jukebox,
-  releaseMusic,
-  reportFailure,
-  reportGesture,
-  reportPlayback,
-  useJukebox,
-} from "@/lib/client/jukebox";
+import { holdMusic, jukebox, releaseMusic, reportFailure, useJukebox } from "@/lib/client/jukebox";
 import type { TrackFiles } from "@/lib/tracks";
 
 /** Players whose file would not load: `paused` still reads false on them. */
@@ -69,7 +61,6 @@ export function Jukebox({ files }: { files: TrackFiles }) {
   // Browsers only let a page make sound once the reader has touched it.
   useEffect(() => {
     const onGesture = () => {
-      reportGesture();
       const el = audioRef.current;
       const { wanted, held } = jukebox();
       if (wanted && !held && el?.paused) void el.play().catch(() => {});
@@ -147,26 +138,17 @@ export function Jukebox({ files }: { files: TrackFiles }) {
     if (!playing) releaseMusic();
   }, [pathname]);
 
-  // The element is the source of truth for `playing` — and `playing` is the
-  // event that means sound, where `play` only means the request was accepted.
-  // These files are one to four megabytes behind `preload="none"`, so the gap
-  // between the two is the whole of the first buffer. Deliberately no
-  // `waiting` handler: a stall mid-track would flicker the state off and on,
-  // and the track is still the one playing.
+  // A record that will not load puts the signs out (`reportFailure`), and a
+  // record taken off — the room changed the track — stops before the next
+  // one goes on. (The store used to carry `playing` and `gestured` as well;
+  // nothing read them, and every play and pause re-rendered every switch.)
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
-    const onPlay = () => reportPlayback({ playing: true });
-    const onStop = () => reportPlayback({ playing: false });
-    el.addEventListener("playing", onPlay);
-    el.addEventListener("pause", onStop);
     el.addEventListener("error", reportFailure);
     return () => {
-      el.removeEventListener("playing", onPlay);
-      el.removeEventListener("pause", onStop);
       el.removeEventListener("error", reportFailure);
       el.pause();
-      reportPlayback({ playing: false });
     };
   }, [file]);
 

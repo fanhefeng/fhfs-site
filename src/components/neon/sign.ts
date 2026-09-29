@@ -60,6 +60,12 @@ export type NeonSign = {
   powerOn: () => void;
   powerOff: () => void;
   toggle: () => void;
+  /**
+   * The light alone, to match music that changed somewhere else — the note on
+   * the island, a record that would not load. It does not write back: a load
+   * failure put through `powerOff` became the reader's own "no" (`silenced`).
+   */
+  follow: (on: boolean) => void;
   /** One tube loses its nerve for a moment under the pointer. */
   stutter: () => void;
   /** Stops everything that moves on its own — the door's way in. */
@@ -111,8 +117,8 @@ export function wireNeonSign({
   writeOffScore(off, lit, [spill], EASE.exit);
 
   let welcomed = false;
-  const powerOn = () => {
-    if (poweredRef.current || held()) return;
+  const lightOn = (): boolean => {
+    if (poweredRef.current || held()) return false;
     poweredRef.current = true;
     setPowered(true);
     off.pause(0);
@@ -131,16 +137,23 @@ export function wireNeonSign({
         },
       );
     }
-    wantMusic();
     main.restart();
+    return true;
   };
-  const powerOff = () => {
-    if (!poweredRef.current || held()) return;
+  const lightOff = (): boolean => {
+    if (!poweredRef.current || held()) return false;
     poweredRef.current = false;
     setPowered(false);
     main.pause();
     off.restart();
-    stopMusic();
+    return true;
+  };
+  // The switch: the light, and the reader's word on the music with it.
+  const powerOn = () => {
+    if (lightOn()) wantMusic();
+  };
+  const powerOff = () => {
+    if (lightOff()) stopMusic();
   };
 
   let stutterTl: gsap.core.Timeline | null = null;
@@ -188,6 +201,7 @@ export function wireNeonSign({
     powerOn,
     powerOff,
     toggle: () => (poweredRef.current ? powerOff() : powerOn()),
+    follow: (on) => void (on ? lightOn() : lightOff()),
     stutter,
     freeze: () => {
       stutterTl?.kill();

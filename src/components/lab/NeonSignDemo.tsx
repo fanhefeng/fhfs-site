@@ -75,6 +75,7 @@ export function NeonSignDemo({
   const { wanted } = useJukebox();
   /** Set by the choreography; the switch calls it. */
   const toggleRef = useRef<(() => void) | null>(null);
+  const followRef = useRef<((on: boolean) => void) | null>(null);
   const stutterRef = useRef<(() => void) | null>(null);
 
   /* ---- the wall ---- */
@@ -89,8 +90,13 @@ export function NeonSignDemo({
   // scroll trigger below lights the sign from a layout effect, before this
   // effect runs, and on that first pass the rendered value is still the old
   // one — acting on it switched the sign straight back off.
+  //
+  // Only the light follows: the music already changed, and the switch's own
+  // path would write back — turning a record that failed to load into the
+  // reader's "no".
   useEffect(() => {
-    if (jukebox().wanted !== poweredRef.current) toggleRef.current?.();
+    const now = jukebox().wanted;
+    if (now !== poweredRef.current) followRef.current?.(now);
   }, [wanted]);
 
   /* ---- the choreography ---- */
@@ -121,14 +127,20 @@ export function NeonSignDemo({
         },
       });
       toggleRef.current = contextSafe(neon.toggle);
+      followRef.current = contextSafe(neon.follow);
       stutterRef.current = contextSafe(neon.stutter);
 
-      // Lights come on as the reader arrives, once.
+      // Lights come on as the reader arrives, once — unless the reader has
+      // switched the music off: the sign is the music's switch, and walking up
+      // to it is not a change of mind (`silenced`, lib/client/jukebox). It
+      // stays dark, one press from lit.
       const trigger = ScrollTrigger.create({
         trigger: stage,
         start: "top 70%",
         once: true,
-        onEnter: () => neon.powerOn(),
+        onEnter: () => {
+          if (!jukebox().silenced) neon.powerOn();
+        },
       });
 
       // While the wall is the top of the frame, the island's paper scrim
@@ -150,6 +162,7 @@ export function NeonSignDemo({
         delete document.body.dataset.neonImmersed;
         neon.kill();
         toggleRef.current = null;
+        followRef.current = null;
         stutterRef.current = null;
         // The lights belong to this run: a re-run (dev's double mount, a
         // remount) starts dark again, or its trigger would find the switch
