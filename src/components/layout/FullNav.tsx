@@ -9,6 +9,7 @@ import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
 import { site } from "@/config/site";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { SearchButton } from "@/components/search/SearchButton";
 
 export type FullNavProps = {
   /**
@@ -439,9 +440,10 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
           </a>
         </div>
 
-        {/* Utility row: language + the lights. */}
+        {/* Utility row: language, search, the lights. */}
         <div className="fn-item mx-auto flex w-full max-w-xl items-center justify-between px-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
           <LocaleSwitcher />
+          <SearchButton />
           <LightSwitch />
         </div>
       </div>

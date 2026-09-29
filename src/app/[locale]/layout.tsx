@@ -15,6 +15,7 @@ import { THEME_COLOR } from "@/lib/theme";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PreviewBanner } from "@/components/layout/PreviewBanner";
+import { SearchLauncher } from "@/components/search/SearchLauncher";
 import { AuroraLayer } from "@/components/fx/AuroraLayer";
 import { ThemeKeeper } from "@/components/fx/ThemeKeeper";
 import { GrainLayer } from "@/components/fx/GrainLayer";
@@ -150,6 +151,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           {children}
           <Footer items={footerLinks} />
           <PreviewBanner />
+          <SearchLauncher />
         </NextIntlClientProvider>
       </body>
     </html>

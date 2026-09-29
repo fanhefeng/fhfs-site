@@ -1197,5 +1197,28 @@
     "stickerHint": "Peel me",
     "stickerAria": "There's a sticker in the corner you can peel",
     "stickerSecret": "Only the lost ever find this line."
+  },
+  "search": {
+    "buttonAria": "Search the site",
+    "buttonTitle": "Search (⌘K or /)",
+    "dialogAria": "Site search",
+    "inputAria": "Search for",
+    "placeholder": "Posts, moments, studies, pages…",
+    "resultsAria": "Results",
+    "suggestions": "Where to",
+    "loading": "Loading…",
+    "error": "The index did not load; close and open again to retry.",
+    "empty": "Nothing found for “{query}”.",
+    "hint": "↑ ↓ to choose · Enter to open · Esc to close",
+    "kinds": {
+      "page": "Page",
+      "post": "Post",
+      "secret": "Secret",
+      "app": "App",
+      "lab": "Lab",
+      "film": "Film",
+      "idol": "Idol",
+      "moment": "Moment"
+    }
   }
 }

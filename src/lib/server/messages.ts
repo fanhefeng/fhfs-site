@@ -31,6 +31,7 @@ export const CLIENT_NAMESPACES = [
   "moments",
   "nav",
   "notFound",
+  "search",
   "secrets",
   "software",
 ] as const;

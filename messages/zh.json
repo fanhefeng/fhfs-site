@@ -1197,5 +1197,28 @@
     "stickerHint": "撕开看看",
     "stickerAria": "角上有一张可以撕的贴纸",
     "stickerSecret": "迷路的人才找得到这句话。"
+  },
+  "search": {
+    "buttonAria": "搜索全站",
+    "buttonTitle": "搜索（⌘K 或 /）",
+    "dialogAria": "全站搜索",
+    "inputAria": "搜索内容",
+    "placeholder": "搜文章、说说、实验、页面……",
+    "resultsAria": "搜索结果",
+    "suggestions": "想去哪儿",
+    "loading": "正在载入……",
+    "error": "索引没能载入，关掉再打开试试。",
+    "empty": "没有找到「{query}」。",
+    "hint": "↑ ↓ 选择 · Enter 打开 · Esc 关闭",
+    "kinds": {
+      "page": "页面",
+      "post": "文章",
+      "secret": "秘密",
+      "app": "软件",
+      "lab": "实验",
+      "film": "电影",
+      "idol": "偶像",
+      "moment": "说说"
+    }
   }
 }

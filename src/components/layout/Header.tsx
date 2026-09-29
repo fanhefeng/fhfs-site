@@ -9,6 +9,7 @@ import { attachMembers, isActiveDoor, isActivePath, type NavLink } from "@/lib/n
 import { useJukebox } from "@/lib/client/jukebox";
 import { LightSwitch } from "@/components/ui/LightSwitch";
 import { LocaleSwitcher } from "./LocaleSwitcher";
+import { SearchButton } from "@/components/search/SearchButton";
 import { GlintDefs, GlintRing } from "@/components/fx/SpecularGlint";
 import { JukeboxSwitch } from "@/components/fx/JukeboxSwitch";
 import { SignRing } from "@/components/neon/SignRing";
@@ -602,6 +603,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
                   })}
                 </nav>
                 <span className="isl-item mx-1.5 h-4 w-px bg-line" aria-hidden="true" />
+                <SearchButton className="isl-item relative z-[1]" />
                 <LocaleSwitcher className="isl-item relative z-[1]" />
                 <LightSwitch className="isl-item relative z-[1]" />
               </div>
