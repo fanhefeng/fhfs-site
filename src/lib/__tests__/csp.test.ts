@@ -17,13 +17,28 @@ describe("contentSecurityPolicy", () => {
   // host — or letting this one into another directive — fails the test.
   const BLOB_HOST = "https://oaq2x6wu11ne1ol7.public.blob.vercel-storage.com";
 
-  it("lets nothing load from another origin, save the board's videos", () => {
+  const foreign = (values: string[]) => values.filter((value) => /^https?:|^\*|^wss?:/.test(value));
+
+  it("lets nothing load from another origin, save the uploads in the Blob store", () => {
     for (const [name, values] of Object.entries(prod)) {
-      expect(
-        values.filter((value) => /^https?:|^\*|^wss?:/.test(value)),
-        name,
-      ).toEqual(name === "media-src" ? [BLOB_HOST] : []);
+      expect(foreign(values), name).toEqual(
+        name === "media-src" || name === "img-src" ? [BLOB_HOST] : [],
+      );
     }
+  });
+
+  it("lets only the admin reach the store's upload API, and only to connect", () => {
+    const admin = parse(contentSecurityPolicy({ dev: false, admin: true }));
+    for (const [name, values] of Object.entries(admin)) {
+      expect(foreign(values), name).toEqual(
+        name === "media-src" || name === "img-src"
+          ? [BLOB_HOST]
+          : name === "connect-src"
+            ? ["https://vercel.com"]
+            : [],
+      );
+    }
+    expect(foreign(prod["connect-src"]!)).toEqual([]);
   });
 
   it("falls back to self, and shuts the doors that have no business open", () => {

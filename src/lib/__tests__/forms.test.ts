@@ -19,7 +19,7 @@ import {
   validKey,
   validLink,
   validPath,
-  validPlayableSrc,
+  validMediaSrc,
 } from "@/lib/forms";
 
 const form = (entries: Record<string, string>) => {
@@ -167,14 +167,14 @@ describe("oneOf / filled", () => {
   });
 });
 
-describe("validPlayableSrc", () => {
+describe("validMediaSrc", () => {
   it("is a file on this site or in the Blob store — the two places media-src allows", () => {
-    expect(validPlayableSrc("/secrets/episode-1.mp3")).toBe(true);
-    expect(validPlayableSrc(`${MEDIA_ORIGIN}/secrets/episode-1.mp3`)).toBe(true);
-    expect(validPlayableSrc("https://podcasts.example.com/episode-1.mp3")).toBe(false);
-    expect(validPlayableSrc(`${MEDIA_ORIGIN}.evil.com/episode-1.mp3`)).toBe(false);
-    expect(validPlayableSrc("//evil.com/episode-1.mp3")).toBe(false);
-    expect(validPlayableSrc("")).toBe(false);
+    expect(validMediaSrc("/secrets/episode-1.mp3")).toBe(true);
+    expect(validMediaSrc(`${MEDIA_ORIGIN}/secrets/episode-1.mp3`)).toBe(true);
+    expect(validMediaSrc("https://podcasts.example.com/episode-1.mp3")).toBe(false);
+    expect(validMediaSrc(`${MEDIA_ORIGIN}.evil.com/episode-1.mp3`)).toBe(false);
+    expect(validMediaSrc("//evil.com/episode-1.mp3")).toBe(false);
+    expect(validMediaSrc("")).toBe(false);
   });
 });
 
@@ -239,16 +239,24 @@ describe("parseMedia / formatMedia", () => {
     expect(wrong("audio /pics/a.m4a 10x20")).toMatch(/时长/);
     expect(wrong(`video ${MEDIA_ORIGIN}/c.mp4 720x1280 30s`)).toMatch(/封面/);
     expect(wrong(`video ${MEDIA_ORIGIN}/c.mp4 720x1280 30s poster=//x/c.jpg`)).toMatch(/看不懂/);
+    expect(
+      wrong(`video ${MEDIA_ORIGIN}/c.mp4 720x1280 30s poster=https://example.com/c.jpg`),
+    ).toMatch(/看不懂/);
     expect(wrong("image /pics/a.jpg 10x20 huge")).toMatch(/看不懂「huge」/);
   });
 
-  it("takes files from this site, and a video from the Blob store too — nowhere else", () => {
+  it("takes files from this site and from the Blob store — nowhere else", () => {
     const wrong = (text: string) => {
       const parsed = parseMedia(text);
       return parsed.ok ? "" : parsed.error;
     };
+    // What the admin uploads: a picture, a voice note, a poster in the store.
+    expect(wrong(`image ${MEDIA_ORIGIN}/moments/a.jpg 10x20`)).toBe("");
+    expect(wrong(`audio ${MEDIA_ORIGIN}/moments/a.m4a 9s`)).toBe("");
+    expect(
+      wrong(`video ${MEDIA_ORIGIN}/c.mp4 720x1280 30s poster=${MEDIA_ORIGIN}/moments/c.jpg`),
+    ).toBe("");
     // next/image throws on a host it was not configured for; the CSP blocks the rest.
-    expect(wrong(`image ${MEDIA_ORIGIN}/a.jpg 10x20`)).toMatch(/站内文件地址/);
     expect(wrong("image https://example.com/a.jpg 10x20")).toMatch(/站内文件地址/);
     expect(wrong("audio https://example.com/a.m4a 9s")).toMatch(/站内文件地址/);
     expect(wrong("video https://example.com/c.mp4 720x1280 30s poster=/pics/c.jpg")).toMatch(

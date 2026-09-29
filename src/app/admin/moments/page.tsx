@@ -38,7 +38,8 @@ const FIELDS: Field[] = [
     label: "图片 / 语音 / 视频（可空）",
     kind: "area",
     rows: 4,
-    hint: "一行一个：image /moments/x.jpg 1080x1440 · audio /moments/x.m4a 90s · video https://… 720x1280 30s poster=/moments/x.jpg。站内文件放 public/moments/ 后先跑 pnpm assets。",
+    upload: "moments",
+    hint: "用下面的按钮上传，尺寸、时长和视频封面会自动量好填进来。也可以手写，一行一个：image /moments/x.jpg 1080x1440 · audio /moments/x.m4a 90s · video https://… 720x1280 30s poster=/moments/x.jpg；站内文件放 public/moments/ 后先跑 pnpm assets。",
   },
   {
     name: "original",

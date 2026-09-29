@@ -43,6 +43,12 @@ export const ENV_RULES: Record<string, Rule> = {
     shape:
       "an https:// origin with no path or trailing slash (overrides the domain Vercel reports; src/lib/siteUrl.ts)",
   },
+  BLOB_READ_WRITE_TOKEN: {
+    required: false,
+    valid: (v) => /^vercel_blob_rw_[A-Za-z0-9]+_[A-Za-z0-9]+$/.test(v),
+    shape:
+      "the Blob store's read-write token, vercel_blob_rw_…, set by Vercel when the store is connected (the admin's uploads; without it the upload button says so)",
+  },
   GITHUB_TOKEN: {
     required: false,
     valid: (v) => v.trim() === v && v.length >= 20,

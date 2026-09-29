@@ -10,6 +10,7 @@ import { useSaveAction } from "./useSaveAction";
 import { Select } from "./Select";
 import { Toggle } from "./Segmented";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
+import { MediaUploader } from "./MediaUploader";
 
 /** What a post and a secret both are, as the form edits them. */
 export type LongformDraft = {
@@ -43,6 +44,7 @@ export function LongformForm({
   headCols,
   extras,
   extrasCols,
+  below,
   draftHint,
   bodyLabel,
   datePlaceholder,
@@ -59,6 +61,8 @@ export function LongformForm({
   /** Fields in the row that ends with the draft switch. */
   extras: ReactNode;
   extrasCols: string;
+  /** Under the draft row, full width — the episode's audio uploader. */
+  below?: ReactNode;
   draftHint: string;
   bodyLabel: string;
   datePlaceholder: string;
@@ -161,6 +165,7 @@ export function LongformForm({
             />
           </div>
         </div>
+        {below}
 
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -191,6 +196,19 @@ export function LongformForm({
               rows={24}
               spellCheck={false}
               className={`${textareaClass} ${monoClass}`}
+            />
+            <MediaUploader
+              folder={previewKind === "post" ? "posts" : "secrets"}
+              kinds={["image"]}
+              label="插入图片"
+              onUploaded={(file) => {
+                const el = body.current;
+                if (!el) return;
+                // At the caret, as a paragraph of its own.
+                const at = el.selectionStart ?? el.value.length;
+                const image = `\n\n![](${file.src})\n\n`;
+                el.value = `${el.value.slice(0, at).replace(/\s+$/, "")}${image}${el.value.slice(at).replace(/^\s+/, "")}`;
+              }}
             />
           </MarkdownPreview>
         </div>

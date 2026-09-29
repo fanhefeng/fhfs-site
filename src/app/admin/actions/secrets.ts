@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/server/auth/session";
-import { intField, oneOf, str, validPlayableSrc } from "@/lib/forms";
+import { intField, oneOf, str, validMediaSrc } from "@/lib/forms";
 import { MEDIA_ORIGIN } from "@/config/csp";
 import { TAGS } from "@/lib/server/content";
 import {
@@ -31,7 +31,7 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
   // Rendered as the <audio> src, so it has to be somewhere the CSP lets a
   // page play from — any other host saves fine and then stays silent.
   const audio = str(form, "audio") || null;
-  if (audio && !validPlayableSrc(audio)) {
+  if (audio && !validMediaSrc(audio)) {
     return {
       error: `音频地址要是站内文件（以单个 / 开头，放在 public/ 下），或 Blob 存储里的文件（${MEDIA_ORIGIN}/…）。别的网站的地址会被页面的安全策略拦下，放不出来。`,
     };

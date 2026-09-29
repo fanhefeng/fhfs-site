@@ -132,12 +132,13 @@ export const validLink = (value: string): boolean =>
   /^https?:\/\/\S+$/.test(value) || validPath(value);
 
 /**
- * Where a voice note, a podcast episode or a video can play from: a file on
- * this site, or the Blob store. Those are the two places the CSP's
- * `media-src` names (config/csp.ts), so anything else would save fine and then
+ * Where any file a page shows or plays can come from: this site, or the Blob
+ * store the admin uploads to. Those are the two places the CSP's `img-src`
+ * and `media-src` name, and the one host next/image is configured for
+ * (config/csp.ts, next.config.ts), so anything else would save fine and then
  * be blocked out front, with nothing on the page to say why.
  */
-export const validPlayableSrc = (value: string): boolean =>
+export const validMediaSrc = (value: string): boolean =>
   validPath(value) || value.startsWith(`${MEDIA_ORIGIN}/`);
 
 /** A GitHub account name — it is spliced into a URL path on /resume. */
@@ -183,10 +184,10 @@ export type MediaParse = { ok: true; value: MomentMedia[] } | { ok: false; error
  *   audio /moments/app-2-1.m4a 90s
  *   video https://…/app-3-1.mp4 720x1280 30s poster=/moments/app-3-1.jpg
  *
- * A picture, a voice note and a poster are files on this site; a video may
- * also be in the Blob store, and nowhere else. Any other host would save
- * fine and then fail out front: next/image refuses a host it was not given
- * (and throws, taking the board with it), and the CSP blocks the rest.
+ * Every file is on this site or in the Blob store the admin uploads to, and
+ * nowhere else. Any other host would save fine and then fail out front:
+ * next/image refuses a host it was not given (and throws, taking the board
+ * with it), and the CSP blocks the rest.
  *
  * `formatMedia` writes the same lines back, so a row round-trips through the
  * editor unchanged. Errors name the line: this field is a list, and a
@@ -204,10 +205,10 @@ export function parseMedia(text: string): MediaParse {
     if (!kind || !MEDIA_KINDS.has(kind)) {
       return { ok: false, error: `${at}：开头要是 image、audio 或 video。` };
     }
-    if (!src || !(kind === "video" ? validPlayableSrc(src) : validPath(src))) {
+    if (!src || !validMediaSrc(src)) {
       return {
         ok: false,
-        error: `${at}：第二项要是站内文件地址，以单个 / 开头；只有视频可以放在 Blob（${MEDIA_ORIGIN}/…）。`,
+        error: `${at}：第二项要是站内文件地址（以单个 / 开头），或上传到 Blob 的文件（${MEDIA_ORIGIN}/…）。`,
       };
     }
     let size: [number, number] | undefined;
@@ -218,7 +219,7 @@ export function parseMedia(text: string): MediaParse {
       const d = DURATION_RE.exec(token);
       if (s && Number(s[1]) > 0 && Number(s[2]) > 0) size = [Number(s[1]), Number(s[2])];
       else if (d && Number(d[1]) > 0) duration = Number(d[1]);
-      else if (token.startsWith("poster=") && validPath(token.slice("poster=".length))) {
+      else if (token.startsWith("poster=") && validMediaSrc(token.slice("poster=".length))) {
         poster = token.slice("poster=".length);
       } else {
         return {
