@@ -235,6 +235,11 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
+      // A modal opened from the sheet — the ⌘K palette, off its search button
+      // — owns the keys while it is up. Escape handled here closed the sheet
+      // behind it and, prevented, never reached the dialog; Tab cycled
+      // through links the modal had made inert.
+      if (e.target instanceof Element && e.target.closest("dialog[open]")) return;
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();

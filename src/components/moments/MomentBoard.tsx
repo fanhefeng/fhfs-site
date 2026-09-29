@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { site } from "@/config/site";
@@ -47,6 +47,30 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
     () => (notebook ? items.filter((item) => item.collection === notebook) : items),
     [items, notebook],
   );
+
+  // The calendar above (a server SVG, no script of its own) links each week to
+  // its newest line by `#key`, and so can a shared address. A line the
+  // notebook filter has taken off the board is not there to land on — the
+  // click only changed the address. Let the filter go, and go to the line
+  // once it is drawn again.
+  const [seek, setSeek] = useState<string | null>(null);
+  useEffect(() => {
+    const onHash = () => {
+      const key = decodeURIComponent(window.location.hash.slice(1));
+      if (!key || document.getElementById(key)) return;
+      if (!items.some((item) => item.key === key)) return;
+      pick(null);
+      setSeek(key);
+    };
+    onHash();
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, [items, pick]);
+  useEffect(() => {
+    if (!seek) return;
+    document.getElementById(seek)?.scrollIntoView();
+    setSeek(null);
+  }, [seek, filtered]);
   // A pinned line stands above the years rather than in its own, so it is
   // read once, first — the way the old QQ 空间 held one at the top.
   const pinned = filtered.filter((item) => item.pinned);

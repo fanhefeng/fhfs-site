@@ -39,7 +39,9 @@ export default async function IdolsPage({ params }: PageProps<"/[locale]/idols">
                       src={asset(cover.src)}
                       width={cover.width}
                       height={cover.height}
-                      alt={cover.alt}
+                      // The name under it is the link's name; the photograph's
+                      // sentence ahead of it only delayed it (as on /films).
+                      alt=""
                       sizes="(min-width: 640px) 340px, 100vw"
                       // The wall's first picture is the page's largest paint.
                       loading={i < 2 ? "eager" : undefined}

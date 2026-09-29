@@ -591,8 +591,15 @@ export function Header({ links, menuLinks, allLinks }: Props) {
                         aria-current={
                           isActivePath(pathname, item.href) ? "page" : active ? "true" : undefined
                         }
-                        // Collapse first, then RouteTransition takes over.
-                        onClick={() => setExpanded(false)}
+                        // Collapse first, then RouteTransition takes over —
+                        // below the wide breakpoint, where the tray was pressed
+                        // open. A wide screen lands on the next page's top,
+                        // where the island stands open by itself; folding it
+                        // here left it shut there, since arriving at scrollY 0
+                        // is not a scroll and nothing unfolded it again.
+                        onClick={() => {
+                          if (!window.matchMedia(WIDE).matches) setExpanded(false);
+                        }}
                         className={`isl-item relative z-[1] rounded-full px-2.5 py-2 text-[13px] font-medium tracking-[0.01em] transition-colors ${
                           active ? "text-accent" : "text-fg-secondary hover:text-fg"
                         }`}

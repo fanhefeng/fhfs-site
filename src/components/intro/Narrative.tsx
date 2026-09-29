@@ -191,7 +191,15 @@ export function Narrative({ text, copy, links }: Props) {
         <p className="mt-3 max-w-sm text-caption text-fg-secondary sm:text-body">
           {text.outroBody}
         </p>
-        <nav className="pointer-events-auto mt-7 flex flex-wrap items-center justify-center gap-3">
+        {/* Clickable only while the frame is shown: an `auto` here beats the
+            parent's `none`, and the invisible chips used to catch clicks
+            (on a phone, taps on the sticker card above them) the whole way
+            down the page. */}
+        <nav
+          className={`mt-7 flex flex-wrap items-center justify-center gap-3 ${
+            isOutro ? "pointer-events-auto" : ""
+          }`}
+        >
           {links.map((l) => (
             <a
               key={l.label}

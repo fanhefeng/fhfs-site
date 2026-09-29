@@ -251,7 +251,7 @@
         "name": "Liquid-metal button",
         "tagline": "A WebGL2 dispersion shader in five passes",
         "summary": "No gradient, no texture, no image behind it. A scalar field is painted through a smooth step, sampled at a slightly different height for every wavelength — which is where the rainbow edge comes from.",
-        "note": "Here the scrollbar is not a timeline but a way through the pipeline: act one is the bare dispersion field, razor-etched; act two pours the softening blur over it and lights the travelling rim; act three adds the bloom and the contrast curve that put the metal back. The button stays live the whole way down — hover it, hold it, tab to it. The clock only turns while you are touching it, or while it is still settling. The two controls on the home page's cover are this button.",
+        "note": "Here the scrollbar is not a timeline but a way through the pipeline: act one is the bare dispersion field, razor-etched; act two pours the softening blur over it and lights the travelling rim; act three adds the bloom and the contrast curve that put the metal back. The button stays live the whole way down — hover it, hold it, tab to it. The clock only turns while you are touching it, or while it is still settling. The home page's one main button, on its first screen, is this one.",
         "headline": "Solved, not drawn",
         "body": "Fringe width falls out as dispersion over the magnitude of the field's gradient. So one shader gives razor-thin rainbow lines where the field is pinched, and broad navy-to-cyan washes where it is not.",
         "tail": "Hold it down. Watch the crease run round the rim as you let go.",
@@ -413,7 +413,7 @@
         "note": "A pure CSS state machine: React flips one boolean and everything else is a transition on transform and opacity. The fold is rotateX under a 520px perspective, with the grey adhesive glimpsed halfway; the lift is sold by two stacked shadows cross-faded on opacity — box-shadow itself never animates, being a property that repaints every frame. A second activation (keyboard included) sticks it back on. While covered, the link underneath is tabIndex -1 and aria-hidden, so it cannot be tabbed into. The big one in the corner of the 404 goes further and can really be peeled off (a clip-path crease). Here it covers a line instead of an address.",
         "label": "Peel · one boolean",
         "peelHint": "Peel me",
-        "peelAria": "Peel the sticker",
+        "peelAria": "Peel me: a peel-off sticker",
         "secret": "Nothing under here."
       },
       "scatter": {
@@ -675,7 +675,7 @@
     "subtitle": "The ones watched too many times: a synopsis, the lines I remember, and a wall of stills. Each puts on its own record at the door.",
     "open": "Open",
     "backToIndex": "← Films",
-    "countStills": "{count} stills",
+    "countStills": "{count, plural, one {# still} other {# stills}}",
     "record": "Record · {title}",
     "facts": {
       "director": "Director",
@@ -729,12 +729,12 @@
     "timeSuffix": " in Shanghai",
     "localTimeAria": "Local time in Shanghai",
     "stickerHint": "Peel me",
-    "stickerAria": "A peel-off sticker with an email underneath",
+    "stickerAria": "Peel me: a peel-off sticker with an email underneath",
     "stickerFallback": "email coming soon :)"
   },
   "common": {
     "localeSwitch": "中文",
-    "localeSwitchAria": "Switch to Chinese",
+    "localeSwitchAria": "中文: switch to Chinese",
     "lightSwitch": "Light / dark mode",
     "lightsOn": "Lights on · switch to light mode",
     "lightsOff": "Lights off · switch to dark mode",

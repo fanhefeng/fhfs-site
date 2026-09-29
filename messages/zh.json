@@ -251,7 +251,7 @@
         "name": "液态金属按钮",
         "tagline": "WebGL2 色散着色器 + 五趟管线",
         "summary": "没有渐变、没有贴图、没有底图。一个标量场穿过一段平滑的台阶，每个波长采样的高度略有不同——彩虹边就是这么来的。",
-        "note": "滚动条在这里不推时间轴，它拆管线：第一幕是裸的色散场，蚀刻般锐利；第二幕把软化模糊浇上去、点亮那圈游走的描边；第三幕接上 bloom 和对比曲线，金属才回来。按钮全程是活的——悬停、按住、Tab 过去都行。时钟只在你碰它或者它还没停稳的时候才走。首页封面上的两颗按钮，就是它。",
+        "note": "滚动条在这里不推时间轴，它拆管线：第一幕是裸的色散场，蚀刻般锐利；第二幕把软化模糊浇上去、点亮那圈游走的描边；第三幕接上 bloom 和对比曲线，金属才回来。按钮全程是活的——悬停、按住、Tab 过去都行。时钟只在你碰它或者它还没停稳的时候才走。首页第一屏那颗主按钮，就是它。",
         "headline": "它不是画的，是解出来的",
         "body": "彩虹边的宽度等于色散除以场的梯度模。所以同一个着色器，在场被挤压的地方给出发丝般的虹线，在场舒展的地方给出大片的靛蓝到青的晕染。",
         "tail": "按住它。松手时看那道折痕跑过描边。",
@@ -320,7 +320,7 @@
         "note": "钉住的距离不是写死的，是轨道溢出的宽度——所以滚多少像素，字就走多少像素（ease 必须是 none）。每个字自己带一个 ScrollTrigger，containerAnimation 指向那条横向补间，于是「left 100% → left 40%」量的是横向进度而不是页面高度。整条带子的布局（一屏高、max-content 的轨道、100vw 的助跑）全由 GSAP 在 matchMedia 分支里写成内联样式，服务端输出和触屏设备拿到的都是一段普通的居中文字，只做淡入；locale 切换后重新拆字。关于页的宣言用的就是这一件（fx/SidewaysBand）。",
         "lead": "这一段之前，页面是纵着走的。",
         "lineOne": "慢一点，字会自己排好。",
-        "lineTwo": "Scroll down, and the line walks left.",
+        "lineTwo": "Slow down, and the line sets itself.",
         "lineThree": "pin · scrub 1 · ease none",
         "tail": "到这里，滚动条又是纵向的了。往回滚，句子会原路拆开。"
       },
@@ -413,7 +413,7 @@
         "note": "纯 CSS 状态机：React 只翻一个布尔，其余全是 transform / opacity 的过渡。折叠是 rotateX，perspective 520，中途露出灰色的胶面；抬起的感觉靠两层阴影用透明度交叉——box-shadow 本身从不参与动画，那是会逐帧重绘的属性。再点一下（键盘也行）贴回去。盖着的时候下面的链接 tabIndex -1、aria-hidden，不会被 Tab 到。404 页角上那张大的更进一步，能真的撕下来（clip-path 折痕）。这里盖住的不是邮箱，是一句话。",
         "label": "撕 · 一个布尔",
         "peelHint": "撕开看看",
-        "peelAria": "撕开贴纸",
+        "peelAria": "撕开看看：一张可以撕开的贴纸",
         "secret": "下面什么也没有。"
       },
       "scatter": {
@@ -729,12 +729,12 @@
     "timeSuffix": "",
     "localTimeAria": "上海当地时间",
     "stickerHint": "撕开看看",
-    "stickerAria": "一张可以撕开的贴纸，下面藏着邮箱",
+    "stickerAria": "撕开看看：一张可以撕开的贴纸，下面藏着邮箱",
     "stickerFallback": "邮箱稍后贴上 :)"
   },
   "common": {
     "localeSwitch": "English",
-    "localeSwitchAria": "切换到英文版",
+    "localeSwitchAria": "English：切换到英文版",
     "lightSwitch": "浅色 / 深色模式",
     "lightsOn": "开灯 · 换成浅色",
     "lightsOff": "关灯 · 换成深色",
