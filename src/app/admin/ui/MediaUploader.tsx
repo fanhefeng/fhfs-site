@@ -40,11 +40,14 @@ export function MediaUploader({
   kinds,
   onUploaded,
   label,
+  doneLabel = "已加进表单，记得保存",
 }: {
   folder: UploadFolder;
   kinds: readonly UploadKind[];
   onUploaded: (file: Uploaded) => void;
   label: string;
+  /** What a finished file says — the form still has to be sent. */
+  doneLabel?: string;
 }) {
   const inputId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -129,7 +132,7 @@ export function MediaUploader({
               <span
                 className={`shrink-0 tabular-nums ${job.error ? "text-accent" : "text-fg-tertiary"}`}
               >
-                {job.error ?? (job.done ? "已加进表单，记得保存" : `${Math.round(job.progress)}%`)}
+                {job.error ?? (job.done ? doneLabel : `${Math.round(job.progress)}%`)}
               </span>
             </li>
           ))}

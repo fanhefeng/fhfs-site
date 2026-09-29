@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: "Admin",
   // Nothing here should ever be indexed, whatever robots.txt says.
   robots: { index: false, follow: false },
+  // "Add to Home Screen" opens the workbench full screen, on the composer.
+  manifest: "/admin/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "fhf 后台", statusBarStyle: "default" },
 };
 
 /** Every admin page reads the database directly for fresh rows — this keeps

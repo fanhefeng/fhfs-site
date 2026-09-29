@@ -4,9 +4,11 @@ import { AdminChrome } from "./AdminChrome";
 import { sectionCounts } from "./counts";
 import { SECTION_GROUPS } from "./sections";
 import { cardClass, metaClass } from "./styles";
+import { QuickMoment } from "./moments/QuickMoment";
 
 /**
- * The front page of the workbench: every section, in the site's own four
+ * The front page of the workbench: a box to post a line from (the page the
+ * home-screen icon opens), then every section, in the site's own four
  * groups, each saying how much is in it and what it changes out front.
  *
  * The counts come from `sectionCounts()` — one statement for all twelve,
@@ -20,6 +22,12 @@ export default async function AdminHome() {
 
   return (
     <AdminChrome title="内容">
+      <section className="mb-10">
+        <h2 className={metaClass}>发一条说说</h2>
+        <div className="mt-3">
+          <QuickMoment />
+        </div>
+      </section>
       <div className="space-y-10">
         {SECTION_GROUPS.map((group) => (
           <section key={group.id}>
