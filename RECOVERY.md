@@ -23,11 +23,12 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 `public/` 下的音乐、模型、照片都在 git 里。`messages/*.json` 是全部文案的默认值，
 也在 git 里：就算 `copy_blocks` 整张表没了，站点照文件显示，不会白屏。
 
-真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那 12 张表。
+真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那些表——除了登录限流用的
+`login_attempts`，schema 里的每一张都在里面（`tables.test.ts` 守着这一点）。
 
 **草稿不进备份。** 仓库和 `db-snapshots` 分支都是公开的，导出草稿等于当晚就把它
-发出去，所以 `db:export` 只写已发布的文章、秘密和说说。草稿只在库里（和 Neon 那
-6 小时的 history 里）；库整个没了，没发布的草稿也跟着没了。`db:import` 对这三张表
+发出去，所以 `db:export` 只写已发布的文章、秘密、说说、电影和偶像。草稿只在库里（和
+Neon 那 6 小时的 history 里）；库整个没了，没发布的草稿也跟着没了。`db:import` 对这五张表
 只做 upsert，恢复备份不会删掉库里现有的草稿。
 
 库里还有一个 `neon_auth` schema（`user`、`session`、`account`、`jwks` 等 9 张表），
@@ -66,7 +67,7 @@ Neon 项目被删、分支被误删、或者欠费清理掉了。账号还能登
 #    DATABASE_URL           （带 -pooler 的）
 #    DATABASE_URL_UNPOOLED  （直连的，迁移和脚本用它）
 
-# 2. 空库建表 —— 12 个迁移都在 drizzle/ 里
+# 2. 空库建表 —— 迁移都在 drizzle/ 里
 pnpm db:migrate
 
 # 3. 灌内容。先确认手上这份 backup/ 是最新的：
@@ -103,7 +104,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ci_readonly;
 账号被封、注销、或者哪天 Neon 这家公司不在了。PITR、分支、项目一起消失，
 `backup/db.json` 是唯一剩下的东西——它在 GitHub 上，也在你本机的 clone 里。
 
-好消息是代码对 Neon 的绑定很浅：**Neon 专有的代码只有三个文件**，schema、12 个
+好消息是代码对 Neon 的绑定很浅：**Neon 专有的代码只有三个文件**，schema、全部
 迁移、所有查询、`drizzle.config.ts`（`dialect: "postgresql"`）、`src/config/env.ts`
 的校验（只认 `postgres://`）全都不用动。
 
