@@ -14,6 +14,7 @@ export function PostForm({ post, isNew }: { post: PostDraft; isNew: boolean }) {
       deleteAction={deletePost}
       doc={post}
       isNew={isNew}
+      previewKind="post"
       headCols="sm:grid-cols-[1fr_9rem_10rem]"
       extrasCols="sm:grid-cols-[1fr_auto]"
       extras={

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, getFormatter } from "next-intl/server";
@@ -31,7 +32,7 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/blog/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const post = await getPost(slug, locale);
+  const post = await getPost(slug, locale, (await draftMode()).isEnabled);
   if (!post) return {};
   // A fallback render is the other language's article under this prefix: its
   // canonical is that article, and hreflang lists only the languages that
@@ -98,7 +99,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
   const { slug } = await params;
   const t = await getTranslations("blog");
   const format = await getFormatter();
-  const post = await getPost(slug, locale);
+  const post = await getPost(slug, locale, (await draftMode()).isEnabled);
   if (!post) notFound();
 
   // Neighbours come from the same date-descending index the list page shows,

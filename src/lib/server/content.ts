@@ -174,12 +174,15 @@ export const getPosts = unstable_cache(
   cacheOptions(TAGS.posts),
 );
 
+/** One article, in this locale if it has it. `drafts` is for Draft Mode
+ *  (`app/admin/preview`), where it is the only way a draft is ever read; the
+ *  mode bypasses this cache, so a draft never lands in it. */
 export const getPost = unstable_cache(
-  async (slug: string, locale: Locale): Promise<Post | null> => {
+  async (slug: string, locale: Locale, drafts = false): Promise<Post | null> => {
     const [row] = await db
       .select({ ...summaryColumns, html: posts.bodyHtml })
       .from(posts)
-      .where(and(eq(posts.slug, slug), publishedOnly))
+      .where(and(eq(posts.slug, slug), drafts ? undefined : publishedOnly))
       .orderBy(localeFirst(locale), asc(posts.id))
       .limit(1);
 
@@ -376,12 +379,13 @@ export const getSecrets = unstable_cache(
   cacheOptions(TAGS.secrets),
 );
 
+/** One secret — `drafts` as for `getPost`. */
 export const getSecret = unstable_cache(
-  async (slug: string, locale: Locale): Promise<Secret | null> => {
+  async (slug: string, locale: Locale, drafts = false): Promise<Secret | null> => {
     const [row] = await db
       .select({ ...secretColumns, html: secrets.bodyHtml })
       .from(secrets)
-      .where(and(eq(secrets.slug, slug), secretPublished))
+      .where(and(eq(secrets.slug, slug), drafts ? undefined : secretPublished))
       .orderBy(secretLocaleFirst(locale), asc(secrets.id))
       .limit(1);
     if (!row) return null;

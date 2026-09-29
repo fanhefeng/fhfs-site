@@ -37,7 +37,10 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
-    if (pathname === "/admin/login") return NextResponse.next();
+    // Leaving draft preview only takes something away; see its route.
+    if (pathname === "/admin/login" || pathname === "/admin/preview/exit") {
+      return NextResponse.next();
+    }
 
     const session = await readSession(request.cookies.get(SESSION_COOKIE)?.value);
     if (!session) {

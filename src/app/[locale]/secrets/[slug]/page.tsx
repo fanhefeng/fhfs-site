@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, getFormatter } from "next-intl/server";
@@ -30,7 +31,7 @@ export async function generateMetadata({
 }: PageProps<"/[locale]/secrets/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const secret = await getSecret(slug, locale);
+  const secret = await getSecret(slug, locale, (await draftMode()).isEnabled);
   if (!secret) return {};
   const alternates = localeAlternates(
     `/secrets/${slug}`,
@@ -55,7 +56,7 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
   const tt = await getTranslations("tracks.secret");
   const tc = await getTranslations("common");
   const format = await getFormatter();
-  const secret = await getSecret(slug, locale);
+  const secret = await getSecret(slug, locale, (await draftMode()).isEnabled);
   if (!secret) notFound();
 
   const { older, newer } = await getAdjacentSecrets(secret.slug, locale);
