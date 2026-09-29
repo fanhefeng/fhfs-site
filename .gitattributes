@@ -9,6 +9,8 @@
 *.webp binary
 *.woff2 binary
 *.mp3 binary
+*.m4a binary
+*.mp4 binary
 *.glb binary
 *.wasm binary
 

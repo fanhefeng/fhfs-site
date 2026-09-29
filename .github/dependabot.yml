@@ -14,13 +14,18 @@ updates:
       timezone: Asia/Shanghai
     open-pull-requests-limit: 5
     groups:
-      # vite-plus pins the Vitest it was built against (the catalog in
-      # pnpm-workspace.yaml); they only work moved together, majors included.
       vite-plus:
-        patterns: ["vite-plus", "vitest", "@vitest/*", "@voidzero-dev/*"]
+        patterns: ["vite-plus", "@voidzero-dev/*"]
       minor-and-patch:
         update-types: [minor, patch]
     ignore:
+      # vite-plus bundles the Vitest it was built against, and `vp test`
+      # refuses a coverage provider of any other version. Grouping them was
+      # not enough: #39 still bumped vitest to 5.0.2 under vite-plus 1.0.0
+      # and failed `check`. They follow vite-plus, by hand, to what its new
+      # release lists (the catalog in pnpm-workspace.yaml).
+      - dependency-name: vitest
+      - dependency-name: "@vitest/*"
       # Pinned to the version patches/ was cut against; pnpm refuses to
       # install a patch onto another one. Move both together, by hand.
       - dependency-name: "@react-three/fiber"

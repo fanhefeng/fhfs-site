@@ -2,6 +2,10 @@
   "name": "fhfs-site",
   "version": "0.1.0",
   "private": true,
+  "description": "fhf's — a personal magazine and private gallery: writing, software, motion studies, and a few rooms with their own records.",
+  "homepage": "https://fhfs-site.vercel.app",
+  "repository": "github:fanhefeng/fhfs-site",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks && git config blame.ignoreRevsFile .git-blame-ignore-revs || true",
     "dev": "next dev",
@@ -26,10 +30,10 @@
     "admin:password": "tsx scripts/admin-password.mts"
   },
   "dependencies": {
-    "@formatjs/icu-messageformat-parser": "3.5.17",
+    "@formatjs/icu-messageformat-parser": "3.5.20",
     "@gsap/react": "^2.1.2",
     "@neondatabase/serverless": "^1.1.0",
-    "@react-three/drei": "^10.7.8",
+    "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "9.7.0",
     "@vercel/blob": "2.8.0",
     "client-only": "0.0.1",
@@ -57,7 +61,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^24.13.6",
+    "@types/node": "^24.19.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.185.4",

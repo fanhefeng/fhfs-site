@@ -7,12 +7,14 @@
  * writes a file full of empty arrays over the last good one, and nobody is
  * watching a job that passes.
  *
- * The comparison is against the copy committed in the checkout — `backup/` as
- * `HEAD` has it, before `db:export` overwrote the working tree. That copy is
- * always some real snapshot, so the check holds whether or not a snapshot
- * branch exists yet.
+ * The comparison is against the newest real snapshot there is. The workflow
+ * hands over the one it last committed on `db-snapshots`: main's `backup/`
+ * only moves with a pull request, so a table filled in the admin and emptied
+ * again between two of them would pass a check against main. Without an
+ * argument — the first run, before the branch exists, or by hand — it is
+ * `backup/` as `HEAD` has it, before `db:export` overwrote the working tree.
  *
- *   pnpm db:export && pnpm tsx scripts/db-snapshot-guard.mts
+ *   pnpm db:export && pnpm tsx scripts/db-snapshot-guard.mts [last/db.json]
  */
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
@@ -22,13 +24,17 @@ import { tablesEmptied, type Snapshot } from "../src/lib/backup";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const committed = execFileSync("git", ["show", "HEAD:backup/db.json"], {
-  cwd: ROOT,
-  encoding: "utf8",
-  maxBuffer: 64 * 1024 * 1024,
-});
+const against = process.argv[2];
+const committed = against
+  ? await readFile(against, "utf8")
+  : execFileSync("git", ["show", "HEAD:backup/db.json"], {
+      cwd: ROOT,
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+    });
 
 const before = JSON.parse(committed) as Snapshot;
+console.log(`comparing against ${against ?? "HEAD:backup/db.json"}`);
 const after = JSON.parse(await readFile(path.join(ROOT, "backup", "db.json"), "utf8")) as Snapshot;
 
 const emptied = tablesEmptied(before, after);

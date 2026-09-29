@@ -21,6 +21,9 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # A few minutes is normal; a hung install or test runner would otherwise
+    # hold the runner for GitHub's six hours.
+    timeout-minutes: 15
     steps:
       # v5 and up run on Node 24 and need a runner of at least v2.327.1;
       # GitHub's hosted runners are well past that. v7 refuses to check a fork
@@ -56,6 +59,9 @@ jobs:
   # deploy. This builds the site the way Vercel does and walks it in a browser.
   build:
     runs-on: ubuntu-latest
+    # Build and smoke take about eleven minutes. Smoke drives a real Chrome,
+    # and a browser that never opens its port must not sit there for hours.
+    timeout-minutes: 30
     env:
       # A role that can only SELECT (`ci_readonly`, and not from
       # login_attempts). Absent on pull requests from forks and from
@@ -74,6 +80,10 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+
+      # Said out loud, so a green tick here is not read as a build that ran.
+      - if: env.DATABASE_URL == ''
+        run: echo "::notice title=build skipped::No DATABASE_URL on this run (a fork or Dependabot pull request gets no secrets). The build and the smoke test run on the push to main after the merge."
 
       - if: env.DATABASE_URL != ''
         run: pnpm build

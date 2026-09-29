@@ -34,6 +34,7 @@ concurrency:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       # The same read-only role CI builds with (`ci_readonly`). Export is all
       # SELECTs, and the one table it must not read — login_attempts — is the
@@ -49,11 +50,27 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
+      # The branch holds nothing but backup/, and carries none of main's
+      # history — a shallow clone, or nothing yet on the very first run.
+      # Fetched before the export: its last snapshot is what the guard below
+      # compares against.
+      - name: Fetch the last snapshot
+        env:
+          REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
+        run: git clone --depth 1 --branch db-snapshots "$REMOTE" "$RUNNER_TEMP/snapshot" 2>/dev/null || true
+
       - run: pnpm db:export
 
       # A table that had rows and came back empty is an alarm, not a snapshot.
       # This is the step that must fail the run (src/lib/backup.ts says why).
-      - run: pnpm tsx scripts/db-snapshot-guard.mts
+      - name: Refuse a snapshot that lost a table
+        run: |
+          LAST="$RUNNER_TEMP/snapshot/backup/db.json"
+          if [ -f "$LAST" ]; then
+            pnpm tsx scripts/db-snapshot-guard.mts "$LAST"
+          else
+            pnpm tsx scripts/db-snapshot-guard.mts
+          fi
 
       - name: Commit the snapshot, if it says anything new
         env:
@@ -62,9 +79,8 @@ jobs:
           set -euo pipefail
           SNAP="$RUNNER_TEMP/snapshot"
 
-          # The branch holds nothing but backup/, and carries none of main's
-          # history — an orphan on the first run, a shallow clone after that.
-          if git clone --depth 1 --branch db-snapshots "$REMOTE" "$SNAP" 2>/dev/null; then
+          # An orphan branch on the first run.
+          if [ -d "$SNAP/.git" ]; then
             rm -rf "$SNAP/backup"
           else
             mkdir -p "$SNAP"
