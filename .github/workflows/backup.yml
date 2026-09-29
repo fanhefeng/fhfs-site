@@ -53,11 +53,21 @@ jobs:
       # The branch holds nothing but backup/, and carries none of main's
       # history — a shallow clone, or nothing yet on the very first run.
       # Fetched before the export: its last snapshot is what the guard below
-      # compares against.
+      # compares against. Only a branch that does not exist (ls-remote's 2)
+      # lets the guard fall back to main's copy; any other failure to fetch
+      # it stops the run, since a stale baseline could wave an emptied
+      # table through.
       - name: Fetch the last snapshot
         env:
           REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
-        run: git clone --depth 1 --branch db-snapshots "$REMOTE" "$RUNNER_TEMP/snapshot" 2>/dev/null || true
+        run: |
+          status=0
+          git ls-remote --exit-code --heads "$REMOTE" db-snapshots > /dev/null || status=$?
+          case "$status" in
+            0) git clone --depth 1 --branch db-snapshots "$REMOTE" "$RUNNER_TEMP/snapshot" ;;
+            2) echo "::notice::No db-snapshots branch yet; the guard compares against main's backup/." ;;
+            *) exit "$status" ;;
+          esac
 
       - run: pnpm db:export
 

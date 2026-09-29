@@ -52,13 +52,16 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
   // its newest line by `#key`, and so can a shared address. A line the
   // notebook filter has taken off the board is not there to land on — the
   // click only changed the address. Let the filter go, and go to the line
-  // once it is drawn again.
+  // once it is drawn again. Asked of the address and the list, not the page:
+  // on a first load of `?nb=…#key` the line is still drawn when this runs,
+  // and the filter read from the address takes it away a render later.
   const [seek, setSeek] = useState<string | null>(null);
   useEffect(() => {
     const onHash = () => {
       const key = decodeURIComponent(window.location.hash.slice(1));
-      if (!key || document.getElementById(key)) return;
-      if (!items.some((item) => item.key === key)) return;
+      const line = key ? items.find((item) => item.key === key) : undefined;
+      const nb = new URLSearchParams(window.location.search).get("nb");
+      if (!line || nb === null || line.collection === nb) return;
       pick(null);
       setSeek(key);
     };

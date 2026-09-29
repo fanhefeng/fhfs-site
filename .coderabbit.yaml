@@ -55,10 +55,13 @@ reviews:
 
     - path: "src/app/admin/**"
       instructions: |
-        - Every server action starts with a session check — `adminSession()`
-          returning `SESSION_EXPIRED` where it reports to a form, the throwing
+        - Every content-writing server action (`src/app/admin/actions/**`)
+          starts with a session check — `adminSession()` returning
+          `SESSION_EXPIRED` where it reports to a form, the throwing
           `requireAdmin()` in the deletes — and ends with `updateTag` (not
-          `revalidateTag`). Flag an action missing either.
+          `revalidateTag`). Flag one missing either. `login` and `logout`
+          (`src/app/admin/login/actions.ts`) are the exceptions: signing in
+          cannot presuppose a session, and neither writes content to invalidate.
         - Admin pages read STRAIGHT from the tables on purpose: the workbench
           shows what is stored right now, not what the cache says. Do not
           suggest moving these reads into the cached getters.

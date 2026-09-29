@@ -90,7 +90,8 @@ async function fetchWithRetry(
  * Runs wherever a card is drawn: at build, and again on the server when a
  * save invalidates one — the OG routes are `force-static`, but their getters
  * carry the `content` tag like every page's, so they regenerate the same way.
- * Hence the retries: a failure there is a request that errors, not a build.
+ * Hence the retries. A font that still will not come fails the build when it
+ * happens at build time, and the card's request when it happens later.
  */
 async function loadGoogleFont(family: string, text: string, weight = 400): Promise<ArrayBuffer> {
   const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
