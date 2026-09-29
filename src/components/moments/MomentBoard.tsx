@@ -335,7 +335,8 @@ function MomentCard({ item }: { item: BoardMoment }) {
   }, [expanded]);
 
   return (
-    <li className="border-b border-line py-6 last:border-b-0">
+    // The id is where the calendar above the board points (`#key`).
+    <li id={item.key} className="scroll-mt-32 border-b border-line py-6 last:border-b-0">
       <article>
         <header className="mb-3 flex items-center gap-3">
           <span

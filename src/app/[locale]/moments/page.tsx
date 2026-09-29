@@ -3,12 +3,13 @@ import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
 import { asset } from "@/lib/asset";
 import { getMoments } from "@/lib/server/content";
-import { stampInZone, type BoardMoment, type MomentMedia } from "@/lib/moments";
+import { momentCalendar, stampInZone, type BoardMoment, type MomentMedia } from "@/lib/moments";
 import { sectionMetadata } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
 import { RadialFab } from "@/components/fx/RadialFab";
 import { RoomMusic } from "@/components/fx/RoomMusic";
 import { MomentBoard } from "@/components/moments/MomentBoard";
+import { MomentCalendar } from "@/components/moments/MomentCalendar";
 
 export const generateMetadata = sectionMetadata("moments", "/moments");
 
@@ -76,7 +77,10 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
         {items.length === 0 ? (
           <p className="text-body text-fg-secondary">{t("empty")}</p>
         ) : (
-          <MomentBoard items={items} />
+          <>
+            <MomentCalendar years={momentCalendar(rows, site.timeZone)} />
+            <MomentBoard items={items} />
+          </>
         )}
       </main>
       {/* The longest page on the site, with its filter at the very top: on a

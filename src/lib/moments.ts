@@ -172,3 +172,84 @@ export function describeMedia(media: readonly MomentMedia[]): string {
     })
     .join(" · ");
 }
+
+/** One cell of the board's calendar: a week, how many lines it holds, and
+ *  the newest of them — where a press on the cell lands. */
+export type CalendarWeek = { week: number; count: number; newest: string; start: string };
+
+/** One row of it: a year, and only the weeks something was said in. */
+export type CalendarYear = { year: string; weeks: CalendarWeek[] };
+
+/** How many columns a year's row spans on that calendar: its weeks, counted
+ *  the same way, the part-weeks at either end included. */
+export function weeksInYear(year: number): number {
+  const jan1 = Date.UTC(year, 0, 1);
+  const lead = (new Date(jan1).getUTCDay() + 6) % 7;
+  const days = (Date.UTC(year + 1, 0, 1) - jan1) / 86_400_000;
+  return Math.floor((days - 1 + lead) / 7) + 1;
+}
+
+/** A calendar day in the given zone, as `YYYY-MM-DD`. */
+const dayInZone = (iso: string, timeZone: string) =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+
+/**
+ * The years above the board, a row each, cut into weeks: the shape of how
+ * much was said when. Weeks run Monday to Sunday and are counted from the
+ * one that holds 1 January, so column 0 is the first days of the year and a
+ * year spans at most 54 columns (53 whole weeks and a day or two either side).
+ * Days are the site's zone's, like every stamp on the board.
+ *
+ * Every year between the first line and the last gets a row, a silent one
+ * included: a year of nothing is part of the shape. Newest year first, as
+ * the board below is.
+ */
+export function momentCalendar(
+  items: readonly { key: string; postedAt: string }[],
+  timeZone: string,
+): CalendarYear[] {
+  const byYear = new Map<string, Map<number, CalendarWeek>>();
+  // The stamp of each cell's newest line, while counting.
+  const newestAt = new Map<CalendarWeek, string>();
+  for (const item of items) {
+    const day = dayInZone(item.postedAt, timeZone);
+    const [y, m, d] = day.split("-").map(Number) as [number, number, number];
+    const jan1 = Date.UTC(y, 0, 1);
+    // getUTCDay is 0 for Sunday; the week starts on Monday.
+    const lead = (new Date(jan1).getUTCDay() + 6) % 7;
+    const dayOfYear = (Date.UTC(y, m - 1, d) - jan1) / 86_400_000;
+    const week = Math.floor((dayOfYear + lead) / 7);
+    const year = String(y);
+    let weeks = byYear.get(year);
+    if (!weeks) byYear.set(year, (weeks = new Map()));
+    const cell = weeks.get(week);
+    if (!cell) {
+      const start = new Date(jan1 + Math.max(0, week * 7 - lead) * 86_400_000);
+      const fresh = { week, count: 1, newest: item.key, start: start.toISOString().slice(0, 10) };
+      weeks.set(week, fresh);
+      newestAt.set(fresh, item.postedAt);
+    } else {
+      cell.count += 1;
+      if (item.postedAt > newestAt.get(cell)!) {
+        cell.newest = item.key;
+        newestAt.set(cell, item.postedAt);
+      }
+    }
+  }
+  const years = [...byYear.keys()].map(Number);
+  if (years.length === 0) return [];
+  const rows: CalendarYear[] = [];
+  for (let y = Math.max(...years); y >= Math.min(...years); y--) {
+    const weeks = byYear.get(String(y));
+    rows.push({
+      year: String(y),
+      weeks: weeks ? [...weeks.values()].sort((a, b) => a.week - b.week) : [],
+    });
+  }
+  return rows;
+}

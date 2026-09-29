@@ -5,6 +5,8 @@ import {
   describeMedia,
   newestSaid,
   momentKey,
+  momentCalendar,
+  weeksInYear,
   shouldFold,
   stampInZone,
   type MomentMedia,
@@ -113,5 +115,79 @@ describe("newestSaid", () => {
   it("is undefined for a board with nothing to quote", () => {
     expect(newestSaid([])).toBeUndefined();
     expect(newestSaid([line("", "2026-09-28T00:00:00.000Z")])).toBeUndefined();
+  });
+});
+
+describe("momentCalendar", () => {
+  const zone = "Asia/Shanghai";
+
+  it("counts a week's lines and points at its newest", () => {
+    // 2024-01-01 is a Monday, so week 0 is 1–7 January.
+    const rows = momentCalendar(
+      [
+        { key: "a", postedAt: "2024-01-02T04:00:00.000Z" },
+        { key: "b", postedAt: "2024-01-06T04:00:00.000Z" },
+        { key: "c", postedAt: "2024-01-08T04:00:00.000Z" },
+      ],
+      zone,
+    );
+    expect(rows).toEqual([
+      {
+        year: "2024",
+        weeks: [
+          { week: 0, count: 2, newest: "b", start: "2024-01-01" },
+          { week: 1, count: 1, newest: "c", start: "2024-01-08" },
+        ],
+      },
+    ]);
+  });
+
+  it("starts week 0 on 1 January even mid-week, and the next on Monday", () => {
+    // 2026-01-01 is a Thursday: week 0 is 1–4 January, week 1 starts the 5th.
+    const [row] = momentCalendar(
+      [
+        { key: "a", postedAt: "2026-01-04T04:00:00.000Z" },
+        { key: "b", postedAt: "2026-01-05T04:00:00.000Z" },
+        { key: "c", postedAt: "2026-12-31T04:00:00.000Z" },
+      ],
+      zone,
+    );
+    expect(row!.weeks.map((w) => [w.week, w.start])).toEqual([
+      [0, "2026-01-01"],
+      [1, "2026-01-05"],
+      [52, "2026-12-28"],
+    ]);
+  });
+
+  it("files a line by the zone's day, which can be next year's", () => {
+    const rows = momentCalendar([{ key: "a", postedAt: "2023-12-31T17:30:00.000Z" }], zone);
+    expect(rows.map((r) => r.year)).toEqual(["2024"]);
+  });
+
+  it("gives a silent year its row, newest year first", () => {
+    const rows = momentCalendar(
+      [
+        { key: "a", postedAt: "2019-06-01T04:00:00.000Z" },
+        { key: "b", postedAt: "2021-06-01T04:00:00.000Z" },
+      ],
+      zone,
+    );
+    expect(rows.map((r) => [r.year, r.weeks.length])).toEqual([
+      ["2021", 1],
+      ["2020", 0],
+      ["2019", 1],
+    ]);
+  });
+
+  it("is empty with nothing said", () => {
+    expect(momentCalendar([], zone)).toEqual([]);
+  });
+});
+
+describe("weeksInYear", () => {
+  it("counts the part-weeks at either end", () => {
+    expect(weeksInYear(2024)).toBe(53); // Monday start, leap year: 52 weeks and 2 days
+    expect(weeksInYear(2026)).toBe(53); // Thursday start: 4 days, 51 weeks, 4 days
+    expect(weeksInYear(2040)).toBe(54); // Sunday start, leap: 1 day, 52 weeks, 2 days
   });
 });
