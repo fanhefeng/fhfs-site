@@ -5,7 +5,14 @@
  * the navigation table sorts into (`nav_items.group`), so a section is found
  * here by remembering where its page sits out front, not by remembering which
  * table it happens to live in. `site` is the fourth, and holds what has no page
- * of its own — copy, navigation, the retired shelf.
+ * of its own — copy and navigation.
+ *
+ * `/admin/works` is deliberately not listed. The shelf the old /portfolio read
+ * is kept — the table, the editor, `saveWork` — for the day a first work is
+ * hung (docs/DESIGN.md, 09-14), but it is empty and nothing out front reads
+ * it, so it left the sidebar and the dashboard (2026-09-29) rather than sit
+ * there as a section with nothing to do. Its editor still answers at its
+ * address.
  *
  * Like `./styles`, this file imports nothing, and for the same reason: the
  * sidebar is a client component, and reaching for `@/db/schema` to name a table
@@ -140,7 +147,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
   {
     id: "site",
     label: "站点",
-    caption: "没有单独页面的那些：全站通用的字、路，和已经下线的架子。",
+    caption: "没有单独页面的那些：全站通用的字，和各处的导航。",
     sections: [
       {
         href: "/admin/copy",
@@ -158,13 +165,6 @@ export const SECTION_GROUPS: AdminGroup[] = [
         blurb: "顶栏、页脚、全屏菜单和站点地图上分别出现哪几条。",
         view: null,
         unit: "条",
-      },
-      {
-        href: "/admin/works",
-        label: "作品集",
-        blurb: "旧的 /portfolio 留下的架子——该页已 308 到 /software，目前前台没有入口。",
-        view: null,
-        unit: "件",
       },
     ],
   },

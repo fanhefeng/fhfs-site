@@ -28,7 +28,8 @@ export default async function WorksPage() {
   return (
     <AdminChrome title="作品集" section="/admin/works">
       <Note>
-        /portfolio 已经 308 到 /software，前台没有页面读这张表——这里存的东西目前不会出现在站上。
+        /portfolio 已经 308 到
+        /software，前台没有页面读这张表——这里存的东西目前不会出现在站上。这一页也不在侧栏里了，只有这个地址进得来。
       </Note>
 
       <div className="space-y-12">

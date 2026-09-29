@@ -38,7 +38,6 @@ const TABLES: Record<string, PgTable> = {
   "/admin/chips": schema.chips,
   "/admin/copy": schema.copyBlocks,
   "/admin/nav": schema.navItems,
-  "/admin/works": schema.works,
 };
 
 export type { SectionCounts };
