@@ -70,6 +70,46 @@ export const list = (form: FormData, key: string): string[] =>
     .filter(Boolean);
 
 /**
+ * One row of a repeated group — the stills on a film's wall, the lines it
+ * quotes — read the way the whole form is. The admin's `RowsField` names its
+ * inputs `<group>.<position>.<field>`; the positions arrive in the order the
+ * rows stand on the page, and only that order survives here.
+ */
+export type FormRow = {
+  str: (field: string) => string;
+  localized: (field: string) => { zh: string; en: string };
+};
+
+/** The rows of one group, in order. A group with none sends no field at all. */
+export function formRows(form: FormData, group: string): FormRow[] {
+  const prefix = `${group}.`;
+  const positions = new Set<number>();
+  for (const key of form.keys()) {
+    if (!key.startsWith(prefix)) continue;
+    const position = /^(\d+)\./.exec(key.slice(prefix.length));
+    if (position) positions.add(Number(position[1]));
+  }
+  return [...positions]
+    .sort((a, b) => a - b)
+    .map((position) => {
+      const at = (field: string) => `${prefix}${position}.${field}`;
+      return {
+        str: (field) => str(form, at(field)),
+        localized: (field) => localized(form, at(field)),
+      };
+    });
+}
+
+/** A colour as the rooms store one: `#5b3f8a`. */
+export const validColor = (value: string): boolean => /^#[0-9a-f]{6}$/i.test(value);
+
+/** A picture's pixel count, as typed: a whole positive number, or 0 for anything else. */
+export const pixels = (value: string): number => {
+  const n = Number(value);
+  return Number.isInteger(n) && n > 0 && n <= 100_000 ? n : 0;
+};
+
+/**
  * The grammar of a key, as source: the action tests it, and the "new" forms
  * hand the same string to `<input pattern>` so a bad key is caught beside the
  * field instead of after a round trip. The hyphen is escaped because a

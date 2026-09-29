@@ -85,8 +85,16 @@ export const COPY_GROUPS: CopyGroup[] = [
   { id: "blog", label: "文章 /blog", blurb: "列表页与每篇文章周围的字。" },
   { id: "software", label: "软件 /software", blurb: "卡片以外的标题、分类和那台设备。" },
   { id: "lab", label: "实验室 /lab", blurb: "每一则研究的名字、导语与台词。" },
-  { id: "films", label: "电影 /films", blurb: "每个房间的介绍与画面说明。" },
-  { id: "idols", label: "偶像 /idols", blurb: "每位的生平、数字与注脚。" },
+  {
+    id: "films",
+    label: "电影 /films",
+    blurb: "每部电影都用的框架字：资料栏的名目、看剧照的按钮。每部片子自己的内容在后台「电影」里。",
+  },
+  {
+    id: "idols",
+    label: "偶像 /idols",
+    blurb: "索引页的字，和科比那尊铜像周围的话。每位偶像自己的内容在后台「偶像」里。",
+  },
   { id: "life", label: "人生 /life", blurb: "版本履历那一页的框架文字。" },
   { id: "moments", label: "说说 /moments", blurb: "峰言峰语那面板子上的固定字。" },
   { id: "secrets", label: "秘密 /secrets", blurb: "随笔与播客列表周围的字。" },

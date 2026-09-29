@@ -15,6 +15,8 @@ import { renderMarkdown } from "@/lib/server/markdown";
 
 import { readingMinutes } from "@/lib/reading";
 
+import { asset } from "@/lib/asset";
+
 /**
  * Every write the admin can make.
  *
@@ -67,6 +69,27 @@ export const linkError = (label: string): ActionState => ({
 export const existsError = (key: string): ActionState => ({
   error: `key 已存在：已经有「${key}」了，换一个或去编辑原来那条。`,
 });
+
+/**
+ * The first site path the asset manifest does not know, as the form's error —
+ * or null. A file under public/ is reached by its hashed address and
+ * `asset()` throws for one it does not know: better here, beside the field,
+ * than on the public page. Uploads are Blob addresses and pass untouched.
+ * `folder` is where such a file belongs, for the message.
+ */
+export function unknownAsset(paths: readonly string[], folder: string): ActionState | null {
+  for (const path of paths) {
+    if (!path.startsWith("/")) continue;
+    try {
+      asset(path);
+    } catch {
+      return {
+        error: `${path} 不在 assets.gen.json 里——文件放进 public/${folder}/ 后跑 pnpm assets，再存一次；或者直接在这里上传。`,
+      };
+    }
+  }
+  return null;
+}
 
 /** A table saved by its `key` column — every record list the admin edits
  *  one row at a time. */

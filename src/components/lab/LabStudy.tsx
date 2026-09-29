@@ -4,11 +4,8 @@ import { asset } from "@/lib/asset";
 import dynamic from "next/dynamic";
 import type { LabSlug } from "./entries";
 import { LENS_SLIDES } from "./lensSlides";
-// The neon sign hangs the La La Land room's stills — same files, same
-// captions, read straight off that room's fixture list.
-import { LALA_STILLS } from "@/components/films/lalaStills";
-import { filmEntry } from "@/components/films/entries";
-import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
+import type { StillItem } from "@/components/films/FilmStills";
+import type { FilmRatio } from "@/lib/films";
 import type { ChangelogEntry } from "@/components/about/Changelog";
 import type { GroveCardData } from "@/components/grove/GroveCard";
 import { DeskFallback, SceneGate, StageFallback } from "./SceneGate";
@@ -120,9 +117,13 @@ type Props = {
   entries?: ChangelogEntry[];
   /** The approach study's two cards — the home page's, built by the page. */
   cards?: [GroveCardData, GroveCardData];
+  /** The screening room's and the neon sign's stills — a film room's, read by the page. */
+  wall?: { ratio: FilmRatio; stills: StillItem[] };
+  /** The photograph standing in for the statue, resolved by the page. */
+  standIn?: { src: string; width: number; height: number };
 };
 
-export function LabStudy({ slug, accent, text, entries, cards }: Props) {
+export function LabStudy({ slug, accent, text, entries, cards, wall, standIn }: Props) {
   // The page fills `text` key by key from a list it keeps by hand. A key it
   // forgot used to arrive here as `undefined` and render as a blank; every
   // study is prerendered, so throwing turns that into a failed build instead.
@@ -130,6 +131,12 @@ export function LabStudy({ slug, accent, text, entries, cards }: Props) {
     const value = text[key];
     if (value === undefined)
       throw new Error(`lab study "${slug}" asks for text.${key}, which the page never set`);
+    return value;
+  };
+  // Likewise the data a study needs from the page, where it has any.
+  const need = <T,>(value: T | undefined, name: string): T => {
+    if (value === undefined)
+      throw new Error(`lab study "${slug}" needs ${name}, which the page never set`);
     return value;
   };
   switch (slug) {
@@ -274,16 +281,7 @@ export function LabStudy({ slug, accent, text, entries, cards }: Props) {
           galleryLede={s("galleryLede")}
           stillsCredit={s("stillsCredit")}
           credit={s("credit")}
-          stills={LALA_STILLS.map((still) => ({
-            src: asset(`/films/lala/${still.file}.jpg`),
-            width: still.width,
-            height: still.height,
-            span: still.span,
-            focus: still.focus,
-            alt: s(`${still.id}Alt`),
-            title: s(`${still.id}Title`),
-            meta: s(`${still.id}Meta`),
-          }))}
+          stills={need(wall, "wall").stills}
         />
       );
 
@@ -484,8 +482,7 @@ export function LabStudy({ slug, accent, text, entries, cards }: Props) {
       return <VeilDemo accent={accent} label={s("label")} body={s("body")} action={s("action")} />;
     case "island":
       return <IslandDemo accent={accent} label={s("label")} body={s("body")} />;
-    case "statue": {
-      const cover = KOBE_PHOTOS[0]!;
+    case "statue":
       return (
         <StatueDemo
           accent={accent}
@@ -502,17 +499,11 @@ export function LabStudy({ slug, accent, text, entries, cards }: Props) {
           dragHint={s("dragHint")}
           loading={s("loading")}
           fallbackNote={s("fallback")}
-          fallback={{
-            src: asset(`/idols/kobe/${cover.file}`),
-            width: cover.width,
-            height: cover.height,
-            alt: s("coverAlt"),
-          }}
+          fallback={{ ...need(standIn, "standIn"), alt: s("coverAlt") }}
           turnLeft={s("turnLeft")}
           turnRight={s("turnRight")}
         />
       );
-    }
     case "changelog":
       // An empty list would prerender as a study with nothing in it and no
       // error to notice; the page is the only thing that fills this in.
@@ -524,21 +515,15 @@ export function LabStudy({ slug, accent, text, entries, cards }: Props) {
         </div>
       );
     case "screening": {
-      const film = filmEntry("odyssey")!;
+      const { ratio, stills } = need(wall, "wall");
       return (
         <div className="mx-auto w-full max-w-[1040px] px-6 pt-8">
           <div className="mb-10">
             <StudyLede>{s("lede")}</StudyLede>
           </div>
           <FilmStills
-            folder={film.slug}
-            ratio={film.ratio}
-            stills={film.stills.map((still) => ({
-              ...still,
-              title: s(`${still.id}Title`),
-              meta: s(`${still.id}Meta`),
-              alt: s(`${still.id}Alt`),
-            }))}
+            ratio={ratio}
+            stills={stills}
             text={{
               open: s("open"),
               close: s("close"),

@@ -1,5 +1,8 @@
 import { sql } from "drizzle-orm";
 import type { MomentMedia } from "../lib/moments";
+import type { FilmFacts, FilmLine, FilmPart, FilmRatio, FilmStill } from "../lib/films";
+import type { IdolMilestone, IdolPhoto } from "../lib/idols";
+import type { TrackId } from "../lib/tracks";
 import {
   boolean,
   check,
@@ -250,6 +253,102 @@ export const works = pgTable("works", {
   // Stored for the same reason apps carry one: a colour derived from list
   // position repaints the whole wall the moment anything is reordered.
   accent: text(),
+  sort: integer().notNull().default(0),
+});
+
+// ---------------------------------------------------------------------------
+// The rooms with a page per row
+// ---------------------------------------------------------------------------
+
+/**
+ * The films room: a row per film, `/films/<key>`. Everything the page says is
+ * here — the header, the facts, the story (a paragraph per line), the parts
+ * of a film released in several, the lines it quotes, and the wall of stills
+ * with a caption each (`FilmStill`); the section labels shared by every film
+ * stay in the catalogue under `films`. `track` is the record the room puts on
+ * at its door (`lib/tracks`), or null for none; `cover` names the still on
+ * the index card. Came over from code with its three films on 2026-09-29.
+ */
+export const films = pgTable("films", {
+  id: serial().primaryKey(),
+  key: text().notNull().unique(),
+  title: localized().notNull(),
+  /** The line over the title. */
+  kicker: localized().notNull(),
+  /** The index card's line, and the page's description. */
+  subtitle: localized().notNull(),
+  /** The title in the other script — the original, on the English page. */
+  latin: localized().notNull(),
+  /** Who made it, in one line under the title. */
+  meta: localized().notNull(),
+  lede: localized().notNull(),
+  year: text().notNull(),
+  track: text().$type<TrackId>(),
+  accent: text(),
+  /** The frame every print on the wall is cut to (`FilmRatio`). */
+  ratio: text().$type<FilmRatio>().notNull(),
+  cover: text(),
+  facts: jsonb().$type<FilmFacts>().notNull(),
+  storyTitle: localized("story_title").notNull(),
+  story: jsonb().$type<LocalizedLines>().notNull().default(EMPTY_LINES),
+  partsKicker: localized("parts_kicker").notNull(),
+  partsTitle: localized("parts_title").notNull(),
+  parts: jsonb()
+    .$type<FilmPart[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  linesTitle: localized("lines_title").notNull(),
+  lines: jsonb()
+    .$type<FilmLine[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  stillsKicker: localized("stills_kicker").notNull(),
+  stillsTitle: localized("stills_title").notNull(),
+  stillsLede: localized("stills_lede").notNull(),
+  stills: jsonb()
+    .$type<FilmStill[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  /** The rights line at the foot — whose stills these are. */
+  credit: localized().notNull(),
+  /** Being hung: only the admin's preview shows it (`app/admin/preview`). */
+  draft: boolean().notNull().default(false),
+  sort: integer().notNull().default(0),
+});
+
+/**
+ * The idols wall: a row per idol, `/idols/<key>`. The name and the numbers,
+ * the photographs with their provenance (`IdolPhoto`), the milestones. The
+ * statue on Kobe's page is code, not a column — see `lib/idols`.
+ */
+export const idols = pgTable("idols", {
+  id: serial().primaryKey(),
+  key: text().notNull().unique(),
+  name: localized().notNull(),
+  latin: localized().notNull(),
+  kicker: localized().notNull(),
+  /** Printed as written, in both languages: `1978 – 2020`. */
+  years: text().notNull(),
+  /** The shirt numbers, or whatever stands for them: `8 · 24`. */
+  numbers: text().notNull(),
+  lede: localized().notNull(),
+  accent: text(),
+  cover: text(),
+  galleryKicker: localized("gallery_kicker").notNull(),
+  galleryTitle: localized("gallery_title").notNull(),
+  galleryLede: localized("gallery_lede").notNull(),
+  photos: jsonb()
+    .$type<IdolPhoto[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  timelineKicker: localized("timeline_kicker").notNull(),
+  timelineTitle: localized("timeline_title").notNull(),
+  timeline: jsonb()
+    .$type<IdolMilestone[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
+  credit: localized().notNull(),
+  draft: boolean().notNull().default(false),
   sort: integer().notNull().default(0),
 });
 

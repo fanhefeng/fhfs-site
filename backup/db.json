@@ -9505,6 +9505,1547 @@
     }
   ],
   "works": [],
+  "films": [
+    {
+      "key": "odyssey",
+      "title": {
+        "en": "A Chinese Odyssey",
+        "zh": "大话西游"
+      },
+      "kicker": {
+        "en": "A Chinese Odyssey · 1995",
+        "zh": "大话西游 · 1995"
+      },
+      "subtitle": {
+        "en": "A film watched many times over: two parts, a few stills, the lines I remember, and the song over the end credits.",
+        "zh": "一部看了很多遍的电影：上下两部，几张剧照，记得的几句台词，和片尾那首《一生所爱》。"
+      },
+      "latin": {
+        "en": "大话西游",
+        "zh": "A Chinese Odyssey"
+      },
+      "meta": {
+        "en": "Jeffrey Lau · Stephen Chow · Athena Chu · Karen Mok · 1995",
+        "zh": "刘镇伟 · 周星驰 · 朱茵 · 莫文蔚 · 1995"
+      },
+      "lede": {
+        "en": "Pandora's Box and Cinderella baffled most people when they came out in 1995; a few years later they were watched over and over in university dorms and video halls, and became, for many, the best Stephen Chow there is. Joker, Zixia, Bai Jingjing, the Pandora's Box — and the song over the end credits, 一生所愛, which plays while you are on this page.",
+        "zh": "《月光宝盒》和《大圣娶亲》1995 年上映时没多少人看懂，几年后在大学宿舍和录像厅里被一遍遍重看，成了很多人心里最好的那部周星驰。至尊宝、紫霞、白晶晶、月光宝盒——还有片尾那首《一生所爱》，进了这一页就会响起。"
+      },
+      "year": "1995",
+      "track": "odyssey",
+      "accent": "#b8552e",
+      "ratio": "video",
+      "cover": "monkeyKing",
+      "facts": {
+        "cast": {
+          "en": "Stephen Chow · Ng Man-tat · Athena Chu · Karen Mok · Yammie Lam · Law Kar-ying",
+          "zh": "周星驰 · 吴孟达 · 朱茵 · 莫文蔚 · 蓝洁瑛 · 罗家英"
+        },
+        "rating": {
+          "en": "9.0 / 9.2",
+          "zh": "9.0 / 9.2"
+        },
+        "runtime": {
+          "en": "88 + 95 min",
+          "zh": "88 + 95 分钟"
+        },
+        "director": {
+          "en": "Jeffrey Lau",
+          "zh": "刘镇伟"
+        },
+        "released": {
+          "en": "1995.01.21 / 02.04 · Hong Kong",
+          "zh": "1995.01.21 / 02.04 · 香港"
+        }
+      },
+      "storyTitle": {
+        "en": "Five hundred years before, five hundred years after",
+        "zh": "五百年前，五百年后"
+      },
+      "story": {
+        "en": [
+          "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. To save Bai Jingjing he uses the Pandora's Box to land back in the same night again and again — until the box carries him five hundred years back instead, into the Bull King's cave, where he meets Zixia. To save her he must put on the golden headband and become the Monkey King; with it on, he may feel nothing again. The two parts are that one choice."
+        ],
+        "zh": [
+          "五百年后，孙悟空转世成了斧头帮的至尊宝。为了救白晶晶，他靠着一只月光宝盒一次次回到同一个夜晚，结果宝盒把他送回了五百年前，在牛魔王的洞府里遇见了紫霞。要救紫霞，他得戴上金箍成为孙悟空；戴上金箍，就不能再有七情六欲。上下两部讲的就是这一个选择。"
+        ]
+      },
+      "partsKicker": {
+        "en": "The two parts",
+        "zh": "上下两部"
+      },
+      "partsTitle": {
+        "en": "Pandora's Box, and Cinderella",
+        "zh": "月光宝盒，与大圣娶亲"
+      },
+      "parts": [
+        {
+          "meta": {
+            "en": "1995.01.21 · Part one",
+            "zh": "1995.01.21 · 上部"
+          },
+          "note": {
+            "en": "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. Bai Jingjing, Spider Woman, a box that turns back time — he wants to save one person, and keeps landing back in the same night.",
+            "zh": "五百年后，孙悟空转世成了斧头帮的至尊宝。白晶晶、春三十娘、一只月光宝盒——他想救一个人，却一次次回到同一个夜晚。"
+          },
+          "title": {
+            "en": "A Chinese Odyssey Part One: Pandora's Box",
+            "zh": "大话西游之月光宝盒"
+          }
+        },
+        {
+          "meta": {
+            "en": "1995.02.04 · Part two",
+            "zh": "1995.02.04 · 下部"
+          },
+          "note": {
+            "en": "The box carries him five hundred years back, where he meets the fairy Zixia. To save her he must put on the golden headband; with it on, he may never love her again.",
+            "zh": "月光宝盒把他带回五百年前，他遇见了紫霞仙子。要救她，就得戴上金箍；戴上金箍，就不能再爱她。"
+          },
+          "title": {
+            "en": "A Chinese Odyssey Part Two: Cinderella",
+            "zh": "大话西游之大圣娶亲"
+          }
+        }
+      ],
+      "linesTitle": {
+        "en": "The ones I remember",
+        "zh": "记得的那几句"
+      },
+      "lines": [
+        {
+          "meta": {
+            "en": "Joker · to Zixia",
+            "zh": "至尊宝 · 对紫霞"
+          },
+          "text": {
+            "en": "Once there was a sincere love in front of me, and I did not treasure it. Only when I lost it did I regret — there is no greater pain in this world. If heaven gave me one more chance, I would say three words to that girl: I love you. And if a limit had to be put on that love, I would want it to be… ten thousand years.",
+            "zh": "曾经有一份真诚的爱情放在我面前，我没有珍惜，等我失去的时候我才后悔莫及，人世间最痛苦的事莫过于此。如果上天能够给我一个再来一次的机会，我会对那个女孩子说三个字：我爱你。如果非要在这份爱上加上一个期限，我希望是……一万年。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Zixia",
+            "zh": "紫霞"
+          },
+          "text": {
+            "en": "The one I love is a great hero. One day he will come for me on a cloud of seven colours. I guessed the beginning — but I could not guess the ending.",
+            "zh": "我的意中人是个盖世英雄，有一天他会踩着七色云彩来娶我。我猜中了前头，可是我猜不着这结局。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Zixia · on the city wall, at the end",
+            "zh": "紫霞 · 城楼上，片尾"
+          },
+          "text": {
+            "en": "Look at that man. He looks like a dog.",
+            "zh": "你看那个人，好像一条狗啊。"
+          }
+        }
+      ],
+      "stillsKicker": {
+        "en": "Stills · 1995",
+        "zh": "剧照 · 1995"
+      },
+      "stillsTitle": {
+        "en": "The scenes that stayed",
+        "zh": "留在眼里的几幕"
+      },
+      "stillsLede": {
+        "en": "The desert, the city wall, the Spider Cave, a wedding, and that one wink. Open any of them for the screening room.",
+        "zh": "沙漠、城楼、盘丝洞、一场婚礼，和那一次眨眼。点开任何一张，进放映厅看大图。"
+      },
+      "stills": [
+        {
+          "id": "monkeyKing",
+          "alt": {
+            "en": "The Monkey King, headband on, with his staff across his shoulders under a golden sky",
+            "zh": "戴上金箍的孙悟空扛着金箍棒，站在金色的天空下"
+          },
+          "src": "/films/odyssey/monkey-king.jpg",
+          "meta": {
+            "en": "Cinderella · a golden sky",
+            "zh": "大圣娶亲 · 金色的天"
+          },
+          "span": "wide",
+          "title": {
+            "en": "The Monkey King",
+            "zh": "齐天大圣"
+          },
+          "width": 1800,
+          "height": 1013
+        },
+        {
+          "id": "wink",
+          "alt": {
+            "en": "The fairy Zixia winking at the camera",
+            "zh": "紫霞仙子对着镜头眨了一下眼"
+          },
+          "src": "/films/odyssey/wink.jpg",
+          "meta": {
+            "en": "Cinderella · Zixia",
+            "zh": "大圣娶亲 · 紫霞"
+          },
+          "span": "tall",
+          "focus": "24% 45%",
+          "title": {
+            "en": "That wink",
+            "zh": "那一次眨眼"
+          },
+          "width": 1280,
+          "height": 720
+        },
+        {
+          "id": "desert",
+          "alt": {
+            "en": "Two people sitting side by side on the crest of a dune in an endless desert",
+            "zh": "无边的沙漠里，两个人并肩坐在沙丘顶上"
+          },
+          "src": "/films/odyssey/desert.jpg",
+          "meta": {
+            "en": "Cinderella · on the dunes",
+            "zh": "大圣娶亲 · 沙丘上"
+          },
+          "span": "one",
+          "title": {
+            "en": "The desert",
+            "zh": "沙漠"
+          },
+          "width": 1800,
+          "height": 1013
+        },
+        {
+          "id": "reeds",
+          "alt": {
+            "en": "Joker standing among pink reeds, looking back",
+            "zh": "至尊宝站在一片粉红色的草丛里回头看"
+          },
+          "src": "/films/odyssey/reeds.jpg",
+          "meta": {
+            "en": "Pandora's Box · Joker",
+            "zh": "月光宝盒 · 至尊宝"
+          },
+          "span": "one",
+          "title": {
+            "en": "The reeds",
+            "zh": "草丛"
+          },
+          "width": 1800,
+          "height": 1013
+        },
+        {
+          "id": "bride",
+          "alt": {
+            "en": "The fairy Zixia in a phoenix crown and a red wedding dress",
+            "zh": "戴着凤冠、穿着红嫁衣的紫霞仙子"
+          },
+          "src": "/films/odyssey/bride.jpg",
+          "meta": {
+            "en": "Cinderella · Zixia",
+            "zh": "大圣娶亲 · 紫霞"
+          },
+          "span": "one",
+          "title": {
+            "en": "The phoenix crown",
+            "zh": "凤冠"
+          },
+          "width": 1280,
+          "height": 720
+        },
+        {
+          "id": "wedding",
+          "alt": {
+            "en": "A wedding all in red — Zixia, the Bull King and Joker standing together",
+            "zh": "一片红色的婚礼现场，紫霞、牛魔王和至尊宝站在一起"
+          },
+          "src": "/films/odyssey/wedding.jpg",
+          "meta": {
+            "en": "Cinderella · the Bull King's cave",
+            "zh": "大圣娶亲 · 牛魔王的洞府"
+          },
+          "span": "one",
+          "title": {
+            "en": "The wedding",
+            "zh": "婚礼"
+          },
+          "width": 1800,
+          "height": 1011
+        },
+        {
+          "id": "jingjing",
+          "alt": {
+            "en": "In the desert, Joker holding Bai Jingjing where she has fallen",
+            "zh": "沙漠里，至尊宝抱着倒在地上的白晶晶"
+          },
+          "src": "/films/odyssey/jingjing.jpg",
+          "meta": {
+            "en": "Pandora's Box · the desert",
+            "zh": "月光宝盒 · 沙漠"
+          },
+          "span": "one",
+          "title": {
+            "en": "Bai Jingjing",
+            "zh": "白晶晶"
+          },
+          "width": 1800,
+          "height": 1013
+        },
+        {
+          "id": "cave",
+          "alt": {
+            "en": "Joker sitting among the tangled roots inside the Spider Cave",
+            "zh": "至尊宝坐在盘丝洞里盘根错节的树根之间"
+          },
+          "src": "/films/odyssey/cave.jpg",
+          "meta": {
+            "en": "Cinderella · inside",
+            "zh": "大圣娶亲 · 洞里"
+          },
+          "span": "one",
+          "title": {
+            "en": "The Spider Cave",
+            "zh": "盘丝洞"
+          },
+          "width": 1800,
+          "height": 1012
+        },
+        {
+          "id": "zixia",
+          "alt": {
+            "en": "The fairy Zixia raising a hand, smiling at the camera",
+            "zh": "紫霞仙子举起手，笑着看向镜头"
+          },
+          "src": "/films/odyssey/zixia.jpg",
+          "meta": {
+            "en": "Cinderella · a raised hand",
+            "zh": "大圣娶亲 · 举起的手"
+          },
+          "span": "one",
+          "title": {
+            "en": "Zixia",
+            "zh": "紫霞"
+          },
+          "width": 1800,
+          "height": 1012
+        },
+        {
+          "id": "box",
+          "alt": {
+            "en": "Joker sitting on the ground, holding up the Pandora's Box",
+            "zh": "至尊宝坐在地上，手里举着月光宝盒"
+          },
+          "src": "/films/odyssey/box.jpg",
+          "meta": {
+            "en": "Pandora's Box · Joker",
+            "zh": "月光宝盒 · 至尊宝"
+          },
+          "span": "one",
+          "title": {
+            "en": "Pandora's Box",
+            "zh": "月光宝盒"
+          },
+          "width": 1800,
+          "height": 1013
+        },
+        {
+          "id": "gate",
+          "alt": {
+            "en": "The Monkey King, headband on, staff across his shoulders in front of a city gate",
+            "zh": "戴着金箍的孙悟空扛着棒，站在城门前"
+          },
+          "src": "/films/odyssey/gate.jpg",
+          "meta": {
+            "en": "Cinderella · the Monkey King",
+            "zh": "大圣娶亲 · 孙悟空"
+          },
+          "span": "one",
+          "title": {
+            "en": "The gate",
+            "zh": "城门"
+          },
+          "width": 1280,
+          "height": 720
+        },
+        {
+          "id": "wall",
+          "alt": {
+            "en": "On the city wall, two people standing in an embrace, snow mountains in the distance",
+            "zh": "城楼上，两个人相拥站着，远处是雪山"
+          },
+          "src": "/films/odyssey/wall.jpg",
+          "meta": {
+            "en": "Cinderella · the ending",
+            "zh": "大圣娶亲 · 片尾"
+          },
+          "span": "full",
+          "focus": "60% 55%",
+          "title": {
+            "en": "On the city wall",
+            "zh": "城楼上"
+          },
+          "width": 1800,
+          "height": 1013
+        }
+      ],
+      "credit": {
+        "en": "Stills © 1995 Choi Sing Film / Xi'an Film Studio, via TMDB; the closing song 一生所愛 (Lowell Lo, 1995) is a recording this site hosts itself, played whole and looped. A personal homage only.",
+        "zh": "剧照 © 1995 彩星电影公司 / 西安电影制片厂，取自 TMDB；片尾曲《一生所爱》（卢冠廷，1995）为本站自托管的录音，整首循环。仅作个人致敬之用。"
+      },
+      "draft": false,
+      "sort": 0
+    },
+    {
+      "key": "secret",
+      "title": {
+        "en": "Secret",
+        "zh": "不能说的秘密"
+      },
+      "kicker": {
+        "en": "Secret · 2007",
+        "zh": "不能说的秘密 · 2007"
+      },
+      "subtitle": {
+        "en": "Jay Chou's first film as director: an old piano room, a piece that plays time backwards, and the hundred and eight steps from the piano room to the classroom.",
+        "zh": "周杰伦的第一部导演作品：一间旧琴房、一首能把时间弹回去的曲子，和从琴房到教室的一百零八步。"
+      },
+      "latin": {
+        "en": "不能說的·秘密",
+        "zh": "Secret"
+      },
+      "meta": {
+        "en": "Jay Chou · Gwei Lun-mei · Anthony Wong · 2007",
+        "zh": "周杰伦 · 桂纶镁 · 黄秋生 · 2007"
+      },
+      "lede": {
+        "en": "The summer of 2007, and the first film Jay Chou directed and starred in. The red-brick arcades of Tamkang, an old piano room about to be pulled down, a piece called Secret — and Lu Xiaoyu, whom Ye Xianglun meets in that room on his first day and who never quite answers a question. That, she says, is a secret. The title song plays while you are on this page.",
+        "zh": "2007 年夏天，周杰伦自导自演的第一部电影。淡江中学的红砖拱廊、一间快要拆掉的旧琴房、一首名字叫《Secret》的曲子——叶湘伦转学第一天在琴房里遇见的路小雨，总是欲言又止，只说那是秘密。片名那首歌，进了这一页就会响起。"
+      },
+      "year": "2007",
+      "track": "secret",
+      "accent": "#8a6a3d",
+      "ratio": "photo",
+      "cover": "piano",
+      "facts": {
+        "cast": {
+          "en": "Jay Chou · Gwei Lun-mei · Anthony Wong · Alice Tzeng",
+          "zh": "周杰伦 · 桂纶镁 · 黄秋生 · 曾恺玹"
+        },
+        "rating": {
+          "en": "8.2",
+          "zh": "8.2"
+        },
+        "runtime": {
+          "en": "101 min",
+          "zh": "101 分钟"
+        },
+        "director": {
+          "en": "Jay Chou",
+          "zh": "周杰伦"
+        },
+        "released": {
+          "en": "2007.07.27 · Taiwan",
+          "zh": "2007.07.27 · 台湾"
+        }
+      },
+      "storyTitle": {
+        "en": "A hundred and eight steps",
+        "zh": "从琴房到教室，一百零八步"
+      },
+      "story": {
+        "en": [
+          "Ye Xianglun transfers to the arts school where his father teaches, and on his first day follows an unfamiliar tune to the old piano room, where Lu Xiaoyu is playing. He asks what the piece is; that, she says, is a secret. She is often missing from class, and after one misunderstanding she vanishes for good — until he finds her in a class photograph from 1979 in the school's archive. On the day the piano room is to be pulled down, he sits at the piano and plays Secret from the top."
+        ],
+        "zh": [
+          "叶湘伦转学到父亲任教的淡江艺术学校，第一天就在旧琴房里循着一段陌生的琴声，遇见了路小雨。他问她弹的是什么，她说，那是秘密。小雨时常不来上课，一场误会之后彻底消失；湘伦却在校史室一张 1979 年的合影里看见了她。琴房要拆的那天，他坐到琴前，把那首《Secret》从头弹起。"
+        ]
+      },
+      "partsKicker": {
+        "en": "",
+        "zh": ""
+      },
+      "partsTitle": {
+        "en": "",
+        "zh": ""
+      },
+      "parts": [],
+      "linesTitle": {
+        "en": "The ones I remember",
+        "zh": "记得的那几句"
+      },
+      "lines": [
+        {
+          "meta": {
+            "en": "Lu Xiaoyu · to Xianglun",
+            "zh": "路小雨 · 对湘伦"
+          },
+          "text": {
+            "en": "I'll tell you a secret… I counted. From the piano room to the classroom is a hundred and eight steps.",
+            "zh": "我跟你说个秘密哦……我数过，从琴房到教室，一共一百零八步。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Xianglun and Xiaoyu · in the piano room",
+            "zh": "湘伦与小雨 · 琴房里"
+          },
+          "text": {
+            "en": "The woman Chopin loved most — they were together ten years… and still they parted. — But to have had ten years is already a long time.",
+            "zh": "肖邦最爱的女人，他们在一起十年……最后还不是分开了。——但是，能够拥有十年，已经很长了。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Lu Xiaoyu · written on the score of Secret",
+            "zh": "路小雨 · 写在《Secret》的琴谱上"
+          },
+          "text": {
+            "en": "Whether or not we meet again, whether or not you forget me, I only want to tell you one secret: I love you.",
+            "zh": "不管我们能不能见面，不管你会不会忘了我，我只想告诉你一个秘密：我爱你。"
+          }
+        }
+      ],
+      "stillsKicker": {
+        "en": "Stills · 2007",
+        "zh": "剧照 · 2007"
+      },
+      "stillsTitle": {
+        "en": "The scenes that stayed",
+        "zh": "留在眼里的几幕"
+      },
+      "stillsLede": {
+        "en": "The piano room, the arcade, a rainy day, a photograph from 1979, and the sunset on the roof. Open any of them for the screening room.",
+        "zh": "琴房、拱廊、一场雨、一张 1979 年的合影，和天台上的落日。点开任何一张，进放映厅看大图。"
+      },
+      "stills": [
+        {
+          "id": "piano",
+          "alt": {
+            "en": "In the old piano room, Xianglun at the piano and Xiaoyu leaning on its far end",
+            "zh": "旧琴房里，湘伦坐在钢琴前，小雨靠在琴的另一头"
+          },
+          "src": "/films/secret/piano.jpg",
+          "meta": {
+            "en": "First meeting · the old piano room",
+            "zh": "第一次相遇 · 旧琴房"
+          },
+          "span": "wide",
+          "title": {
+            "en": "The piano room",
+            "zh": "琴房"
+          },
+          "width": 1628,
+          "height": 1080
+        },
+        {
+          "id": "doorway",
+          "alt": {
+            "en": "Xiaoyu standing in the doorway of the piano room, head down, smiling",
+            "zh": "小雨站在琴房门口，低着头微笑"
+          },
+          "src": "/films/secret/doorway.jpg",
+          "meta": {
+            "en": "Xiaoyu · outside the piano room",
+            "zh": "小雨 · 琴房门外"
+          },
+          "span": "tall",
+          "focus": "58% 30%",
+          "title": {
+            "en": "The doorway",
+            "zh": "门口"
+          },
+          "width": 1544,
+          "height": 1024
+        },
+        {
+          "id": "corridor",
+          "alt": {
+            "en": "The two of them in black coats walking side by side down a red-brick arcade",
+            "zh": "两人穿着黑外套并肩走在红砖拱廊里"
+          },
+          "src": "/films/secret/corridor.jpg",
+          "meta": {
+            "en": "Tamkang · a hundred and eight steps",
+            "zh": "淡江中学 · 一百零八步"
+          },
+          "span": "one",
+          "title": {
+            "en": "The arcade",
+            "zh": "拱廊"
+          },
+          "width": 1500,
+          "height": 994
+        },
+        {
+          "id": "bike",
+          "alt": {
+            "en": "Xianglun cycling with Xiaoyu on the back, one hand on his shoulder",
+            "zh": "湘伦骑车，小雨坐在后座，一只手搭在他肩上"
+          },
+          "src": "/films/secret/bike.jpg",
+          "meta": {
+            "en": "The way home",
+            "zh": "放学路上"
+          },
+          "span": "one",
+          "title": {
+            "en": "The bicycle",
+            "zh": "单车"
+          },
+          "width": 1800,
+          "height": 1013
+        },
+        {
+          "id": "icecream",
+          "alt": {
+            "en": "At dusk by the river, two people touching ice-cream cones together",
+            "zh": "黄昏的河边，两个人举着冰淇淋碰了一下"
+          },
+          "src": "/films/secret/icecream.jpg",
+          "meta": {
+            "en": "The Tamsui riverside · dusk",
+            "zh": "淡水河边 · 黄昏"
+          },
+          "span": "one",
+          "title": {
+            "en": "Ice cream",
+            "zh": "冰淇淋"
+          },
+          "width": 1544,
+          "height": 1024
+        },
+        {
+          "id": "rain",
+          "alt": {
+            "en": "On a rainy campus, the two of them walking side by side under separate umbrellas",
+            "zh": "下雨的校园里，两人各撑一把伞并肩走着"
+          },
+          "src": "/films/secret/rain.jpg",
+          "meta": {
+            "en": "Two umbrellas",
+            "zh": "两把伞"
+          },
+          "span": "one",
+          "title": {
+            "en": "Rain",
+            "zh": "雨"
+          },
+          "width": 1544,
+          "height": 1024
+        },
+        {
+          "id": "duel",
+          "alt": {
+            "en": "In the hall, Xianglun playing with his head down and the seats behind him full of students",
+            "zh": "礼堂里，湘伦低头弹琴，身后坐满了看热闹的学生"
+          },
+          "src": "/films/secret/duel.jpg",
+          "meta": {
+            "en": "The hall · against Yuhao",
+            "zh": "礼堂 · 对宇豪"
+          },
+          "span": "one",
+          "title": {
+            "en": "The piano duel",
+            "zh": "斗琴"
+          },
+          "width": 1544,
+          "height": 1024
+        },
+        {
+          "id": "desk",
+          "alt": {
+            "en": "Xiaoyu bent over a desk, writing on it: I am Xiaoyu, I love you, do you love me",
+            "zh": "小雨伏在课桌上写字：我是小雨，我爱你，你爱我吗"
+          },
+          "src": "/films/secret/desk.jpg",
+          "meta": {
+            "en": "1979 · Xiaoyu",
+            "zh": "1979 · 小雨"
+          },
+          "span": "one",
+          "title": {
+            "en": "The desk",
+            "zh": "课桌"
+          },
+          "width": 1728,
+          "height": 735
+        },
+        {
+          "id": "photo1979",
+          "alt": {
+            "en": "In a yellowed photograph, Xiaoyu standing beside the young Mr Ye",
+            "zh": "泛黄的照片里，小雨和年轻时的叶老师站在一起"
+          },
+          "src": "/films/secret/photo1979.jpg",
+          "meta": {
+            "en": "1979 · the archive",
+            "zh": "1979 · 校史室"
+          },
+          "span": "one",
+          "title": {
+            "en": "The photograph",
+            "zh": "合影"
+          },
+          "width": 1500,
+          "height": 1000
+        },
+        {
+          "id": "guitar",
+          "alt": {
+            "en": "Mr Ye playing the guitar by a window at home",
+            "zh": "叶老师坐在家里的窗前弹吉他"
+          },
+          "src": "/films/secret/guitar.jpg",
+          "meta": {
+            "en": "Mr Ye · at home",
+            "zh": "叶老师 · 家里"
+          },
+          "span": "one",
+          "title": {
+            "en": "The guitar",
+            "zh": "吉他"
+          },
+          "width": 1280,
+          "height": 720
+        },
+        {
+          "id": "note",
+          "alt": {
+            "en": "Handwriting on yellowed paper: whether or not we meet again, whether or not you forget me, I only want to tell you one secret",
+            "zh": "泛黄的纸上手写着：不管我们能不能见面，不管你会不会忘了我，我只想告诉你一个秘密"
+          },
+          "src": "/films/secret/note.jpg",
+          "meta": {
+            "en": "Secret · the last page",
+            "zh": "Secret · 最后一页"
+          },
+          "span": "one",
+          "title": {
+            "en": "The words on the score",
+            "zh": "琴谱上的话"
+          },
+          "width": 1800,
+          "height": 758
+        },
+        {
+          "id": "rooftop",
+          "alt": {
+            "en": "On a bench on the roof, the two of them side by side, watching the sun set over the river",
+            "zh": "天台的长椅上，两人并肩看着河上的落日"
+          },
+          "src": "/films/secret/rooftop.jpg",
+          "meta": {
+            "en": "Sunset · the Tamsui river",
+            "zh": "落日 · 淡水河"
+          },
+          "span": "full",
+          "focus": "50% 62%",
+          "title": {
+            "en": "The roof",
+            "zh": "天台"
+          },
+          "width": 1544,
+          "height": 1024
+        }
+      ],
+      "credit": {
+        "en": "Stills © 2007 Edko Films / JVR Music, official stills via Douban and TMDB; 路小雨, from the film's own soundtrack (Jay Chou, 2007), is a recording this site hosts itself, played whole and looped. A personal homage only.",
+        "zh": "剧照 © 2007 安乐影片 / 杰威尔音乐，官方剧照取自豆瓣电影与 TMDB；原声带里的《路小雨》（周杰伦，2007）为本站自托管的录音，整首循环。仅作个人致敬之用。"
+      },
+      "draft": false,
+      "sort": 1
+    },
+    {
+      "key": "lala",
+      "title": {
+        "en": "La La Land",
+        "zh": "爱乐之城"
+      },
+      "kicker": {
+        "en": "La La Land · 2016",
+        "zh": "爱乐之城 · 2016"
+      },
+      "subtitle": {
+        "en": "A pianist who wants a club of his own, a barista who wants to act: in love in Los Angeles, both dreams come true — just not with each other.",
+        "zh": "一个想开俱乐部的钢琴师，一个想当演员的女孩：洛杉矶相爱，各自的梦想都成了真，只是没能是彼此的。"
+      },
+      "latin": {
+        "en": "爱乐之城",
+        "zh": "La La Land"
+      },
+      "meta": {
+        "en": "Ryan Gosling · Emma Stone · 2016",
+        "zh": "瑞恩·高斯林 · 艾玛·斯通 · 2016"
+      },
+      "lede": {
+        "en": "In 2016 Damien Chazelle set the golden-age musical down in today's Los Angeles: a jam on the freeway throws Sebastian, who plays jazz, and Mia, who waits tables and fails auditions, into the same dance. They fall in love under a purple sky and let go where their dreams come true. Mia & Sebastian's Theme plays while you are on this page.",
+        "zh": "2016 年，达米恩·查泽雷把黄金年代的歌舞片放回了今天的洛杉矶：高架桥上的一场群舞，让弹爵士的塞巴斯汀和端咖啡的米娅跳进了同一座城。紫色的夜里相爱，梦想成真的路口分开。主题曲《Mia & Sebastian's Theme》进了这一页就会响起。"
+      },
+      "year": "2016",
+      "track": "theme",
+      "accent": "#3f5fd6",
+      "ratio": "video",
+      "cover": "lamp",
+      "facts": {
+        "cast": {
+          "en": "Ryan Gosling · Emma Stone · John Legend · Rosemarie DeWitt",
+          "zh": "瑞恩·高斯林 · 艾玛·斯通 · 约翰·传奇 · 罗丝玛丽·德威特"
+        },
+        "rating": {
+          "en": "8.4",
+          "zh": "8.4"
+        },
+        "runtime": {
+          "en": "128 min",
+          "zh": "128 分钟"
+        },
+        "director": {
+          "en": "Damien Chazelle",
+          "zh": "达米恩·查泽雷"
+        },
+        "released": {
+          "en": "2016.12.09 · U.S.",
+          "zh": "2016.12.09 · 美国"
+        }
+      },
+      "storyTitle": {
+        "en": "Winter, spring, summer, fall — and winter again",
+        "zh": "冬、春、夏、秋，又一个冬"
+      },
+      "story": {
+        "en": [
+          "In winter Mia waits tables on the studio lot and fails audition after audition, while Sebastian plays the jazz he believes in and is fired for it; a jam on the freeway throws the two of them into the same dance. In spring an old picture house and a planetarium full of stars draw them together; in summer each runs hard — Mia writing her one-woman show, Sebastian touring with Keith's band, singing songs he doesn't believe in — until autumn, and a dinner where it all comes apart. The night the show flops, Mia goes home; one phone call brings her back to a bare audition room, where one quiet song sends her to Paris — and, on a path above the city, the two of them apart. Five winters later, Mia the actress walks into a jazz club called Seb's, and the opening number under the light plays the road they didn't take, from the top."
+        ],
+        "zh": [
+          "冬天，米娅在片场的咖啡店端盘子、一场接一场地试镜，塞巴斯汀在酒吧弹自己想弹的爵士、被老板开除；一场高架上的堵车，把两个人撞进了同一支舞。春天，一部老电影和一晚星空让两人走近；夏天各自奔忙——米娅写自己的独角戏，塞巴斯汀加入了 Keith 的乐队，唱着自己不信的歌四处巡演；秋天，一顿晚餐把话说散了。独角戏演砸的那晚，米娅回了老家，一通电话又把她带回试镜间：一支清唱把她送去了巴黎，也在山间的小路上，把两人送到了分开。五年后的冬夜，已是演员的米娅走进一家叫 Seb's 的爵士俱乐部，灯下的开场曲，把那条没走完的路从头到尾弹了一遍。"
+        ]
+      },
+      "partsKicker": {
+        "en": "",
+        "zh": ""
+      },
+      "partsTitle": {
+        "en": "",
+        "zh": ""
+      },
+      "parts": [],
+      "linesTitle": {
+        "en": "The ones I remember",
+        "zh": "唱过、说过的几句"
+      },
+      "lines": [
+        {
+          "meta": {
+            "en": "Mia, to Sebastian",
+            "zh": "米娅 · 对塞巴斯汀"
+          },
+          "text": {
+            "en": "People will want to go to it because you're passionate about it, and people love what other people are passionate about. You remind people of what they've forgotten.",
+            "zh": "人们会来的。你对它有热情，而人们爱的，正是别人全力以赴的样子。你让他们想起了自己忘掉的东西。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Mia, at the audition — Audition (The Fools Who Dream)",
+            "zh": "米娅 · 试镜时唱的《Audition (The Fools Who Dream)》"
+          },
+          "text": {
+            "en": "Here's to the ones who dream, foolish as they may seem.",
+            "zh": "敬那些做梦的人，哪怕他们显得有点傻。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Mia and Sebastian, on the path after the audition",
+            "zh": "米娅与塞巴斯汀 · 试镜后的路上"
+          },
+          "text": {
+            "en": "I'm always gonna love you. — I'm always gonna love you, too.",
+            "zh": "我会一直爱你。——我也会一直爱你。"
+          }
+        }
+      ],
+      "stillsKicker": {
+        "en": "Stills · 2016",
+        "zh": "剧照 · 2016"
+      },
+      "stillsTitle": {
+        "en": "The scenes that stayed",
+        "zh": "留在眼里的几幕"
+      },
+      "stillsLede": {
+        "en": "The dance on the freeway, the tap under a purple sky, dusk on the pier, a look across a cinema, and the posters' road of piano keys. Open any of them for the screening room.",
+        "zh": "高架上的第一支舞、紫夜里的踢踏、栈桥的黄昏、放映厅的对望，和海报上那条琴键铺成的路。点开任何一张，进放映厅看大图。"
+      },
+      "stills": [
+        {
+          "id": "freeway",
+          "alt": {
+            "en": "On a jammed freeway the drivers leap out of the traffic with their arms flung wide, a woman in a green top jumping highest, the skyline of Los Angeles far behind",
+            "zh": "堵成一片的高架桥上，人们从车流里跃起、张开双臂，穿绿上衣的女子跳得最高，远处是洛杉矶的天际线"
+          },
+          "src": "/films/lala/freeway.jpg",
+          "meta": {
+            "en": "Opening · Another Day of Sun",
+            "zh": "开场 · Another Day of Sun"
+          },
+          "span": "wide",
+          "title": {
+            "en": "The freeway",
+            "zh": "高架"
+          },
+          "width": 1620,
+          "height": 1080
+        },
+        {
+          "id": "roommates",
+          "alt": {
+            "en": "In a blue apartment corridor Mia clutches a blue dress to herself with her hands over her ears, while her three roommates in red, green and yellow lean on the walls and watch her",
+            "zh": "蓝墙的公寓走廊里，米娅抱着一条蓝裙子、双手捂住耳朵，穿红、绿、黄裙子的三位室友靠在墙边看着她"
+          },
+          "src": "/films/lala/roommates.jpg",
+          "meta": {
+            "en": "Getting ready · Someone in the Crowd",
+            "zh": "出门前 · Someone in the Crowd"
+          },
+          "span": "tall",
+          "focus": "50% 38%",
+          "title": {
+            "en": "Roommates",
+            "zh": "室友"
+          },
+          "width": 1620,
+          "height": 1080
+        },
+        {
+          "id": "lovelyNight",
+          "alt": {
+            "en": "On an overlook above the city the two land the same tap step, Mia's yellow dress just settled, a starry purple sky and one lit white lamppost behind",
+            "zh": "俯瞰夜景的高台上，两人踢踏舞跳到同一拍，米娅的黄裙刚落，身后是紫色的星空，和一盏亮着的白色灯柱"
+          },
+          "src": "/films/lala/lovely-night.jpg",
+          "meta": {
+            "en": "The overlook · A Lovely Night",
+            "zh": "山顶 · A Lovely Night"
+          },
+          "span": "one",
+          "title": {
+            "en": "A lovely night",
+            "zh": "良夜"
+          },
+          "width": 1800,
+          "height": 1012
+        },
+        {
+          "id": "piano",
+          "alt": {
+            "en": "In a brick-walled jazz club Sebastian looks back from the piano bench, a round stained-glass window with a lighthouse behind him",
+            "zh": "砖墙的爵士俱乐部里，塞巴斯汀坐在钢琴前回头望，身后是一扇灯塔图案的圆形彩窗"
+          },
+          "src": "/films/lala/piano.jpg",
+          "meta": {
+            "en": "The Lighthouse Café · the piano",
+            "zh": "Lighthouse Café · 钢琴"
+          },
+          "span": "one",
+          "title": {
+            "en": "The lighthouse window",
+            "zh": "灯塔窗"
+          },
+          "width": 1800,
+          "height": 1012
+        },
+        {
+          "id": "pier",
+          "alt": {
+            "en": "At dusk Sebastian walks alone down the pier, old lamp posts on either side, the sky turning from pink to violet",
+            "zh": "黄昏的栈桥上，塞巴斯汀独自走向画面深处，两侧立着老式灯柱，天空由粉转紫"
+          },
+          "src": "/films/lala/pier.jpg",
+          "meta": {
+            "en": "Hermosa Beach · dusk",
+            "zh": "Hermosa Beach · 黄昏"
+          },
+          "span": "one",
+          "title": {
+            "en": "The pier",
+            "zh": "栈桥"
+          },
+          "width": 1403,
+          "height": 789
+        },
+        {
+          "id": "stage",
+          "alt": {
+            "en": "Among the red seats of an old picture house Mia, in a green dress and seen from behind, stands before the screen with the projector's beam shining straight at her; in the aisle to the right, Sebastian in a tan suit stands looking at her",
+            "zh": "老影院的红色座椅之间，米娅穿绿裙背对镜头站在银幕前，放映机的光从正对面打来；右侧的过道上，穿浅褐西装的塞巴斯汀站着望向她"
+          },
+          "src": "/films/lala/stage.jpg",
+          "meta": {
+            "en": "The Rialto · looking for him",
+            "zh": "Rialto · 找人"
+          },
+          "span": "one",
+          "title": {
+            "en": "Before the screen",
+            "zh": "银幕前"
+          },
+          "width": 1624,
+          "height": 1080
+        },
+        {
+          "id": "cinema",
+          "alt": {
+            "en": "In the red seats of a picture house the two sit side by side and turn to each other, the audience a blur behind",
+            "zh": "红色座椅的放映厅里，两人并肩而坐、侧过头对望，身后的观众虚成一片"
+          },
+          "src": "/films/lala/cinema.jpg",
+          "meta": {
+            "en": "The Rialto · the date",
+            "zh": "Rialto · 约会"
+          },
+          "span": "one",
+          "title": {
+            "en": "The cinema",
+            "zh": "放映厅"
+          },
+          "width": 1619,
+          "height": 1080
+        },
+        {
+          "id": "planetarium",
+          "alt": {
+            "en": "Inside a projection of stars the two rise into the air hand in hand, the city a blue blur below",
+            "zh": "星空的投影里，两人手牵手腾空而起，脚下是化成一片蓝光的城市"
+          },
+          "src": "/films/lala/planetarium.jpg",
+          "meta": {
+            "en": "Griffith Observatory · among the stars",
+            "zh": "格里菲斯天文馆 · 星空里"
+          },
+          "span": "one",
+          "title": {
+            "en": "The planetarium",
+            "zh": "天文馆"
+          },
+          "width": 1800,
+          "height": 1012
+        },
+        {
+          "id": "lamp",
+          "alt": {
+            "en": "Against a lit lamppost at night the two embrace and kiss, the yellow dress caught mid-swing, Los Angeles glowing below",
+            "zh": "夜色里两人靠着亮着的灯柱相拥亲吻，黄裙扬起，脚下是洛杉矶的灯海"
+          },
+          "src": "/films/lala/lamp.jpg",
+          "meta": {
+            "en": "Poster · a kiss under the lamp",
+            "zh": "海报 · 灯柱下的吻"
+          },
+          "span": "one",
+          "title": {
+            "en": "The lamppost",
+            "zh": "灯柱"
+          },
+          "width": 1800,
+          "height": 1012
+        },
+        {
+          "id": "messengers",
+          "alt": {
+            "en": "On a stage before a deep red curtain Sebastian sings into a vintage microphone, a wash of blue behind him",
+            "zh": "深红幕布前的舞台上，塞巴斯汀握着复古麦克风唱歌，身后是一片蓝色的光"
+          },
+          "src": "/films/lala/messengers.jpg",
+          "meta": {
+            "en": "The Messengers · on stage",
+            "zh": "The Messengers · 舞台"
+          },
+          "span": "one",
+          "title": {
+            "en": "On tour",
+            "zh": "巡演"
+          },
+          "width": 1620,
+          "height": 1080
+        },
+        {
+          "id": "moonDoor",
+          "alt": {
+            "en": "Through a round doorway the two stand hand in hand, backs to us, facing a hand-painted Paris riverbank — a street clock, lit windows, the water — with red leaves strewn on the ground",
+            "zh": "圆形的门洞里，两人牵手背对镜头，望着一幅手绘的巴黎河岸：街钟、亮灯的楼窗和河水，地上落满红叶"
+          },
+          "src": "/films/lala/moon-door.jpg",
+          "meta": {
+            "en": "What if · the reverie",
+            "zh": "如果当初 · 幻境"
+          },
+          "span": "one",
+          "title": {
+            "en": "The moon door",
+            "zh": "月门"
+          },
+          "width": 1619,
+          "height": 1080
+        },
+        {
+          "id": "keys",
+          "alt": {
+            "en": "Under a grey, starry sky a row of piano keys curves into a road hung in the air; on it the two embrace and kiss, Mia's yellow dress lifted with one leg, a lit lamppost at the far end, their reflection on the mirror-like floor below",
+            "zh": "灰白的星空下，一排琴键弯成一条悬空的路，两人在路上相拥亲吻，米娅的黄裙扬起一条腿，路的另一头立着一盏亮着的灯柱，倒影落在下方的镜面上"
+          },
+          "src": "/films/lala/keys.jpg",
+          "meta": {
+            "en": "Poster · a road paved in keys",
+            "zh": "海报 · 一条琴键铺的路"
+          },
+          "span": "full",
+          "title": {
+            "en": "A road of piano keys",
+            "zh": "琴键之路"
+          },
+          "width": 1800,
+          "height": 1012
+        }
+      ],
+      "credit": {
+        "en": "Stills © 2016 Summit Entertainment / Lionsgate, publicity stills via TMDB and official stills via Douban; Mia & Sebastian's Theme (Justin Hurwitz, 2016) is a recording this site hosts itself, played whole and looped. A personal homage only.",
+        "zh": "剧照 © 2016 Summit Entertainment / Lionsgate，宣传剧照取自 TMDB、官方剧照取自豆瓣电影；主题曲《Mia & Sebastian's Theme》（Justin Hurwitz，2016）为本站自托管的录音，整首循环。仅作个人致敬之用。"
+      },
+      "draft": false,
+      "sort": 2
+    }
+  ],
+  "idols": [
+    {
+      "key": "kobe",
+      "name": {
+        "en": "Kobe Bryant",
+        "zh": "科比 · 布莱恩特"
+      },
+      "latin": {
+        "en": "Kobe Bean Bryant",
+        "zh": "Kobe Bryant"
+      },
+      "kicker": {
+        "en": "Idols · the first",
+        "zh": "偶像 · 第一位"
+      },
+      "years": "1978 – 2020",
+      "numbers": "8 · 24",
+      "lede": {
+        "en": "Twenty years with the Lakers, two numbers, five championships, one night of 81. A Los Angeles at four in the morning is the line he left everyone after him.",
+        "zh": "洛杉矶湖人二十年，两个号码，五座总冠军，一场 81 分。凌晨四点的洛杉矶，是他留给后来人的一句话。"
+      },
+      "accent": "#5b3f8a",
+      "cover": "hawaii8",
+      "galleryKicker": {
+        "en": "Photographs · 2005 – 2024",
+        "zh": "照片 · 2005 – 2024"
+      },
+      "galleryTitle": {
+        "en": "On the court, and off it",
+        "zh": "球场上，和球场外"
+      },
+      "galleryLede": {
+        "en": "From number 8 to number 24, from a preseason night in Hawaii to a wall in Valencia.",
+        "zh": "从 8 号到 24 号，从夏威夷的季前赛到瓦伦西亚的一面墙。"
+      },
+      "photos": [
+        {
+          "id": "hawaii8",
+          "alt": {
+            "en": "Kobe Bryant in the number 8 purple-and-gold jersey, set at the free-throw line",
+            "zh": "身穿 8 号紫金球衣的科比站在罚球线上准备出手"
+          },
+          "src": "/idols/kobe/kobe-bryant-8.jpg",
+          "meta": {
+            "en": "Hawaii · preseason · 2005",
+            "zh": "夏威夷 · 季前赛 · 2005"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_8.jpg",
+          "title": {
+            "en": "Number 8",
+            "zh": "8 号"
+          },
+          "width": 1071,
+          "author": "Sgt. Joseph A. Lee, U.S. Marine Corps",
+          "height": 1600,
+          "licence": "Public domain"
+        },
+        {
+          "id": "hawaiiDunk",
+          "alt": {
+            "en": "Kobe Bryant hanging from the rim with both hands after a dunk",
+            "zh": "科比扣篮后双手挂在篮筐上"
+          },
+          "src": "/idols/kobe/kobe-bryant-dunk.jpg",
+          "meta": {
+            "en": "Hawaii · preseason · 2005",
+            "zh": "夏威夷 · 季前赛 · 2005"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_dunk.jpg",
+          "title": {
+            "en": "Hanging on the rim",
+            "zh": "挂在篮筐上"
+          },
+          "width": 1066,
+          "author": "Cpl. Megan Stiner, U.S. Marine Corps",
+          "height": 1600,
+          "licence": "Public domain"
+        },
+        {
+          "id": "drives2007",
+          "alt": {
+            "en": "Kobe Bryant driving to the basket against the Wizards",
+            "zh": "科比运球突破奇才队的防守"
+          },
+          "src": "/idols/kobe/kobe-bryant-drives2.jpg",
+          "meta": {
+            "en": "Washington · 2007",
+            "zh": "华盛顿 · 2007"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_Drives2.jpg",
+          "title": {
+            "en": "The drive",
+            "zh": "突破"
+          },
+          "width": 1130,
+          "author": "Keith Allison",
+          "height": 1600,
+          "licence": "CC BY-SA 3.0"
+        },
+        {
+          "id": "dunk2008",
+          "alt": {
+            "en": "Kobe Bryant in the air, about to dunk",
+            "zh": "科比腾空即将扣篮"
+          },
+          "src": "/idols/kobe/bryant-about-to-dunk-2008.jpg",
+          "meta": {
+            "en": "Washington · 2008",
+            "zh": "华盛顿 · 2008"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Bryant_about_to_dunk_2008.jpg",
+          "title": {
+            "en": "Take-off",
+            "zh": "起跳"
+          },
+          "width": 1121,
+          "author": "Keith Allison",
+          "height": 1600,
+          "licence": "CC BY-SA 2.0"
+        },
+        {
+          "id": "beijing2008",
+          "alt": {
+            "en": "Kobe Bryant in a Team USA jersey during the Beijing Olympics semifinal",
+            "zh": "科比身穿美国队球衣在北京奥运会半决赛中"
+          },
+          "src": "/idols/kobe/kobe-bryant-beijing-olympics-men-s-semifinal-basketball.jpg",
+          "meta": {
+            "en": "Olympic semifinal · 2008",
+            "zh": "奥运会半决赛 · 2008"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_Beijing_Olympics_Men%27s_Semifinal_Basketball.jpg",
+          "title": {
+            "en": "Beijing",
+            "zh": "北京"
+          },
+          "width": 1066,
+          "author": "Richard Giles",
+          "height": 1600,
+          "licence": "CC BY-SA 2.0"
+        },
+        {
+          "id": "parade2009",
+          "alt": {
+            "en": "Kobe Bryant waving to the crowd during the Lakers' championship parade at Disneyland",
+            "zh": "科比在迪士尼乐园的湖人夺冠庆祝游行中向人群挥手"
+          },
+          "src": "/idols/kobe/kobe-bryant-disney-parade.jpg",
+          "meta": {
+            "en": "Disneyland · 2009",
+            "zh": "迪士尼乐园 · 2009"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_Disney_Parade.jpg",
+          "title": {
+            "en": "Victory parade",
+            "zh": "冠军游行"
+          },
+          "width": 1248,
+          "author": "LDCross",
+          "height": 1600,
+          "licence": "CC BY 2.0"
+        },
+        {
+          "id": "game2010",
+          "alt": {
+            "en": "Kobe Bryant in the number 24 jersey during a game",
+            "zh": "身穿 24 号球衣的科比在比赛中"
+          },
+          "src": "/idols/kobe/kobe-bryant-in-2010-1.jpg",
+          "meta": {
+            "en": "2010",
+            "zh": "2010"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_in_2010-1.jpg",
+          "title": {
+            "en": "Number 24",
+            "zh": "24 号"
+          },
+          "width": 1600,
+          "author": "Bryan Horowitz",
+          "height": 1200,
+          "licence": "CC BY-SA 2.0"
+        },
+        {
+          "id": "obama2010",
+          "alt": {
+            "en": "The 2010 champion Lakers with President Obama at a community event in Washington",
+            "zh": "2010 年总冠军湖人队与奥巴马总统在华盛顿的社区活动上"
+          },
+          "src": "/idols/kobe/2010-nba-champion-los-angeles-lakers-with-president-obama.jpg",
+          "meta": {
+            "en": "Washington · 2010",
+            "zh": "华盛顿 · 2010"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:2010_NBA_Champion_Los_Angeles_Lakers_with_President_Obama.jpg",
+          "title": {
+            "en": "Visitors at the White House",
+            "zh": "白宫来客"
+          },
+          "width": 1600,
+          "author": "Lawrence Jackson, The White House",
+          "height": 1066,
+          "licence": "Public domain"
+        },
+        {
+          "id": "london2012",
+          "alt": {
+            "en": "Kobe Bryant smiling on the Team USA bench",
+            "zh": "科比坐在美国队替补席上笑着"
+          },
+          "src": "/idols/kobe/kobe-bryant-smiling-on-the-bench-usa-vs-gbr-2012.jpg",
+          "meta": {
+            "en": "Team USA · 2012",
+            "zh": "美国队 · 2012"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_smiling_on_the_bench_USA_vs_GBR_2012.jpg",
+          "title": {
+            "en": "A smile on the bench",
+            "zh": "板凳上的笑"
+          },
+          "width": 1600,
+          "author": "Christopher Johnson",
+          "height": 1066,
+          "licence": "CC BY-SA 2.0"
+        },
+        {
+          "id": "stage2013",
+          "alt": {
+            "en": "Kobe Bryant on stage at an event",
+            "zh": "科比在一场活动的舞台上"
+          },
+          "src": "/idols/kobe/kobe-bryant-stage.jpg",
+          "meta": {
+            "en": "2013",
+            "zh": "2013"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_Stage.jpg",
+          "title": {
+            "en": "On stage",
+            "zh": "台上"
+          },
+          "width": 1307,
+          "author": "Neon Tommy",
+          "height": 1600,
+          "licence": "CC BY-SA 2.0"
+        },
+        {
+          "id": "farewell2015",
+          "alt": {
+            "en": "Kobe Bryant in the number 24 jersey during his farewell season",
+            "zh": "告别赛季的科比身穿 24 号球衣在场上"
+          },
+          "src": "/idols/kobe/kobe-bryant-2015.jpg",
+          "meta": {
+            "en": "Washington · 2015",
+            "zh": "华盛顿 · 2015"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_2015.jpg",
+          "title": {
+            "en": "The last season",
+            "zh": "最后一季"
+          },
+          "width": 1107,
+          "author": "Keith Allison",
+          "height": 1600,
+          "licence": "CC BY-SA 2.0"
+        },
+        {
+          "id": "cabanyal2024",
+          "alt": {
+            "en": "A mural of Kobe Bryant on a wall in the Cabanyal district of Valencia",
+            "zh": "瓦伦西亚 Cabanyal 街区一面画着科比的涂鸦墙"
+          },
+          "src": "/idols/kobe/kobe-bryant-cabanyal-02.jpg",
+          "meta": {
+            "en": "Valencia · 2024",
+            "zh": "瓦伦西亚 · 2024"
+          },
+          "page": "https://commons.wikimedia.org/wiki/File:Kobe_Bryant_-_Cabanyal_02.jpg",
+          "title": {
+            "en": "On the wall",
+            "zh": "墙上"
+          },
+          "width": 1600,
+          "author": "Francesc Fort",
+          "height": 1201,
+          "licence": "CC0"
+        }
+      ],
+      "timelineKicker": {
+        "en": "Career · milestones",
+        "zh": "生涯 · 节点"
+      },
+      "timelineTitle": {
+        "en": "Philadelphia to Los Angeles",
+        "zh": "从费城到洛杉矶"
+      },
+      "timeline": [
+        {
+          "date": "1978.08.23",
+          "note": {
+            "en": "His father Joe Bryant played in the NBA too; seven years of his childhood were spent in Italy.",
+            "zh": "父亲乔·布莱恩特也是 NBA 球员；童年有七年在意大利度过。"
+          },
+          "title": {
+            "en": "Born in Philadelphia",
+            "zh": "生于费城"
+          }
+        },
+        {
+          "date": "1996.06",
+          "note": {
+            "en": "Picked 13th by the Hornets and traded to the Lakers at once — at 17.",
+            "zh": "首轮第 13 顺位被黄蜂选中，随即交易到湖人，17 岁。"
+          },
+          "title": {
+            "en": "Straight from high school",
+            "zh": "高中直接进入 NBA"
+          }
+        },
+        {
+          "date": "2000 – 2002",
+          "note": {
+            "en": "Three titles in three years, beside Shaquille O'Neal.",
+            "zh": "与奥尼尔一起，湖人三年三座总冠军。"
+          },
+          "title": {
+            "en": "Three-peat",
+            "zh": "三连冠"
+          }
+        },
+        {
+          "date": "2006.01.22",
+          "note": {
+            "en": "Against the Toronto Raptors — the second-highest single game in NBA history.",
+            "zh": "对多伦多猛龙，NBA 历史单场第二高分。"
+          },
+          "title": {
+            "en": "81 points",
+            "zh": "81 分"
+          }
+        },
+        {
+          "date": "2008",
+          "note": {
+            "en": "His one regular-season MVP; that summer, gold with the Redeem Team.",
+            "zh": "生涯唯一一座 MVP；同年夏天随「救赎之队」在北京夺金。"
+          },
+          "title": {
+            "en": "MVP · gold in Beijing",
+            "zh": "常规赛 MVP · 北京金牌"
+          }
+        },
+        {
+          "date": "2009 – 2010",
+          "note": {
+            "en": "Finals MVP both times; the fifth championship.",
+            "zh": "两届总决赛 MVP；第五座总冠军。"
+          },
+          "title": {
+            "en": "Back to back",
+            "zh": "两连冠"
+          }
+        },
+        {
+          "date": "2016.04.13",
+          "note": {
+            "en": "Against the Jazz, the final game of his career: 60 points.",
+            "zh": "对爵士，生涯最后一场，60 分。"
+          },
+          "title": {
+            "en": "60 in the last game",
+            "zh": "告别战 60 分"
+          }
+        },
+        {
+          "date": "2017.12.18",
+          "note": {
+            "en": "8 and 24 went up into the rafters of Staples Center together.",
+            "zh": "8 号与 24 号一起升上斯台普斯中心的穹顶。"
+          },
+          "title": {
+            "en": "Two jerseys retired",
+            "zh": "两件球衣同时退役"
+          }
+        },
+        {
+          "date": "2018.03.04",
+          "note": {
+            "en": "Dear Basketball won Best Animated Short Film.",
+            "zh": "《亲爱的篮球》获最佳动画短片。"
+          },
+          "title": {
+            "en": "An Oscar",
+            "zh": "奥斯卡"
+          }
+        },
+        {
+          "date": "2020.01.26",
+          "note": {
+            "en": "Killed with his daughter Gianna in a helicopter crash in Calabasas, at 41. Elected to the Naismith Hall of Fame the same year.",
+            "zh": "与女儿 Gianna 在卡拉巴萨斯的直升机事故中离世，41 岁。同年入选奈史密斯篮球名人堂。"
+          },
+          "title": {
+            "en": "Gone",
+            "zh": "离开"
+          }
+        },
+        {
+          "date": "2024.02.08",
+          "note": {
+            "en": "Number 8, a finger to the sky, on Star Plaza outside Crypto.com Arena.",
+            "zh": "8 号球衣、指天的手，立在 Crypto.com 球馆外的 Star Plaza。"
+          },
+          "title": {
+            "en": "The statue",
+            "zh": "铜像"
+          }
+        }
+      ],
+      "credit": {
+        "en": "Photographs from Wikimedia Commons, each under its own licence (author and licence under every picture); the statue is procedural geometry, a personal homage only.",
+        "zh": "照片来自 Wikimedia Commons，各按其授权使用（作者与许可见每张图下）；铜像为程序化几何，仅作个人致敬之用。"
+      },
+      "draft": false,
+      "sort": 0
+    }
+  ],
   "introNodes": [
     {
       "key": "frontend",

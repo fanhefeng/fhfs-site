@@ -1,6 +1,4 @@
 import type { TrackId } from "@/lib/tracks";
-import { IDOLS } from "@/components/idols/entries";
-import { FILMS, filmCover, stillSrc } from "@/components/films/entries";
 
 /**
  * What /life knows about each room beyond its link. The rooms themselves —
@@ -15,33 +13,36 @@ export type RoomMeta = {
   key: string;
   /** The record the room plays on entry (`lib/tracks`), if it has one. */
   track?: TrackId;
-  /** A picture for the row, from `public/`. */
+  /** A picture for the row, already the address the browser fetches. */
   cover?: { src: string; width: number; height: number };
   /** The accent rule that slides in on hover. */
   accent: string;
 };
 
-const firstFilm = filmCover(FILMS[0]!);
+/** A room's first card as the row borrows it: its picture and its colour. */
+type FirstCard = { cover?: RoomMeta["cover"]; accent: string | null } | undefined;
 
-export const ROOM_META: Record<string, RoomMeta> = {
-  "/moments": { key: "moments", track: "lovely", accent: "#b45309" },
-  "/secrets": { key: "secrets", track: "secret", accent: "#6e8bff" },
-  // The wall's own first card, rather than a second copy of its path, size and
-  // colour — one edit to `entries.ts` moves both.
-  "/idols": {
-    key: "idols",
-    cover: IDOLS[0]!.cover,
-    accent: IDOLS[0]!.accent,
-  },
-  // Likewise the first film's card. No record on the row: each film puts on
-  // its own at its door, and the index between them plays the theme.
-  "/films": {
-    key: "films",
-    cover: {
-      src: stillSrc(FILMS[0]!, firstFilm),
-      width: firstFilm.width,
-      height: firstFilm.height,
+/**
+ * The rows' furniture. The idols' and the films' rows borrow the first card
+ * on their walls — its picture, its colour — rather than keeping a second
+ * copy of either, so hanging a new first film in the admin moves both; the
+ * page hands those over from the rows it has read.
+ */
+export function roomMeta(firstIdol: FirstCard, firstFilm: FirstCard): Record<string, RoomMeta> {
+  return {
+    "/moments": { key: "moments", track: "lovely", accent: "#b45309" },
+    "/secrets": { key: "secrets", track: "secret", accent: "#6e8bff" },
+    "/idols": {
+      key: "idols",
+      cover: firstIdol?.cover,
+      accent: firstIdol?.accent ?? "#5b3f8a",
     },
-    accent: FILMS[0]!.accent,
-  },
-};
+    // No record on the row: each film puts on its own at its door, and the
+    // index between them plays the theme.
+    "/films": {
+      key: "films",
+      cover: firstFilm?.cover,
+      accent: firstFilm?.accent ?? "#b8552e",
+    },
+  };
+}

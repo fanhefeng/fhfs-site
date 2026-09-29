@@ -3,34 +3,23 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { asset } from "@/lib/asset";
 import { site } from "@/config/site";
 import { momentKey, type MomentMedia } from "@/lib/moments";
 import { adminSession, requireAdmin } from "@/lib/server/auth/session";
 import { parseMedia, parseMomentTime, raw, str, validKey } from "@/lib/forms";
 import { TAGS } from "@/lib/server/content";
-import { invalidate, SESSION_EXPIRED, KEY_ERROR, upsertKeyed, type ActionState } from "./shared";
+import {
+  invalidate,
+  SESSION_EXPIRED,
+  KEY_ERROR,
+  unknownAsset,
+  upsertKeyed,
+  type ActionState,
+} from "./shared";
 
-/**
- * A file under public/ is reached by its hashed address, and asset() throws
- * for one the manifest does not know — better here, beside the field, than on
- * the public page. Uploads are Blob addresses and pass untouched.
- */
-function unknownAsset(media: MomentMedia[]): ActionState | null {
-  for (const item of media) {
-    for (const path of item.kind === "video" ? [item.src, item.poster] : [item.src]) {
-      if (!path.startsWith("/")) continue;
-      try {
-        asset(path);
-      } catch {
-        return {
-          error: `${path} 不在 assets.gen.json 里——文件放进 public/moments/ 后跑 pnpm assets，再存一次。`,
-        };
-      }
-    }
-  }
-  return null;
-}
+/** Every site path a line's files are reached by — see `unknownAsset`. */
+const mediaPaths = (media: MomentMedia[]) =>
+  media.flatMap((item) => (item.kind === "video" ? [item.src, item.poster] : [item.src]));
 
 export async function saveMoment(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
@@ -42,7 +31,7 @@ export async function saveMoment(_prev: ActionState, form: FormData): Promise<Ac
   if (!parsedMedia.ok) return { error: parsedMedia.error };
   const media = parsedMedia.value;
   if (!content && media.length === 0) return { error: "正文和媒体不能都是空的。" };
-  const missing = unknownAsset(media);
+  const missing = unknownAsset(mediaPaths(media), "moments");
   if (missing) return missing;
   const postedAt = parseMomentTime(str(form, "postedAt"));
   if (!postedAt) {
@@ -98,7 +87,7 @@ export async function postMoment(_prev: ActionState, form: FormData): Promise<Ac
   if (!parsedMedia.ok) return { error: parsedMedia.error };
   const media = parsedMedia.value;
   if (!content && media.length === 0) return { error: "写点什么，或者传张图。" };
-  const missing = unknownAsset(media);
+  const missing = unknownAsset(mediaPaths(media), "moments");
   if (missing) return missing;
   const postedAt = new Date();
   const row = {

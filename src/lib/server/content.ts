@@ -1,6 +1,6 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   abouts,
@@ -9,6 +9,8 @@ import {
   chipToneEnum,
   chips,
   copyBlocks,
+  films,
+  idols,
   introNodes,
   moments,
   navItems,
@@ -64,6 +66,8 @@ export const TAGS = {
   resume: "resume",
   moments: "moments",
   secrets: "secrets",
+  films: "films",
+  idols: "idols",
 } as const;
 
 const cacheOptions = (...tags: string[]) => ({
@@ -497,6 +501,70 @@ export const getMoments = unstable_cache(
   },
   ["moments"],
   cacheOptions(TAGS.moments),
+);
+
+// ---------------------------------------------------------------------------
+// The films and the idols — a room each, a page per row
+// ---------------------------------------------------------------------------
+
+// Every column but the row's bookkeeping: the pages read all of it, and the
+// lists (the index, /life, the sitemap, search) are three films and one idol.
+const { id: _filmId, draft: _filmDraft, sort: _filmSort, ...filmColumns } = getTableColumns(films);
+const { id: _idolId, draft: _idolDraft, sort: _idolSort, ...idolColumns } = getTableColumns(idols);
+
+export type Film = { [K in keyof typeof filmColumns]: (typeof films.$inferSelect)[K] };
+export type Idol = { [K in keyof typeof idolColumns]: (typeof idols.$inferSelect)[K] };
+
+/** The films on the wall, in the room's order. */
+export const getFilms = unstable_cache(
+  async (): Promise<Film[]> =>
+    db
+      .select(filmColumns)
+      .from(films)
+      .where(eq(films.draft, false))
+      .orderBy(asc(films.sort), asc(films.key)),
+  ["films"],
+  cacheOptions(TAGS.films),
+);
+
+/** One film — `drafts` as for `getPost`. */
+export const getFilm = unstable_cache(
+  async (key: string, drafts = false): Promise<Film | null> => {
+    const [row] = await db
+      .select(filmColumns)
+      .from(films)
+      .where(and(eq(films.key, key), drafts ? undefined : eq(films.draft, false)))
+      .limit(1);
+    return row ?? null;
+  },
+  ["film"],
+  cacheOptions(TAGS.films),
+);
+
+/** The idols on the wall, in its order. */
+export const getIdols = unstable_cache(
+  async (): Promise<Idol[]> =>
+    db
+      .select(idolColumns)
+      .from(idols)
+      .where(eq(idols.draft, false))
+      .orderBy(asc(idols.sort), asc(idols.key)),
+  ["idols"],
+  cacheOptions(TAGS.idols),
+);
+
+/** One idol — `drafts` as for `getPost`. */
+export const getIdol = unstable_cache(
+  async (key: string, drafts = false): Promise<Idol | null> => {
+    const [row] = await db
+      .select(idolColumns)
+      .from(idols)
+      .where(and(eq(idols.key, key), drafts ? undefined : eq(idols.draft, false)))
+      .limit(1);
+    return row ?? null;
+  },
+  ["idol"],
+  cacheOptions(TAGS.idols),
 );
 
 // ---------------------------------------------------------------------------

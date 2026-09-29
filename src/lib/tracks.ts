@@ -29,7 +29,9 @@
  * artists are copy, so they stay in `messages/*.json` under `tracks.<id>`;
  * a room reads them there and hands them to `RoomMusic`.
  */
-export type TrackId = "theme" | "lovely" | "secret" | "odyssey";
+export const TRACK_IDS = ["theme", "lovely", "secret", "odyssey"] as const;
+
+export type TrackId = (typeof TRACK_IDS)[number];
 
 /** The address each record plays from — built by `trackFiles()`. */
 export type TrackFiles = Record<TrackId, string>;

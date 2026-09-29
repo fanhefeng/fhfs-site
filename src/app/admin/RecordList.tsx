@@ -14,6 +14,9 @@ type ListRow = {
   meta?: string;
   /** Not on the public page yet. A list with any such row can show only those. */
   draft?: boolean;
+  /** The row's own page out front, when it has one — drafts included, through
+   *  the preview (`/admin/preview`). */
+  view?: string;
   data: RecordData;
 };
 
@@ -209,6 +212,7 @@ export function RecordList({
                     fields={fields}
                     record={row.data}
                     deleteAction={deleteAction}
+                    view={row.view}
                   />
                 </div>
               )}

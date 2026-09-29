@@ -3,12 +3,13 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
-import { getAllNavItems, getMoments, getSecrets } from "@/lib/server/content";
+import { asset } from "@/lib/asset";
+import { coverOf } from "@/lib/films";
+import { inLocale } from "@/lib/localized";
+import { getAllNavItems, getFilms, getIdols, getMoments, getSecrets } from "@/lib/server/content";
 import { sectionMetadata } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
-import { IDOLS } from "@/components/idols/entries";
-import { FILMS } from "@/components/films/entries";
-import { ROOM_META } from "@/components/life/rooms";
+import { roomMeta } from "@/components/life/rooms";
 
 export const generateMetadata = sectionMetadata("life", "/life");
 
@@ -26,15 +27,30 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
   const t = await getTranslations("life");
   const tNav = await getTranslations("nav");
   const tTracks = await getTranslations("tracks");
-  const tIdols = await getTranslations("idols");
-  const tFilms = await getTranslations("films");
 
   const rooms = (await getAllNavItems()).filter(
     (row) => row.group === "rooms" && !row.surfaces.includes("header"),
   );
 
   // What each room holds, counted where the room itself counts.
-  const [moments, secrets] = await Promise.all([getMoments(), getSecrets(locale)]);
+  const [moments, secrets, idols, films] = await Promise.all([
+    getMoments(),
+    getSecrets(locale),
+    getIdols(),
+    getFilms(),
+  ]);
+  const firstCard = (picture: { src: string; width: number; height: number } | undefined) =>
+    picture && { src: asset(picture.src), width: picture.width, height: picture.height };
+  const furniture = roomMeta(
+    idols[0] && {
+      cover: firstCard(coverOf(idols[0].photos, idols[0].cover)),
+      accent: idols[0].accent,
+    },
+    films[0] && {
+      cover: firstCard(coverOf(films[0].stills, films[0].cover)),
+      accent: films[0].accent,
+    },
+  );
   const stat = (href: string): string | null => {
     switch (href) {
       case "/moments":
@@ -42,9 +58,9 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
       case "/secrets":
         return secrets.length ? t("countPieces", { count: secrets.length }) : t("empty");
       case "/idols":
-        return t("countIdols", { count: IDOLS.length });
+        return t("countIdols", { count: idols.length });
       case "/films":
-        return t("countFilms", { count: FILMS.length });
+        return t("countFilms", { count: films.length });
       default:
         return null;
     }
@@ -53,14 +69,14 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
   const subs = (href: string): SubLink[] => {
     switch (href) {
       case "/idols":
-        return IDOLS.map((idol) => ({
-          href: `/idols/${idol.slug}`,
-          label: tIdols(`${idol.key}.name`),
+        return idols.map((idol) => ({
+          href: `/idols/${idol.key}`,
+          label: inLocale(idol.name, locale),
         }));
       case "/films":
-        return FILMS.map((film) => ({
-          href: `/films/${film.slug}`,
-          label: tFilms(`${film.slug}.title`),
+        return films.map((film) => ({
+          href: `/films/${film.key}`,
+          label: inLocale(film.title, locale),
         }));
       default:
         return [];
@@ -82,7 +98,7 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
       ) : (
         <Reveal as="ol" role="list" stagger={0.06} className="border-t border-line">
           {rooms.map((room, i) => {
-            const meta = ROOM_META[room.href];
+            const meta = furniture[room.href];
             const key = meta?.key ?? room.labelKey;
             const title = t.has(`items.${key}.title`)
               ? t(`items.${key}.title`)

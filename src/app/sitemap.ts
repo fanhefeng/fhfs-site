@@ -6,13 +6,13 @@ import {
   getAllSecretSlugs,
   getAllSlugs,
   getAllTags,
+  getFilms,
+  getIdols,
   getNavItems,
   getPostEditions,
   getSecretEditions,
 } from "@/lib/server/content";
 import { LAB_ENTRIES } from "@/components/lab/entries";
-import { IDOLS } from "@/components/idols/entries";
-import { FILMS } from "@/components/films/entries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
@@ -73,11 +73,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // The idols and the films hang one level below their rooms, listed in
-  // code like the studies.
+  // The idols and the films hang one level below their rooms, a page per row.
+  const [idols, films] = await Promise.all([getIdols(), getFilms()]);
   const subPaths = [
-    ...IDOLS.map((idol) => `/idols/${idol.slug}`),
-    ...FILMS.map((film) => `/films/${film.slug}`),
+    ...idols.map((idol) => `/idols/${idol.key}`),
+    ...films.map((film) => `/films/${film.key}`),
   ];
   for (const path of subPaths) {
     for (const locale of routing.locales) {

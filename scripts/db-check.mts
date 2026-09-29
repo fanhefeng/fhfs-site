@@ -21,6 +21,8 @@ const TABLES = [
   "timeline_entries",
   "apps",
   "works",
+  "films",
+  "idols",
   "intro_nodes",
   "chips",
   "nav_items",

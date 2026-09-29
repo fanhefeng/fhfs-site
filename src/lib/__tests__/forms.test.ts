@@ -4,6 +4,7 @@ import {
   KEY_PATTERN,
   filled,
   formatMedia,
+  formRows,
   intField,
   list,
   localized,
@@ -12,6 +13,7 @@ import {
   parseLocale,
   parseMedia,
   parseMomentTime,
+  pixels,
   raw,
   str,
   validDate,
@@ -20,6 +22,7 @@ import {
   validLink,
   validPath,
   validMediaSrc,
+  validColor,
 } from "@/lib/forms";
 
 const form = (entries: Record<string, string>) => {
@@ -298,5 +301,48 @@ describe("intField", () => {
     });
     expect(intField(form({ sort: "1e10" }), "sort", "排序", 0).ok).toBe(false);
     expect(intField(form({ sort: "-2147483649" }), "sort", "排序", 0).ok).toBe(false);
+  });
+});
+
+describe("formRows", () => {
+  it("reads a group's rows in the order they stand", () => {
+    const rows = formRows(
+      form({
+        "stills.2.id": "b",
+        "stills.0.id": " a ",
+        "stills.0.title.zh": "齐天大圣",
+        "stills.0.title.en": "The Monkey King",
+        "stills.10.id": "c",
+        "stillsKicker.zh": "剧照",
+        "other.0.id": "x",
+      }),
+      "stills",
+    );
+    expect(rows.map((row) => row.str("id"))).toEqual(["a", "b", "c"]);
+    expect(rows[0]!.localized("title")).toEqual({ zh: "齐天大圣", en: "The Monkey King" });
+    expect(rows[1]!.localized("title")).toEqual({ zh: "", en: "" });
+  });
+
+  it("finds nothing in a group that sent nothing", () => {
+    expect(formRows(form({ "parts.x": "1" }), "parts")).toEqual([]);
+  });
+});
+
+describe("validColor / pixels", () => {
+  it("takes a six-digit hex colour only", () => {
+    expect(validColor("#5b3f8a")).toBe(true);
+    expect(validColor("#5B3F8A")).toBe(true);
+    expect(validColor("5b3f8a")).toBe(false);
+    expect(validColor("#fff")).toBe(false);
+    expect(validColor("red")).toBe(false);
+  });
+
+  it("reads a pixel count, and 0 for anything that is not one", () => {
+    expect(pixels("1800")).toBe(1800);
+    expect(pixels("0")).toBe(0);
+    expect(pixels("-4")).toBe(0);
+    expect(pixels("12.5")).toBe(0);
+    expect(pixels("")).toBe(0);
+    expect(pixels("1e9")).toBe(0);
   });
 });

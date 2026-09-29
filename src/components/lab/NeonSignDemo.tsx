@@ -8,7 +8,7 @@ import { jukebox, useJukebox } from "@/lib/client/jukebox";
 import { NeonSignArt } from "@/components/neon/NeonSignArt";
 import { useBrickWall, wireNeonSign } from "@/components/neon/sign";
 import { WALL_CSS } from "@/components/neon/wall";
-import type { StillSpan } from "@/components/films/entries";
+import type { StillSpan } from "@/lib/films";
 
 /** A print on the wall — the La La Land room's still, with its caption translated. */
 export type NeonStillItem = {

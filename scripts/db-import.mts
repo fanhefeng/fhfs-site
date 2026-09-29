@@ -142,6 +142,8 @@ const keyed = [
   [schema.timelineEntries, data.timelineEntries],
   [schema.apps, data.apps],
   [schema.works, data.works],
+  [schema.films, data.films],
+  [schema.idols, data.idols],
   [schema.introNodes, data.introNodes],
   [schema.resumeProfiles, data.resumeProfiles],
   [schema.resumeExperiences, data.resumeExperiences],

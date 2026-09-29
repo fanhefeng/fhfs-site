@@ -1,12 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vite-plus/test";
-import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
-import { SECRET_STILLS } from "@/components/films/secretStills";
-import { LALA_STILLS } from "@/components/films/lalaStills";
-import { IDOLS } from "@/components/idols/entries";
-import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
+import { statueStandIn } from "@/components/idols/statue";
 import frames from "../../../public/lab/scroll-video/manifest.json";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
@@ -31,61 +27,53 @@ function jpegSize(file: string): { width: number; height: number } {
   throw new Error(`no frame header in ${file}`);
 }
 
-const jpegsIn = (dir: string) =>
-  readdirSync(inPublic(dir))
-    .filter((name) => /\.jpe?g$/.test(name))
-    .sort();
+type Picture = { id: string; src: string; width: number; height: number };
+type Backup = {
+  films: { key: string; stills: Picture[] }[];
+  idols: { key: string; photos: Picture[] }[];
+};
 
-// The width and height written next to each file name are what next/image
+/** The films' and idols' pictures, as the committed backup has them. */
+const backup = JSON.parse(readFileSync(path.join(root, "backup/db.json"), "utf8")) as Backup;
+const walls = [
+  ...backup.films.map((film) => ({ name: `film ${film.key}`, pictures: film.stills })),
+  ...backup.idols.map((idol) => ({ name: `idol ${idol.key}`, pictures: idol.photos })),
+];
+
+// The width and height stored beside each picture are what next/image
 // reserves the box with. A picture swapped for one of another shape still
 // loads — into the old box, cropped or letterboxed, with nothing to notice.
-describe("the pictures listed in code", () => {
-  const galleries = [
-    {
-      name: "odyssey stills",
-      dir: "films/odyssey",
-      items: ODYSSEY_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
-    },
-    {
-      name: "secret stills",
-      dir: "films/secret",
-      items: SECRET_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
-    },
-    {
-      name: "lala stills",
-      dir: "films/lala",
-      items: LALA_STILLS.map((s) => ({ ...s, file: `${s.file}.jpg` })),
-    },
-    { name: "kobe photos", dir: "idols/kobe", items: KOBE_PHOTOS },
-  ];
+// The films and idols keep theirs in the database, edited in /admin, so this
+// reads the backup (`pnpm db:export`); an upload's size is measured by the
+// browser that sends it, so only the files in `public/` are checked here.
+describe("the pictures the rooms hang", () => {
+  it("finds the walls", () => {
+    expect(walls.length).toBeGreaterThan(0);
+  });
 
-  for (const { name, dir, items } of galleries) {
-    it(`${name}: every size is the file's own`, () => {
-      const wrong = items
-        .map((item) => ({ item, real: jpegSize(inPublic(`${dir}/${item.file}`)) }))
-        .filter(({ item, real }) => item.width !== real.width || item.height !== real.height)
-        .map(
-          ({ item, real }) =>
-            `${item.file}: says ${item.width}×${item.height}, is ${real.width}×${real.height}`,
-        );
+  for (const { name, pictures } of walls) {
+    it(`${name}: every file is there, at the size it says`, () => {
+      const wrong = pictures
+        .filter((picture) => picture.src.startsWith("/"))
+        .flatMap((picture) => {
+          const file = inPublic(picture.src);
+          if (!existsSync(file)) return [`${picture.src}: no such file in public/`];
+          const real = jpegSize(file);
+          return picture.width === real.width && picture.height === real.height
+            ? []
+            : [
+                `${picture.src}: says ${picture.width}×${picture.height}, is ${real.width}×${real.height}`,
+              ];
+        });
       expect(wrong).toEqual([]);
-    });
-
-    it(`${name}: the list and the folder hold the same files`, () => {
-      expect(items.map((item) => item.file).sort()).toEqual(jpegsIn(dir));
     });
   }
 
-  it("idol covers: every size is the file's own", () => {
-    for (const idol of IDOLS) {
-      // `src` has been through asset(); the hash comes back off.
-      const file = idol.cover.src.replace(/\.[0-9a-f]{8}(?=\.\w+$)/, "");
-      expect({ file, ...jpegSize(inPublic(file)) }).toEqual({
-        file,
-        width: idol.cover.width,
-        height: idol.cover.height,
-      });
-    }
+  it("the statue's stand-in is the size it says", () => {
+    const { src, width, height } = statueStandIn();
+    // `src` has been through asset(); the hash comes back off.
+    const file = src.replace(/\.[0-9a-f]{8}(?=\.\w+$)/, "");
+    expect({ file, ...jpegSize(inPublic(file)) }).toEqual({ file, width, height });
   });
 });
 

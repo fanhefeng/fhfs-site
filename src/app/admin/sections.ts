@@ -79,6 +79,20 @@ export const SECTION_GROUPS: AdminGroup[] = [
         view: "/secrets",
         unit: "篇",
       },
+      {
+        href: "/admin/films",
+        label: "电影",
+        blurb: "/films 的每一部：简介、台词、剧照墙。一部一页。",
+        view: "/films",
+        unit: "部",
+      },
+      {
+        href: "/admin/idols",
+        label: "偶像",
+        blurb: "/idols 的每一位：照片和出处、时间线。一位一页。",
+        view: "/idols",
+        unit: "位",
+      },
     ],
   },
   {
@@ -135,7 +149,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
           "全站每一行字，按页面分组。默认在 messages/*.json，这里只存改过的——清空一条就回到默认。",
         view: null,
         // The count is how many lines have been edited away from the files,
-        // not how many there are: 885 of those, and none of them a row.
+        // not how many there are: 634 of those, and none of them a row.
         unit: "条改过",
       },
       {

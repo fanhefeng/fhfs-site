@@ -177,14 +177,14 @@ Neon 账号整个没了，三级各有一份能照着敲的操作单。
   `RoomMusic` 的替身署名）——要放回没有文件的歌，得把两条路一起请回来。房间里印的曲名一律是
   实际在放的那份录音——所以《不能说的秘密》那间房写的是《路小雨》，不是同名主题曲。
 - /idols/kobe 的十二张照片取自 Wikimedia Commons（2005 – 2024），每张的作者与许可
-  （公有领域 / CC BY 2.0 / CC BY-SA 2.0、3.0 / CC0）列在 `src/components/idols/kobePhotos.ts`
+  （公有领域 / CC BY 2.0 / CC BY-SA 2.0、3.0 / CC0）写在 `idols` 表那一行的 `photos` 里（后台「偶像」）
   并印在图下，链接回 Commons 的文件页；1600px 长边重编码放在 `public/idols/kobe/`。
   铜像是程序化几何（胶囊体 + 球体，一种青铜材质），照的是 2024 年 Star Plaza 那尊
   81 分雕像的姿势（8 号球衣、右手指天），不是它的扫描或复制。
 - /films/odyssey 的十二张剧照取自 TMDB 收录的两部《大话西游》（1995）的剧照（`月光宝盒` id 13345、
   `大圣娶亲` id 21835），© 1995 彩星电影公司 / 西安电影制片厂，仅作个人致敬之用，页面上有
   署名；1800px 宽重编码放在 `public/films/odyssey/`（三张原图只有 1280px，保持原尺寸），清单与
-  尺寸在 `src/components/films/odysseyStills.ts`。音乐是《一生所爱》1995 年的原版录音，
+  尺寸在 `films` 表 odyssey 那一行的 `stills` 里（后台「电影」）。音乐是《一生所爱》1995 年的原版录音，
   自托管在 `public/music/a-lifetime-of-love.mp3`。
 - /films/secret 的十二张剧照：TMDB 上《不能说的秘密》（id 20342）只有六张 backdrop，其中四张是同一
   个单车镜头的不同裁法，撑不起一面墙，所以主体取自豆瓣电影条目（id 2124724）「官方剧照」分类
@@ -193,10 +193,10 @@ Neon 账号整个没了，三级各有一份能照着敲的操作单。
   杰威尔音乐，仅作个人致敬之用，页面上有署名。豆瓣的列表页对脚本会跳 `sec.douban.com` 验证，
   要用真浏览器（chrome-devtools MCP 的隔离上下文）打开一次拿到图 id，图片本身
   `img9.doubanio.com/view/photo/raw/public/p<id>.jpg` 带 Referer 就能下；保持原尺寸
-  （1500–1800px），清单在 `src/components/films/secretStills.ts`。音乐是原声带里的《路小雨》，
+  （1500–1800px），清单在 `films` 表 secret 那一行。音乐是原声带里的《路小雨》，
   自托管在 `public/music/lu-xiaoyu.mp3`，与 /secrets 共用 `tracks.secret`。
 - /films/lala 的十二张剧照放在 `public/films/lala/`，清单与尺寸在
-  `src/components/films/lalaStills.ts`，/lab/neon 招牌下那面墙读的也是这份。六张取自 TMDB 收录的
+  `films` 表 lala 那一行，/lab/neon 招牌下那面墙读的也是这份。六张取自 TMDB 收录的
   片方宣传图（16:9，1800px 宽，栈桥那张原图只有 1403px），其中灯柱下的吻和琴键之路是海报画、
   不是片中镜头，图注照实标「海报」；另六张取自豆瓣电影条目「官方剧照」分类（3:2 的片场照片，
   保持原尺寸 1620px 宽），抓法同上一条。© 2016 Summit Entertainment / Lionsgate，仅作个人

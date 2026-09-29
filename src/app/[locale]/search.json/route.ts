@@ -2,12 +2,19 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { routing, type Locale } from "@/i18n/routing";
 import { site } from "@/config/site";
-import { getAllNavItems, getApps, getMoments, getPosts, getSecrets } from "@/lib/server/content";
+import {
+  getAllNavItems,
+  getApps,
+  getFilms,
+  getIdols,
+  getMoments,
+  getPosts,
+  getSecrets,
+} from "@/lib/server/content";
+import { inLocale } from "@/lib/localized";
 import { stampInZone } from "@/lib/moments";
 import type { SearchEntry } from "@/lib/search";
 import { LAB_ENTRIES } from "@/components/lab/entries";
-import { FILMS } from "@/components/films/entries";
-import { IDOLS } from "@/components/idols/entries";
 
 export const dynamic = "force-static";
 // Two indexes and nothing else — the same reason as the feed beside it.
@@ -31,18 +38,18 @@ export function generateStaticParams() {
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const l: Locale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
-  const [tn, tl, tf, ti, ts] = await Promise.all([
+  const [tn, tl, ts] = await Promise.all([
     getTranslations({ locale: l, namespace: "nav" }),
     getTranslations({ locale: l, namespace: "lab" }),
-    getTranslations({ locale: l, namespace: "films" }),
-    getTranslations({ locale: l, namespace: "idols" }),
     getTranslations({ locale: l, namespace: "software" }),
   ]);
-  const [nav, posts, secrets, apps, moments] = await Promise.all([
+  const [nav, posts, secrets, apps, films, idols, moments] = await Promise.all([
     getAllNavItems(),
     getPosts(l),
     getSecrets(l),
     getApps(),
+    getFilms(),
+    getIdols(),
     getMoments(),
   ]);
 
@@ -80,20 +87,24 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
       text: `${tl(`items.${entry.key}.tagline`)} ${tl(`items.${entry.key}.summary`)}`,
       href: `/lab/${entry.slug}`,
     })),
-    ...FILMS.map((film) => ({
-      kind: "film" as const,
-      title: tf(`${film.slug}.title`),
-      text: `${tf(`${film.slug}.latin`)} ${tf(`${film.slug}.meta`)} ${tf(`${film.slug}.lede`)}`,
-      href: `/films/${film.slug}`,
-      meta: film.year,
-    })),
-    ...IDOLS.map((idol) => ({
-      kind: "idol" as const,
-      title: ti(`${idol.key}.name`),
-      text: `${ti(`${idol.key}.latin`)} ${ti(`${idol.key}.lede`)}`,
-      href: `/idols/${idol.slug}`,
-      meta: ti(`${idol.key}.years`),
-    })),
+    ...films
+      .map((row) => inLocale(row, l))
+      .map((film) => ({
+        kind: "film" as const,
+        title: film.title,
+        text: `${film.latin} ${film.meta} ${film.lede}`,
+        href: `/films/${film.key}`,
+        meta: film.year,
+      })),
+    ...idols
+      .map((row) => inLocale(row, l))
+      .map((idol) => ({
+        kind: "idol" as const,
+        title: idol.name,
+        text: `${idol.latin} ${idol.lede}`,
+        href: `/idols/${idol.key}`,
+        meta: idol.years,
+      })),
     ...moments
       .filter((moment) => moment.content)
       .map((moment) => ({

@@ -440,6 +440,7 @@ export const LAB_ENTRIES: LabEntry[] = [
       "components/lab/StatueDemo.tsx",
       "components/idols/KobeStatueStage.tsx",
       "components/idols/KobeStatue.tsx",
+      "components/idols/statue.ts",
     ],
   },
   // /about's version history: the year rail that rolls as entries pass.
@@ -460,11 +461,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     ordinal: "26",
     added: "2026-09-16",
     accent: "#b8552e",
-    sources: [
-      "components/films/FilmStills.tsx",
-      "lib/client/scrollLock.ts",
-      "components/films/entries.ts",
-    ],
+    sources: ["components/films/FilmStills.tsx", "lib/client/scrollLock.ts", "lib/films.ts"],
   },
 
   /* ---- the shell, one piece per study: what surrounds every page ---- */

@@ -1,6 +1,5 @@
 "use client";
 
-import { asset } from "@/lib/asset";
 import Image from "next/image";
 import {
   useCallback,
@@ -15,9 +14,16 @@ import {
 import { EASE, gsap } from "@/lib/client/gsap";
 import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
 import { Reveal } from "@/components/fx/Reveal";
-import type { FilmRatio, FilmStill, StillSpan } from "./entries";
+import type { FilmRatio, FilmStill, StillSpan } from "@/lib/films";
 
-export type StillItem = FilmStill & { title: string; meta: string; alt: string };
+/** A still as the wall hangs it: its captions in this page's language, and
+ *  `src` already the address the browser fetches (`asset()`, on the server —
+ *  the manifest stays out of this chunk). */
+export type StillItem = Omit<FilmStill, "title" | "meta" | "alt"> & {
+  title: string;
+  meta: string;
+  alt: string;
+};
 
 /** The viewer's labels, translated by the page — the chunk carries no catalogue. */
 export type ViewerText = {
@@ -31,8 +37,6 @@ export type ViewerText = {
 };
 
 type Props = {
-  /** `public/films/<folder>/` */
-  folder: string;
   ratio: FilmRatio;
   stills: StillItem[];
   text: ViewerText;
@@ -89,7 +93,7 @@ const VIEWER_BUTTON =
  * on the backdrop leave. Page scroll is locked through the shared contract
  * while it is open, and focus goes back to the print that opened it.
  */
-export function FilmStills({ folder, ratio, stills, text }: Props) {
+export function FilmStills({ ratio, stills, text }: Props) {
   const [current, setCurrent] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -104,8 +108,6 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
    *  which would otherwise close the room right after turning the page. */
   const swipedRef = useRef(false);
   const altId = useId();
-
-  const src = (still: FilmStill) => asset(`/films/${folder}/${still.file}.jpg`);
 
   const open = (index: number, opener: HTMLElement) => {
     openerRef.current = opener;
@@ -276,7 +278,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
                 {item.alt}
               </span>
               <a
-                href={src(item)}
+                href={item.src}
                 aria-label={`${text.open} · ${item.title}`}
                 aria-describedby={`${altId}-${i}`}
                 // A file, not a route: keep RouteTransition's capture-phase
@@ -290,7 +292,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
                 className="group block overflow-hidden rounded-card bg-surface"
               >
                 <Image
-                  src={src(item)}
+                  src={item.src}
                   width={item.width}
                   height={item.height}
                   alt={item.alt}
@@ -338,7 +340,7 @@ export function FilmStills({ folder, ratio, stills, text }: Props) {
             >
               <Image
                 key={still.id}
-                src={src(still)}
+                src={still.src}
                 width={still.width}
                 height={still.height}
                 alt={still.alt}

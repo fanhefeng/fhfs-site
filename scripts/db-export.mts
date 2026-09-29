@@ -22,7 +22,8 @@
  * be readable on GitHub the same night, which is exactly what marking it a
  * draft was meant to prevent. A draft therefore lives only in the database
  * (and Neon's own history) until it is published — and since db:import only
- * upserts posts, secrets and moments, restoring a backup never deletes one.
+ * upserts posts, secrets, moments, films and idols, restoring a backup never
+ * deletes one.
  *
  *   pnpm db:export
  */
@@ -79,6 +80,16 @@ const data = {
     .select()
     .from(schema.works)
     .orderBy(asc(schema.works.sort), asc(schema.works.key)),
+  films: await db
+    .select()
+    .from(schema.films)
+    .where(eq(schema.films.draft, false))
+    .orderBy(asc(schema.films.sort), asc(schema.films.key)),
+  idols: await db
+    .select()
+    .from(schema.idols)
+    .where(eq(schema.idols.draft, false))
+    .orderBy(asc(schema.idols.sort), asc(schema.idols.key)),
   introNodes: await db
     .select()
     .from(schema.introNodes)

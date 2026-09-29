@@ -168,15 +168,44 @@ Failures resolve to `null` and the badge is simply absent.
   Only `src/app/[locale]/not-found.tsx` loads its stage through
   `next/dynamic`; a not-found boundary is bundled with its layout, so
   anything it imports statically ships with every page.
-- **Board media**: a moment's pictures, voice notes and video posters are
-  files in `public/moments/` (`moments.media`, a jsonb list — see
+- **Board media and uploads**: a moment's pictures, voice notes and video
+  posters are files in `public/moments/` (`moments.media`, a jsonb list — see
   `MomentMedia` in `src/lib/moments.ts`), named by their site path and
-  hashed by `asset()` when the page renders; the videos themselves are too
-  big for the repository and live in the Vercel Blob store `fhfs-media`,
-  whose host is the one cross-origin entry in `csp.ts` (`media-src`). The
-  admin writes the list one file per line (`parseMedia` in `src/lib/forms.ts`,
-  unit-tested), and the save action refuses a site path the manifest does
-  not know — put the file in `public/moments/`, run `pnpm assets`, then save.
+  hashed by `asset()` when the page renders — or addresses in the Vercel Blob
+  store `fhfs-media`, whose host is the one cross-origin entry in `csp.ts`
+  (`img-src`, `media-src`; `next.config.ts` lets `next/image` fetch from it).
+  The editors upload straight to that store (`app/admin/ui/MediaUploader.tsx`,
+  the store's client upload: the browser sends the bytes to Vercel, and
+  `app/admin/upload/route.ts` only signs the request, after the session
+  check) with the size, the length and a video's poster measured in the
+  browser on the way; the admin's own CSP adds the store's API host to
+  `connect-src`. Uploads need `BLOB_READ_WRITE_TOKEN`; without it the route
+  says so and the rest of the admin works. The board's list is still one file
+  per line (`parseMedia` in `src/lib/forms.ts`, unit-tested), and a save
+  refuses a site path the manifest does not know (`unknownAsset` in
+  `actions/shared.ts`) — upload it, or put it in `public/`, run
+  `pnpm assets`, then save.
+- **Draft preview**: `/admin/preview` turns on Draft Mode for the signed-in
+  browser and opens a post, secret, film or idol on its own page; those pages
+  pass `(await draftMode()).isEnabled` to their getter as `drafts`, and the
+  mode skips every cache, so a draft never lands in one. The banner
+  (`components/layout/PreviewBanner.tsx`) posts to `/admin/preview/exit`.
+- **Search (⌘K, `/`)**: `components/search/SearchLauncher.tsx` in the
+  layout listens for the keys and loads the palette as its own chunk on
+  first use; the palette fetches `/[locale]/search.json`, a force-static
+  route built from the same getters as the pages (so their tags rebuild it
+  on save) and matched by `src/lib/search.ts`. A new kind of page is found
+  once it is added to that route.
+- **Films and idols** are rows (`films`, `idols`), a page per row, edited
+  under 电影 / 偶像 in the admin; their repeated groups (stills, photos,
+  lines, milestones) are jsonb lists edited with `app/admin/ui/RowsField.tsx`
+  and read back with `formRows`. A page reads its row through `inLocale`
+  (`src/lib/localized.ts`), which picks each `{ zh, en }` pair's side and
+  falls back to the other when one is empty. Kobe's statue is code, not a
+  column: `/idols/[slug]` mounts it for `STATUE_IDOL` (`src/lib/idols.ts`),
+  its words stay under `idols.kobe` in the catalogues, and it stands on its
+  own photograph (`components/idols/statue.ts`). `media.test.ts` checks the
+  size of every picture in `public/` that `backup/db.json` lists.
 - **Front door and music**: the home page opens with `NeonSplash` once per
   session, on a hard landing only — decided before first paint by the inline
   script in `src/lib/client/splash.ts` (`<html data-splash>`), which is also what
@@ -228,8 +257,8 @@ replacement. That is one deliberate change of the whole read layer, verified
 against the route table (every public page must stay prerendered), not
 something to start one getter at a time.
 
-`messages/*.json` holds the defaults for *all* copy — every one of the 885
-lines. The `copy_blocks` table is an override layer merged in
+`messages/*.json` holds the defaults for *all* copy — every one of the 634
+lines (the films' and idols' own words left for their tables on 2026-09-29). The `copy_blocks` table is an override layer merged in
 `src/i18n/request.ts`, and it holds **only the lines that have been edited**:
 no row means the file's line, and `zh` / `en` are nullable so a line rewritten
 in one language leaves the other one following the file. An empty or

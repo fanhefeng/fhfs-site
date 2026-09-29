@@ -11,6 +11,7 @@ import { useFieldErrors } from "./ui/fieldErrors";
 import { formatMedia, KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import type { UploadFolder } from "@/lib/upload";
 import { MediaUploader } from "./ui/MediaUploader";
+import { RowsField, type RowsSpec } from "./ui/RowsField";
 import { useSaveAction } from "./ui/useSaveAction";
 
 export type Field =
@@ -55,7 +56,10 @@ export type Field =
       hint?: string;
       group?: string;
     }
-  | { name: string; label: string; kind: "lines"; hint?: string; rows?: number; group?: string };
+  | { name: string; label: string; kind: "lines"; hint?: string; rows?: number; group?: string }
+  /** A repeated group of small records — a film's stills, an idol's milestones.
+   *  The record holds them as an array under `name`; see `ui/RowsField`. */
+  | { name: string; label: string; kind: "rows"; hint?: string; group?: string; rows: RowsSpec };
 
 export type RecordData = { [key: string]: unknown };
 
@@ -100,6 +104,7 @@ export function RecordForm({
   isNew = false,
   deleteAction,
   foldEmpty = false,
+  view,
 }: {
   action: (prev: ActionState, form: FormData) => Promise<ActionState>;
   fields: Field[];
@@ -107,6 +112,8 @@ export function RecordForm({
   isNew?: boolean;
   deleteAction?: (form: FormData) => Promise<void>;
   foldEmpty?: boolean;
+  /** Where this row's own page is — shown beside the save button. */
+  view?: string;
 }) {
   const { state, pending, formProps } = useSaveAction(action);
   const formId = useId();
@@ -127,6 +134,10 @@ export function RecordForm({
   const key = value("key");
 
   const hasValue = (field: Field): boolean => {
+    if (field.kind === "rows") {
+      const list = record[field.name];
+      return Array.isArray(list) && list.length > 0;
+    }
     if (field.kind === "lines") {
       const pair = record[field.name] as { [locale: string]: string[] } | undefined;
       return Boolean(pair?.zh?.some(Boolean) || pair?.en?.some(Boolean));
@@ -181,6 +192,20 @@ export function RecordForm({
             ))}
           </div>
         </div>
+      );
+    }
+
+    if (field.kind === "rows") {
+      const list = record[field.name];
+      return (
+        <RowsField
+          key={field.name}
+          name={field.name}
+          label={field.label}
+          hint={field.hint}
+          spec={field.rows}
+          defaultRows={Array.isArray(list) ? (list as RecordData[]) : []}
+        />
       );
     }
 
@@ -324,6 +349,16 @@ export function RecordForm({
         )}
 
         <SaveControls state={state} pending={pending} />
+        {view && !isNew && (
+          <a
+            href={view}
+            target="_blank"
+            rel="noreferrer"
+            className={`${hintClass} inline-block underline decoration-line underline-offset-4 hover:text-accent`}
+          >
+            在站上看上次保存的版本 ↗
+          </a>
+        )}
       </form>
 
       {deleteAction && !isNew && key && (

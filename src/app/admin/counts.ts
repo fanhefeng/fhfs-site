@@ -29,6 +29,8 @@ const TABLES: Record<string, PgTable> = {
   "/admin/apps": schema.apps,
   "/admin/moments": schema.moments,
   "/admin/secrets": schema.secrets,
+  "/admin/films": schema.films,
+  "/admin/idols": schema.idols,
   "/admin/timeline": schema.timelineEntries,
   "/admin/about": schema.abouts,
   "/admin/intro": schema.introNodes,

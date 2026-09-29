@@ -5,15 +5,18 @@ import { routing } from "@/i18n/routing";
 import { adminSession } from "@/lib/server/auth/session";
 import { validKey } from "@/lib/forms";
 
-/** Which room a long-form piece hangs in, by the kind the editor sends. */
-const ROOMS = { post: "blog", secret: "secrets" } as const;
+/** Which room a piece hangs in, by the kind the editor sends. */
+const ROOMS = { post: "blog", secret: "secrets", film: "films", idol: "idols" } as const;
+
+const isKind = (kind: string | null): kind is keyof typeof ROOMS =>
+  kind !== null && Object.hasOwn(ROOMS, kind);
 
 /**
  * "See it on the site": turns on Next's Draft Mode for this browser and goes
  * to the piece's own page. With the mode on, every cached read is bypassed and
- * the article and secret pages ask for drafts too, so the page shows the last
- * save — draft or not — exactly as it will read once published. Everyone else
- * keeps getting the prerendered page.
+ * the article, secret, film and idol pages ask for drafts too, so the page
+ * shows the last save — draft or not — exactly as it will read once
+ * published. Everyone else keeps getting the prerendered page.
  *
  * The cookie Draft Mode sets is a secret minted by each build, so it cannot be
  * made by hand; this handler is the only way to get one, and it checks the
@@ -27,11 +30,7 @@ export async function GET(request: Request) {
   const kind = params.get("kind");
   const slug = params.get("slug") ?? "";
   const locale = params.get("locale");
-  if (
-    (kind !== "post" && kind !== "secret") ||
-    !validKey(slug) ||
-    !hasLocale(routing.locales, locale)
-  ) {
+  if (!isKind(kind) || !validKey(slug) || !hasLocale(routing.locales, locale)) {
     return new Response("Bad Request", { status: 400 });
   }
 

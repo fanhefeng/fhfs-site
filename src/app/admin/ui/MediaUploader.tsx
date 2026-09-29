@@ -44,7 +44,8 @@ export function MediaUploader({
 }: {
   folder: UploadFolder;
   kinds: readonly UploadKind[];
-  onUploaded: (file: Uploaded) => void;
+  /** Each file as it lands, with the name it had on the author's disk. */
+  onUploaded: (file: Uploaded, name: string) => void;
   label: string;
   /** What a finished file says — the form still has to be sent. */
   doneLabel?: string;
@@ -73,7 +74,7 @@ export function MediaUploader({
       }
       const put = await uploader(folder, (progress) => update(id, { progress }));
       const media = await measureAndUpload(file, kind, put);
-      onUploaded(media);
+      onUploaded(media, file.name);
       update(id, { progress: 100, done: true });
     } catch (error) {
       update(id, { error: error instanceof Error ? error.message : "上传失败。" });

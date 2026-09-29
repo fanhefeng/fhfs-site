@@ -22,12 +22,15 @@ import {
   BLADES_FAR_SMALL,
 } from "@/lib/grove/blades";
 import { LENS_SLIDES } from "@/components/lab/lensSlides";
-import { ODYSSEY_STILLS } from "@/components/films/odysseyStills";
-import { LALA_STILLS } from "@/components/films/lalaStills";
-import { KOBE_PHOTOS } from "@/components/idols/kobePhotos";
+import type { StillItem } from "@/components/films/FilmStills";
+import { statueStandIn } from "@/components/idols/statue";
+import { asset } from "@/lib/asset";
+import type { FilmRatio } from "@/lib/films";
+import { STATUE_IDOL } from "@/lib/idols";
+import { inLocale } from "@/lib/localized";
 import { LabStudy, type StudyText } from "@/components/lab/LabStudy";
 import type { ChangelogEntry } from "@/components/about/Changelog";
-import { getTimeline } from "@/lib/server/content";
+import { getFilm, getIdol, getTimeline } from "@/lib/server/content";
 import { groveCards } from "@/components/grove/cards";
 import type { GroveCardData } from "@/components/grove/GroveCard";
 
@@ -197,52 +200,51 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
   }
 
   // The screening room hangs the 大话西游 room's stills, and the neon sign
-  // hangs the La La Land room's, so they read those rooms' copy
-  // — the same captions and, importantly, the same rights line. Duplicating a
-  // credit is how two copies of it end up disagreeing.
-  if (entry.slug === "screening") {
-    const to = await getTranslations("films.odyssey");
-    for (const still of ODYSSEY_STILLS) {
-      text[`${still.id}Title`] = to(`stills.${still.id}.title`);
-      text[`${still.id}Meta`] = to(`stills.${still.id}.meta`);
-      text[`${still.id}Alt`] = to(`stills.${still.id}.alt`);
+  // hangs the La La Land room's: the rows /films reads, captions and rights
+  // line included. Duplicating a credit is how two copies of it end up
+  // disagreeing. A film taken down in the admin leaves its study an empty
+  // wall, not a failed page.
+  let wall: { ratio: FilmRatio; stills: StillItem[] } | undefined;
+  if (entry.slug === "screening" || entry.slug === "neon") {
+    const row = await getFilm(entry.slug === "screening" ? "odyssey" : "lala");
+    const film = row ? inLocale(row, locale) : null;
+    wall = {
+      ratio: film?.ratio ?? "video",
+      stills: (film?.stills ?? []).map((still) => ({ ...still, src: asset(still.src) })),
+    };
+    if (entry.slug === "screening") {
+      text.credit = film?.credit ?? "";
+      const tf = await getTranslations("films");
+      Object.assign(text, {
+        open: tf("viewer.open"),
+        close: tf("viewer.close"),
+        prev: tf("viewer.prev"),
+        next: tf("viewer.next"),
+        // Raw: the placeholders are the viewer's to fill, not ICU's.
+        counter: tf.raw("viewer.counter"),
+        viewerHint: tf("viewer.hint"),
+      });
+    } else {
+      // The sign keeps its own credit (the lettering's); the stills' is the room's.
+      text.stillsCredit = film?.credit ?? "";
     }
-    text.credit = to("credit");
-    const tf = await getTranslations("films");
-    Object.assign(text, {
-      open: tf("viewer.open"),
-      close: tf("viewer.close"),
-      prev: tf("viewer.prev"),
-      next: tf("viewer.next"),
-      // Raw: the placeholders are the viewer's to fill, not ICU's.
-      counter: tf.raw("viewer.counter"),
-      viewerHint: tf("viewer.hint"),
-    });
-  }
-  if (entry.slug === "neon") {
-    const tl = await getTranslations("films.lala");
-    for (const still of LALA_STILLS) {
-      text[`${still.id}Title`] = tl(`stills.${still.id}.title`);
-      text[`${still.id}Meta`] = tl(`stills.${still.id}.meta`);
-      text[`${still.id}Alt`] = tl(`stills.${still.id}.alt`);
-    }
-    // The sign keeps its own credit (the lettering's); the stills' is the room's.
-    text.stillsCredit = tl("credit");
   }
 
-  // The statue reads its own room's labels, and the photograph that stands
-  // in for it is the same one that does on /idols/kobe.
+  // The statue reads its own labels and stands on its own photograph
+  // (`components/idols/statue`); the rights line is its idol's page's.
+  let standIn: { src: string; width: number; height: number } | undefined;
   if (entry.slug === "statue") {
     const tk = await getTranslations("idols.kobe");
-    const cover = KOBE_PHOTOS[0]!;
+    const idol = await getIdol(STATUE_IDOL);
+    standIn = statueStandIn();
     Object.assign(text, {
       dragHint: tk("statueHint"),
       loading: tk("loading"),
       fallback: tk("statueFallback"),
-      coverAlt: tk(`photos.${cover.id}.alt`),
+      coverAlt: tk("statueAlt"),
       turnLeft: tk("turnLeft"),
       turnRight: tk("turnRight"),
-      credit: tk("credit"),
+      credit: idol ? inLocale(idol.credit, locale) : "",
     });
   }
 
@@ -350,6 +352,8 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
         text={text}
         entries={entries}
         cards={cards}
+        wall={wall}
+        standIn={standIn}
       />
 
       <section className="mx-auto w-full max-w-[720px] px-6 pb-28 pt-20">
