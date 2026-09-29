@@ -6,9 +6,9 @@ import { site } from "@/config/site";
 import { formatMedia } from "@/lib/forms";
 import { describeMedia, momentKey, stampInZone } from "@/lib/moments";
 import { AdminChrome } from "../AdminChrome";
-import { RecordList } from "../RecordList";
+import { RecordList } from "../ui/RecordList";
 import { deleteMoment, saveMoment } from "../actions/moments";
-import type { Field } from "../RecordForm";
+import type { Field } from "../ui/RecordForm";
 import { Note } from "../ui/Note";
 
 const FIELDS: Field[] = [

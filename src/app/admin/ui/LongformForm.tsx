@@ -3,8 +3,8 @@
 import { useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
-import { SaveControls } from "../SaveControls";
-import { DeleteRow } from "../DeleteRow";
+import { SaveControls } from "./SaveControls";
+import { DeleteRow } from "./DeleteRow";
 import { useFieldErrors } from "./fieldErrors";
 import { useSaveAction } from "./useSaveAction";
 import { Select } from "./Select";

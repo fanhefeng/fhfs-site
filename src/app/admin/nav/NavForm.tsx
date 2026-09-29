@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { NAV_GROUPS, type NavGroup } from "@/lib/nav";
 import { saveNavItems } from "../actions/nav";
 import { cardClass, ghostButtonClass, inputClass, labelClass, metaClass } from "../styles";
-import { SaveControls } from "../SaveControls";
+import { SaveControls } from "../ui/SaveControls";
 import { Select } from "../ui/Select";
 import { useSaveAction } from "../ui/useSaveAction";
 

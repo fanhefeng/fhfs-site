@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { ActionState } from "./actions/shared";
-import { buttonClass } from "./styles";
+import type { ActionState } from "../actions/shared";
+import { buttonClass } from "../styles";
 
 /**
  * The submit button and the error/saved lines every admin form ends with.

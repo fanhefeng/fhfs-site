@@ -2,8 +2,8 @@
 
 import { deleteWork, saveWork } from "../actions/works";
 import { inputClass, labelClass, textareaClass } from "../styles";
-import { DeleteRow } from "../DeleteRow";
-import { SaveControls } from "../SaveControls";
+import { DeleteRow } from "../ui/DeleteRow";
+import { SaveControls } from "../ui/SaveControls";
 import { useFieldErrors } from "../ui/fieldErrors";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import { useSaveAction } from "../ui/useSaveAction";

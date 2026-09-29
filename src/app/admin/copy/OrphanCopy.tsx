@@ -1,5 +1,5 @@
 import { deleteOrphanCopy } from "../actions/copy";
-import { DeleteRow } from "../DeleteRow";
+import { DeleteRow } from "../ui/DeleteRow";
 import { hintClass } from "../styles";
 
 /**

@@ -4,9 +4,9 @@ import { idols } from "@/db/schema";
 import { requireAdminPage } from "@/lib/server/auth/session";
 import { STATUE_IDOL } from "@/lib/idols";
 import { AdminChrome } from "../AdminChrome";
-import { RecordList } from "../RecordList";
+import { RecordList } from "../ui/RecordList";
 import { deleteIdol, saveIdol } from "../actions/idols";
-import type { Field, RecordData } from "../RecordForm";
+import type { Field, RecordData } from "../ui/RecordForm";
 import { Note } from "../ui/Note";
 
 const EMPTY = { zh: "", en: "" };

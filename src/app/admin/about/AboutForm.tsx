@@ -2,7 +2,7 @@
 
 import { saveAbout } from "../actions/about";
 import { inputClass, monoClass, textareaClass, labelClass } from "../styles";
-import { SaveControls } from "../SaveControls";
+import { SaveControls } from "../ui/SaveControls";
 import { useSaveAction } from "../ui/useSaveAction";
 
 export function AboutForm({

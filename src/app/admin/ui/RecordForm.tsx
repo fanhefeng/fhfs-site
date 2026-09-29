@@ -1,18 +1,18 @@
 "use client";
 
 import { useId, useRef } from "react";
-import type { ActionState } from "./actions/shared";
-import { hintClass, inputClass, labelClass, metaClass, monoClass, textareaClass } from "./styles";
+import type { ActionState } from "../actions/shared";
+import { hintClass, inputClass, labelClass, metaClass, monoClass, textareaClass } from "../styles";
 import { SaveControls } from "./SaveControls";
 import { DeleteRow } from "./DeleteRow";
-import { Select, type SelectOption } from "./ui/Select";
-import { Segmented } from "./ui/Segmented";
-import { useFieldErrors } from "./ui/fieldErrors";
+import { Select, type SelectOption } from "./Select";
+import { Segmented } from "./Segmented";
+import { useFieldErrors } from "./fieldErrors";
 import { formatMedia, KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import type { UploadFolder } from "@/lib/upload";
-import { MediaUploader } from "./ui/MediaUploader";
-import { RowsField, type RowsSpec } from "./ui/RowsField";
-import { useSaveAction } from "./ui/useSaveAction";
+import { MediaUploader } from "./MediaUploader";
+import { RowsField, type RowsSpec } from "./RowsField";
+import { useSaveAction } from "./useSaveAction";
 
 export type Field =
   | {

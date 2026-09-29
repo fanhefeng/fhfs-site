@@ -1,3 +1,4 @@
+import "client-only";
 import * as THREE from "three";
 import type { StickerShape } from "@/lib/intro/stickers";
 

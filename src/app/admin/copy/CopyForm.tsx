@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { CopyEntry } from "@/lib/copy";
 import { saveCopy } from "../actions/copy";
 import { cardClass, fieldSkin, hintClass, inputClass, metaClass } from "../styles";
-import { SaveControls } from "../SaveControls";
+import { SaveControls } from "../ui/SaveControls";
 import { useSaveAction } from "../ui/useSaveAction";
 
 /**

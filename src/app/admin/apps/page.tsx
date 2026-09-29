@@ -3,9 +3,9 @@ import { db } from "@/db";
 import { apps } from "@/db/schema";
 import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../AdminChrome";
-import { RecordList } from "../RecordList";
+import { RecordList } from "../ui/RecordList";
 import { deleteApp, saveApp } from "../actions/apps";
-import type { Field, RecordData } from "../RecordForm";
+import type { Field, RecordData } from "../ui/RecordForm";
 import { Note } from "../ui/Note";
 
 const FIELDS: Field[] = [

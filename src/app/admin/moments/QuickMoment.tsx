@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { formatMedia } from "@/lib/forms";
 import { describeMedia, type MomentMedia } from "@/lib/moments";
 import { postMoment } from "../actions/moments";
-import { SaveControls } from "../SaveControls";
+import { SaveControls } from "../ui/SaveControls";
 import { cardClass, hintClass, textareaClass } from "../styles";
 import { MediaUploader } from "../ui/MediaUploader";
 import { useSaveAction } from "../ui/useSaveAction";

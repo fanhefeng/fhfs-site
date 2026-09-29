@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type Ref } from "react";
 import { useFormStatus } from "react-dom";
-import { dangerButtonClass, ghostButtonClass, hintClass } from "./styles";
+import { dangerButtonClass, ghostButtonClass, hintClass } from "../styles";
 
 /**
  * The delete control every editable row ends with.

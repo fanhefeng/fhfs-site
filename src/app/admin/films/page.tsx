@@ -6,9 +6,9 @@ import { FILM_FACTS } from "@/lib/films";
 import { TRACK_IDS } from "@/lib/tracks";
 import zh from "../../../../messages/zh.json";
 import { AdminChrome } from "../AdminChrome";
-import { RecordList } from "../RecordList";
+import { RecordList } from "../ui/RecordList";
 import { deleteFilm, saveFilm } from "../actions/films";
-import type { Field, RecordData } from "../RecordForm";
+import type { Field, RecordData } from "../ui/RecordForm";
 import { Note } from "../ui/Note";
 
 const EMPTY = { zh: "", en: "" };

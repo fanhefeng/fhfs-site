@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { saveChips } from "../actions/chips";
 import { ghostButtonClass, inputClass, labelClass } from "../styles";
-import { SaveControls } from "../SaveControls";
+import { SaveControls } from "../ui/SaveControls";
 import { Select } from "../ui/Select";
 import { useSaveAction } from "../ui/useSaveAction";
 

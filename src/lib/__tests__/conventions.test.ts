@@ -188,8 +188,8 @@ describe("admin save forms", () => {
         .sort(),
     ).toEqual([
       "app/admin/AdminSidebar.tsx",
-      "app/admin/DeleteRow.tsx",
       "app/admin/login/LoginForm.tsx",
+      "app/admin/ui/DeleteRow.tsx",
     ]);
   });
 });

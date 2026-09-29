@@ -10,9 +10,9 @@ import { DRACO_DECODER_PATH } from "@/lib/client/three/draco";
 import { DeskFallback } from "@/components/lab/SceneGate";
 
 /* "Gaming Desktop PC" by Yolala1232 (sketchfab.com/Yolala1232), CC-BY-4.0 —
- * the hero model of the owner's old fhf-portfolio, now living on the About
- * page. Compressed from 8.5 MB to 1.1 MB (Draco + 1024px WebP) at build
- * time; the Draco decoder is served from /draco/. */
+ * the hero model of the owner's old fhf-portfolio, on /about for a while and
+ * now the lab's /lab/workstation. Compressed from 8.5 MB to 1.1 MB (Draco +
+ * 1024px WebP) at build time; the Draco decoder is served from /draco/. */
 const MODEL_URL = asset("/models/workstation.glb");
 /** Idle turntable speed, rad/s — slow enough to read as "alive", not spin. */
 const IDLE_SPIN = 0.16;

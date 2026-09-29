@@ -4,7 +4,7 @@ import { resumeExperiences, resumeProfiles } from "@/db/schema";
 import { requireAdminPage } from "@/lib/server/auth/session";
 import { formatProjects, formatSkillLine } from "@/lib/resume";
 import { AdminChrome } from "../AdminChrome";
-import { RecordForm, type Field } from "../RecordForm";
+import { RecordForm, type Field } from "../ui/RecordForm";
 import { saveResumeProfile } from "../actions/resume";
 import { ExperienceForm, type ExperienceDraft } from "./ExperienceForm";
 import { Note } from "../ui/Note";

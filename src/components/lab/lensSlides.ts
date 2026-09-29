@@ -1,6 +1,6 @@
 /**
  * The photographs the lens slides between, in order. Files live in
- * `public/lab/lens/<id>.jpg` (Unsplash, see README「内容与模型从哪来」); the
+ * `public/lab/lens/<id>.jpg` (Unsplash, see docs/CREDITS.md); the
  * captions come from `lab.items.lensSlider.<id>{Alt,Title,Body,Meta}`.
  *
  * Kept out of the demo module for the same reason the film walls' lists are: the page —

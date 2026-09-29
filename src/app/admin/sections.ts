@@ -9,7 +9,7 @@
  *
  * `/admin/works` is deliberately not listed. The shelf the old /portfolio read
  * is kept — the table, the editor, `saveWork` — for the day a first work is
- * hung (docs/DESIGN.md, 09-14), but it is empty and nothing out front reads
+ * hung (docs/DESIGN-LOG.md, 09-14), but it is empty and nothing out front reads
  * it, so it left the sidebar and the dashboard (2026-09-29) rather than sit
  * there as a section with nothing to do. Its editor still answers at its
  * address.

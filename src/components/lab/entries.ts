@@ -383,9 +383,12 @@ export const LAB_ENTRIES: LabEntry[] = [
       "lib/canvasColor.ts",
     ],
   },
-  // The cover's second and third acts, as they stand on the home page: the
-  // window the scroll opens onto the grove, the two paper cards standing in
-  // it — one under the canvas, one over — and the paper washing back over it.
+  // The cover's second and third acts, as they stood on the home page until
+  // 2026-09-24: the window the scroll opens onto the grove, the two paper
+  // cards standing in it — one under the canvas, one over — and the paper
+  // washing back over it. It kept its shelf and its number when the cover
+  // gave it up; moving it would renumber every study after it, and its
+  // summary says where it went.
   {
     slug: "approach",
     key: "approach",
