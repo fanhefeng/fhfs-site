@@ -50,8 +50,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
-      # The branch holds nothing but backup/, and carries none of main's
-      # history — a shallow clone, or nothing yet on the very first run.
+      # The branch holds the snapshot and nothing else — backup/, the recovery
+      # guide beside it, a vercel.json that keeps Vercel off it — and carries
+      # none of main's history: a shallow clone, or nothing on the first run.
       # Fetched before the export: its last snapshot is what the guard below
       # compares against. Only a branch that does not exist (ls-remote's 2)
       # lets the guard fall back to main's copy; any other failure to fetch
@@ -100,6 +101,13 @@ jobs:
 
           cp -R backup "$SNAP/backup"
           cp docs/RECOVERY.md "$SNAP/RECOVERY.md"
+
+          # The branch is data, not a site. Vercel reads vercel.json from the
+          # commit it is asked to build, so this one turns deployments off for
+          # this branch alone: without it every snapshot was a build that
+          # failed on a tree with no package.json, and a red cross on the
+          # commit. Restores take backup/ only, so it never reaches main.
+          printf '{\n  "git": { "deploymentEnabled": false }\n}\n' > "$SNAP/vercel.json"
 
           git -C "$SNAP" config user.name "github-actions[bot]"
           git -C "$SNAP" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
