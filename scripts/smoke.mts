@@ -18,7 +18,12 @@ import path from "node:path";
 import { IMMUTABLE_DIRS } from "../src/config/immutable";
 
 const base = (process.argv[2] ?? "http://localhost:3000").replace(/\/$/, "");
-const PORT = 9333;
+/**
+ * How long Chrome may take to say where its DevTools endpoint is. A cold
+ * start on a CI runner, straight after `next build` has had the machine,
+ * has taken longer than the ten seconds this used to allow.
+ */
+const LAUNCH_MS = 60_000;
 /** Per page: long enough for the 3D scenes to fetch their models. */
 const SETTLE_MS = 6000;
 
@@ -58,7 +63,8 @@ const browser = spawn(
   chrome,
   [
     "--headless=new",
-    `--remote-debugging-port=${PORT}`,
+    // Any free port; Chrome prints the one it took on stderr (below).
+    "--remote-debugging-port=0",
     `--user-data-dir=${profile}`,
     "--no-first-run",
     "--no-sandbox",
@@ -67,7 +73,7 @@ const browser = spawn(
     "--autoplay-policy=no-user-gesture-required",
     "about:blank",
   ],
-  { stdio: "ignore" },
+  { stdio: ["ignore", "ignore", "pipe"] },
 );
 const quit = (code: number): never => {
   browser.kill();
@@ -76,19 +82,43 @@ const quit = (code: number): never => {
   process.exit(code);
 };
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-let version: Response | undefined;
-for (let i = 0; i < 50 && !version?.ok; i++) {
-  await sleep(200);
-  version = await fetch(`http://localhost:${PORT}/json/version`).catch(() => undefined);
-}
-if (!version?.ok) {
-  console.error("smoke: Chrome did not open its debugging port");
+// Chrome announces its endpoint on stderr — "DevTools listening on
+// ws://127.0.0.1:<port>/…" — which is both the moment it is ready and the
+// port it chose. What it said is kept, so a launch that fails says why:
+// this used to throw its output away and report only a timeout.
+let said = "";
+const origin = await new Promise<string | null>((resolve) => {
+  const timer = setTimeout(() => resolve(null), LAUNCH_MS);
+  browser.stderr.setEncoding("utf8");
+  browser.stderr.on("data", (chunk: string) => {
+    said = (said + chunk).slice(-4000);
+    const endpoint = /DevTools listening on ws:\/\/([^/\s]+)\//.exec(said);
+    if (endpoint) {
+      clearTimeout(timer);
+      resolve(`http://${endpoint[1]}`);
+    }
+  });
+  browser.on("exit", () => {
+    clearTimeout(timer);
+    resolve(null);
+  });
+});
+if (!origin) {
+  console.error(
+    (browser.exitCode === null
+      ? `smoke: Chrome did not open its debugging port within ${LAUNCH_MS / 1000} s`
+      : `smoke: Chrome exited with ${browser.exitCode} before opening its debugging port`) +
+      (said.trim() ? `. It said:\n${said.trim()}` : ", and said nothing."),
+  );
   quit(2);
 }
+// The listener above stays on: it keeps draining the pipe, which a
+// browser writing to a full one would otherwise block on.
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const target = (await (
-  await fetch(`http://localhost:${PORT}/json/new?about:blank`, { method: "PUT" })
+  await fetch(`${origin}/json/new?about:blank`, { method: "PUT" })
 ).json()) as {
   webSocketDebuggerUrl: string;
 };
