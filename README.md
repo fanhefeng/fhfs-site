@@ -123,7 +123,7 @@ pnpm db:export       # 把库写回 backup/
 `.github/workflows/backup.yml`：跑一次 `db:export`，内容有变就往 `db-snapshots` 分支提交一个
 快照；**任何一张有行的表变成空表就拒绝提交并让 job 失败**。这个 workflow 变红要去看。
 
-`messages/*.json` 是**全部** 634 行文案的默认值；库里的 `copy_blocks` 只是叠在上面的覆盖层，而且
+`messages/*.json` 是**全部**文案的默认值；库里的 `copy_blocks` 只是叠在上面的覆盖层，而且
 只存**改过的那几行**。表空了或者连不上库，站点就照 JSON 显示，不会白屏。`/admin/copy` 照着语言
 文件生成，**输入框清空 = 恢复默认**，不是把那处变成空白。
 

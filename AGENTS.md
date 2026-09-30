@@ -268,8 +268,9 @@ replacement. That is one deliberate change of the whole read layer, verified
 against the route table (every public page must stay prerendered), not
 something to start one getter at a time.
 
-`messages/*.json` holds the defaults for *all* copy — every one of the 634
-lines (the films' and idols' own words left for their tables on 2026-09-29). The `copy_blocks` table is an override layer merged in
+`messages/*.json` holds the defaults for *all* copy — every line of it (the
+films' and idols' own words left for their tables on 2026-09-29; no count is
+written here, since one went stale twice). The `copy_blocks` table is an override layer merged in
 `src/i18n/request.ts`, and it holds **only the lines that have been edited**:
 no row means the file's line, and `zh` / `en` are nullable so a line rewritten
 in one language leaves the other one following the file. An empty or
