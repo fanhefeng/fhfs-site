@@ -202,20 +202,20 @@ describe("validGithubUser", () => {
 describe("parseMedia / formatMedia", () => {
   it("reads one file per line, the extras in any order", () => {
     const text = [
-      "image /pics/app-1-1.jpg 1080x1440",
+      "image /pics/m-1-1.jpg 1080x1440",
       "",
-      "  audio /pics/app-2-1.m4a 90s  ",
-      `video ${MEDIA_ORIGIN}/app-3-1.mp4 poster=/pics/app-3-1.jpg 30s 720x1280`,
+      "  audio /pics/m-2-1.m4a 90s  ",
+      `video ${MEDIA_ORIGIN}/m-3-1.mp4 poster=/pics/m-3-1.jpg 30s 720x1280`,
     ].join("\n");
     expect(parseMedia(text)).toEqual({
       ok: true,
       value: [
-        { kind: "image", src: "/pics/app-1-1.jpg", width: 1080, height: 1440 },
-        { kind: "audio", src: "/pics/app-2-1.m4a", duration: 90 },
+        { kind: "image", src: "/pics/m-1-1.jpg", width: 1080, height: 1440 },
+        { kind: "audio", src: "/pics/m-2-1.m4a", duration: 90 },
         {
           kind: "video",
-          src: `${MEDIA_ORIGIN}/app-3-1.mp4`,
-          poster: "/pics/app-3-1.jpg",
+          src: `${MEDIA_ORIGIN}/m-3-1.mp4`,
+          poster: "/pics/m-3-1.jpg",
           width: 720,
           height: 1280,
           duration: 30,

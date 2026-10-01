@@ -228,9 +228,9 @@ export type MediaParse = { ok: true; value: MomentMedia[] } | { ok: false; error
  * what that kind needs, in any order — `1080x1440` for a picture or a video,
  * `90s` for a voice note or a video, `poster=/moments/x.jpg` for a video.
  *
- *   image /moments/app-1-1.jpg 1080x1440
- *   audio /moments/app-2-1.m4a 90s
- *   video https://…/app-3-1.mp4 720x1280 30s poster=/moments/app-3-1.jpg
+ *   image /moments/m-1-1.jpg 1080x1440
+ *   audio /moments/m-2-1.m4a 90s
+ *   video https://…/m-3-1.mp4 720x1280 30s poster=/moments/m-3-1.jpg
  *
  * Every file is on this site or in the Blob store the admin uploads to, and
  * nowhere else. Any other host would save fine and then fail out front:

@@ -10,10 +10,11 @@
 
 /**
  * What hangs under a line: a picture, a voice note, a video. `src` is either
- * a site path for a file in public/moments/ — app-1-2.jpg there is
- * /moments/app-1-2.jpg, and `asset()` hashes it when the page is drawn — or
- * an address in the Blob store: where the app import's videos went, and
- * where everything uploaded from the editors goes. Sizes are the file's own,
+ * a site path for a file in public/moments/ — m-20200118-232807-1.jpg there
+ * is /moments/m-20200118-232807-1.jpg (the line's key and the file's place
+ * under it), and `asset()` hashes it when the page is drawn — or an address
+ * in the Blob store: where the imported videos went, and where everything
+ * uploaded from the editors goes. Sizes are the file's own,
  * so the card can reserve the box before the bytes arrive; durations are in
  * seconds.
  */

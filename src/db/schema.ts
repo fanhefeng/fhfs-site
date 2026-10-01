@@ -147,11 +147,10 @@ export const secrets = pgTable(
  * The first 242 came over from the 一言 app (`source` = "yiyan"), where they
  * sat in two notebooks — `collection` keeps the notebook's name. `original`
  * and `attribution` are that app's own distinction: a line of one's own, or a
- * line worth keeping and who said it. Another 337 came from another app's posts
- * (`source` = "app", `collection` = "app", keyed `app-<post id>`): the
- * text of every post that had any, and the pictures, videos and voice notes
- * under them. The ones app itself had hidden came in as drafts and were
- * published after a read-through (2026-09-28).
+ * line worth keeping and who said it. Another 336 came from posts kept on
+ * another app, with the pictures, videos and voice notes under them; they
+ * carry no `source` or `collection`, and are keyed by the second they were
+ * posted, the way a line written in the admin is (`m-20200118-232807`).
  */
 export const moments = pgTable("moments", {
   id: serial().primaryKey(),
@@ -163,14 +162,14 @@ export const moments = pgTable("moments", {
   original: boolean().notNull().default(true),
   /** Who said it, for a line that is not the author's own. */
   attribution: text(),
-  /** Where the line came from: "yiyan" or "app" for the imported ones, null for the board's own. */
+  /** Where the line came from: "yiyan" for the 一言 import, null for the rest. */
   source: text(),
   /** An optional one-word mood — the board's equivalent of a tag. */
   mood: text(),
   /**
    * The pictures, voice notes and videos under the line, in order — see
    * `MomentMedia`. Empty for a line that is only words, which most are; a
-   * line may also be only this, with `content` empty. The app import is
+   * line may also be only this, with `content` empty. The second import is
    * where nearly all of these came from.
    */
   media: jsonb()
