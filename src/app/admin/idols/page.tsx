@@ -70,7 +70,7 @@ const FIELDS: Field[] = [
     label: "每一张",
     kind: "rows",
     group: "照片",
-    hint: "别人拍的照片要写清作者、授权和出处——每张下面都会印出来。上传会自动填好地址、宽高和 id。",
+    hint: "别人拍的照片要写清作者、授权和出处——每张下面都会印出来。地址、宽高和 id 要手填（站内 /idols/… 或媒体站地址）。",
     rows: {
       noun: "张",
       pictures: true,

@@ -256,7 +256,7 @@ export function parseMedia(text: string): MediaParse {
     if (!src || !validMediaSrc(src)) {
       return {
         ok: false,
-        error: `${at}：第二项要是站内文件地址（以单个 / 开头），或上传到媒体站的文件（${MEDIA_ORIGIN}/…）。`,
+        error: `${at}：第二项要是站内文件地址（以单个 / 开头），或媒体站上的文件（${MEDIA_ORIGIN}/…）。`,
       };
     }
     let size: [number, number] | undefined;

@@ -74,7 +74,7 @@ export const existsError = (key: string): ActionState => ({
  * The first site path the asset manifest does not know, as the form's error —
  * or null. A file under public/ is reached by its hashed address and
  * `asset()` throws for one it does not know: better here, beside the field,
- * than on the public page. Uploads are media-site addresses and pass untouched.
+ * than on the public page. Media-site addresses pass untouched.
  * `folder` is where such a file belongs, for the message.
  */
 export function unknownAsset(paths: readonly string[], folder: string): ActionState | null {
@@ -84,7 +84,7 @@ export function unknownAsset(paths: readonly string[], folder: string): ActionSt
       asset(path);
     } catch {
       return {
-        error: `${path} 不在 assets.gen.json 里——文件放进 public/${folder}/ 后跑 pnpm assets，再存一次；或者直接在这里上传。`,
+        error: `${path} 不在 assets.gen.json 里——文件放进 public/${folder}/ 后跑 pnpm assets，再存一次；或者放进媒体站（media/files/，pnpm media:deploy）后填它的地址。`,
       };
     }
   }

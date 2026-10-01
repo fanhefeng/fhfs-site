@@ -85,7 +85,7 @@ export function checkPictures(
     if (seen.has(picture.id)) return `${at}：id「${picture.id}」重复了，同一面墙上每张要不一样。`;
     seen.add(picture.id);
     if (!validSrc(picture.src)) {
-      return `${at}：地址要是站内文件（以单个 / 开头），或上传到媒体站的文件。`;
+      return `${at}：地址要是站内文件（以单个 / 开头），或媒体站上的文件。`;
     }
     if (!(picture.width > 0 && picture.height > 0)) {
       return `${at}：宽和高要填图片本身的像素数。`;

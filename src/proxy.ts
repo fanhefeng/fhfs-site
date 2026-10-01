@@ -9,19 +9,13 @@ const intlProxy = createMiddleware(routing);
 
 /**
  * The /admin paths the check below leaves alone. The login form, and leaving
- * draft preview, which only takes something away (see its route). And the two
- * routes the editor calls with `fetch` rather than visits: each checks the
+ * draft preview, which only takes something away (see its route). And the
+ * route the editor calls with `fetch` rather than visits: it checks the
  * session itself and answers with a status and words the editor shows. A
  * redirect reaches `fetch` as the login page — a 200 full of HTML — so an
- * expired session drew the login form inside the preview, and an upload said
- * only "Failed to retrieve the client token".
+ * expired session drew the login form inside the preview.
  */
-const PASS_THROUGH = new Set([
-  "/admin/login",
-  "/admin/preview/exit",
-  "/admin/preview/markdown",
-  "/admin/upload",
-]);
+const PASS_THROUGH = new Set(["/admin/login", "/admin/preview/exit", "/admin/preview/markdown"]);
 
 /**
  * Two things share this file, and the order matters.

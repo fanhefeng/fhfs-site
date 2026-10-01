@@ -150,7 +150,7 @@ const FIELDS: Field[] = [
     label: "每一张",
     kind: "rows",
     group: "剧照墙",
-    hint: "上传会自动填好地址、宽高和 id；墙按这里的顺序挂，一行六格。",
+    hint: "每张填地址（站内 /films/… 或媒体站地址）、宽高和 id；墙按这里的顺序挂，一行六格。",
     rows: {
       noun: "张",
       pictures: true,
