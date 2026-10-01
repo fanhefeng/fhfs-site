@@ -27,9 +27,9 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 `fhfs-media`（`media/`），库里只存地址（`MEDIA_ORIGIN` 开头）。换库、恢复库都不碰它。
 `pnpm media:pull` 把库里指到的每个文件拉回本机的 `media/files/`，这就是备份的办法，也是
 重新部署之前必须做的一步（部署会整体替换，`media:deploy` 发现缺文件会拒绝）。媒体站整个没了：
-先 `media:pull` 过的那份本机副本就是全部；没有的话，2026-10-01 之前的图片、语音和封面还在
-git 历史里（`git log --diff-filter=D -- public/moments` 找到删掉它们的那次提交，取它的父提交），
-视频得从原平台重新下载。
+先 `media:pull` 过的那份本机副本就是全部。git 历史里**没有**它们——2026-10-01 改写历史时把
+`public/moments/` 整个拿掉了；改写前的完整历史只在用户本机的一个 bundle 里
+（`../fhfs-site-history-backup/`，不在任何远端）。都没有的话，视频和图片得从原平台重新下载。
 
 真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那些表——除了登录限流用的
 `login_attempts`，schema 里的每一张都在里面（`tables.test.ts` 守着这一点）。
