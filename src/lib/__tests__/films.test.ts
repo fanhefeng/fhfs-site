@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { checkPictures, coverOf, pictureId } from "@/lib/films";
+import { checkPictures, coverOf } from "@/lib/films";
 
 const picture = (id: string, src = `/films/x/${id}.jpg`) => ({
   id,
@@ -16,23 +16,6 @@ describe("coverOf", () => {
     expect(coverOf(wall, "gone")?.id).toBe("a");
     expect(coverOf(wall, null)?.id).toBe("a");
     expect(coverOf([], "a")).toBeUndefined();
-  });
-});
-
-describe("pictureId", () => {
-  it("names an upload after its file", () => {
-    expect(pictureId("Monkey King.JPG", [])).toBe("monkey-king");
-    expect(pictureId("IMG_0042.jpeg", [])).toBe("img-0042");
-  });
-
-  it("stays unique on its wall", () => {
-    expect(pictureId("wink.jpg", ["wink"])).toBe("wink-2");
-    expect(pictureId("wink.jpg", ["wink", "wink-2"])).toBe("wink-3");
-  });
-
-  it("still names a file whose name has nothing Latin in it", () => {
-    expect(pictureId("剧照.jpg", [])).toBe("still");
-    expect(pictureId("剧照.jpg", ["still"])).toBe("still-2");
   });
 });
 

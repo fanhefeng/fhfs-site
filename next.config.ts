@@ -15,8 +15,8 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   images: {
-    // The board's pictures uploaded from the admin live in the Blob store;
-    // next/image resizes them like the ones in public/, from this host only.
+    // The board's pictures live on the media site (media/, a Cloudflare
+    // Worker); next/image resizes them like the ones in public/, from this host only.
     remotePatterns: [new URL(`${MEDIA_ORIGIN}/**`)],
   },
   headers() {
@@ -36,14 +36,6 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
-        ],
-      },
-      // The editor's policy replaces the one above under /admin (the later
-      // rule wins for the same key): the same, plus where uploads go.
-      {
-        source: "/admin/:path*",
-        headers: [
-          { key: "Content-Security-Policy", value: contentSecurityPolicy({ dev, admin: true }) },
         ],
       },
       // A year, and only on an address with the content's hash in it — the

@@ -34,7 +34,7 @@ export type FilmFacts = Record<FilmFact, Localized>;
 /**
  * A print on a film's wall. `src` is a site path for a file in
  * `public/films/<film>/` — hashed by `asset()` when the page renders — or an
- * upload's address in the Blob store. The size is the file's own, so the wall
+ * upload's address in the media site. The size is the file's own, so the wall
  * reserves the box before the bytes arrive.
  */
 export type FilmStill = {
@@ -65,25 +65,8 @@ export const coverOf = <T extends { id: string }>(
 ): T | undefined => pictures.find((picture) => picture.id === cover) ?? pictures[0];
 
 /** What a picture's id may look like: the stills that came from code were
- *  named in camelCase (`monkeyKing`), an upload is named after its file. */
+ *  named in camelCase (`monkeyKing`), the later ones in kebab-case. */
 export const PICTURE_ID = /^[A-Za-z0-9][A-Za-z0-9-]*$/;
-
-/**
- * An id for an uploaded picture, from its file name: `Monkey King.JPG` is
- * `monkey-king`. Taken against the ids the wall already has, so a second
- * `monkey-king` comes back as `monkey-king-2`.
- */
-export function pictureId(fileName: string, taken: readonly string[]): string {
-  const stem =
-    fileName
-      .replace(/\.[^.]*$/, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "still";
-  let id = stem;
-  for (let n = 2; taken.includes(id); n++) id = `${stem}-${n}`;
-  return id;
-}
 
 /**
  * What is wrong with a wall of pictures, or null. Ids unique and well-formed
@@ -102,7 +85,7 @@ export function checkPictures(
     if (seen.has(picture.id)) return `${at}：id「${picture.id}」重复了，同一面墙上每张要不一样。`;
     seen.add(picture.id);
     if (!validSrc(picture.src)) {
-      return `${at}：地址要是站内文件（以单个 / 开头），或上传到 Blob 的文件。`;
+      return `${at}：地址要是站内文件（以单个 / 开头），或上传到媒体站的文件。`;
     }
     if (!(picture.width > 0 && picture.height > 0)) {
       return `${at}：宽和高要填图片本身的像素数。`;

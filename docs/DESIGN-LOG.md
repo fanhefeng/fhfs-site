@@ -1021,3 +1021,31 @@
 > - **文案**：`moments.subtitle` 那句来历改成「2020 年起的多半散在别处」；后台「来源标记」的提示、
 >   schema 注释、`CREDITS.md` 和上面 09-24 那条都换成中性说法。git 历史里的旧文件名与旧文档没有改写
 >   （要改得重写 main 的历史、强推），是用户可以另行决定的事。
+>
+> **同日续（Vercel Blob 被封，说说的媒体搬到 Cloudflare 免费版的一个 Worker 上）**，覆盖 09-24、09-29
+> 里关于 Blob 和「编辑器里直接上传」的句子：
+> - **起因**：上面那次改名为了不断线，先把 57 个视频 `copy` 一份再删旧的，Blob 存储瞬间到了 ~1.7GB，
+>   越过 Hobby 的 1GB，整个 store 被停（`limits-exceeded-suspended`，读写都 403，令牌也取不出来）。
+>   删回 893MB 也不自动恢复，Vercel 的规矩是等 30 天或升 Pro。教训记在这里：免费档上任何会让存储
+>   短时翻倍的操作都要先算总量。
+> - **为什么不是 R2**：R2 有免费额度，但开通前必须绑卡，用户不绑。Cloudflare 免费、不用卡的是静态托管：
+>   先试了 Pages（`fhfs-media.pages.dev`），又试了 Workers 静态资源——两者对 `Range` 都回 200 整个文件，
+>   而 Safari 不支持 Range 的服务器上不放视频和语音。所以落在 **Worker `fhfs-media` + 静态资源**
+>   （`media/`，地址 `fhfs-media.fhfs.workers.dev`，账号的 workers.dev 子域名 `fhfs` 是这次建的）：
+>   `run_worker_first: ["/moments/*"]` 让代码先接，按 `src/lib/byteRange.ts` 切出那一段回 206。静态资源
+>   在 Worker 里拿到时既不带 `Content-Length` 也不认 Range，所以长度来自部署时写的
+>   `media/sizes.gen.json`。实测 `bytes=0-1`、中段、`500000-`、`-500` 全部逐字节对、越界回 416。另：
+>   `run_worker_first` 只认前缀通配，`/moments/*.mp4` 这种写法匹配不上，图片也就一起经过代码（不在长度表
+>   里的原样返回；免费版每天 10 万次调用，这个站用不完）。
+> - **文件**：视频从原平台重新导出下载（Blob 里那份取不出来），前三个 2020-01 的要带 `Referer` 才给；
+>   重新 `+faststart` 封装，宽高比、时长逐个对过库里的数。Cloudflare 单个静态文件上限 25 MiB，
+>   超了的 10 个用 x264 两遍编码压到 ~23MB（唯一的 1080p 降到 720p，其余原分辨率）。`public/moments/`
+>   的 224 个图、语音、封面也搬过去，仓库里删掉，`IMMUTABLE_DIRS` 少了 `/moments`。库和 backup 里的地址
+>   一律改成 `MEDIA_ORIGIN/moments/<key>-<n>.<ext>`。
+> - **工作流**：`media/files/` 不进 git，站上那份就是正本。`pnpm media:pull` 拉回本机，`pnpm media:deploy`
+>   整体部署——缺了库里指到的文件、或有文件超 25 MiB 就拒绝，部署完给每个还没被引用的新文件打印媒体栏
+>   那一行。`mediaSite.test.ts` 守着长度表覆盖 backup 里的每个地址。**后台不再能上传**（免费的 Worker 没地方
+>   接文件）：上传按钮、签名路由、`lib/upload.ts` 都删了，快捷发布只发文字，媒体栏和剧照行只能填地址。
+> - **一个坑**：`wrangler pages project create` 在仓库根目录跑，会把这个 Next 项目当成要迁移的应用自动
+>   配置，往 `package.json` 里加了 wrangler 依赖（已撤回）。wrangler 一律在 `media/` 里跑，脚本就是这么做的。
+> - Vercel 那个被停的 Blob store 和账号里的 `BLOB_READ_WRITE_TOKEN` 还在，代码已不再用；删不删由用户定。

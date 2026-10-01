@@ -34,7 +34,7 @@ export async function saveSecret(_prev: ActionState, form: FormData): Promise<Ac
   const audio = str(form, "audio") || null;
   if (audio && !validMediaSrc(audio)) {
     return {
-      error: `音频地址要是站内文件（以单个 / 开头，放在 public/ 下），或 Blob 存储里的文件（${MEDIA_ORIGIN}/…）。别的网站的地址会被页面的安全策略拦下，放不出来。`,
+      error: `音频地址要是站内文件（以单个 / 开头，放在 public/ 下），或 媒体站里的文件（${MEDIA_ORIGIN}/…）。别的网站的地址会被页面的安全策略拦下，放不出来。`,
     };
   }
   // A file under public/ is played from its hashed address, which the page

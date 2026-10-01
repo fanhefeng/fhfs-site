@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useId } from "react";
 import type { ActionState } from "../actions/shared";
 import { hintClass, inputClass, labelClass, metaClass, monoClass, textareaClass } from "../styles";
 import { SaveControls } from "./SaveControls";
@@ -8,9 +8,7 @@ import { DeleteRow } from "./DeleteRow";
 import { Select, type SelectOption } from "./Select";
 import { Segmented } from "./Segmented";
 import { useFieldErrors } from "./fieldErrors";
-import { formatMedia, KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
-import type { UploadFolder } from "@/lib/upload";
-import { MediaUploader } from "./MediaUploader";
+import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import { RowsField, type RowsSpec } from "./RowsField";
 import { useSaveAction } from "./useSaveAction";
 
@@ -27,8 +25,8 @@ export type Field =
     }
   | { name: string; label: string; kind: "number"; hint?: string; group?: string }
   /** A single-language textarea — for text that is what it is, not a translation pair.
-   *  `upload` puts an uploader under it that adds a media line per file
-   *  (`parseMedia`'s grammar), into that folder of the Blob store. */
+   *  `mono` sets it in the code face with no spellcheck, for lines that are
+   *  addresses and numbers (the board's media field, `parseMedia`'s grammar). */
   | {
       name: string;
       label: string;
@@ -36,7 +34,7 @@ export type Field =
       rows?: number;
       hint?: string;
       group?: string;
-      upload?: UploadFolder;
+      mono?: boolean;
     }
   | {
       name: string;
@@ -209,20 +207,6 @@ export function RecordForm({
       );
     }
 
-    if (field.kind === "area" && field.upload) {
-      return (
-        <MediaArea
-          key={field.name}
-          name={field.name}
-          label={field.label}
-          hint={field.hint}
-          rows={field.rows}
-          folder={field.upload}
-          defaultValue={value(field.name)}
-        />
-      );
-    }
-
     if (field.kind === "area") {
       return (
         <label key={field.name} className="block space-y-1.5">
@@ -232,7 +216,8 @@ export function RecordForm({
             name={field.name}
             defaultValue={value(field.name)}
             rows={field.rows ?? 6}
-            className={textareaClass}
+            spellCheck={field.mono ? false : undefined}
+            className={field.mono ? `${textareaClass} ${monoClass}` : textareaClass}
           />
         </label>
       );
@@ -365,58 +350,5 @@ export function RecordForm({
         <DeleteRow action={deleteAction} fields={{ key }} what={key} />
       )}
     </>
-  );
-}
-
-/**
- * The board's media field with the uploader under it: each file that lands in
- * the store becomes one more line, in the grammar the field already reads.
- * The textarea stays the record — the uploader only writes into it, so a line
- * can still be typed, reordered or deleted by hand before saving.
- */
-function MediaArea({
-  name,
-  label,
-  hint,
-  rows,
-  folder,
-  defaultValue,
-}: {
-  name: string;
-  label: string;
-  hint?: string;
-  rows?: number;
-  folder: UploadFolder;
-  defaultValue: string;
-}) {
-  const area = useRef<HTMLTextAreaElement>(null);
-  const areaId = useId();
-  return (
-    <div className="space-y-1.5">
-      <label htmlFor={areaId} className={labelClass}>
-        {label}
-      </label>
-      {hint && <span className={`block ${hintClass}`}>{hint}</span>}
-      <textarea
-        ref={area}
-        id={areaId}
-        name={name}
-        defaultValue={defaultValue}
-        rows={rows ?? 6}
-        spellCheck={false}
-        className={`${textareaClass} ${monoClass}`}
-      />
-      <MediaUploader
-        folder={folder}
-        kinds={["image", "audio", "video"]}
-        label="上传图片 / 语音 / 视频"
-        onUploaded={(file) => {
-          const el = area.current;
-          if (!el) return;
-          const line = formatMedia([file]);
-          el.value = el.value.trim() ? `${el.value.replace(/\s+$/, "")}\n${line}` : line;
-        }}
-      />
-    </div>
   );
 }

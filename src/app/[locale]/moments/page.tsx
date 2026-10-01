@@ -13,9 +13,10 @@ import { MomentCalendar } from "@/components/moments/MomentCalendar";
 
 export const generateMetadata = sectionMetadata("moments", "/moments");
 
-/** The files under a line, at the addresses the browser fetches: hashed for
- *  the ones in `public/`, as they are for a video in the Blob store (`asset()`
- *  hands back anything outside the immutable folders unchanged). */
+/** The files under a line, at the addresses the browser fetches: as stored for
+ *  the ones in the media site, where all of the board's live, and hashed for
+ *  any a line points at in `public/` (`asset()` hands back anything outside the
+ *  immutable folders unchanged). */
 const resolveMedia = (item: MomentMedia): MomentMedia =>
   item.kind === "video"
     ? { ...item, src: asset(item.src), poster: asset(item.poster) }

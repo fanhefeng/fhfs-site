@@ -73,7 +73,7 @@ const FIELDS: Field[] = [
     hint: "别人拍的照片要写清作者、授权和出处——每张下面都会印出来。上传会自动填好地址、宽高和 id。",
     rows: {
       noun: "张",
-      pictures: "idols",
+      pictures: true,
       blank: {
         id: "",
         src: "",

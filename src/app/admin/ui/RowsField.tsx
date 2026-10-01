@@ -1,10 +1,7 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { pictureId } from "@/lib/films";
-import type { UploadFolder } from "@/lib/upload";
 import { hintClass, inputClass, labelClass, monoClass, textareaClass } from "../styles";
-import { MediaUploader } from "./MediaUploader";
 import { Select, type SelectOption } from "./Select";
 
 type RowData = { [field: string]: unknown };
@@ -36,9 +33,8 @@ export type RowsSpec = {
   blank: RowData;
   /** What one row is called, for its heading and its buttons: 张 / 句 / 条. */
   noun: string;
-  /** Rows that are pictures: each shows its own, and an uploader adds a row
-   *  per file — into this folder of the Blob store — with its size filled. */
-  pictures?: UploadFolder;
+  /** Rows that are pictures: each shows its own beside its fields. */
+  pictures?: boolean;
 };
 
 type Row = { uid: number; data: RowData };
@@ -150,44 +146,16 @@ export function RowsField({
         </ol>
       )}
 
-      <div className="flex flex-wrap items-start gap-3">
-        <button
-          type="button"
-          onClick={() => setRows((all) => [...all, make({ ...spec.blank })])}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-3 font-mono text-meta text-fg-secondary transition-colors hover:border-fg-tertiary hover:text-fg"
-        >
-          <span aria-hidden className="text-fg-tertiary">
-            +
-          </span>
-          加一{spec.noun}
-        </button>
-        {spec.pictures && (
-          <div className="min-w-0 flex-1">
-            <MediaUploader
-              folder={spec.pictures}
-              kinds={["image"]}
-              label="上传图片"
-              doneLabel="已加一行，记得保存"
-              onUploaded={(file, fileName) => {
-                if (file.kind !== "image") return;
-                setRows((all) => {
-                  const taken = all.map((r) => leaf(r.data.id));
-                  return [
-                    ...all,
-                    make({
-                      ...spec.blank,
-                      id: pictureId(fileName, taken),
-                      src: file.src,
-                      width: file.width,
-                      height: file.height,
-                    }),
-                  ];
-                });
-              }}
-            />
-          </div>
-        )}
-      </div>
+      <button
+        type="button"
+        onClick={() => setRows((all) => [...all, make({ ...spec.blank })])}
+        className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-3 font-mono text-meta text-fg-secondary transition-colors hover:border-fg-tertiary hover:text-fg"
+      >
+        <span aria-hidden className="text-fg-tertiary">
+          +
+        </span>
+        加一{spec.noun}
+      </button>
     </div>
   );
 }

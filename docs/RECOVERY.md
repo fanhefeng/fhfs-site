@@ -23,6 +23,14 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 `public/` 下的音乐、模型、照片都在 git 里。`messages/*.json` 是全部文案的默认值，
 也在 git 里：就算 `copy_blocks` 整张表没了，站点照文件显示，不会白屏。
 
+**说说的图片、语音、视频不在 git 里，也不在库里**：在媒体站——Cloudflare 免费版上的 Worker
+`fhfs-media`（`media/`），库里只存地址（`MEDIA_ORIGIN` 开头）。换库、恢复库都不碰它。
+`pnpm media:pull` 把库里指到的每个文件拉回本机的 `media/files/`，这就是备份的办法，也是
+重新部署之前必须做的一步（部署会整体替换，`media:deploy` 发现缺文件会拒绝）。媒体站整个没了：
+先 `media:pull` 过的那份本机副本就是全部；没有的话，2026-10-01 之前的图片、语音和封面还在
+git 历史里（`git log --diff-filter=D -- public/moments` 找到删掉它们的那次提交，取它的父提交），
+视频得从原平台重新下载。
+
 真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那些表——除了登录限流用的
 `login_attempts`，schema 里的每一张都在里面（`tables.test.ts` 守着这一点）。
 

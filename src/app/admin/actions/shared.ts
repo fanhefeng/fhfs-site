@@ -74,7 +74,7 @@ export const existsError = (key: string): ActionState => ({
  * The first site path the asset manifest does not know, as the form's error —
  * or null. A file under public/ is reached by its hashed address and
  * `asset()` throws for one it does not know: better here, beside the field,
- * than on the public page. Uploads are Blob addresses and pass untouched.
+ * than on the public page. Uploads are media-site addresses and pass untouched.
  * `folder` is where such a file belongs, for the message.
  */
 export function unknownAsset(paths: readonly string[], folder: string): ActionState | null {

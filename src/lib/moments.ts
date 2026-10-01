@@ -9,14 +9,13 @@
  */
 
 /**
- * What hangs under a line: a picture, a voice note, a video. `src` is either
- * a site path for a file in public/moments/ — m-20200118-232807-1.jpg there
- * is /moments/m-20200118-232807-1.jpg (the line's key and the file's place
- * under it), and `asset()` hashes it when the page is drawn — or an address
- * in the Blob store: where the imported videos went, and where everything
- * uploaded from the editors goes. Sizes are the file's own,
- * so the card can reserve the box before the bytes arrive; durations are in
- * seconds.
+ * What hangs under a line: a picture, a voice note, a video. `src` is an
+ * address on the media site (`MEDIA_ORIGIN`, a Cloudflare Worker — media/):
+ * `moments/m-20200118-232807-1.jpg` there is the line's key and the file's
+ * place under it. A site path into `public/` still works — `asset()` hashes
+ * it when the page is drawn — though none of the board's files live there
+ * any more. Sizes are the file's own, so the card can reserve the box before
+ * the bytes arrive; durations are in seconds.
  */
 export type MomentMedia =
   | { kind: "image"; src: string; width: number; height: number }
@@ -24,8 +23,8 @@ export type MomentMedia =
   | {
       kind: "video";
       src: string;
-      /** A frame of the video, stored the way a picture is: in `public/moments/`
-       *  or, for an upload, in the Blob store beside the video. */
+      /** A frame of the video, stored the way a picture is, on the media site
+       *  beside the video. */
       poster: string;
       width: number;
       height: number;

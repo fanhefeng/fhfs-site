@@ -1,0 +1,15 @@
+// The media Worker (worker.ts). Deployed with `pnpm media:deploy`, never by
+// hand: the script refuses when a file the database points at is missing
+// from files/, since a deploy replaces every asset at once.
+{
+  "name": "fhfs-media",
+  "main": "worker.ts",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./files",
+    "binding": "ASSETS",
+    "run_worker_first": ["/moments/*"],
+  },
+  "observability": { "enabled": false },
+}

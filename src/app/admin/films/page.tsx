@@ -153,7 +153,7 @@ const FIELDS: Field[] = [
     hint: "上传会自动填好地址、宽高和 id；墙按这里的顺序挂，一行六格。",
     rows: {
       noun: "张",
-      pictures: "films",
+      pictures: true,
       blank: {
         id: "",
         src: "",

@@ -15,27 +15,14 @@ describe("contentSecurityPolicy", () => {
 
   // The one exception is named here as well as in csp.ts, so adding a second
   // host — or letting this one into another directive — fails the test.
-  const BLOB_HOST = "https://oaq2x6wu11ne1ol7.public.blob.vercel-storage.com";
+  const MEDIA_HOST = "https://fhfs-media.fhfs.workers.dev";
 
   const foreign = (values: string[]) => values.filter((value) => /^https?:|^\*|^wss?:/.test(value));
 
-  it("lets nothing load from another origin, save the uploads in the Blob store", () => {
+  it("lets nothing load from another origin, save the board's media from the media site", () => {
     for (const [name, values] of Object.entries(prod)) {
       expect(foreign(values), name).toEqual(
-        name === "media-src" || name === "img-src" ? [BLOB_HOST] : [],
-      );
-    }
-  });
-
-  it("lets only the admin reach the store's upload API, and only to connect", () => {
-    const admin = parse(contentSecurityPolicy({ dev: false, admin: true }));
-    for (const [name, values] of Object.entries(admin)) {
-      expect(foreign(values), name).toEqual(
-        name === "media-src" || name === "img-src"
-          ? [BLOB_HOST]
-          : name === "connect-src"
-            ? ["https://vercel.com"]
-            : [],
+        name === "media-src" || name === "img-src" ? [MEDIA_HOST] : [],
       );
     }
     expect(foreign(prod["connect-src"]!)).toEqual([]);

@@ -70,3 +70,7 @@ next-env.d.ts
 **/.claude/agent-memory-local
 **/.claude/first-run
 **/.claude/assistant-daemon-state.json
+
+# The media Worker's files (pnpm media:pull / media:deploy) and wrangler's cache.
+/media/files/
+/media/.wrangler/

@@ -86,7 +86,7 @@ export async function postMoment(_prev: ActionState, form: FormData): Promise<Ac
   const parsedMedia = parseMedia(raw(form, "media"));
   if (!parsedMedia.ok) return { error: parsedMedia.error };
   const media = parsedMedia.value;
-  if (!content && media.length === 0) return { error: "写点什么，或者传张图。" };
+  if (!content && media.length === 0) return { error: "写点什么再发。" };
   const missing = unknownAsset(mediaPaths(media), "moments");
   if (missing) return missing;
   const postedAt = new Date();

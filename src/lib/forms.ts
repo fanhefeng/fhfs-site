@@ -180,8 +180,8 @@ export const validLink = (value: string): boolean =>
   /^https?:\/\/\S+$/.test(value) || validPath(value);
 
 /**
- * Where any file a page shows or plays can come from: this site, or the Blob
- * store the admin uploads to. Those are the two places the CSP's `img-src`
+ * Where any file a page shows or plays can come from: this site, or the media
+ * site (media/, `pnpm media:deploy`). Those are the two places the CSP's `img-src`
  * and `media-src` name, and the one host next/image is configured for
  * (config/csp.ts, next.config.ts), so anything else would save fine and then
  * be blocked out front, with nothing on the page to say why.
@@ -232,7 +232,7 @@ export type MediaParse = { ok: true; value: MomentMedia[] } | { ok: false; error
  *   audio /moments/m-2-1.m4a 90s
  *   video https://…/m-3-1.mp4 720x1280 30s poster=/moments/m-3-1.jpg
  *
- * Every file is on this site or in the Blob store the admin uploads to, and
+ * Every file is on this site or in the media site the admin uploads to, and
  * nowhere else. Any other host would save fine and then fail out front:
  * next/image refuses a host it was not given (and throws, taking the board
  * with it), and the CSP blocks the rest.
@@ -256,7 +256,7 @@ export function parseMedia(text: string): MediaParse {
     if (!src || !validMediaSrc(src)) {
       return {
         ok: false,
-        error: `${at}：第二项要是站内文件地址（以单个 / 开头），或上传到 Blob 的文件（${MEDIA_ORIGIN}/…）。`,
+        error: `${at}：第二项要是站内文件地址（以单个 / 开头），或上传到媒体站的文件（${MEDIA_ORIGIN}/…）。`,
       };
     }
     let size: [number, number] | undefined;

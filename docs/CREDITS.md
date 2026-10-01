@@ -11,7 +11,7 @@
   默认文集）。App 没有导出功能，全文、发布时间（北京时间）、所属文集与出处是在安卓模拟器里
   登录后读它的本地数据库得到的；`key` 为 `yiyan-<卡片 id>`，`source` 标 `yiyan`。
   其后 336 条是我在另一个 App 上发过的动态（网页版逐页导出，洗掉了内嵌标签与表情码，不标
-  `source`、不归文集），其中带图片、语音或视频的放在 `public/moments/` 或 Vercel Blob。
+  `source`、不归文集），其中带的图片、语音和视频放在媒体站（Cloudflare Worker `fhfs-media`）上。
 
 ## 模型与照片
 

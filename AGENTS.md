@@ -171,23 +171,30 @@ Failures resolve to `null` and the badge is simply absent.
   Only `src/app/[locale]/not-found.tsx` loads its stage through
   `next/dynamic`; a not-found boundary is bundled with its layout, so
   anything it imports statically ships with every page.
-- **Board media and uploads**: a moment's pictures, voice notes and video
-  posters are files in `public/moments/` (`moments.media`, a jsonb list — see
-  `MomentMedia` in `src/lib/moments.ts`), named by their site path and
-  hashed by `asset()` when the page renders — or addresses in the Vercel Blob
-  store `fhfs-media`, whose host is the one cross-origin entry in `csp.ts`
-  (`img-src`, `media-src`; `next.config.ts` lets `next/image` fetch from it).
-  The editors upload straight to that store (`app/admin/ui/MediaUploader.tsx`,
-  the store's client upload: the browser sends the bytes to Vercel, and
-  `app/admin/upload/route.ts` only signs the request, after the session
-  check) with the size, the length and a video's poster measured in the
-  browser on the way; the admin's own CSP adds the store's API host to
-  `connect-src`. Uploads need `BLOB_READ_WRITE_TOKEN`; without it the route
-  says so and the rest of the admin works. The board's list is still one file
-  per line (`parseMedia` in `src/lib/forms.ts`, unit-tested), and a save
-  refuses a site path the manifest does not know (`unknownAsset` in
-  `actions/shared.ts`) — upload it, or put it in `public/`, run
-  `pnpm assets`, then save.
+- **Board media (the media site)**: a moment's pictures, voice notes, videos
+  and posters (`moments.media`, a jsonb list — see `MomentMedia` in
+  `src/lib/moments.ts`) are addresses on the media site, the Cloudflare
+  Worker `fhfs-media` in `media/` (`MEDIA_ORIGIN` in `csp.ts`, on the free
+  plan, no card) — the one cross-origin entry there (`img-src`, `media-src`;
+  `next.config.ts` lets `next/image` fetch from it). The imported ones are
+  `moments/<line key>-<n>.<ext>`. The files are the Worker's static assets in
+  `media/files/`, which is not in git: the site is the live copy, `pnpm
+  media:pull` fetches every file the database points at, and `pnpm
+  media:deploy` uploads the folder (scripts/media.mts). A deploy replaces
+  every asset at once, so it refuses while a referenced file is missing, or
+  one is over Cloudflare's 25 MiB (re-encode a longer video under it); it
+  writes `media/sizes.gen.json` — commit it — and runs the global `wrangler`
+  from `media/` (never from the root: wrangler's autoconfig takes the root for
+  a Next app to port). Static assets ignore `Range`, and Safari plays no media
+  without it, so `media/worker.ts` runs first for `/moments/*` and answers
+  ranges itself from that size table (`src/lib/byteRange.ts`, unit-tested);
+  `mediaSite.test.ts` fails when the backup points at a file the table lacks.
+  There is no uploading from the admin (a Worker on the free plan has nowhere
+  to put one): add a file to `media/files/`, deploy — it prints the media
+  field's line for each file nothing points at yet — then paste that line.
+  The list is one file per line (`parseMedia` in `src/lib/forms.ts`); a site
+  path into `public/` is still accepted, and a save refuses one the manifest
+  does not know (`unknownAsset` in `actions/shared.ts`).
 - **Draft preview**: `/admin/preview` turns on Draft Mode for the signed-in
   browser and opens a post, secret, film or idol on its own page; those pages
   pass `await showDrafts()` (`lib/server/auth/session.ts`: the mode is on *and*

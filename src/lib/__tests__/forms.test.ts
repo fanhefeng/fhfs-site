@@ -179,7 +179,7 @@ describe("oneOf / filled", () => {
 });
 
 describe("validMediaSrc", () => {
-  it("is a file on this site or in the Blob store — the two places media-src allows", () => {
+  it("is a file on this site or in the media site — the two places media-src allows", () => {
     expect(validMediaSrc("/secrets/episode-1.mp3")).toBe(true);
     expect(validMediaSrc(`${MEDIA_ORIGIN}/secrets/episode-1.mp3`)).toBe(true);
     expect(validMediaSrc("https://podcasts.example.com/episode-1.mp3")).toBe(false);
@@ -256,12 +256,12 @@ describe("parseMedia / formatMedia", () => {
     expect(wrong("image /pics/a.jpg 10x20 huge")).toMatch(/看不懂「huge」/);
   });
 
-  it("takes files from this site and from the Blob store — nowhere else", () => {
+  it("takes files from this site and from the media site — nowhere else", () => {
     const wrong = (text: string) => {
       const parsed = parseMedia(text);
       return parsed.ok ? "" : parsed.error;
     };
-    // What the admin uploads: a picture, a voice note, a poster in the store.
+    // What the admin uploads: a picture, a voice note, a poster on the media site.
     expect(wrong(`image ${MEDIA_ORIGIN}/moments/a.jpg 10x20`)).toBe("");
     expect(wrong(`audio ${MEDIA_ORIGIN}/moments/a.m4a 9s`)).toBe("");
     expect(

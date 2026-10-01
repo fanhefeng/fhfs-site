@@ -1,11 +1,10 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useId } from "react";
 import { deleteSecret, saveSecret } from "../actions/secrets";
 import { inputClass, labelClass } from "../styles";
 import { Select } from "../ui/Select";
 import { LongformForm, type LongformDraft } from "../ui/LongformForm";
-import { MediaUploader } from "../ui/MediaUploader";
 
 export type SecretDraft = LongformDraft & {
   kind: "essay" | "podcast";
@@ -21,8 +20,6 @@ export type SecretDraft = LongformDraft & {
  */
 export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: boolean }) {
   const kindLabel = useId();
-  const audio = useRef<HTMLInputElement>(null);
-  const duration = useRef<HTMLInputElement>(null);
   return (
     <LongformForm
       action={saveSecret}
@@ -51,9 +48,8 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
       extras={
         <>
           <label className="space-y-1.5">
-            <span className={labelClass}>音频地址（播客必填；站内路径或 Blob 地址）</span>
+            <span className={labelClass}>音频地址（播客必填；站内路径或媒体站地址）</span>
             <input
-              ref={audio}
               name="audio"
               defaultValue={secret.audio}
               placeholder="/secrets/episode-1.mp3"
@@ -63,7 +59,6 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
           <label className="space-y-1.5">
             <span className={labelClass}>时长（分钟）</span>
             <input
-              ref={duration}
               name="duration"
               type="number"
               defaultValue={secret.duration}
@@ -71,20 +66,6 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
             />
           </label>
         </>
-      }
-      below={
-        <MediaUploader
-          folder="secrets"
-          kinds={["audio"]}
-          label="上传这一期的音频"
-          onUploaded={(file) => {
-            if (file.kind !== "audio") return;
-            if (audio.current) audio.current.value = file.src;
-            // The page speaks in whole minutes; a 30-minute episode that runs
-            // 30:40 says 31.
-            if (duration.current) duration.current.value = String(Math.ceil(file.duration / 60));
-          }}
-        />
       }
       draftHint="开着就不公开"
       bodyLabel="正文 / 节目笔记（Markdown）"

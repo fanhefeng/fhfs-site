@@ -41,7 +41,7 @@
   可以拖着转；**/films** 看了很多遍的三部电影，一面剧照墙，点开进原生 `<dialog>` 做的放映厅。
 - **⌘K / `/`** —— 全站搜索，面板按需加载，索引是一份静态 JSON。
 - **/admin** —— 浏览器里的编辑部：四组十三栏，文章、软件、说说、电影、偶像、简历、全站文案、
-  导航都能改，保存即生效；图片、语音、视频从浏览器直传 Vercel Blob，草稿能在自己的页面上预览，
+  导航都能改，保存即生效；图片、语音、视频放在 Cloudflare 免费版的一个 Worker 上，草稿能在自己的页面上预览，
   手机上也能直接发一条说说。
 
 完整的设计语言（材质、动效语法、每页的叙事）在 [`docs/DESIGN.md`](docs/DESIGN.md)；此后每一次改动的
@@ -63,7 +63,7 @@
 - **数据有退路。** 每晚导出一次到 `db-snapshots` 分支，有行的表变空就拒绝提交；
   [`docs/RECOVERY.md`](docs/RECOVERY.md) 是从「删错一行」到「Neon 账号没了」的三级操作单，
   演练过，全程 298 秒。
-- **CSP 不放行任何跨域。** 字体、解码器、音乐全部自托管；唯一的例外是说说媒体所在的 Blob 存储。
+- **CSP 不放行任何跨域。** 字体、解码器、音乐全部自托管；唯一的例外是说说媒体所在的那个 Cloudflare Worker（它自己补上了 Safari 放视频要的 Range）。
 - **模块放在哪，就说明它在哪跑。** `src/lib/server` 与 `src/lib/client` 各自引入 `server-only` /
   `client-only`，放错一边就是构建错误——测试、脚本或 proxy 直接加载的那几个服务端模块除外
   （`server-only` 在它们那里会抛错，清单见 `AGENTS.md`），它们靠所在的文件夹标明。
@@ -81,7 +81,7 @@
 - three.js r185：/intro 与铜像用 @react-three/fiber + drei；苔藓（/lab/grove、/lab/approach）与
   /lab/workstation 是命令式 three。每个场景都在 `next/dynamic` 后面，挂载前先问
   `prefersSaveData()` / `hasWebGL()`
-- Neon Postgres（HTTP 驱动）+ Drizzle ORM · jose 签的会话，登录按 IP 限流 · Vercel Blob
+- Neon Postgres（HTTP 驱动）+ Drizzle ORM · jose 签的会话，登录按 IP 限流 · Cloudflare Workers（说说的图片、语音、视频）
 - 工具链是 [Vite+](https://viteplus.dev)（`vp`）：Oxlint（带类型感知规则）、Oxfmt、Vitest；
   构建仍是 `next build`
 

@@ -62,7 +62,7 @@ export default async function SecretPage({ params }: PageProps<"/[locale]/secret
 
   const { older, newer } = await getAdjacentSecrets(secret.slug, locale);
   const isPodcast = secret.kind === "podcast";
-  // A file in public/ by its hashed address; an upload is a Blob URL already.
+  // A file in public/ by its hashed address; an upload is a media-site URL already.
   const audio = secret.audio ? asset(secret.audio) : null;
 
   return (

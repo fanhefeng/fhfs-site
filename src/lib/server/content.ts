@@ -469,7 +469,7 @@ export type Moment = {
   attribution: string | null;
   source: string | null;
   mood: string | null;
-  /** Site paths and Blob addresses as stored — the page resolves the hashed ones. */
+  /** Site paths and media-site addresses as stored — the page resolves the hashed ones. */
   media: MomentMedia[];
   pinned: boolean;
 };
