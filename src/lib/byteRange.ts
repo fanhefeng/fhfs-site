@@ -4,11 +4,23 @@
  * — and Safari will not play a video or a voice note from a server that does
  * that: it asks for `bytes=0-1` first and gives up on the answer. Chrome plays
  * it, but cannot seek past what has arrived. So the Worker answers the ranged
- * requests itself, with these two functions over the full asset.
+ * requests itself, with these functions over the full asset.
  *
  * Plain functions over standard streams, so they run in the Worker and in the
  * tests alike.
+ *
+ * What it costs matters more than usual: the free plan gives a request 10 ms
+ * of CPU, and a stream whose every chunk passes through JavaScript spent 240–
+ * 400 ms carrying one 23 MB video (measured with `wrangler tail`, 2026-10-01).
+ * Cloudflare forgives the occasional overrun and terminates a Worker that
+ * makes a habit of it. So `byteSlice` touches as little as it can: it skips
+ * to the start a megabyte at a time, and when the range runs to the end of the
+ * file — which is what a player asks for — it hands back the asset's own
+ * stream for the runtime to pipe without JavaScript in the loop.
  */
+
+/** How much one read takes while skipping or copying: few reads, little JavaScript. */
+const BLOCK = 1 << 20;
 
 export type ByteRange = { start: number; end: number };
 
@@ -39,9 +51,65 @@ export function parseRange(
 }
 
 /**
- * The bytes `start`…`end` (inclusive) of a stream, read no further than the
- * end: the source is cancelled once the range is out, so a request for the
- * first two bytes of a video does not drag the rest of it through.
+ * The bytes `start`…`end` (inclusive) of a byte stream of `size` bytes. With a
+ * BYOB reader each read asks for exactly what is still to skip or to send, so
+ * none overshoots and a read is a megabyte rather than a few kilobytes. A
+ * range that ends at the last byte comes back as `source` itself, already
+ * advanced to `start` — the caller pipes it on untouched. A stream that has no
+ * BYOB reader falls back to `sliceStream`.
+ */
+export async function byteSlice(
+  source: ReadableStream<Uint8Array>,
+  { start, end }: ByteRange,
+  size: number,
+): Promise<ReadableStream<Uint8Array>> {
+  let reader: ReadableStreamBYOBReader;
+  try {
+    reader = source.getReader({ mode: "byob" });
+  } catch {
+    return sliceStream(source, { start, end });
+  }
+  // One buffer for the whole skip: a read hands it back (transferred), and it
+  // is read into again — a fresh megabyte each time is a megabyte zeroed.
+  let scratch = new ArrayBuffer(Math.min(BLOCK, start));
+  let offset = 0;
+  while (offset < start) {
+    const view = new Uint8Array(scratch, 0, Math.min(scratch.byteLength, start - offset));
+    const { done, value } = await reader.read(view);
+    if (done || !value) break;
+    offset += value.byteLength;
+    scratch = value.buffer as ArrayBuffer;
+  }
+  if (end >= size - 1) {
+    reader.releaseLock();
+    return source;
+  }
+  let left = end - start + 1;
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      const { done, value } = await reader.read(new Uint8Array(Math.min(BLOCK, left)));
+      if (done || !value) {
+        controller.close();
+        return;
+      }
+      left -= value.byteLength;
+      controller.enqueue(value);
+      if (left <= 0) {
+        controller.close();
+        await reader.cancel();
+      }
+    },
+    cancel(reason) {
+      return reader.cancel(reason);
+    },
+  });
+}
+
+/**
+ * The bytes `start`…`end` (inclusive) of any stream, chunk by chunk as it
+ * comes, read no further than the end: the source is cancelled once the range
+ * is out. The fallback for a stream without a BYOB reader — correct, but every
+ * chunk passes through here.
  */
 export function sliceStream(
   source: ReadableStream<Uint8Array>,

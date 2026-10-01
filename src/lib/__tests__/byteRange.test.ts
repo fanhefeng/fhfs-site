@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { parseRange, sliceStream } from "@/lib/byteRange";
+import { byteSlice, parseRange, sliceStream } from "@/lib/byteRange";
 
 describe("parseRange", () => {
   it("reads the ranges a browser sends for a video", () => {
@@ -46,9 +46,17 @@ function counting(size: number, chunk: number) {
   return { stream, seen };
 }
 
-const bytes = async (stream: ReadableStream<Uint8Array>) => [
-  ...new Uint8Array(await new Response(stream).arrayBuffer()),
-];
+/** Every byte left in a stream. Read with a reader, as the Worker's `pipeTo` does: a
+ *  `Response` would refuse a stream `byteSlice` has already moved along. */
+async function bytes(stream: ReadableStream<Uint8Array>): Promise<number[]> {
+  const out: number[] = [];
+  const reader = stream.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return out;
+    for (const byte of value) out.push(byte);
+  }
+}
 
 describe("sliceStream", () => {
   it("gives exactly the bytes asked for, across chunk edges", async () => {
@@ -70,5 +78,73 @@ describe("sliceStream", () => {
     await bytes(sliceStream(stream, { start: 0, end: 1 }));
     expect(seen.read).toBeLessThan(1000);
     expect(seen.cancelled).toBe(true);
+  });
+});
+
+/** A byte stream — what the runtime hands over as an asset's body — of `0, 1, 2, …` in chunks, that counts how far it was read. */
+function byteCounting(size: number, chunk: number) {
+  const seen = { read: 0, cancelled: false };
+  let next = 0;
+  const stream = new ReadableStream({
+    type: "bytes",
+    pull(controller) {
+      if (next >= size) {
+        controller.close();
+        controller.byobRequest?.respond(0);
+        return;
+      }
+      const length = Math.min(chunk, size - next);
+      controller.enqueue(Uint8Array.from({ length }, (_, i) => (next + i) % 256));
+      next += length;
+      seen.read = next;
+    },
+    cancel() {
+      seen.cancelled = true;
+    },
+  }) as ReadableStream<Uint8Array>;
+  return { stream, seen };
+}
+
+const run = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, i) => (from + i) % 256);
+
+describe("byteSlice", () => {
+  it("hands back the stream itself for a range that runs to the end, moved to its start", async () => {
+    const { stream } = byteCounting(1000, 64);
+    const out = await byteSlice(stream, { start: 60, end: 999 }, 1000);
+    expect(out).toBe(stream);
+    expect(await bytes(out)).toEqual(run(60, 999));
+  });
+
+  it("skips megabytes without reading past the start", async () => {
+    const size = 5 * 1024 * 1024;
+    const start = 3 * 1024 * 1024 + 17;
+    const { stream } = byteCounting(size, 64 * 1024);
+    const out = await byteSlice(stream, { start, end: size - 1 }, size);
+    const got = await bytes(out);
+    expect(got.length).toBe(size - start);
+    expect(got.slice(0, 5)).toEqual(run(start, start + 4));
+    expect(got.at(-1)).toBe((size - 1) % 256);
+  });
+
+  it("gives a bounded range exactly, and stops reading at its end", async () => {
+    const { stream, seen } = byteCounting(100_000, 64);
+    expect(await bytes(await byteSlice(stream, { start: 60, end: 200 }, 100_000))).toEqual(
+      run(60, 200),
+    );
+    expect(seen.read).toBeLessThan(1000);
+    expect(seen.cancelled).toBe(true);
+  });
+
+  it("serves the first two bytes, which is how Safari opens a video", async () => {
+    const { stream } = byteCounting(100_000, 4096);
+    expect(await bytes(await byteSlice(stream, { start: 0, end: 1 }, 100_000))).toEqual([0, 1]);
+  });
+
+  it("falls back to reading chunk by chunk from a stream with no BYOB reader", async () => {
+    const { stream } = counting(1000, 64);
+    expect(await bytes(await byteSlice(stream, { start: 60, end: 200 }, 1000))).toEqual(
+      run(60, 200),
+    );
   });
 });

@@ -1,18 +1,23 @@
-import { parseRange, sliceStream } from "../src/lib/byteRange";
+import { byteSlice, parseRange } from "../src/lib/byteRange";
 import sizes from "./sizes.gen.json";
 
 /**
  * fhfs-media — the Cloudflare Worker that serves the board's pictures, voice
  * notes and videos (`MEDIA_ORIGIN`, src/config/csp.ts). The files are its
- * static assets (`files/`, deployed by `pnpm media:deploy`); a picture is
- * answered by Cloudflare straight from those, without this code.
+ * static assets (`files/`, deployed by `pnpm media:deploy`).
  *
- * What this code is for: the voice notes and videos (`run_worker_first` in
- * wrangler.jsonc). Static assets come back whole whatever `Range` asks, and
- * Safari plays no media from a server that does that — so this answers the
- * range itself (src/lib/byteRange.ts). The asset arrives without a length,
- * so the length is looked up in `sizes.gen.json`, which the deploy writes
- * from the very files it uploads; a file missing from it goes out whole.
+ * What this code is for: ranges (`run_worker_first: /moments/*` in
+ * wrangler.jsonc — it only takes prefixes, so pictures come through here too).
+ * Static assets come back whole whatever `Range` asks, and Safari plays no
+ * media from a server that does that — so this answers the range itself
+ * (src/lib/byteRange.ts). The asset arrives without a length, so the length is
+ * looked up in `sizes.gen.json`, which the deploy writes from the very files
+ * it uploads; a file missing from it goes out whole.
+ *
+ * The bytes themselves are left to the runtime wherever they can be: the
+ * free plan's 10 ms of CPU is not enough to carry a video chunk by chunk
+ * through JavaScript (see byteRange.ts), so a whole file, or a range that
+ * runs to its end, is piped from the asset straight into the response.
  */
 
 type Env = { ASSETS: { fetch(request: Request): Promise<Response> } };
@@ -52,8 +57,11 @@ export default {
       await asset.body.cancel();
       return new Response(null, { status, headers });
     }
+    // The response starts now; the body follows once the skip to `start` is done.
     const { readable, writable } = new FixedLengthStream(length);
-    void sliceStream(asset.body, { start, end }).pipeTo(writable);
+    void byteSlice(asset.body, { start, end }, size)
+      .then((body) => body.pipeTo(writable))
+      .catch((error: unknown) => writable.abort(error));
     return new Response(readable, { status, headers });
   },
 };
