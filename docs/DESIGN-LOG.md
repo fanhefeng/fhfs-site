@@ -1048,4 +1048,7 @@
 >   接文件）：上传按钮、签名路由、`lib/upload.ts` 都删了，快捷发布只发文字，媒体栏和剧照行只能填地址。
 > - **一个坑**：`wrangler pages project create` 在仓库根目录跑，会把这个 Next 项目当成要迁移的应用自动
 >   配置，往 `package.json` 里加了 wrangler 依赖（已撤回）。wrangler 一律在 `media/` 里跑，脚本就是这么做的。
-> - Vercel 那个被停的 Blob store 和账号里的 `BLOB_READ_WRITE_TOKEN` 还在，代码已不再用；删不删由用户定。
+> - Vercel 那个被停的 Blob store 同日按用户的决定清空并删除，`BLOB_READ_WRITE_TOKEN` 两个环境里的也都删了。
+>   删的时候踩了一个坑：`vercel blob delete-store … --yes`（和 `create-store --yes` 一样）会把仓库根的
+>   `.env.local` 整个改写成 Development 环境的变量，而这里的几个都是敏感变量，拉回来是空的。在仓库目录跑
+>   任何 `vercel` 子命令之前，先把 `.env.local` 备份出去。
