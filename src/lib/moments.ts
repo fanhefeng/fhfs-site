@@ -175,20 +175,58 @@ export function describeMedia(media: readonly MomentMedia[]): string {
     .join(" · ");
 }
 
-/** One cell of the board's calendar: a week, how many lines it holds, and
- *  the newest of them — where a press on the cell lands. */
-export type CalendarWeek = { week: number; count: number; newest: string; start: string };
+/** One square of the board's calendar: a day something was said on — counted
+ *  from 0 on 1 January — how many lines it holds, and the newest of them,
+ *  where a press on the square lands. */
+export type CalendarDay = { day: number; count: number; newest: string };
 
-/** One row of it: a year, and only the weeks something was said in. */
-export type CalendarYear = { year: string; weeks: CalendarWeek[] };
+/** One year of it: how much was said, and only the days it was said on. */
+export type CalendarYear = { year: number; total: number; days: CalendarDay[] };
 
-/** How many columns a year's row spans on that calendar: its weeks, counted
- *  the same way, the part-weeks at either end included. */
-export function weeksInYear(year: number): number {
+const DAY_MS = 86_400_000;
+
+/**
+ * How a year lies on the calendar, the way GitHub lays one out: a column a
+ * week, Monday on top and Sunday at the bottom. 1 January sits `lead` rows
+ * down the first column, and the year spans `columns` of them — 53, or 54
+ * when a leap year starts on a Sunday.
+ */
+export function yearGrid(year: number): { lead: number; days: number; columns: number } {
   const jan1 = Date.UTC(year, 0, 1);
+  // getUTCDay is 0 for Sunday; the week starts on Monday.
   const lead = (new Date(jan1).getUTCDay() + 6) % 7;
-  const days = (Date.UTC(year + 1, 0, 1) - jan1) / 86_400_000;
-  return Math.floor((days - 1 + lead) / 7) + 1;
+  const days = (Date.UTC(year + 1, 0, 1) - jan1) / DAY_MS;
+  return { lead, days, columns: Math.ceil((lead + days) / 7) };
+}
+
+/** Where a day of the year sits on that grid. */
+export function dayCell(day: number, lead: number): { column: number; row: number } {
+  return { column: Math.floor((day + lead) / 7), row: (day + lead) % 7 };
+}
+
+/** The instant a day of the year starts, in UTC — for formatting it, in UTC. */
+export function dayDate(year: number, day: number): Date {
+  return new Date(Date.UTC(year, 0, 1) + day * DAY_MS);
+}
+
+/** The column each month's first day falls in: where its name goes above the grid. */
+export function monthColumns(year: number): number[] {
+  const { lead } = yearGrid(year);
+  const jan1 = Date.UTC(year, 0, 1);
+  return Array.from(
+    { length: 12 },
+    (_, month) => dayCell((Date.UTC(year, month, 1) - jan1) / DAY_MS, lead).column,
+  );
+}
+
+/**
+ * How dark a day is drawn, from 0 (nothing said) to 4. One line, two, three,
+ * four or more: the bands the board actually falls in — of the days that
+ * hold anything, two in three hold a single line, and a handful hold more
+ * than four.
+ */
+export function dayLevel(count: number): 0 | 1 | 2 | 3 | 4 {
+  return count <= 0 ? 0 : count >= 4 ? 4 : (count as 1 | 2 | 3);
 }
 
 /** A calendar day in the given zone, as `YYYY-MM-DD`. */
@@ -201,39 +239,34 @@ const dayInZone = (iso: string, timeZone: string) =>
   }).format(new Date(iso));
 
 /**
- * The years above the board, a row each, cut into weeks: the shape of how
- * much was said when. Weeks run Monday to Sunday and are counted from the
- * one that holds 1 January, so column 0 is the first days of the year and a
- * year spans at most 54 columns (53 whole weeks and a day or two either side).
- * Days are the site's zone's, like every stamp on the board.
+ * The calendar above the board, a year at a time and a square a day: the
+ * shape of how much was said when. Days are the site's zone's, like every
+ * stamp on the board.
  *
- * Every year between the first line and the last gets a row, a silent one
- * included: a year of nothing is part of the shape. Newest year first, as
+ * Every year between the first line and the last is there to pick, a silent
+ * one included: a year of nothing is part of the shape. Newest year first, as
  * the board below is.
  */
 export function momentCalendar(
   items: readonly { key: string; postedAt: string }[],
   timeZone: string,
 ): CalendarYear[] {
-  const byYear = new Map<string, Map<number, CalendarWeek>>();
-  // The stamp of each cell's newest line, while counting.
-  const newestAt = new Map<CalendarWeek, string>();
+  const byYear = new Map<number, Map<number, CalendarDay>>();
+  // The stamp of each square's newest line, while counting.
+  const newestAt = new Map<CalendarDay, string>();
   for (const item of items) {
-    const day = dayInZone(item.postedAt, timeZone);
-    const [y, m, d] = day.split("-").map(Number) as [number, number, number];
-    const jan1 = Date.UTC(y, 0, 1);
-    // getUTCDay is 0 for Sunday; the week starts on Monday.
-    const lead = (new Date(jan1).getUTCDay() + 6) % 7;
-    const dayOfYear = (Date.UTC(y, m - 1, d) - jan1) / 86_400_000;
-    const week = Math.floor((dayOfYear + lead) / 7);
-    const year = String(y);
-    let weeks = byYear.get(year);
-    if (!weeks) byYear.set(year, (weeks = new Map()));
-    const cell = weeks.get(week);
+    const [y, m, d] = dayInZone(item.postedAt, timeZone).split("-").map(Number) as [
+      number,
+      number,
+      number,
+    ];
+    const day = (Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / DAY_MS;
+    let days = byYear.get(y);
+    if (!days) byYear.set(y, (days = new Map()));
+    const cell = days.get(day);
     if (!cell) {
-      const start = new Date(jan1 + Math.max(0, week * 7 - lead) * 86_400_000);
-      const fresh = { week, count: 1, newest: item.key, start: start.toISOString().slice(0, 10) };
-      weeks.set(week, fresh);
+      const fresh = { day, count: 1, newest: item.key };
+      days.set(day, fresh);
       newestAt.set(fresh, item.postedAt);
     } else {
       cell.count += 1;
@@ -243,15 +276,12 @@ export function momentCalendar(
       }
     }
   }
-  const years = [...byYear.keys()].map(Number);
-  if (years.length === 0) return [];
+  if (byYear.size === 0) return [];
+  const years = [...byYear.keys()];
   const rows: CalendarYear[] = [];
   for (let y = Math.max(...years); y >= Math.min(...years); y--) {
-    const weeks = byYear.get(String(y));
-    rows.push({
-      year: String(y),
-      weeks: weeks ? [...weeks.values()].sort((a, b) => a.week - b.week) : [],
-    });
+    const days = [...(byYear.get(y)?.values() ?? [])].sort((a, b) => a.day - b.day);
+    rows.push({ year: y, total: days.reduce((sum, cell) => sum + cell.count, 0), days });
   }
   return rows;
 }

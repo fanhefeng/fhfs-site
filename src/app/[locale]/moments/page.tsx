@@ -57,9 +57,11 @@ export default async function MomentsPage({ params }: PageProps<"/[locale]/momen
             {t("kicker")}
           </p>
           <h1 className="mt-3 text-display-sm">{t("title")}</h1>
-          <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("subtitle")}</p>
+          {/* The subtitle is the page's description for search and sharing
+            only (DESIGN-LOG, 10-03): the paragraph on where the name came
+            from is gone from the page. */}
           {langNotice && (
-            <p className="mt-3 max-w-[46ch] text-caption text-fg-tertiary">{langNotice}</p>
+            <p className="mt-4 max-w-[46ch] text-caption text-fg-tertiary">{langNotice}</p>
           )}
           {items.length > 0 && (
             <p className="mt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
