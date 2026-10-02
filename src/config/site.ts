@@ -10,8 +10,8 @@ export const site = {
   signName: "fhf",
   title: { zh: "fhf's", en: "fhf's" },
   description: {
-    zh: "fhf 的个人网站：一个对世界好奇的前端 developer——文章、自研软件与动效实验，留一盏灯。",
-    en: "The personal site of fhf — a front-end developer curious about the world: essays, self-built software and motion studies, with one light left on.",
+    zh: "fhf 的个人网站。喜欢音乐、游戏、电影；这里放着文章、自研软件和动效实验，留一盏灯。",
+    en: "The personal site of fhf, who likes music, games and films: essays, self-built software and motion studies, with one light left on.",
   },
   /** Production origin, for canonical URLs, hreflang, the sitemap, RSS and
    *  the OG images. Read from the deployment (src/lib/siteUrl.ts), so binding
