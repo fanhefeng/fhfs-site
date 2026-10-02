@@ -120,14 +120,16 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
    * to go to it (`MomentBoard`, which scrolls by Lenis). Left to the browser,
    * the jump to `#key` is undone by Lenis a frame later whenever the page is
    * still gliding from the wheel. A press that asks for a new tab or window
-   * keeps the browser's own way.
+   * keeps the browser's own way. Like the browser's, a press on the line the
+   * address already holds adds no step to history — Back would only stall.
    */
   const seek = (event: MouseEvent<Element>) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
       return;
     }
     event.preventDefault();
-    window.history.pushState(null, "", event.currentTarget.getAttribute("href"));
+    const href = event.currentTarget.getAttribute("href");
+    if (href && href !== window.location.hash) window.history.pushState(null, "", href);
     window.dispatchEvent(new HashChangeEvent("hashchange"));
   };
 
