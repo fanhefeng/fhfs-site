@@ -48,8 +48,8 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
     [items, notebook],
   );
 
-  // The calendar above (a server SVG, no script of its own) links each week to
-  // its newest line by `#key`, and so can a shared address. A line the
+  // The calendar above links each day to its newest line by `#key`, and so
+  // can a shared address. A line the
   // notebook filter has taken off the board is not there to land on — the
   // click only changed the address. Let the filter go, and go to the line
   // once it is drawn again. Asked of the address and the list, not the page:

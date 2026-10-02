@@ -6,7 +6,11 @@ import {
   newestSaid,
   momentKey,
   momentCalendar,
-  weeksInYear,
+  monthColumns,
+  dayCell,
+  dayDate,
+  dayLevel,
+  yearGrid,
   shouldFold,
   stampInZone,
   type MomentMedia,
@@ -121,50 +125,33 @@ describe("newestSaid", () => {
 describe("momentCalendar", () => {
   const zone = "Asia/Shanghai";
 
-  it("counts a week's lines and points at its newest", () => {
-    // 2024-01-01 is a Monday, so week 0 is 1–7 January.
+  it("counts a day's lines and points at its newest", () => {
     const rows = momentCalendar(
       [
         { key: "a", postedAt: "2024-01-02T04:00:00.000Z" },
-        { key: "b", postedAt: "2024-01-06T04:00:00.000Z" },
+        { key: "b", postedAt: "2024-01-02T09:00:00.000Z" },
         { key: "c", postedAt: "2024-01-08T04:00:00.000Z" },
       ],
       zone,
     );
     expect(rows).toEqual([
       {
-        year: "2024",
-        weeks: [
-          { week: 0, count: 2, newest: "b", start: "2024-01-01" },
-          { week: 1, count: 1, newest: "c", start: "2024-01-08" },
+        year: 2024,
+        total: 3,
+        days: [
+          { day: 1, count: 2, newest: "b" },
+          { day: 7, count: 1, newest: "c" },
         ],
       },
     ]);
   });
 
-  it("starts week 0 on 1 January even mid-week, and the next on Monday", () => {
-    // 2026-01-01 is a Thursday: week 0 is 1–4 January, week 1 starts the 5th.
-    const [row] = momentCalendar(
-      [
-        { key: "a", postedAt: "2026-01-04T04:00:00.000Z" },
-        { key: "b", postedAt: "2026-01-05T04:00:00.000Z" },
-        { key: "c", postedAt: "2026-12-31T04:00:00.000Z" },
-      ],
-      zone,
-    );
-    expect(row!.weeks.map((w) => [w.week, w.start])).toEqual([
-      [0, "2026-01-01"],
-      [1, "2026-01-05"],
-      [52, "2026-12-28"],
-    ]);
-  });
-
   it("files a line by the zone's day, which can be next year's", () => {
     const rows = momentCalendar([{ key: "a", postedAt: "2023-12-31T17:30:00.000Z" }], zone);
-    expect(rows.map((r) => r.year)).toEqual(["2024"]);
+    expect(rows.map((r) => [r.year, r.days[0]?.day])).toEqual([[2024, 0]]);
   });
 
-  it("gives a silent year its row, newest year first", () => {
+  it("gives a silent year its place, newest year first", () => {
     const rows = momentCalendar(
       [
         { key: "a", postedAt: "2019-06-01T04:00:00.000Z" },
@@ -172,10 +159,10 @@ describe("momentCalendar", () => {
       ],
       zone,
     );
-    expect(rows.map((r) => [r.year, r.weeks.length])).toEqual([
-      ["2021", 1],
-      ["2020", 0],
-      ["2019", 1],
+    expect(rows.map((r) => [r.year, r.total])).toEqual([
+      [2021, 1],
+      [2020, 0],
+      [2019, 1],
     ]);
   });
 
@@ -184,10 +171,43 @@ describe("momentCalendar", () => {
   });
 });
 
-describe("weeksInYear", () => {
-  it("counts the part-weeks at either end", () => {
-    expect(weeksInYear(2024)).toBe(53); // Monday start, leap year: 52 weeks and 2 days
-    expect(weeksInYear(2026)).toBe(53); // Thursday start: 4 days, 51 weeks, 4 days
-    expect(weeksInYear(2040)).toBe(54); // Sunday start, leap: 1 day, 52 weeks, 2 days
+describe("yearGrid", () => {
+  it("puts 1 January on its weekday's row and counts the part-weeks at either end", () => {
+    expect(yearGrid(2024)).toEqual({ lead: 0, days: 366, columns: 53 }); // starts on a Monday
+    expect(yearGrid(2026)).toEqual({ lead: 3, days: 365, columns: 53 }); // a Thursday
+    expect(yearGrid(2040)).toEqual({ lead: 6, days: 366, columns: 54 }); // a Sunday, leap
+  });
+});
+
+describe("dayCell", () => {
+  it("runs down a week, Monday to Sunday, then on to the next column", () => {
+    const { lead } = yearGrid(2026);
+    expect(dayCell(0, lead)).toEqual({ column: 0, row: 3 }); // Thu 1 January
+    expect(dayCell(3, lead)).toEqual({ column: 0, row: 6 }); // Sun 4 January
+    expect(dayCell(4, lead)).toEqual({ column: 1, row: 0 }); // Mon 5 January
+    expect(dayCell(364, lead)).toEqual({ column: 52, row: 3 }); // Thu 31 December
+  });
+});
+
+describe("dayDate", () => {
+  it("is the start of that day of the year, in UTC", () => {
+    expect(dayDate(2024, 59).toISOString()).toBe("2024-02-29T00:00:00.000Z");
+    expect(dayDate(2026, 364).toISOString()).toBe("2026-12-31T00:00:00.000Z");
+  });
+});
+
+describe("monthColumns", () => {
+  it("is the column each month's first day falls in", () => {
+    // 2026: 1 Feb is a Sunday (column 4), 1 Mar a Sunday too (column 8).
+    const columns = monthColumns(2026);
+    expect(columns).toHaveLength(12);
+    expect(columns.slice(0, 3)).toEqual([0, 4, 8]);
+    expect(columns[11]).toBe(48); // 1 December, a Tuesday
+  });
+});
+
+describe("dayLevel", () => {
+  it("shades one, two, three and four-or-more apart, and nothing as nothing", () => {
+    expect([0, 1, 2, 3, 4, 9, 20].map(dayLevel)).toEqual([0, 1, 2, 3, 4, 4, 4]);
   });
 });
