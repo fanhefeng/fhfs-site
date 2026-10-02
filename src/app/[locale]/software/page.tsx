@@ -4,20 +4,18 @@ import { getApps } from "@/lib/server/content";
 import { getLatestReleases } from "@/lib/server/github";
 import { sectionMetadata } from "@/lib/server/seo";
 import { SoftwareGallery } from "@/components/software/SoftwareGallery";
-import { DeviceShowcase } from "@/components/software/DeviceShowcase";
 import { toSoftwareApp } from "@/components/software/appMeta";
-import { Reveal } from "@/components/fx/Reveal";
 
 export const generateMetadata = sectionMetadata("software", "/software");
 
 /**
- * Software — the keynote bento, then the same apps framed on a Mac and an
- * iPhone, one channel at a time. Stays a Server Component: the apps come out
- * of the cached `getApps()` read, their latest versions out of GitHub, and
- * both are flattened to a plain payload (localized strings, CTA key, accent
- * hue, version) before crossing into the client islands, so nothing about
- * the data is client work. The device frames used to open the portfolio;
- * that page is gone, and this is the one shelf everything made stands on.
+ * Software — one card per app and nothing under them. Stays a Server
+ * Component: the apps come out of the cached `getApps()` read, their latest
+ * versions out of GitHub, and both are flattened to a plain payload (localized
+ * strings, CTA key, accent hue, version) before crossing into the client
+ * island, so nothing about the data is client work. The Mac / iPhone frames
+ * that used to close the page, and the CSS schematics they and the cards held,
+ * are gone (DESIGN-LOG, 10-02): they stood in for screenshots nobody had taken.
  */
 export default async function SoftwarePage({ params }: PageProps<"/[locale]/software">) {
   const locale = await pageLocale(params);
@@ -41,16 +39,6 @@ export default async function SoftwarePage({ params }: PageProps<"/[locale]/soft
       </header>
 
       <SoftwareGallery apps={apps} />
-
-      {apps.length > 0 && (
-        <Reveal as="section" className="pt-24">
-          <div className="mb-8 max-w-[42rem]">
-            <h2 className="text-title text-fg">{t("deviceTitle")}</h2>
-            <p className="mt-3 text-body text-fg-secondary">{t("deviceSub")}</p>
-          </div>
-          <DeviceShowcase apps={apps} />
-        </Reveal>
-      )}
     </main>
   );
 }

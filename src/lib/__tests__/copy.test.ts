@@ -71,7 +71,7 @@ describe("COPY_NOTES", () => {
 
 describe("isScreenReaderOnly", () => {
   it("reads the house suffixes", () => {
-    expect(isScreenReaderOnly("software.mockAlt")).toBe(true);
+    expect(isScreenReaderOnly("moments.imageAlt")).toBe(true);
     expect(isScreenReaderOnly("lab.items.dissolve.stills.forest.alt")).toBe(true);
     expect(isScreenReaderOnly("blog.yearAria")).toBe(true);
   });

@@ -28,10 +28,9 @@ export type SoftwareApp = {
   website: string;
   platforms: string[];
   /**
-   * Accent hue in degrees for the schematic UI mock. There are no real
-   * screenshots in the repo, so each app gets one hue and the mock is drawn
-   * from it. It is a stored column rather than a function of list position,
-   * so reordering the shelf no longer repaints every app on it.
+   * Hue in degrees for the app's sleeve and record label. It is a stored
+   * column rather than a function of list position, so reordering the shelf
+   * does not repaint every app on it.
    */
   hue: number;
   /** Which `software.*` message labels the outbound link. */
@@ -54,10 +53,22 @@ export function appMonogram(name: string): string {
   return (words[0]![0]! + words[1]![0]!).toUpperCase();
 }
 
-/** Accent color for one of the mock's two tones. */
-export function mockAccent(hue: number, tone: "light" | "dark"): string {
+/** The two ends of a record label's gradient. */
+export function appAccent(hue: number, tone: "light" | "dark"): string {
   return tone === "light" ? `oklch(0.58 0.15 ${hue})` : `oklch(0.74 0.15 ${hue})`;
 }
+
+/**
+ * A sleeve's printed colour, the same in both themes — it is a thing on the
+ * shelf, not a surface of the page. Quieter than the label, so the record
+ * coming out of it is the brighter of the two.
+ */
+export function sleeveInk(hue: number): string {
+  return `linear-gradient(160deg, oklch(0.62 0.11 ${hue}), oklch(0.46 0.12 ${hue}))`;
+}
+
+/** "01", "02", … — the catalogue number printed on a sleeve. */
+export const catalogueNumber = (index: number): string => String(index + 1).padStart(2, "0");
 
 export function toSoftwareApp(app: App, index: number, locale: Locale): SoftwareApp {
   const category = app.category;

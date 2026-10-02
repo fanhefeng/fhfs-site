@@ -13,7 +13,7 @@ import { gsap } from "./gsap";
  * The plugins only a few leaf components use. Importing this module registers
  * them; `./gsap` stays the entry for everything shared.
  *
- * - Draggable + InertiaPlugin: the sticker wall, the phone app rail, the 404
+ * - Draggable + InertiaPlugin: the sticker wall, the 404
  *   peel — `inertia: true` and the flick physics.
  * - ScrambleTextPlugin: the Latin headline decode on a post (`scrambleText:`).
  * - CustomWiggle: the hover shiver on a sticker (`"wiggle(…)"` ease strings).

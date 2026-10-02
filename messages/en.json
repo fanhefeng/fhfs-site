@@ -467,8 +467,8 @@
       "reshuffle": {
         "name": "Cards reshuffling on filter",
         "tagline": "GSAP Flip · the difference, replayed in the layout phase",
-        "summary": "When the software page is filtered by category, the app cards do not snap to a new arrangement: the ones that stay slide from their old cell to their new one, and the rest fade out. Nine coloured tiles stand in for the cards here — pick a shape, fix your eye on one tile, and watch where it goes.",
-        "note": "Every tile stays in the DOM and the filter only toggles display; the timing is the whole trick: the state is captured in the click handler, before React re-renders, and Flip.from runs in a layout-phase useGSAP so the new positions never paint first. Entering tiles fade in from scale 0.94, leaving ones go the other way, 30ms apart. The filter buttons here are plain on purpose — the sliding pill is the filter tabs' own study, not mixed into this one. On a phone the software page drops this for a seamless rail you can flick (a Draggable proxy plus wrap).",
+        "summary": "When the software page's record shelf is filtered by category, the sleeves do not snap to a new arrangement: the ones that stay slide from their old cell to their new one, and the rest fade out. Nine coloured tiles stand in for the sleeves here — pick a shape, fix your eye on one tile, and watch where it goes.",
+        "note": "Every tile stays in the DOM and the filter only toggles display; the timing is the whole trick: the state is captured in the click handler, before React re-renders, and Flip.from runs in a layout-phase useGSAP so the new positions never paint first. Entering tiles fade in from scale 0.94, leaving ones go the other way, 30ms apart. The filter buttons here are plain on purpose — the sliding pill is the filter tabs' own study, not mixed into this one. On a phone the shelf does the same, three sleeves to a row.",
         "ariaLabel": "Filter by shape",
         "all": "All",
         "round": "Round",
@@ -705,14 +705,17 @@
   "software": {
     "kicker": "Software",
     "title": "Software",
-    "subtitle": "Apps and tools I've made — help yourself. Version numbers are read straight from each repo's latest GitHub release.",
-    "count": "{count, plural, =0 {no apps} one {# app} other {# apps}}",
+    "subtitle": "Apps and tools I've made, shelved like records. Put one on the deck to see what it does. Version numbers are read straight from each repo's latest GitHub release.",
+    "count": "{count, plural, =0 {no records} one {# record} other {# records}}",
     "empty": "No apps yet — this page is waiting for its first.",
-    "mockAlt": "Schematic of the {name} interface",
     "filterAll": "All",
     "filterAria": "Filter apps by category",
-    "railPrev": "Previous app",
-    "railNext": "Next app",
+    "shelfTitle": "The shelf",
+    "onDeck": "On the deck",
+    "side": "Side A · {index} / {count}",
+    "startStop": "Start · Stop",
+    "spinAria": "Platter turning",
+    "deckAria": "On the deck: {name}",
     "categories": {
       "desktop": "Desktop",
       "tool": "Tools",
@@ -721,10 +724,7 @@
     },
     "download": "Visit site",
     "play": "Play in browser",
-    "open": "Open website",
-    "deviceTitle": "On a device",
-    "deviceSub": "Framed on a Mac and an iPhone — flip through them one by one.",
-    "deviceAria": "Choose which app to preview"
+    "open": "Open website"
   },
   "footer": {
     "rights": "All rights reserved",
