@@ -109,7 +109,7 @@ export default async function ResumePage({ params }: PageProps<"/[locale]/resume
           </div>
 
           <h1 className="mt-5 text-display-sm text-fg">{profile.name[locale]}</h1>
-          <p className="no-cjk-oblique mt-3 font-serif text-title italic leading-tight text-fg-secondary">
+          <p className="no-cjk-oblique mt-3 font-serif text-title font-normal italic leading-tight text-fg-secondary">
             {profile.tagline[locale]}
           </p>
 

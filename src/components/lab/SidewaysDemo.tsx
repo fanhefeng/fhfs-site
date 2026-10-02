@@ -47,7 +47,7 @@ export function SidewaysDemo({ accent, hint, lead, lineOne, lineTwo, lineThree, 
             // CJK tracking and the no-oblique rule follow the words, not the page.
             lang: locale === "zh" ? "en" : "zh-CN",
             className:
-              "no-cjk-oblique mt-4 font-serif text-title italic text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]",
+              "no-cjk-oblique mt-4 font-serif text-title font-normal italic text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]",
           },
           {
             text: lineThree,

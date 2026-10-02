@@ -227,3 +227,20 @@ describe("eases", () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe("the serif", () => {
+  // Lora is loaded at 400 alone (src/app/fonts.ts). The title, heading and
+  // display sizes carry a weight of their own, and a serif line set at one
+  // of them gets a bold the browser smears on itself — it still renders,
+  // just thick and crowded, with no warning anywhere.
+  it("is set at its own weight wherever a size would make it bold", () => {
+    const weighted = /\btext-(?:title|heading|display(?:-sm)?)\b/;
+    const offenders = files.flatMap(({ file, text }) =>
+      [...text.matchAll(/["'`][^"'`]*\bfont-serif\b[^"'`]*["'`]/g)]
+        .map(([classes]) => classes)
+        .filter((classes) => weighted.test(classes) && !/\bfont-normal\b/.test(classes))
+        .map((classes) => `${file}: ${classes}`),
+    );
+    expect(offenders).toEqual([]);
+  });
+});

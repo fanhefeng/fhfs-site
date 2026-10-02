@@ -114,7 +114,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
           <DotDoodle text={site.author} className="h-[clamp(3rem,13vw,5rem)]" />
           <span className="sr-only">{site.author}</span>
         </h1>
-        <p className="no-cjk-oblique mt-4 font-serif text-title italic leading-tight text-fg-secondary">
+        <p className="no-cjk-oblique mt-4 font-serif text-title font-normal italic leading-tight text-fg-secondary">
           {t("keywords")}
         </p>
         <p className="mt-6 max-w-[46ch] text-body text-fg-secondary">{t("lead")}</p>
