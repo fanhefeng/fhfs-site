@@ -181,8 +181,6 @@ export const COPY_SR_EXTRA = new Set([
   "films.viewer.next",
   "idols.kobe.turnLeft",
   "idols.kobe.turnRight",
-  "software.railPrev",
-  "software.railNext",
 ]);
 
 /** True when this line is only ever read aloud — never drawn on the page. */

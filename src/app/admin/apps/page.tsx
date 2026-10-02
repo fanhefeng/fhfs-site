@@ -39,10 +39,10 @@ const FIELDS: Field[] = [
     label: "主色（hex，暂未生效）",
     kind: "text",
     placeholder: "#b45309",
-    hint: "前台的卡片和示意图都只认下面的色相，这一栏填了也不会改变页面。",
+    hint: "前台的封套和唱片标签只认下面的色相，这一栏填了也不会改变页面。",
     group: "样子与排序",
   },
-  { name: "hue", label: "示意图色相（0–360）", kind: "number", group: "样子与排序" },
+  { name: "hue", label: "封套色相（0–360）", kind: "number", group: "样子与排序" },
   { name: "sort", label: "排序", kind: "number", group: "样子与排序" },
 ];
 

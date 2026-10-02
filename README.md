@@ -17,9 +17,9 @@
 
 </div>
 
-| 首页 · 一整屏纸 | 实验室 · 程序生成的苔藓 | 软件 · bento 展柜 |
+| 首页 · 一整屏纸 | 实验室 · 程序生成的苔藓 | 软件 · 唱片架 |
 |:---:|:---:|:---:|
-| [<img src="docs/readme/home.jpg" alt="纸色首页：大字「欢迎来到 fhf's」、一句自我介绍和一个戴眼镜的卡通小人">](https://fhfs-site.vercel.app/zh) | [<img src="docs/readme/grove.jpg" alt="暗绿色的夜里，一截长满苔藓的树根扭成一个字形">](https://fhfs-site.vercel.app/zh/lab/grove) | [<img src="docs/readme/software.jpg" alt="软件页：分类药丸和两张应用卡片">](https://fhfs-site.vercel.app/zh/software) |
+| [<img src="docs/readme/home.jpg" alt="纸色首页：大字「欢迎来到 fhf's」、一句自我介绍和一个戴眼镜的卡通小人">](https://fhfs-site.vercel.app/zh) | [<img src="docs/readme/grove.jpg" alt="暗绿色的夜里，一截长满苔藓的树根扭成一个字形">](https://fhfs-site.vercel.app/zh/lab/grove) | [<img src="docs/readme/software.jpg" alt="软件页：一台黑色唱机放着一张橙色标签的唱片，旁边是这张唱片对应的应用说明">](https://fhfs-site.vercel.app/zh/software) |
 
 ## 进门之后
 
@@ -30,8 +30,8 @@
   溶解、融化文字、苔藓树根、色散按钮、3D 工作台、镜头畸变、霓虹招牌）、站点在用的（09–26）、
   壳层（27–33：开灯、阅读进度、扇形菜单、推门、换页的雾、灵动岛……）。每则按路由单独拆包，
   页尾逐个链到它由哪些源文件写成。
-- **/software** —— keynote 式 bento 展柜，分类筛选用 Flip 重排；版本号读自各仓库的 GitHub 最新
-  release；页尾是 Mac / iPhone 设备框，逐个翻看。
+- **/software** —— 一台唱机和一排唱片：每个应用是一张纯字封面的封套，点一下它的唱片飞上唱机，
+  旁边换成它的说明；唱片架按分类筛选用 Flip 重排。版本号读自各仓库的 GitHub 最新 release。
 - **/blog** —— 目录页式索引，按年分组；文章页单栏 68ch，中文标题逐行揭示、拉丁标题解码进场。
 - **/about** —— 点阵名字、横穿屏幕的标语（全站唯一的 pin）、自述，然后是「同一个人，另外两种
   讲法」：**/intro** 一颗由单张照片重建的 3D 头像，滚动带镜头绕头飞行、每张贴纸停一站；

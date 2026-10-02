@@ -2,7 +2,7 @@ import "client-only";
 import { EASE, Flip, gsap } from "@/lib/client/gsap";
 
 /**
- * A grid that reshuffles when it is filtered — /software's bento, and the lab
+ * A grid that reshuffles when it is filtered — /software's record shelf, and the lab
  * study that shows it on its own. Every item stays in the DOM, the filter only
  * toggles `display`, and Flip replays the difference: `captureGrid` in the
  * click handler, before React re-renders; `playGrid` in the layout-phase
