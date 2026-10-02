@@ -101,9 +101,27 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
   const playingRef = useRef(true);
   /** Whether the deck has been seen yet: the first drop of the arm waits for it. */
   const started = useRef(false);
+  /** Whether it is on screen now. */
+  const inView = useRef(false);
 
   const app = apps.find((a) => a.id === current) ?? apps[0]!;
   const position = apps.indexOf(app);
+
+  /** Set a label turning — held still if the deck is off screen by then (a
+   *  record can land after the reader has scrolled away); coming back into
+   *  view resumes it. */
+  const turn = (label: HTMLElement) => {
+    const tween = spinUp(label);
+    if (!inView.current) tween.pause();
+    return tween;
+  };
+
+  /** Bring a change still in the air to where it was going, without running
+   *  what it would have done on landing — whoever interrupted decides that. */
+  const land = () => {
+    swap.current?.progress(1, true).kill();
+    swap.current = null;
+  };
 
   // Start when the deck is first seen; pause the platter whenever it is not.
   useEffect(() => {
@@ -112,7 +130,8 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
     if (!deck || !arm) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting) {
+        inView.current = entry?.isIntersecting ?? false;
+        if (!inView.current) {
           spin.current?.pause();
           return;
         }
@@ -142,11 +161,11 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
     const next = !playingRef.current;
     playingRef.current = next;
     setPlaying(next);
-    swap.current?.progress(1);
+    land();
     if (next) {
       const label = labels.current.get(shown.current);
       spin.current?.kill();
-      if (label) spin.current = spinUp(label);
+      if (label) spin.current = turn(label);
       moveArm(arm, ARM_PLAYING, 0.8).delay(0.2);
     } else {
       moveArm(arm, ARM_PARKED, 0.6);
@@ -160,7 +179,7 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
       const before = shown.current;
       if (before === current) return;
       // Whatever the last change still had in the air lands first.
-      swap.current?.progress(1).kill();
+      land();
       shown.current = current;
       const from = arrival.current;
       arrival.current = null;
@@ -188,7 +207,7 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
         gsap.set(leaving, { autoAlpha: 0 });
         gsap.set(coming, { autoAlpha: 1, x: 0, y: 0, scale: 1 });
         spin.current?.kill();
-        spin.current = running ? spinUp(label) : null;
+        spin.current = running ? turn(label) : null;
         return;
       }
 
@@ -222,7 +241,7 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
       if (running) {
         tl.add(() => {
           spin.current?.kill();
-          spin.current = spinUp(label);
+          spin.current = turn(label);
         });
         tl.add(moveArm(arm, ARM_PLAYING, 0.7), "+=0.1");
       } else {
