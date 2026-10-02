@@ -674,9 +674,9 @@
     }
   },
   "films": {
-    "kicker": "电影 · 看了很多遍的",
+    "kicker": "电影",
     "title": "电影",
-    "subtitle": "看了很多遍的几部：一段简介、记得的台词，和一面剧照墙。每部进门换一张唱片。",
+    "subtitle": "每部一页：简介、经典台词和剧照；进门放一首片中的曲子。",
     "open": "进去看看",
     "backToIndex": "← 电影",
     "countStills": "{count} 张剧照",
@@ -688,8 +688,11 @@
       "runtime": "片长",
       "rating": "豆瓣"
     },
-    "storyKicker": "简介",
-    "linesKicker": "台词",
+    "sections": {
+      "synopsis": "简介",
+      "lines": "经典台词",
+      "stills": "剧照"
+    },
     "viewer": {
       "open": "放大看",
       "close": "关闭",
