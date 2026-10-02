@@ -127,8 +127,8 @@
   "intro": {
     "title": "另一种自我介绍",
     "subtitle": "一张贴满标签的脸，滚动着看完。",
-    "role": "developer · 拉琴的人 · 对世界好奇",
-    "meta": "FRONTEND · VIOLIN · CURIOUS",
+    "role": "音乐 · 游戏 · 电影",
+    "meta": "MUSIC · GAMES · FILMS",
     "tagline": "用一条链接，代替一份简历。",
     "scrollHint": "向下滚动 · 走近这张脸",
     "loading": "正在加载",
