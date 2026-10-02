@@ -1081,3 +1081,15 @@
 >   新仓库。Vercel 项目断开旧仓库、接到新仓库（`vercel git connect`），生产分支仍是 `main`。
 > - 一个小坑：密钥配好之前推送 main 触发的那次 CI 显示「成功」，其实 `build` 因为没有密钥自己跳过了
 >   （26 秒）；配好后重跑，才是真正的构建加 smoke。
+
+> **2026-10-02 补记之二（科比那页有了自己的唱片：他自己的声音）**：用户要 /idols/kobe 放科比的退役
+> 讲话——"those times when you get up early and you work hard… that is actually the dream" 那段，最后是
+> "Mamba out"。这两句其实出自两场：前者是 2017-12-18 的球衣退役仪式，后者是 2016-04-13 告别战的收尾，
+> 所以唱片是两段剪在一起（出处、剪点、响度见 `docs/CREDITS.md`「音乐」）。
+> - **从哪段开始**：从 "And lastly, our daughters, Natalia, Gianna and Bianca" 起，而不是从 "those times"
+>   起——这段话是说给三个女儿听的，结尾 "I'm doing my job as a father" 要有前面这句才接得上。
+> - **挂法**：页头挂 `RoomMusic`，和电影页一样（进门换唱片、出门还回主题曲、说过「不要」的读者不被打扰）。
+>   唱片号 `mamba`；哪位偶像放哪张记在 `lib/idols.ts` 的 `IDOL_TRACKS`，和铜像的 `STATUE_IDOL` 并排——
+>   只有他有，不值得给偶像表加一列。电影后台的唱片下拉框也会多出这一张，选不选随意。
+> - **循环**：播放器照旧 `loop`，"Mamba out" 之后欢呼淡出，再从 "And lastly…" 开始；70 秒一圈。
+> - 剪好后用 whisper.cpp 把成品转写了一遍，与原话逐字对上，没有剪掉字。

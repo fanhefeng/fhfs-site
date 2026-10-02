@@ -7,12 +7,13 @@ import { routing } from "@/i18n/routing";
 import { pageLocale } from "@/i18n/page";
 import { Link } from "@/i18n/navigation";
 import { asset } from "@/lib/asset";
-import { STATUE_IDOL } from "@/lib/idols";
+import { IDOL_TRACKS, STATUE_IDOL } from "@/lib/idols";
 import { inLocale } from "@/lib/localized";
 import { getIdol, getIdols } from "@/lib/server/content";
 import { showDrafts } from "@/lib/server/auth/session";
 import { localeAlternates } from "@/lib/server/seo";
 import { Reveal } from "@/components/fx/Reveal";
+import { RoomMusic } from "@/components/fx/RoomMusic";
 import { KobeStatueStage } from "@/components/idols/KobeStatueStage";
 import { IdolGallery, type GalleryPhoto } from "@/components/idols/IdolGallery";
 import { statueStandIn } from "@/components/idols/statue";
@@ -37,10 +38,12 @@ export async function generateMetadata({
 }
 
 /**
- * One idol, one page. Up to four movements: the name and the numbers; the
- * statue, for the one idol who has one in code (`STATUE_IDOL`); the
- * photographs, with their provenance; the milestones. A wide page (1040px)
- * for the statue and the pictures, the text narrower.
+ * One idol, one page. Up to four movements: the name and the numbers, with
+ * the idol's own record going on at the door when there is one
+ * (`IDOL_TRACKS`, `RoomMusic`); the statue, for the one idol who has one in
+ * code (`STATUE_IDOL`); the photographs, with their provenance; the
+ * milestones. A wide page (1040px) for the statue and the pictures, the text
+ * narrower.
  */
 export default async function IdolPage({ params }: PageProps<"/[locale]/idols/[slug]">) {
   const locale = await pageLocale(params);
@@ -50,6 +53,9 @@ export default async function IdolPage({ params }: PageProps<"/[locale]/idols/[s
   const idol = inLocale(row, locale);
   const t = await getTranslations("idols");
   const tk = await getTranslations("idols.kobe");
+  const tTracks = await getTranslations("tracks");
+  const tc = await getTranslations("common");
+  const track = IDOL_TRACKS.get(idol.key);
 
   const photos: GalleryPhoto[] = idol.photos.map((photo) => ({ ...photo, src: asset(photo.src) }));
 
@@ -81,6 +87,15 @@ export default async function IdolPage({ params }: PageProps<"/[locale]/idols/[s
             ))}
         </p>
         <p className="mt-6 max-w-[52ch] text-body text-fg-secondary">{idol.lede}</p>
+        {track && (
+          <RoomMusic
+            track={track}
+            tonight={tc("tonight")}
+            title={tTracks(`${track}.title`)}
+            artist={tTracks(`${track}.artist`)}
+            className="mt-6"
+          />
+        )}
       </Reveal>
 
       {/* The statue — code, and only his. */}

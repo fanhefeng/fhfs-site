@@ -104,7 +104,7 @@ export const COPY_GROUPS: CopyGroup[] = [
   { id: "nav", label: "导航", blurb: "顶栏、页脚、全屏菜单上每条链接的字。" },
   { id: "search", label: "搜索 ⌘K", blurb: "搜索框的提示、各类结果的名字，和找不到时说的话。" },
   { id: "footer", label: "页脚", blurb: "版权、时钟两侧的词、贴纸提示。" },
-  { id: "tracks", label: "背景音乐", blurb: "四首曲子在界面上显示的名字。" },
+  { id: "tracks", label: "背景音乐", blurb: "每张唱片在界面上显示的名字。" },
   { id: "common", label: "通用按钮", blurb: "返回、展开、复制这类到处都在用的词。" },
   {
     id: "error",

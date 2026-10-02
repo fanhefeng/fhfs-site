@@ -60,8 +60,8 @@
 
 ## 音乐
 
-背景音乐的四张唱片登记在 `src/lib/tracks.ts`，**全部自托管**在 `public/music/`，不嵌任何第三方
-播放器，大陆网络照样能听。都由本地无损 / 320kbps 源经 `pnpm media:music <源文件> <名字>`
+背景音乐的唱片登记在 `src/lib/tracks.ts`，**全部自托管**在 `public/music/`，不嵌任何第三方
+播放器，大陆网络照样能听。都由本地源（无损 / 320kbps，科比那张见下）经 `pnpm media:music <源文件> <名字>`
 （`scripts/encode-music.mts`：去元数据、LAME `-q:a 5`、44.1kHz，并报告首尾静音）重编码到约
 110–125kbps VBR：
 
@@ -71,9 +71,19 @@
 | Lovely Day（Jurrivh） | /moments | 4:01 | 3.7MB |
 | 《一生所爱》（卢冠廷 1995 原版） | /films/odyssey | 4:28 | 4.0MB |
 | 《路小雨》（周杰伦，《不能说的秘密》原声带里的钢琴曲） | /secrets、/films/secret | 1:37 | 1.3MB |
+| That's the Dream · Mamba Out（科比·布莱恩特的两段讲话） | /idols/kobe | 1:10 | 1.0MB |
 
 《路小雨》的源 flac 尾部 3.2 秒静音已裁掉并加 0.8 秒淡出，否则循环时会空一拍。房间里印的
 曲名一律是实际在放的那份录音——所以《不能说的秘密》那间房写的是《路小雨》，不是同名主题曲。
+
+科比那张不是音乐，是两场讲话剪在一起，现场声都留着：前 61 秒取自湖人官方 YouTube 频道的
+「Kobe Bryant's Jersey Retirement Ceremony」（`NjqYkhg9bdQ`，2017-12-18 球衣退役仪式，12:56–13:58，
+从 "And lastly, our daughters, Natalia, Gianna and Bianca" 到 "I love you"）；掌声里 1.5 秒交叉淡化接上
+ESPN 频道「'Mamba out' - Remembering Kobe Bryant's farewell speech after his last NBA game」
+（`Eg0mxPXIpLY`，2016-04-13 告别战，2:34–2:43，"What can I say? Mamba out." 和随后的欢呼，取英文原声轨，
+不是那条视频自带的 AI 配音轨）。后一段人声比前一段轻 5 dB，先补齐，再整体提到 -16 LUFS、限幅到
+-1.4 dBFS，和其他几张放在一起不至于忽大忽小。源是 YouTube 的 opus 音轨（约 135kbps），不是无损。
+© NBA / Los Angeles Lakers / ESPN。
 
 播放器因此只有一条路：一个 `<audio loop preload="none">`，页面引用的是带内容 hash 的地址
 （`asset()`），重编码后跑 `pnpm assets` 即可，不必改文件名。**Spotify iFrame API + 网易云外链

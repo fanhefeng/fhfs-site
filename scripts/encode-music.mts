@@ -1,5 +1,5 @@
 /**
- * Encodes a record for the jukebox the way the four in public/music were.
+ * Encodes a record for the jukebox the way the others in public/music were.
  *
  *   pnpm media:music <source file> <name>     # → public/music/<name>.mp3
  *
