@@ -95,14 +95,14 @@
     {
       "locale": "zh",
       "title": "关于我",
-      "bodyMd": "\n你好，我是 fhf，一个前端 developer，写了九年代码。\n\n从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。白天的工作是把需求变成人能用的界面；夜里属于自己的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。\n\n工作之外，我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。\n\n这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。\n",
-      "bodyHtml": "<p>你好，我是 fhf，一个前端 developer，写了九年代码。</p>\n<p>从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。白天的工作是把需求变成人能用的界面；夜里属于自己的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。</p>\n<p>工作之外，我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。</p>\n<p>这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。</p>"
+      "bodyMd": "\n你好，我是 fhf，喜欢音乐、游戏、电影。\n\n从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。闲下来的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。\n\n我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。\n\n这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。\n",
+      "bodyHtml": "<p>你好，我是 fhf，喜欢音乐、游戏、电影。</p>\n<p>从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。闲下来的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。</p>\n<p>我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。</p>\n<p>这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。</p>"
     },
     {
       "locale": "en",
       "title": "About",
-      "bodyMd": "\nHi, I'm fhf — a front-end developer, nine years of code so far.\n\nI set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. The day job is turning requirements into interfaces people can use; the evenings are for small software of my own — most of it written for myself first, and named only later.\n\nOutside of work there is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.\n\nThis site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.\n",
-      "bodyHtml": "<p>Hi, I'm fhf — a front-end developer, nine years of code so far.</p>\n<p>I set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. The day job is turning requirements into interfaces people can use; the evenings are for small software of my own — most of it written for myself first, and named only later.</p>\n<p>Outside of work there is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.</p>\n<p>This site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.</p>"
+      "bodyMd": "\nHi, I'm fhf. I like music, games and films.\n\nI set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. Spare evenings go to small software of my own — most of it written for myself first, and named only later.\n\nThere is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.\n\nThis site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.\n",
+      "bodyHtml": "<p>Hi, I'm fhf. I like music, games and films.</p>\n<p>I set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. Spare evenings go to small software of my own — most of it written for myself first, and named only later.</p>\n<p>There is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.</p>\n<p>This site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.</p>"
     }
   ],
   "secrets": [],
@@ -9499,25 +9499,13 @@
         "en": "A Chinese Odyssey",
         "zh": "大话西游"
       },
-      "kicker": {
-        "en": "A Chinese Odyssey · 1995",
-        "zh": "大话西游 · 1995"
-      },
       "subtitle": {
-        "en": "A film watched many times over: two parts, a few stills, the lines I remember, and the song over the end credits.",
-        "zh": "一部看了很多遍的电影：上下两部，几张剧照，记得的几句台词，和片尾那首《一生所爱》。"
+        "en": "Joker uses the Pandora's Box to go five hundred years back, and meets the fairy Zixia.",
+        "zh": "至尊宝用月光宝盒回到五百年前，遇见了紫霞仙子。"
       },
       "latin": {
         "en": "大话西游",
         "zh": "A Chinese Odyssey"
-      },
-      "meta": {
-        "en": "Jeffrey Lau · Stephen Chow · Athena Chu · Karen Mok · 1995",
-        "zh": "刘镇伟 · 周星驰 · 朱茵 · 莫文蔚 · 1995"
-      },
-      "lede": {
-        "en": "Pandora's Box and Cinderella baffled most people when they came out in 1995; a few years later they were watched over and over in university dorms and video halls, and became, for many, the best Stephen Chow there is. Joker, Zixia, Bai Jingjing, the Pandora's Box — and the song over the end credits, 一生所愛, which plays while you are on this page.",
-        "zh": "《月光宝盒》和《大圣娶亲》1995 年上映时没多少人看懂，几年后在大学宿舍和录像厅里被一遍遍重看，成了很多人心里最好的那部周星驰。至尊宝、紫霞、白晶晶、月光宝盒——还有片尾那首《一生所爱》，进了这一页就会响起。"
       },
       "year": "1995",
       "track": "odyssey",
@@ -9546,59 +9534,13 @@
           "zh": "1995.01.21 / 02.04 · 香港"
         }
       },
-      "storyTitle": {
-        "en": "Five hundred years before, five hundred years after",
-        "zh": "五百年前，五百年后"
-      },
       "story": {
         "en": [
-          "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. To save Bai Jingjing he uses the Pandora's Box to land back in the same night again and again — until the box carries him five hundred years back instead, into the Bull King's cave, where he meets Zixia. To save her he must put on the golden headband and become the Monkey King; with it on, he may feel nothing again. The two parts are that one choice."
+          "Two parts, Pandora's Box and Cinderella. For plotting with the Bull King against Tripitaka on the road to the scriptures, the Monkey King is sentenced to be reborn a man five hundred years later. Reborn as Joker, a bandit chief, he uses the Pandora's Box again and again to turn back time and save Bai Jingjing — until it carries him five hundred years back, to the fairy Zixia. Zixia has sworn that whoever can draw her sword is the one she will marry; the one who draws it is Joker."
         ],
         "zh": [
-          "五百年后，孙悟空转世成了斧头帮的至尊宝。为了救白晶晶，他靠着一只月光宝盒一次次回到同一个夜晚，结果宝盒把他送回了五百年前，在牛魔王的洞府里遇见了紫霞。要救紫霞，他得戴上金箍成为孙悟空；戴上金箍，就不能再有七情六欲。上下两部讲的就是这一个选择。"
+          "《月光宝盒》与《大圣娶亲》上下两集。孙悟空在取经路上与牛魔王合谋加害唐三藏，被罚五百年后投胎做人。五百年后，他成了山贼头目至尊宝，为了救白晶晶，一次次用月光宝盒让时光倒流，却被带回五百年前，遇见了紫霞仙子。紫霞立誓，谁能拔出她的紫青宝剑，谁就是她的意中人——拔出宝剑的，正是至尊宝。"
         ]
-      },
-      "partsKicker": {
-        "en": "The two parts",
-        "zh": "上下两部"
-      },
-      "partsTitle": {
-        "en": "Pandora's Box, and Cinderella",
-        "zh": "月光宝盒，与大圣娶亲"
-      },
-      "parts": [
-        {
-          "meta": {
-            "en": "1995.01.21 · Part one",
-            "zh": "1995.01.21 · 上部"
-          },
-          "note": {
-            "en": "Five hundred years on, the Monkey King has been reborn as Joker, chief of the Axe Gang. Bai Jingjing, Spider Woman, a box that turns back time — he wants to save one person, and keeps landing back in the same night.",
-            "zh": "五百年后，孙悟空转世成了斧头帮的至尊宝。白晶晶、春三十娘、一只月光宝盒——他想救一个人，却一次次回到同一个夜晚。"
-          },
-          "title": {
-            "en": "A Chinese Odyssey Part One: Pandora's Box",
-            "zh": "大话西游之月光宝盒"
-          }
-        },
-        {
-          "meta": {
-            "en": "1995.02.04 · Part two",
-            "zh": "1995.02.04 · 下部"
-          },
-          "note": {
-            "en": "The box carries him five hundred years back, where he meets the fairy Zixia. To save her he must put on the golden headband; with it on, he may never love her again.",
-            "zh": "月光宝盒把他带回五百年前，他遇见了紫霞仙子。要救她，就得戴上金箍；戴上金箍，就不能再爱她。"
-          },
-          "title": {
-            "en": "A Chinese Odyssey Part Two: Cinderella",
-            "zh": "大话西游之大圣娶亲"
-          }
-        }
-      ],
-      "linesTitle": {
-        "en": "The ones I remember",
-        "zh": "记得的那几句"
       },
       "lines": [
         {
@@ -9618,32 +9560,60 @@
           },
           "text": {
             "en": "The one I love is a great hero. One day he will come for me on a cloud of seven colours. I guessed the beginning — but I could not guess the ending.",
-            "zh": "我的意中人是个盖世英雄，有一天他会踩着七色云彩来娶我。我猜中了前头，可是我猜不着这结局。"
+            "zh": "我的意中人是个盖世英雄，有一天他会踩着七色的云彩来娶我。我猜中了前头，可是我猜不着这结局。"
           }
         },
         {
           "meta": {
-            "en": "Zixia · on the city wall, at the end",
-            "zh": "紫霞 · 城楼上，片尾"
+            "en": "The girl on the city wall, and the Sunset Warrior · the ending",
+            "zh": "城楼上的姑娘与夕阳武士 · 片尾"
           },
           "text": {
-            "en": "Look at that man. He looks like a dog.",
-            "zh": "你看那个人，好像一条狗啊。"
+            "en": "That man looks strange. — I see him too. He looks like a dog.",
+            "zh": "那个人样子好怪。——我也看到了，他好像一条狗耶。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Princess Iron Fan · to Joker",
+            "zh": "铁扇公主 · 对至尊宝"
+          },
+          "text": {
+            "en": "When you watched the moon with me, I was your Sweetie. Now there's someone new, and I'm Mrs Bull King!",
+            "zh": "以前陪我看月亮的时候叫人家小甜甜，现在新人胜旧人了，叫人家牛夫人！"
+          }
+        },
+        {
+          "meta": {
+            "en": "Bai Jingjing · to Joker",
+            "zh": "白晶晶 · 对至尊宝"
+          },
+          "text": {
+            "en": "Your conscience tells me the one you love most isn't me, but another woman. Now that I've seen what she left in your conscience, I think the one you came back five hundred years to find isn't me — it's her.",
+            "zh": "你的良心告诉我你最爱的不是我，而是另外一个女人。当我见到她在你良心里面留下的东西后，我觉得你经过这五百年，回来要找的不是我，而是她。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Master Bodhi · to Joker",
+            "zh": "菩提老祖 · 对至尊宝"
+          },
+          "text": {
+            "en": "One day, when you find you have fallen for someone you can't stand — that is the love that will be the death of you.",
+            "zh": "有一天当你发觉你爱上一个你讨厌的人，这段感情才是最要命的！"
+          }
+        },
+        {
+          "meta": {
+            "en": "Tripitaka · to Wukong",
+            "zh": "唐僧 · 对悟空"
+          },
+          "text": {
+            "en": "You want it? Wukong, if you want it, just say so. If you don't say so, how am I to know you want it…",
+            "zh": "你想要啊？悟空，你要是想要的话你就说话嘛，你不说我怎么知道你想要呢……"
           }
         }
       ],
-      "stillsKicker": {
-        "en": "Stills · 1995",
-        "zh": "剧照 · 1995"
-      },
-      "stillsTitle": {
-        "en": "The scenes that stayed",
-        "zh": "留在眼里的几幕"
-      },
-      "stillsLede": {
-        "en": "The desert, the city wall, the Spider Cave, a wedding, and that one wink. Open any of them for the screening room.",
-        "zh": "沙漠、城楼、盘丝洞、一场婚礼，和那一次眨眼。点开任何一张，进放映厅看大图。"
-      },
       "stills": [
         {
           "id": "monkeyKing",
@@ -9889,25 +9859,13 @@
         "en": "Secret",
         "zh": "不能说的秘密"
       },
-      "kicker": {
-        "en": "Secret · 2007",
-        "zh": "不能说的秘密 · 2007"
-      },
       "subtitle": {
-        "en": "Jay Chou's first film as director: an old piano room, a piece that plays time backwards, and the hundred and eight steps from the piano room to the classroom.",
-        "zh": "周杰伦的第一部导演作品：一间旧琴房、一首能把时间弹回去的曲子，和从琴房到教室的一百零八步。"
+        "en": "In the school's old piano room, a transfer student meets a girl playing a piece no one knows.",
+        "zh": "插班生叶湘伦在旧琴房里，遇见了弹着一首神秘曲子的路小雨。"
       },
       "latin": {
         "en": "不能說的·秘密",
         "zh": "Secret"
-      },
-      "meta": {
-        "en": "Jay Chou · Gwei Lun-mei · Anthony Wong · 2007",
-        "zh": "周杰伦 · 桂纶镁 · 黄秋生 · 2007"
-      },
-      "lede": {
-        "en": "The summer of 2007, and the first film Jay Chou directed and starred in. The red-brick arcades of Tamkang, an old piano room about to be pulled down, a piece called Secret — and Lu Xiaoyu, whom Ye Xianglun meets in that room on his first day and who never quite answers a question. That, she says, is a secret. The title song plays while you are on this page.",
-        "zh": "2007 年夏天，周杰伦自导自演的第一部电影。淡江中学的红砖拱廊、一间快要拆掉的旧琴房、一首名字叫《Secret》的曲子——叶湘伦转学第一天在琴房里遇见的路小雨，总是欲言又止，只说那是秘密。片名那首歌，进了这一页就会响起。"
       },
       "year": "2007",
       "track": "secret",
@@ -9936,75 +9894,76 @@
           "zh": "2007.07.27 · 台湾"
         }
       },
-      "storyTitle": {
-        "en": "A hundred and eight steps",
-        "zh": "从琴房到教室，一百零八步"
-      },
       "story": {
         "en": [
-          "Ye Xianglun transfers to the arts school where his father teaches, and on his first day follows an unfamiliar tune to the old piano room, where Lu Xiaoyu is playing. He asks what the piece is; that, she says, is a secret. She is often missing from class, and after one misunderstanding she vanishes for good — until he finds her in a class photograph from 1979 in the school's archive. On the day the piano room is to be pulled down, he sits at the piano and plays Secret from the top."
+          "Ye Xianglun, a transfer student at the Tamkang arts school, is drawn by a piece he has never heard into the school's old piano room, where he meets the girl playing it, Lu Xiaoyu. Xiaoyu is always a little mysterious: ask her what she was playing, and she says only that it is a secret. After a misunderstanding she disappears. Searching everywhere for her, Xianglun finds out the secret she could not tell."
         ],
         "zh": [
-          "叶湘伦转学到父亲任教的淡江艺术学校，第一天就在旧琴房里循着一段陌生的琴声，遇见了路小雨。他问她弹的是什么，她说，那是秘密。小雨时常不来上课，一场误会之后彻底消失；湘伦却在校史室一张 1979 年的合影里看见了她。琴房要拆的那天，他坐到琴前，把那首《Secret》从头弹起。"
+          "淡江艺术高中的插班生叶湘伦，在学校的旧琴房里被一段从没听过的钢琴曲吸引，遇见了弹琴的女孩路小雨。小雨总是神神秘秘，问她弹的是什么曲子，她只说那是一个秘密。一场误会之后，小雨突然消失了。湘伦四处寻找她，终于发现了那个不能说的秘密。"
         ]
       },
-      "partsKicker": {
-        "en": "",
-        "zh": ""
-      },
-      "partsTitle": {
-        "en": "",
-        "zh": ""
-      },
-      "parts": [],
-      "linesTitle": {
-        "en": "The ones I remember",
-        "zh": "记得的那几句"
-      },
       "lines": [
+        {
+          "meta": {
+            "en": "Lu Xiaoyu · written in the score",
+            "zh": "路小雨 · 写在琴谱里"
+          },
+          "text": {
+            "en": "Whether or not we meet again, whether or not you forget me, I only want to tell you one secret: I love you.",
+            "zh": "不管我们能不能见面，不管你会不会忘了我，我只想告诉你一个秘密：我爱你。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Xiaoyu and Xianglun · in the piano room",
+            "zh": "小雨与湘伦 · 琴房里"
+          },
+          "text": {
+            "en": "You like playing the piano with one hand, don't you? — That way… my other hand can hold yours!",
+            "zh": "你很喜欢用一只手弹钢琴哦？——因为这样……另一只手才可以牵你啊！"
+          }
+        },
+        {
+          "meta": {
+            "en": "Xianglun and Xiaoyu",
+            "zh": "湘伦与小雨"
+          },
+          "text": {
+            "en": "You like creeping up on me from behind, don't you? — Because I like the sight of your back…",
+            "zh": "你很喜欢从背后吓我哦？——因为我喜欢你的背影啊……"
+          }
+        },
+        {
+          "meta": {
+            "en": "Lu Xiaoyu",
+            "zh": "路小雨"
+          },
+          "text": {
+            "en": "That I met you at all is already hard to believe.",
+            "zh": "能遇见你，已经很不可思议了。"
+          }
+        },
         {
           "meta": {
             "en": "Lu Xiaoyu · to Xianglun",
             "zh": "路小雨 · 对湘伦"
           },
           "text": {
-            "en": "I'll tell you a secret… I counted. From the piano room to the classroom is a hundred and eight steps.",
-            "zh": "我跟你说个秘密哦……我数过，从琴房到教室，一共一百零八步。"
+            "en": "I'll tell you a secret — I… counted. From the piano room to the classroom is a hundred and eight steps.",
+            "zh": "我跟你说个秘密喔——我……数过，从琴房到教室，总共一百零八步。"
           }
         },
         {
           "meta": {
-            "en": "Xianglun and Xiaoyu · in the piano room",
-            "zh": "湘伦与小雨 · 琴房里"
+            "en": "Ye Xianglun · in Xiaoyu's way",
+            "zh": "叶湘伦 · 学小雨的口气"
           },
           "text": {
-            "en": "The woman Chopin loved most — they were together ten years… and still they parted. — But to have had ten years is already a long time.",
-            "zh": "肖邦最爱的女人，他们在一起十年……最后还不是分开了。——但是，能够拥有十年，已经很长了。"
-          }
-        },
-        {
-          "meta": {
-            "en": "Lu Xiaoyu · written on the score of Secret",
-            "zh": "路小雨 · 写在《Secret》的琴谱上"
-          },
-          "text": {
-            "en": "Whether or not we meet again, whether or not you forget me, I only want to tell you one secret: I love you.",
-            "zh": "不管我们能不能见面，不管你会不会忘了我，我只想告诉你一个秘密：我爱你。"
+            "en": "Shh… it's a secret I can't tell…",
+            "zh": "嘘……这是个不能说的秘密……"
           }
         }
       ],
-      "stillsKicker": {
-        "en": "Stills · 2007",
-        "zh": "剧照 · 2007"
-      },
-      "stillsTitle": {
-        "en": "The scenes that stayed",
-        "zh": "留在眼里的几幕"
-      },
-      "stillsLede": {
-        "en": "The piano room, the arcade, a rainy day, a photograph from 1979, and the sunset on the roof. Open any of them for the screening room.",
-        "zh": "琴房、拱廊、一场雨、一张 1979 年的合影，和天台上的落日。点开任何一张，进放映厅看大图。"
-      },
       "stills": [
         {
           "id": "piano",
@@ -10250,25 +10209,13 @@
         "en": "La La Land",
         "zh": "爱乐之城"
       },
-      "kicker": {
-        "en": "La La Land · 2016",
-        "zh": "爱乐之城 · 2016"
-      },
       "subtitle": {
-        "en": "A pianist who wants a club of his own, a barista who wants to act: in love in Los Angeles, both dreams come true — just not with each other.",
-        "zh": "一个想开俱乐部的钢琴师，一个想当演员的女孩：洛杉矶相爱，各自的梦想都成了真，只是没能是彼此的。"
+        "en": "An aspiring actress and a jazz pianist fall in love in Los Angeles, each chasing a dream.",
+        "zh": "想当演员的米娅与爵士钢琴手塞巴斯汀，在洛杉矶相爱，也各自追梦。"
       },
       "latin": {
         "en": "爱乐之城",
         "zh": "La La Land"
-      },
-      "meta": {
-        "en": "Ryan Gosling · Emma Stone · 2016",
-        "zh": "瑞恩·高斯林 · 艾玛·斯通 · 2016"
-      },
-      "lede": {
-        "en": "In 2016 Damien Chazelle set the golden-age musical down in today's Los Angeles: a jam on the freeway throws Sebastian, who plays jazz, and Mia, who waits tables and fails auditions, into the same dance. They fall in love under a purple sky and let go where their dreams come true. Mia & Sebastian's Theme plays while you are on this page.",
-        "zh": "2016 年，达米恩·查泽雷把黄金年代的歌舞片放回了今天的洛杉矶：高架桥上的一场群舞，让弹爵士的塞巴斯汀和端咖啡的米娅跳进了同一座城。紫色的夜里相爱，梦想成真的路口分开。主题曲《Mia & Sebastian's Theme》进了这一页就会响起。"
       },
       "year": "2016",
       "track": "theme",
@@ -10297,32 +10244,35 @@
           "zh": "2016.12.09 · 美国"
         }
       },
-      "storyTitle": {
-        "en": "Winter, spring, summer, fall — and winter again",
-        "zh": "冬、春、夏、秋，又一个冬"
-      },
       "story": {
         "en": [
-          "In winter Mia waits tables on the studio lot and fails audition after audition, while Sebastian plays the jazz he believes in and is fired for it; a jam on the freeway throws the two of them into the same dance. In spring an old picture house and a planetarium full of stars draw them together; in summer each runs hard — Mia writing her one-woman show, Sebastian touring with Keith's band, singing songs he doesn't believe in — until autumn, and a dinner where it all comes apart. The night the show flops, Mia goes home; one phone call brings her back to a bare audition room, where one quiet song sends her to Paris — and, on a path above the city, the two of them apart. Five winters later, Mia the actress walks into a jazz club called Seb's, and the opening number under the light plays the road they didn't take, from the top."
+          "Mia, who wants to act, serves coffee on a studio lot and fails audition after audition; Sebastian, a pianist who dreams of a jazz club of his own, plays Christmas songs in a restaurant to get by. They meet in Los Angeles, fall in love, and push each other to chase their dreams. But as the dreams start coming true, they drift apart — and between the dream and each other, they have to choose."
         ],
         "zh": [
-          "冬天，米娅在片场的咖啡店端盘子、一场接一场地试镜，塞巴斯汀在酒吧弹自己想弹的爵士、被老板开除；一场高架上的堵车，把两个人撞进了同一支舞。春天，一部老电影和一晚星空让两人走近；夏天各自奔忙——米娅写自己的独角戏，塞巴斯汀加入了 Keith 的乐队，唱着自己不信的歌四处巡演；秋天，一顿晚餐把话说散了。独角戏演砸的那晚，米娅回了老家，一通电话又把她带回试镜间：一支清唱把她送去了巴黎，也在山间的小路上，把两人送到了分开。五年后的冬夜，已是演员的米娅走进一家叫 Seb's 的爵士俱乐部，灯下的开场曲，把那条没走完的路从头到尾弹了一遍。"
+          "渴望成为演员的米娅在片场的咖啡厅打工，试镜屡屡失败；钢琴手塞巴斯汀一心想开一家自己的爵士俱乐部，却只能在餐厅弹圣诞歌糊口。两人在洛杉矶相遇、相爱，彼此鼓励着追逐梦想。可当梦想渐渐成真，两人的距离却越来越远，在梦想与爱情之间，他们必须做出选择。"
         ]
       },
-      "partsKicker": {
-        "en": "",
-        "zh": ""
-      },
-      "partsTitle": {
-        "en": "",
-        "zh": ""
-      },
-      "parts": [],
-      "linesTitle": {
-        "en": "The ones I remember",
-        "zh": "唱过、说过的几句"
-      },
       "lines": [
+        {
+          "meta": {
+            "en": "Mia, at the audition — Audition (The Fools Who Dream)",
+            "zh": "米娅 · 试镜时唱的《Audition (The Fools Who Dream)》"
+          },
+          "text": {
+            "en": "Here's to the ones who dream, foolish as they may seem. Here's to the hearts that ache, here's to the mess we make.",
+            "zh": "敬那些做梦的人，哪怕他们有点傻；敬那些痛着的心，敬我们制造的混乱。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Sebastian, to Mia",
+            "zh": "塞巴斯汀 · 对米娅"
+          },
+          "text": {
+            "en": "That's L.A. They worship everything and they value nothing.",
+            "zh": "这就是洛杉矶。他们崇拜一切，却什么都不珍惜。"
+          }
+        },
         {
           "meta": {
             "en": "Mia, to Sebastian",
@@ -10330,17 +10280,27 @@
           },
           "text": {
             "en": "People will want to go to it because you're passionate about it, and people love what other people are passionate about. You remind people of what they've forgotten.",
-            "zh": "人们会来的。你对它有热情，而人们爱的，正是别人全力以赴的样子。你让他们想起了自己忘掉的东西。"
+            "zh": "人们会去的，因为你对它有热情，而人们爱的，正是别人的热情。你让人们想起他们忘掉的东西。"
           }
         },
         {
           "meta": {
-            "en": "Mia, at the audition — Audition (The Fools Who Dream)",
-            "zh": "米娅 · 试镜时唱的《Audition (The Fools Who Dream)》"
+            "en": "Keith, to Sebastian",
+            "zh": "Keith · 对塞巴斯汀"
           },
           "text": {
-            "en": "Here's to the ones who dream, foolish as they may seem.",
-            "zh": "敬那些做梦的人，哪怕他们显得有点傻。"
+            "en": "How are you gonna be a revolutionary if you're such a traditionalist? You hold onto the past, but jazz is about the future.",
+            "zh": "你这么守旧，怎么当革命者？你总抓着过去不放，可爵士乐是属于未来的。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Sebastian, on the pier — City of Stars",
+            "zh": "塞巴斯汀 · 栈桥上唱的《City of Stars》"
+          },
+          "text": {
+            "en": "City of stars, are you shining just for me?",
+            "zh": "星光之城，你是否只为我闪耀？"
           }
         },
         {
@@ -10354,18 +10314,6 @@
           }
         }
       ],
-      "stillsKicker": {
-        "en": "Stills · 2016",
-        "zh": "剧照 · 2016"
-      },
-      "stillsTitle": {
-        "en": "The scenes that stayed",
-        "zh": "留在眼里的几幕"
-      },
-      "stillsLede": {
-        "en": "The dance on the freeway, the tap under a purple sky, dusk on the pier, a look across a cinema, and the posters' road of piano keys. Open any of them for the screening room.",
-        "zh": "高架上的第一支舞、紫夜里的踢踏、栈桥的黄昏、放映厅的对望，和海报上那条琴键铺成的路。点开任何一张，进放映厅看大图。"
-      },
       "stills": [
         {
           "id": "freeway",
