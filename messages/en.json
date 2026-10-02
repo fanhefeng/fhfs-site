@@ -749,7 +749,9 @@
     "music": "Background music",
     "musicPlay": "Play the background music",
     "musicPause": "Stop the background music",
-    "tonight": "Tonight · on the stand"
+    "tonight": "Tonight · on the stand",
+    "mailCopied": "Email address copied",
+    "mailAddress": "Email address"
   },
   "error": {
     "kicker": "Printing error",

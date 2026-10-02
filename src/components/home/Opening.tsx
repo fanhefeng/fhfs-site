@@ -4,18 +4,22 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { LiquidPill } from "@/components/grove/LiquidPill";
+import { MailLink } from "@/components/ui/MailLink";
 import { OVERTURE_DONE_EVENT, overtureSeen } from "@/lib/client/overture";
 import { splashDue } from "@/lib/client/splash";
 
 export type OpeningMeta = { label: string; value: string };
 
 /** A place the author can be found — GitHub, RSS, mail. */
-export type ContactLink = {
-  label: string;
-  href: string;
-  /** External links open in a new tab; file routes and mailto don't need to. */
-  external?: boolean;
-};
+export type ContactLink =
+  | {
+      label: string;
+      href: string;
+      /** External links open in a new tab; file routes don't need to. */
+      external?: boolean;
+    }
+  /** The address itself: a MailLink, which copies it as well as opening it. */
+  | { label: string; email: string };
 
 /** The primary control's height, and the halo its canvas leaves around it —
  *  `pad` defaults to 1.744 button heights inside LiquidPill. */
@@ -242,20 +246,34 @@ export function Opening({
             {contacts.length > 0 ? (
               <div className="flex flex-wrap items-baseline gap-x-4">
                 <dt>{contactTitle}</dt>
-                {contacts.map((contact) => (
-                  <dd key={contact.href}>
-                    <a
-                      href={contact.href}
-                      {...(contact.external
-                        ? { target: "_blank", rel: "noreferrer" }
-                        : { "data-no-transition": "" })}
-                      className="hit-ext text-fg-secondary transition-colors hover:text-accent"
-                    >
+                {contacts.map((contact) => {
+                  const inner = (
+                    <>
                       {contact.label}
                       <span aria-hidden="true"> ↗</span>
-                    </a>
-                  </dd>
-                ))}
+                    </>
+                  );
+                  const className = "hit-ext text-fg-secondary transition-colors hover:text-accent";
+                  return "email" in contact ? (
+                    <dd key={contact.email}>
+                      <MailLink email={contact.email} className={className}>
+                        {inner}
+                      </MailLink>
+                    </dd>
+                  ) : (
+                    <dd key={contact.href}>
+                      <a
+                        href={contact.href}
+                        {...(contact.external
+                          ? { target: "_blank", rel: "noreferrer" }
+                          : { "data-no-transition": "" })}
+                        className={className}
+                      >
+                        {inner}
+                      </a>
+                    </dd>
+                  );
+                })}
               </div>
             ) : null}
           </dl>
