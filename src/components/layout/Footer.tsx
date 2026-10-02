@@ -43,7 +43,7 @@ function columns(items: NavLink[]): Column[] {
  * slogan beside it and the tear-off sticker in the corner; a map of the site
  * in four columns — the three wings of the nav table under their names, in
  * the island's order, doors in ink and the rows under them in grey, then
- * where to find the author; and one mono line of colophon, clock and the
+ * where to find the author; and one mono line of copyright, clock and the
  * light switch under a hairline. It stands on the reading measure, so its
  * left edge is the page's. Still the quietest place on the site: nothing
  * animates in, nothing glows; the one indulgence is the sticker.
@@ -161,8 +161,9 @@ export function Footer({ items }: { items: NavLink[] }) {
           </div>
         </nav>
 
-        {/* The colophon line: who, the way it was set, what time it is where
-            he is, and the light switch. */}
+        {/* The bottom line: who, what time it is where he is, and the light
+            switch. Nothing ornamental — the slogan up top is the footer's one
+            line of the author's own. */}
         <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5 font-mono text-[11px] text-fg-tertiary">
           {/* Build-time year is baked into the static HTML; let the client
               keep it rather than fail hydration right after New Year. */}
@@ -171,7 +172,6 @@ export function Footer({ items }: { items: NavLink[] }) {
             <span className="hidden sm:inline"> · {t("rights")}</span>
           </span>
           <span className="ml-auto flex items-center gap-x-4">
-            <span className="hidden md:inline">{t("colophon")}</span>
             <span
               title={t("localTimeAria")}
               className="tracking-[0.08em] [font-variant-numeric:tabular-nums]"
