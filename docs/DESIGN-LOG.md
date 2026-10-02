@@ -1081,6 +1081,10 @@
 >   新仓库。Vercel 项目断开旧仓库、接到新仓库（`vercel git connect`），生产分支仍是 `main`。
 > - 一个小坑：密钥配好之前推送 main 触发的那次 CI 显示「成功」，其实 `build` 因为没有密钥自己跳过了
 >   （26 秒）；配好后重跑，才是真正的构建加 smoke。
+> - 漏掉的一项：CodeRabbit。它的 GitHub App 装的是「只选部分仓库」，跟着改名留在了归档仓库上，新仓库
+>   没有——PR 上评论 `@coderabbitai review` 无人应答，本地 CLI 报「没接到组织」。同日在 GitHub 的应用安装
+>   设置里把新 `fhfs-site` 加进去（要过一次 sudo 确认），`.coderabbit.yaml` 随仓库走，不用动。再换仓库时，
+>   GitHub App 的仓库访问要和保护规则一起逐项补。
 
 > **2026-10-02 补记之二（科比那页有了自己的唱片：他自己的声音）**：用户要 /idols/kobe 放科比的退役
 > 讲话——"those times when you get up early and you work hard… that is actually the dream" 那段，最后是
