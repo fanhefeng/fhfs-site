@@ -9,6 +9,7 @@ import { Reveal } from "@/components/fx/Reveal";
 import { PrintButton } from "@/components/resume/PrintButton";
 import { Rich } from "@/components/resume/Rich";
 import { Bullets, ResumeSection } from "@/components/resume/ResumeSection";
+import { MailLink } from "@/components/ui/MailLink";
 
 export const generateMetadata = sectionMetadata("resume", "/resume");
 
@@ -149,10 +150,10 @@ export default async function ResumePage({ params }: PageProps<"/[locale]/resume
             )}
             {profile.email && (
               <li>
-                <a href={`mailto:${profile.email}`} className="hover:text-accent">
+                <MailLink email={profile.email} className="hover:text-accent">
                   <span className={metaLabel}>{t("emailLabel")}&ensp;</span>
                   {profile.email}
-                </a>
+                </MailLink>
               </li>
             )}
             {profile.note?.[locale] && (

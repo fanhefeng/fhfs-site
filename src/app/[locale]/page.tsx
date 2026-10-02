@@ -129,7 +129,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const contacts: ContactLink[] = [
     { label: "GitHub", href: site.social.github, external: true },
     { label: "RSS", href: `/${locale}/rss.xml` },
-    ...(site.social.email ? [{ label: "Email", href: `mailto:${site.social.email}` }] : []),
+    ...(site.social.email ? [{ label: "Email", email: site.social.email }] : []),
   ];
 
   const meta: OpeningMeta[] = [{ label: th("metaPlaceLabel"), value: th("metaPlace") }];

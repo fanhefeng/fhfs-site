@@ -749,7 +749,9 @@
     "music": "背景音乐",
     "musicPlay": "放背景音乐",
     "musicPause": "停掉背景音乐",
-    "tonight": "今晚 · 台上放的是"
+    "tonight": "今晚 · 台上放的是",
+    "mailCopied": "邮箱已复制",
+    "mailAddress": "邮箱地址"
   },
   "error": {
     "kicker": "印刷事故",

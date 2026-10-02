@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MailLink } from "@/components/ui/MailLink";
 
 type Props = {
   /** Address hidden under the sticker; empty string renders `fallback`. */
@@ -41,14 +42,14 @@ export function PeelSticker({ email, hint, ariaLabel, fallback, className }: Pro
           sets the sticker's width, so the note always covers it exactly. */}
         <span className="flex h-full items-center justify-center whitespace-nowrap rounded-[10px] border border-dashed border-line bg-surface px-2.5 text-center">
           {email ? (
-            <a
-              href={`mailto:${email}`}
+            <MailLink
+              email={email}
               tabIndex={peeled ? 0 : -1}
               aria-hidden={!peeled}
               className="font-mono text-[10.5px] leading-tight text-accent underline decoration-from-font underline-offset-2"
             >
               {email}
-            </a>
+            </MailLink>
           ) : (
             <span
               aria-hidden={!peeled}
