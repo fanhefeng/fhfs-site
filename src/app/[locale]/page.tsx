@@ -9,7 +9,6 @@ import { site } from "@/config/site";
 import { getPosts, getApps, getMoments } from "@/lib/server/content";
 import { getLatestReleases, type Release } from "@/lib/server/github";
 import { newestSaid, stampInZone } from "@/lib/moments";
-import { toSoftwareApp } from "@/components/software/appMeta";
 import { newestLabEntry } from "@/components/lab/entries";
 import { Chibi } from "@/components/chibi/Chibi";
 import { Opening, type OpeningMeta, type ContactLink } from "@/components/home/Opening";
@@ -71,8 +70,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       tagline: app.tagline[locale],
       category: ts(`categories.${app.category}`),
       href: app.website,
-      mock: wide ? toSoftwareApp(app, i, locale) : undefined,
-      mockLabel: wide ? ts("mockAlt", { name: app.name }) : undefined,
       // Version beside platform on the two wide cards — the version is read
       // from the repo's latest GitHub release, so it keeps itself current.
       stat: wide ? [version, ...app.platforms].filter(Boolean).join(" · ") : undefined,

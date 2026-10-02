@@ -1,6 +1,4 @@
 import { Reveal } from "@/components/fx/Reveal";
-import { AppMock } from "@/components/software/AppMock";
-import type { SoftwareApp } from "@/components/software/appMeta";
 import { SectionHeader } from "./SectionHeader";
 
 export type BentoItem = {
@@ -10,11 +8,6 @@ export type BentoItem = {
   category: string;
   /** The app's own site — these are real, shipped things. */
   href: string;
-  /** When present, the wide cards draw the app's schematic UI instead of
-   *  words alone — the shelf's two leads get to *look* like software. */
-  mock?: SoftwareApp;
-  /** Accessible description for the mock ("Portreaper 的界面示意图"). */
-  mockLabel?: string;
   /** Mono proof line under the tagline — version, platform, licence. */
   stat?: string;
 };
@@ -29,10 +22,10 @@ type Props = {
 
 /**
  * Software, as a small bento: the first two entries take a double-wide card
- * with their one-liner and a live-drawn schematic of their UI, the remaining
- * four sit in the small cells — an Apple-keynote grid at column width, one
- * glance for the whole shelf. The schematic is the same zero-JS `AppMock`
- * the software page uses, so it crossfades with the gallery lights for free.
+ * with their one-liner, the remaining four sit in the small cells — one
+ * glance for the whole shelf. The wide cards used to carry a CSS-drawn
+ * schematic of the app beside the words; it was the same few bars for every
+ * app of a category and is gone (DESIGN-LOG, 10-02).
  *
  * Paper cards, not glass: glass is reserved for floating layers, and this
  * grid sits flat on the page. The hover lift crossfades a second, softer
@@ -70,28 +63,8 @@ export function MiniBento({ items, title, viewAllLabel, index }: Props) {
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-0 rounded-card opacity-0 shadow-lift transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
                 />
-                {wide && item.mock ? (
-                  <span className="relative flex min-h-[6.5rem] gap-4">
-                    <span className="flex min-w-0 flex-1 flex-col gap-2">
-                      <span className="flex items-start justify-between gap-2">
-                        <span className="text-heading">{item.name}</span>
-                        <span
-                          aria-hidden="true"
-                          className="font-mono text-meta text-fg-tertiary transition-colors group-hover:text-accent"
-                        >
-                          ↗
-                        </span>
-                      </span>
-                      <span className="text-caption text-fg-secondary">{item.tagline}</span>
-                    </span>
-                    <AppMock
-                      app={item.mock}
-                      label={item.mockLabel ?? item.name}
-                      className="w-[38%] shrink-0 self-stretch rounded-[8px] border border-line"
-                    />
-                  </span>
-                ) : (
-                  <span className="relative flex items-start justify-between gap-2">
+                <span className="relative flex flex-col gap-2">
+                  <span className="flex items-start justify-between gap-2">
                     <span className="text-heading">{item.name}</span>
                     <span
                       aria-hidden="true"
@@ -100,7 +73,10 @@ export function MiniBento({ items, title, viewAllLabel, index }: Props) {
                       ↗
                     </span>
                   </span>
-                )}
+                  {wide ? (
+                    <span className="text-caption text-fg-secondary">{item.tagline}</span>
+                  ) : null}
+                </span>
                 <span className="relative flex items-baseline justify-between gap-2 font-mono text-meta text-fg-tertiary">
                   <span className="uppercase tracking-meta">{item.category}</span>
                   {item.stat ? <span className="tabular-nums">{item.stat}</span> : null}
