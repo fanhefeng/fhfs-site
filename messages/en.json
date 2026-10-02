@@ -52,8 +52,8 @@
     "enterHint": "or press Enter, or scroll down the page"
   },
   "home": {
-    "slogan": "Slow down, and the world starts to speak.",
-    "sloganEcho": "慢一点，世界会开口说话。",
+    "slogan": "If life were always as it was when we first met",
+    "sloganEcho": "人生若只如初见",
     "latestPosts": "Recent writing",
     "readingTime": "{minutes} min read",
     "viewAllPosts": "All writing",
@@ -335,8 +335,8 @@
         "note": "Each line is wrapped in overflow hidden, and the inner one rises from 112% to 0 over 1.05s on expo.out, lines 110ms apart. On the cover it is a CSS transition fired by the opening ritual; here it is a GSAP tween fired on entering the viewport, so it can be replayed — \"Again\" remounts the two lines, which is what a route change does. Why a mask beats a fade: a fade says \"it just appeared\"; a mask says \"it was always there, you just saw it\".",
         "label": "Masthead · line mask",
         "replay": "Again",
-        "lineOne": "Slow down,",
-        "lineTwo": "and the world starts to speak."
+        "lineOne": "If life were always",
+        "lineTwo": "as it was when we first met"
       },
       "reveal": {
         "name": "Scroll entrance: fade and rise",
