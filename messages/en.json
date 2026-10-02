@@ -674,9 +674,9 @@
     }
   },
   "films": {
-    "kicker": "Films · watched too many times",
+    "kicker": "Films",
     "title": "Films",
-    "subtitle": "The ones watched too many times: a synopsis, the lines I remember, and a wall of stills. Each puts on its own record at the door.",
+    "subtitle": "A page each: the synopsis, the memorable lines and the stills — and a record from the film at the door.",
     "open": "Open",
     "backToIndex": "← Films",
     "countStills": "{count, plural, one {# still} other {# stills}}",
@@ -688,8 +688,11 @@
       "runtime": "Runtime",
       "rating": "Douban"
     },
-    "storyKicker": "Synopsis",
-    "linesKicker": "Lines",
+    "sections": {
+      "synopsis": "Synopsis",
+      "lines": "Quotes",
+      "stills": "Stills"
+    },
     "viewer": {
       "open": "View larger",
       "close": "Close",

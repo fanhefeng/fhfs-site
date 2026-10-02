@@ -39,15 +39,15 @@ export async function generateMetadata({
 }
 
 /**
- * One film, one room. The movements: the title and who made it, with the
- * film's own record going on at the door (`RoomMusic`); the facts; the story,
- * one paragraph of it; the parts, for a film released in two; the lines
- * everyone remembers; the stills. A wide page (1040px) for the pictures, the
- * text at 720px like the rest.
+ * One film, one room: the title, with the film's own record going on at the
+ * door (`RoomMusic`); then three sections and nothing between them — the
+ * synopsis (the facts, and what happens), the lines the film says, and the
+ * stills. A wide page (1040px) for the pictures, the text at 720px like the
+ * rest.
  *
- * There is no review movement: a page about a film people have seen is for
- * the film, not for an essay about it — the story says what it is, the lines
- * and the stills do the rest.
+ * The page is the film's, not an essay about it: no lede, no review, no
+ * heading of its own over a section (the three labels are the catalogue's,
+ * the same on every film). 2026-10-02, DESIGN-LOG.
  */
 export default async function FilmPage({ params }: PageProps<"/[locale]/films/[slug]">) {
   const locale = await pageLocale(params);
@@ -60,7 +60,8 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
   const tc = await getTranslations("common");
 
   const stills: StillItem[] = film.stills.map((still) => ({ ...still, src: asset(still.src) }));
-  const story = film.story;
+  const facts = FILM_FACTS.filter((fact) => film.facts[fact]);
+  const label = "font-mono text-meta uppercase tracking-meta text-fg-tertiary";
   const backToIndex = (
     <Link
       href="/films"
@@ -74,16 +75,12 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
     <main id="main" className="mx-auto w-full max-w-[1040px] flex-1 px-6 pb-28 pt-32 md:pt-40">
       <Reveal as="header" className="mb-16 max-w-[720px]">
         {backToIndex}
-        <p className="mt-6 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-          {film.kicker}
-        </p>
-        <h1 className="mt-3 text-display">{film.title}</h1>
-        <p className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
+        <h1 className="mt-6 text-display">{film.title}</h1>
+        <p className={`mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 ${label}`}>
           {film.latin && <span className="text-accent">{film.latin}</span>}
-          {film.latin && film.meta && <span aria-hidden>·</span>}
-          {film.meta && <span>{film.meta}</span>}
+          {film.latin && film.year && <span aria-hidden>·</span>}
+          {film.year && <span className="tabular-nums">{film.year}</span>}
         </p>
-        <p className="mt-6 max-w-[52ch] text-body text-fg-secondary">{film.lede}</p>
         {film.track && (
           <RoomMusic
             track={film.track}
@@ -95,83 +92,47 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
         )}
       </Reveal>
 
-      {/* The facts. */}
-      <Reveal className="mb-24 max-w-[720px]">
-        <dl className="border-t border-line">
-          {FILM_FACTS.filter((fact) => film.facts[fact]).map((fact) => (
-            <div
-              key={fact}
-              className="grid gap-1 border-b border-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-6"
-            >
-              <dt className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                {t(`facts.${fact}`)}
-              </dt>
-              <dd className="text-caption text-fg">{film.facts[fact]}</dd>
-            </div>
-          ))}
-        </dl>
-      </Reveal>
-
-      {/* The story. */}
-      {story.length > 0 && (
-        <section aria-labelledby="film-story" className="mb-24 max-w-[720px]">
-          <Reveal className="mb-8">
-            <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              {t("storyKicker")}
-            </p>
-            <h2 id="film-story" className="mt-3 text-title">
-              {film.storyTitle}
+      {/* The synopsis: the facts, then what happens. */}
+      {(facts.length > 0 || film.story.length > 0) && (
+        <section aria-labelledby="film-synopsis" className="mb-24 max-w-[720px]">
+          <Reveal className="mb-6">
+            <h2 id="film-synopsis" className={label}>
+              {t("sections.synopsis")}
             </h2>
           </Reveal>
-          <Reveal as="div" stagger={0.08} className="space-y-5">
-            {story.map((paragraph, i) => (
-              <p key={i} className="max-w-[60ch] text-body text-fg-secondary">
-                {paragraph}
-              </p>
-            ))}
-          </Reveal>
+          {facts.length > 0 && (
+            <Reveal>
+              <dl className="border-t border-line">
+                {facts.map((fact) => (
+                  <div
+                    key={fact}
+                    className="grid gap-1 border-b border-line py-3 sm:grid-cols-[9rem_1fr] sm:gap-6"
+                  >
+                    <dt className={label}>{t(`facts.${fact}`)}</dt>
+                    <dd className="text-caption text-fg">{film.facts[fact]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          )}
+          {film.story.length > 0 && (
+            <Reveal as="div" stagger={0.08} className="mt-10 space-y-5">
+              {film.story.map((paragraph, i) => (
+                <p key={i} className="max-w-[60ch] text-body text-fg-secondary">
+                  {paragraph}
+                </p>
+              ))}
+            </Reveal>
+          )}
         </section>
       )}
 
-      {/* The parts, for a film released in two. */}
-      {film.parts.length > 0 && (
-        <section aria-labelledby="film-parts" className="mb-24 max-w-[720px]">
-          <Reveal className="mb-8">
-            <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              {film.partsKicker}
-            </p>
-            <h2 id="film-parts" className="mt-3 text-title">
-              {film.partsTitle}
-            </h2>
-          </Reveal>
-          <Reveal as="ol" stagger={0.05} className="border-t border-line">
-            {film.parts.map((part, i) => (
-              <li
-                key={i}
-                className="grid gap-1 border-b border-line py-5 sm:grid-cols-[9rem_1fr] sm:gap-6"
-              >
-                <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary tabular-nums">
-                  {part.meta}
-                </span>
-                <div>
-                  <p className="text-heading text-fg">{part.title}</p>
-                  <p className="mt-1 max-w-[56ch] text-caption text-fg-secondary">{part.note}</p>
-                </div>
-              </li>
-            ))}
-          </Reveal>
-        </section>
-      )}
-
-      {/* The lines. */}
+      {/* The lines, word for word. */}
       {film.lines.length > 0 && (
         <section aria-labelledby="film-lines" className="mb-24 max-w-[720px]">
           <Reveal className="mb-8">
-            <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              {t("linesKicker")}
-            </p>
-            <h2 id="film-lines" className="mt-3 text-title">
-              {film.linesTitle}
+            <h2 id="film-lines" className={label}>
+              {t("sections.lines")}
             </h2>
           </Reveal>
           <Reveal as="ul" stagger={0.08} className="space-y-10">
@@ -185,9 +146,7 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
                   >
                     “{line.text}”
                   </p>
-                  <footer className="mt-3 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                    {line.meta}
-                  </footer>
+                  <footer className={`mt-3 ${label}`}>{line.meta}</footer>
                 </blockquote>
               </li>
             ))}
@@ -198,14 +157,10 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
       {/* The stills. */}
       {stills.length > 0 && (
         <section aria-labelledby="film-stills" className="mb-16">
-          <Reveal className="mb-8 max-w-[720px]">
-            <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-              {film.stillsKicker}
-            </p>
-            <h2 id="film-stills" className="mt-3 text-title">
-              {film.stillsTitle}
+          <Reveal className="mb-8">
+            <h2 id="film-stills" className={label}>
+              {t("sections.stills")}
             </h2>
-            <p className="mt-4 max-w-[52ch] text-body text-fg-secondary">{film.stillsLede}</p>
           </Reveal>
           <FilmStills
             ratio={film.ratio}

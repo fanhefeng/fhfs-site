@@ -92,7 +92,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
       .map((film) => ({
         kind: "film" as const,
         title: film.title,
-        text: `${film.latin} ${film.meta} ${film.lede}`,
+        text: `${film.latin} ${film.facts.director} ${film.facts.cast} ${film.subtitle}`,
         href: `/films/${film.key}`,
         meta: film.year,
       })),

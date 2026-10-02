@@ -51,10 +51,7 @@ export type FilmStill = {
   alt: Localized;
 };
 
-/** A part of a film released in several — 大话西游's two. */
-export type FilmPart = { title: Localized; meta: Localized; note: Localized };
-
-/** A line the page quotes, and who says it where. */
+/** A line the film says, word for word, and who says it where. */
 export type FilmLine = { text: Localized; meta: Localized };
 
 /** The picture on an index card — a film's still or an idol's photograph,

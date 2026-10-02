@@ -37,8 +37,8 @@ import {
 } from "./shared";
 
 /**
- * A film, whole: the header, the facts, the story, the parts, the lines and
- * the wall of stills, as `/admin/films` sends them. The repeated groups come
+ * A film, whole: the title, the facts, the story, the lines and the wall of
+ * stills, as `/admin/films` sends them. The repeated groups come
  * in as rows (`formRows`); a row left entirely empty is dropped rather than
  * refused, which is how one is removed without a button having been pressed.
  */
@@ -100,13 +100,6 @@ export async function saveFilm(_prev: ActionState, form: FormData): Promise<Acti
   const facts = Object.fromEntries(
     FILM_FACTS.map((fact) => [fact, localized(form, `facts.${fact}`)]),
   ) as FilmFacts;
-  const parts = formRows(form, "parts")
-    .map((row) => ({
-      title: row.localized("title"),
-      meta: row.localized("meta"),
-      note: row.localized("note"),
-    }))
-    .filter((part) => filled(part.title) || filled(part.meta) || filled(part.note));
   const lines = formRows(form, "lines")
     .map((row) => ({ text: row.localized("text"), meta: row.localized("meta") }))
     .filter((line) => filled(line.text) || filled(line.meta));
@@ -114,27 +107,16 @@ export async function saveFilm(_prev: ActionState, form: FormData): Promise<Acti
   const row = {
     key,
     title,
-    kicker: localized(form, "kicker"),
     subtitle: localized(form, "subtitle"),
     latin: localized(form, "latin"),
-    meta: localized(form, "meta"),
-    lede: localized(form, "lede"),
     year: str(form, "year"),
     track,
     accent,
     ratio,
     cover,
     facts,
-    storyTitle: localized(form, "storyTitle"),
     story: localizedLines(form, "story"),
-    partsKicker: localized(form, "partsKicker"),
-    partsTitle: localized(form, "partsTitle"),
-    parts,
-    linesTitle: localized(form, "linesTitle"),
     lines,
-    stillsKicker: localized(form, "stillsKicker"),
-    stillsTitle: localized(form, "stillsTitle"),
-    stillsLede: localized(form, "stillsLede"),
     stills,
     credit: localized(form, "credit"),
     draft: draft === "yes",
