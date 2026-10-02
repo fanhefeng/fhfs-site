@@ -68,7 +68,7 @@
   "grove": {
     "headline1": "Welcome to fhf's",
     "headline2": "",
-    "lede": "I'm fhf, a front-end developer of nine years. I write code, play the violin, rewatch films, and stay curious about the world.",
+    "lede": "I'm fhf. I like music, games and films.",
     "cta": "Into the lab",
     "cardLabLabel": "Lab",
     "cardLabLink": "Open: {name}",
@@ -105,8 +105,8 @@
   "about": {
     "title": "About",
     "subtitle": "Who I am, and the road here.",
-    "lead": "Nine years of front-end; a developer who never stopped being curious.",
-    "keywords": "developer · violinist at home · curious about the world",
+    "lead": "I'm fhf. I listen to music, play games and watch films.",
+    "keywords": "music · games · films",
     "stickersTitle": "Sticker wall",
     "stickersHint": "Poke one — or drag them around",
     "stickersAria": "A wall of stickers — skills, hobbies and cities lived in. They can be dragged.",

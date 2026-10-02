@@ -68,7 +68,7 @@
   "grove": {
     "headline1": "欢迎来到 fhf's",
     "headline2": "",
-    "lede": "我是 fhf，九年前端。写代码，拉小提琴，看很多遍的电影，对世界始终好奇。",
+    "lede": "我是 fhf，喜欢音乐、游戏、电影。",
     "cta": "去实验室看看",
     "cardLabLabel": "实验室",
     "cardLabLink": "打开：{name}",
@@ -105,8 +105,8 @@
   "about": {
     "title": "关于",
     "subtitle": "关于我，以及走到这里的路。",
-    "lead": "九年前端，一个对世界始终好奇的 developer。",
-    "keywords": "developer · 拉琴的人 · 对世界好奇",
+    "lead": "我是 fhf，平时听音乐、打游戏、看电影。",
+    "keywords": "音乐 · 游戏 · 电影",
     "stickersTitle": "贴纸墙",
     "stickersHint": "戳一戳，或者拖着玩",
     "stickersAria": "一墙贴纸：技能、爱好和住过的城市，可以拖动",
