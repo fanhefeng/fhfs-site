@@ -172,7 +172,7 @@ export function Jukebox({ files }: { files: TrackFiles }) {
       <style href="fx-jukebox" precedence="low">
         {CSS}
       </style>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- an instrumental, and this player is not a control */}
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- a background record behind a switch, not a control; even the one with words (Kobe's) has nowhere to show a caption from a hidden player */}
       <audio ref={audioRef} src={file} loop preload="none" />
     </div>
   );
