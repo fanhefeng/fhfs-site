@@ -49,7 +49,7 @@
 ### 1.2 字体
 
 - EN display：**Nunito**（可变字重，圆角末端，与中文圆体同调）600–700，`clamp(2.5rem, 7vw, 6.5rem)`，`letter-spacing: -0.03em`，`line-height: 1.05`。
-- 衬线点缀：**Instrument Serif** italic（引语/关键词，next/font/google 新增）。
+- 衬线点缀：**Lora** italic，只用 400（引语/关键词，next/font/google；2026-10-02 起替换 Instrument Serif，见 DESIGN-LOG）。
 - 正文：Nunito 400，16–18px / 1.7。
 - 元信息：**Geist Mono** 11–12px uppercase `tracking +0.08em`（版本号/日期/kicker）。
 - ZH：**悠哉字体 Yozai**（圆体，OFL；`public/fonts/yozai/` 自托管，GB2312 子集 + cn-font-split 按 unicode-range 分片，400 / 500 两字重，500 面声明为 500–900 免合成粗体，`src/app/yozai.css`）优先，其后只列系统 CJK 字体（PingFang SC / Microsoft YaHei / 本地 Noto CJK；衬线 Songti SC / SimSun），不再下载任何兜底网络字体（Noto Sans/Serif SC 已于 09-15 删除，见上方修订）；中文标题不做负字距（tracking 0～+0.01em）。

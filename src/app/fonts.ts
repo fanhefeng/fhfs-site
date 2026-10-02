@@ -1,4 +1,4 @@
-import { Nunito, Instrument_Serif, Geist_Mono } from "next/font/google";
+import { Nunito, Lora, Geist_Mono } from "next/font/google";
 
 /* Editorial type trio. globals.css assembles the runtime stacks from these
  * variables. Latin is Nunito — rounded terminals to sit beside the Yozai
@@ -24,12 +24,17 @@ const sans = Nunito({
 /* Preload is reserved for Nunito, which sets the body copy. The other two
  * carry a handful of words each — an italic accent, a line of meta — and
  * preloading all three had the browser fetching four files up front and
- * reporting them unused. They still load, just without the head start. */
-const serif = Instrument_Serif({
+ * reporting them unused. They still load, just without the head start.
+ *
+ * The serif is Lora since 2026-10-02 (DESIGN-LOG): Instrument Serif's
+ * condensed display italic read cramped once it set whole sentences — a
+ * film's lines, a pull quote. Lora's italic is open and brushed, a text face
+ * that holds a paragraph and sits beside the rounded Nunito and Yozai. */
+const serif = Lora({
   weight: "400",
   style: ["normal", "italic"],
   subsets: ["latin"],
-  variable: "--font-instrument",
+  variable: "--font-lora",
   display: "swap",
   preload: false,
 });

@@ -9500,8 +9500,8 @@
         "zh": "大话西游"
       },
       "subtitle": {
-        "en": "Joker is carried five hundred years back by the Pandora's Box and meets the fairy Zixia. In two parts: Pandora's Box and Cinderella.",
-        "zh": "至尊宝靠月光宝盒回到五百年前，遇见紫霞仙子。分上下两部：《月光宝盒》与《大圣娶亲》。"
+        "en": "Joker uses the Pandora's Box to go five hundred years back, and meets the fairy Zixia.",
+        "zh": "至尊宝用月光宝盒回到五百年前，遇见了紫霞仙子。"
       },
       "latin": {
         "en": "大话西游",
@@ -9536,23 +9536,21 @@
       },
       "story": {
         "zh": [
-          "上部《月光宝盒》：孙悟空护送唐三藏西天取经，途中与牛魔王合谋要害唐三藏，被罚五百年后投胎做人赎罪。五百年后，他成了山贼头子至尊宝，遇上想吃唐僧肉的春三十娘和白晶晶，与白晶晶一见钟情。白晶晶为救他中了毒，又误会了他，绝望自尽；至尊宝用月光宝盒让时光倒流，想要救她。",
-          "下部《大圣娶亲》：月光宝盒把至尊宝带回了五百年前。他遇见紫霞仙子，被她打上烙印，又无意间拔出了她的紫青宝剑——紫霞发过誓，谁能拔出这把剑，谁就是她的意中人。一心记挂白晶晶的至尊宝拒绝了她。后来牛魔王逼紫霞成亲，要救她，至尊宝就得戴上金箍，做回孙悟空。"
+          "《月光宝盒》与《大圣娶亲》上下两集。孙悟空在取经路上与牛魔王合谋加害唐三藏，被罚五百年后投胎做人。五百年后，他成了山贼头目至尊宝，为了救白晶晶，一次次用月光宝盒让时光倒流，却被带回五百年前，遇见了紫霞仙子。紫霞立誓，谁能拔出她的紫青宝剑，谁就是她的意中人——拔出宝剑的，正是至尊宝。"
         ],
         "en": [
-          "Part one, Pandora's Box: escorting Tripitaka west for the scriptures, the Monkey King plots with the Bull King against his master, and is sentenced to be reborn a man five hundred years later. Reborn, he is Joker, chief of a band of bandits, who runs into two demon sisters after the monk's flesh, Spider Woman and Bai Jingjing — and falls for Bai Jingjing at first sight. Poisoned saving him, then believing he has betrayed her, she takes her own life; Joker turns to the Pandora's Box to turn back time and save her.",
-          "Part two, Cinderella: the box carries Joker five hundred years back instead. He meets the fairy Zixia, who brands him as hers, and without meaning to draws her sword — she has sworn that whoever draws it is the one she will marry. His heart set on Bai Jingjing, he turns her down. When the Bull King forces Zixia to marry him, the only way to save her is for Joker to put on the golden headband and become the Monkey King again."
+          "Two parts, Pandora's Box and Cinderella. For plotting with the Bull King against Tripitaka on the road to the scriptures, the Monkey King is sentenced to be reborn a man five hundred years later. Reborn as Joker, a bandit chief, he uses the Pandora's Box again and again to turn back time and save Bai Jingjing — until it carries him five hundred years back, to the fairy Zixia. Zixia has sworn that whoever can draw her sword is the one she will marry; the one who draws it is Joker."
         ]
       },
       "lines": [
         {
           "meta": {
-            "en": "Tripitaka · to Wukong",
-            "zh": "唐僧 · 对悟空"
+            "en": "Joker · to Zixia",
+            "zh": "至尊宝 · 对紫霞"
           },
           "text": {
-            "en": "You want it? Wukong, if you want it, just say so. If you don't say so, how am I to know you want it…",
-            "zh": "你想要啊？悟空，你要是想要的话你就说话嘛，你不说我怎么知道你想要呢……"
+            "en": "Once there was a sincere love in front of me, and I did not treasure it. Only when I lost it did I regret — there is no greater pain in this world. If heaven gave me one more chance, I would say three words to that girl: I love you. And if a limit had to be put on that love, I would want it to be… ten thousand years.",
+            "zh": "曾经有一份真诚的爱情放在我面前，我没有珍惜，等我失去的时候我才后悔莫及，人世间最痛苦的事莫过于此。如果上天能够给我一个再来一次的机会，我会对那个女孩子说三个字：我爱你。如果非要在这份爱上加上一个期限，我希望是……一万年。"
           }
         },
         {
@@ -9567,12 +9565,32 @@
         },
         {
           "meta": {
-            "en": "Zixia",
-            "zh": "紫霞"
+            "en": "The girl on the city wall, and the Sunset Warrior · the ending",
+            "zh": "城楼上的姑娘与夕阳武士 · 片尾"
           },
           "text": {
-            "en": "Lie to me, then. Like a moth: it knows it will be hurt, and still it flies into the flame. That is how foolish a moth is.",
-            "zh": "骗就骗吧！就像飞蛾一样，明知道会受伤，还是会扑到火上。飞蛾就那么傻。"
+            "en": "That man looks strange. — I see him too. He looks like a dog.",
+            "zh": "那个人样子好怪。——我也看到了，他好像一条狗耶。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Princess Iron Fan · to Joker",
+            "zh": "铁扇公主 · 对至尊宝"
+          },
+          "text": {
+            "en": "When you watched the moon with me, I was your Sweetie. Now there's someone new, and I'm Mrs Bull King!",
+            "zh": "以前陪我看月亮的时候叫人家小甜甜，现在新人胜旧人了，叫人家牛夫人！"
+          }
+        },
+        {
+          "meta": {
+            "en": "Bai Jingjing · to Joker",
+            "zh": "白晶晶 · 对至尊宝"
+          },
+          "text": {
+            "en": "Your conscience tells me the one you love most isn't me, but another woman. Now that I've seen what she left in your conscience, I think the one you came back five hundred years to find isn't me — it's her.",
+            "zh": "你的良心告诉我你最爱的不是我，而是另外一个女人。当我见到她在你良心里面留下的东西后，我觉得你经过这五百年，回来要找的不是我，而是她。"
           }
         },
         {
@@ -9587,22 +9605,12 @@
         },
         {
           "meta": {
-            "en": "Joker · to Zixia",
-            "zh": "至尊宝 · 对紫霞"
+            "en": "Tripitaka · to Wukong",
+            "zh": "唐僧 · 对悟空"
           },
           "text": {
-            "en": "Once there was a sincere love in front of me, and I did not treasure it. Only when I lost it did I regret — there is no greater pain in this world. If heaven gave me one more chance, I would say three words to that girl: I love you. And if a limit had to be put on that love, I would want it to be… ten thousand years.",
-            "zh": "曾经有一份真诚的爱情放在我面前，我没有珍惜，等我失去的时候我才后悔莫及，人世间最痛苦的事莫过于此。如果上天能够给我一个再来一次的机会，我会对那个女孩子说三个字：我爱你。如果非要在这份爱上加上一个期限，我希望是……一万年。"
-          }
-        },
-        {
-          "meta": {
-            "en": "The girl on the city wall, and the Sunset Warrior · the ending",
-            "zh": "城楼上的姑娘与夕阳武士 · 片尾"
-          },
-          "text": {
-            "en": "That man looks strange. — I see him too. He looks like a dog.",
-            "zh": "那个人样子好怪。——我也看到了，他好像一条狗耶。"
+            "en": "You want it? Wukong, if you want it, just say so. If you don't say so, how am I to know you want it…",
+            "zh": "你想要啊？悟空，你要是想要的话你就说话嘛，你不说我怎么知道你想要呢……"
           }
         }
       ],
@@ -9852,8 +9860,8 @@
         "zh": "不能说的秘密"
       },
       "subtitle": {
-        "en": "A transfer student at the Tamkang arts school follows a piece of music into the old piano rooms and meets Lu Xiaoyu. Written and directed by Jay Chou, who also stars.",
-        "zh": "淡江艺术高中的插班生叶湘伦，在旧琴房里循着一段琴声，遇见了路小雨。周杰伦自编自导自演。"
+        "en": "In the school's old piano room, a transfer student meets a girl playing a piece no one knows.",
+        "zh": "插班生叶湘伦在旧琴房里，遇见了弹着一首神秘曲子的路小雨。"
       },
       "latin": {
         "en": "不能說的·秘密",
@@ -9888,13 +9896,53 @@
       },
       "story": {
         "zh": [
-          "叶湘伦是淡江艺术高中的插班生，父亲是这所学校的老师。转学第一天，同学晴依带他参观校园，他独自走到旧琴房，被一段从没听过的钢琴曲吸引，在其中一间琴房里遇见了路小雨。小雨总带着几分神秘，湘伦问她弹的是什么曲子，她只说那是秘密。一次湘伦约小雨在琴房见面，却把晴依当成了小雨，两人接吻时被小雨看见，从此小雨再没出现。湘伦四处寻找她，终于发现了小雨口中那个「不能说的秘密」的全部真相。"
+          "淡江艺术高中的插班生叶湘伦，在学校的旧琴房里被一段从没听过的钢琴曲吸引，遇见了弹琴的女孩路小雨。小雨总是神神秘秘，问她弹的是什么曲子，她只说那是一个秘密。一场误会之后，小雨突然消失了。湘伦四处寻找她，终于发现了那个不能说的秘密。"
         ],
         "en": [
-          "Ye Xianglun transfers to the Tamkang arts school, where his father teaches. On his first day a classmate, Qingyi, shows him round; on his own he wanders into the old piano rooms, drawn by a piece he has never heard, and finds Lu Xiaoyu at the piano. There is always something hidden about her — when he asks what she was playing, she says it is a secret. He asks her to meet him in the piano room, mistakes Qingyi for her and kisses her, and Xiaoyu, who sees it, is not seen again. Searching everywhere for her, he uncovers the whole truth of the secret she could not tell."
+          "Ye Xianglun, a transfer student at the Tamkang arts school, is drawn by a piece he has never heard into the school's old piano room, where he meets the girl playing it, Lu Xiaoyu. Xiaoyu is always a little mysterious: ask her what she was playing, and she says only that it is a secret. After a misunderstanding she disappears. Searching everywhere for her, Xianglun finds out the secret she could not tell."
         ]
       },
       "lines": [
+        {
+          "meta": {
+            "en": "Lu Xiaoyu · written in the score",
+            "zh": "路小雨 · 写在琴谱里"
+          },
+          "text": {
+            "en": "Whether or not we meet again, whether or not you forget me, I only want to tell you one secret: I love you.",
+            "zh": "不管我们能不能见面，不管你会不会忘了我，我只想告诉你一个秘密：我爱你。"
+          }
+        },
+        {
+          "meta": {
+            "en": "Xiaoyu and Xianglun · in the piano room",
+            "zh": "小雨与湘伦 · 琴房里"
+          },
+          "text": {
+            "en": "You like playing the piano with one hand, don't you? — That way… my other hand can hold yours!",
+            "zh": "你很喜欢用一只手弹钢琴哦？——因为这样……另一只手才可以牵你啊！"
+          }
+        },
+        {
+          "meta": {
+            "en": "Xianglun and Xiaoyu",
+            "zh": "湘伦与小雨"
+          },
+          "text": {
+            "en": "You like creeping up on me from behind, don't you? — Because I like the sight of your back…",
+            "zh": "你很喜欢从背后吓我哦？——因为我喜欢你的背影啊……"
+          }
+        },
+        {
+          "meta": {
+            "en": "Lu Xiaoyu",
+            "zh": "路小雨"
+          },
+          "text": {
+            "en": "That I met you at all is already hard to believe.",
+            "zh": "能遇见你，已经很不可思议了。"
+          }
+        },
         {
           "meta": {
             "en": "Lu Xiaoyu · to Xianglun",
@@ -9907,22 +9955,12 @@
         },
         {
           "meta": {
-            "en": "Xianglun and Xiaoyu · in the piano room",
-            "zh": "湘伦与小雨 · 琴房里"
+            "en": "Ye Xianglun · in Xiaoyu's way",
+            "zh": "叶湘伦 · 学小雨的口气"
           },
           "text": {
-            "en": "The woman Chopin loved most — they were together ten years… — And still they parted. — But to have had it — ten years is already a long time.",
-            "zh": "肖邦最爱的女人，他们在一起十年……——最后还不是分开了。——但是，能够拥有，十年已经很长了。"
-          }
-        },
-        {
-          "meta": {
-            "en": "Lu Xiaoyu · written in the score",
-            "zh": "路小雨 · 写在琴谱里"
-          },
-          "text": {
-            "en": "Whether or not we meet again, whether or not you forget me, I only want to tell you one secret: I love you.",
-            "zh": "不管我们能不能见面，不管你会不会忘了我，我只想告诉你一个秘密：我爱你。"
+            "en": "Shh… it's a secret I can't tell…",
+            "zh": "嘘……这是个不能说的秘密……"
           }
         }
       ],
@@ -10172,8 +10210,8 @@
         "zh": "爱乐之城"
       },
       "subtitle": {
-        "en": "An aspiring actress and a jazz pianist meet in Los Angeles, fall in love, and each chase a dream. A musical written and directed by Damien Chazelle.",
-        "zh": "想当演员的米娅与爵士钢琴手塞巴斯汀在洛杉矶相遇、相爱，又各自追逐梦想。达米恩·查泽雷编导的歌舞片。"
+        "en": "An aspiring actress and a jazz pianist fall in love in Los Angeles, each chasing a dream.",
+        "zh": "想当演员的米娅与爵士钢琴手塞巴斯汀，在洛杉矶相爱，也各自追梦。"
       },
       "latin": {
         "en": "爱乐之城",
@@ -10208,21 +10246,21 @@
       },
       "story": {
         "zh": [
-          "米娅想当演员，却一直只是片场咖啡厅里的咖啡师，大大小小的试镜一场接一场地失败。一次派对上，她遇见了爵士钢琴手塞巴斯汀，两人起初有些不快，很快便被彼此吸引，走到了一起。在塞巴斯汀的鼓励下，米娅辞掉咖啡厅的工作，专心写自己的独角戏；塞巴斯汀为了有一份稳定的收入，加入一支流行爵士乐队，演奏自己并不喜欢的音乐，没想到一炮而红。各自追逐梦想的两人，距离却越来越远，在梦想和感情之间，他们必须做出选择。"
+          "渴望成为演员的米娅在片场的咖啡厅打工，试镜屡屡失败；钢琴手塞巴斯汀一心想开一家自己的爵士俱乐部，却只能在餐厅弹圣诞歌糊口。两人在洛杉矶相遇、相爱，彼此鼓励着追逐梦想。可当梦想渐渐成真，两人的距离却越来越远，在梦想与爱情之间，他们必须做出选择。"
         ],
         "en": [
-          "Mia wants to act, but she is still a barista at a coffee shop on a studio lot, failing one audition after another. At a party she runs into Sebastian, a jazz pianist; they get off on the wrong foot, are soon drawn to each other, and fall in love. With his encouragement Mia quits the coffee shop to write a one-woman play; Sebastian, for a steady income, joins a pop-jazz band playing music he doesn't care for — and it takes off. As each of them chases a dream they drift further apart, and between the dream and each other, they have to choose."
+          "Mia, who wants to act, serves coffee on a studio lot and fails audition after audition; Sebastian, a pianist who dreams of a jazz club of his own, plays Christmas songs in a restaurant to get by. They meet in Los Angeles, fall in love, and push each other to chase their dreams. But as the dreams start coming true, they drift apart — and between the dream and each other, they have to choose."
         ]
       },
       "lines": [
         {
           "meta": {
-            "en": "Mia and Sebastian",
-            "zh": "米娅与塞巴斯汀"
+            "en": "Mia, at the audition — Audition (The Fools Who Dream)",
+            "zh": "米娅 · 试镜时唱的《Audition (The Fools Who Dream)》"
           },
           "text": {
-            "en": "It's pretty strange that we keep running into each other. — Maybe it means something. — I doubt it. — Yeah, I didn't think so.",
-            "zh": "我们总是碰见，挺奇怪的。——也许这意味着什么。——我看不见得。——嗯，我也觉得不会。"
+            "en": "Here's to the ones who dream, foolish as they may seem. Here's to the hearts that ache, here's to the mess we make.",
+            "zh": "敬那些做梦的人，哪怕他们有点傻；敬那些痛着的心，敬我们制造的混乱。"
           }
         },
         {
@@ -10232,7 +10270,7 @@
           },
           "text": {
             "en": "That's L.A. They worship everything and they value nothing.",
-            "zh": "这就是洛杉矶。他们什么都崇拜，却什么都不珍惜。"
+            "zh": "这就是洛杉矶。他们崇拜一切，却什么都不珍惜。"
           }
         },
         {
@@ -10247,22 +10285,22 @@
         },
         {
           "meta": {
-            "en": "Mia and Sebastian · outside her parents' house",
-            "zh": "米娅与塞巴斯汀 · 米娅老家门外"
+            "en": "Keith, to Sebastian",
+            "zh": "Keith · 对塞巴斯汀"
           },
           "text": {
-            "en": "Because maybe I'm not good enough! — Yes, you are.",
-            "zh": "因为也许我就是不够好！——你够好。"
+            "en": "How are you gonna be a revolutionary if you're such a traditionalist? You hold onto the past, but jazz is about the future.",
+            "zh": "你这么守旧，怎么当革命者？你总抓着过去不放，可爵士乐是属于未来的。"
           }
         },
         {
           "meta": {
-            "en": "Mia, at the audition — Audition (The Fools Who Dream)",
-            "zh": "米娅 · 试镜时唱的《Audition (The Fools Who Dream)》"
+            "en": "Sebastian, on the pier — City of Stars",
+            "zh": "塞巴斯汀 · 栈桥上唱的《City of Stars》"
           },
           "text": {
-            "en": "Here's to the ones who dream, foolish as they may seem.",
-            "zh": "敬那些做梦的人，哪怕他们看起来有点傻。"
+            "en": "City of stars, are you shining just for me?",
+            "zh": "星光之城，你是否只为我闪耀？"
           }
         },
         {
