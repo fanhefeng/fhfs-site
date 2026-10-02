@@ -49,20 +49,22 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
   );
 
   // The calendar above links each day to its newest line by `#key`, and so
-  // can a shared address. A line the
-  // notebook filter has taken off the board is not there to land on — the
-  // click only changed the address. Let the filter go, and go to the line
-  // once it is drawn again. Asked of the address and the list, not the page:
-  // on a first load of `?nb=…#key` the line is still drawn when this runs,
-  // and the filter read from the address takes it away a render later.
+  // can a shared address; every change of the hash brings the reader here,
+  // to the line. A line the notebook filter has taken off the board is not
+  // there to land on, so the filter goes first, and the line is sought once
+  // it is drawn again. Asked of the address and the list, not the page: on a
+  // first load of `?nb=…#key` the line is still drawn when this runs, and the
+  // filter read from the address takes it away a render later. Any other
+  // first load the browser has already put on the line itself.
   const [seek, setSeek] = useState<string | null>(null);
   useEffect(() => {
-    const onHash = () => {
+    const onHash = (event?: HashChangeEvent) => {
       const key = decodeURIComponent(window.location.hash.slice(1));
       const line = key ? items.find((item) => item.key === key) : undefined;
+      if (!line) return;
       const nb = new URLSearchParams(window.location.search).get("nb");
-      if (!line || nb === null || line.collection === nb) return;
-      pick(null);
+      if (nb !== null && line.collection !== nb) pick(null);
+      else if (!event) return;
       setSeek(key);
     };
     onHash();
@@ -71,8 +73,23 @@ export function MomentBoard({ items }: { items: BoardMoment[] }) {
   }, [items, pick]);
   useEffect(() => {
     if (!seek) return;
-    document.getElementById(seek)?.scrollIntoView();
+    const line = document.getElementById(seek);
     setSeek(null);
+    if (!line) return;
+    // By Lenis when it runs: the browser's own jump lands, and on the next
+    // frame Lenis puts the page back where its easing was headed — any click
+    // within a second of the wheel (longer, on a trackpad's glide) went
+    // nowhere. `lock` keeps the rest of that glide from pulling it off
+    // course; the card's `scroll-mt` is read by Lenis as the browser would.
+    // Measured first: a filter let go of this render has made the page twenty
+    // times longer, and Lenis would stop at the short page's bottom.
+    const lenis = window.__lenis;
+    if (lenis) {
+      lenis.resize();
+      lenis.scrollTo(line, { lock: true, force: true });
+    } else {
+      line.scrollIntoView();
+    }
   }, [seek, filtered]);
   // A pinned line stands above the years rather than in its own, so it is
   // read once, first — the way the old QQ 空间 held one at the top.

@@ -1195,3 +1195,9 @@
 > - **代价**：从服务端 SVG 变成客户端组件（年份切换和提示框要脚本），数据仍在服务端算好（`momentCalendar`
 >   按天、`yearGrid` / `dayCell` / `monthColumns` / `dayLevel` 都在 `lib/moments.ts` 里测过）。月份与星期的名字
 >   用 `useFormatter` 按语言格式化，不进文案表。
+> - **点了不跳（旧图就有）**：亮格是 `#key` 锚点，跳转交给浏览器；可 Lenis 在滚轮停下后还有约一秒的减速
+>   （触控板的惯性更长），这期间浏览器跳过去，下一帧又被 Lenis 拉回它自己的目标——页面只「偏移一下」。
+>   现在点亮格时拦下默认跳转：地址栏照样写上 `#key`（`pushState`），再发一个 `hashchange`，板子收到后用
+>   `lenis.scrollTo(卡片, { lock: true })` 滚过去（Lenis 自己读 `scroll-margin-top`；`lock` 让剩下的惯性拽不走）。
+>   文集筛选会先放开，列表一下长了二十倍，所以滚之前先 `lenis.resize()`，否则停在短页面的底。带修饰键的点击
+>   和没有脚本时，仍是浏览器原生的锚点。

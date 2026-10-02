@@ -1,6 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import {
   dayCell,
@@ -108,6 +115,22 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
     }
   };
 
+  /**
+   * A press on a lit square: the address takes the line, and the board is told
+   * to go to it (`MomentBoard`, which scrolls by Lenis). Left to the browser,
+   * the jump to `#key` is undone by Lenis a frame later whenever the page is
+   * still gliding from the wheel. A press that asks for a new tab or window
+   * keeps the browser's own way.
+   */
+  const seek = (event: MouseEvent<Element>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    event.preventDefault();
+    window.history.pushState(null, "", event.currentTarget.getAttribute("href"));
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+  };
+
   const hovered = tip ? byDay.get(tip.day) : undefined;
   const place = (day: number) => {
     const { column, row } = dayCell(day, lead);
@@ -196,7 +219,7 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
                   />
                 );
                 return cell ? (
-                  <a key={day} href={`#${cell.newest}`} tabIndex={-1}>
+                  <a key={day} href={`#${cell.newest}`} tabIndex={-1} onClick={seek}>
                     {/* The link reaches half across the gap on every side —
                         the same square the pointer arithmetic gives the day,
                         so a press lands wherever the ring is drawn. */}
