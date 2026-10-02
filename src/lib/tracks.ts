@@ -5,6 +5,8 @@
  * neon study play the theme; 峰言峰语 plays Lovely Day, 《不能说的秘密》 plays
  * 路小雨 — the piano piece from the film's own soundtrack, shared by the
  * essays and the film — and the 大话西游 room plays the film's closing song.
+ * One record is not music at all: Kobe's page plays Kobe — "that's the dream"
+ * from his jersey night, closed with "Mamba out" from his last game.
  * A room asks for its record through `setTrack` in `lib/client/jukebox`; which file
  * that is lives here, and only here.
  *
@@ -19,7 +21,7 @@
  *
  * The files are addressed through `asset()`, which hashes them — and that
  * resolves against the whole manifest, so it happens on the server:
- * `trackFiles()` is called by the locale layout, which hands the four
+ * `trackFiles()` is called by the locale layout, which hands the
  * addresses to the player. This module, which the rooms import on the client
  * for `TrackId`, stays free of the manifest; importing `asset` here put all
  * 288 entries of it into every page's scripts.
@@ -29,7 +31,7 @@
  * artists are copy, so they stay in `messages/*.json` under `tracks.<id>`;
  * a room reads them there and hands them to `RoomMusic`.
  */
-export const TRACK_IDS = ["theme", "lovely", "secret", "odyssey"] as const;
+export const TRACK_IDS = ["theme", "lovely", "secret", "odyssey", "mamba"] as const;
 
 export type TrackId = (typeof TRACK_IDS)[number];
 
