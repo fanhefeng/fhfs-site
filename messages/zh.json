@@ -52,8 +52,8 @@
     "enterHint": "也可以按 Enter 键，或者往下滚动页面"
   },
   "home": {
-    "slogan": "慢一点，世界会开口说话。",
-    "sloganEcho": "Slow down, and the world starts to speak.",
+    "slogan": "人生若只如初见",
+    "sloganEcho": "If life were always as it was when we first met",
     "latestPosts": "最近文章",
     "readingTime": "{minutes} 分钟",
     "viewAllPosts": "全部文章",
@@ -335,8 +335,8 @@
         "note": "每行外面套一层 overflow hidden，内层从 112% 升到 0，1.05 秒 expo.out，行与行错开 110 毫秒。首页用的是 CSS 过渡，由开灯动画触发；这里改成进视口触发的 GSAP 补间，好重放——「再来一遍」是重新挂载这两行，和换路由时发生的事一样。遮罩之所以比淡入好：淡入说的是「它刚出现」，遮罩说的是「它一直在，只是刚被看见」。",
         "label": "报头 · 行级遮罩",
         "replay": "再来一遍",
-        "lineOne": "慢一点，",
-        "lineTwo": "世界会开口说话。"
+        "lineOne": "人生若只如初见，",
+        "lineTwo": "何事秋风悲画扇。"
       },
       "reveal": {
         "name": "滚动入场：淡入上浮",
