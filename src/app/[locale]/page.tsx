@@ -14,7 +14,6 @@ import { Chibi } from "@/components/chibi/Chibi";
 import { Opening, type OpeningMeta, type ContactLink } from "@/components/home/Opening";
 import { NeonSplash } from "@/components/home/NeonSplash";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
-import { MiniBento, type BentoItem } from "@/components/home/MiniBento";
 import { NowStrip, type NowItem } from "@/components/home/NowStrip";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
@@ -23,26 +22,24 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">): Prom
   return { alternates: localeAlternates("", locale) };
 }
 
-/** How many entries each section of the issue carries. */
+/** How many posts the issue carries. */
 const POST_COUNT = 4;
-const APP_COUNT = 6;
 
 /**
  * The cover, and the issue.
  *
  * First paper: the manifesto on a full screen with the person beside it —
- * one line on who he is, the site's one primary control (to the lab, the
- * wing this page shows least of), and a mono line of where he lives and
- * where to find him. Then the issue itself at the 720px measure: what was
- * built, what was written, and what is newest in the rooms the issue does
- * not otherwise reach.
+ * one line on who he is, the site's one primary control (to /software —
+ * what was built is behind that button, so the issue does not list it a
+ * second time), and a mono line of where he lives and where to find him.
+ * Then the issue itself at the 720px measure: what was written, and what is
+ * newest in the rooms the issue does not otherwise reach.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await pageLocale(params);
 
   const t = await getTranslations("home");
   const th = await getTranslations("grove");
-  const ts = await getTranslations("software");
   const td = await getTranslations("splash");
   const tn = await getTranslations("nav");
   const tl = await getTranslations("lab");
@@ -61,20 +58,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     date: post.date.replaceAll("-", "."),
     readingTime: t("readingTime", { minutes: post.readingMinutes }),
   }));
-
-  const apps: BentoItem[] = allApps.slice(0, APP_COUNT).map((app, i) => {
-    const wide = i < 2;
-    const version = app.repo ? releases.get(app.repo)?.version : undefined;
-    return {
-      name: app.name,
-      tagline: app.tagline[locale],
-      category: ts(`categories.${app.category}`),
-      href: app.website,
-      // Version beside platform on the two wide cards — the version is read
-      // from the repo's latest GitHub release, so it keeps itself current.
-      stat: wide ? [version, ...app.platforms].filter(Boolean).join(" · ") : undefined,
-    };
-  });
 
   // Now: the newest thing in each room. The newest line on the board by the
   // clock — not the pinned one, which getMoments puts first for the board's
@@ -159,11 +142,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <Opening
           headline={[th("headline1"), th("headline2")]}
           lede={th("lede")}
-          // The one primary control goes to the lab: the wing the issue below
-          // only touches in a single row, and the one thing on the site nobody
-          // else has. It used to go to /software, which then turned out to be
-          // the very next section — a button standing in for the scrollbar.
-          cta={{ label: th("cta"), href: `/${locale}/lab` }}
+          // The one primary control goes to /software (DESIGN-LOG, 10-03) —
+          // back from the lab, where it spent a week. The issue below used to
+          // open with the same six apps as cards; with the button pointing at
+          // them that section said it twice, and it is gone.
+          cta={{ label: th("cta"), href: `/${locale}/software` }}
           meta={meta}
           contactTitle={t("contactTitle")}
           contacts={contacts}
@@ -176,19 +159,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           id="issue"
           className="mx-auto flex w-full max-w-[720px] scroll-mt-24 flex-col gap-20 px-6 pt-8 pb-24 md:gap-24 md:pt-12 md:pb-32"
         >
-          <MiniBento
-            items={apps}
-            title={t("featuredWorks")}
-            viewAllLabel={t("viewAllSoftware")}
-            index="01"
-          />
           <RecentWriting
             items={posts}
             title={t("latestPosts")}
             viewAllLabel={t("viewAllPosts")}
-            index="02"
+            index="01"
           />
-          <NowStrip items={now} title={t("nowTitle")} index="03" />
+          <NowStrip items={now} title={t("nowTitle")} index="02" />
         </div>
       </main>
     </>
