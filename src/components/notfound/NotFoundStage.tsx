@@ -228,7 +228,7 @@ export function NotFoundStage({ blocks, sticker }: Props) {
                 data-secret
                 lang={sticker.lang}
                 aria-hidden={!peeled}
-                className="no-cjk-oblique max-w-[76%] text-right font-serif text-[12px] italic leading-snug text-fg-secondary"
+                className="max-w-[76%] text-right font-accent text-[12px] leading-snug text-fg-secondary"
               >
                 {sticker.secret}
               </p>

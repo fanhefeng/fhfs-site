@@ -228,19 +228,45 @@ describe("eases", () => {
   });
 });
 
-describe("the serif", () => {
-  // Lora is loaded at 400 alone (src/app/fonts.ts). The title, heading and
-  // display sizes carry a weight of their own, and a serif line set at one
-  // of them gets a bold the browser smears on itself — it still renders,
-  // just thick and crowded, with no warning anywhere.
+describe("the accent face", () => {
+  const accentClasses = files.flatMap(({ file, text }) =>
+    [...text.matchAll(/["'`][^"'`]*\bfont-accent\b[^"'`]*["'`]/g)].map(([classes]) => ({
+      file,
+      classes,
+    })),
+  );
+
+  // Josefin Sans is set light or regular (src/app/fonts.ts). The title,
+  // heading and display sizes carry a weight of their own, and an accent line
+  // set at one of them comes out semi-bold — it still renders, just as a
+  // heavier face than the line beside it, with no warning anywhere.
   it("is set at its own weight wherever a size would make it bold", () => {
     const weighted = /\btext-(?:title|heading|display(?:-sm)?)\b/;
-    const offenders = files.flatMap(({ file, text }) =>
-      [...text.matchAll(/["'`][^"'`]*\bfont-serif\b[^"'`]*["'`]/g)]
-        .map(([classes]) => classes)
-        .filter((classes) => weighted.test(classes) && !/\bfont-normal\b/.test(classes))
-        .map((classes) => `${file}: ${classes}`),
-    );
+    const offenders = accentClasses
+      .filter(
+        ({ classes }) =>
+          weighted.test(classes) && !/\b(?:font-normal|accent-light)\b/.test(classes),
+      )
+      .map(({ file, classes }) => `${file}: ${classes}`);
+    expect(offenders).toEqual([]);
+  });
+
+  // No italic is loaded for it, so an `italic` beside it is a slant the
+  // browser shears on by itself.
+  it("is never set italic", () => {
+    const offenders = accentClasses
+      .filter(({ classes }) => /\bitalic\b/.test(classes))
+      .map(({ file, classes }) => `${file}: ${classes}`);
+    expect(offenders).toEqual([]);
+  });
+
+  // It was `font-serif` until 2026-10-03. Tailwind ships a `font-serif` of
+  // its own (ui-serif, Georgia), so a class left behind would not fail — it
+  // would quietly set the system serif.
+  it("is not reached through Tailwind's font-serif", () => {
+    const offenders = files
+      .filter(({ text }) => /\bfont-serif\b/.test(text))
+      .map(({ file }) => file);
     expect(offenders).toEqual([]);
   });
 });

@@ -365,7 +365,7 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
           <h2 lang="en" className="text-title text-fg">
             {app.name}
           </h2>
-          <p className="no-cjk-oblique mt-2 font-serif text-heading font-normal italic text-fg-secondary">
+          <p className="mt-2 font-accent text-heading font-normal text-fg-secondary">
             {app.tagline}
           </p>
         </div>

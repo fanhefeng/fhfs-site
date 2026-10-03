@@ -422,7 +422,7 @@ html[data-js][data-splash="due"] { background-color: #0a0a0f; }
 .ns-welcome {
   margin: 0;
   padding-left: 0.34em;
-  font-family: var(--font-stack-serif);
+  font-family: var(--font-stack-accent);
   font-size: clamp(1.05rem, 2.6vw, 1.7rem);
   font-weight: 400;
   letter-spacing: 0.34em;

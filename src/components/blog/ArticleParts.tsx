@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
-import { HAS_CJK } from "@/lib/reading";
 
 /**
  * The pieces an article page and a secret's page share around the text. They
@@ -9,15 +8,10 @@ import { HAS_CJK } from "@/lib/reading";
  * which differ (a secret has a kind, a length, a record).
  */
 
-/** The standfirst: serif, and italic unless it is CJK — CJK has no true
- *  italic, and the synthesised slant reads as broken. */
+/** The standfirst, in the accent face. */
 export function ArticleSummary({ children }: { children: string }) {
   return (
-    <p
-      className={`mt-5 font-serif text-[1.1875rem] leading-relaxed text-fg-secondary ${
-        HAS_CJK.test(children) ? "" : "italic"
-      }`}
-    >
+    <p className="mt-5 font-accent text-[1.1875rem] leading-relaxed text-fg-secondary">
       {children}
     </p>
   );

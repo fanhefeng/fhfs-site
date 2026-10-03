@@ -19,7 +19,7 @@
 
 把个人站从「深夜爵士俱乐部」改造成**一本个人杂志兼私人画廊**：
 
-- 暖白纸感为默认底色，**文字是绝对主角**——超大负字距无衬线标题 + 衬线 italic 点缀、窄版心、大量留白、一屏一个信息点。
+- 暖白纸感为默认底色，**文字是绝对主角**——超大负字距无衬线标题 + 另一款字体的点缀（2026-10-03 起是细体 Josefin Sans，不再是衬线 italic）、窄版心、大量留白、一屏一个信息点。
 - 玻璃拟态严格降级为「**悬浮层材质**」：灵动岛导航、chip、HUD、面板。玻璃是容器，不是装饰。
 - 霓虹时代唯一保留的情绪资产是「**灯**」：全站「开灯」拨杆让 aurora 光晕与双态图像在 1.2s 内交叉淡化（致敬 incommonwith.com）。暗色模式即「闭馆后的画廊」。
 - **贴纸**是「内容物」材质，注入个人温度，全站限定 5 处（见 §4）。
@@ -49,7 +49,7 @@
 ### 1.2 字体
 
 - EN display：**Nunito**（可变字重，圆角末端，与中文圆体同调）600–700，`clamp(2.5rem, 7vw, 6.5rem)`，`letter-spacing: -0.03em`，`line-height: 1.05`。
-- 衬线点缀：**Lora** italic，只用 400（引语/关键词，next/font/google；2026-10-02 起替换 Instrument Serif，见 DESIGN-LOG）。
+- 点缀字体：**Josefin Sans** 正体，不斜（引语/关键词，next/font/google 可变字体；标题字号的行用细体 300、成句的用 400；中文仍落在系统宋体上。2026-10-03 起替换 Lora italic，见 DESIGN-LOG）。类名 `font-accent`。
 - 正文：Nunito 400，16–18px / 1.7。
 - 元信息：**Geist Mono** 11–12px uppercase `tracking +0.08em`（版本号/日期/kicker）。
 - ZH：**悠哉字体 Yozai**（圆体，OFL；`public/fonts/yozai/` 自托管，GB2312 子集 + cn-font-split 按 unicode-range 分片，400 / 500 两字重，500 面声明为 500–900 免合成粗体，`src/app/yozai.css`）优先，其后只列系统 CJK 字体（PingFang SC / Microsoft YaHei / 本地 Noto CJK；衬线 Songti SC / SimSun），不再下载任何兜底网络字体（Noto Sans/Serif SC 已于 09-15 删除，见上方修订）；中文标题不做负字距（tracking 0～+0.01em）。

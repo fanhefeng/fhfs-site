@@ -1,4 +1,4 @@
-import { Nunito, Lora, Geist_Mono } from "next/font/google";
+import { Nunito, Josefin_Sans, Geist_Mono } from "next/font/google";
 
 /* Editorial type trio. globals.css assembles the runtime stacks from these
  * variables. Latin is Nunito — rounded terminals to sit beside the Yozai
@@ -22,19 +22,21 @@ const sans = Nunito({
 });
 
 /* Preload is reserved for Nunito, which sets the body copy. The other two
- * carry a handful of words each — an italic accent, a line of meta — and
+ * carry a handful of words each — an accent line, a line of meta — and
  * preloading all three had the browser fetching four files up front and
  * reporting them unused. They still load, just without the head start.
  *
- * The serif is Lora since 2026-10-02 (DESIGN-LOG): Instrument Serif's
- * condensed display italic read cramped once it set whole sentences — a
- * film's lines, a pull quote. Lora's italic is open and brushed, a text face
- * that holds a paragraph and sits beside the rounded Nunito and Yozai. */
-const serif = Lora({
-  weight: "400",
-  style: ["normal", "italic"],
+ * The accent face is Josefin Sans since 2026-10-03 (DESIGN-LOG), the third
+ * to stand there: Instrument Serif's condensed italic read cramped in a
+ * sentence, and Lora's brushed italic was not liked either — nor was italic
+ * itself. Josefin is a thin geometric sans with a low x-height, upright, the
+ * lettering of a title card; it changes the voice without a slant. One
+ * variable file carries both weights in use (light for a line at title size,
+ * regular for a sentence); no italic is loaded, and a test keeps `italic`
+ * away from it. */
+const accent = Josefin_Sans({
   subsets: ["latin"],
-  variable: "--font-lora",
+  variable: "--font-josefin",
   display: "swap",
   preload: false,
 });
@@ -47,4 +49,4 @@ const mono = Geist_Mono({
 });
 
 /** Every font variable, ready to drop on <html>. */
-export const fontVariables = [sans.variable, serif.variable, mono.variable].join(" ");
+export const fontVariables = [sans.variable, accent.variable, mono.variable].join(" ");
