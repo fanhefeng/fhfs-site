@@ -36,7 +36,7 @@ export function ManifestoBand() {
           text: t("sloganEcho"),
           lang: locale === "zh" ? "en" : "zh-CN",
           className:
-            "no-cjk-oblique mt-4 font-serif text-title font-normal italic text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]",
+            "accent-light mt-4 font-accent text-title text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]",
         },
       ]}
     />

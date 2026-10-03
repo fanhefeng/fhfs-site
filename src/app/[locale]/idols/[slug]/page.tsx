@@ -121,7 +121,7 @@ export default async function IdolPage({ params }: PageProps<"/[locale]/idols/[s
           <Reveal className="mt-8 grid gap-6 border-t border-line pt-6 md:grid-cols-[auto_1fr] md:gap-12">
             <p className="font-mono text-heading tabular-nums text-fg">{tk("statuePlaque")}</p>
             <blockquote className="max-w-[60ch]">
-              <p className="font-serif text-[1.1875rem] italic leading-relaxed text-fg-secondary">
+              <p className="font-accent text-[1.1875rem] leading-relaxed text-fg-secondary">
                 “{tk("statueQuote")}”
               </p>
               <footer className="mt-2 font-mono text-meta uppercase tracking-meta text-fg-tertiary">

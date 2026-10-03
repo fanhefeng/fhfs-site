@@ -75,7 +75,7 @@ export function Sleeve({ app, index, onDeck, onPick }: Props) {
           </span>
           <span
             lang="en"
-            className="relative font-serif text-[15.5cqw] font-normal italic leading-[0.92] tracking-[-0.02em] [overflow-wrap:anywhere]"
+            className="relative font-accent text-[15.5cqw] font-normal leading-[0.92] tracking-[-0.02em] [overflow-wrap:anywhere]"
           >
             {words.map((word, i) => (
               <span key={i} className="block">

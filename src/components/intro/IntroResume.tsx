@@ -34,7 +34,7 @@ function ResumeDocument({ text, copy, links }: Omit<Props, "variant">) {
         <p className="mt-2 font-mono text-meta uppercase tracking-meta text-fg-secondary">
           {text.role}
         </p>
-        <p className="no-cjk-oblique mt-4 font-serif text-title font-normal italic leading-tight text-fg-secondary">
+        <p className="accent-light mt-4 font-accent text-title leading-tight text-fg-secondary">
           {text.tagline}
         </p>
       </header>

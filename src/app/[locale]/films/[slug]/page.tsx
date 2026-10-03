@@ -139,11 +139,7 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
             {film.lines.map((line, i) => (
               <li key={i}>
                 <blockquote className="border-l-2 border-accent pl-5">
-                  <p
-                    className={`font-serif text-[1.1875rem] leading-relaxed text-fg-secondary ${
-                      locale === "en" ? "italic" : ""
-                    }`}
-                  >
+                  <p className="font-accent text-[1.1875rem] leading-relaxed text-fg-secondary">
                     “{line.text}”
                   </p>
                   <footer className={`mt-3 ${label}`}>{line.meta}</footer>

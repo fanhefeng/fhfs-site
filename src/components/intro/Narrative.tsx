@@ -148,7 +148,7 @@ export function Narrative({ text, copy, links }: Props) {
       >
         <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">{text.meta}</p>
         <p className="mt-3 text-display-sm text-fg">{text.name}</p>
-        <p className="no-cjk-oblique mt-3 max-w-md font-serif text-heading font-normal italic leading-snug text-fg-secondary">
+        <p className="mt-3 max-w-md font-accent text-heading font-normal leading-snug text-fg-secondary">
           {text.tagline}
         </p>
         <div className="mt-8 flex flex-col items-center gap-2 font-mono text-[11px] uppercase tracking-meta text-fg-tertiary">
