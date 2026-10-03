@@ -278,6 +278,12 @@ body {
   :where(a, button, [role="button"]):active {
     scale: 0.97;
   }
+  /* A link inside a drawing scales about the drawing's corner, not its own
+   * middle (`transform-box: view-box`): pressed, it slid toward the top left —
+   * out from under the pointer, so the release missed it and no click came. */
+  :where(svg a):active {
+    scale: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------
