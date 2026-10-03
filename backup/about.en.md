@@ -3,10 +3,8 @@ title: About
 ---
 
 
-Hi, I'm fhf. I like music, games and films.
+I'm fhf, from Hejin in Shanxi. I've written front-end for nine years, and full-stack when the job needs it; after hours I build small software I want for myself.
 
-I set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. Spare evenings go to small software of my own — most of it written for myself first, and named only later.
+I've played the violin since I was a kid and still do. The games are mostly Dota 2 and Overwatch, the sports are basketball and table tennis, and I travel when I can.
 
-There is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.
-
-This site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.
+This site keeps what I write, the software I make, and a few effects I'm still trying out.
