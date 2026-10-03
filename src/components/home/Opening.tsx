@@ -231,12 +231,20 @@ export function Opening({
 
         {/* One mono line: where he is, where to find him, and the door to
             the rest of him. The dl holds the facts; the link stands beside
-            it, pushed to the line's end where there is room. */}
+            it, pushed to the line's end where there is room.
+            The English line is the long one: at 40px gaps, with the link
+            reading "More about me", it came to 675px on a 672px measure and
+            the link dropped to a line of its own. Hence 32px and the
+            shorter label — about 619px now. `justify-between` rather than
+            `ml-auto` on the link, so that where it does wrap (a narrower
+            window, a longer line from the copy editor) it starts the next
+            line at the left edge like the facts above it, not alone at the
+            right. */}
         <div
-          className="op-fade mt-[4.5rem] flex flex-wrap items-baseline gap-x-10 gap-y-3 border-t border-line pt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
+          className="op-fade mt-[4.5rem] flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 border-t border-line pt-5 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
           style={{ "--d": "540ms" } as React.CSSProperties}
         >
-          <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-3">
+          <dl className="flex flex-wrap items-baseline gap-x-8 gap-y-3">
             {meta.map((item) => (
               <div key={item.label} className="flex items-baseline gap-2">
                 <dt>{item.label}</dt>
@@ -279,7 +287,7 @@ export function Opening({
           </dl>
           <Link
             href="/about"
-            className="hit-ext text-fg-secondary underline decoration-accent/60 decoration-1 underline-offset-4 transition-colors hover:text-accent sm:ml-auto"
+            className="hit-ext text-fg-secondary underline decoration-accent/60 decoration-1 underline-offset-4 transition-colors hover:text-accent"
           >
             {aboutLink.label}
             <span aria-hidden="true"> →</span>
