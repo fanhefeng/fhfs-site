@@ -221,7 +221,16 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
                   />
                 );
                 return cell ? (
-                  <a key={day} href={`#${cell.newest}`} tabIndex={-1} onClick={seek}>
+                  // A press still focuses the link, and a focused link in an SVG
+                  // gets the browser's own blue box, left on the square beside
+                  // the ring. No key reaches it, so there is nothing to mark.
+                  <a
+                    key={day}
+                    href={`#${cell.newest}`}
+                    tabIndex={-1}
+                    onClick={seek}
+                    className="outline-none"
+                  >
                     {/* The link reaches half across the gap on every side —
                         the same square the pointer arithmetic gives the day,
                         so a press lands wherever the ring is drawn. */}
