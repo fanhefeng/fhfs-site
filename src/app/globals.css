@@ -559,6 +559,17 @@ body {
   font-size: 1.0625rem;
   line-height: 1.7;
   max-width: 68ch;
+  /* Chrome shows the I-beam only on a line's own glyph box — 23px of the
+   * 28.9px line here — and the arrow in the leading and between paragraphs,
+   * so a pointer crossing the column changed shape twice a line (measured:
+   * 16 times down these eight lines, the same on a bare page). The column
+   * asks for one cursor instead; a link still takes the hand from the UA
+   * sheet. */
+  cursor: text;
+}
+/* …and a picture is not text. */
+.prose-editorial :is(img, video) {
+  cursor: auto;
 }
 .prose-editorial :is(h1, h2, h3, h4) {
   font-weight: 600;
