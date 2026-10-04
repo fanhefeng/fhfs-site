@@ -446,7 +446,8 @@ export const LAB_ENTRIES: LabEntry[] = [
       "components/idols/statue.ts",
     ],
   },
-  // /about's version history: the year rail that rolls as entries pass.
+  // A life numbered like software (on /about until 2026-10-04): the year rail
+  // that rolls as entries pass.
   {
     slug: "changelog",
     key: "changelog",

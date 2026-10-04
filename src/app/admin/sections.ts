@@ -48,8 +48,8 @@ export type AdminGroup = {
 export const SECTION_GROUPS: AdminGroup[] = [
   {
     id: "issue",
-    label: "本期",
-    caption: "站点当期在讲的事：写的、做的。试的那些（/lab）写在代码里，不在这儿。",
+    label: "作品",
+    caption: "文章和软件。实验室（/lab）的内容写在代码里，不在这里。",
     sections: [
       {
         href: "/admin/posts",
@@ -61,7 +61,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
       {
         href: "/admin/apps",
         label: "软件",
-        blurb: "/software 上的每张卡片。版本号不填，填仓库让站点自己去读。",
+        blurb: "/software 上的每个应用。版本号不用填，填仓库地址后站点会自己读取。",
         view: "/software",
         unit: "款",
       },
@@ -69,13 +69,13 @@ export const SECTION_GROUPS: AdminGroup[] = [
   },
   {
     id: "rooms",
-    label: "房间",
-    caption: "推门进去各有各的样子，内容也各写各的。",
+    label: "生活",
+    caption: "说说、随笔、电影和偶像，各有自己的页面。",
     sections: [
       {
         href: "/admin/moments",
         label: "说说",
-        blurb: "/moments 那面板子上的短句，一条几行字加一个时刻。",
+        blurb: "/moments 上的说说，一条几行字加一个时间。",
         view: "/moments",
         unit: "条",
       },
@@ -105,7 +105,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
   {
     id: "me",
     label: "关于我",
-    caption: "同一个人的几种讲法：一页自述和它的版本履历、一幕 3D、一份简历。",
+    caption: "关于页、3D 自我介绍和简历。",
     sections: [
       {
         href: "/admin/about",
@@ -117,28 +117,28 @@ export const SECTION_GROUPS: AdminGroup[] = [
       {
         href: "/admin/timeline",
         label: "版本履历",
-        blurb: "/about 页上那串版本号——一生按软件发布来记。",
-        view: "/about",
+        blurb: "实验室「跟随滚动的年份轴」用的数据，按软件版本号的格式记个人经历。",
+        view: "/lab/changelog",
         unit: "版",
       },
       {
         href: "/admin/intro",
         label: "简历节点",
-        blurb: "/intro 那个 3D 场景里浮着的节点文字。",
+        blurb: "/intro 的 3D 场景里每个节点的文字。",
         view: "/intro",
         unit: "个",
       },
       {
         href: "/admin/resume",
         label: "简历页",
-        blurb: "/resume 的抬头与每段经历。公开页不写真实公司名。",
+        blurb: "/resume 的抬头、技术栈和履历；履历那几行 /about 也在用。公开页不写公司名。",
         view: "/resume",
         unit: "段",
       },
       {
         href: "/admin/chips",
         label: "贴纸墙",
-        blurb: "/about 页面上那堆可以拖的纸片。",
+        blurb: "/about 页面上可以拖动的贴纸。",
         view: "/about",
         unit: "张",
       },
@@ -147,7 +147,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
   {
     id: "site",
     label: "站点",
-    caption: "没有单独页面的那些：全站通用的字，和各处的导航。",
+    caption: "不属于某一页的内容：全站文案和导航。",
     sections: [
       {
         href: "/admin/copy",

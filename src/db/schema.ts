@@ -410,12 +410,17 @@ export const resumeProfiles = pgTable("resume_profiles", {
 });
 
 /**
- * One row per job on /resume. `period` is freeform bilingual text
- * ("2021.06 – 至今" / "Jun 2021 – Present") rather than date columns — the
- * same discipline as the timeline: state what is true, never invent a date.
+ * One row per stretch of the road, read by /resume and drawn as a line on
+ * /about. Since 2026-10-04 a row is a city rather than an employer —
+ * `company` holds the place, `role` one line of what the work was — and
+ * `sort` runs oldest first, the way a journey is told. `period` is freeform
+ * bilingual text ("2025 – 至今" / "2025 – Present") rather than date columns
+ * — the same discipline as the timeline: state what is true, never invent a
+ * date.
  *
- * `bullets` are the job's own points; `projects` groups further points under
- * a named project, which is how most of the jobs read. Either may be empty.
+ * `bullets` are the row's own points; `projects` groups further points under
+ * a named project. Both are empty on the short résumé and only /resume would
+ * show them.
  */
 export const resumeExperiences = pgTable("resume_experiences", {
   id: serial().primaryKey(),

@@ -21,20 +21,20 @@ const SURFACES = [
 
 /** What each wing is called in the form — the site's own names are in messages. */
 const GROUP_LABELS: Record<NavGroup, string> = {
-  issue: "正刊",
-  rooms: "房间",
-  me: "作者",
+  issue: "作品",
+  rooms: "生活",
+  me: "关于我",
 };
 
 /** The same three, with what choosing one actually does to the page. */
 const GROUP_HINTS: Record<NavGroup, string> = {
-  issue: "当期在讲的：写的、做的、试的",
-  rooms: "各有各样子的房间，也会上 /life 的目录",
-  me: "关于作者本人的那几页",
+  issue: "文章、软件、实验室",
+  rooms: "说说、偶像、电影这类，也会出现在 /life 的目录里",
+  me: "关于、简历、3D 自我介绍",
 };
 
 const GROUP_OPTIONS = [
-  { value: "", label: "不分组", hint: "首页那种，不属于任何一簇" },
+  { value: "", label: "不分组", hint: "比如首页，不属于任何一组" },
   ...NAV_GROUPS.map((group) => ({
     value: group,
     label: GROUP_LABELS[group],

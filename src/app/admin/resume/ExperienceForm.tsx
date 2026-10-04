@@ -23,9 +23,9 @@ export type ExperienceDraft = {
 };
 
 const LINE_FIELDS = {
-  company: "公司 / 组织",
-  role: "职位",
-  period: "时间段（原样显示，如 2021.06 – 至今）",
+  company: "地点（城市；公开页不写公司名）",
+  role: "做什么（一句话，/about 的履历也显示）",
+  period: "时间段（原样显示，如 2025 – 至今；关于页的年份栏取第一个年份）",
 } as const;
 
 const pair = (name: string, label: string, current: { zh: string; en: string } | null) => (
@@ -56,10 +56,10 @@ export function ExperienceForm({
   const { state, pending, formProps } = useSaveAction(saveResumeExperience);
   const check = useFieldErrors();
 
-  // Everything under the job's one line is optional, and on this resume
-  // every job leaves it empty — the prose lives in the profile's sections.
-  // Folded while empty, so five jobs are not five screens of blank boxes;
-  // a closed <details> still submits what is in it.
+  // Everything under the row's one line is optional, and on this resume
+  // every row leaves it empty — a city, its years and one line is the whole
+  // entry. Folded while empty, so three rows are not three screens of blank
+  // boxes; a closed <details> still submits what is in it.
   const detailed = Boolean(
     experience.summary?.zh ||
     experience.summary?.en ||

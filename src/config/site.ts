@@ -6,7 +6,7 @@ import { siteUrl } from "@/lib/siteUrl";
 export const site = {
   /** The wordmark on the masthead / dynamic-island logo badge. Lowercase on
    *  purpose — the editorial identity sets the name quiet and small, and the
-   *  changelog on /about numbers releases as `fhf 1.0 → 5.x`. */
+   *  changelog (/lab/changelog) numbers releases as `fhf 1.0 → 5.x`. */
   signName: "fhf",
   title: { zh: "fhf's", en: "fhf's" },
   description: {
