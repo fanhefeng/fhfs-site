@@ -392,7 +392,7 @@ export function FullNav({ links, open, onClose, triggerRef }: FullNavProps) {
                 {members.length > 0 && (
                   <ul
                     // Named after its door — these are the pages behind
-                    // 生活, not the whole 房间 wing.
+                    // 生活, not the whole rooms group.
                     aria-labelledby={doorId}
                     className="fn-item -mt-1 mb-1 flex flex-wrap gap-x-4 gap-y-0 pl-8"
                   >

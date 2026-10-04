@@ -75,36 +75,37 @@ export type CopyGroup = {
  * against the catalogue, so a new namespace cannot arrive unnamed.
  */
 export const COPY_GROUPS: CopyGroup[] = [
-  { id: "splash", label: "首页 · 霓虹开场", blurb: "进站时那面墙：招牌、推门进去。" },
+  { id: "splash", label: "首页 · 霓虹开场", blurb: "直接打开首页时的霓虹招牌和「进入」按钮。" },
   {
     id: "grove",
     label: "首页 · 开场大字",
-    blurb: "满屏的那句话、下面那句自我介绍与主按钮；两张卡的字如今只在实验室的推近那则里。",
+    blurb:
+      "首页第一屏的大字、自我介绍和主按钮；两张卡片的文字现在只用在实验室「滚动开窗，推近苔藓」那一则。",
   },
-  { id: "home", label: "首页 · 正文三节", blurb: "做过的、最近写的、此刻这三节的标题与找到我。" },
-  { id: "blog", label: "文章 /blog", blurb: "列表页与每篇文章周围的字。" },
-  { id: "software", label: "软件 /software", blurb: "卡片以外的标题、分类和那台设备。" },
-  { id: "lab", label: "实验室 /lab", blurb: "每一则研究的名字、导语与台词。" },
+  { id: "home", label: "首页 · 正文三节", blurb: "软件、文章、最近这三节的标题，和「找到我」。" },
+  { id: "blog", label: "文章 /blog", blurb: "列表页和文章页上除正文以外的文字。" },
+  { id: "software", label: "软件 /software", blurb: "页面标题、分类名和唱机上的标签。" },
+  { id: "lab", label: "实验室 /lab", blurb: "每一则的名字、摘要、说明和演示里的文字。" },
   {
     id: "films",
     label: "电影 /films",
-    blurb: "每部电影都用的框架字：资料栏的名目、看剧照的按钮。每部片子自己的内容在后台「电影」里。",
+    blurb: "每部电影共用的文字：资料栏的名称、看剧照的按钮。每部片子自己的内容在后台「电影」里。",
   },
   {
     id: "idols",
     label: "偶像 /idols",
-    blurb: "索引页的字，和科比那尊铜像周围的话。每位偶像自己的内容在后台「偶像」里。",
+    blurb: "列表页的文字，和科比铜像那一节的文字。每位偶像自己的内容在后台「偶像」里。",
   },
-  { id: "life", label: "人生 /life", blurb: "版本履历那一页的框架文字。" },
-  { id: "moments", label: "说说 /moments", blurb: "峰言峰语那面板子上的固定字。" },
-  { id: "secrets", label: "秘密 /secrets", blurb: "随笔与播客列表周围的字。" },
+  { id: "life", label: "生活 /life", blurb: "/life 目录页的标题和每个栏目的一句介绍。" },
+  { id: "moments", label: "说说 /moments", blurb: "说说页上除说说本身以外的文字。" },
+  { id: "secrets", label: "秘密 /secrets", blurb: "随笔和播客的列表页、详情页上的固定文字。" },
   { id: "about", label: "关于 /about", blurb: "自述页的标题、副题与贴纸墙提示。" },
   { id: "resume", label: "简历 /resume", blurb: "简历页的抬头与段落标题。" },
-  { id: "intro", label: "3D 简历 /intro", blurb: "那一幕里的标题、角色与收尾。" },
+  { id: "intro", label: "3D 自我介绍 /intro", blurb: "3D 场景里的标题、标语和结尾。" },
   { id: "nav", label: "导航", blurb: "顶栏、页脚、全屏菜单上每条链接的字。" },
-  { id: "search", label: "搜索 ⌘K", blurb: "搜索框的提示、各类结果的名字，和找不到时说的话。" },
+  { id: "search", label: "搜索 ⌘K", blurb: "搜索框的提示、各类结果的名字，和没有结果时的提示。" },
   { id: "footer", label: "页脚", blurb: "版权、时钟两侧的词、贴纸提示。" },
-  { id: "tracks", label: "背景音乐", blurb: "每张唱片在界面上显示的名字。" },
+  { id: "tracks", label: "背景音乐", blurb: "每首背景音乐在界面上显示的名字。" },
   { id: "common", label: "通用按钮", blurb: "返回、展开、复制这类到处都在用的词。" },
   {
     id: "error",
@@ -112,7 +113,7 @@ export const COPY_GROUPS: CopyGroup[] = [
     // global-error.tsx renders above the layout, with no provider to carry an
     // override — it reads ERROR_COPY, a copy of the files' `error` lines.
     blurb:
-      "页面塌了时那一屏说的话。只管页面里的报错；整站布局都塌了时的那一屏读的是代码里的副本，这里改了它看不见。",
+      "页面出错时显示的文字。只对页面内的报错生效；整个布局出错时显示的是代码里的副本，这里的修改对它无效。",
   },
   {
     id: "notFound",
@@ -120,7 +121,7 @@ export const COPY_GROUPS: CopyGroup[] = [
     // global-not-found.tsx, for addresses outside /zh and /en, imports the
     // JSON files directly for the same reason.
     blurb:
-      "找不到的那一页。/zh、/en 下的地址用这里的字；连语言都对不上的地址落到全局 404，那一页直接读语言文件。",
+      "404 页的文字。/zh、/en 下的地址用这里的文字；语言前缀都不对的地址显示全局 404，那一页直接读语言文件。",
   },
   { id: "layout", label: "站点标题", blurb: "浏览器标签页上的那一行。" },
 ];
@@ -165,7 +166,6 @@ export const COPY_SR_EXTRA = new Set([
   "common.music",
   "grove.cardLabLink",
   "grove.cardNoteLink",
-  "about.changelogDot",
   "intro.resumeRegion",
   "lab.studyNav",
   "lab.items.lensSlider.prev",

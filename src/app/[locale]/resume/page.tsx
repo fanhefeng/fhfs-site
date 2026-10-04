@@ -18,9 +18,12 @@ const metaLabel = "font-mono text-meta uppercase tracking-meta text-fg-tertiary"
 /**
  * Resume — the formal, printable counterpart to /intro's 3D face.
  *
- * One column of paper with a rail of section labels down its left: summary,
- * skills, experience, open source, education, in the order a reader who
- * hires expects them. No animation beyond the site's one entrance; the page
+ * One column of paper with a rail of section labels down its left: the
+ * stack, what was built with it, the road from city to city (the same rows
+ * /about draws as a line), open source, education. It is kept short on
+ * purpose — what I know and what kinds of thing I have made, no employers
+ * and no case studies (DESIGN-LOG, 10-04); the summary slot stays for the
+ * day it is wanted. No animation beyond the site's one entrance; the page
  * is meant to be read top to bottom, on screen or — through the print
  * button and the print stylesheet in globals.css — on A4. Everything on it
  * comes from the database and is edited in /admin/resume; until the profile
@@ -163,20 +166,6 @@ export default async function ResumePage({ params }: PageProps<"/[locale]/resume
         </header>
       </Reveal>
 
-      {/* The prose — who, what I have built, how I work — each section's
-          heading its own, in the author's words rather than a fixed slot. */}
-      {sections.map((section, i) => (
-        <ResumeSection key={i} index={next()} title={section.title}>
-          <div className="space-y-4 text-body text-fg-secondary print:space-y-2">
-            {section.bullets.map((paragraph, j) => (
-              <p key={j}>
-                <Rich text={paragraph} />
-              </p>
-            ))}
-          </div>
-        </ResumeSection>
-      ))}
-
       {(intro.length > 0 || highlights.length > 0) && (
         <ResumeSection index={next()} title={t("summaryTitle")}>
           {intro.length > 0 && (
@@ -214,10 +203,26 @@ export default async function ResumePage({ params }: PageProps<"/[locale]/resume
         </ResumeSection>
       )}
 
+      {/* The free sections — "what I have built" — each under a heading of
+          its own, in the author's words rather than a fixed slot. After the
+          stack and before the road: what I work with, what came of it,
+          where. */}
+      {sections.map((section, i) => (
+        <ResumeSection key={i} index={next()} title={section.title}>
+          <div className="space-y-4 text-body text-fg-secondary print:space-y-2">
+            {section.bullets.map((paragraph, j) => (
+              <p key={j}>
+                <Rich text={paragraph} />
+              </p>
+            ))}
+          </div>
+        </ResumeSection>
+      ))}
+
       {experiences.length > 0 && (
         <ResumeSection index={next()} title={t("experienceTitle")}>
-          {/* Jobs with no bullets and no projects are a bare list — where,
-              as what, when — and sit close; jobs with content keep their
+          {/* Rows with no bullets and no projects are a bare list — where,
+              when, doing what — and sit close; rows with content keep their
               room. */}
           <div
             className={

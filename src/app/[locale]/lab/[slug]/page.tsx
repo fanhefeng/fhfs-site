@@ -273,19 +273,19 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
   if (entry.slug === "door") text.homeHref = `/${locale}`;
   if (entry.slug === "radial-fan") text.shareTitle = t(`${ns}.name`);
 
-  // The changelog shows the real one: the same rows /about localizes.
+  // The changelog shows the real one: the rows the admin's 版本履历 edits. An
+  // entry without a real `date` shows its placeholder label instead — the
+  // page never invents a date it cannot source.
   if (entry.slug === "changelog") {
-    const ta = await getTranslations("about");
-    text.title = ta("changelogTitle");
-    text.ariaLabel = ta("changelogAria");
+    text.title = t(`${ns}.title`);
+    text.ariaLabel = t(`${ns}.listAria`);
     entries = (await getTimeline()).map((row) => {
       const dateText = row.date ?? row.dateLabel?.[locale] ?? "—";
       return {
         id: row.key,
-        version: row.version,
-        dateText,
+        label: `fhf ${row.version}`,
         year: row.date ? row.date.slice(0, 4) : "—",
-        dateAria: ta("changelogDot", { date: dateText }),
+        date: { text: dateText, aria: t(`${ns}.dotAria`, { date: dateText }) },
         title: row.title[locale],
         note: row.note[locale],
       };

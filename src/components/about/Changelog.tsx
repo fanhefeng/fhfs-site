@@ -4,18 +4,21 @@ import { useRef } from "react";
 import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
 import { REVEAL_START, REVEAL_VARS } from "@/components/fx/Reveal";
 
-/** One release of a person. The page localizes before handing it over. */
+/** One row of the list. The page localizes before handing it over. */
 export type ChangelogEntry = {
   id: string;
-  /** "5.1" — rendered as `fhf 5.1` in Geist Mono. */
-  version: string;
-  /** ISO day, or the localized placeholder when the real date is unknown. */
-  dateText: string;
-  /** Four-digit year for the rail, or a dash when there is no date. */
+  /** The mono line over the title: the years on /about, `fhf 5.1` in the lab. */
+  label: string;
+  /** Four-digit year for the rail, or a dash when there is none. */
   year: string;
-  /** Accessible name for the node button ("Released 2026-07-31"). */
-  dateAria: string;
+  /**
+   * The exact day the node's bubble shows — ISO, or the localized placeholder
+   * when the real date is unknown — and the node button's accessible name
+   * ("Released 2026-07-31"). A row without one gets a plain dot.
+   */
+  date?: { text: string; aria: string };
   title: string;
+  /** One sentence under the title. May be empty. */
   note: string;
 };
 
@@ -23,25 +26,24 @@ type Props = {
   entries: ChangelogEntry[];
   title: string;
   ariaLabel: string;
-  /** Show the year rail at every width. /about keeps it to sm and up; the
-   *  lab study *is* the rail, and on a phone it was the part that vanished. */
-  railAlways?: boolean;
   className?: string;
 };
 
 /**
- * A life numbered like software. Version + date + one sentence per glass
- * note card, newest first.
+ * A list of dated rows beside a rail of years: a mono line, a title and one
+ * sentence per glass card. Two pages hand it rows — /about the career, a row
+ * per city, oldest first (`resume_experiences`); the lab's changelog study a
+ * life numbered like software, newest first (`timeline_entries`). The rail
+ * shows at every width: on a phone it used to be the part that vanished.
  *
  * Two pieces of motion, both of them wayfinding rather than decoration:
  * - the year rail is a single window onto a stack of years that snaps as
  *   entries pass the middle of the viewport (Family-style number roll), so
  *   the reader always knows *when* they are;
- * - each node pops a tooltip with the exact date on hover/focus, entering on
- *   `back.out` and leaving on the reversed ease at 2.2x — arrive generously,
- *   leave briskly.
+ * - each node that has an exact date pops it in a tooltip on hover/focus,
+ *   entering on `back.out` and leaving on the reversed ease at 2.2x.
  */
-export function Changelog({ entries, title, ariaLabel, railAlways = false, className }: Props) {
+export function Changelog({ entries, title, ariaLabel, className }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
 
@@ -161,10 +163,9 @@ export function Changelog({ entries, title, ariaLabel, railAlways = false, class
 
       <div ref={rootRef} className="flex gap-6">
         {/* Year rail — a one-row window onto a stack of years. */}
-        <div
-          aria-hidden="true"
-          className={`${railAlways ? "block w-14" : "hidden"} shrink-0 sm:block sm:w-[4.5rem]`}
-        >
+        {/* Four mono digits are 2.4em wide: 57.6px at 1.5rem, 76.8px at 2rem.
+            The window has to clear that, or the year's last digit is cut. */}
+        <div aria-hidden="true" className="w-16 shrink-0 sm:w-20">
           <div className="sticky top-28 h-10 overflow-hidden">
             <div ref={stripRef} className="will-change-transform">
               {rows.map((year, i) => (
@@ -188,38 +189,55 @@ export function Changelog({ entries, title, ariaLabel, railAlways = false, class
               {/* Node + date tooltip. The button carries the date as its
                   accessible name, so the bubble itself stays decorative.
                   hit-ext's default -10px inset would leave this 14px dot at
-                  34px, so the pseudo is widened to clear 44px. */}
-              <button
-                type="button"
-                data-node
-                aria-label={entry.dateAria}
-                className="hit-ext absolute left-0 top-7 z-10 h-3.5 w-3.5 rounded-full border border-line bg-surface-raised shadow-card [&::before]:-inset-[15px]"
-              >
-                <span aria-hidden="true" className="absolute inset-[3px] rounded-full bg-accent" />
-                <span
-                  data-tip
-                  aria-hidden="true"
-                  className="pointer-events-none absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-chip bg-fg px-2.5 py-1 font-mono text-[11px] tracking-meta text-bg shadow-card [font-variant-numeric:tabular-nums]"
+                  34px, so the pseudo is widened to clear 44px. A row with no
+                  exact date has nothing to pop, so its node is only a dot. */}
+              {entry.date ? (
+                <button
+                  type="button"
+                  data-node
+                  aria-label={entry.date.aria}
+                  className="hit-ext absolute left-0 top-7 z-10 h-3.5 w-3.5 rounded-full border border-line bg-surface-raised shadow-card [&::before]:-inset-[15px]"
                 >
-                  {entry.dateText}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-[3px] rounded-full bg-accent"
+                  />
+                  <span
+                    data-tip
+                    aria-hidden="true"
+                    className="pointer-events-none absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-chip bg-fg px-2.5 py-1 font-mono text-[11px] tracking-meta text-bg shadow-card [font-variant-numeric:tabular-nums]"
+                  >
+                    {entry.date.text}
+                  </span>
+                </button>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="absolute left-0 top-7 z-10 h-3.5 w-3.5 rounded-full border border-line bg-surface-raised shadow-card"
+                >
+                  <span className="absolute inset-[3px] rounded-full bg-accent" />
                 </span>
-              </button>
+              )}
 
               <article className="glass-thin rounded-card px-5 py-5 sm:px-6">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="font-mono text-[0.9375rem] tracking-[0.04em] text-accent">
-                    fhf {entry.version}
+                  <span className="font-mono text-[0.9375rem] tracking-[0.04em] text-accent [font-variant-numeric:tabular-nums]">
+                    {entry.label}
                   </span>
-                  {/* The rail is desktop-only, so small screens read the date
-                      here rather than behind a hover. */}
-                  <span className="font-mono text-meta tracking-meta text-fg-tertiary [font-variant-numeric:tabular-nums] sm:hidden">
-                    {entry.dateText}
-                  </span>
+                  {/* A phone has no hover to pop the bubble with, so small
+                      screens read the date here. */}
+                  {entry.date && (
+                    <span className="font-mono text-meta tracking-meta text-fg-tertiary [font-variant-numeric:tabular-nums] sm:hidden">
+                      {entry.date.text}
+                    </span>
+                  )}
                 </div>
                 <h3 className="vibrancy mt-2 text-heading">{entry.title}</h3>
-                <p className="mt-1.5 text-caption leading-relaxed text-fg-secondary">
-                  {entry.note}
-                </p>
+                {entry.note && (
+                  <p className="mt-1.5 text-caption leading-relaxed text-fg-secondary">
+                    {entry.note}
+                  </p>
+                )}
               </article>
             </li>
           ))}

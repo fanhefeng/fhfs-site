@@ -95,14 +95,14 @@
     {
       "locale": "zh",
       "title": "关于我",
-      "bodyMd": "\n你好，我是 fhf，喜欢音乐、游戏、电影。\n\n从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。闲下来的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。\n\n我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。\n\n这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。\n",
-      "bodyHtml": "<p>你好，我是 fhf，喜欢音乐、游戏、电影。</p>\n<p>从山西河津出发，在北京做过几年，又去青岛待了一阵，如今落在上海。闲下来的时间，用来做一些小软件——它们大多先是写给自己用的，后来才想起该有个名字。</p>\n<p>我热爱的东西不少。从小学小提琴，至今还拉；音乐、电影、游戏都是日常——Dota 2、守望先锋、双人成行，篮球和乒乓球，狼人杀与三国杀的桌上夜晚，还有说走就走的旅行。对这个世界，我始终保持好奇。</p>\n<p>这个网站是我的一间小书房：想法放在文章里，软件摆在架子上，实验室里放着那些还在生长的东西。留一盏灯，欢迎随时进来坐坐。</p>"
+      "bodyMd": "\n我是 fhf，山西河津人。写了九年前端，也写全栈；下班以后做几个自己用得上的小软件。\n\n从小学小提琴，现在还拉。游戏主要是 Dota 2 和守望先锋，运动是篮球和乒乓球，有空就出去走走。\n\n这个站放着我写的文章、做的软件，还有一些在试的效果。\n",
+      "bodyHtml": "<p>我是 fhf，山西河津人。写了九年前端，也写全栈；下班以后做几个自己用得上的小软件。</p>\n<p>从小学小提琴，现在还拉。游戏主要是 Dota 2 和守望先锋，运动是篮球和乒乓球，有空就出去走走。</p>\n<p>这个站放着我写的文章、做的软件，还有一些在试的效果。</p>"
     },
     {
       "locale": "en",
       "title": "About",
-      "bodyMd": "\nHi, I'm fhf. I like music, games and films.\n\nI set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. Spare evenings go to small software of my own — most of it written for myself first, and named only later.\n\nThere is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.\n\nThis site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.\n",
-      "bodyHtml": "<p>Hi, I'm fhf. I like music, games and films.</p>\n<p>I set out from Hejin in Shanxi, spent a few years in Beijing and a spell in Qingdao, and now live in Shanghai. Spare evenings go to small software of my own — most of it written for myself first, and named only later.</p>\n<p>There is a lot I love. I have played the violin since I was a child and still do; music, film and games are everyday things — Dota 2, Overwatch, It Takes Two, basketball and table tennis, long table-top nights of Werewolf and Sanguosha, and trips taken on short notice. I have never stopped being curious about the world.</p>\n<p>This site is my small study: thoughts go into the writing, the software sits on the shelf, and the lab holds whatever is still growing. One light stays on — come in any time.</p>"
+      "bodyMd": "\nI'm fhf, from Hejin in Shanxi. I've written front-end for nine years, and full-stack when the job needs it; after hours I build small software I want for myself.\n\nI've played the violin since I was a kid and still do. The games are mostly Dota 2 and Overwatch, the sports are basketball and table tennis, and I travel when I can.\n\nThis site keeps what I write, the software I make, and a few effects I'm still trying out.\n",
+      "bodyHtml": "<p>I'm fhf, from Hejin in Shanxi. I've written front-end for nine years, and full-stack when the job needs it; after hours I build small software I want for myself.</p>\n<p>I've played the violin since I was a kid and still do. The games are mostly Dota 2 and Overwatch, the sports are basketball and table tennis, and I travel when I can.</p>\n<p>This site keeps what I write, the software I make, and a few effects I'm still trying out.</p>"
     }
   ],
   "secrets": [],
@@ -9276,12 +9276,12 @@
       "date": "2026-08-10",
       "dateLabel": null,
       "title": {
-        "en": "Chinese chess, in the browser",
-        "zh": "把中国象棋搬进浏览器"
+        "zh": "浏览器里的中国象棋",
+        "en": "Chinese chess in the browser"
       },
       "note": {
-        "en": "The pieces are not discs with characters on them but soldiers that walk: the general wears a crown, the pawns carry pike and shield, the cannon actually takes aim and fires across the river, and a piece about to be taken has turned to face its attacker before the attacker arrives. Not one asset was downloaded: the figures are three.js primitives, the textures are painted on a canvas at load, and the motion is joints turning rather than skinning. The rules never touch the scene, and perft agrees to four plies.",
-        "zh": "棋子不是刻字的圆盘，是会走路的兵：主帅戴冕旒，卒子扛枪盾，炮真的架起来轰过河，被吃的一方在对手过河时就已经转身面对。没有下载过一件素材——造型是 three.js 图元拼的，纹理是 Canvas 现画的，动作靠转关节而不是蒙皮。规则那一层碰不到画面，perft 四层全对。"
+        "zh": "棋子做成了会走动的 3D 人物：主帅戴冕旒，卒子拿枪和盾，炮会架起来向对岸开火，被吃的棋子会在对方过来之前转身面对它。没有下载任何素材：造型用 three.js 的基本几何体拼成，纹理用 Canvas 绘制，动作靠转动关节实现，没有用蒙皮。规则部分和画面分开，perft 四层结果全部正确。",
+        "en": "The pieces are 3D figures that walk: the general wears a crown, the pawns carry a pike and shield, the cannon sets up and fires across the river, and a piece about to be taken turns to face its attacker before it arrives. No assets were downloaded: the figures are built from three.js primitives, the textures are painted on a canvas, and the motion is done by rotating joints, without skinning. The rules are separate from the scene, and perft is correct to four plies."
       },
       "sort": 1
     },
@@ -9295,8 +9295,8 @@
         "zh": "本站 · fhf's"
       },
       "note": {
-        "en": "The version you are reading. Every page is prerendered and static, yet all of its words live in a database: change one in the browser, press save, and the site is the new one the moment it lands, with no rebuild. Chinese and English sit side by side, and the theme switch is the gallery opening and closing.",
-        "zh": "你现在看的这一版。每一页都是预渲染好的静态页，可文字全在数据库里：在浏览器里改一个字，存下去的那一刻站点就是新的，不用重新构建。中英两份文案并排放着，开灯关灯是一次开馆和闭馆。"
+        "zh": "你现在看的这一版。每一页都是预渲染的静态页，文字都存在数据库里：在浏览器里改完保存，站点马上更新，不用重新构建。中文和英文各有一份文案，有浅色和深色两种主题。",
+        "en": "The version you are reading. Every page is prerendered and static, and all of its text is stored in a database: edit it in the browser and save, and the site updates immediately, with no rebuild. The copy exists in Chinese and English, and there is a light and a dark theme."
       },
       "sort": 2
     },
@@ -9306,12 +9306,12 @@
       "date": "2026-06-03",
       "dateLabel": null,
       "title": {
-        "en": "Three desktop apps in one summer",
-        "zh": "一个夏天，三个桌面端"
+        "zh": "一个夏天做了三个桌面应用",
+        "en": "Three desktop apps in one summer"
       },
       "note": {
-        "en": "Three things I was missing myself: something to reap the process still on a port after its terminal is gone, a screensaver that would show a line of my own text, a folder of photos I could flip through by lens. All three now live on my own Mac, and each has its page under Software.",
-        "zh": "三个都是自己缺的东西：关掉终端还占着端口的进程要有人收拾，屏保上想放一句自己的话，一个文件夹的照片想按镜头翻。写完之后它们就常驻在自己的 Mac 上了，各自的页面在「软件」里。"
+        "zh": "三个都是自己需要的工具：清理关掉终端后还占着端口的进程，把一段自己的文字做成屏保，按镜头浏览一个文件夹的照片。做完后一直在自己的 Mac 上用，介绍在「软件」页。",
+        "en": "All three are tools I needed myself: one that cleans up processes still holding a port after their terminal is closed, a screensaver that shows a line of my own text, and a way to browse a folder of photos by lens. I have used them on my own Mac since, and each is described on the Software page."
       },
       "sort": 3
     },
@@ -9325,8 +9325,8 @@
         "zh": "第一版作品集"
       },
       "note": {
-        "en": "fhf-portfolio — the first time the work got a page of its own. Its 3D desk now lives in the lab.",
-        "zh": "fhf-portfolio：第一次把做过的东西摆成一个页面。那台 3D 工作台，如今住在实验室里。"
+        "zh": "fhf-portfolio：第一次把做过的东西放到一个页面上。里面的 3D 工作台现在在实验室。",
+        "en": "fhf-portfolio: the first time my work was put on a page. Its 3D desk is now in the lab."
       },
       "sort": 4
     },
@@ -9340,8 +9340,8 @@
         "zh": "开始把学到的写下来"
       },
       "note": {
-        "en": "The first public note was on the seven OSI layers. Ever since: understand something, leave a paragraph behind.",
-        "zh": "第一篇公开笔记是 OSI 七层模型。从此看懂一件事，就留一段字。"
+        "zh": "第一篇公开笔记写的是 OSI 七层模型。之后每弄懂一件事，就写一篇。",
+        "en": "The first public note was about the seven OSI layers. Since then, whenever I understand something, I write it up."
       },
       "sort": 5
     },
@@ -9351,12 +9351,12 @@
       "date": "2017-05-19",
       "dateLabel": null,
       "title": {
-        "en": "A place to put the code",
-        "zh": "有了一个放代码的地方"
+        "zh": "注册 GitHub",
+        "en": "Signed up for GitHub"
       },
       "note": {
-        "en": "Signed up for GitHub. Every version above leaves its shadow on that commit graph.",
-        "zh": "注册 GitHub。往后所有版本号，都能在那条提交曲线上找到影子。"
+        "zh": "之后的项目都放在上面。",
+        "en": "Every project since has been kept there."
       },
       "sort": 6
     }
@@ -10571,8 +10571,8 @@
       "years": "1978 – 2020",
       "numbers": "8 · 24",
       "lede": {
-        "en": "Twenty years with the Lakers, two numbers, five championships, one night of 81. A Los Angeles at four in the morning is the line he left everyone after him.",
-        "zh": "洛杉矶湖人二十年，两个号码，五座总冠军，一场 81 分。凌晨四点的洛杉矶，是他留给后来人的一句话。"
+        "zh": "在洛杉矶湖人打了二十年，穿过 8 号和 24 号，拿了五座总冠军，单场最高 81 分。",
+        "en": "Twenty years with the Los Angeles Lakers, wearing numbers 8 and 24, with five championships and a career-high 81 points in a game."
       },
       "accent": "#5b3f8a",
       "cover": "hawaii8",
@@ -10581,12 +10581,12 @@
         "zh": "照片 · 2005 – 2024"
       },
       "galleryTitle": {
-        "en": "On the court, and off it",
-        "zh": "球场上，和球场外"
+        "zh": "场上和场外的照片",
+        "en": "Photographs on and off the court"
       },
       "galleryLede": {
-        "en": "From number 8 to number 24, from a preseason night in Hawaii to a wall in Valencia.",
-        "zh": "从 8 号到 24 号，从夏威夷的季前赛到瓦伦西亚的一面墙。"
+        "zh": "从 2005 年夏威夷的季前赛到 2024 年瓦伦西亚的涂鸦墙，按时间排列。",
+        "en": "From a preseason game in Hawaii in 2005 to a mural in Valencia in 2024, in chronological order."
       },
       "photos": [
         {
@@ -10847,8 +10847,8 @@
         "zh": "生涯 · 节点"
       },
       "timelineTitle": {
-        "en": "Philadelphia to Los Angeles",
-        "zh": "从费城到洛杉矶"
+        "zh": "生涯时间线",
+        "en": "Career timeline"
       },
       "timeline": [
         {
@@ -10957,8 +10957,8 @@
             "zh": "与女儿 Gianna 在卡拉巴萨斯的直升机事故中离世，41 岁。同年入选奈史密斯篮球名人堂。"
           },
           "title": {
-            "en": "Gone",
-            "zh": "离开"
+            "zh": "离世",
+            "en": "Died"
           }
         },
         {
@@ -10994,19 +10994,19 @@
       },
       "period": null,
       "body": {
-        "en": "From requirement to release, turning ideas into interfaces people can use. This site is the exhibit: bilingual routing, a content pipeline and a motion system, all written by hand.",
-        "zh": "从需求到上线，把想法做成人能用的界面。这个站点就是现场：双语路由、内容管线、动效系统，都是手写的。"
+        "zh": "做前端九年，从需求做到上线。这个站点的双语路由、内容管理和动效都是自己写的。",
+        "en": "Nine years of front-end work, from requirements to release. The bilingual routing, content management and motion on this site are all written by me."
       },
       "bullets": {
-        "en": [
-          "React / Next.js / TypeScript",
-          "Desktop apps in Tauri 2 + Rust, and some Swift",
-          "One token set, colour semantics down to components"
-        ],
         "zh": [
           "React / Next.js / TypeScript",
           "桌面端用 Tauri 2 + Rust，也写 Swift",
-          "一套 token 从颜色语义一路贯到组件"
+          "一套设计 token，从颜色到组件通用"
+        ],
+        "en": [
+          "React / Next.js / TypeScript",
+          "Desktop apps in Tauri 2 + Rust, and some Swift",
+          "One set of design tokens, from colours to components"
         ]
       },
       "stickerLabel": "FRONTEND",
@@ -11025,15 +11025,15 @@
       },
       "period": null,
       "body": {
-        "en": "Started as a child and never stopped. What the scales taught me is what code teaches: get the basics past thinking, and there is room to improvise.",
-        "zh": "从小学琴，拉到现在。音阶教会我的事，和写代码是同一件：基本功练到不必去想，才有余裕即兴。"
+        "zh": "从小学小提琴，一直拉到现在。",
+        "en": "I started the violin as a child and still play."
       },
       "bullets": {
-        "en": [
-          "Music is a daily thing, not a line on a form"
-        ],
         "zh": [
-          "音乐是日常，不是爱好栏里的一项"
+          "音乐是每天都有的事"
+        ],
+        "en": [
+          "Music is part of every day"
         ]
       },
       "stickerLabel": "VIOLIN",
@@ -11043,8 +11043,8 @@
     {
       "key": "games",
       "kicker": {
-        "en": "03 — player one",
-        "zh": "03 — 玩家一号"
+        "zh": "03 — 常玩的",
+        "en": "03 — what I play"
       },
       "title": {
         "en": "Games",
@@ -11052,8 +11052,8 @@
       },
       "period": null,
       "body": {
-        "en": "Dota 2 and Overwatch on permanent rotation; It Takes Two saved for a friend. Games taught me tempo and teamwork — and to queue again after a loss.",
-        "zh": "Dota 2 与守望先锋是常驻名单，双人成行是留给朋友的。游戏教会我的是节奏和配合——以及输了也要再来一把。"
+        "zh": "常玩 Dota 2 和守望先锋，和朋友一起时玩双人成行。",
+        "en": "I mostly play Dota 2 and Overwatch, and It Takes Two when playing with a friend."
       },
       "bullets": {
         "en": [
@@ -11070,8 +11070,8 @@
     {
       "key": "film",
       "kicker": {
-        "en": "04 — the screen",
-        "zh": "04 — 银幕"
+        "zh": "04 — 常看常听的",
+        "en": "04 — what I watch and hear"
       },
       "title": {
         "en": "Film and music",
@@ -11079,8 +11079,8 @@
       },
       "period": null,
       "body": {
-        "en": "A lot of films, a lot of music. Good work of any kind shares one thing: restraint, and letting go exactly where it should. I look for the same thing in an interface.",
-        "zh": "看很多电影，听很多音乐。好的作品都有同一种东西：克制，以及在该放的地方放开。做界面时，我也在找它。"
+        "zh": "看很多电影，听很多音乐。",
+        "en": "I watch a lot of films and listen to a lot of music."
       },
       "bullets": {
         "en": [],
@@ -11093,8 +11093,8 @@
     {
       "key": "court",
       "kicker": {
-        "en": "05 — the court",
-        "zh": "05 — 球场"
+        "zh": "05 — 运动",
+        "en": "05 — sport"
       },
       "title": {
         "en": "Basketball and table tennis",
@@ -11102,8 +11102,8 @@
       },
       "period": null,
       "body": {
-        "en": "Basketball for the teamwork, table tennis for the reflexes. When I have sat too long, I go and play.",
-        "zh": "篮球靠配合，乒乓靠反应。坐久了，就去打一场。"
+        "zh": "打篮球和乒乓球，坐久了就去打一场。",
+        "en": "I play basketball and table tennis, usually after sitting for too long."
       },
       "bullets": {
         "en": [],
@@ -11116,8 +11116,8 @@
     {
       "key": "road",
       "kicker": {
-        "en": "06 — on the road",
-        "zh": "06 — 在路上"
+        "zh": "06 — 出门",
+        "en": "06 — going out"
       },
       "title": {
         "en": "Travel and the table",
@@ -11125,8 +11125,8 @@
       },
       "period": null,
       "body": {
-        "en": "Trips taken on short notice, and long nights around a table — Werewolf, Sanguosha; reading people beats reading cards.",
-        "zh": "喜欢说走就走的旅行，也喜欢一桌人的夜晚——狼人杀、三国杀，看人比看牌有意思。"
+        "zh": "喜欢临时起意的旅行，也喜欢和朋友玩桌游：狼人杀、三国杀。",
+        "en": "I like trips on short notice, and board games with friends: Werewolf and Sanguosha."
       },
       "bullets": {
         "en": [
@@ -11143,8 +11143,8 @@
     {
       "key": "curious",
       "kicker": {
-        "en": "07 — the ground note",
-        "zh": "07 — 底色"
+        "zh": "07 — 最后",
+        "en": "07 — last"
       },
       "title": {
         "en": "Curious about the world",
@@ -11152,8 +11152,8 @@
       },
       "period": null,
       "body": {
-        "en": "All of the above is really one thing: a standing curiosity about the world. The light stays on for whatever there is still to see.",
-        "zh": "以上所有，其实是同一件事：对世界始终好奇。留一盏灯，是为了那些还想看看的东西。"
+        "zh": "上面这些的共同点，是对很多事情都好奇，想多看看、多试试。",
+        "en": "What all of the above have in common is curiosity: I want to see and try more things."
       },
       "bullets": {
         "en": [],
@@ -11178,77 +11178,23 @@
       "sections": {
         "en": [
           {
-            "title": "Who",
+            "title": "What I've built",
             "period": null,
             "bullets": [
-              "I'm fhf, a front-end engineer in Shanghai. Nine years of front-end, the last six mostly React and TypeScript; Next.js, TanStack and Tailwind are the everyday, and Node, Electron and Swift come in when the thing needs them. On the Web3 side it is ethers.js and wagmi.",
-              "Right now I build an enterprise AI portal at the digital-technology arm of a state-owned construction group: one place for employees to use the group's AI agent service, from chat and a knowledge base to a handful of internal apps, front-end and BFF both delivered by me alone. Alongside that I work remotely for a Web3 team building for overseas markets, three products in turn: the marketing site and Electron desktop of a social messaging app, the four-locale site of a multi-chain social platform, and a five-locale crypto news site. Before that, an Electron collaboration platform and a cross-border e-commerce platform at a leading home-appliance group; earlier, an order and finance system and a K-12 classroom platform at an education company; and at the start, the H5 pages of the official civil-aviation travel platform."
-            ]
-          },
-          {
-            "title": "What I have built",
-            "period": null,
-            "bullets": [
-              "**Several streaming protocols folded into one type.** The upstream AI service spoke a few streaming dialects, and the UI knows only one `ChatStreamEvent` union. `EventSource` cannot carry custom headers, so frames are parsed off `fetch` + `ReadableStream`, with reconnects resuming from Last-Event-ID; rendering flushes once per animation frame rather than a setState per token, so long answers never drop frames. The browser talks only to a BFF, and request and response shapes are one zod schema both sides share, so a changed field shows up at typecheck and at runtime at once.",
-              "**Electron, twice.** Once to rework an enterprise collaboration client: the metric was defined first, process launch to first interaction and the share of long tasks on the main thread, instrumented against a baseline; then synchronous main-process init was deferred, the preload slimmed, chunks split by route and long lists virtualised, for a cold start 60% faster and a jank rate halved. Once to build a social app's desktop foundation from scratch: third-party apps hosted in a WebContentsView and bridged through a JSAPI, the renderer never seeing Node, IPC arguments validated in the main process, so a third-party app gets only what the shell chooses to give.",
-              "**Money never touches floating point.** In enterprise order, settlement and reconciliation systems every amount goes through one component that formats by currency precision; report export used to assemble the full dataset in the browser and freeze it, so it moved to asynchronous server-side generation with client polling. I integrated Yonyou so data synced itself in place of manual reconciliation. Pure logic like this is always unit-tested; the latest project stands at 446+ cases.",
-              "**Localisation is a type, not a translation.** One four-locale site and one five-locale site: the dictionary is typed after the Chinese one, so a key missing from any other locale fails typecheck, and routing and copy are per locale. The news site's newsflash arrives over WebSocket and falls back to polling when push is unavailable, and the reader cannot tell; its home page is arranged by drag-and-drop in the admin and resolved live on the front-end, so a change of line-up needs no release.",
-              "**Every number has a definition.** Reworking the critical rendering path of an e-commerce platform cut overall load time by 50%; a classroom platform's first paint came down 40%; rebuilding the civil-aviation travel platform's SEO on prerendering, sitemaps, canonical tags and structured data doubled its indexed core pages. All of it real-user instrumentation against a baseline, not a single machine."
-            ]
-          },
-          {
-            "title": "How I work",
-            "period": null,
-            "bullets": [
-              "What I trust is what can be measured. A metric gets its definition before it gets optimised, a rework gets its instrumented baseline before the first commit, and an improvement I cannot say how to measure does not go on this page.",
-              "Components sit on Radix primitives, so keyboard reachability and ARIA come with the primitive; colour and spacing come from design tokens, so a theme change touches one place; motion honours `prefers-reduced-motion`. Lint, typecheck and tests each gate the merge and one failure is enough to stop it: a one-person project has no peer review, so CI stands in that place."
-            ]
-          },
-          {
-            "title": "What I publish",
-            "period": null,
-            "bullets": [
-              "I write what I am missing myself, and it all lives under Software on this site: Portreaper reaps the process still holding a port after its terminal is gone, Photo Browser flips through a folder of photos by camera and lens, Lumitext turns a line of your own text into the Mac's screensaver, and File Tidy files Downloads by type and month and undoes it in one step. Tauri, Rust and Swift, each where it fits.",
-              "In open source I fixed a component-compatibility bug in Element Plus, merged upstream, and added pinyin search to Raycast's Apple Notes extension. Crypto Note took 3rd place in the AI track at ETH Beijing Hackathon 2025; wallet connection, EIP-712 signing, contract reads and writes and on-chain event subscription were all mine.",
-              "The rest is on this site: the writing, and a lab of effects, each carrying a note on how it is built."
+              "**Web** — an enterprise AI portal, order and finance back offices, cross-border e-commerce, multilingual marketing and news sites.",
+              "**Mobile and mini programs** — H5 pages inside apps, WeChat mini programs.",
+              "**Desktop** — an Electron collaboration platform and an IM client; my own Mac utilities in Tauri and Swift."
             ]
           }
         ],
         "zh": [
           {
-            "title": "我是谁",
+            "title": "做过的应用",
             "period": null,
             "bullets": [
-              "我是 fhf，前端工程师，在上海。写前端九年，后六年主要是 React 和 TypeScript；Next.js、TanStack、Tailwind 是日常，Node、Electron 和 Swift 看东西需要什么。Web3 那一侧是 ethers.js 和 wagmi。",
-              "现在在一家央企旗下的数字科技公司做企业 AI 门户：员工在一个地方用上集团的 AI Agent 服务，从会话、知识库到几个智能应用，前端和 BFF 都是我一个人交付的。同时远程给一个面向海外的 Web3 团队做前端，先后接了三个产品：一个社交 IM 的官网和 Electron 桌面端、一个多链社交平台的四语官网、一个五语的加密财经资讯站。之前在一家头部家电集团做 Electron 协作平台和海外电商，再往前是教育科技公司的订单财务系统和 K12 课堂平台，起点是民航官方出行平台的 H5。"
-            ]
-          },
-          {
-            "title": "我做过什么",
-            "period": null,
-            "bullets": [
-              "**把几种流式协议收成一个类型。** 上游的 AI 服务说好几种流式方言，界面只认一个 `ChatStreamEvent` 联合类型。`EventSource` 带不了自定义请求头，就用 `fetch` + `ReadableStream` 自己解析帧，断线按 Last-Event-ID 续传；渲染按动画帧批量刷新而不是每个 token 一次 setState，长回答不掉帧。浏览器只和 BFF 说话，出入参是一份前后端共用的 zod schema，字段一改，类型检查和运行时同时报出来。",
-              "**两次 Electron 桌面端。** 一次是重构一个企业协作平台：口径先定成「进程拉起到首屏可交互」和主线程长任务占比，埋点上报，对照基线，然后把主进程里同步的初始化后移、preload 瘦身、按路由分包、长列表虚拟滚动，启动提速 60%、卡顿率下降 50%。另一次是从零搭一个社交 App 的桌面底座：第三方应用装进 WebContentsView，通过 JSAPI 和壳通信，渲染进程拿不到 Node，IPC 参数在主进程校验，第三方拿到的只有壳愿意给的。",
-              "**钱不经过浮点数。** 企业的订单、结算和对账系统里，金额全链路走一个按币种精度格式化的组件；报表导出原来在前端拼全量数据会把浏览器卡死，改成后端异步生成、前端轮询。对接过用友，让数据自动同步替代人工对账。这类纯逻辑必有单测，最近一个项目累计 446+ 用例。",
-              "**多语言不是翻译，是类型。** 四语和五语的站点各做过一个：字典的类型以中文那份为基准，别的语言少一个键就过不了类型检查；路由和文案按语言各一份。资讯站的快讯走 WebSocket 推送，推不到就退回轮询，读者看不出区别；首页的编排在后台拖动配置、前台实时解析，调栏目不用发版。",
-              "**每个数字都有口径。** 电商平台重做关键渲染路径后整体加载时间下降 50%，课堂平台首屏缩短 40%，民航出行 H5 用预渲染、sitemap、canonical 和结构化数据重做 SEO 后核心页面收录翻了一倍。都是线上埋点对照基线，不是单机跑分。"
-            ]
-          },
-          {
-            "title": "我怎么工作",
-            "period": null,
-            "bullets": [
-              "我信的是可以量化的东西。一个指标先写清口径再谈优化，一次重构先有埋点基线再动手；一个说不出怎么量的改进，我不会写进这一页。",
-              "组件落在 Radix 原语上，键盘可达和 ARIA 由原语保证；颜色和间距来自设计令牌，换主题只改一处；动效遵守 `prefers-reduced-motion`。lint、类型检查和测试三道卡点，任一不过就合不进去——一个人做的项目没有同侪评审，就让 CI 站在那个位置上。"
-            ]
-          },
-          {
-            "title": "我发布了什么",
-            "period": null,
-            "bullets": [
-              "自己缺什么就写什么，都在本站「软件」里：Portreaper 收拾关掉终端后还占着端口的进程，Photo Browser 把一个文件夹的照片按相机和镜头翻，Lumitext 把一段字做成 Mac 的屏保，File Tidy 把 Downloads 按类型和年月归位、不对就撤销。Tauri、Rust、Swift，各用在该用的地方。",
-              "开源方面给 Element Plus 修过一个组件兼容问题，PR 已合并；给 Raycast 的 Apple Notes 扩展加了拼音搜索。Crypto Note 拿了 ETH Beijing Hackathon 2025 AI 赛道第三名，钱包连接、EIP-712 签名、合约读写和链上事件订阅都是我一个人写的。",
-              "其余在这个站上：写过的文章，和实验室里的效果，每一个都附着它是怎么做的。"
+              "**Web** — 企业 AI 门户、订单和财务后台、海外电商、多语言的官网和资讯站。",
+              "**手机端与小程序** — App 里的 H5 页面，微信小程序。",
+              "**桌面端** — Electron 的企业协作平台和 IM 客户端；自己用的 Mac 小工具，用 Tauri 和 Swift 写。"
             ]
           }
         ]
@@ -11262,8 +11208,50 @@
         "zh": []
       },
       "skills": {
-        "en": [],
-        "zh": []
+        "en": [
+          {
+            "name": "Front-end",
+            "items": "React, TypeScript, Next.js, Vue 3, Tailwind CSS"
+          },
+          {
+            "name": "Full-stack",
+            "items": "Node.js, BFF, SSE / WebSocket, Docker"
+          },
+          {
+            "name": "Desktop",
+            "items": "Electron, Tauri, Rust, Swift"
+          },
+          {
+            "name": "Motion and 3D",
+            "items": "GSAP, Three.js"
+          },
+          {
+            "name": "Web3",
+            "items": "ethers.js, wagmi"
+          }
+        ],
+        "zh": [
+          {
+            "name": "前端",
+            "items": "React、TypeScript、Next.js、Vue 3、Tailwind CSS"
+          },
+          {
+            "name": "全栈",
+            "items": "Node.js、BFF、SSE / WebSocket、Docker"
+          },
+          {
+            "name": "桌面端",
+            "items": "Electron、Tauri、Rust、Swift"
+          },
+          {
+            "name": "动效与 3D",
+            "items": "GSAP、Three.js"
+          },
+          {
+            "name": "Web3",
+            "items": "ethers.js、wagmi"
+          }
+        ]
       },
       "projects": {
         "en": [
@@ -11308,18 +11296,18 @@
   ],
   "resumeExperiences": [
     {
-      "key": "digital-tech-2025",
+      "key": "beijing",
       "company": {
-        "en": "Digital-technology arm of a state-owned construction group",
-        "zh": "某央企旗下数字科技公司"
+        "en": "Beijing",
+        "zh": "北京"
       },
       "role": {
-        "en": "Senior Front-end Engineer",
-        "zh": "资深前端工程师"
+        "en": "Where I started: mobile H5 pages, admin systems, an online classroom.",
+        "zh": "从这里入行：手机 H5、企业后台、在线课堂。"
       },
       "period": {
-        "en": "Jan 2025 – Present",
-        "zh": "2025.01 – 至今"
+        "en": "2017 – 2022",
+        "zh": "2017 – 2022"
       },
       "url": null,
       "summary": null,
@@ -11334,18 +11322,18 @@
       "sort": 0
     },
     {
-      "key": "web3-studio-2026",
+      "key": "qingdao",
       "company": {
-        "en": "Web3 product team for overseas markets",
-        "zh": "海外 Web3 产品技术团队"
+        "en": "Qingdao",
+        "zh": "青岛"
       },
       "role": {
-        "en": "Front-end Engineer (remote)",
-        "zh": "前端工程师（远程）"
+        "en": "Electron desktop apps and cross-border e-commerce.",
+        "zh": "Electron 桌面端，海外电商。"
       },
       "period": {
-        "en": "Jan 2026 – Present",
-        "zh": "2026.01 – 至今"
+        "en": "2023 – 2024",
+        "zh": "2023 – 2024"
       },
       "url": null,
       "summary": null,
@@ -11360,18 +11348,18 @@
       "sort": 1
     },
     {
-      "key": "appliance-group-2023",
+      "key": "shanghai",
       "company": {
-        "en": "A leading home-appliance group",
-        "zh": "某头部家电集团"
+        "en": "Shanghai",
+        "zh": "上海"
       },
       "role": {
-        "en": "Senior Front-end Engineer",
-        "zh": "资深前端工程师"
+        "en": "An enterprise AI portal, front end and BFF both.",
+        "zh": "企业 AI 门户，前端和 BFF 都写。"
       },
       "period": {
-        "en": "Jan 2023 – Dec 2024",
-        "zh": "2023.01 – 2024.12"
+        "en": "2025 – Present",
+        "zh": "2025 – 至今"
       },
       "url": null,
       "summary": null,
@@ -11384,58 +11372,6 @@
         "zh": []
       },
       "sort": 2
-    },
-    {
-      "key": "edtech-2020",
-      "company": {
-        "en": "An education-technology company (Beijing)",
-        "zh": "某教育科技公司（北京）"
-      },
-      "role": {
-        "en": "Front-end Engineer → Senior Front-end Engineer",
-        "zh": "前端开发工程师 → 高级前端工程师"
-      },
-      "period": {
-        "en": "Mar 2020 – Dec 2022",
-        "zh": "2020.03 – 2022.12"
-      },
-      "url": null,
-      "summary": null,
-      "bullets": {
-        "en": [],
-        "zh": []
-      },
-      "projects": {
-        "en": [],
-        "zh": []
-      },
-      "sort": 3
-    },
-    {
-      "key": "aviation-2017",
-      "company": {
-        "en": "A civil-aviation IT company",
-        "zh": "某民航信息科技公司"
-      },
-      "role": {
-        "en": "Front-end Engineer",
-        "zh": "前端开发工程师"
-      },
-      "period": {
-        "en": "Mar 2017 – Dec 2019",
-        "zh": "2017.03 – 2019.12"
-      },
-      "url": null,
-      "summary": null,
-      "bullets": {
-        "en": [],
-        "zh": []
-      },
-      "projects": {
-        "en": [],
-        "zh": []
-      },
-      "sort": 4
     }
   ],
   "chips": [

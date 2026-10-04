@@ -15,17 +15,17 @@ export const ERROR_COPY: Record<
   { kicker: string; title: string; description: string; retry: string; backHome: string }
 > = {
   zh: {
-    kicker: "印刷事故",
-    title: "这一页没能印出来",
-    description: "不是你的问题，是我们这边出了岔子。再试一次通常就好；要是还不行，过一会儿再来。",
+    kicker: "出错了",
+    title: "页面加载失败",
+    description: "服务器出了问题。请再试一次，不行的话过一会儿再来。",
     retry: "再试一次",
     backHome: "回首页",
   },
   en: {
-    kicker: "Printing error",
-    title: "This page did not make it to print",
+    kicker: "Error",
+    title: "This page failed to load",
     description:
-      "Nothing you did — something went wrong on our side. Trying again usually works; if not, come back in a little while.",
+      "Something went wrong on the server. Please try again; if that does not help, come back a little later.",
     retry: "Try again",
     backHome: "Back home",
   },

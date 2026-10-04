@@ -519,7 +519,7 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn, fi
       return (
         <div className="mx-auto w-full max-w-[720px] px-6 pt-8">
           <StudyLede>{s("lede")}</StudyLede>
-          <Changelog entries={entries} title={s("title")} ariaLabel={s("ariaLabel")} railAlways />
+          <Changelog entries={entries} title={s("title")} ariaLabel={s("ariaLabel")} />
         </div>
       );
     case "screening": {
