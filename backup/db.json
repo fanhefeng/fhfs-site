@@ -9276,12 +9276,12 @@
       "date": "2026-08-10",
       "dateLabel": null,
       "title": {
-        "en": "Chinese chess, in the browser",
-        "zh": "把中国象棋搬进浏览器"
+        "en": "Chinese chess in the browser",
+        "zh": "浏览器里的中国象棋"
       },
       "note": {
-        "en": "The pieces are not discs with characters on them but soldiers that walk: the general wears a crown, the pawns carry pike and shield, the cannon actually takes aim and fires across the river, and a piece about to be taken has turned to face its attacker before the attacker arrives. Not one asset was downloaded: the figures are three.js primitives, the textures are painted on a canvas at load, and the motion is joints turning rather than skinning. The rules never touch the scene, and perft agrees to four plies.",
-        "zh": "棋子不是刻字的圆盘，是会走路的兵：主帅戴冕旒，卒子扛枪盾，炮真的架起来轰过河，被吃的一方在对手过河时就已经转身面对。没有下载过一件素材——造型是 three.js 图元拼的，纹理是 Canvas 现画的，动作靠转关节而不是蒙皮。规则那一层碰不到画面，perft 四层全对。"
+        "en": "The pieces are 3D figures that walk: the general wears a crown, the pawns carry a pike and shield, the cannon sets up and fires across the river, and a piece about to be taken turns to face its attacker before it arrives. No assets were downloaded: the figures are built from three.js primitives, the textures are painted on a canvas, and the motion is done by rotating joints, without skinning. The rules are separate from the scene, and perft is correct to four plies.",
+        "zh": "棋子做成了会走动的 3D 人物：主帅戴冕旒，卒子拿枪和盾，炮会架起来向对岸开火，被吃的棋子会在对方过来之前转身面对它。没有下载任何素材：造型用 three.js 的基本几何体拼成，纹理用 Canvas 绘制，动作靠转动关节实现，没有用蒙皮。规则部分和画面分开，perft 四层结果全部正确。"
       },
       "sort": 1
     },
@@ -9295,8 +9295,8 @@
         "zh": "本站 · fhf's"
       },
       "note": {
-        "en": "The version you are reading. Every page is prerendered and static, yet all of its words live in a database: change one in the browser, press save, and the site is the new one the moment it lands, with no rebuild. Chinese and English sit side by side, and the theme switch is the gallery opening and closing.",
-        "zh": "你现在看的这一版。每一页都是预渲染好的静态页，可文字全在数据库里：在浏览器里改一个字，存下去的那一刻站点就是新的，不用重新构建。中英两份文案并排放着，开灯关灯是一次开馆和闭馆。"
+        "en": "The version you are reading. Every page is prerendered and static, and all of its text is stored in a database: edit it in the browser and save, and the site updates immediately, with no rebuild. The copy exists in Chinese and English, and there is a light and a dark theme.",
+        "zh": "你现在看的这一版。每一页都是预渲染的静态页，文字都存在数据库里：在浏览器里改完保存，站点马上更新，不用重新构建。中文和英文各有一份文案，有浅色和深色两种主题。"
       },
       "sort": 2
     },
@@ -9307,11 +9307,11 @@
       "dateLabel": null,
       "title": {
         "en": "Three desktop apps in one summer",
-        "zh": "一个夏天，三个桌面端"
+        "zh": "一个夏天做了三个桌面应用"
       },
       "note": {
-        "en": "Three things I was missing myself: something to reap the process still on a port after its terminal is gone, a screensaver that would show a line of my own text, a folder of photos I could flip through by lens. All three now live on my own Mac, and each has its page under Software.",
-        "zh": "三个都是自己缺的东西：关掉终端还占着端口的进程要有人收拾，屏保上想放一句自己的话，一个文件夹的照片想按镜头翻。写完之后它们就常驻在自己的 Mac 上了，各自的页面在「软件」里。"
+        "en": "All three are tools I needed myself: one that cleans up processes still holding a port after their terminal is closed, a screensaver that shows a line of my own text, and a way to browse a folder of photos by lens. I have used them on my own Mac since, and each is described on the Software page.",
+        "zh": "三个都是自己需要的工具：清理关掉终端后还占着端口的进程，把一段自己的文字做成屏保，按镜头浏览一个文件夹的照片。做完后一直在自己的 Mac 上用，介绍在「软件」页。"
       },
       "sort": 3
     },
@@ -9325,8 +9325,8 @@
         "zh": "第一版作品集"
       },
       "note": {
-        "en": "fhf-portfolio — the first time the work got a page of its own. Its 3D desk now lives in the lab.",
-        "zh": "fhf-portfolio：第一次把做过的东西摆成一个页面。那台 3D 工作台，如今住在实验室里。"
+        "en": "fhf-portfolio: the first time my work was put on a page. Its 3D desk is now in the lab.",
+        "zh": "fhf-portfolio：第一次把做过的东西放到一个页面上。里面的 3D 工作台现在在实验室。"
       },
       "sort": 4
     },
@@ -9340,8 +9340,8 @@
         "zh": "开始把学到的写下来"
       },
       "note": {
-        "en": "The first public note was on the seven OSI layers. Ever since: understand something, leave a paragraph behind.",
-        "zh": "第一篇公开笔记是 OSI 七层模型。从此看懂一件事，就留一段字。"
+        "en": "The first public note was about the seven OSI layers. Since then, whenever I understand something, I write it up.",
+        "zh": "第一篇公开笔记写的是 OSI 七层模型。之后每弄懂一件事，就写一篇。"
       },
       "sort": 5
     },
@@ -9351,12 +9351,12 @@
       "date": "2017-05-19",
       "dateLabel": null,
       "title": {
-        "en": "A place to put the code",
-        "zh": "有了一个放代码的地方"
+        "en": "Signed up for GitHub",
+        "zh": "注册 GitHub"
       },
       "note": {
-        "en": "Signed up for GitHub. Every version above leaves its shadow on that commit graph.",
-        "zh": "注册 GitHub。往后所有版本号，都能在那条提交曲线上找到影子。"
+        "en": "Every project since has been kept there.",
+        "zh": "之后的项目都放在上面。"
       },
       "sort": 6
     }
@@ -10571,8 +10571,8 @@
       "years": "1978 – 2020",
       "numbers": "8 · 24",
       "lede": {
-        "en": "Twenty years with the Lakers, two numbers, five championships, one night of 81. A Los Angeles at four in the morning is the line he left everyone after him.",
-        "zh": "洛杉矶湖人二十年，两个号码，五座总冠军，一场 81 分。凌晨四点的洛杉矶，是他留给后来人的一句话。"
+        "en": "Twenty years with the Los Angeles Lakers, wearing numbers 8 and 24, with five championships and a career-high 81 points in a game.",
+        "zh": "在洛杉矶湖人打了二十年，穿过 8 号和 24 号，拿了五座总冠军，单场最高 81 分。"
       },
       "accent": "#5b3f8a",
       "cover": "hawaii8",
@@ -10581,12 +10581,12 @@
         "zh": "照片 · 2005 – 2024"
       },
       "galleryTitle": {
-        "en": "On the court, and off it",
-        "zh": "球场上，和球场外"
+        "en": "Photographs on and off the court",
+        "zh": "场上和场外的照片"
       },
       "galleryLede": {
-        "en": "From number 8 to number 24, from a preseason night in Hawaii to a wall in Valencia.",
-        "zh": "从 8 号到 24 号，从夏威夷的季前赛到瓦伦西亚的一面墙。"
+        "en": "From a preseason game in Hawaii in 2005 to a mural in Valencia in 2024, in chronological order.",
+        "zh": "从 2005 年夏威夷的季前赛到 2024 年瓦伦西亚的涂鸦墙，按时间排列。"
       },
       "photos": [
         {
@@ -10847,8 +10847,8 @@
         "zh": "生涯 · 节点"
       },
       "timelineTitle": {
-        "en": "Philadelphia to Los Angeles",
-        "zh": "从费城到洛杉矶"
+        "en": "Career timeline",
+        "zh": "生涯时间线"
       },
       "timeline": [
         {
@@ -10957,8 +10957,8 @@
             "zh": "与女儿 Gianna 在卡拉巴萨斯的直升机事故中离世，41 岁。同年入选奈史密斯篮球名人堂。"
           },
           "title": {
-            "en": "Gone",
-            "zh": "离开"
+            "en": "Died",
+            "zh": "离世"
           }
         },
         {
@@ -10994,19 +10994,19 @@
       },
       "period": null,
       "body": {
-        "en": "From requirement to release, turning ideas into interfaces people can use. This site is the exhibit: bilingual routing, a content pipeline and a motion system, all written by hand.",
-        "zh": "从需求到上线，把想法做成人能用的界面。这个站点就是现场：双语路由、内容管线、动效系统，都是手写的。"
+        "en": "Nine years of front-end work, from requirements to release. The bilingual routing, content management and motion on this site are all written by me.",
+        "zh": "做前端九年，从需求做到上线。这个站点的双语路由、内容管理和动效都是自己写的。"
       },
       "bullets": {
         "en": [
           "React / Next.js / TypeScript",
           "Desktop apps in Tauri 2 + Rust, and some Swift",
-          "One token set, colour semantics down to components"
+          "One set of design tokens, from colours to components"
         ],
         "zh": [
           "React / Next.js / TypeScript",
           "桌面端用 Tauri 2 + Rust，也写 Swift",
-          "一套 token 从颜色语义一路贯到组件"
+          "一套设计 token，从颜色到组件通用"
         ]
       },
       "stickerLabel": "FRONTEND",
@@ -11025,15 +11025,15 @@
       },
       "period": null,
       "body": {
-        "en": "Started as a child and never stopped. What the scales taught me is what code teaches: get the basics past thinking, and there is room to improvise.",
-        "zh": "从小学琴，拉到现在。音阶教会我的事，和写代码是同一件：基本功练到不必去想，才有余裕即兴。"
+        "en": "I started the violin as a child and still play.",
+        "zh": "从小学小提琴，一直拉到现在。"
       },
       "bullets": {
         "en": [
-          "Music is a daily thing, not a line on a form"
+          "Music is part of every day"
         ],
         "zh": [
-          "音乐是日常，不是爱好栏里的一项"
+          "音乐是每天都有的事"
         ]
       },
       "stickerLabel": "VIOLIN",
@@ -11043,8 +11043,8 @@
     {
       "key": "games",
       "kicker": {
-        "en": "03 — player one",
-        "zh": "03 — 玩家一号"
+        "en": "03 — what I play",
+        "zh": "03 — 常玩的"
       },
       "title": {
         "en": "Games",
@@ -11052,8 +11052,8 @@
       },
       "period": null,
       "body": {
-        "en": "Dota 2 and Overwatch on permanent rotation; It Takes Two saved for a friend. Games taught me tempo and teamwork — and to queue again after a loss.",
-        "zh": "Dota 2 与守望先锋是常驻名单，双人成行是留给朋友的。游戏教会我的是节奏和配合——以及输了也要再来一把。"
+        "en": "I mostly play Dota 2 and Overwatch, and It Takes Two when playing with a friend.",
+        "zh": "常玩 Dota 2 和守望先锋，和朋友一起时玩双人成行。"
       },
       "bullets": {
         "en": [
@@ -11070,8 +11070,8 @@
     {
       "key": "film",
       "kicker": {
-        "en": "04 — the screen",
-        "zh": "04 — 银幕"
+        "en": "04 — what I watch and hear",
+        "zh": "04 — 常看常听的"
       },
       "title": {
         "en": "Film and music",
@@ -11079,8 +11079,8 @@
       },
       "period": null,
       "body": {
-        "en": "A lot of films, a lot of music. Good work of any kind shares one thing: restraint, and letting go exactly where it should. I look for the same thing in an interface.",
-        "zh": "看很多电影，听很多音乐。好的作品都有同一种东西：克制，以及在该放的地方放开。做界面时，我也在找它。"
+        "en": "I watch a lot of films and listen to a lot of music.",
+        "zh": "看很多电影，听很多音乐。"
       },
       "bullets": {
         "en": [],
@@ -11093,8 +11093,8 @@
     {
       "key": "court",
       "kicker": {
-        "en": "05 — the court",
-        "zh": "05 — 球场"
+        "en": "05 — sport",
+        "zh": "05 — 运动"
       },
       "title": {
         "en": "Basketball and table tennis",
@@ -11102,8 +11102,8 @@
       },
       "period": null,
       "body": {
-        "en": "Basketball for the teamwork, table tennis for the reflexes. When I have sat too long, I go and play.",
-        "zh": "篮球靠配合，乒乓靠反应。坐久了，就去打一场。"
+        "en": "I play basketball and table tennis, usually after sitting for too long.",
+        "zh": "打篮球和乒乓球，坐久了就去打一场。"
       },
       "bullets": {
         "en": [],
@@ -11116,8 +11116,8 @@
     {
       "key": "road",
       "kicker": {
-        "en": "06 — on the road",
-        "zh": "06 — 在路上"
+        "en": "06 — going out",
+        "zh": "06 — 出门"
       },
       "title": {
         "en": "Travel and the table",
@@ -11125,8 +11125,8 @@
       },
       "period": null,
       "body": {
-        "en": "Trips taken on short notice, and long nights around a table — Werewolf, Sanguosha; reading people beats reading cards.",
-        "zh": "喜欢说走就走的旅行，也喜欢一桌人的夜晚——狼人杀、三国杀，看人比看牌有意思。"
+        "en": "I like trips on short notice, and board games with friends: Werewolf and Sanguosha.",
+        "zh": "喜欢临时起意的旅行，也喜欢和朋友玩桌游：狼人杀、三国杀。"
       },
       "bullets": {
         "en": [
@@ -11143,8 +11143,8 @@
     {
       "key": "curious",
       "kicker": {
-        "en": "07 — the ground note",
-        "zh": "07 — 底色"
+        "en": "07 — last",
+        "zh": "07 — 最后"
       },
       "title": {
         "en": "Curious about the world",
@@ -11152,8 +11152,8 @@
       },
       "period": null,
       "body": {
-        "en": "All of the above is really one thing: a standing curiosity about the world. The light stays on for whatever there is still to see.",
-        "zh": "以上所有，其实是同一件事：对世界始终好奇。留一盏灯，是为了那些还想看看的东西。"
+        "en": "What all of the above have in common is curiosity: I want to see and try more things.",
+        "zh": "上面这些的共同点，是对很多事情都好奇，想多看看、多试试。"
       },
       "bullets": {
         "en": [],
