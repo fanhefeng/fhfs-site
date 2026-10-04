@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { useLocalClock } from "@/lib/client/useLocalClock";
+import { langOfText } from "@/lib/localized";
 import {
   attachMembers,
   isActivePath,
@@ -55,6 +56,7 @@ export function Footer({ items }: { items: NavLink[] }) {
   const locale = useLocale();
   const pathname = usePathname();
   const time = useLocalClock();
+  const slogan = tHome("slogan");
 
   const kicker = "font-mono text-[11px] uppercase tracking-meta text-fg-tertiary";
   const row =
@@ -83,7 +85,9 @@ export function Footer({ items }: { items: NavLink[] }) {
               </span>
             </SignRing>
           </Link>
-          <p className="text-fg-secondary">{tHome("slogan")}</p>
+          <p lang={langOfText(slogan)} className="text-fg-secondary">
+            {slogan}
+          </p>
           <PeelSticker
             email={site.social.email}
             hint={t("stickerHint")}

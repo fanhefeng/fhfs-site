@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { SidewaysBand } from "@/components/fx/SidewaysBand";
+import { langOfText } from "@/lib/localized";
 
 /**
  * The manifesto, crossing the screen inside /about.
@@ -20,21 +21,25 @@ import { SidewaysBand } from "@/components/fx/SidewaysBand";
 export function ManifestoBand() {
   const t = useTranslations("home");
   const locale = useLocale();
+  const slogan = t("slogan");
+  const echo = t("sloganEcho");
 
   return (
     <SidewaysBand
       resplitKey={locale}
       lines={[
+        // Both lines are tagged by their own words rather than the page's
+        // language — the slogan reads the same on both locales — so the CJK
+        // tracking guard in globals.css picks the right rule for each.
         {
-          text: t("slogan"),
+          text: slogan,
+          lang: langOfText(slogan),
           className:
             "text-display-sm md:text-[clamp(3rem,8vw,7rem)] md:leading-[1.08] md:font-[650] md:tracking-[-0.03em]",
         },
-        // The echo is always the other language — tagged so the CJK tracking
-        // guard in globals.css picks the right rule.
         {
-          text: t("sloganEcho"),
-          lang: locale === "zh" ? "en" : "zh-CN",
+          text: echo,
+          lang: langOfText(echo),
           className:
             "accent-light mt-4 font-accent text-title text-fg-secondary md:text-[clamp(1.5rem,3vw,2.75rem)]",
         },

@@ -44,3 +44,14 @@ function walk(value: unknown, locale: Locale): unknown {
   }
   return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item, locale)]));
 }
+
+/**
+ * The BCP 47 tag of a line of copy, read off its own words: Chinese when it
+ * has a Han character, English otherwise. For a line that is not always in
+ * the page's language — the slogan is the same English sentence on both
+ * locales, its echo the same Chinese one — where `lang` has to follow the
+ * words: the CJK tracking guard in globals.css and a screen reader's voice
+ * both go by it.
+ */
+export const langOfText = (text: string): "zh-CN" | "en" =>
+  /\p{Script=Han}/u.test(text) ? "zh-CN" : "en";

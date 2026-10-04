@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { inLocale } from "@/lib/localized";
+import { inLocale, langOfText } from "@/lib/localized";
 
 describe("inLocale", () => {
   const row = {
@@ -34,5 +34,17 @@ describe("inLocale", () => {
       en: "y",
       note: "z",
     });
+  });
+});
+
+describe("langOfText", () => {
+  it("tags a line by its own words", () => {
+    expect(langOfText("I love you three thousand")).toBe("en");
+    expect(langOfText("我爱你三千遍")).toBe("zh-CN");
+  });
+
+  it("reads a line with any Han character in it as Chinese", () => {
+    expect(langOfText("路小雨 · Lu Xiaoyu")).toBe("zh-CN");
+    expect(langOfText("")).toBe("en");
   });
 });
