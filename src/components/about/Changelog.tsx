@@ -38,8 +38,8 @@ type Props = {
  *
  * Two pieces of motion, both of them wayfinding rather than decoration:
  * - the year rail is a single window onto a stack of years that snaps as
- *   entries pass the middle of the viewport (Family-style number roll), so
- *   the reader always knows *when* they are;
+ *   entries pass the rail itself (Family-style number roll), so the year
+ *   always belongs to the row it stands beside;
  * - each node that has an exact date pops it in a tooltip on hover/focus,
  *   entering on `back.out` and leaving on the reversed ease at 2.2x.
  */
@@ -67,9 +67,15 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
       const items = gsap.utils.toArray<HTMLElement>("[data-entry]", root);
 
       /* --- year rail ------------------------------------------------------
-       * One ScrollTrigger per entry; whichever entry owns the middle band of
-       * the viewport decides the year. */
+       * One ScrollTrigger per entry; whichever entry the rail stands beside
+       * decides the year. The line is the middle of the rail where it sticks,
+       * read off its own `top` — not the middle of the viewport: a list
+       * shorter than half a screen is read well below the rail, and a year
+       * that followed the reader's eye stood beside a card from another one. */
       if (strip && rows.length > 1) {
+        const rail = strip.parentElement;
+        const line = () =>
+          rail ? (parseFloat(getComputedStyle(rail).top) || 0) + rail.offsetHeight / 2 : 0;
         const rowHeight = (strip.firstElementChild as HTMLElement | null)?.offsetHeight;
         let current = 0;
         const snapTo = (row: number) => {
@@ -85,8 +91,8 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
         items.forEach((el, i) => {
           ScrollTrigger.create({
             trigger: el,
-            start: "top 55%",
-            end: "bottom 55%",
+            start: () => `top ${line()}px`,
+            end: () => `bottom ${line()}px`,
             onToggle: (self) => {
               if (self.isActive) snapTo(rowOfEntry[i] ?? 0);
             },

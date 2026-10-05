@@ -495,12 +495,12 @@
       "changelog": {
         "name": "A year rail that follows the scroll",
         "tagline": "ScrollTrigger snap · tooltips",
-        "summary": "A personal history written in the format of software version numbers. The year column on the left shows one row at a time and switches to the matching year when an entry crosses the middle of the viewport.",
-        "lede": "Scroll down: as each entry crosses the middle of the viewport, the year on the left switches to that entry's year. Rest the pointer on a dot, or focus it with Tab, to see the exact date of that entry.",
+        "summary": "A personal history written in the format of software version numbers. The year column on the left shows one row at a time and switches to the matching year when an entry reaches the column.",
+        "lede": "Scroll down: as each entry reaches the year on the left, the year switches to that entry's year. Rest the pointer on a dot, or focus it with Tab, to see the exact date of that entry.",
         "title": "Changelog",
         "listAria": "Personal milestones, numbered like software releases",
         "dotAria": "Released {date}",
-        "note": "The rows are read from the database and edited in the admin. This list used to be on the About page; since October the career section there lists three cities with this same component and year column, and the version list is kept only here. The year column is a stack of years behind a window one row tall. As each entry crosses the middle of the viewport, ScrollTrigger snaps the stack to that entry's year, so the reader can see which year the current entry belongs to. Each node shows its exact date on hover or focus: it appears on back.out and disappears on the reversed ease at 2.2× speed."
+        "note": "The rows are read from the database and edited in the admin. This list used to be on the About page; since October the career section there lists three cities with this same component and year column, and the version list is kept only here. The year column is a stack of years behind a window one row tall. The column stays near the top of the screen, and as each entry reaches it ScrollTrigger snaps the stack to that entry's year, so the year always matches the entry beside it. Each node shows its exact date on hover or focus: it appears on back.out and disappears on the reversed ease at 2.2× speed."
       },
       "screening": {
         "name": "A stills wall with a full-screen viewer",
