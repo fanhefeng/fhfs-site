@@ -41,6 +41,7 @@ async function getJson<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`https://api.github.com${path}`, {
       headers: headers(),
+      signal: AbortSignal.timeout(4000),
       next: { revalidate: REVALIDATE_SECONDS },
     });
     if (!res.ok) return null;

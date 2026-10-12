@@ -1,0 +1,34 @@
+name: browser flows
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+# A single dedicated database is shared; cancelled runs could leave a server
+# or a test half-done, so serialize all writers to it.
+concurrency:
+  group: dedicated-e2e-database
+  cancel-in-progress: false
+
+jobs:
+  flows:
+    if: vars.E2E_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chrome
+      - run: pnpm e2e
+      # Test reports can contain drafts and an authenticated browser state.
+      # Keep them local to this trusted runner; do not upload public artifacts.

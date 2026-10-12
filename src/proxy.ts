@@ -49,6 +49,13 @@ export default async function proxy(request: NextRequest) {
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (PASS_THROUGH.has(pathname)) return NextResponse.next();
 
+    // A redirect would replace an expired editor with the login page before
+    // its action can return SESSION_EXPIRED. The header is only a routing
+    // hint, never proof of authorization: every action checks its own session.
+    if (request.method === "POST" && request.headers.has("next-action")) {
+      return NextResponse.next();
+    }
+
     const session = await readSession(request.cookies.get(SESSION_COOKIE)?.value);
     if (!session) {
       const url = new URL("/admin/login", request.nextUrl);

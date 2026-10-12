@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": ".e2e/types.tsbuildinfo"
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "scripts/**/*.mts",
+    "tests/**/*.ts",
+    "*.ts",
+    ".e2e/next/types/**/*.ts",
+    ".e2e/next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next"]
+}

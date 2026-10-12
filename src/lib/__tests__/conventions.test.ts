@@ -270,3 +270,12 @@ describe("the accent face", () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe("fonts", () => {
+  it("never require a font provider during builds or OG regeneration", () => {
+    const externalFonts = files.filter(({ text }) =>
+      /next\/font\/google|fonts\.(?:googleapis|gstatic)\.com/.test(text),
+    );
+    expect(externalFonts.map(({ file }) => file)).toEqual([]);
+  });
+});

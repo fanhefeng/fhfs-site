@@ -8,6 +8,10 @@ import { HASHED_ROUTES } from "./src/config/immutable";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  // A browser-test build must never replace the normal site's pages or cache.
+  ...(process.env.E2E_BUILD === "true"
+    ? { distDir: ".e2e/next", typescript: { tsconfigPath: "tsconfig.e2e.json" } }
+    : {}),
   experimental: {
     // The root layout sits under [locale], so a URL matching no route at all
     // has no layout to render a segment-level not-found inside. This routes

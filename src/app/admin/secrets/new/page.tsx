@@ -1,5 +1,6 @@
 import { site } from "@/config/site";
 import { requireAdminPage } from "@/lib/server/auth/session";
+import { requestTime } from "@/lib/server/clock";
 import { AdminChrome } from "../../AdminChrome";
 import { SecretForm } from "../SecretForm";
 
@@ -21,7 +22,7 @@ export default async function NewSecret() {
           kind: "essay",
           title: "",
           // Today in the site's zone (the server's is UTC) — a starting point, editable.
-          date: new Intl.DateTimeFormat("sv-SE", { timeZone: site.timeZone }).format(new Date()),
+          date: new Intl.DateTimeFormat("sv-SE", { timeZone: site.timeZone }).format(requestTime()),
           summary: "",
           audio: "",
           duration: "",
