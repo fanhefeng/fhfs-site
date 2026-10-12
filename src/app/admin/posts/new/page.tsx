@@ -1,5 +1,6 @@
 import { site } from "@/config/site";
 import { requireAdminPage } from "@/lib/server/auth/session";
+import { requestTime } from "@/lib/server/clock";
 import { AdminChrome } from "../../AdminChrome";
 import { PostForm } from "../PostForm";
 
@@ -22,7 +23,7 @@ export default async function NewPost() {
           // Today, as a starting point rather than a claim — it is editable.
           // sv-SE formats as YYYY-MM-DD, in the site's zone: the server's own is
           // UTC on Vercel, which before 08:00 in Shanghai is still yesterday.
-          date: new Intl.DateTimeFormat("sv-SE", { timeZone: site.timeZone }).format(new Date()),
+          date: new Intl.DateTimeFormat("sv-SE", { timeZone: site.timeZone }).format(requestTime()),
           summary: "",
           tags: [],
           draft: false,

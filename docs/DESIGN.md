@@ -49,7 +49,7 @@
 ### 1.2 字体
 
 - EN display：**Nunito**（可变字重，圆角末端，与中文圆体同调）600–700，`clamp(2.5rem, 7vw, 6.5rem)`，`letter-spacing: -0.03em`，`line-height: 1.05`。
-- 点缀字体：**Josefin Sans** 正体，不斜（引语/关键词，next/font/google 可变字体；标题字号的行用细体 300、成句的用 400；中文仍落在系统宋体上。2026-10-03 起替换 Lora italic，见 DESIGN-LOG）。类名 `font-accent`。
+- 点缀字体：**Josefin Sans** 正体，不斜（引语/关键词，next/font/local 可变字体；标题字号的行用 `accent-light`、成句的用 400；中文仍落在系统宋体上。2026-10-03 起替换 Lora italic，字体本地化见 2026-10-12 DESIGN-LOG）。类名 `font-accent`。
 - 正文：Nunito 400，16–18px / 1.7。
 - 元信息：**Geist Mono** 11–12px uppercase `tracking +0.08em`（版本号/日期/kicker）。
 - ZH：**悠哉字体 Yozai**（圆体，OFL；`public/fonts/yozai/` 自托管，GB2312 子集 + cn-font-split 按 unicode-range 分片，400 / 500 两字重，500 面声明为 500–900 免合成粗体，`src/app/yozai.css`）优先，其后只列系统 CJK 字体（PingFang SC / Microsoft YaHei / 本地 Noto CJK；衬线 Songti SC / SimSun），不再下载任何兜底网络字体（Noto Sans/Serif SC 已于 09-15 删除，见上方修订）；中文标题不做负字距（tracking 0～+0.01em）。
@@ -249,7 +249,7 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
   getter 带缓存标签，写入侧 `updateTag`）。长文（posts / secrets / abouts）一语言一行、
   按 `(slug, locale)` 建键；短字段是 `{zh,en}` 的 jsonb 列。locale fallback +
   isFallback 提示条行为保留。**不要在这个文件之外读库，也不要留未缓存的读。**
-- OG 图构建期联网拉 Google Fonts（lib/server/og.ts）——换字体先本地跑通 build。
+- OG 字体与浏览器字体均从仓库本地读取，不在构建或生成图片时下载 Google Fonts；来源、许可和重建方法见 `docs/FONTS.md`。换字体先本地跑通 build。
 
 ### 5.3 性能预算
 

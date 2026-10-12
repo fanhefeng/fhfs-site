@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale, useNow, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/config/site";
 import { useLocalClock } from "@/lib/client/useLocalClock";
@@ -54,6 +54,10 @@ export function Footer({ items }: { items: NavLink[] }) {
   const tNav = useTranslations("nav");
   const tHome = useTranslations("home");
   const locale = useLocale();
+  const now = useNow();
+  const year = new Intl.DateTimeFormat("en", { year: "numeric", timeZone: site.timeZone }).format(
+    now,
+  );
   const pathname = usePathname();
   const time = useLocalClock();
   const slogan = tHome("slogan");
@@ -169,10 +173,10 @@ export function Footer({ items }: { items: NavLink[] }) {
             switch. Nothing ornamental — the slogan up top is the footer's one
             line of the author's own. */}
         <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-5 font-mono text-[11px] text-fg-tertiary">
-          {/* Build-time year is baked into the static HTML; let the client
-              keep it rather than fail hydration right after New Year. */}
-          <span suppressHydrationWarning>
-            © {new Date().getFullYear()} {site.author}
+          {/* The provider's initial instant and the site's time zone agree
+              across SSR and hydration, including either side of New Year. */}
+          <span>
+            © {year} {site.author}
             <span className="hidden sm:inline"> · {t("rights")}</span>
           </span>
           <span className="ml-auto flex items-center gap-x-4">

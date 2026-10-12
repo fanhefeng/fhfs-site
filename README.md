@@ -65,6 +65,8 @@
 - **数据有退路。** 每晚导出一次到 `db-snapshots` 分支，有行的表变空就拒绝提交；
   [`docs/RECOVERY.md`](docs/RECOVERY.md) 是从「删错一行」到「Neon 账号没了」的三级操作单，
   演练过，全程 298 秒。
+- **构建不下载字体。** 浏览器字体与 OG 字体固定版本、连同 OFL 提交，来源和再生成方式见
+  [`docs/FONTS.md`](docs/FONTS.md)。构建仍需要数据库，GitHub release 请求有 4 秒超时并允许缺省。
 - **CSP 不放行任何跨域。** 字体、解码器、音乐全部自托管；唯一的例外是说说媒体所在的那个 Cloudflare Worker（它自己补上了 Safari 放视频要的 Range）。
 - **模块放在哪，就说明它在哪跑。** `src/lib/server` 与 `src/lib/client` 各自引入 `server-only` /
   `client-only`，放错一边就是构建错误——测试、脚本或 proxy 直接加载的那几个服务端模块除外
@@ -112,7 +114,19 @@ pnpm media:music <源文件> <名字>   # 照其余几首的参数编码一张�
 pnpm db:generate     # 改了 src/db/schema.ts 之后生成迁移，再 db:migrate
 pnpm db:check        # 打印库里每张表的真实内容
 pnpm db:export       # 把库写回 backup/
+pnpm e2e:public      # 已启动的本机生产服务，桌面与移动视口的公开关键流程
+pnpm e2e             # 专用测试库：迁移、准备、构建、登录/保存/错误/草稿预览
+pnpm backup:private check   # 私有备份配置和原生工具检查
+pnpm backup:private create  # 加密备份，包含草稿、迁移记录与媒体
+pnpm backup:private verify # 恢复字节与完整性校验；数据库恢复仍需单独演练
 ```
+
+覆盖率针对有测试的辅助模块，不能代表组件或全项目覆盖率。后台写入测试必须使用独立测试库，
+保护与配置见 [`docs/TESTING.md`](docs/TESTING.md)。私有备份需要先配置独立存储和只读凭据，
+首次备份、恢复与 CI 启用步骤见 [`docs/PRIVATE-BACKUP.md`](docs/PRIVATE-BACKUP.md)；配置完成前
+它不构成已有的恢复来源。
+
+当前验证结果与按优先级排列的待办见 [`docs/PROJECT-STATUS.md`](docs/PROJECT-STATUS.md)。
 
 改代码之前先读 [`AGENTS.md`](AGENTS.md)：架构、每条规矩为什么存在、哪些测试在守着它们，都写在那里。
 

@@ -72,7 +72,7 @@ export default defineConfig({
         rules: { "eslint/no-console": "off" },
       },
     ],
-    ignorePatterns: [".next", "tools", "public"],
+    ignorePatterns: [".next", ".e2e", "tools", "public"],
     options: {
       // Rules that read the types (floating promises, unbound methods, …).
       // The type check itself stays with `tsc --noEmit` in `pnpm typecheck`:
@@ -88,6 +88,7 @@ export default defineConfig({
     ignorePatterns: [
       // Generated, vendored or written by a tool that has its own opinion.
       ".next",
+      ".e2e",
       "node_modules",
       "pnpm-lock.yaml",
       "backup",

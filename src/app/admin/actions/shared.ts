@@ -16,6 +16,7 @@ import { renderMarkdown } from "@/lib/server/markdown";
 import { readingMinutes } from "@/lib/reading";
 
 import { asset } from "@/lib/asset";
+import { isImmutable } from "@/config/immutable";
 
 /**
  * Every write the admin can make.
@@ -81,6 +82,9 @@ export function unknownAsset(paths: readonly string[], folder: string): ActionSt
   for (const path of paths) {
     if (!path.startsWith("/")) continue;
     try {
+      // asset() intentionally passes through unrelated URLs; a saved local
+      // media path must belong to the managed static assets in the first place.
+      if (!isImmutable(path)) throw new Error("Unmanaged local media path");
       asset(path);
     } catch {
       return {

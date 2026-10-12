@@ -12,11 +12,13 @@
 | `backup/`（main 分支）              | GitHub + 你本机的 clone         | 每个改内容的 PR，跟着代码走        |
 | `backup/`（`db-snapshots` 分支）    | GitHub                          | 每天 03:00 自动，内容有变才提交    |
 | Neon 自己的 history / branch restore | Neon                            | 连续，但只保留很短一段时间         |
+| 私有 restic 仓库（配置并验证后） | 独立加密存储 | 每天 04:00；包含草稿和媒体 |
 
 前两份是同一个 `backup/db.json`，`pnpm db:import` 读的就是它。第三份是 Neon 的
 point-in-time restore，**只在情形一里有用**：它和库存在同一个账号里，账号没了它
-一起没。这个项目的保留期实测是 **21600 秒，正好 6 小时**（Free 计划），过了就回
-不去了——也就是说，超过六小时才发现的误删，只能靠上面两份快照。
+一起没。早期演练时这个项目的保留期实测是 **21600 秒，正好 6 小时**（Free 计划），
+这只是当时的记录。事故时应先在控制台核实当前可恢复窗口；超出窗口后，使用已配置并验证的
+私有 restic 副本，或上面两份公开快照。公开快照不含草稿和媒体。
 
 **没有备份、也不需要备份的东西**：`AUTH_SECRET` 和 `ADMIN_PASSWORD_HASH` 丢了
 跑 `pnpm admin:password` 重新生成一对，填回 Vercel 就是了——它们不锁任何数据。
@@ -27,7 +29,8 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 `fhfs-media`（`media/`），库里只存地址（`MEDIA_ORIGIN` 开头）。换库、恢复库都不碰它。
 `pnpm media:pull` 把库里指到的每个文件拉回本机的 `media/files/`，这就是备份的办法，也是
 重新部署之前必须做的一步（部署会整体替换，`media:deploy` 发现缺文件会拒绝）。媒体站整个没了：
-先 `media:pull` 过的那份本机副本就是全部。git 历史里**没有**它们——2026-10-01 改写历史时把
+先用 `media:pull` 过的本机副本，或已经配置且验证过的[私有备份](PRIVATE-BACKUP.md)恢复。
+git 历史里**没有**它们——2026-10-01 改写历史时把
 `public/moments/` 整个拿掉了。改写前的完整历史在两处：用户本机的一个 bundle
 （`../fhfs-site-history-backup/`），和 GitHub 上已设为私有并归档的旧仓库 `fanhefeng/fhfs-site-archive`
 （10-02 起，旧的 48 个 PR 也都在那里）。都没有的话，视频和图片得从原平台重新下载。
@@ -35,9 +38,10 @@ point-in-time restore，**只在情形一里有用**：它和库存在同一个�
 真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那些表——除了登录限流用的
 `login_attempts`，schema 里的每一张都在里面（`tables.test.ts` 守着这一点）。
 
-**草稿不进备份。** 仓库和 `db-snapshots` 分支都是公开的，导出草稿等于当晚就把它
-发出去，所以 `db:export` 只写已发布的文章、秘密、说说、电影和偶像。草稿只在库里（和
-Neon 那 6 小时的 history 里）；库整个没了，没发布的草稿也跟着没了。`db:import` 对这五张表
+**草稿不进公开备份。** 仓库和 `db-snapshots` 分支都是公开的，导出草稿等于当晚就把它
+发出去，所以 `db:export` 只写已发布的文章、秘密、说说、电影和偶像。私有 restic 备份另含草稿，
+但要先按 [PRIVATE-BACKUP.md](PRIVATE-BACKUP.md) 配置并完成首次验证；尚未启用时，草稿仍只有数据库
+与 Neon 的恢复窗口可用。`db:import` 对这五张表
 只做 upsert，恢复备份不会删掉库里现有的草稿。
 
 库里还有一个 `neon_auth` schema（`user`、`session`、`account`、`jwks` 等 9 张表），
@@ -97,7 +101,7 @@ secret 也要换成新库的只读角色，否则每天的自动备份会一直�
 
 别忘了在新库上重建只读角色，CI 的 build 和每日备份都用它。这几句 SQL 在
 **Neon console 的 SQL Editor** 里跑——这台机器没有 `psql`（`vp` 只管 JS 工具链），
-而恢复的时候不该再去装一个：
+公开 JSON 恢复不依赖 `psql`；私有 dump 恢复另需原生客户端，见私有备份操作单：
 
 ```sql
 CREATE ROLE ci_readonly WITH LOGIN PASSWORD '…';
@@ -111,7 +115,8 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO ci_readonly;
 ## 情形三：Neon 账号整个没了
 
 账号被封、注销、或者哪天 Neon 这家公司不在了。PITR、分支、项目一起消失，
-`backup/db.json` 是唯一剩下的东西——它在 GitHub 上，也在你本机的 clone 里。
+先用已配置并验证的私有 restic dump 恢复草稿与媒体；没有这份副本时，
+`backup/db.json` 是剩下的内容来源——它在 GitHub 上，也在你本机的 clone 里。
 
 好消息是代码对 Neon 的绑定很浅：**Neon 专有的代码只有三个文件**，schema、全部
 迁移、所有查询、`drizzle.config.ts`（`dialect: "postgresql"`）、`src/config/env.ts`

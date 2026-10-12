@@ -60,6 +60,23 @@ describe("envProblems", () => {
       "sekrit-value",
     );
   });
+
+  it("accepts local HTTP and HTTPS browser tests while rejecting remote endpoints", () => {
+    for (const E2E_BASE_URL of ["http://localhost:3100", "https://localhost:3443"]) {
+      expect(envProblems({ ...good, E2E_BASE_URL })).toEqual([]);
+    }
+    expect(envProblems({ ...good, E2E_BASE_URL: "https://example.com:443" })).toEqual([
+      expect.stringMatching(/^E2E_BASE_URL/),
+    ]);
+  });
+
+  it("only accepts an explicit browser-test build switch", () => {
+    expect(envProblems({ ...good, E2E_BUILD: "true" })).toEqual([]);
+    expect(envProblems({ ...good, E2E_BUILD: "false" })).toEqual([]);
+    expect(envProblems({ ...good, E2E_BUILD: "yes" })).toEqual([
+      expect.stringMatching(/^E2E_BUILD/),
+    ]);
+  });
 });
 
 describe("the variables the code reads", () => {

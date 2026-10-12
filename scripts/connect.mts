@@ -17,14 +17,14 @@ import { withConnectionRetry } from "../src/lib/retryFetch";
 
 const RETRY_DELAYS = [500, 1500, 4000, 8000];
 
-export function connect() {
+export function connect(explicitUrl?: string) {
   try {
     process.loadEnvFile(".env.local");
   } catch {
     // Already in the environment.
   }
 
-  const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+  const url = explicitUrl ?? process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL_UNPOOLED or DATABASE_URL must be set");
 
   neonConfig.fetchFunction = withConnectionRetry(

@@ -1,0 +1,64 @@
+{
+  "upstreamCommit": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+  "fonttools": "4.66.1",
+  "brotli": "1.2.0",
+  "sources": [
+    {
+      "family": "Nunito",
+      "url": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ofl/nunito/Nunito%5Bwght%5D.ttf",
+      "sha256": "bb55a5ca5c2042335b3991af27c4d0705d0ef41cac6164ac737fd8f2a1e85207"
+    },
+    {
+      "family": "JosefinSans",
+      "url": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ofl/josefinsans/JosefinSans%5Bwght%5D.ttf",
+      "sha256": "9255abdb5f393bc51e101abbd07a716a977fd3e15472b1b84b260f426a342bfd"
+    },
+    {
+      "family": "GeistMono",
+      "url": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ofl/geistmono/GeistMono%5Bwght%5D.ttf",
+      "sha256": "d00e590b8eb3a59acc329b2d044fd143ae935090b7da33199ebee27cc7de8196"
+    },
+    {
+      "family": "NotoSansSC",
+      "url": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf",
+      "sha256": "a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/app/font-files/GeistMono.woff2",
+      "bytes": 25172,
+      "sha256": "fccb356b2ec54b05a0336c285a2e809da6247aaf0c7cda9e60443b2a608ac348"
+    },
+    {
+      "path": "src/app/font-files/JosefinSans.woff2",
+      "bytes": 34200,
+      "sha256": "f6f4d0762f28999c5187a0a28cb4fa66e9f25eb450f92c748e512fc3305cb1df"
+    },
+    {
+      "path": "src/app/font-files/Nunito.woff2",
+      "bytes": 45784,
+      "sha256": "a3d0444e0181f2ae22371398ca3fa0c4e995c6df707fbbcae6de66dc599c162d"
+    },
+    {
+      "path": "src/lib/server/og-fonts/NotoSansSC-400.woff",
+      "bytes": 6317068,
+      "sha256": "f2c6d083ed50863d39fb1f6177606d21ddd4b924458dde14191d4ed591567767"
+    },
+    {
+      "path": "src/lib/server/og-fonts/NotoSansSC-600.woff",
+      "bytes": 6368568,
+      "sha256": "5633acacf6eb6bc8d98835de645a503dc988ff9e51c590fd9ac78c64a1e65bf9"
+    },
+    {
+      "path": "src/lib/server/og-fonts/Nunito-400.woff",
+      "bytes": 60064,
+      "sha256": "e7ca2ac3b88ecc1768d40c4cbdd92de69e538b765180aac53a159c3b41a7b008"
+    },
+    {
+      "path": "src/lib/server/og-fonts/Nunito-700.woff",
+      "bytes": 59492,
+      "sha256": "546cbf0afc12acbd3ee8844ac6b1a5e18d63a14192438e2cc0a6b84e5e5c4174"
+    }
+  ]
+}

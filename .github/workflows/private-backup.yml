@@ -1,0 +1,63 @@
+name: private backup
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # Daily, 04:00 Asia/Shanghai.
+    - cron: "0 2,8,14 * * *" # Independent freshness checks.
+    - cron: "0 21 1 */3 *" # Quarterly restore and byte verification.
+  workflow_dispatch:
+    inputs:
+      operation:
+        type: choice
+        options: [create, health, verify]
+        default: create
+
+permissions:
+  contents: read
+concurrency:
+  group: private-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: vars.PRIVATE_BACKUP_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+      RESTIC_REPOSITORY: ${{ secrets.RESTIC_REPOSITORY }}
+      RESTIC_PASSWORD: ${{ secrets.RESTIC_PASSWORD }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ vars.BACKUP_AWS_REGION }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install native backup clients
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common restic
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-18
+          echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
+      - name: Select operation
+        env:
+          REQUESTED: ${{ inputs.operation }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          operation=health
+          if [ "$SCHEDULE" = '0 20 * * *' ]; then operation=create; fi
+          if [ "$SCHEDULE" = '0 21 1 */3 *' ]; then operation=verify; fi
+          if [ -n "$REQUESTED" ]; then operation="$REQUESTED"; fi
+          case "$operation" in create|health|verify) ;; *) exit 1 ;; esac
+          pnpm backup:private "$operation"
+          pnpm backup:private health
+      - name: Report failure without private data
+        if: failure()
+        run: echo '::error::Private backup failed. Inspect configuration and storage; private native-tool output is intentionally withheld.'

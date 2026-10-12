@@ -1,4 +1,4 @@
-import { Nunito, Josefin_Sans, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 /* Editorial type trio. globals.css assembles the runtime stacks from these
  * variables. Latin is Nunito — rounded terminals to sit beside the Yozai
@@ -15,8 +15,10 @@ import { Nunito, Josefin_Sans, Geist_Mono } from "next/font/google";
  *
  * Shared because `global-not-found` renders outside the [locale] root layout
  * and has to dress itself. */
-const sans = Nunito({
-  subsets: ["latin"],
+const sans = localFont({
+  src: "./font-files/Nunito.woff2",
+  weight: "200 1000",
+  style: "normal",
   variable: "--font-nunito",
   display: "swap",
 });
@@ -34,15 +36,19 @@ const sans = Nunito({
  * variable file carries both weights in use (light for a line at title size,
  * regular for a sentence); no italic is loaded, and a test keeps `italic`
  * away from it. */
-const accent = Josefin_Sans({
-  subsets: ["latin"],
+const accent = localFont({
+  src: "./font-files/JosefinSans.woff2",
+  weight: "100 700",
+  style: "normal",
   variable: "--font-josefin",
   display: "swap",
   preload: false,
 });
 
-const mono = Geist_Mono({
-  subsets: ["latin"],
+const mono = localFont({
+  src: "./font-files/GeistMono.woff2",
+  weight: "100 900",
+  style: "normal",
   variable: "--font-geist-mono",
   display: "swap",
   preload: false,

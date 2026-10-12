@@ -15,6 +15,42 @@
 type Rule = { required: boolean; valid: (value: string) => boolean; shape: string };
 
 export const ENV_RULES: Record<string, Rule> = {
+  BACKUP_DATABASE_URL: {
+    required: false,
+    valid: (v) => /^postgres(ql)?:\/\/\S+$/.test(v),
+    shape: "the direct Postgres URL of a private backup role, including drafts",
+  },
+  RESTIC_REPOSITORY: {
+    required: false,
+    valid: (v) => v.trim() === v && v.length > 0 && !/[\r\n\0]/.test(v),
+    shape: "the private encrypted restic repository address",
+  },
+  RESTIC_PASSWORD: {
+    required: false,
+    valid: (v) => v.length >= 20,
+    shape: "a dedicated random backup encryption password of at least 20 characters",
+  },
+  RESTIC_PASSWORD_FILE: {
+    required: false,
+    valid: (v) => v.trim() === v && v.length > 0 && !/[\r\n\0]/.test(v),
+    shape:
+      "a protected file containing the backup encryption password (alternative to RESTIC_PASSWORD)",
+  },
+  TEST_DATABASE_URL: {
+    required: false,
+    valid: (v) => /^postgres(ql)?:\/\/\S+$/.test(v),
+    shape: "a dedicated, disposable Neon test project; never a production branch",
+  },
+  E2E_BASE_URL: {
+    required: false,
+    valid: (v) => /^https?:\/\/localhost:\d+$/.test(v),
+    shape: "a local HTTP/HTTPS browser-test server with an explicit port; supplied by pnpm e2e",
+  },
+  E2E_BUILD: {
+    required: false,
+    valid: (v) => v === "true" || v === "false",
+    shape: "true for the isolated browser-test build; supplied by pnpm e2e, unset in production",
+  },
   DATABASE_URL: {
     required: true,
     valid: (v) => /^postgres(ql)?:\/\/\S+$/.test(v),

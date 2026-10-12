@@ -1,4 +1,6 @@
 import "server-only";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 /**
  * Open Graph image toolkit — the paper palette.
  *
@@ -46,125 +48,41 @@ export type OgFont = {
   style: "normal";
 };
 
-/**
- * A build generates ~30 cards across 13 worker processes, so Google's font
- * endpoints see a burst of parallel requests and occasionally drop one
- * (ECONNRESET before the TLS handshake completes). Every fetch here is
- * therefore retried with exponential backoff plus jitter — one dropped
- * socket must not fail the whole build.
- */
-const FETCH_ATTEMPTS = 5;
+/** Server files, read lazily and shared within each worker. Full CJK coverage
+ * also handles titles written after deployment. These files are traced into
+ * the Node deployment, never imported into JavaScript or a browser bundle. */
+const files = {
+  latinBody: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/Nunito-400.woff")),
+  latinDisplay: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/Nunito-700.woff")),
+  cjkBody: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/NotoSansSC-400.woff")),
+  cjkDisplay: () =>
+    readFile(path.join(process.cwd(), "src/lib/server/og-fonts/NotoSansSC-600.woff")),
+};
 
-async function fetchWithRetry(
-  url: string,
-  label: string,
-  accept: (response: Response) => Promise<boolean> = async () => true,
-): Promise<Response> {
-  let lastError: unknown;
-  for (let attempt = 0; attempt < FETCH_ATTEMPTS; attempt++) {
-    if (attempt > 0) {
-      const backoff = 250 * 2 ** (attempt - 1) + Math.random() * 250;
-      await new Promise((resolve) => setTimeout(resolve, backoff));
-    }
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        lastError = new Error(`${label}: HTTP ${response.status}`);
-      } else if (await accept(response)) {
-        return response;
-      } else {
-        lastError = new Error(`${label}: response is not a font file`);
-      }
-    } catch (error) {
-      lastError = error;
-    }
+const loaded = new Map<keyof typeof files, Promise<ArrayBuffer>>();
+
+function load(key: keyof typeof files): Promise<ArrayBuffer> {
+  let pending = loaded.get(key);
+  if (!pending) {
+    pending = files[key]().then((data) => Uint8Array.from(data).buffer);
+    loaded.set(key, pending);
+    // A transient filesystem failure may be retried on the next request.
+    void pending.catch(() => loaded.delete(key));
   }
-  throw new Error(`${label} failed after ${FETCH_ATTEMPTS} attempts`, {
-    cause: lastError,
-  });
+  return pending;
 }
 
-/**
- * Fetches a text-subset font (TTF) from the Google Fonts CSS API for use in
- * ImageResponse (satori). The default fetch user agent receives truetype URLs.
- * Runs wherever a card is drawn: at build, and again on the server when a
- * save invalidates one — the OG routes are `force-static`, but their getters
- * carry the `content` tag like every page's, so they regenerate the same way.
- * Hence the retries. A font that still will not come fails the build when it
- * happens at build time, and the card's request when it happens later.
- */
-async function loadGoogleFont(family: string, text: string, weight = 400): Promise<ArrayBuffer> {
-  const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
-    family,
-  )}:wght@${weight}&text=${encodeURIComponent(text)}`;
-  const css = await (await fetchWithRetry(url, `font css ${family}`)).text();
-  const resource = css.match(/src: url\((.+?)\) format\('(?:opentype|truetype)'\)/);
-  if (!resource) throw new Error(`No TTF url for font ${family}`);
-  // A 200 with a truncated or non-font body (seen once as an HTML error page)
-  // blows up inside satori as a DataView RangeError, so the body is checked
-  // for a TrueType/OpenType magic number and counted as a failed attempt
-  // otherwise; the accepted body is captured here since a Response body can
-  // only be read once.
-  let data: ArrayBuffer | undefined;
-  await fetchWithRetry(resource[1]!, `font file ${family}`, async (response) => {
-    const buffer = await response.arrayBuffer();
-    if (!isSfnt(buffer)) return false;
-    data = buffer;
-    return true;
-  });
-  if (!data) throw new Error(`No font data for ${family}`);
-  return data;
-}
-
-/** TrueType (0x00010000 / "true") or CFF OpenType ("OTTO") header. */
-function isSfnt(buffer: ArrayBuffer): boolean {
-  if (buffer.byteLength < 12) return false;
-  const tag = new DataView(buffer).getUint32(0);
-  return tag === 0x00010000 || tag === 0x74727565 || tag === 0x4f54544f;
-}
-
-/** CJK + fullwidth punctuation — everything Nunito cannot draw. */
+/** Latin-extended is in Nunito; CJK and fullwidth punctuation need Noto. */
 const CJK_RE = /[⺀-⿿　-〿㐀-䶿一-鿿豈-﫿︰-﹏＀-￯]/;
 
-/** Deduplicated character set — keeps the `&text=` subset URL short. */
-function subset(text: string, wantCjk: boolean) {
-  const seen = new Set<string>();
-  for (const ch of text) {
-    if (CJK_RE.test(ch) === wantCjk) seen.add(ch);
-  }
-  return [...seen].join("");
-}
-
-/**
- * Loads exactly the glyphs an image needs, in the two weights the layout
- * uses: `display` text (wordmark / headline) at 700, `body` text (tagline,
- * meta line) at 400. The CJK companion is only fetched when the text
- * actually contains CJK, so English pages pay for two requests, not four.
- */
 export async function loadOgFonts(displayText: string, bodyText: string): Promise<OgFont[]> {
   const jobs: Promise<OgFont>[] = [];
-
-  const push = (family: string, name: string, text: string, weight: OgWeight) => {
-    jobs.push(
-      loadGoogleFont(family, text, weight).then((data) => ({
-        name,
-        data,
-        weight,
-        style: "normal" as const,
-      })),
-    );
+  const push = (key: keyof typeof files, name: string, weight: OgWeight) => {
+    jobs.push(load(key).then((data) => ({ name, data, weight, style: "normal" as const })));
   };
-
-  // Latin is always needed — the wordmark alone guarantees it.
-  push("Nunito", "Nunito", subset(displayText, false) || "fhf", 700);
-  push("Nunito", "Nunito", subset(bodyText, false) || "fhf", 400);
-
-  const displayCjk = subset(displayText, true);
-  const bodyCjk = subset(bodyText, true);
-  // 600 rather than 700: CJK bold is already dense, and satori snaps a 700
-  // request to the nearest registered weight.
-  if (displayCjk) push("Noto Sans SC", "NotoSansSC", displayCjk, 600);
-  if (bodyCjk) push("Noto Sans SC", "NotoSansSC", bodyCjk, 400);
-
+  push("latinDisplay", "Nunito", 700);
+  push("latinBody", "Nunito", 400);
+  if (CJK_RE.test(displayText)) push("cjkDisplay", "NotoSansSC", 600);
+  if (CJK_RE.test(bodyText)) push("cjkBody", "NotoSansSC", 400);
   return Promise.all(jobs);
 }

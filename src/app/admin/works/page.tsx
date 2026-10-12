@@ -1,7 +1,9 @@
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { works } from "@/db/schema";
+import { site } from "@/config/site";
 import { requireAdminPage } from "@/lib/server/auth/session";
+import { requestTime } from "@/lib/server/clock";
 import { AdminChrome } from "../AdminChrome";
 import { WorkForm, type WorkDraft } from "./WorkForm";
 import { Note } from "../ui/Note";
@@ -17,7 +19,11 @@ export default async function WorksPage() {
     key: "",
     title: { zh: "", en: "" },
     description: { zh: "", en: "" },
-    year: new Date().getFullYear(),
+    year: Number(
+      new Intl.DateTimeFormat("en", { year: "numeric", timeZone: site.timeZone }).format(
+        requestTime(),
+      ),
+    ),
     cover: null,
     url: null,
     tags: [],

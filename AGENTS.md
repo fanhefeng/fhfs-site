@@ -311,3 +311,23 @@ and the pure function it calls, are in `src/lib/backup.ts`. A red `backup` run
 is a real alarm. Restoring — a wrong edit, a lost project, a lost Neon account
 and the three files that would have to change to move off Neon — is
 `docs/RECOVERY.md`.
+
+# Build and recovery checks (2026-10-12)
+
+Browser fonts are committed under `src/app/font-files/` and loaded with
+`next/font/local`. OG fonts are server files under `src/lib/server/og-fonts/`;
+neither build nor OG generation downloads Google Fonts (`conventions.test.ts`
+checks the sources). Provenance, hashes and regeneration: `docs/FONTS.md`.
+
+`pnpm e2e:public` reads a running local production server. `pnpm e2e` writes
+only to `TEST_DATABASE_URL`, after rejecting the production endpoint and
+checking the manually provisioned `fhfs_e2e_guard` marker. See `docs/TESTING.md`.
+The proxy lets Server Action POSTs reach their own session checks so an expired
+editor retains its input; ordinary unauthenticated visits still redirect.
+
+Public JSON exports still exclude drafts. Private encrypted recovery copies
+include drafts and media, through `pnpm backup:private`; `verify` checks restored
+bytes, while a real Postgres restore drill is separate. The local synthetic
+round trip is `pnpm backup:private:selftest`. Configuration and activation:
+`docs/PRIVATE-BACKUP.md`. Neither workflow is enabled until its repository
+variable is set after configuration and first verification.
