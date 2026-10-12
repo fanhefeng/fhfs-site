@@ -70,6 +70,34 @@ try {
   assert.equal(snapshots.length, 1);
   assert.equal(snapshotProblem(latestSnapshotTime(snapshots)), null);
   await restic(["check"]);
+  const databaseOnly = path.join(root, "database-only");
+  await restic([
+    "restore",
+    "latest",
+    "--tag",
+    "fhfs-private",
+    "--host",
+    "fhfs-site",
+    "--target",
+    databaseOnly,
+    "--include",
+    "/database.dump",
+    "--include",
+    "/snapshot.json",
+  ]);
+  const selected = parsePrivateManifest(
+    JSON.parse(await readFile(path.join(databaseOnly, "snapshot.json"), "utf8")),
+  );
+  const selectedDatabase = {
+    ...selected,
+    files: selected.files.filter((file) => file.path === "database.dump"),
+  };
+  await verifyPrivateManifest(databaseOnly, selectedDatabase);
+  await assert.rejects(readFile(path.join(databaseOnly, "media/moments/test.bin")), {
+    code: "ENOENT",
+  });
+  await writeFile(path.join(databaseOnly, "database.dump"), "tampered");
+  await assert.rejects(verifyPrivateManifest(databaseOnly, selectedDatabase), /integrity mismatch/);
   await restic([
     "restore",
     "latest",
@@ -89,7 +117,7 @@ try {
   await writeFile(path.join(directory, "media/moments/test.bin"), "tampered");
   await assert.rejects(verifyPrivateManifest(directory, actual), /integrity mismatch/);
   console.log(
-    "Private backup self-test passed: encryption, restore, SHA-256 and tamper detection. No database or remote storage was used.",
+    "Private backup self-test passed: encryption, full/selective restore, SHA-256 and tamper detection. No database or remote storage was used.",
   );
 } finally {
   await rm(root, { recursive: true, force: true });

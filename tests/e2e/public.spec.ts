@@ -62,3 +62,34 @@ test("unauthenticated action requests reach their authorization boundary", async
   expect(action.headers().location).toBeUndefined();
   expect(action.status()).toBeGreaterThanOrEqual(400);
 });
+
+test("the intro opening is readable before JavaScript and the 3D runtime load", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false });
+  try {
+    const page = await context.newPage();
+    await page.goto("/zh/intro");
+    // This is the visible opening, rather than the off-screen accessible copy.
+    const name = page.locator("main p.text-display-sm").first();
+    await expect(name).toBeVisible();
+    await expect(name).toBeInViewport();
+    await expect(page.locator("main canvas")).toHaveCount(0);
+  } finally {
+    await context.close();
+  }
+});
+
+test("calendar dates expose named links that work with the keyboard", async ({ page }) => {
+  await page.goto("/zh/moments");
+  const calendar = page.locator("main svg[aria-label]").first();
+  await expect(calendar).toHaveAttribute("role", "group");
+  const day = calendar.getByRole("link").first();
+  await expect(day).toHaveAccessibleName(/\d/);
+  await day.focus();
+  await expect(day).toBeFocused();
+  const target = await day.getAttribute("href");
+  await page.keyboard.press("Enter");
+  await expect.poll(() => new URL(page.url()).hash).toBe(target);
+});

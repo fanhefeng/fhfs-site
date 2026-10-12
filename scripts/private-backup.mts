@@ -187,14 +187,21 @@ async function manifestDirectory(dir: string): Promise<string | null> {
 }
 
 async function main() {
-  if (!["check", "create", "verify", "health"].includes(command))
-    throw new BackupError("Usage: pnpm backup:private [check|create|verify|health]");
+  if (!["check", "create", "verify", "verify-database", "health"].includes(command))
+    throw new BackupError(
+      "Usage: pnpm backup:private [check|create|verify|verify-database|health]",
+    );
   const problems: string[] = [];
   if (!repository) problems.push("RESTIC_REPOSITORY is missing");
   if (!password) problems.push("RESTIC_PASSWORD or RESTIC_PASSWORD_FILE is missing");
   if ((command === "create" || command === "check") && !database)
     problems.push("BACKUP_DATABASE_URL is missing");
-  const binaries = command === "health" ? ["restic"] : ["pg_dump", "pg_restore", "restic"];
+  const binaries =
+    command === "health"
+      ? ["restic"]
+      : command === "verify" || command === "verify-database"
+        ? ["pg_restore", "restic"]
+        : ["pg_dump", "pg_restore", "restic"];
   for (const binary of binaries) {
     try {
       await run(binary, [binary === "restic" ? "version" : "--version"]);
@@ -250,16 +257,35 @@ async function main() {
       console.log(`Encrypted backup completed, including drafts and ${mediaCount} media files.`);
     } else {
       await run("restic", ["check"]);
-      await run("restic", ["restore", "latest", "--tag", TAG, "--host", HOST, "--target", stage]);
+      await run("restic", [
+        "restore",
+        "latest",
+        "--tag",
+        TAG,
+        "--host",
+        HOST,
+        "--target",
+        stage,
+        ...(command === "verify-database"
+          ? ["--include", "/database.dump", "--include", "/snapshot.json"]
+          : []),
+      ]);
       const dir = await manifestDirectory(stage);
       if (!dir) throw new BackupError("Restored snapshot has no integrity manifest");
       const manifest = parsePrivateManifest(
         JSON.parse(await readFile(path.join(dir, "snapshot.json"), "utf8")),
       );
-      await verifyPrivateManifest(dir, manifest);
+      await verifyPrivateManifest(
+        dir,
+        command === "verify-database"
+          ? { ...manifest, files: manifest.files.filter((file) => file.path === "database.dump") }
+          : manifest,
+      );
       await run("pg_restore", ["--list", "database.dump"], dir);
       console.log(
-        `Restored bytes verified: ${manifest.files.length} files. A database restore drill is still required.`,
+        command === "verify-database"
+          ? "Restored database bytes and archive directory verified. Media bytes were not downloaded; a database restore drill is still separate."
+          : `Restored bytes verified: ${manifest.files.length} files. A database restore drill is still required.`,
       );
     }
   } finally {

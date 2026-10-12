@@ -98,7 +98,7 @@ function LoadingOverlay({ label, onStalled }: { label: string; onStalled: () => 
   return (
     <div
       aria-hidden={done}
-      className={`absolute inset-0 z-20 flex flex-col items-center justify-center bg-bg transition-opacity duration-700 ${
+      className={`absolute inset-0 z-0 flex flex-col items-center justify-center bg-bg transition-opacity duration-700 ${
         done ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
