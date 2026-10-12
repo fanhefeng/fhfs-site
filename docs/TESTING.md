@@ -85,14 +85,15 @@ SIGINT / SIGTERM 会终止并等待本次子进程退出，清理会话、测试
 正常结束时删除；下次运行也先清理遗留的新建行。固定测试文章保留供检查，并在下次运行重置。
 
 GitHub 配置 `TEST_DATABASE_URL` Secret，首次本机完整运行成功后再设置
-`E2E_ENABLED=true` 仓库变量。workflow 只在可信 main push 或手工触发，串行写测试库，
+`E2E_ENABLED=true` 仓库变量。workflow 在可信 main push、每天北京时间 05:23 或手工触发，串行写测试库，
 不接受外部 PR 输入，不上传授权报告。
 
 2026-10-12 已在独立 Neon 项目 `fhfs-site-e2e` 配置直连 URL 与手工标记，
 完整生产构建、6 项后台流程和桌面/移动视口的 10 项公开流程均通过。
 已确认临时会话、锁文件和测试新建文章清理。2026-10-13 在修复依赖后再次完整运行，
-16 项通过；GitHub `TEST_DATABASE_URL` Secret 已配置，workflow 尚未发布，
-`E2E_ENABLED` 变量尚未设置。
+16 项通过；GitHub `TEST_DATABASE_URL` Secret 已配置。
+PR #19 合并上线后设置了 `E2E_ENABLED=true`，首次云端运行
+[38304671450](https://github.com/fanhefeng/fhfs-site/actions/runs/38304671450) 的 21 项流程全部通过。
 
 
 2026-10-13 后续批次：独立构建目录下 21 项流程全部通过（11 项后台、10 项公开）。
@@ -100,3 +101,13 @@ GitHub 配置 `TEST_DATABASE_URL` Secret，首次本机完整运行成功后再�
 预渲染清单及两份 tsconfig 在测试前后保持一致，根 next-env.d.ts 恢复，会话与锁清除。
 SIGINT（迁移阶段）和 SIGTERM（服务启动后）实际中断均通过：退出码分别为 130 / 143，
 3100 端口释放、会话与锁删除、正常构建及类型入口保持原样。
+
+
+后续批次新增两个公开浏览器回归：介绍页在 JavaScript/3D 尚未加载时已能阅读，
+说说日历的日期链接具备可访问名称和键盘 Enter 激活。对应 Chrome 桌面/移动视口均通过。
+生产 HTTPS 上 WebKit 公开流程、视频解码、拖动和播放器互斥已验证；音视频样本的
+首段/尾段 Range 为 206，越界为 416。WebKit 不等同于真实 iOS 设备。
+
+无障碍检查覆盖中英文首页、介绍、说说、Kobe 页的浅/深主题。等待字体与入场动画完成后
+扫描，避免把透明度过渡中的瞬间当成最终颜色；人工键盘流程与自动扫描分别记录。
+介绍页已有首屏文字渲染回归，但 3D 主线程负载仍需按 Lighthouse 实测继续优化。

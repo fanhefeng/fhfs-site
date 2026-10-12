@@ -3,6 +3,8 @@ name: browser flows
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "23 21 * * *" # Daily, 05:23 Asia/Shanghai.
   workflow_dispatch:
 
 permissions:

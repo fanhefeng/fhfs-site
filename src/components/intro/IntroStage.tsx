@@ -203,19 +203,16 @@ export function IntroStage({ text, copy, links, loadingLabel }: Props) {
              read straight through it — and the theme cross-fade stays CSS. */
         >
           {mode === "webgl" && (
-            <>
-              {/* The loading overlay travels with the canvas, so the words
-                  now sit below it in the DOM. Stacking is unaffected: the
-                  overlay is z-20 and this layer z-10. */}
-              <AvatarCanvas
-                tone={tone}
-                onScreen={onScreen}
-                loadingLabel={loadingLabel}
-                onFailed={handleCanvasFailure}
-              />
-              {!editing && <Narrative text={text} copy={copy} links={links} />}
-            </>
+            <AvatarCanvas
+              tone={tone}
+              onScreen={onScreen}
+              loadingLabel={loadingLabel}
+              onFailed={handleCanvasFailure}
+            />
           )}
+          {/* Keep the opening readable in server HTML and while the optional
+              3D runtime/model loads. The scene's loader stays below the words. */}
+          {!editing && <Narrative text={text} copy={copy} links={links} />}
         </div>
       </div>
 
