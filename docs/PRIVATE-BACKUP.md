@@ -75,7 +75,7 @@ S3 凭据对应 `BACKUP_AWS_ACCESS_KEY_ID`、`BACKUP_AWS_SECRET_ACCESS_KEY`，�
 `BACKUP_AWS_REGION`。首次手工验证后设置仓库变量 `PRIVATE_BACKUP_ENABLED=true`。
 
 `.github/workflows/private-backup.yml` 每天北京时间 04:17 创建，并立即从异地仓库取回数据库校验；10:37、16:37、22:37
-独立检查新鲜度，每年 1/4/7/10 月 1 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
+独立检查新鲜度，每年 1/4/7/10 月 2 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
 调度避开整点，但 GitHub 不保证准点执行。
 任务串行，日志不列私有行和文件名，不上传 artifact。打开 GitHub Actions 失败通知，
 并检查通知确实送达；调度延迟、workflow 被停用等完全不运行的情形仍需外部监控覆盖。
@@ -142,7 +142,11 @@ GitHub 所需五项 Secret 和区域变量已配置；PR #19 已合并并上线�
 `PRIVATE_BACKUP_ENABLED=true` 已启用。首次云端创建运行
 [38304663153](https://github.com/fanhefeng/fhfs-site/actions/runs/38304663153) 成功，
 包含 281 个媒体文件；云端 health 确认快照时间为 2026-10-13 04:32:49 +08:00。
-新增每日数据库取回校验、错峰调度和告警演练随后续批次发布。
+PR #21 已发布每日数据库取回校验、错峰调度和告警演练。main 的
+[38310197460](https://github.com/fanhefeng/fhfs-site/actions/runs/38310197460) 创建/数据库取回/health 全部通过。
+受控告警 [38307835631](https://github.com/fanhefeng/fhfs-site/actions/runs/38307835631) 的 GitHub 站内通知
+及现有 QQ 收件箱邮件均已确认；后续 health 成功。Codex 每 12 小时的只读巡检已启用（ACTIVE），
+独立于 GitHub workflow 调度器，检查任务停用、跳过与过期；依赖本机 Codex 在线，不能当作全天候托管监控。
 
 本次快照 ID：`f62a87db0fbaff22b6094f69f0c18dff7c3cdbce6e85fa85d0adae90d194af5a`，
 时间 2026-10-13 03:35:57 +08:00。恢复到独立新建的 PostgreSQL 18 Neon 项目
