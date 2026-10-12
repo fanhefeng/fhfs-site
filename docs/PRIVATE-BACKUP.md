@@ -75,7 +75,7 @@ S3 凭据对应 `BACKUP_AWS_ACCESS_KEY_ID`、`BACKUP_AWS_SECRET_ACCESS_KEY`，�
 `BACKUP_AWS_REGION`。首次手工验证后设置仓库变量 `PRIVATE_BACKUP_ENABLED=true`。
 
 `.github/workflows/private-backup.yml` 每天北京时间 04:17 创建，并立即从异地仓库取回数据库校验；10:37、16:37、22:37
-独立检查新鲜度，每年 1/4/7/10 月 1 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
+独立检查新鲜度，每年 1/4/7/10 月 2 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
 调度避开整点，但 GitHub 不保证准点执行。
 任务串行，日志不列私有行和文件名，不上传 artifact。打开 GitHub Actions 失败通知，
 并检查通知确实送达；调度延迟、workflow 被停用等完全不运行的情形仍需外部监控覆盖。
