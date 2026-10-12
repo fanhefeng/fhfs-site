@@ -49,12 +49,14 @@ restic init               # 仅在新的私有仓库运行一次，变量已注�
 pnpm backup:private create
 pnpm backup:private health
 pnpm backup:private verify
+pnpm backup:private verify-database # 仅取回数据库和清单，适合每日校验
 ```
 
 `create` 使用 `pg_dump` 的一致性快照，再从该 dump 的数据中提取媒体引用，包含草稿引用。
 它合并本机 `media/files/moments/`（包括尚未引用的文件）；缺少的引用从媒体站下载，
 任何缺失引用都会拒绝上传。媒体站若被同时覆盖，无法承诺数据库与对象存储的跨系统原子快照，
-所以部署推荐用 `pnpm media:deploy:safe`：部署前、部署后分别完成一次私有备份。
+所以正常入口 `pnpm media:deploy` 在部署前、部署后分别完成一次私有备份。
+`pnpm media:deploy:safe` 保留为同一入口的兼容别名。
 这个命令的第一次备份失败就不会部署；第二次失败需要立即补跑备份。
 
 每份副本包含 `database.dump`、`media/moments/*`、`snapshot.json`。
@@ -63,7 +65,8 @@ pnpm backup:private verify
 突然断电或 SIGKILL 仍可能留下系统临时目录 `fhfs-private-backup-*`，应在确认进程停止后清理。
 
 `verify` 会从加密仓库恢复最新副本到临时目录，验证每个文件和 dump 的目录表，然后清理。
-它证明字节能取回，**不能代替向 Postgres 恢复的演练**。
+`verify-database` 先检查仓库，再只恢复 dump/清单并校验数据库字节和目录表，
+不会重新下载全部媒体。两者都**不能代替向 Postgres 恢复的演练**。
 
 ## 自动化与保留
 
@@ -71,11 +74,14 @@ GitHub Secrets：`BACKUP_DATABASE_URL`、`RESTIC_REPOSITORY`、`RESTIC_PASSWORD`
 S3 凭据对应 `BACKUP_AWS_ACCESS_KEY_ID`、`BACKUP_AWS_SECRET_ACCESS_KEY`，仓库变量
 `BACKUP_AWS_REGION`。首次手工验证后设置仓库变量 `PRIVATE_BACKUP_ENABLED=true`。
 
-`.github/workflows/private-backup.yml` 每天北京时间 04:00 创建，10:00、16:00、22:00
-独立检查新鲜度，每季度恢复并做字节验证。36 小时没有成功快照即失败。
+`.github/workflows/private-backup.yml` 每天北京时间 04:17 创建，并立即从异地仓库取回数据库校验；10:37、16:37、22:37
+独立检查新鲜度，每年 1/4/7/10 月 1 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
+调度避开整点，但 GitHub 不保证准点执行。
 任务串行，日志不列私有行和文件名，不上传 artifact。打开 GitHub Actions 失败通知，
 并检查通知确实送达；调度延迟、workflow 被停用等完全不运行的情形仍需外部监控覆盖。
 首次启用可手动执行 `health` 验证空仓库报警，再执行 `create` 与 `verify` 验证恢复。
+手工 `alert-test` 在接触数据库或存储之前故意失败，用于检验失败通知；它不创建或修改副本。
+该演练的红色记录是预期结果，不能把真实失败或跳过的 job 当成成功。
 
 默认不自动删除任何旧快照。先完成恢复演练并观察容量，再设每日 30、每周 12、每月 12
 的保留策略；删除权限与常规备份凭据分开。应用保留策略时先使用 `forget --dry-run`，
@@ -132,7 +138,11 @@ restic 锁清理已实际完成，不能把 B2 的隐藏操作误当成永久版
 账户控制台实际限制为存储 10 GB、每日下载 1 GB，费用上限 $0，邮件提醒已选中。
 本次完整字节验证仅下载一次全部媒体；数据库演练再按同一快照 ID 选择性取回 dump 和清单，
 避免重复全量下载越过每日限额。后续演练与批量恢复也先核对控制台剩余额度。
-GitHub 所需五项 Secret 和区域变量已配置，工作流已提交分支，尚未合并至 main 或启用。
+GitHub 所需五项 Secret 和区域变量已配置；PR #19 已合并并上线，
+`PRIVATE_BACKUP_ENABLED=true` 已启用。首次云端创建运行
+[38304663153](https://github.com/fanhefeng/fhfs-site/actions/runs/38304663153) 成功，
+包含 281 个媒体文件；云端 health 确认快照时间为 2026-10-13 04:32:49 +08:00。
+新增每日数据库取回校验、错峰调度和告警演练随后续批次发布。
 
 本次快照 ID：`f62a87db0fbaff22b6094f69f0c18dff7c3cdbce6e85fa85d0adae90d194af5a`，
 时间 2026-10-13 03:35:57 +08:00。恢复到独立新建的 PostgreSQL 18 Neon 项目
@@ -142,7 +152,7 @@ GitHub 所需五项 Secret 和区域变量已配置，工作流已提交分支�
 登录限流表保留结构、数据排除，恢复为空。
 
 选择性下载 dump/清单、数据库导入及 SQL 验证共 190 秒；这不是包含部署切换的完整 RTO。
-快照在本次数据库校验完成时约 11 分钟；这不是已获得持续 24 小时 RPO 保证，定时任务尚未启用。
+快照在本次数据库校验完成时约 11 分钟；这不是包含持续运行历史的 24 小时 RPO 保证；定时任务现已启用，仍须观察每日运行。
 恢复库的生产构建生成 155/155 个静态页面，10 项 Chrome 桌面/移动视口公开测试通过；
 使用临时随机密码完成后台登录，5 个后台页面可读取，中英文 OG 图片正常。快照没有草稿行，
 逐表数据比较仍包括 draft 字段；草稿匿名隐藏和授权预览由独立测试库的合成样本验证。

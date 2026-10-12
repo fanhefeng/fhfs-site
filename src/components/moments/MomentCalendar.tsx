@@ -50,8 +50,8 @@ type Tip = { day: number; x: number; y: number };
  *
  * Every day with a line is still a link to the newest of them on the board
  * (`#key`, the card's id), so a press works before any script has run. The
- * squares are out of the tab order and hidden from a screen reader, which
- * reads the board itself — the picture's name says what it shows.
+ * populated days expose named links with native keyboard activation. The SVG
+ * is a group, so assistive technologies can reach those links as well.
  */
 export function MomentCalendar({ years }: { years: CalendarYear[] }) {
   const t = useTranslations("moments");
@@ -174,7 +174,7 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
             width={width}
             height={height}
             viewBox={`0 0 ${width} ${height}`}
-            role="img"
+            role="group"
             aria-label={t("calendarAria", { year: String(shown.year) })}
             className="block text-fg"
             style={{ cursor: hovered ? "pointer" : undefined }}
@@ -203,7 +203,7 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
                 </text>
               ))}
             </g>
-            <g aria-hidden="true">
+            <g>
               {Array.from({ length: days }, (_, day) => {
                 const { x, y } = place(day);
                 const cell = byDay.get(day);
@@ -221,15 +221,20 @@ export function MomentCalendar({ years }: { years: CalendarYear[] }) {
                   />
                 );
                 return cell ? (
-                  // A press still focuses the link, and a focused link in an SVG
-                  // gets the browser's own blue box, left on the square beside
-                  // the ring. No key reaches it, so there is nothing to mark.
                   <a
                     key={day}
                     href={`#${cell.newest}`}
-                    tabIndex={-1}
+                    aria-label={t("calendarDay", {
+                      date: format.dateTime(dayDate(shown.year, day), {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        timeZone: "UTC",
+                      }),
+                      count: cell.count,
+                    })}
                     onClick={seek}
-                    className="outline-none"
+                    className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   >
                     {/* The link reaches half across the gap on every side —
                         the same square the pointer arithmetic gives the day,

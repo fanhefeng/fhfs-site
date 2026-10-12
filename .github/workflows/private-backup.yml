@@ -1,15 +1,16 @@
 name: private backup
+run-name: private backup / ${{ inputs.operation || (github.event.schedule == '17 20 * * *' && 'create') || (github.event.schedule == '47 21 1 */3 *' && 'verify') || 'health' }}
 
 on:
   schedule:
-    - cron: "0 20 * * *" # Daily, 04:00 Asia/Shanghai.
-    - cron: "0 2,8,14 * * *" # Independent freshness checks.
-    - cron: "0 21 1 */3 *" # Quarterly restore and byte verification.
+    - cron: "17 20 * * *" # Daily, 04:17 Asia/Shanghai.
+    - cron: "37 2,8,14 * * *" # Freshness checks, 10:37 / 16:37 / 22:37.
+    - cron: "47 21 1 */3 *" # Quarterly restore and byte verification.
   workflow_dispatch:
     inputs:
       operation:
         type: choice
-        options: [create, health, verify]
+        options: [create, health, verify, verify-database, alert-test]
         default: create
 
 permissions:
@@ -31,6 +32,23 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ${{ vars.BACKUP_AWS_REGION }}
     steps:
+      - name: Select operation
+        id: operation
+        env:
+          REQUESTED: ${{ inputs.operation }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          operation=health
+          if [ "$SCHEDULE" = '17 20 * * *' ]; then operation=create; fi
+          if [ "$SCHEDULE" = '47 21 1 */3 *' ]; then operation=verify; fi
+          if [ -n "$REQUESTED" ]; then operation="$REQUESTED"; fi
+          case "$operation" in create|health|verify|verify-database|alert-test) ;; *) exit 1 ;; esac
+          echo "value=$operation" >> "$GITHUB_OUTPUT"
+      - name: Controlled alert drill
+        if: steps.operation.outputs.value == 'alert-test'
+        run: |
+          echo '::error::Controlled backup alert drill. No database or backup repository was accessed.'
+          exit 1
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -39,25 +57,32 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Install native backup clients
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-common restic
-          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client-18
-          echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
-      - name: Select operation
         env:
-          REQUESTED: ${{ inputs.operation }}
-          SCHEDULE: ${{ github.event.schedule }}
+          OPERATION: ${{ steps.operation.outputs.value }}
         run: |
-          operation=health
-          if [ "$SCHEDULE" = '0 20 * * *' ]; then operation=create; fi
-          if [ "$SCHEDULE" = '0 21 1 */3 *' ]; then operation=verify; fi
-          if [ -n "$REQUESTED" ]; then operation="$REQUESTED"; fi
-          case "$operation" in create|health|verify) ;; *) exit 1 ;; esac
-          pnpm backup:private "$operation"
-          pnpm backup:private health
+          sudo apt-get update
+          sudo apt-get install -y restic
+          if [ "$OPERATION" != health ]; then
+            sudo apt-get install -y postgresql-common
+            sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+            sudo apt-get update
+            sudo apt-get install -y postgresql-client-18
+            echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
+          fi
+      - name: Run backup operation and verify freshness
+        env:
+          OPERATION: ${{ steps.operation.outputs.value }}
+        run: |
+          pnpm backup:private "$OPERATION"
+          if [ "$OPERATION" = create ]; then pnpm backup:private verify-database; fi
+          if [ "$OPERATION" != health ]; then pnpm backup:private health; fi
       - name: Report failure without private data
         if: failure()
-        run: echo '::error::Private backup failed. Inspect configuration and storage; private native-tool output is intentionally withheld.'
+        env:
+          OPERATION: ${{ steps.operation.outputs.value }}
+        run: |
+          if [ "$OPERATION" = alert-test ]; then
+            echo '::error::Controlled notification test completed; this failure was intentional.'
+          else
+            echo '::error::Private backup failed. Inspect configuration and storage; private native-tool output is intentionally withheld.'
+          fi
