@@ -1,0 +1,71 @@
+name: cloud monitor
+
+on:
+  schedule:
+    - cron: "11 1,7,13,19 * * *" # Every six hours, off the busy hour boundary.
+  workflow_run:
+    workflows: [private backup, browser flows, backup]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cloud-monitor
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: vars.MONITOR_ENABLED == 'true' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == github.event.repository.default_branch && github.event.workflow_run.head_repository.full_name == github.repository))
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      # workflow_run is privileged: always execute default-branch code, never
+      # code or artifacts from the workflow that caused this event.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.repository.default_branch || github.ref }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit workflow state and actual execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MONITOR_FLAGS: >-
+            {"PRIVATE_BACKUP_ENABLED":${{ toJSON(vars.PRIVATE_BACKUP_ENABLED) }},"PRIVATE_RESTORE_ENABLED":${{ toJSON(vars.PRIVATE_RESTORE_ENABLED) }},"E2E_ENABLED":${{ toJSON(vars.E2E_ENABLED) }}}
+          AUDIT_REPOSITORY: ${{ github.repository }}
+          AUDIT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: pnpm exec tsx scripts/monitor.mts audit "$AUDIT_REPOSITORY" "$AUDIT_BRANCH"
+      - name: Read encrypted repository freshness
+        env:
+          RESTIC_REPOSITORY: ${{ secrets.RESTIC_REPOSITORY }}
+          RESTIC_PASSWORD: ${{ secrets.RESTIC_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.BACKUP_AWS_REGION }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y restic
+          pnpm backup:private health
+      - name: Report to independent watchdog
+        if: always()
+        env:
+          HEALTHCHECKS_PING_URL: ${{ secrets.HEALTHCHECKS_PING_URL }}
+          AUDIT_RESULT: ${{ job.status }}
+        run: |
+          # Keep this independent of checkout, pnpm and install succeeding.
+          if [[ ! "$HEALTHCHECKS_PING_URL" =~ ^https://hc-ping\.com/[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$ ]]; then
+            echo 'Missing or invalid independent monitor URL'
+            exit 1
+          fi
+          status=failure
+          suffix=/fail
+          if [ "$AUDIT_RESULT" = success ]; then status=success; suffix=; fi
+          curl --silent --fail --output /dev/null --max-time 10 --retry 2 --retry-all-errors \
+            --request POST --data "fhfs-site cloud audit: $status" "$HEALTHCHECKS_PING_URL$suffix"
+          echo "Independent monitor received $status"

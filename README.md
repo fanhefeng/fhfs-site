@@ -65,6 +65,7 @@
 - **数据有退路。** 每晚导出一次到 `db-snapshots` 分支，有行的表变空就拒绝提交；
   [`docs/RECOVERY.md`](docs/RECOVERY.md) 是从「删错一行」到「Neon 账号没了」的三级操作单，
   演练过，全程 298 秒。
+- **巡检在云端。** GitHub Actions 定期复核备份、测试和恢复的真实执行结果；Healthchecks.io 在失败或信号缺失时告警。迁移顺序、检测窗口与回退见 [`docs/CLOUD-MONITORING.md`](docs/CLOUD-MONITORING.md)。
 - **构建不下载字体。** 浏览器字体与 OG 字体固定版本、连同 OFL 提交，来源和再生成方式见
   [`docs/FONTS.md`](docs/FONTS.md)。构建仍需要数据库，GitHub release 请求有 4 秒超时并允许缺省。
 - **CSP 不放行任何跨域。** 字体、解码器、音乐全部自托管；唯一的例外是说说媒体所在的那个 Cloudflare Worker（它自己补上了 Safari 放视频要的 Range）。

@@ -15,6 +15,26 @@
 type Rule = { required: boolean; valid: (value: string) => boolean; shape: string };
 
 export const ENV_RULES: Record<string, Rule> = {
+  HEALTHCHECKS_PING_URL: {
+    required: false,
+    valid: (v) =>
+      /^https:\/\/hc-ping\.com\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(
+        v,
+      ),
+    shape: "a secret Healthchecks.io UUID ping URL, only for cloud monitor status",
+  },
+  MONITOR_FLAGS: {
+    required: false,
+    valid: (v) => {
+      try {
+        const value: unknown = JSON.parse(v);
+        return typeof value === "object" && value !== null && !Array.isArray(value);
+      } catch {
+        return false;
+      }
+    },
+    shape: "repository variables as a JSON object; supplied only by the cloud monitor workflow",
+  },
   BACKUP_RESTORE_DATABASE_URL: {
     required: false,
     valid: (v) => /^postgres(ql)?:\/\/\S+$/.test(v),
@@ -87,7 +107,8 @@ export const ENV_RULES: Record<string, Rule> = {
   GITHUB_TOKEN: {
     required: false,
     valid: (v) => v.trim() === v && v.length >= 20,
-    shape: "a GitHub token (only lifts the release lookups' rate limit)",
+    shape:
+      "a GitHub token for release lookups, or the read-only Actions token in the cloud monitor",
   },
 };
 
