@@ -27,6 +27,12 @@ import {
   regularBackupFile,
   verifyPrivateManifest,
 } from "../src/lib/node/privateBackup";
+import {
+  applicationArchiveTables,
+  requireRestoreGuard,
+  restoreTargetEnvironment,
+} from "../src/lib/privateRestore";
+import { postgresDataFingerprint } from "../src/lib/node/privateRestore";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 try {
@@ -186,22 +192,146 @@ async function manifestDirectory(dir: string): Promise<string | null> {
   return null;
 }
 
-async function main() {
-  if (!["check", "create", "verify", "verify-database", "health"].includes(command))
+async function checkRestoreGuard(env: Record<string, string>) {
+  const result = await run(
+    "psql",
+    [
+      "-X",
+      "--no-password",
+      "-At",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-c",
+      `SELECT json_build_object(
+      'database', current_database(), 'role', current_user,
+      'purpose', (SELECT purpose FROM recovery_control.guard),
+      'guardCount', (SELECT count(*) FROM recovery_control.guard),
+      'superuser', rolsuper, 'createDatabase', rolcreatedb, 'createRole', rolcreaterole,
+      'membershipCount', (SELECT count(*) FROM pg_auth_members WHERE member = pg_roles.oid),
+      'canChangeGuard', has_table_privilege(current_user, 'recovery_control.guard', 'INSERT,UPDATE,DELETE,TRUNCATE')
+    ) FROM pg_roles WHERE rolname = current_user;`,
+    ],
+    ROOT,
+    env,
+  );
+  requireRestoreGuard(JSON.parse(result));
+}
+
+async function restoreDatabase(dir: string, env: Record<string, string>) {
+  const expectedTables = applicationArchiveTables(
+    await run("pg_restore", ["--list", "database.dump"], dir),
+  );
+  await run("pg_restore", ["--data-only", "--file=expected.sql", "database.dump"], dir);
+  const expected = postgresDataFingerprint(await readFile(path.join(dir, "expected.sql"), "utf8"));
+  if (
+    JSON.stringify(expectedTables) !==
+    JSON.stringify([...Object.keys(expected.tables), "public.login_attempts"].sort())
+  )
+    throw new BackupError("Archive table inventory does not match its data sections");
+  // Only this disposable database is replaced. No --create, no role/ACL restore,
+  // and the independently owned control schema is outside both restored schemas.
+  await checkRestoreGuard(env);
+  await run(
+    "pg_restore",
+    [
+      "--clean",
+      "--if-exists",
+      "--exit-on-error",
+      "--single-transaction",
+      "--no-owner",
+      "--no-privileges",
+      `--dbname=${env.PGDATABASE!}`,
+      "database.dump",
+    ],
+    dir,
+    env,
+  );
+  await run(
+    "pg_dump",
+    [
+      "--data-only",
+      "--no-owner",
+      "--no-privileges",
+      "--schema=public",
+      "--schema=drizzle",
+      "--exclude-table-data=public.login_attempts",
+      "--file=actual.sql",
+    ],
+    dir,
+    env,
+  );
+  const actual = postgresDataFingerprint(await readFile(path.join(dir, "actual.sql"), "utf8"));
+  if (JSON.stringify(expected) !== JSON.stringify(actual))
     throw new BackupError(
-      "Usage: pnpm backup:private [check|create|verify|verify-database|health]",
+      "Restored rows, columns, migrations or sequences differ from the archive",
+    );
+  const inventory = JSON.parse(
+    await run(
+      "psql",
+      [
+        "-X",
+        "--no-password",
+        "-At",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-c",
+        `SELECT json_build_object(
+      'tables', (SELECT json_agg(schemaname || '.' || tablename ORDER BY schemaname, tablename)
+        FROM pg_tables WHERE schemaname IN ('public', 'drizzle')),
+      'loginRows', (SELECT count(*) FROM public.login_attempts));`,
+      ],
+      dir,
+      env,
+    ),
+  ) as { tables: string[]; loginRows: number };
+  if (
+    inventory.loginRows !== 0 ||
+    JSON.stringify(inventory.tables) !== JSON.stringify(expectedTables)
+  )
+    throw new BackupError("Restored table inventory or excluded login data differs");
+  await checkRestoreGuard(env);
+  console.log(
+    `Postgres restore drill passed: ${expectedTables.length} tables, ${actual.sequences.length} sequences; rows, columns and migration history match. No production cutover or media restore was attempted.`,
+  );
+}
+
+async function main() {
+  if (
+    !["check", "create", "verify", "verify-database", "restore-database", "health"].includes(
+      command,
+    )
+  )
+    throw new BackupError(
+      "Usage: pnpm backup:private [check|create|verify|verify-database|restore-database|health]",
     );
   const problems: string[] = [];
   if (!repository) problems.push("RESTIC_REPOSITORY is missing");
   if (!password) problems.push("RESTIC_PASSWORD or RESTIC_PASSWORD_FILE is missing");
-  if ((command === "create" || command === "check") && !database)
+  if ((command === "create" || command === "check" || command === "restore-database") && !database)
     problems.push("BACKUP_DATABASE_URL is missing");
+  let restoreEnv: Record<string, string> | undefined;
+  if (command === "restore-database") {
+    if (!process.env.BACKUP_RESTORE_DATABASE_URL)
+      problems.push("BACKUP_RESTORE_DATABASE_URL is missing");
+    else
+      restoreEnv = restoreTargetEnvironment(
+        process.env.BACKUP_RESTORE_DATABASE_URL,
+        [
+          database,
+          process.env.DATABASE_URL,
+          process.env.DATABASE_URL_UNPOOLED,
+          process.env.TEST_DATABASE_URL,
+        ].filter((value): value is string => !!value),
+      );
+  }
   const binaries =
     command === "health"
       ? ["restic"]
       : command === "verify" || command === "verify-database"
         ? ["pg_restore", "restic"]
-        : ["pg_dump", "pg_restore", "restic"];
+        : command === "restore-database"
+          ? ["pg_dump", "pg_restore", "psql", "restic"]
+          : ["pg_dump", "pg_restore", "restic"];
   for (const binary of binaries) {
     try {
       await run(binary, [binary === "restic" ? "version" : "--version"]);
@@ -223,6 +353,7 @@ async function main() {
     );
     return;
   }
+  if (restoreEnv) await checkRestoreGuard(restoreEnv);
   if (command === "health") {
     const newest = latestSnapshotTime(
       JSON.parse(
@@ -266,7 +397,7 @@ async function main() {
         HOST,
         "--target",
         stage,
-        ...(command === "verify-database"
+        ...(command === "verify-database" || command === "restore-database"
           ? ["--include", "/database.dump", "--include", "/snapshot.json"]
           : []),
       ]);
@@ -277,16 +408,22 @@ async function main() {
       );
       await verifyPrivateManifest(
         dir,
-        command === "verify-database"
+        command === "verify-database" || command === "restore-database"
           ? { ...manifest, files: manifest.files.filter((file) => file.path === "database.dump") }
           : manifest,
       );
       await run("pg_restore", ["--list", "database.dump"], dir);
-      console.log(
-        command === "verify-database"
-          ? "Restored database bytes and archive directory verified. Media bytes were not downloaded; a database restore drill is still separate."
-          : `Restored bytes verified: ${manifest.files.length} files. A database restore drill is still required.`,
-      );
+      if (restoreEnv) {
+        const problem = snapshotProblem(manifest.createdAt);
+        if (problem) throw new BackupError(problem);
+        console.log(`Restoring database archive created at ${manifest.createdAt}`);
+        await restoreDatabase(dir, restoreEnv);
+      } else
+        console.log(
+          command === "verify-database"
+            ? "Restored database bytes and archive directory verified. Media bytes were not downloaded; a database restore drill is still separate."
+            : `Restored bytes verified: ${manifest.files.length} files. A database restore drill is still required.`,
+        );
     }
   } finally {
     // Only our own 0700 temporary directory; never the source media or database.
