@@ -91,8 +91,10 @@ ESPN 频道「'Mamba out' - Remembering Kobe Bryant's farewell speech after his 
 
 ## 字体
 
-中文是 Yozai（SIL OFL 1.1，许可全文在 `public/fonts/yozai/LICENSE.txt`），两个字重各切成八十多片
-按 `unicode-range` 加载，自托管（`src/app/yozai.css`）；拉丁字是 Nunito、Josefin Sans（2026-10-03 起替换
+中文沿用 [Yozai 0.868](https://github.com/lxgw/yozai-font/releases/tag/v0.868) 的字形，
+可复现 Web 子集的内部名为 FHFS Round CJK（CSS 别名 Yozai），遵循 SIL OFL 1.1，原作者信息保留。
+许可全文在 `public/fonts/yozai/frequency-v1/LICENSE.txt`；两个字重各 86 片按 `unicode-range`
+加载，自托管（`src/app/yozai.css`）。旧分片与原许可保留供缓存兼容。拉丁字是 Nunito、Josefin Sans（2026-10-03 起替换
 Lora）与 Geist Mono（均为 OFL，通过 `next/font/local` 读取已提交的 WOFF2，`src/app/fonts.ts`）。
 OG 图使用 Nunito 400 / 700、Noto Sans SC 400 / 600 的服务器本地 WOFF。
 这些字体来自 Google Fonts 仓库固定提交 `bd8f81ddb5c74d5c8897b36ad88b440266245103`，
