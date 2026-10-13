@@ -1,0 +1,17 @@
+.root {
+  /* Labels, navigation and other UI metadata use the same rounded face as
+     prose. Scope the token to this root so public-page metadata stays mono. */
+  --font-stack-mono: var(--font-stack-sans);
+}
+
+.root :where(input, textarea, pre, code) {
+  /* Technical fields keep aligned Latin characters; Chinese uses Yozai
+     rather than falling through to the platform's default monospace face. */
+  --font-stack-mono:
+    var(--font-geist-mono), "Yozai", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC",
+    ui-monospace, monospace;
+}
+
+.root :where(pre, code) {
+  font-family: var(--font-stack-mono);
+}

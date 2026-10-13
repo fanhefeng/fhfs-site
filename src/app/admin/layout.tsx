@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fontVariables } from "../fonts";
 import { ThemeInitScript } from "../ThemeInitScript";
+import styles from "./admin.module.css";
 import "../globals.css";
 
 /**
@@ -33,7 +34,7 @@ export const dynamic = "force-dynamic";
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning className={`${fontVariables} h-full antialiased`}>
-      <body className="min-h-dvh bg-bg text-fg">
+      <body className={`${styles.root} min-h-dvh bg-bg text-fg`}>
         {/* The workbench is painted in the same `--bg`/`--fg` tokens the site
             is, and without this it resolved them light whatever the editor
             had chosen — a paper-white page thrown at someone who came here
