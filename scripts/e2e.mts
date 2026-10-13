@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { eq, like, or, sql } from "drizzle-orm";
 import { connect } from "./connect.mjs";
-import { films, moments, posts } from "../src/db/schema";
+import { films, idols, moments, posts, resumeExperiences } from "../src/db/schema";
 import { hashPassword } from "../src/lib/server/auth/password";
 import { testDatabaseProblem } from "../src/lib/e2e";
 
@@ -142,6 +142,8 @@ try {
     );
   await db.delete(films).where(like(films.key, "e2e-created-%"));
   await db.delete(moments).where(like(moments.key, "e2e-created-%"));
+  await db.delete(idols).where(like(idols.key, "e2e-created-%"));
+  await db.delete(resumeExperiences).where(like(resumeExperiences.key, "e2e-created-%"));
   interrupted.signal.throwIfAborted();
   await db
     .insert(posts)
@@ -251,6 +253,8 @@ try {
         await db.delete(posts).where(like(posts.slug, "e2e-created-%"));
         await db.delete(films).where(like(films.key, "e2e-created-%"));
         await db.delete(moments).where(like(moments.key, "e2e-created-%"));
+        await db.delete(idols).where(like(idols.key, "e2e-created-%"));
+        await db.delete(resumeExperiences).where(like(resumeExperiences.key, "e2e-created-%"));
       }
     }
   } finally {
