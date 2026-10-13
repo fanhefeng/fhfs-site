@@ -255,3 +255,137 @@ test("film rows preserve edited text when reordered, saved, previewed and delete
   await expect(page.getByRole("button", { name: new RegExp(title) })).toHaveCount(0);
   expect((await page.goto(`/admin/preview?kind=film&slug=${key}&locale=zh`))?.status()).toBe(404);
 });
+
+test("idol timeline rows retain bilingual fields through validation, reordering and draft preview", async ({
+  page,
+  browser,
+}) => {
+  const visitor = await browser.newContext();
+  const key = `e2e-created-idol-${Date.now()}`;
+  const name = { zh: `偶像表单验证 ${key}`, en: `Idol form ${key}` };
+  try {
+    await authenticate(page);
+    await page.goto("/admin/idols");
+    await page.getByRole("button", { name: "新偶像", exact: true }).click();
+    await page.getByLabel("key（网址 /idols/…）", { exact: false }).fill(key);
+    await page.locator('input[name="name.zh"]').fill(name.zh);
+    await page.locator('input[name="name.en"]').fill(name.en);
+    const timeline = page.getByRole("group", { name: /每一件事/ });
+    for (const [index, date, title] of [
+      [0, "2001.01", "第一件事"],
+      [1, "2002.02", "第二件事"],
+    ] as const) {
+      await timeline.getByRole("button", { name: "加一条", exact: true }).click();
+      await timeline.locator(`input[name="timeline.${index}.date"]`).fill(date);
+      await timeline.locator(`input[name="timeline.${index}.title.zh"]`).fill(title);
+      await timeline
+        .locator(`input[name="timeline.${index}.title.en"]`)
+        .fill(`Milestone ${index + 1}`);
+      await timeline
+        .locator(`textarea[name="timeline.${index}.note.zh"]`)
+        .fill(`中文说明 ${index + 1}`);
+    }
+    await timeline.getByRole("button", { name: "下移", exact: true }).first().click();
+    await timeline.getByRole("button", { name: "加一条", exact: true }).click();
+    await timeline.locator('input[name="timeline.2.title.zh"]').fill("不应保存的第三件事");
+    await timeline.getByRole("button", { name: "去掉这条", exact: true }).last().click();
+    await page.locator('input[name="cover"]').fill("missing-photo");
+    await page.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(page.getByRole("main").getByRole("alert")).toContainText("封面填的是照片的 id");
+    await expect(timeline.locator('input[name="timeline.0.date"]')).toHaveValue("2002.02");
+    await expect(timeline.locator('textarea[name="timeline.0.note.zh"]')).toHaveValue("中文说明 2");
+    await page.locator('input[name="cover"]').fill("");
+    await page.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(page.getByRole("main").getByRole("status")).toContainText("已保存");
+    await page.reload();
+    await page.getByRole("button", { name: new RegExp(name.zh) }).click();
+    await expect(page.locator('input[name="timeline.0.title.en"]')).toHaveValue("Milestone 2");
+    await expect(page.locator('input[name="timeline.1.title.zh"]')).toHaveValue("第一件事");
+    await expect(page.locator('input[name="timeline.2.title.zh"]')).toHaveCount(0);
+    expect((await visitor.request.get(`http://localhost:3100/zh/idols/${key}`)).status()).toBe(404);
+    await page.goto(`/admin/preview?kind=idol&slug=${key}&locale=en`);
+    await expect(page.locator("main h1")).toHaveText(name.en);
+    const milestones = page.locator("main ol li");
+    await expect(milestones).toHaveCount(2);
+    await expect(milestones.first()).toContainText("Milestone 2");
+    await expect(milestones.first()).toContainText("中文说明 2");
+    await page.goto("/admin/idols");
+    await page.getByRole("button", { name: new RegExp(name.zh) }).click();
+    await page.getByRole("button", { name: new RegExp(`删除这条.*${key}`) }).click();
+    await page.getByRole("button", { name: "确认删除", exact: true }).click();
+    await expect(page.getByRole("button", { name: new RegExp(name.zh) })).toHaveCount(0);
+    expect((await page.goto(`/admin/preview?kind=idol&slug=${key}&locale=zh`))?.status()).toBe(404);
+  } finally {
+    await visitor.close();
+  }
+});
+
+test("resume experience validation preserves input and saves invalidate resume and about", async ({
+  page,
+  browser,
+}) => {
+  const visitor = await browser.newContext({ baseURL: "http://localhost:3100" });
+  const key = `e2e-created-resume-${Date.now()}`;
+  const city = { zh: `测试城市 ${key}`, en: `Test City ${key}` };
+  try {
+    const publicPage = await visitor.newPage();
+    await publicPage.goto("/zh/resume");
+    await publicPage.goto("/zh/about");
+    await authenticate(page);
+    await page.goto("/admin/resume");
+    const blank = page
+      .locator("section")
+      .filter({ has: page.getByRole("heading", { name: "新经历", exact: true }) });
+    await blank.locator('input[name="key"]').fill(key);
+    await blank.locator('input[name="company.zh"]').fill(city.zh);
+    await blank.locator('input[name="company.en"]').fill(city.en);
+    await blank.locator('input[name="role.zh"]').fill("保存前的职责");
+    await blank.locator('input[name="period.zh"]').fill("2030 – 至今");
+    await blank.locator('textarea[name="projects.zh"]').fill("缺少项目标题的文字");
+    await blank.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(blank.getByRole("alert")).toContainText("zh 项目");
+    await expect(blank.locator('input[name="company.zh"]')).toHaveValue(city.zh);
+    await expect(blank.locator('textarea[name="projects.zh"]')).toHaveValue("缺少项目标题的文字");
+    await blank
+      .locator('textarea[name="projects.zh"]')
+      .fill("# 集成验证 | 2030\n完成 **发布** 与 `恢复` 验证\n\n# 第二个项目\n第二项说明");
+    await blank.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(page.getByRole("main").getByRole("status")).toContainText("已保存");
+    await page.reload();
+    const saved = page
+      .locator("section")
+      .filter({ has: page.getByRole("heading", { name: key, exact: true }) });
+    await expect(saved.locator('input[name="company.en"]')).toHaveValue(city.en);
+    await expect(saved.locator('input[name="period.en"]')).toHaveValue("2030 – 至今");
+    await expect(saved.locator('textarea[name="projects.zh"]')).toHaveValue(/# 集成验证 \| 2030/);
+    await publicPage.goto("/zh/resume");
+    const article = publicPage
+      .locator("article")
+      .filter({ has: publicPage.getByRole("heading", { name: city.zh, exact: true }) });
+    await expect(article).toContainText("集成验证");
+    await expect(article.locator("strong")).toHaveText("发布");
+    await expect(article.locator("code")).toHaveText("恢复");
+    await publicPage.goto("/en/resume");
+    await expect(publicPage.getByRole("heading", { name: city.en, exact: true })).toBeVisible();
+    await publicPage.goto("/zh/about");
+    await expect(publicPage.getByText(city.zh, { exact: true })).toHaveCount(1);
+    await expect(publicPage.getByText("保存前的职责", { exact: true })).toHaveCount(1);
+    await saved.locator('input[name="role.zh"]').fill("更新后的职责");
+    await saved.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(saved.getByRole("status")).toContainText("已保存");
+    for (const route of ["/zh/resume", "/zh/about"]) {
+      await publicPage.goto(route);
+      await expect(publicPage.getByText("更新后的职责", { exact: true })).toHaveCount(1);
+      await expect(publicPage.getByText("保存前的职责", { exact: true })).toHaveCount(0);
+    }
+    await saved.getByRole("button", { name: new RegExp(`删除这条.*${key}`) }).click();
+    await page.getByRole("button", { name: "确认删除", exact: true }).click();
+    await expect(page.getByRole("heading", { name: key, exact: true })).toHaveCount(0);
+    for (const route of ["/zh/resume", "/zh/about"]) {
+      await publicPage.goto(route);
+      await expect(publicPage.getByText(city.zh, { exact: true })).toHaveCount(0);
+    }
+  } finally {
+    await visitor.close();
+  }
+});
