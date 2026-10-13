@@ -1,0 +1,133 @@
+"""Rebuild the pinned CJK webfonts into a NEW staging directory, without network access.
+
+python tools/vendor-yozai.py <source-directory> <empty-output-directory>
+See docs/FONTS.md. Normal install/build never runs Python or downloads fonts.
+"""
+from pathlib import Path
+import copy
+import hashlib
+import json
+import sys
+
+import brotli
+import fontTools
+from fontTools import subset
+from fontTools.ttLib import TTFont
+
+
+ROOT = Path(__file__).resolve().parent.parent
+RECIPE = json.loads((ROOT / "tools/yozai.gen.json").read_text())
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def ranges(characters):
+    points = sorted(ord(char) for char in characters)
+    groups = []
+    start = end = points[0]
+    for point in points[1:]:
+        if point == end + 1:
+            end = point
+        else:
+            groups.append((start, end))
+            start = end = point
+    groups.append((start, end))
+    return ",".join(f"U+{a:X}" + (f"-{b:X}" if b != a else "") for a, b in groups)
+
+
+def checked_inputs(source):
+    if fontTools.__version__ != RECIPE["fonttools"] or brotli.__version__ != RECIPE["brotli"]:
+        raise ValueError("Use the exact fonttools and brotli versions from the recipe")
+    if RECIPE["version"] != 1:
+        raise ValueError("Unsupported recipe version")
+    chars = list("".join(RECIPE["chunks"]))
+    if (
+        len(chars) != RECIPE["charset"]["count"]
+        or len(set(chars)) != len(chars)
+        or any(0xD800 <= ord(char) <= 0xDFFF for char in chars)
+        or any(not chunk or len(chunk) > 100 for chunk in RECIPE["chunks"])
+        or sha("".join(sorted(chars)).encode()) != RECIPE["charset"]["sha256"]
+    ):
+        raise ValueError("Character inventory does not match the pinned recipe")
+    for item in [*RECIPE["sources"], RECIPE["license"]]:
+        if sha((source / item["file"]).read_bytes()) != item["sha256"]:
+            raise ValueError(f"Source checksum mismatch: {item['file']}")
+    for item in RECIPE["sources"]:
+        with TTFont(source / item["file"]) as font:
+            if not set(map(ord, chars)) <= font.getBestCmap().keys():
+                raise ValueError("Source font does not support the complete recipe")
+
+
+def main():
+    if len(sys.argv) != 3:
+        raise ValueError("Usage: python tools/vendor-yozai.py <source-directory> <empty-output-directory>")
+    source, output = (Path(value).resolve() for value in sys.argv[1:])
+    checked_inputs(source)  # Verify everything before creating or writing output.
+    if output.exists() and any(output.iterdir()):
+        raise ValueError("Output must be a new or empty staging directory")
+    output.mkdir(parents=True, exist_ok=True)
+    expected = {item["file"]: item for item in RECIPE["outputs"]}
+    if len(expected) != len(RECIPE["chunks"]) * len(RECIPE["sources"]):
+        raise ValueError("Output manifest is incomplete or has duplicate files")
+    css, built = [], []
+    for item in RECIPE["sources"]:
+        weight = item["weight"]
+        style = "Regular" if weight == "400" else "Medium"
+        with TTFont(source / item["file"], recalcTimestamp=False) as original:
+            for index, characters in enumerate(RECIPE["chunks"]):
+                font = copy.deepcopy(original)
+                options = subset.Options()
+                options.name_IDs = RECIPE["options"]["nameIDs"]
+                options.name_languages = RECIPE["options"]["nameLanguages"]
+                options.name_legacy = RECIPE["options"]["nameLegacy"]
+                options.layout_features = RECIPE["options"]["layoutFeatures"]
+                options.recalc_timestamp = RECIPE["options"]["recalcTimestamp"]
+                worker = subset.Subsetter(options=options)
+                worker.populate(unicodes=map(ord, characters))
+                worker.subset(font)
+                version = RECIPE["sourceVersion"].removeprefix("v").replace(".", "")
+                family = RECIPE["family"]
+                postscript = family.replace(" ", "")
+                names = {
+                    1: family, 2: style,
+                    3: f"{postscript}-{version}-{style}-{index:03}",
+                    4: f"{family} {style}", 6: f"{postscript}-{style}",
+                    16: family, 17: style,
+                }
+                for entry in font["name"].names:
+                    if entry.nameID in names:
+                        entry.string = names[entry.nameID].encode(entry.getEncoding())
+                relative = f"{weight}/cn-{index:03}.woff2"
+                destination = output / "fonts" / relative
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                font.flavor = "woff2"
+                font.save(destination)
+                font.close()
+                data = destination.read_bytes()
+                recorded = expected[relative]
+                if len(data) != recorded["bytes"] or sha(data) != recorded["sha256"]:
+                    raise ValueError(f"Generated bytes differ from the pinned manifest: {relative}")
+                built.append(relative)
+                css_weight = "400" if weight == "400" else "500 900"
+                url = f"/fonts/yozai/{RECIPE['folder']}/{relative}"
+                css.append(
+                    f'@font-face{{font-family:"{RECIPE["alias"]}";src:url("{url}") format("woff2");'
+                    f"font-style:normal;font-display:swap;font-weight:{css_weight};"
+                    f"unicode-range:{ranges(characters)};}}"
+                )
+    if set(built) != set(expected):
+        raise ValueError("Generated file inventory differs from the recipe")
+    (output / "fonts/LICENSE.txt").write_bytes((source / RECIPE["license"]["file"]).read_bytes())
+    header = (
+        "/* Generated FHFS Round CJK web subsets, derived from Yozai 0.868 (SIL OFL 1.1).\n"
+        " * Fixed source/toolchain/character plan: tools/yozai.gen.json. Rebuild: docs/FONTS.md.\n"
+        " * The Yozai CSS alias preserves existing stacks; the internal derived family is distinct. */\n\n"
+    )
+    (output / "yozai.css").write_text(header + "\n".join(css) + "\n")
+    print(f"Verified {len(built)} reproducible webfont files; copy only after reviewing the complete staging output.")
+
+
+if __name__ == "__main__":
+    main()
