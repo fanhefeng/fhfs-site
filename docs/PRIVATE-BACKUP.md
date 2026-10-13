@@ -235,3 +235,5 @@ SQL 创建的 `backup_restore` 无提权成员资格、CREATEDB/CREATEROLE/super
 
 B2 权限依据：[应用密钥能力](https://www.backblaze.com/docs/cloud-storage-application-key-capabilities)、
 [S3 与 B2 权限映射](https://www.backblaze.com/docs/cloud-storage-map-iam-policies-and-s3-acls-to-backblaze-b2-access-controls)。
+
+云端巡检和独立超时告警的配置、权限、检测窗口与迁移回退见 [CLOUD-MONITORING.md](CLOUD-MONITORING.md)。

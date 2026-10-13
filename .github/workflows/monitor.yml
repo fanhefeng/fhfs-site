@@ -1,0 +1,60 @@
+name: cloud monitor
+
+on:
+  schedule:
+    - cron: "11 1,7,13,19 * * *" # Every six hours, off the busy hour boundary.
+  workflow_run:
+    workflows: [private backup, browser flows, backup]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cloud-monitor
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    if: vars.MONITOR_ENABLED == 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      # workflow_run is privileged: always execute default-branch code, never
+      # code or artifacts from the workflow that caused this event.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.repository.default_branch || github.ref }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Audit workflow state and actual execution
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          MONITOR_FLAGS: ${{ toJSON(vars) }}
+        run: pnpm exec tsx scripts/monitor.mts audit '${{ github.repository }}' '${{ github.event.repository.default_branch }}'
+      - name: Read encrypted repository freshness
+        env:
+          RESTIC_REPOSITORY: ${{ secrets.RESTIC_REPOSITORY }}
+          RESTIC_PASSWORD: ${{ secrets.RESTIC_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.BACKUP_AWS_REGION }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y restic
+          pnpm backup:private health
+      - name: Report to independent watchdog
+        if: always()
+        env:
+          HEALTHCHECKS_PING_URL: ${{ secrets.HEALTHCHECKS_PING_URL }}
+          AUDIT_RESULT: ${{ job.status }}
+        run: |
+          status=failure
+          if [ "$AUDIT_RESULT" = success ]; then status=success; fi
+          pnpm exec tsx scripts/monitor.mts signal "$status"
