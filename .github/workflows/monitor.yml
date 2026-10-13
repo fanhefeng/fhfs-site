@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   audit:
-    if: vars.MONITOR_ENABLED == 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.head_branch == github.event.repository.default_branch)
+    if: vars.MONITOR_ENABLED == 'true' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == github.event.repository.default_branch && github.event.workflow_run.head_repository.full_name == github.repository))
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -37,7 +37,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           MONITOR_FLAGS: ${{ toJSON(vars) }}
-        run: pnpm exec tsx scripts/monitor.mts audit '${{ github.repository }}' '${{ github.event.repository.default_branch }}'
+          AUDIT_REPOSITORY: ${{ github.repository }}
+          AUDIT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: pnpm exec tsx scripts/monitor.mts audit "$AUDIT_REPOSITORY" "$AUDIT_BRANCH"
       - name: Read encrypted repository freshness
         env:
           RESTIC_REPOSITORY: ${{ secrets.RESTIC_REPOSITORY }}
@@ -55,6 +57,14 @@ jobs:
           HEALTHCHECKS_PING_URL: ${{ secrets.HEALTHCHECKS_PING_URL }}
           AUDIT_RESULT: ${{ job.status }}
         run: |
+          # Keep this independent of checkout, pnpm and install succeeding.
+          if [[ ! "$HEALTHCHECKS_PING_URL" =~ ^https://hc-ping\.com/[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$ ]]; then
+            echo 'Missing or invalid independent monitor URL'
+            exit 1
+          fi
           status=failure
-          if [ "$AUDIT_RESULT" = success ]; then status=success; fi
-          pnpm exec tsx scripts/monitor.mts signal "$status"
+          suffix=/fail
+          if [ "$AUDIT_RESULT" = success ]; then status=success; suffix=; fi
+          curl --silent --fail --output /dev/null --max-time 10 --retry 2 --retry-all-errors \
+            --request POST --data "fhfs-site cloud audit: $status" "$HEALTHCHECKS_PING_URL$suffix"
+          echo "Independent monitor received $status"
