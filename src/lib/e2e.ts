@@ -7,7 +7,11 @@ export function testDatabaseProblem(
   const endpoint = (value: string) => {
     const url = new URL(value);
     if (!/^postgres(?:ql)?:$/.test(url.protocol)) throw new Error("Invalid Postgres URL");
-    return `${url.hostname.replace(/-pooler(?=\.)/, "")}:${url.port || "5432"}`;
+    const host = url.hostname
+      .toLowerCase()
+      .replace(/\.$/, "")
+      .replace(/-pooler(?=\.)/, "");
+    return `${host}:${url.port || "5432"}`;
   };
   try {
     const test = endpoint(testUrl);

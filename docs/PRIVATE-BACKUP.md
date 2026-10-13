@@ -50,6 +50,7 @@ pnpm backup:private create
 pnpm backup:private health
 pnpm backup:private verify
 pnpm backup:private verify-database # 仅取回数据库和清单，适合每日校验
+pnpm backup:private restore-database # 向受保护的独立演练库真实导入并逐表比对
 ```
 
 `create` 使用 `pg_dump` 的一致性快照，再从该 dump 的数据中提取媒体引用，包含草稿引用。
@@ -68,6 +69,61 @@ pnpm backup:private verify-database # 仅取回数据库和清单，适合每日
 `verify-database` 先检查仓库，再只恢复 dump/清单并校验数据库字节和目录表，
 不会重新下载全部媒体。两者都**不能代替向 Postgres 恢复的演练**。
 
+## 每月数据库恢复演练
+
+`restore-database` 选择性取回最新 dump/清单，先验证大小、SHA-256、归档目录和 36 小时新鲜度，
+再向独立恢复项目的专用数据库导入。它比较全部 COPY 列和排序后行数据（包含草稿字段、空值、
+转义文本和迁移历史），比对序列值/调用状态、表清单及空的登录限流表。媒体完整字节验证仍按季度运行。
+这不是生产部署切换或完整灾难恢复 RTO 演练。
+
+新增 Secret/本机变量 `BACKUP_RESTORE_DATABASE_URL` 仅交给恢复步骤。目标必须满足：
+
+- 直连独立恢复项目；主机与备份源、生产以及 E2E URL 不同（池化主机归一化后比较）。
+- 数据库名 `fhfs_restore_drill`，角色名 `backup_restore`，使用 TLS。
+- 角色无 superuser、CREATEDB、CREATEROLE 或角色成员资格；只拥有演练库的应用对象。
+- `recovery_control.guard` 恰有一行 `fhfs-private-restore-only`；角色只能读取标记，不能写入。
+
+标记必须预先由恢复项目管理员创建；脚本不会自动创建或修复它。首次准备示例（仅在独立恢复项目）：
+
+```sql
+-- 使用独立随机密码；SQL 创建的 Neon 角色不自动取得 neon_superuser。
+CREATE ROLE backup_restore LOGIN PASSWORD '<随机密码>'
+  NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION;
+-- 创建库的管理员需要目标 owner 的成员资格；反向授权不允许。
+GRANT backup_restore TO neondb_owner;
+CREATE DATABASE fhfs_restore_drill OWNER backup_restore;
+```
+
+连接新建的 `fhfs_restore_drill` 后由管理员执行：
+
+```sql
+REVOKE CONNECT, TEMPORARY ON DATABASE fhfs_restore_drill FROM PUBLIC;
+GRANT CONNECT, TEMPORARY ON DATABASE fhfs_restore_drill TO backup_restore;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+CREATE SCHEMA recovery_control AUTHORIZATION neondb_owner;
+REVOKE ALL ON SCHEMA recovery_control FROM PUBLIC;
+CREATE TABLE recovery_control.guard (
+  purpose text PRIMARY KEY CHECK (purpose = 'fhfs-private-restore-only')
+);
+INSERT INTO recovery_control.guard VALUES ('fhfs-private-restore-only');
+GRANT USAGE ON SCHEMA recovery_control TO backup_restore;
+GRANT SELECT ON recovery_control.guard TO backup_restore;
+```
+
+导入前重复检查 URL、实际库名/角色、权限与标记。归档目录只允许 public/drizzle schema 及其
+受支持对象，拒绝数据库创建或第三种 schema；完整恢复这些 schema 定义，避免 `pg_restore --schema`
+过滤掉 schema 本身。使用单事务和 `--clean --if-exists --no-owner --no-privileges`，不创建/删除数据库，
+不恢复角色授权。命令依据：[PostgreSQL pg_restore](https://www.postgresql.org/docs/18/app-pgrestore.html)。
+
+演练会替换专用库中属于归档的应用对象；不可把它用于日常开发或保管唯一副本。
+若出现归档外的额外应用表，清单比对会失败，需要管理员确认来源后处理。
+控制标记不在恢复的 schema 中，导入后再次确认它和角色权限。
+
+本机首次真实导入和比对通过、Secret 配置后，手工运行 workflow 的 `restore-database`。
+确认云端实际执行成功，再设置仓库变量 `PRIVATE_RESTORE_ENABLED=true` 启用每月北京时间
+8 日 06:53 的调度；该开关只控制自然调度，便于先手工验收。GitHub 不保证准点。
+该步骤与其他私有备份任务串行，明文仅在 0700 临时目录，结束清理，不上传 artifact。
+
 ## 自动化与保留
 
 GitHub Secrets：`BACKUP_DATABASE_URL`、`RESTIC_REPOSITORY`、`RESTIC_PASSWORD`；
@@ -76,6 +132,7 @@ S3 凭据对应 `BACKUP_AWS_ACCESS_KEY_ID`、`BACKUP_AWS_SECRET_ACCESS_KEY`，�
 
 `.github/workflows/private-backup.yml` 每天北京时间 04:17 创建，并立即从异地仓库取回数据库校验；10:37、16:37、22:37
 独立检查新鲜度，每年 1/4/7/10 月 2 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
+每月 8 日 06:53 另向受保护的专用库真实恢复数据库，需要上述独立恢复 Secret。
 调度避开整点，但 GitHub 不保证准点执行。
 任务串行，日志不列私有行和文件名，不上传 artifact。打开 GitHub Actions 失败通知，
 并检查通知确实送达；调度延迟、workflow 被停用等完全不运行的情形仍需外部监控覆盖。
@@ -162,6 +219,15 @@ PR #21 已发布每日数据库取回校验、错峰调度和告警演练。main
 逐表数据比较仍包括 draft 字段；草稿匿名隐藏和授权预览由独立测试库的合成样本验证。
 验收后停止恢复库站点，删除本机临时明文 dump、会话凭据及包含恢复内容的测试构建。
 独立恢复项目仍留在用户 Neon 账号下，未向生产部署或切换数据库。
+
+2026-10-13 补充：在同一独立恢复项目内新建 `fhfs_restore_drill`，原 `neondb` 恢复副本保留。
+SQL 创建的 `backup_restore` 无提权成员资格、CREATEDB/CREATEROLE/superuser，控制标记由管理员拥有。
+`pnpm backup:private restore-database` 已真实导入并比较 17 张表、14 个序列，数据/列/迁移一致。
+另暂时撤销标记 SELECT，命令按预期失败，存储与恢复命令未被调用，17 张应用表不变；随后恢复权限。
+归档范围与数据比较新增 7 项测试，含空表/空字符串、重复行、转义、草稿、序列变化和异常归档拒绝。
+审查补充了 Postgres 主机大小写与 DNS 尾点归一化；E2E 的生产隔离也用真实失败回归补齐相同边界。
+首次原生命令发现 `--schema` 会漏掉 schema 创建；修复为先校验完整归档范围再完整恢复，真实重跑通过。
+云端首次执行与重复恢复结果记录在对应 PR；定时触发的成功仍应独立观察。
 
 原理与命令依据：[PostgreSQL pg_dump](https://www.postgresql.org/docs/18/app-pgdump.html)、
 [restic backup](https://restic.readthedocs.io/en/stable/040_backup.html)、

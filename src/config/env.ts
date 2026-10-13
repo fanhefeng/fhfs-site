@@ -15,6 +15,11 @@
 type Rule = { required: boolean; valid: (value: string) => boolean; shape: string };
 
 export const ENV_RULES: Record<string, Rule> = {
+  BACKUP_RESTORE_DATABASE_URL: {
+    required: false,
+    valid: (v) => /^postgres(ql)?:\/\/\S+$/.test(v),
+    shape: "the dedicated disposable restore database, never production or the E2E project",
+  },
   BACKUP_DATABASE_URL: {
     required: false,
     valid: (v) => /^postgres(ql)?:\/\/\S+$/.test(v),
