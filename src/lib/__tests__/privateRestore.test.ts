@@ -26,7 +26,9 @@ describe("disposable restore boundary", () => {
     expect(restoreTargetEnvironment(target, [production]).PGDATABASE).toBe("fhfs_restore_drill");
     for (const url of [
       target.replace("restore.neon", "production.neon"),
+      target.replace("restore.neon.tech", "PRODUCTION.NEON.TECH."),
       target.replace("restore.neon", "restore-pooler.neon"),
+      target.replace("restore.neon.tech", "RESTORE-POOLER.NEON.TECH."),
       target.replace("backup_restore:", "neondb_owner:"),
       target.replace("fhfs_restore_drill", "neondb"),
       target.replace("sslmode=require", "sslmode=disable"),
@@ -37,6 +39,11 @@ describe("disposable restore boundary", () => {
     expect(() =>
       restoreTargetEnvironment(target, [
         production.replace("production.neon", "restore-pooler.neon"),
+      ]),
+    ).toThrow();
+    expect(() =>
+      restoreTargetEnvironment(target, [
+        production.replace("production.neon.tech", "RESTORE-POOLER.NEON.TECH."),
       ]),
     ).toThrow();
   });

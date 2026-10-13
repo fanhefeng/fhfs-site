@@ -47,13 +47,18 @@ export function applicationArchiveTables(toc: string): string[] {
 /** Fixed names plus an independently provisioned marker prevent accidental production restores. */
 export function restoreTargetEnvironment(target: string, protectedUrls: string[]) {
   const env = postgresEnvironment(target);
+  // Postgres is a non-special URL scheme: WHATWG does not lowercase its host.
+  const host = (value: string) => value.toLowerCase().replace(/\.$/, "");
+  const targetHost = host(env.PGHOST!);
   if (
     protectedUrls.length === 0 ||
     env.PGDATABASE !== "fhfs_restore_drill" ||
     env.PGUSER !== "backup_restore" ||
-    env.PGHOST!.includes("-pooler.") ||
+    targetHost.includes("-pooler.") ||
     !["require", "verify-ca", "verify-full"].includes(env.PGSSLMODE!) ||
-    protectedUrls.some((value) => new URL(value).hostname.replace("-pooler.", ".") === env.PGHOST)
+    protectedUrls.some(
+      (value) => host(new URL(value).hostname).replace("-pooler.", ".") === targetHost,
+    )
   )
     throw new Error("Restore target must be a separate direct database with the dedicated role");
   return env;
