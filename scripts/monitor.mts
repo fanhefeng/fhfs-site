@@ -91,7 +91,9 @@ async function nativeRestoreLog(job: MonitorJob): Promise<boolean> {
   if (log.length > 8_000_000) throw new MonitorError("Restore evidence exceeds audit size limit");
   // Current schema inventory, plus the migration journal and its serial.
   // No database connection is opened; adding a table updates this expectation.
-  const tables = Object.values(schema).filter((value): value is PgTable => is(value, PgTable));
+  const tables = Object.values(schema)
+    .filter((value) => is(value, PgTable))
+    .map((value) => value as PgTable);
   const sequences = tables
     .flatMap((table) => getTableConfig(table).columns)
     .filter((column) =>
