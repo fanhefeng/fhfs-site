@@ -13,14 +13,16 @@ import {
 import { is } from "drizzle-orm";
 import { getTableConfig, PgTable } from "drizzle-orm/pg-core";
 import * as schema from "../src/db/schema";
+import { withConnectionRetry } from "../src/lib/retryFetch";
 
 class MonitorError extends Error {}
 const [command, repository, branch = "main"] = process.argv.slice(2);
+const readFetch = withConnectionRetry(fetch, [500, 1500]);
 
 async function github(path: string): Promise<Response> {
   const token = process.env.GITHUB_TOKEN;
   if (!token) throw new MonitorError("GITHUB_TOKEN is missing");
-  const response = await fetch(`https://api.github.com/repos/${repository}/${path}`, {
+  const response = await readFetch(`https://api.github.com/repos/${repository}/${path}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/vnd.github+json",
@@ -73,9 +75,14 @@ async function runs(workflow: string, now: number): Promise<MonitorRun[]> {
       "timed_out",
       "cancelled",
       "action_required",
+      "neutral",
+      "skipped",
+      "stale",
       "queued",
       "in_progress",
       "waiting",
+      "pending",
+      "requested",
     ].map((status) => runPages(workflow, { status })),
   ]);
   return [...new Map(groups.flat().map((run) => [run.id, run])).values()];
@@ -90,7 +97,10 @@ async function nativeRestoreLog(job: MonitorJob): Promise<boolean> {
     if (!location || new URL(location).protocol !== "https:")
       throw new MonitorError("Invalid log download redirect");
     // Never forward the GitHub token to the signed download host.
-    response = await fetch(location, { signal: AbortSignal.timeout(30_000), redirect: "error" });
+    response = await readFetch(location, {
+      signal: AbortSignal.timeout(30_000),
+      redirect: "error",
+    });
   }
   if (!response.ok) throw new MonitorError("Restore evidence download unavailable");
   const log = await response.text();
