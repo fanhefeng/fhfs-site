@@ -1,6 +1,7 @@
 /** Read-only GitHub audit; signal sends only a fixed status to Healthchecks.io. */
 import {
   assessRuns,
+  latestAttemptFirst,
   NATURAL_CREATE_DEADLINE,
   requiredJob,
   restoreComparisonPassed,
@@ -8,6 +9,10 @@ import {
   type MonitorJob,
   type MonitorRun,
 } from "../src/lib/monitor";
+
+import { is } from "drizzle-orm";
+import { getTableConfig, PgTable } from "drizzle-orm/pg-core";
+import * as schema from "../src/db/schema";
 
 class MonitorError extends Error {}
 const [command, repository, branch = "main"] = process.argv.slice(2);
@@ -35,22 +40,39 @@ async function json<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
-async function runs(workflow: string, now: number): Promise<MonitorRun[]> {
+async function runPages(workflow: string, filters: Record<string, string>): Promise<MonitorRun[]> {
   const result: MonitorRun[] = [];
   const query = new URLSearchParams({
     branch,
     per_page: "100",
-    created: `>=${new Date(now - 36 * 86_400_000).toISOString()}`,
+    ...filters,
   });
   for (let page = 1; page <= 10; page++) {
-    const data = await json<{ workflow_runs: MonitorRun[] }>(
+    const data = await json<{ workflow_runs: MonitorRun[]; total_count: number }>(
       `actions/workflows/${workflow}/runs?${query}&page=${page}`,
     );
     if (!Array.isArray(data.workflow_runs)) throw new MonitorError("Invalid workflow history");
+    if (data.total_count > 1000)
+      throw new MonitorError(
+        "Workflow history exceeds the bounded API search; narrower queries are required",
+      );
     result.push(...data.workflow_runs);
     if (data.workflow_runs.length < 100) return result;
   }
   throw new MonitorError("Workflow history exceeds the bounded audit window");
+}
+
+async function runs(workflow: string, now: number): Promise<MonitorRun[]> {
+  // Retain quarterly recoveries. Fetch failures without a created cutoff:
+  // rerunning an old run changes run_started_at, not created_at.
+  const days = workflow === "private-backup.yml" ? 120 : 36;
+  const groups = await Promise.all([
+    runPages(workflow, { created: `>=${new Date(now - days * 86_400_000).toISOString()}` }),
+    ...["failure", "timed_out", "cancelled", "action_required"].map((status) =>
+      runPages(workflow, { status }),
+    ),
+  ]);
+  return [...new Map(groups.flat().map((run) => [run.id, run])).values()];
 }
 
 async function nativeRestoreLog(job: MonitorJob): Promise<boolean> {
@@ -67,7 +89,18 @@ async function nativeRestoreLog(job: MonitorJob): Promise<boolean> {
   if (!response.ok) throw new MonitorError("Restore evidence download unavailable");
   const log = await response.text();
   if (log.length > 8_000_000) throw new MonitorError("Restore evidence exceeds audit size limit");
-  return restoreComparisonPassed(log, step.started_at, step.completed_at);
+  // Current schema inventory, plus the migration journal and its serial.
+  // No database connection is opened; adding a table updates this expectation.
+  const tables = Object.values(schema).filter((value): value is PgTable => is(value, PgTable));
+  const sequences = tables
+    .flatMap((table) => getTableConfig(table).columns)
+    .filter((column) =>
+      ["PgSerial", "PgBigSerial", "PgSmallSerial"].includes(column.columnType),
+    ).length;
+  return restoreComparisonPassed(log, step.started_at, step.completed_at, {
+    tables: tables.length + 1,
+    sequences: sequences + 1,
+  });
 }
 
 async function audit() {
@@ -124,10 +157,19 @@ async function audit() {
     });
   // Other real backup operations must not be hidden by a successful create.
   for (const operation of ["verify", "verify-database"]) {
+    if (
+      privateRuns!.some(
+        (r) =>
+          r.display_title === `private backup / ${operation}` &&
+          r.run_attempt > 1 &&
+          r.status !== "completed",
+      )
+    )
+      problems.push(`${operation}: rerun is awaiting verification`);
     const history = privateRuns!.filter(
       (r) => r.display_title === `private backup / ${operation}` && r.status === "completed",
     );
-    history.sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+    history.sort(latestAttemptFirst);
     if (history[0] && history[0].conclusion !== "success")
       problems.push(`${operation}: latest run did not succeed`);
   }

@@ -9,6 +9,7 @@ GitHub Actions 的 `monitor.yml` 执行只读巡检，Healthchecks.io 独立监�
 - 验证三个工作流 active，`PRIVATE_BACKUP_ENABLED`、`PRIVATE_RESTORE_ENABLED`、`E2E_ENABLED` 为 true。
 - create、公开快照、browser flows 最近实际成功不超过 36 小时；health 不超过 12 小时；SQL 恢复不超过 35 天。
 - 验证 job 与关键步骤实际执行；全部 skipped 不算成功，新失败不能被旧成功掩盖。
+- 按最新执行尝试排序；失败、取消、超时与需处理状态不按创建时间截断查询，防止旧任务重跑或季度失败消失。
 - 恢复要求原生逐表行/列、迁移、序列比对摘要，且日志时间位于实际恢复步骤内。日志过期或无法访问即报告无法验证。
 - 2026-10-14 16:17（北京时间）起另查最近 36 小时自然 create；手工运行不能替代自然调度验收。
 - 排除受控 `alert-test`；普通 verify / verify-database 失败仍需告警。
@@ -45,6 +46,7 @@ Healthchecks 不持有数据库、restic、B2、GitHub 或网站后台凭据。
 
 - 先看 Actions 的 `cloud monitor`：API 审计、restic health、状态上报分开显示。
 - API 限流、权限不足、日志缺失与异常元数据属于无法验证，不报告健康。
+- 历史查询有分页和数量上限，达到 GitHub 搜索上限时告警要求缩小查询，不把截断历史视为健康。
 - 备份过期应修复原备份任务；巡检不会自动写库或创建备份来消除告警。
 - ping URL 泄露须更换检查地址与 Secret，并验证新信号；只删日志不能撤销旧地址。
 - 回退时先启用并验证本地巡检，再停云端并暂停外部检查，避免空窗或持续误报。

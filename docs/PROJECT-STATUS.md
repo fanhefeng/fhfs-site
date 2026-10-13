@@ -194,6 +194,6 @@ Next 16.4 生产构建的 200 次公开/404 请求，堆从 37.0 到 37.6 MiB，
 
 新增 GitHub Actions 只读巡检与 Healthchecks.io 独立看门狗，覆盖工作流/开关、真实 job/步骤、
 备份与测试年龄、自然调度证据及原生恢复比对，并读取加密仓库 health。
-配置与切换顺序见 [CLOUD-MONITORING.md](CLOUD-MONITORING.md)。344 项完整门禁及真实 API 审计通过；
+配置与切换顺序见 [CLOUD-MONITORING.md](CLOUD-MONITORING.md)。新增重跑/恢复清单回归，完整门禁与真实 API 审计通过；
 独立演练的故障/恢复邮件已在收件箱核实。超时、云端主分支运行和停用旧本地任务的最终证据见发布 PR。
 只有完成云端验证后才停旧巡检，原有备份、测试和恢复任务继续运行。

@@ -7,7 +7,15 @@ export type MonitorRun = {
   status: string;
   conclusion: string | null;
   created_at: string;
+  run_started_at: string;
+  run_attempt: number;
 };
+
+export function latestAttemptFirst(a: MonitorRun, b: MonitorRun): number {
+  return (
+    Date.parse(b.run_started_at) - Date.parse(a.run_started_at) || b.run_attempt - a.run_attempt
+  );
+}
 
 export type MonitorJob = {
   id: number;
@@ -38,16 +46,18 @@ export function assessRuns(
         r.status === "completed" &&
         (!scheduledOnly || r.event === "schedule"),
     )
-    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+    .sort(latestAttemptFirst);
   const problems: string[] = [];
-  if (completed.some((r) => !Number.isFinite(Date.parse(r.created_at))))
+  if (runs.some((r) => r.head_branch === branch && r.run_attempt > 1 && r.status !== "completed"))
+    problems.push("rerun is awaiting verification");
+  if (completed.some((r) => !Number.isFinite(Date.parse(r.run_started_at))))
     problems.push("invalid run timestamp");
   if (completed[0] && completed[0].conclusion !== "success")
     problems.push(`latest completed run is ${completed[0].conclusion ?? "unknown"}`);
   const successful = completed.find((r) => r.conclusion === "success");
   if (!successful) problems.push("no successful run");
   else {
-    const age = now - Date.parse(successful.created_at);
+    const age = now - Date.parse(successful.run_started_at);
     if (!Number.isFinite(age) || age < -300_000 || age > hours * 3_600_000)
       problems.push(`successful run is outside the ${hours} hour window`);
   }
@@ -69,18 +79,23 @@ export function restoreComparisonPassed(
   log: string,
   startedAt: string,
   completedAt: string,
+  expected: { tables: number; sequences: number },
 ): boolean {
   const start = Date.parse(startedAt);
   const end = Date.parse(completedAt) + 999; // GitHub step metadata has second precision.
   if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return false;
   return log.split("\n").some((line) => {
     const time = Date.parse(line.split(" ")[0] ?? "");
+    const counts =
+      /Postgres restore drill passed: ([1-9]\d*) tables, ([1-9]\d*) sequences; rows, columns and migration history match\./.exec(
+        line,
+      );
     return (
       time >= start &&
       time <= end &&
-      /Postgres restore drill passed: [1-9]\d* tables, \d+ sequences; rows, columns and migration history match\./.test(
-        line,
-      )
+      !!counts &&
+      Number(counts[1]) === expected.tables &&
+      Number(counts[2]) === expected.sequences
     );
   });
 }

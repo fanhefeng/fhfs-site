@@ -18,6 +18,8 @@ const run = (fields: Partial<MonitorRun> = {}): MonitorRun => ({
   status: "completed",
   conclusion: "success",
   created_at: new Date(now - 3_600_000).toISOString(),
+  run_started_at: fields.created_at ?? new Date(now - 3_600_000).toISOString(),
+  run_attempt: 1,
   ...fields,
 });
 
@@ -40,6 +42,31 @@ describe("cloud monitoring policy", () => {
     );
     const recovered = run({ id: 3, created_at: new Date(now + 1000).toISOString() });
     expect(assessRuns([failed, run(), recovered], now, 36, "main").problems).toEqual([]);
+  });
+
+  it("orders reruns by the latest attempt, never by original creation", () => {
+    const oldRerun = run({
+      id: 2,
+      created_at: "2026-01-01T00:00:00Z",
+      run_started_at: new Date(now).toISOString(),
+      run_attempt: 2,
+      conclusion: "failure",
+    });
+    expect(assessRuns([run(), oldRerun], now, 36, "main").problems).toContain(
+      "latest completed run is failure",
+    );
+    expect(
+      assessRuns([run(), { ...oldRerun, status: "in_progress", conclusion: null }], now, 36, "main")
+        .problems,
+    ).toContain("rerun is awaiting verification");
+    expect(
+      assessRuns(
+        [oldRerun, { ...oldRerun, run_attempt: 3, conclusion: "success" }],
+        now,
+        36,
+        "main",
+      ).problems,
+    ).toEqual([]);
   });
 
   it("rejects stale, invalid and implausibly future timestamps", () => {
@@ -83,12 +110,43 @@ describe("cloud monitoring policy", () => {
     const start = "2026-10-13T10:08:00Z",
       end = "2026-10-13T10:09:17Z";
     const prefix = "2026-10-13T10:09:14.8337980Z ";
-    expect(restoreComparisonPassed(prefix + summary, start, end)).toBe(true);
-    expect(restoreComparisonPassed("2026-10-13T11:00:00Z " + summary, start, end)).toBe(false);
-    expect(restoreComparisonPassed(prefix + "pg_restore exited 0", start, end)).toBe(false);
-    expect(restoreComparisonPassed(prefix + summary, "invalid", end)).toBe(false);
+    for (const changed of [
+      summary.replace("14 sequences", "0 sequences"),
+      summary.replace("17 tables", "16 tables"),
+      summary.replace("14 sequences", "13 sequences"),
+    ])
+      expect(
+        restoreComparisonPassed(prefix + changed, start, end, { tables: 17, sequences: 14 }),
+      ).toBe(false);
     expect(
-      restoreComparisonPassed(prefix + summary.replace("17 tables", "0 tables"), start, end),
+      restoreComparisonPassed(prefix + summary.replace("17 tables", "18 tables"), start, end, {
+        tables: 18,
+        sequences: 14,
+      }),
+    ).toBe(true);
+    expect(
+      restoreComparisonPassed(prefix + summary, start, end, { tables: 17, sequences: 14 }),
+    ).toBe(true);
+    expect(
+      restoreComparisonPassed("2026-10-13T11:00:00Z " + summary, start, end, {
+        tables: 17,
+        sequences: 14,
+      }),
+    ).toBe(false);
+    expect(
+      restoreComparisonPassed(prefix + "pg_restore exited 0", start, end, {
+        tables: 17,
+        sequences: 14,
+      }),
+    ).toBe(false);
+    expect(
+      restoreComparisonPassed(prefix + summary, "invalid", end, { tables: 17, sequences: 14 }),
+    ).toBe(false);
+    expect(
+      restoreComparisonPassed(prefix + summary.replace("17 tables", "0 tables"), start, end, {
+        tables: 17,
+        sequences: 14,
+      }),
     ).toBe(false);
   });
 
