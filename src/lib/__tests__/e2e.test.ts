@@ -17,4 +17,14 @@ describe("browser test database safety", () => {
       testDatabaseProblem("postgresql://tester:secret@ep-test.neon.tech/site", [production]),
     ).toBeNull();
   });
+  it("rejects production aliases with uppercase hosts, pooler spelling or a DNS trailing dot", () => {
+    for (const host of ["EP-PROD.NEON.TECH", "EP-PROD-POOLER.NEON.TECH", "ep-prod.neon.tech."]) {
+      expect(testDatabaseProblem(`postgresql://tester:secret@${host}/other`, [production])).toMatch(
+        /production endpoint/,
+      );
+      expect(testDatabaseProblem(production, [`postgresql://owner:secret@${host}/site`])).toMatch(
+        /production endpoint/,
+      );
+    }
+  });
 });
