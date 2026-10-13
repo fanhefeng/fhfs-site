@@ -68,9 +68,15 @@ async function runs(workflow: string, now: number): Promise<MonitorRun[]> {
   const days = workflow === "private-backup.yml" ? 120 : 36;
   const groups = await Promise.all([
     runPages(workflow, { created: `>=${new Date(now - days * 86_400_000).toISOString()}` }),
-    ...["failure", "timed_out", "cancelled", "action_required"].map((status) =>
-      runPages(workflow, { status }),
-    ),
+    ...[
+      "failure",
+      "timed_out",
+      "cancelled",
+      "action_required",
+      "queued",
+      "in_progress",
+      "waiting",
+    ].map((status) => runPages(workflow, { status })),
   ]);
   return [...new Map(groups.flat().map((run) => [run.id, run])).values()];
 }

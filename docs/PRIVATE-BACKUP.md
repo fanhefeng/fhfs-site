@@ -202,8 +202,9 @@ GitHub 所需五项 Secret 和区域变量已配置；PR #19 已合并并上线�
 PR #21 已发布每日数据库取回校验、错峰调度和告警演练。main 的
 [38310197460](https://github.com/fanhefeng/fhfs-site/actions/runs/38310197460) 创建/数据库取回/health 全部通过。
 受控告警 [38307835631](https://github.com/fanhefeng/fhfs-site/actions/runs/38307835631) 的 GitHub 站内通知
-及现有 QQ 收件箱邮件均已确认；后续 health 成功。Codex 每 12 小时的只读巡检已启用（ACTIVE），
-独立于 GitHub workflow 调度器，检查任务停用、跳过与过期；依赖本机 Codex 在线，不能当作全天候托管监控。
+及现有 QQ 收件箱邮件均已确认；后续 health 成功。原 Codex 本地巡检迁移为 GitHub 云端只读审计与 Healthchecks.io 独立超时告警，
+不依赖本机在线；权限、检测窗口和先验证后切换的顺序见 [CLOUD-MONITORING.md](CLOUD-MONITORING.md)，
+实际云端运行、本地停用及临时凭据撤销证据见 [PR #26](https://github.com/fanhefeng/fhfs-site/pull/26)。
 
 本次快照 ID：`f62a87db0fbaff22b6094f69f0c18dff7c3cdbce6e85fa85d0adae90d194af5a`，
 时间 2026-10-13 03:35:57 +08:00。恢复到独立新建的 PostgreSQL 18 Neon 项目
