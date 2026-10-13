@@ -9,7 +9,24 @@ export type MonitorRun = {
   created_at: string;
   run_started_at: string;
   run_attempt: number;
+  updated_at: string;
 };
+
+/** Parallel API queries may return different attempts of the same run. */
+export function mergeRunAttempts(runs: MonitorRun[]): MonitorRun[] {
+  const byId = new Map<number, MonitorRun>();
+  for (const run of runs) {
+    const old = byId.get(run.id);
+    if (
+      !old ||
+      run.run_attempt > old.run_attempt ||
+      (run.run_attempt === old.run_attempt &&
+        Date.parse(run.updated_at) > Date.parse(old.updated_at))
+    )
+      byId.set(run.id, run);
+  }
+  return [...byId.values()];
+}
 
 export function latestAttemptFirst(a: MonitorRun, b: MonitorRun): number {
   return (

@@ -36,7 +36,8 @@ jobs:
       - name: Audit workflow state and actual execution
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          MONITOR_FLAGS: ${{ toJSON(vars) }}
+          MONITOR_FLAGS: >-
+            {"PRIVATE_BACKUP_ENABLED":${{ toJSON(vars.PRIVATE_BACKUP_ENABLED) }},"PRIVATE_RESTORE_ENABLED":${{ toJSON(vars.PRIVATE_RESTORE_ENABLED) }},"E2E_ENABLED":${{ toJSON(vars.E2E_ENABLED) }}}
           AUDIT_REPOSITORY: ${{ github.repository }}
           AUDIT_BRANCH: ${{ github.event.repository.default_branch }}
         run: pnpm exec tsx scripts/monitor.mts audit "$AUDIT_REPOSITORY" "$AUDIT_BRANCH"

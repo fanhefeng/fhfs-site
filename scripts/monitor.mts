@@ -2,6 +2,7 @@
 import {
   assessRuns,
   latestAttemptFirst,
+  mergeRunAttempts,
   NATURAL_CREATE_DEADLINE,
   requiredJob,
   restoreComparisonPassed,
@@ -85,7 +86,7 @@ async function runs(workflow: string, now: number): Promise<MonitorRun[]> {
       "requested",
     ].map((status) => runPages(workflow, { status })),
   ]);
-  return [...new Map(groups.flat().map((run) => [run.id, run])).values()];
+  return mergeRunAttempts(groups.flat());
 }
 
 async function nativeRestoreLog(job: MonitorJob): Promise<boolean> {

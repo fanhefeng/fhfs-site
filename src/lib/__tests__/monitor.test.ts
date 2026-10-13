@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 import {
   assessRuns,
+  mergeRunAttempts,
   NATURAL_CREATE_DEADLINE,
   requiredJob,
   restoreComparisonPassed,
@@ -20,10 +21,25 @@ const run = (fields: Partial<MonitorRun> = {}): MonitorRun => ({
   created_at: new Date(now - 3_600_000).toISOString(),
   run_started_at: fields.created_at ?? new Date(now - 3_600_000).toISOString(),
   run_attempt: 1,
+  updated_at: fields.run_started_at ?? fields.created_at ?? new Date(now).toISOString(),
   ...fields,
 });
 
 describe("cloud monitoring policy", () => {
+  it("keeps the newest attempt and update when parallel API responses overlap", () => {
+    const old = run({ run_attempt: 1, conclusion: "failure" });
+    const fresh = run({ run_attempt: 2, conclusion: "success" });
+    expect(mergeRunAttempts([fresh, old])).toEqual([fresh]);
+    expect(mergeRunAttempts([old, fresh])).toEqual([fresh]);
+    const complete = run({ run_attempt: 2, updated_at: new Date(now).toISOString() });
+    const pending = run({
+      run_attempt: 2,
+      status: "in_progress",
+      conclusion: null,
+      updated_at: new Date(now - 1000).toISOString(),
+    });
+    expect(mergeRunAttempts([complete, pending])).toEqual([complete]);
+  });
   it("requires a recent real success on the default branch", () => {
     expect(assessRuns([run()], now, 36, "main").problems).toEqual([]);
     for (const fields of [
