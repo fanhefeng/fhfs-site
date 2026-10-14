@@ -424,6 +424,29 @@ export const getSecretEditions = unstable_cache(
   cacheOptions(TAGS.secrets),
 );
 
+export type PublishedEdition = { slug: string; locale: Locale; date: string };
+
+/** All actual editions for the sitemap, in one HTTP batch regardless of slug count. */
+export const getSitemapEditions = unstable_cache(
+  async (): Promise<{ posts: PublishedEdition[]; secrets: PublishedEdition[] }> => {
+    const [postEditions, secretEditions] = await db.batch([
+      db
+        .select({ slug: posts.slug, locale: posts.locale, date: posts.date })
+        .from(posts)
+        .where(publishedOnly)
+        .orderBy(asc(posts.slug), asc(posts.locale)),
+      db
+        .select({ slug: secrets.slug, locale: secrets.locale, date: secrets.date })
+        .from(secrets)
+        .where(secretPublished)
+        .orderBy(asc(secrets.slug), asc(secrets.locale)),
+    ]);
+    return { posts: postEditions, secrets: secretEditions };
+  },
+  ["sitemap-editions"],
+  cacheOptions(TAGS.posts, TAGS.secrets),
+);
+
 export const getAdjacentSecrets = unstable_cache(
   async (
     slug: string,

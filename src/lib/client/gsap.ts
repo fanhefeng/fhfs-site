@@ -11,7 +11,7 @@ import { Flip } from "gsap/Flip";
 // here in every fx component. Only the plugins that are on every page get
 // registered here: the Header's Flip, Reveal's ScrollTrigger, the headline
 // SplitText, and CustomEase because the others build on it. Draggable,
-// InertiaPlugin, ScrambleTextPlugin, CustomWiggle and the EasePack eases are
+// InertiaPlugin, ScrambleTextPlugin and CustomWiggle are
 // each used by one or two leaf components and live in `./gsap-extras`, so
 // the pages that never drag, scramble or wiggle do not ship them.
 gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, CustomEase, Flip);

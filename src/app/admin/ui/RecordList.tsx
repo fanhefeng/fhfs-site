@@ -32,8 +32,8 @@ const VIEWS: { view: View; label: string }[] = [
 /**
  * A list where each row opens into its own form.
  *
- * These tables hold a handful of rows each — except the board, which holds two
- * hundred and forty-two — so a separate route per record would mean a page load
+ * These tables hold a handful of rows each, apart from the board; a separate
+ * route per record would mean a page load
  * to change a word. Everything is on the page already; opening a row just
  * reveals it. The filter box is what makes that scale: it matches the row's
  * headline, its dim line and its key, which between them carry the date, the
