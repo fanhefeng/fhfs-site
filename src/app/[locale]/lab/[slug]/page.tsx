@@ -64,6 +64,24 @@ export async function generateMetadata({
  * not in the file.
  */
 const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
+  hello: [
+    "label",
+    "lede",
+    "hello",
+    "nihao",
+    "play",
+    "pause",
+    "playbackAria",
+    "replay",
+    "wordLabel",
+    "speedLabel",
+    "themeLabel",
+    "paperAria",
+    "peachAria",
+    "blueAria",
+    "nightAria",
+    "guideLabel",
+  ],
   scrollVideo: [
     "loading",
     "failed",

@@ -1,7 +1,7 @@
 import { site } from "@/config/site";
 
 /**
- * The lab's table of contents. Thirty-three studies, each on its own route,
+ * The lab's table of contents. Each study has its own route,
  * on three shelves the index prints under their own headings.
  *
  * Slug and message key are kept separate on purpose: the URL wants kebab-case
@@ -9,8 +9,8 @@ import { site } from "@/config/site";
  * table is what stops the two from drifting apart the way the craft log's ids
  * once did.
  *
- * The first eight are pieces built *for* the lab. From the ninth on, each
- * study is an effect the site itself uses — the sideways passage on /about,
+ * The first shelf holds pieces built *for* the lab. The second holds
+ * effects the site itself uses — the sideways passage on /about,
  * the stickers, the entrances, the statue, the screening room — shown on its
  * own so the mechanism can be read apart from the page it serves; the last
  * seven are the shell, what surrounds every page. One effect per study,
@@ -30,6 +30,7 @@ export type LabSlug =
   | "workstation"
   | "lens-slider"
   | "neon"
+  | "hello"
   | "sideways"
   | "masthead"
   | "reveal"
@@ -79,6 +80,7 @@ export type LabEntry = {
     | "workstation"
     | "lensSlider"
     | "neon"
+    | "hello"
     | "sideways"
     | "masthead"
     | "reveal"
@@ -234,6 +236,16 @@ export const LAB_ENTRIES: LabEntry[] = [
     ],
   },
 
+  {
+    slug: "hello",
+    key: "hello",
+    group: "piece",
+    ordinal: "09",
+    added: "2026-10-14",
+    accent: "#b4745e",
+    sources: ["components/lab/HelloDemo.tsx", "lib/hello.ts"],
+  },
+
   /* ---- from here on: the site's own effects, one per study ---- */
 
   // The manifesto's passage on /about: a pinned screen, the line riding
@@ -242,7 +254,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "sideways",
     key: "sideways",
     group: "site",
-    ordinal: "09",
+    ordinal: "10",
     added: "2026-09-19",
     accent: "#a0522d",
     sources: [
@@ -256,7 +268,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "masthead",
     key: "masthead",
     group: "site",
-    ordinal: "10",
+    ordinal: "11",
     added: "2026-09-19",
     accent: "#5c6b73",
     sources: ["components/lab/MastheadDemo.tsx", "components/home/Opening.tsx"],
@@ -266,7 +278,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "reveal",
     key: "reveal",
     group: "site",
-    ordinal: "11",
+    ordinal: "12",
     added: "2026-09-19",
     accent: "#6b7a68",
     sources: ["components/lab/RevealDemo.tsx", "components/fx/Reveal.tsx"],
@@ -276,7 +288,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "headline",
     key: "headline",
     group: "site",
-    ordinal: "12",
+    ordinal: "13",
     added: "2026-09-19",
     accent: "#7a6a5c",
     sources: ["components/lab/HeadlineDemo.tsx", "components/blog/PostTitle.tsx"],
@@ -287,7 +299,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "unmask",
     key: "unmask",
     group: "site",
-    ordinal: "13",
+    ordinal: "14",
     added: "2026-09-19",
     accent: "#6e6458",
     sources: ["components/lab/UnmaskDemo.tsx", "components/blog/PostTitle.tsx"],
@@ -298,7 +310,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "magnetic",
     key: "magnetic",
     group: "site",
-    ordinal: "14",
+    ordinal: "15",
     added: "2026-09-19",
     accent: "#8b6f3e",
     sources: [
@@ -313,7 +325,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "glint",
     key: "glint",
     group: "site",
-    ordinal: "15",
+    ordinal: "16",
     added: "2026-09-19",
     accent: "#9a8a6a",
     sources: [
@@ -327,7 +339,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "die-cut",
     key: "dieCut",
     group: "site",
-    ordinal: "16",
+    ordinal: "17",
     added: "2026-09-19",
     accent: "#c2410c",
     sources: ["components/lab/DieCutDemo.tsx", "components/ui/Sticker.tsx"],
@@ -337,7 +349,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "sticker-wall",
     key: "stickerWall",
     group: "site",
-    ordinal: "17",
+    ordinal: "18",
     added: "2026-09-19",
     accent: "#b4532a",
     sources: ["components/lab/StickerWallDemo.tsx", "components/about/StickerWall.tsx"],
@@ -347,7 +359,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "peel",
     key: "peel",
     group: "site",
-    ordinal: "18",
+    ordinal: "19",
     added: "2026-09-19",
     accent: "#a05a3c",
     sources: [
@@ -361,7 +373,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "scatter",
     key: "scatter",
     group: "site",
-    ordinal: "19",
+    ordinal: "20",
     added: "2026-09-19",
     accent: "#475569",
     sources: [
@@ -375,7 +387,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "dot-name",
     key: "dotName",
     group: "site",
-    ordinal: "20",
+    ordinal: "21",
     added: "2026-09-19",
     accent: "#5a6478",
     sources: [
@@ -395,7 +407,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "approach",
     key: "approach",
     group: "site",
-    ordinal: "21",
+    ordinal: "22",
     added: "2026-08-28",
     accent: "#3f5a3a",
     sources: [
@@ -412,7 +424,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "segmented",
     key: "segmented",
     group: "site",
-    ordinal: "22",
+    ordinal: "23",
     added: "2026-09-19",
     accent: "#2f6f8f",
     sources: ["components/lab/SegmentedDemo.tsx", "components/ui/SegmentedFilter.tsx"],
@@ -423,7 +435,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "reshuffle",
     key: "reshuffle",
     group: "site",
-    ordinal: "23",
+    ordinal: "24",
     added: "2026-09-19",
     accent: "#3a7a8a",
     sources: [
@@ -438,7 +450,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "statue",
     key: "statue",
     group: "site",
-    ordinal: "24",
+    ordinal: "25",
     added: "2026-09-19",
     accent: "#8a6a2e",
     sources: [
@@ -454,7 +466,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "changelog",
     key: "changelog",
     group: "site",
-    ordinal: "25",
+    ordinal: "26",
     added: "2026-07-31",
     accent: "#4b6b8a",
     sources: ["components/about/Changelog.tsx"],
@@ -464,7 +476,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "screening",
     key: "screening",
     group: "site",
-    ordinal: "26",
+    ordinal: "27",
     added: "2026-09-16",
     accent: "#b8552e",
     sources: ["components/films/FilmStills.tsx", "lib/client/scrollLock.ts", "lib/films.ts"],
@@ -477,7 +489,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "lights",
     key: "lights",
     group: "shell",
-    ordinal: "27",
+    ordinal: "28",
     added: "2026-09-19",
     accent: "#6d5d4b",
     sources: [
@@ -492,7 +504,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "reading-chip",
     key: "readingChip",
     group: "shell",
-    ordinal: "28",
+    ordinal: "29",
     added: "2026-09-19",
     accent: "#7d6b55",
     sources: ["components/lab/ReadingChipDemo.tsx", "components/fx/ProgressHud.tsx"],
@@ -502,7 +514,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "radial-fan",
     key: "radialFan",
     group: "shell",
-    ordinal: "29",
+    ordinal: "30",
     added: "2026-09-19",
     accent: "#8a6d4e",
     sources: ["components/lab/RadialFanDemo.tsx", "components/fx/RadialFab.tsx"],
@@ -512,7 +524,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "overture",
     key: "overture",
     group: "shell",
-    ordinal: "30",
+    ordinal: "31",
     added: "2026-09-19",
     accent: "#5e5246",
     sources: [
@@ -526,7 +538,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "door",
     key: "door",
     group: "shell",
-    ordinal: "31",
+    ordinal: "32",
     added: "2026-09-19",
     accent: "#4b5a7a",
     sources: [
@@ -540,7 +552,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "veil",
     key: "veil",
     group: "shell",
-    ordinal: "32",
+    ordinal: "33",
     added: "2026-09-19",
     accent: "#6f7a86",
     sources: [
@@ -554,7 +566,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     slug: "island",
     key: "island",
     group: "shell",
-    ordinal: "33",
+    ordinal: "34",
     added: "2026-09-19",
     accent: "#585f6b",
     sources: ["components/lab/IslandDemo.tsx", "components/layout/Header.tsx"],

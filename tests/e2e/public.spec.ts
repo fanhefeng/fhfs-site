@@ -48,6 +48,36 @@ test("unknown pages return 404", async ({ page }) => {
   await expect(page.locator("h1")).toBeVisible();
 });
 
+test("hello writes continuously and preserves the drawing when paused", async ({ page }) => {
+  await page.goto("/zh/lab/hello");
+  const stage = page.locator(".hlo-stage");
+  await stage.scrollIntoViewIfNeeded();
+  await page.getByRole("radio", { name: "0.5×", exact: true }).check();
+  await page.getByRole("button", { name: "重写", exact: true }).click();
+  const firstStroke = stage.locator("svg > g").last().locator("path").first();
+  const offset = () =>
+    firstStroke.evaluate((path) => Number.parseFloat(getComputedStyle(path).strokeDashoffset));
+  // A normalized CSS tween rounded to whole pixels jumps from 1 to 0.
+  // Inspect an actual intermediate frame so that regression cannot pass.
+  await expect
+    .poll(async () => {
+      const value = await offset();
+      return value > 0 && value < 1;
+    })
+    .toBe(true);
+  const playback = page.getByRole("button", { name: "动画播放", exact: true });
+  await playback.click();
+  await expect(playback).toHaveAttribute("aria-pressed", "false");
+  const paused = await offset();
+  const later = await firstStroke.evaluate(async (path) => {
+    await new Promise<void>((resolve) => window.setTimeout(resolve, 250));
+    return Number.parseFloat(getComputedStyle(path).strokeDashoffset);
+  });
+  expect(later).toBe(paused);
+  await playback.click();
+  await expect.poll(offset).toBeLessThan(paused);
+});
+
 test("unauthenticated action requests reach their authorization boundary", async ({ request }) => {
   const url = "/admin/posts/e2e-does-not-exist/zh";
   const visit = await request.get(url, { maxRedirects: 0 });

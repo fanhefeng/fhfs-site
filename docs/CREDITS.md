@@ -40,6 +40,11 @@
 （`app/icon.svg`）、灵动岛和页脚上套着 `fhf` 的圆环（`components/neon/SignRing.tsx`）、OG 卡题头
 （`lib/server/ogMark.tsx`）都从同一份几何（`lib/neon/geometry.ts`）画出来。
 
+## 手写动画
+
+/lab/hello 的手写动画以 Apple 的 Hello 欢迎动画为视觉参考；英文与中文笔迹是本项目手工绘制的
+贝塞尔路径（`src/lib/hello.ts`），没有提取或使用 Apple 的字体、字形文件或动画素材。
+
 ## 剧照
 
 三部电影的剧照都仅作个人致敬之用，版权归各自的片方，页面上有署名；清单与尺寸在 `films` 表

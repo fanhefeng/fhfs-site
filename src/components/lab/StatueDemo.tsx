@@ -96,7 +96,7 @@ export function StatueDemo({
         <div className="spn-field">
           <p className="spn-field-name">{viewName}</p>
           {/* Plain toggles, as in the reshuffle study: a pill that slides
-              between them is study 22's effect, not this one's. */}
+              between them is the segmented control's effect, not this one's. */}
           <div role="group" aria-label={viewAria} className="std-views">
             {views.map((o) => (
               <button

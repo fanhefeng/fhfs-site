@@ -69,6 +69,7 @@ const LensSliderDemo = dynamic(() => import("./LensSliderDemo").then((m) => m.Le
 // but the sign is SVG — so it keeps its SSR pass: the page reads whole
 // before its chunk lands, and the wall paints over.
 const NeonSignDemo = dynamic(() => import("./NeonSignDemo").then((m) => m.NeonSignDemo));
+const HelloDemo = dynamic(() => import("./HelloDemo").then((m) => m.HelloDemo));
 
 /* ---- the site's own effects: text in the DOM, GSAP over it ---- */
 const SidewaysDemo = dynamic(() => import("./SidewaysDemo").then((m) => m.SidewaysDemo));
@@ -146,6 +147,8 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn, fi
   };
   const file = (name: string): string => need(files?.[name], `files.${name}`);
   switch (slug) {
+    case "hello":
+      return <HelloDemo accent={accent} text={text} />;
     case "scroll-video":
       return (
         <ScrollVideoDemo
