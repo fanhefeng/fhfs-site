@@ -16,6 +16,8 @@ import { NeonSplash } from "@/components/home/NeonSplash";
 import { RecentWriting, type WritingItem } from "@/components/home/RecentWriting";
 import { NowStrip, type NowItem } from "@/components/home/NowStrip";
 
+export const revalidate = 3600;
+
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};

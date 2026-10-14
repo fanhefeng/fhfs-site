@@ -733,6 +733,12 @@
     "side": "A 面 · {index} / {count}",
     "startStop": "启停",
     "spinAria": "唱盘转动",
+    "release": "下载最新版",
+    "source": "GitHub",
+    "stars": "Star {count, number}",
+    "forks": "Fork {count, number}",
+    "published": "发布于 {date}",
+    "downloads": "下载文件（{count}）",
     "deckAria": "唱机上：{name}",
     "categories": {
       "desktop": "桌面应用",

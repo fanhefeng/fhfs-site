@@ -6,7 +6,16 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { adminSession, requireAdmin } from "@/lib/server/auth/session";
 
-import { intField, list, localized, oneOf, str, validKey, validLink } from "@/lib/forms";
+import {
+  intField,
+  list,
+  localized,
+  oneOf,
+  str,
+  validGithubRepo,
+  validKey,
+  validLink,
+} from "@/lib/forms";
 
 import { TAGS } from "@/lib/server/content";
 
@@ -41,7 +50,7 @@ export async function saveApp(_prev: ActionState, form: FormData): Promise<Actio
   // "owner/name" — src/lib/server/github.ts builds an API URL out of it, so it has
   // to be exactly two path segments and nothing that could escape them.
   const repo = str(form, "repo") || null;
-  if (repo && !/^[\w.-]+\/[\w.-]+$/.test(repo)) {
+  if (repo && !validGithubRepo(repo)) {
     return { error: "仓库要写成 owner/name，比如 fanhefeng/fhfs-site。" };
   }
 

@@ -1,5 +1,6 @@
 import type { App } from "@/lib/server/content";
 import type { Locale } from "@/i18n/routing";
+import type { GithubProject, Release, RepositoryStats } from "@/lib/githubData";
 
 /** The four buckets the segmented filter offers, in display order — the same
  *  union `App["category"]` carries out of the database enum. */
@@ -34,9 +35,14 @@ export type SoftwareApp = {
    */
   hue: number;
   /** Which `software.*` message labels the outbound link. */
-  cta: "download" | "play" | "open";
+  cta: "download" | "play" | "open" | "release";
   /** "v0.12.0" — the repo's latest GitHub release, when it has one. */
   version?: string;
+  release?: Release;
+  stats?: RepositoryStats;
+  repoUrl?: string;
+  /** A release with downloadable files, rather than the app's home page. */
+  downloadUrl?: string;
 };
 
 /**
@@ -70,8 +76,16 @@ export function sleeveInk(hue: number): string {
 /** "01", "02", … — the catalogue number printed on a sleeve. */
 export const catalogueNumber = (index: number): string => String(index + 1).padStart(2, "0");
 
-export function toSoftwareApp(app: App, index: number, locale: Locale): SoftwareApp {
+export function toSoftwareApp(
+  app: App,
+  index: number,
+  locale: Locale,
+  github?: GithubProject,
+): SoftwareApp {
   const category = app.category;
+  const release = github?.release ?? undefined;
+  const downloadable =
+    (category === "desktop" || category === "tool") && Boolean(release?.downloads.length);
   return {
     id: app.key,
     name: app.name,
@@ -81,6 +95,17 @@ export function toSoftwareApp(app: App, index: number, locale: Locale): Software
     website: app.website,
     platforms: app.platforms,
     hue: app.hue ?? HUES[index % HUES.length]!,
-    cta: category === "game" ? "play" : category === "website" ? "open" : "download",
+    cta: downloadable
+      ? "release"
+      : category === "game"
+        ? "play"
+        : category === "website"
+          ? "open"
+          : "download",
+    version: release?.version,
+    release,
+    stats: github?.stats ?? undefined,
+    repoUrl: app.repo ? `https://github.com/${app.repo}` : undefined,
+    downloadUrl: downloadable ? release?.url : undefined,
   };
 }

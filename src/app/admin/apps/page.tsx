@@ -30,7 +30,7 @@ const FIELDS: Field[] = [
     label: "GitHub 仓库（owner/name）",
     kind: "text",
     placeholder: "fanhefeng/fhfs-site",
-    hint: "站点上这款软件旁边的版本徽章，读的是这个仓库的最新 release；留空就不显示版本。",
+    hint: "同步公开仓库的版本、发布日期、下载文件和 Star / Fork；配置 Webhook 后更新即刷新，否则每小时检查。留空不接入 GitHub。",
     group: "去处",
   },
   { name: "platforms", label: "平台（逗号分隔）", kind: "text", group: "样子与排序" },

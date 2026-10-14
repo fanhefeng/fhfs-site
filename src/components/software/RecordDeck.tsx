@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
 import { Vinyl } from "./Vinyl";
 import { catalogueNumber, type SoftwareApp } from "./appMeta";
@@ -87,6 +87,7 @@ type Props = {
  */
 export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
   const t = useTranslations("software");
+  const format = useFormatter();
   const rootRef = useRef<HTMLDivElement>(null);
   const armRef = useRef<SVGGElement>(null);
   const notesRef = useRef<HTMLDivElement>(null);
@@ -372,7 +373,7 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
         <p className="text-[0.975rem] leading-relaxed text-fg-secondary">{app.description}</p>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-1">
           <a
-            href={app.website}
+            href={app.downloadUrl ?? app.website}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${t(app.cta)} — ${app.name}`}
@@ -384,12 +385,80 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
           {app.version || app.platforms.length > 0 ? (
             <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
               {/* The repo's latest GitHub release — it keeps itself current. */}
-              {app.version ? <span className="normal-case text-accent">{app.version}</span> : null}
+              {app.version && app.release ? (
+                <a
+                  href={app.release.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="normal-case text-accent hover:underline"
+                >
+                  {app.version}
+                </a>
+              ) : null}
               {app.version && app.platforms.length > 0 ? " · " : null}
               {app.platforms.join(" · ")}
             </p>
           ) : null}
         </div>
+        {app.repoUrl ? (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-meta text-fg-tertiary">
+            <a
+              href={app.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-h-8 content-center text-fg-secondary hover:text-accent"
+            >
+              {t("source")} <span aria-hidden>↗</span>
+            </a>
+            {app.stats ? (
+              <>
+                <span>{t("stars", { count: app.stats.stars })}</span>
+                <span>{t("forks", { count: app.stats.forks })}</span>
+              </>
+            ) : null}
+            {app.release?.publishedAt ? (
+              <time dateTime={app.release.publishedAt}>
+                {t("published", {
+                  date: format.dateTime(new Date(app.release.publishedAt), {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  }),
+                })}
+              </time>
+            ) : null}
+          </div>
+        ) : null}
+        {app.release?.downloads.length ? (
+          <details className="border-t border-line pt-3 text-caption text-fg-secondary">
+            <summary className="w-fit cursor-pointer py-1 hover:text-accent">
+              {t("downloads", { count: app.release.downloads.length })}
+            </summary>
+            <ul className="mt-2 space-y-1">
+              {app.release.downloads.map((file) => (
+                <li key={file.url}>
+                  <a
+                    href={file.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-9 items-center justify-between gap-3 py-1 hover:text-accent"
+                  >
+                    <span className="min-w-0 break-all">
+                      {file.name} <span aria-hidden>↗</span>
+                    </span>
+                    <span className="shrink-0 font-mono text-meta text-fg-tertiary">
+                      {file.size >= 1024 * 1024
+                        ? `${format.number(file.size / (1024 * 1024), { maximumFractionDigits: 1 })} MB`
+                        : file.size >= 1024
+                          ? `${format.number(file.size / 1024, { maximumFractionDigits: 1 })} KB`
+                          : `${format.number(file.size)} B`}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : null}
         {/* What a screen reader hears when the record changes. */}
         <p className="sr-only" aria-live="polite">
           {t("deckAria", { name: app.name })}

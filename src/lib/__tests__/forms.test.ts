@@ -18,6 +18,7 @@ import {
   str,
   validDate,
   validGithubUser,
+  validGithubRepo,
   validKey,
   validLink,
   validPath,
@@ -186,6 +187,26 @@ describe("validMediaSrc", () => {
     expect(validMediaSrc(`${MEDIA_ORIGIN}.evil.com/episode-1.mp3`)).toBe(false);
     expect(validMediaSrc("//evil.com/episode-1.mp3")).toBe(false);
     expect(validMediaSrc("")).toBe(false);
+  });
+});
+
+describe("validGithubRepo", () => {
+  it("accepts repository names and rejects URLs and traversal", () => {
+    for (const repo of ["fanhefeng/portreaper", "FanHeFeng/file-tidy", "owner/a.b_c"])
+      expect(validGithubRepo(repo)).toBe(true);
+    for (const repo of [
+      "",
+      "owner",
+      "owner/../repo",
+      "owner/.",
+      "owner/..",
+      "https://github.com/owner/repo",
+      "owner/repo?x=1",
+      "owner/repo/",
+      "owner/repo#tag",
+      " owner/repo",
+    ])
+      expect(validGithubRepo(repo)).toBe(false);
   });
 });
 

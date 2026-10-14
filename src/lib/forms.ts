@@ -192,6 +192,10 @@ export const validMediaSrc = (value: string): boolean =>
 /** A GitHub account name — it is spliced into a URL path on /resume. */
 export const validGithubUser = (value: string): boolean => /^[A-Za-z0-9-]{1,39}$/.test(value);
 
+/** Exactly two GitHub path segments, never a traversal or a pasted URL. */
+export const validGithubRepo = (value: string): boolean =>
+  /^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9_.-]{1,100}$/.test(value) && !/\/\.{1,2}$/.test(value);
+
 /** What a Postgres `integer` column holds. `Number.isInteger(1e10)` is true,
  *  and the column would still refuse it — as a database error, not a form one. */
 const INT4_MIN = -2147483648;

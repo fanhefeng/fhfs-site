@@ -1,28 +1,26 @@
 import "server-only";
+import {
+  githubCacheTag,
+  parseGithubRelease,
+  parseGithubStats,
+  parseGithubTag,
+  type GithubProject,
+  type Release,
+} from "@/lib/githubData";
+import { validGithubRepo } from "@/lib/forms";
+
+export type { Release } from "@/lib/githubData";
 
 /**
  * The one thing the site reads from somewhere other than its own database:
- * the latest version of each app, straight from GitHub. It used to be a
- * hand-typed constant on the home page ("v1.0", forever) — a release is
- * something that happens on GitHub, so the site asks GitHub.
+ * releases, download assets and repository statistics, straight from GitHub.
  *
  * Cached through `fetch`'s own data cache for an hour: a page that shows a
- * version therefore regenerates at most hourly, and six repos at one request
- * each sit far inside the unauthenticated limit of sixty an hour. Set
- * `GITHUB_TOKEN` to raise it. Any failure — no release, rate-limited, offline
- * at build time — resolves to `null` and the page simply shows no version,
- * which is what it showed before this existed.
+ * version regenerates hourly as a fallback. A signed webhook expires the
+ * repository's tag immediately, across the home and software pages. Set
+ * `GITHUB_TOKEN` to raise the unauthenticated API limit. Failures (no release,
+ * rate-limited, offline) omit only the unavailable data.
  */
-
-export type Release = {
-  /** "v0.12.0" — the tag as published. */
-  version: string;
-  /** The release page, or the tag's tree when the repo only has tags. */
-  url: string;
-  /** When the release was published, ISO 8601; null for a bare tag, which
-   *  GitHub does not date. The home page's "now" strip sorts on it. */
-  publishedAt: string | null;
-};
 
 const REVALIDATE_SECONDS = 60 * 60;
 
@@ -37,15 +35,21 @@ function headers(): HeadersInit {
   return h;
 }
 
-async function getJson<T>(path: string): Promise<T | null> {
+async function getJson(
+  repo: string,
+  path: string,
+): Promise<{ status: number; value: unknown } | null> {
   try {
     const res = await fetch(`https://api.github.com${path}`, {
       headers: headers(),
       signal: AbortSignal.timeout(4000),
-      next: { revalidate: REVALIDATE_SECONDS },
+      cache: "force-cache",
+      next: { revalidate: REVALIDATE_SECONDS, tags: [githubCacheTag(repo)] },
     });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
+    // Only a real 404 means a repo has no release. A timeout or rate limit
+    // must not turn an older bare tag into its supposedly latest version.
+    if (!res.ok) return { status: res.status, value: null };
+    return { status: res.status, value: await res.json() };
   } catch {
     return null;
   }
@@ -54,35 +58,18 @@ async function getJson<T>(path: string): Promise<T | null> {
 /** A repo's latest release, falling back to its newest tag; null if neither.
  *  Every caller wants several at once, so only the plural is exported. */
 async function getLatestRelease(repo: string | null): Promise<Release | null> {
-  if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
+  if (!repo || !validGithubRepo(repo)) return null;
 
-  const release = await getJson<{ tag_name: string; html_url: string; published_at?: string }>(
-    `/repos/${repo}/releases/latest`,
-  );
-  if (release?.tag_name) {
-    return {
-      version: release.tag_name,
-      url: release.html_url,
-      publishedAt: release.published_at ?? null,
-    };
-  }
-
-  const tags = await getJson<{ name: string }[]>(`/repos/${repo}/tags?per_page=1`);
-  const tag = tags?.[0]?.name;
-  if (tag) {
-    return {
-      version: tag,
-      url: `https://github.com/${repo}/releases/tag/${tag}`,
-      publishedAt: null,
-    };
-  }
-
-  return null;
+  const release = await getJson(repo, `/repos/${repo}/releases/latest`);
+  if (release?.status === 200) return parseGithubRelease(release.value, repo);
+  if (release?.status !== 404) return null;
+  const tags = await getJson(repo, `/repos/${repo}/tags?per_page=1`);
+  return parseGithubTag(tags?.value, repo);
 }
 
 /** Latest releases for many repos at once, keyed by repo. */
 export async function getLatestReleases(repos: (string | null)[]): Promise<Map<string, Release>> {
-  const unique = [...new Set(repos.filter((r): r is string => Boolean(r)))];
+  const unique = uniqueRepos(repos);
   const results = await Promise.all(unique.map((repo) => getLatestRelease(repo)));
   const out = new Map<string, Release>();
   unique.forEach((repo, i) => {
@@ -90,4 +77,26 @@ export async function getLatestReleases(repos: (string | null)[]): Promise<Map<s
     if (r) out.set(repo, r);
   });
   return out;
+}
+
+function uniqueRepos(repos: (string | null)[]): string[] {
+  return [...new Set(repos.filter((r): r is string => r !== null && validGithubRepo(r)))];
+}
+
+/** Independent requests: stats still appear when a repo has no releases, and
+ * releases still appear when the metadata request fails. */
+export async function getGithubProjects(
+  repos: (string | null)[],
+): Promise<Map<string, GithubProject>> {
+  const unique = uniqueRepos(repos);
+  const projects = await Promise.all(
+    unique.map(async (repo): Promise<[string, GithubProject]> => {
+      const [release, metadata] = await Promise.all([
+        getLatestRelease(repo),
+        getJson(repo, `/repos/${repo}`),
+      ]);
+      return [repo, { release, stats: parseGithubStats(metadata?.value) }];
+    }),
+  );
+  return new Map(projects);
 }

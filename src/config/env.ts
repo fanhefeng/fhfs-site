@@ -110,6 +110,11 @@ export const ENV_RULES: Record<string, Rule> = {
     shape:
       "a GitHub token for release lookups, or the read-only Actions token in the cloud monitor",
   },
+  GITHUB_WEBHOOK_SECRET: {
+    required: false,
+    valid: (v) => v.trim() === v && v.length >= 32 && !/[\r\n\0]/.test(v),
+    shape: "a dedicated random GitHub webhook secret of at least 32 characters",
+  },
 };
 
 /** One line per variable that is missing or malformed; empty when all is well. */

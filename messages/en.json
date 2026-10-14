@@ -733,6 +733,12 @@
     "side": "Side A · {index} / {count}",
     "startStop": "Start · Stop",
     "spinAria": "Platter turning",
+    "release": "Download latest",
+    "source": "GitHub",
+    "stars": "Star {count, number}",
+    "forks": "Fork {count, number}",
+    "published": "Released {date}",
+    "downloads": "Downloads ({count})",
     "deckAria": "On the deck: {name}",
     "categories": {
       "desktop": "Desktop",

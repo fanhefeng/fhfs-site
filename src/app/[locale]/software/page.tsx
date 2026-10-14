@@ -1,12 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { getApps } from "@/lib/server/content";
-import { getLatestReleases } from "@/lib/server/github";
+import { getGithubProjects } from "@/lib/server/github";
 import { sectionMetadata } from "@/lib/server/seo";
 import { SoftwareGallery } from "@/components/software/SoftwareGallery";
 import { toSoftwareApp } from "@/components/software/appMeta";
 
 export const generateMetadata = sectionMetadata("software", "/software");
+
+// Recover even if every GitHub request failed during the initial prerender.
+export const revalidate = 3600;
 
 /**
  * Software — one card per app and nothing under them. Stays a Server
@@ -22,11 +25,10 @@ export default async function SoftwarePage({ params }: PageProps<"/[locale]/soft
   const t = await getTranslations("software");
 
   const rows = await getApps();
-  const releases = await getLatestReleases(rows.map((app) => app.repo));
-  const apps = rows.map((app, i) => ({
-    ...toSoftwareApp(app, i, locale),
-    version: app.repo ? releases.get(app.repo)?.version : undefined,
-  }));
+  const github = await getGithubProjects(rows.map((app) => app.repo));
+  const apps = rows.map((app, i) =>
+    toSoftwareApp(app, i, locale, app.repo ? github.get(app.repo) : undefined),
+  );
 
   return (
     <main id="main" className="mx-auto w-full max-w-[1040px] flex-1 px-6 pb-24 pt-16 sm:pt-20">

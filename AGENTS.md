@@ -61,10 +61,16 @@ regenerates the asset manifest when `public/` changed and checks format and
 lint on staged files; pre-push runs `pnpm check`. This machine's Node and
 global JS CLIs are managed by `vp`, not npm/nvm.
 
-The one read from outside the database is `src/lib/server/github.ts`: each app's
-version badge is its repo's latest GitHub release, cached through `fetch`
-(`next: { revalidate: 3600 }`), so pages that show one regenerate hourly.
-Failures resolve to `null` and the badge is simply absent.
+The one read from outside the database is `src/lib/server/github.ts`: apps read
+GitHub releases, publication dates, downloadable assets and Star/Fork counts.
+`fetch` caches them hourly under a case-insensitive per-repo `github:*` tag.
+`/api/github/webhook` verifies the original body with `GITHUB_WEBHOOK_SECRET`
+before reading configured apps and expiring that repo's tag with
+`revalidateTag(tag, { expire: 0 })` (Route Handlers cannot use `updateTag`).
+Home and software also declare `revalidate = 3600`, including when every API
+request failed at build time. GitHub failures omit only the unavailable data;
+tag fallback is for a release's 404, never a rate limit or timeout. Parsing and
+webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SYNC.md`.
 
 # Architecture
 

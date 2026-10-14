@@ -61,6 +61,20 @@ describe("envProblems", () => {
     );
   });
 
+  it("requires a dedicated webhook secret with no pasted whitespace", () => {
+    expect(envProblems({ ...good, GITHUB_WEBHOOK_SECRET: "x".repeat(64) })).toEqual([]);
+    for (const value of [
+      "short",
+      ` ${"x".repeat(32)}`,
+      `${"x".repeat(32)}\n`,
+      `${"x".repeat(32)}\0`,
+    ]) {
+      expect(envProblems({ ...good, GITHUB_WEBHOOK_SECRET: value })).toEqual([
+        expect.stringMatching(/^GITHUB_WEBHOOK_SECRET/),
+      ]);
+    }
+  });
+
   it("accepts local HTTP and HTTPS browser tests while rejecting remote endpoints", () => {
     for (const E2E_BASE_URL of ["http://localhost:3100", "https://localhost:3443"]) {
       expect(envProblems({ ...good, E2E_BASE_URL })).toEqual([]);
