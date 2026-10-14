@@ -24,6 +24,7 @@ pnpm db:migrate
 pnpm db:check     # print what's actually in each table
 pnpm db:export    # write DB back to backup/
 pnpm db:import    # restore from backup/ (upsert by key, one batch per table; save once in /admin after to flush caches; in dev `rm -rf .next/dev/cache/fetch-cache` + restart does the same — Next 16 keeps the dev data cache under .next/dev, not .next/cache)
+pnpm admin:password   # the admin's two secrets, or the hash of a password fed on stdin (never as an argument)
 ```
 
 Tests cover pure functions in `src/lib`, plus a set that reads the *source*
@@ -31,12 +32,15 @@ rather than running it — the rules that break without an error:
 `conventions.test.ts` (pages start from `pageLocale`, the database is read
 only in `content.ts` and only inside `unstable_cache`, every admin action
 checks the session first and invalidates last, every ease is an `EASE`
-token), `asset.test.ts`,
+token, the accent face is never `font-serif` or `italic` and names its
+weight at title sizes), `asset.test.ts`,
 `media.test.ts` (sizes written in code against the files), `tables.test.ts`
 (every schema table named in db:check / export / import / backup),
 `env.test.ts`, `messages.test.ts`, `copy.test.ts` (every namespace in the
 catalogue has a card in `COPY_GROUPS`), `lab.test.ts` (every lab study's
-`sources` exist under `src/`, and it has copy in both catalogues). When you
+`sources` exist under `src/`, and it has copy in both catalogues),
+`errorCopy.test.ts` (the global error boundary's copy says what the
+catalogues say). When you
 add a rule of that kind to this file, add its check there. There is no component suite; `pnpm smoke` is the
 end-to-end pass. The scripts share `scripts/connect.mts` (env, unpooled URL,
 the same connection-level retry as the site, with more patient delays); a new
@@ -126,7 +130,10 @@ Failures resolve to `null` and the badge is simply absent.
 - **Error boundaries**: `src/app/[locale]/error.tsx` (a page failing at
   request time — a cold database on an uncached path), `src/app/global-error.tsx`
   (the layout itself), `src/app/admin/error.tsx`. Keep them dependency-free;
-  they must not be able to fail the way the page did.
+  they must not be able to fail the way the page did. The global one renders
+  above the provider, so it reads `ERROR_COPY` (`src/lib/errorCopy.ts`), a
+  copy of the catalogues' `error` lines — change both, `errorCopy.test.ts`
+  compares them.
 - **Database**: Neon Postgres over the HTTP driver (`src/db/index.ts`) — no
   multi-statement transactions, and the schema is designed so none are needed
   (tags are array columns, saves are single upserts). Schema in
@@ -140,8 +147,25 @@ Failures resolve to `null` and the badge is simply absent.
   come from its `EASE` token table, named by use — a new curve gets a token
   there first; an `ease: "…"` string anywhere else fails
   `conventions.test.ts`. `prefersReducedMotion` gates only the
-  short no-stop-button list documented there. Lenis inertial scrolling shares
+  short no-stop-button list documented there, and that list is closed
+  (DESIGN-LOG 10-02): a new loop gets a stop control of its own and pauses
+  off screen — the record deck's 启停 and its `IntersectionObserver` are the
+  pattern. Lenis inertial scrolling shares
   GSAP's clock (`gsap.ticker` drives `lenis.raf`).
+- **Type**: Latin is Nunito, meta is Geist Mono, and the accent face — a
+  quote, the slogan's echo, a sleeve — is Josefin Sans, upright, through
+  `font-accent` / `--font-stack-accent` (`src/app/fonts.ts`, `globals.css`;
+  DESIGN-LOG 10-03). No italic is loaded, so `italic` beside it is a slant
+  the browser shears on; a title-size line names its weight, `font-normal`
+  or `.accent-light` — never `font-weight: 300`, which drops the Chinese
+  behind it onto Songti SC Light. A line that is not in the page's language
+  (the slogan is English on both) gets `lang` from its own words through
+  `langOfText` (`src/lib/localized.ts`); the CJK tracking guard reads it.
+- **URL state on a static page** — the software shelf's `?app=` / `?cat=`,
+  the board's `?nb=` — goes through `useUrlChoice`
+  (`src/lib/client/useUrlChoice.ts`): read once after hydration, written
+  back with `replaceState`. `useSearchParams` would cost the page its
+  prerender.
 - **3D**: `/intro` and the statue on `/idols/kobe` use @react-three/fiber +
   drei; the moss (`components/grove` — two lab studies, `/lab/grove` and
   `/lab/approach`; it left the home page's cover on 2026-09-24) and the
@@ -189,6 +213,12 @@ Failures resolve to `null` and the badge is simply absent.
   without it, so `media/worker.ts` runs first for `/moments/*` and answers
   ranges itself from that size table (`src/lib/byteRange.ts`, unit-tested);
   `mediaSite.test.ts` fails when the backup points at a file the table lacks.
+  The free plan gives a request 10 ms of CPU, and a stream whose chunks pass
+  through JavaScript spent 240–400 ms on one video — so `byteSlice` skips to
+  the start with a BYOB reader a megabyte at a time and, for a range that
+  runs to the end (what a player asks for), hands the asset's own stream
+  back for the runtime to pipe. Keep bytes out of JavaScript there, and
+  measure a change with `wrangler tail`.
   There is no uploading from the admin (a Worker on the free plan has nowhere
   to put one): add a file to `media/files/`, deploy — it prints the media
   field's line for each file nothing points at yet — then paste that line.
@@ -211,13 +241,31 @@ Failures resolve to `null` and the badge is simply absent.
 - **Films and idols** are rows (`films`, `idols`), a page per row, edited
   under 电影 / 偶像 in the admin; their repeated groups (stills, photos,
   lines, milestones) are jsonb lists edited with `app/admin/ui/RowsField.tsx`
-  and read back with `formRows`. A page reads its row through `inLocale`
+  and read back with `formRows`. A film's page is the synopsis, the film's
+  own lines and the stills, nothing else: the lede, the per-film headings
+  and the parts left the table on 2026-10-02 (migration 0015) so that no
+  column is left for an opinion — do not add one back. A page reads its row
+  through `inLocale`
   (`src/lib/localized.ts`), which picks each `{ zh, en }` pair's side and
-  falls back to the other when one is empty. Kobe's statue is code, not a
-  column: `/idols/[slug]` mounts it for `STATUE_IDOL` (`src/lib/idols.ts`),
-  its words stay under `idols.kobe` in the catalogues, and it stands on its
-  own photograph (`components/idols/statue.ts`). `media.test.ts` checks the
+  falls back to the other when one is empty. Two of Kobe's things are code,
+  not columns (`src/lib/idols.ts`): the statue, mounted by `/idols/[slug]`
+  for `STATUE_IDOL`, its words under `idols.kobe` in the catalogues, standing
+  on its own photograph (`components/idols/statue.ts`); and his record,
+  `IDOL_TRACKS` — the only idol with one, so a map there rather than a
+  column on every row. `media.test.ts` checks the
   size of every picture in `public/` that `backup/db.json` lists.
+- **About and résumé** read one table: the three rows of
+  `resume_experiences` are the cities (`company` the place, `role` one line
+  of what the work was, oldest first), drawn on `/about` by
+  `components/about/Changelog.tsx` and listed again on `/resume`. The lab's
+  `/lab/changelog` hands the same component `timeline_entries`. Its year
+  rail takes the first four digits of a row's `period`, so a period starts
+  with its year. No employer is named anywhere public (DESIGN-LOG 10-04).
+- **Email links** go through `components/ui/MailLink.tsx`, never a bare
+  `mailto:`: the browser says nothing when no mail program takes the link,
+  so it copies the address inside the click (Safari allows the clipboard
+  only in the gesture) and shows a chip if the page still has focus 0.8 s
+  later.
 - **Front door and music**: the home page opens with `NeonSplash` once per
   session, on a hard landing only — decided before first paint by the inline
   script in `src/lib/client/splash.ts` (`<html data-splash>`), which is also what
@@ -228,7 +276,14 @@ Failures resolve to `null` and the badge is simply absent.
   The player is also the site's one rule about sound — never two things at
   once: it catches every `<audio>`/`<video>` `play` at the document, pauses
   the rest and steps aside (`held`), and comes back when the last one stops.
-  A new player anywhere gets this for free; do not add a second copy.
+  A new player anywhere gets this for free; do not add a second copy. A
+  room puts on its own record through `components/fx/RoomMusic` (the films
+  by their `track` column, Kobe's page by `IDOL_TRACKS`). Every record is
+  self-hosted in `public/music/`; a new one is encoded with `pnpm
+  media:music`, its id added to `TRACK_IDS` (`src/lib/tracks.ts`), its
+  hashed address to `trackFiles()` (`src/lib/server/trackFiles.ts` — server
+  only, so the manifest stays out of every page's scripts), its name under
+  `tracks.<id>` in both catalogues, and its source in `docs/CREDITS.md`.
 - **Design source of truth**: `docs/DESIGN.md` — §5 (工程规则) is required
   reading before implementation work. Every revision since the original spec
   is dated in `docs/DESIGN-LOG.md` and overrides what it contradicts there;
@@ -236,7 +291,8 @@ Failures resolve to `null` and the badge is simply absent.
   covers the `/intro` scene; `docs/CREDITS.md` is where every third-party
   picture, recording, model and typeface is credited.
 
-Two scroll gotchas that cost real debugging time (details in README.md):
+Three scroll gotchas that cost real debugging time (the first two in
+README.md, the third in DESIGN-LOG 10-03):
 
 - `html` must keep `scrollbar-gutter: stable`, or ScrollTrigger pins measured
   while the intro overlay locks `overflow` leave the page 15px horizontally
@@ -245,6 +301,13 @@ Two scroll gotchas that cost real debugging time (details in README.md):
   attribute, enabled only while actually captured — `preventDefault()` alone
   does nothing, because Lenis's window-level listener never checks
   `defaultPrevented`.
+- Lenis eats a native `#anchor` jump made while it is still gliding (about a
+  second after the wheel, longer on a trackpad): the browser lands, and the
+  next frame Lenis pulls the page back to its own target. Keep the `href`
+  for no-script and modified clicks, but on a plain click `pushState` the
+  hash and scroll with `lenis.scrollTo(target, { lock: true })` — after
+  `lenis.resize()` if the DOM just grew. `components/moments/MomentBoard.tsx`
+  does this for the calendar's squares.
 
 # Content lives in Postgres
 
@@ -261,9 +324,10 @@ images together. Two rules follow:
   admin, which shows what is stored right now rather than what the cache
   says, and the login throttle, a write path; `conventions.test.ts` names
   exactly those.
-- **Never capture anything from module scope inside those cached functions.**
-  `unstable_cache` keys on arguments but not on closures, so a shared constant
-  bleeds across cache entries.
+- **Pass every request-varying value into cached functions as an argument.**
+  `unstable_cache` does not key on captured values: locale, slug, tag and other
+  values that vary between calls must be parameters. Stable database handles,
+  column sets and query helpers may be shared at module scope.
 
 Cache Components (`cacheComponents: true` / `'use cache'`) is off. What
 used to rule it out — next-intl passing the locale through `React.cache`,
@@ -299,6 +363,15 @@ Keep the naming convention — `…Aria`, `…Alt` / `.alt` — and a new one ma
 itself; a line that lands in one under another name goes in `COPY_SR_EXTRA`.
 Rows left behind by a key renamed in the files are swept from the index page.
 
+Copy is written plainly (DESIGN-LOG 10-04, three rounds): a page's header
+line says what the page holds and nothing more — no metaphor (shelf, room,
+wall), no instructions to the reader, no explanation of the implementation
+or where the data comes from, no 「不是…是…」, and no title that is a quip.
+Error and empty states say what happened. Labels for things actually drawn
+on the page (唱片架, 唱机上, 开灯) stay; it is the prose that is kept flat.
+The navigation groups read 作品 / 生活 / 关于我 while their keys stay
+`issue` / `rooms` / `me`.
+
 `pnpm db:export` writes the database back out to `backup/`, which is committed.
 Content keeps a diffable history that way; keep it current after bulk edits.
 
@@ -311,6 +384,14 @@ and the pure function it calls, are in `src/lib/backup.ts`. A red `backup` run
 is a real alarm. Restoring — a wrong edit, a lost project, a lost Neon account
 and the three files that would have to change to move off Neon — is
 `docs/RECOVERY.md`.
+
+The repository's history was rewritten on 2026-10-01 (`public/moments/` and
+a platform's name taken out of every commit) and moved to a fresh public
+repository the next day; the old one is the private, archived
+`fhfs-site-archive`. Pull request numbers restarted at #1, so a PR number
+cited in the docs or a comment from before 2026-10-02 refers to the archive.
+Git holds no copy of the board's media: `media/files/` after `pnpm media:pull`
+is the backup.
 
 # Build and recovery checks (2026-10-12)
 

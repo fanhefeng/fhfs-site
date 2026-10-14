@@ -16,6 +16,9 @@ allowBuilds:
 # Keep the override within Next's compatible 0.35 release line.
 overrides:
   sharp: "^0.35.5"
+  # drizzle-kit's legacy TS loader still pins vulnerable esbuild 0.18.
+  # Reuse the patched version drizzle-kit itself already uses (GHSA-67mh-4wv8-2f99).
+  "@esbuild-kit/core-utils>esbuild": "0.25.12"
   # Vite+ ships its own Vite and pins the Vitest it was built against; every
   # copy in the tree resolves to those two (catalog below).
   vite@*: "catalog:"

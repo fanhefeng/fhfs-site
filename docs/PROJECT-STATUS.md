@@ -1,199 +1,122 @@
-# 项目现状与待完善事项
+# 项目现状与审查记录
 
-检查日期：2026-10-13（北京时间）。线上、本机与独立测试/恢复环境的结果分别记录。
+检查日期：2026-10-14（北京时间）。本页只保留当前结论、验证证据和未完成事项；历史发布细节见对应 PR 与 Git 历史。设计决定继续以 `DESIGN.md` / `DESIGN-LOG.md` 为准。
 
-## 已上线
+## 代码、推送与合并
 
-[PR #19](https://github.com/fanhefeng/fhfs-site/pull/19) 已合并，生产提交
-`96f0316b70015ec7012176566e6485525eb3bcd3`，站点为 [fhfs-site](https://fhfs-site.vercel.app)。
-[PR #21](https://github.com/fanhefeng/fhfs-site/pull/21) 已完成补充交付，生产提交
-`10fb31ca41f043af47f6195920c1f9d51dd0645b`，部署状态 success。main 的首次
-[check/build](https://github.com/fanhefeng/fhfs-site/actions/runs/38304525630) 实际执行成功。
-构建生成 155/155 静态页面；构建/检查成功不等于备份或真实恢复成功，下面分别列证据。
+- 本轮从 `main` / `origin/main` 的 `7eac972a7c97d13293ad7eb694831dd7c5ff0782` 开始，开发分支为 `codex/sitemap-webgl-optimization`。
+- 审查开始时最新合并为 [PR #26](https://github.com/fanhefeng/fhfs-site/pull/26)，当时没有开放 PR。
+- 该提交的 [check / 生产构建 / smoke](https://github.com/fanhefeng/fhfs-site/actions/runs/38421391636) 实际执行成功；GitHub 上 Vercel 部署状态为 success。
+- 本轮的提交、检查与部署验收记录在对应 PR；此页记录代码结论及本机证据。开始审查前已有的 `AGENTS.md` 修改保留，并修正缓存函数闭包的说明。
 
-[PR #20](https://github.com/fanhefeng/fhfs-site/pull/20) 已合并上线，生产提交
-`90af9916fd868c8916b015bc7bd2c2f8b7dcfca6`；main 的
-[构建与检查](https://github.com/fanhefeng/fhfs-site/actions/runs/38313352117) 为 323 项测试、155 页构建及 64 页 smoke 全通过。
+已删除 8 个本地开发分支、7 个对应远端开发分支。删除前核对 PR 已合并、远端 head 没有新增提交；远端使用原子操作和逐分支提交租约。
 
-此次上线包含 Next/sharp/source-map-js 安全修复、本地字体、E2E 构建隔离、后台媒体路径校验、
-fiber 与工具链兼容升级，以及私有加密备份。项目现有服务端/客户端边界、集中读层、授权和
-缓存失效约定继续使用；Cache Components 整体迁移仍是明确推迟的架构选择。
-
-## 逐项验证
-
-| 检查 | 结果与边界 |
-|---|---|
-| `pnpm check` | 35 个测试文件、323 项测试通过；含类型/lint/格式及辅助模块覆盖率下限 |
-| `pnpm audit --prod` | 当前锁文件所有严重级别均为 0；不是完整安全审计 |
-| 生产公开流程 | Chrome 桌面/移动视口 14 项通过；WebKit 7 项通过，使用真实生产 HTTPS |
-| 生产 HTTP | 中英文首页、说说、sitemap、搜索、RSS、中英文 OG 共 8 路径正常 |
-| 生产媒体 | WebKit 视频实际解码/播放/拖动、播放器互斥通过；音视频样本首尾 Range 为 206、越界为 416 |
-| 云端后台写入隔离测试 | [38304671450](https://github.com/fanhefeng/fhfs-site/actions/runs/38304671450)：21 项通过，专用 Neon 测试库，未写生产内容 |
-| 首次云端私有备份 | [38304663153](https://github.com/fanhefeng/fhfs-site/actions/runs/38304663153)：创建和 health 通过，含 281 个媒体文件 |
-| 完整异地字节验证 | 数据库与 281 个媒体文件，共 282 个文件的大小/SHA-256 一致 |
-| 真实独立数据库恢复 | 17 张表恢复，16 张数据表、迁移历史与 14 个序列一致，选择性取回/导入/SQL 验证 190 秒 |
-| 恢复库站点 | 155 页构建、10 项公开测试、后台登录、5 后台页、中英文 OG 通过 |
-| 本机备份回归 | 真实 restic 合成加密往返、全量与数据库选择性取回、SHA-256 与篡改拒绝均通过 |
-| 生产后台只读验收 | 用户本人登录后，18 个后台页面、编辑器渲染、Markdown 与页面预览权限通过；已恢复浏览器原预览模式，未写生产内容 |
-
-辅助模块覆盖率：语句 96.04%、分支 94.43%、函数 91.54%、行 96.77%，
-不代表组件、页面或整个项目覆盖率。恢复快照没有草稿行；匿名隐藏/授权预览由独立 E2E 草稿样本验证。
-190 秒不包含生产部署切换，不能当作完整灾难恢复 RTO。
-
-## 自动化与恢复保障
-
-仓库变量 `PRIVATE_BACKUP_ENABLED=true`、`E2E_ENABLED=true` 已设置，五项备份 Secret、
-区域变量和独立测试库 Secret 已配置。首次真实云端运行均成功，后续调度按 default branch 生效。
-
-已交付的自动化包含：
-
-- 每天 04:17 创建私有备份，立即取回数据库并验证字节和 dump 目录；10:37/16:37/22:37 检查 36 小时新鲜度。
-- 每季度 1/4/7/10 月 2 日 05:47 完整取回验证；B2 每日下载上限 1 GB，避免同日重复全量媒体下载。
-- 每天 05:23，以及 main push/手工触发，运行独立测试库的关键流程。
-- 默认 `pnpm media:deploy` 在部署前后创建私有副本，首次备份失败即拒绝部署。
-- `alert-test` 在读取数据库/仓库之前故意失败，验证 GitHub 通知；演练红色记录单独识别。
-- 云端只读巡检覆盖 workflow 停用、全跳过、失败和过期，Healthchecks.io 独立监测信号缺失；不依赖本机。迁移时先验证云端，再停旧 Codex 任务，切换证据见 [PR #26](https://github.com/fanhefeng/fhfs-site/pull/26)。
-
-B2 私有 bucket 与 Neon/Cloudflare 分离；前缀受限的日常密钥无永久删除或密钥管理权。
-SSE-B2、保留全部版本、10 GB 存储和每日 1 GB 下载限制已核实，费用上限 $0，无需绑卡。
-临时配置密钥已撤销，旧认证实际返回 401；永久删除/前缀外上传均实际拒绝。
-
-私有恢复凭据留在被忽略、权限 0600 的 `.private-backup-recovery/credentials.json`。
-用户仍需独立存入密码管理器/离线介质并确认能够取回；不能仅依赖本机和 GitHub Secrets。
-独立恢复项目 `fhfs-site-restore-20261013` 留在用户 Neon 账号下，本机明文 dump 和临时凭据已清理。
-
-## 性能与无障碍
-
-生产移动 Lighthouse 13.5：首页 94 分、无障碍 100，LCP 1.61 秒、CLS 0.00081、TBT 61 毫秒。
-介绍页两次独立基线为 38/39 分，无障碍均 100，LCP 10.3–10.7 秒、TBT 1.7–1.8 秒。
-这些是实验室模拟，不是现场用户 INP 或真实 iOS 数据。
-
-介绍页定位到开场文字仅客户端出现、不透明模型加载遮罩覆盖文字；PR #21 已将文字直接放入
-服务端 HTML，遮罩放到文字下层。禁用 JavaScript 的真实浏览器回归先失败、修复后通过。
-3D 页另用 DevTools 请求/CPU 限速交叉测量，避免把默认仿真值等同于真实阻塞；
-本机修复版为 LCP 1.88 秒、TBT 57 毫秒。生产同地址、同 DevTools 限速配置，
-修复前 LCP 13.81 秒/TBT 65 毫秒，修复后 LCP 3.21 秒/TBT 53 毫秒，无障碍均 100。
-修复后默认仿真为 63 分，LCP 2.01 秒、TBT 1.70 秒；与 DevTools 实际限速结果分别保留。
-首屏文字不再依赖模型；两种测法的生产 LCP 仍高于 1.8 秒项目目标，真实用户 INP 尚未测量。
-
-axe 检查中英文首页、介绍、说说和 Kobe 页的浅/深主题；稳定状态下首页颜色通过。
-说说日历的图片角色吞掉内部链接，导致交互嵌套错误；改为命名分组/日期链接并恢复键盘焦点。
-修复后本机与真实生产 HTTPS 的 10 个路由/主题组合均无自动扫描违规，
-新增两项浏览器回归在 Chrome 桌面/移动端通过。
-自动扫描不替代完整人工 WCAG 验收。
-
-## 尚待完成或需要本人参与
-
-| 工作 | 当前状态 |
-|---|---|
-| 自动化/首屏/日历修复交付 | PR #21 已上线；155 页构建、64 页 smoke、14 项 Chrome 和 7 项 WebKit 公开测试通过，生产新增两项回归通过 |
-| 告警送达与独立巡检 | 受控失败 [38307835631](https://github.com/fanhefeng/fhfs-site/actions/runs/38307835631) 的站内通知与现有 QQ 收件箱邮件已确认；随后 health 成功；云端迁移与本地停用证据见 PR #26 |
-| 生产后台只读页面 | 已完成 18 个页面与预览权限验收；生产预览样本为已发布文章，草稿与写入测试继续只用独立测试库 |
-| 恢复密码独立保管 | 等用户保存并确认；密码不发送到聊天或公共日志 |
-| 真实 Safari/iOS 设备 | WebKit 媒体与公开流程已通过；真实设备的系统播放器、触摸和省电行为仍需设备验收 |
-| 3D 页面性能 | 首屏空白与遮罩已修复；保留仿真/实际限速分别测量的基线，真实用户 INP 和物理设备仍待观察 |
-| 依赖更新 PR #20 | 已合并上线；Next 16.4 等 7 项通过真实构建、64 页 smoke、25 项独立库流程与生产验收 |
-
-本机代理对媒体域名的 fake-IP 解析曾令图片优化器返回 400；生产相同路径正常，main CI 实际
-smoke 通过。应在本机代理排除媒体域名，不能开启 `dangerouslyAllowLocalIP` 绕过 SSRF 防护。
-原有用户 `AGENTS.md` 工作区改动未混入交付。
-
-
-## 本轮云端验收记录
-
-- PR #21 的首次 smoke 在一个媒体图片请求上遇到 ECONNRESET/500，源文件及生产优化器复测均为 200。
-  同一提交重跑 [38307633239](https://github.com/fanhefeng/fhfs-site/actions/runs/38307633239) 后 64 页全部通过，再合并；未放宽安全或测试门禁。
-- main 的新版备份 [38310197460](https://github.com/fanhefeng/fhfs-site/actions/runs/38310197460)
-  创建、数据库取回校验与 health 通过，快照时间为 2026-10-13 05:23:48 +08:00。
-- main 的关键流程 [38310190560](https://github.com/fanhefeng/fhfs-site/actions/runs/38310190560)
-  为 25 项通过；依赖更新的同样 25 项见 [38309103287](https://github.com/fanhefeng/fhfs-site/actions/runs/38309103287)。
-- 依赖更新的 [38309088648](https://github.com/fanhefeng/fhfs-site/actions/runs/38309088648)
-  由可信分支更新触发，实际执行构建与 smoke，未读取“跳过构建”的绿勾作为验收。
-
-CodeRabbit 的一项 minor 建议已补测：开发模式 Next 16.4 的 624 次请求后，继续 400 次并在
-每批强制 GC，JS 堆从 150.2 到 165.7 MiB；外部缓冲增长约 19 MiB/100 请求。
-仅换回 Next 16.3.8，同样观测到约 16–17 MiB/100 请求的开发缓冲增长，未定位为新版特有回归。
-Next 16.4 生产构建的 200 次公开/404 请求，堆从 37.0 到 37.6 MiB，arrayBuffers 保持 0.6 MiB。
-进一步仅改变调试通道连接：100 次纯 HTTP 请求使缓冲从 18.6 增至 33.8 MiB；
-随后连接并排空同一批 HMR 调试流，回落至 18.8 MiB；再做 100 次带调试通道的请求为 19.2 MiB。
-版本内的 `server/dev/debug-channel.js` 注明，curl/禁用 JS 等未连接客户端的调试流尚缺超时清理。
-该实验解释了上述纯 HTTP 开发压测中的主要增长；本站压力/流程测试继续使用生产构建，
-未给 Next 内部实现打补丁。有限样本不证明所有长期开发或生产场景均无泄漏。
-[Next 16.4 升级说明](https://nextjs.org/blog/next-16-4) 的新缓存模型未在本站启用。
-
-
-## 最新复核与优化优先级
-
-2026-10-13 复核：复核时没有遗留开放 PR，工作流均 active；现有自动化开关已启用。
-定时浏览器任务已自然触发，[38338001484](https://github.com/fanhefeng/fhfs-site/actions/runs/38338001484)
-实际执行 25 项且全部通过。私有备份首轮自然调度仍待观察，不能用手工成功代替定时运行证据。
-最近已验证的 main 私有创建为
-[38313395698](https://github.com/fanhefeng/fhfs-site/actions/runs/38313395698)，
-包含 281 个媒体文件，数据库取回校验及 health 通过，快照时间 2026-10-13 05:54:51 +08:00。
-
-| 优先级 | 待完善项 | 建议与验收方式 |
+| 已清理分支（均为 `codex/` 前缀） | 原 head | 合并证据 |
 |---|---|---|
-| P1 | 介绍页首屏性能 | 最新同配置 DevTools 限速 LCP 3.19 秒、TBT 55 毫秒，仍高于 LCP 1.8 秒目标。先分别测响应时间、阻塞 CSS 和字体请求，再比较同环境基线；不通过降低 3D 画质或隐藏文案替代优化。 |
-| P1 | 私有备份自然调度及恢复凭据 | 首次自然 health 与每月真实数据库恢复已验证/启用；首个自然 create 观察 10 月 14 日，持续检查新鲜度。用户需独立保管恢复密码；完整部署切换 RTO 仍需单独演练。 |
-| P2 | 中文字体分片的可复现性与加载 | 固定 0.868 源文件/工具/字符计划和输出哈希的重建工具已完成；每字重仍为 8,542 字，172 个新分片与旧字形一致，保留旧文件。五页原型字体字节减少约 19%–45%，337 项门禁/155 页构建/21 项公开流程及后台原生字体验证通过；线上与限速结果见对应发布 PR。 |
-| P2 | 后台流程覆盖 | 已扩为 13 项后台流程，新增偶像时间线双语/重排/校验/草稿预览及履历项目/回退/跨页缓存失效；共 27 项浏览器流程通过。后续按业务变化补照片字段、履历个人信息等不同结构，继续只写专用测试库。 |
-| P2 | 真机与人工可访问性 | 验证真实 iOS 的触摸/系统播放器/省电模式，以及 VoiceOver、键盘与放大后的表单。现有 WebKit 与 axe 结果不能替代真机和人工验收。 |
-| P2 | 真实用户性能证据 | 现场 INP 尚未测量；先确定采样与隐私边界，再评估真实使用中的慢交互，不能把实验室 TBT 当作 INP。 |
+| `build-backup-browser-verification` | `a37564e0a80025b8fcd77b2798e7a1c0d27c4fab` | [#19](https://github.com/fanhefeng/fhfs-site/pull/19)，main 祖先 |
+| `dependency-release-verification`（仅本地） | `6cad9a64a42dcefe9e4adaf9b26290918b0c3f8a` | [#20](https://github.com/fanhefeng/fhfs-site/pull/20)，main 祖先 |
+| `production-automation-verification` | `9407c1de4db064becf0e29bb6f32e72e8720044c` | [#21](https://github.com/fanhefeng/fhfs-site/pull/21)，main 祖先 |
+| `admin-rounded-release` | `d7180eb9869ac9ad36c9f1ae1769fb94f03af840` | [#22](https://github.com/fanhefeng/fhfs-site/pull/22)，main 祖先 |
+| `periodic-restore-drill` | `6060d877aaef447a40b86d6e49fe9db78e388166` | [#23](https://github.com/fanhefeng/fhfs-site/pull/23)，main 祖先 |
+| `admin-critical-flows` | `147489d41bd830795757822a036ae04e368b7571` | [#24](https://github.com/fanhefeng/fhfs-site/pull/24)，main 祖先 |
+| `reproducible-cjk-fonts` | `254e56203076da26e57ecaea7fb70861e1dab01d` | [#25](https://github.com/fanhefeng/fhfs-site/pull/25)，与 squash 后 `3a5c303` 代码树完全一致 |
+| `cloud-monitoring` | `f120ae91b39965d928c10e19c9154559876bc354` | [#26](https://github.com/fanhefeng/fhfs-site/pull/26)，与 squash 后 `7eac972` 代码树完全一致 |
 
-后台字体本次修改：界面元信息统一沿用 Nunito + Yozai 圆体，技术输入保留等宽英文，
-中文也落到 Yozai。字体规则仅作用于后台根布局，无新增字体下载；发布状态与线上字体验收证据见对应 PR。
-当前没有证据要求立即切换数据库驱动、缓存架构或启用 Cache Components。
+保留 `main` 和 `db-snapshots`。后者是自动内容备份分支，不能按“未合并开发分支”删除；本地从 `52b017a` 快进至远端 `5e1cbed`，没有独有提交被覆盖。
 
-2026-10-13 圆体已通过 [PR #22](https://github.com/fanhefeng/fhfs-site/pull/22) 合并上线，提交
-`36a55606572970fa58f1bec8d0346c087da2e07d`。生产域名指向 Vercel
-`dpl_4uy6tBYGznhxdPt6YKX9Roz7QNPP`，状态 READY。用户已登录后台的导航、文章表单与技术输入字体通过；
-生产登录页 Chrome 原生字体为 Yozai / Nunito，代码为 Geist Mono + Yozai，390px 无溢出，
-公开页等宽字体隔离通过。合并后的 [323 测试/155 页/64 页 smoke](https://github.com/fanhefeng/fhfs-site/actions/runs/38374317594)
-以及 [25 项隔离流程](https://github.com/fanhefeng/fhfs-site/actions/runs/38374317578) 均实际执行成功，未写生产内容。
+## 架构与目录
 
-优先级后续进展：
+整体结构适合当前个人内容站，执行环境和领域职责清楚，无需整体重写或增加通用 Repository / Service 层。
 
-- 恢复演练已补成 `backup:private restore-database`：独立项目专用库/受限角色、管理员标记、
-  导入前后保护检查、归档范围校验、单事务导入以及逐表数据/列/迁移/序列比对。本机真实导入 17 表/14 序列通过；
-  撤销标记权限的真实拒绝测试确认没有访问存储或执行恢复，应用表不变。新增每月 8 日 06:53 调度及独立 Secret，
-  云端激活/验收证据记录在对应 PR；完整媒体仍按季度验证，完整部署切换 RTO 尚未演练。
-- 介绍页分别阻止中文字体与模型请求，各重复两次，均没有改善约 3.2 秒 LCP。
-  HTML 首字节约 1.65–1.85 秒，首屏文字绘制紧随阻塞 CSS 完成；下一批应针对该请求链测量。
-  不直接开启全站实验性 CSS 内联：当前共享 CSS 较大，Next 文档注明它会增加 HTML、重复初次 RSC 样式且失去独立缓存。
-  进一步两组冷/暖访问中，冷访问 TLS 建连约 1.41–1.44 秒，请求到首字节 282–290 毫秒，CDN 均 HIT；
-  暖访问复用连接和 CSS 缓存后 LCP 为 924/932 毫秒。不能把完整导航 TTFB 都归为服务器处理时间，
-  也不能把这两次暖缓存结果当作所有用户达标的证据；冷访问 CSS 请求链仍有优化空间。
-- 私有备份 workflow 于 10 月 13 日 04:29 创建，已晚于当日 04:17 创建时段；首个自然创建应观察 10 月 14 日。
-  健康检查的自然触发仍待观察，不能用手工运行代替。现有 E2E/公开备份的自然调度曾延迟数小时，调度时间不是 SLA。
+```text
+src/
+  app/[locale]/       中英文公开路由、元数据和静态 JSON
+  app/admin/          后台页面、actions 和表单 UI
+  components/         按页面领域组织的交互与展示
+  lib/                两端可用的纯函数和领域数据
+    server/           带缓存的内容读取、鉴权、Markdown、SEO、OG
+    client/           GSAP、播放器、滚动和浏览器生命周期
+    node/             文件系统、备份与脚本辅助
+  config/             环境变量、CSP、站点配置和资源缓存规则
+  db/                 Neon 驱动与 Drizzle schema
+  i18n/               locale 校验、导航与消息加载
+scripts/              构建外的检查、资源、备份和测试入口
+tests/e2e/            公开流程与独立测试库后台流程
+messages/             全站文案默认值
+public/               按 hash 寻址的静态资源
+drizzle/              数据库迁移与快照
+backup/               可公开内容导出
+media/                Cloudflare 媒体 Worker；files/ 不进 Git
+tools/                字体复现与模型校准工具
+docs/                 当前操作说明、设计依据和历史决定
+```
 
-18:10 补充交付：
+- `content.ts` 集中公开读层、缓存标签、草稿过滤和文章语言回退；多个内容领域的实现集中于此，没有因此造成错误。保持这一接口比按表拆出转发层更容易维护缓存约定。
+- 后台页面各自鉴权，写入 actions 先验会话、后验证、最后失效；`forms.ts` 和 `useSaveAction` 集中处理校验及保存失败保留输入。
+- 3D 经按需加载和 WebGL / Save-Data 探测，首页不挂 three.js。`gsap-extras`、请求时间缓存、主题首屏脚本等小模块都有具体作用。
+- 没有独立 `CONTEXT.md` / ADR 目录；现有术语和决定集中在 `AGENTS.md` 与设计日志。当前规模不必为目录形式再复制一份说明。
 
-- [PR #23](https://github.com/fanhefeng/fhfs-site/pull/23) 已合并上线，提交 `66decbf5880b82e6a20d8f2610ff88ffe310442c`，
-  Vercel `dpl_7u2Umv1sNudfXePnVwqhN6wCNrhn` READY。331 项门禁通过，生产/测试/恢复主机均拒绝大小写、池化和尾点别名绕过。
-- 用户明确授权后配置受限恢复 Secret；[云端真实重复恢复](https://github.com/fanhefeng/fhfs-site/actions/runs/38381161831)
-  在已有数据的专用库完成，17 表/14 序列、全部行/列/迁移一致，health 通过。`PRIVATE_RESTORE_ENABLED=true`
-  已启用每月 8 日 06:53 调度，独立巡检同步检查月度恢复年龄及自然创建证据。原恢复库和生产均未替换。
-- 首次自然 [health](https://github.com/fanhefeng/fhfs-site/actions/runs/38378325520) 于 17:43 实际执行成功；
-  首个自然 create 的观察点仍是 10 月 14 日，不能用本次手工恢复替代每日创建验收。
-- 新增后台流程的 [独立库云端验收](https://github.com/fanhefeng/fhfs-site/actions/runs/38380403300) 为 27 项全部通过；
-  偶像时间线与履历表单分别为 9.1/14.2 秒。前后清理覆盖 `e2e-created-*` 偶像和履历；本机测试须避开云端写库。
+## 本轮代码审查与清理
 
-中文字体后续批次已补齐可复现构建：固定官方 Yozai 0.868，完整参数及源码/产物哈希在
-`tools/yozai.gen.json`，工具为 `tools/vendor-yozai.py`。两次生成字节一致，错误输入哈希在写输出前拒绝。
-旧文件保留，新字符覆盖、字形、字宽、行高和作者/许可信息通过原生核验。
-新 CSS 为 115,812 字节（原 130,916），gzip 为 35,598（原 39,140），没有新增客户端脚本。
-本机生产构建及桌面/移动/WebKit 21 项公开流程通过，后台中文实际使用同字形的 FHFS Round CJK，
-英文 Nunito、技术区 Geist Mono，390px 无横向溢出，公开等宽栈隔离通过。
-字体请求原型降低下载量不能直接当作 LCP 改善；真实生产限速与首访网络路径仍要分别观察。
+审查覆盖路由/缓存、后台鉴权与保存、Markdown/媒体路径、播放器/WebGL 生命周期、备份/恢复保护、目录引用和依赖使用。未发现需要立即阻止发布的高危问题；这不是完整安全审计。
 
-本次圆体验证：`pnpm check`（35 文件、323 测试）和 155 页生产构建通过，生产依赖审计为零已知漏洞。
-本机 HTTPS + Chrome 原生字体检查确认 UI 中文实际使用 Yozai、英文使用 Nunito；
-代码为 Geist Mono + Yozai。登录页、文章编辑器、390px 手机宽度无横向溢出，公开页面的等宽字体保持原样。
+| 发现 | 处理 |
+|---|---|
+| `/admin/intro` 允许标题只写一种语言，公开 `/intro` 却直接取当前语言，另一侧为空标题 | 页面统一调用已有 `inLocale`；标题、正文、时间段与要点一起回退 |
+| 版本履历同样允许单语标题/日期占位，英文实验室履历会出现空标题与空日期 | 同一条记录统一本地化，再生成 Changelog 数据 |
+| 连续保存期间仍显示上一轮成功/错误提示 | 保存中隐藏旧结果，仅显示当前操作的进度，完成后再报告本轮结果 |
+| `ExpoScaleEase` 导入、注册但没有调用 | 删除该插件和预留说明，保留实际使用的 GSAP 插件 |
+| `CopyLocale` 无引用 | 删除未使用类型 |
+| 完整依赖审计发现旧 TS loader 间接引入 esbuild 0.18.20 | 精确覆盖该依赖至 drizzle-kit 已用的 0.25.12，移除旧版及平台副本；CJS / ESM 转换兼容验证通过 |
+| 文案/说说数量写死，Markdown 注释仍描述已移除管线 | 删除易过期计数和无助于当前实现的迁移叙述 |
+| 介绍页文档仍说首屏 probing 留白、about 预取工作台 | 更新为当前 SSR 开场、可聚焦简历与按需分包行为 |
+| 缓存说明误称禁止捕获任何模块常量 | 改准为请求/调用间变化的值必须是参数；稳定数据库句柄与列集合可共享 |
+| 项目状态反复追加旧版本结果，完成项仍写待观察 | 合并为本页，保留发布与恢复证据，区分本轮结果和历史测量 |
+| sitemap 按 slug 逐一读取版本，查询数量随文章数增长 | 在缓存读层一次 `db.batch` 读取两表的已发布 slug/locale/date；导航、标签和子页并行读取，保持 URL、语言及日期语义 |
+| 镜片与消融分别实现尺寸、可见性、context 和时钟管理 | 提取不依赖 three.js 的 `mountCanvasLoop`，隐藏/离屏暂停、恢复即重绘、幂等释放；各效果仍拥有纹理与 shader |
+| 镜片图片部分加载成功后失败时，已到达纹理未进入清理列表 | 每张纹理到达即登记；失败或卸载释放成功项，晚到项自行释放，不重启已卸载效果 |
 
-## 云端巡检迁移（2026-10-13）
+后台新增两项真实浏览器回归：单语简历节点保存后另一语言的无 JavaScript 页面可读；单语版本履历在英文页回退，新增/删除会刷新缓存。只写带手工标记的独立测试库；节点恢复原内容，新建履历由 UI 和运行器清理。
 
-新增 GitHub Actions 只读巡检与 Healthchecks.io 独立看门狗，覆盖工作流/开关、真实 job/步骤、
-备份与测试年龄、自然调度证据及原生恢复比对，并读取加密仓库 health。
-配置与切换顺序见 [CLOUD-MONITORING.md](CLOUD-MONITORING.md)。新增重跑/恢复清单回归，完整门禁与真实 API 审计通过；
-独立演练的故障/恢复邮件已在收件箱核实。超时、云端主分支运行和停用旧本地任务的最终证据见发布 PR。
-只有完成云端验证后才停旧巡检，原有备份、测试和恢复任务继续运行。
+引用检查遍历 376 个受跟踪的 TS/TSX/MTS/MJS 文件，从路由、脚本、配置与测试入口追踪 import / dynamic import。两个看似未被 import 的文件是框架配置入口：`app/global-not-found.tsx` 和 `i18n/request.ts`；未发现可据此删除的整模块。
+
+直接依赖均有用途：`leva` 用于开发校准面板；`shiki` 是 Markdown 高亮的 peer；Vitest、coverage、Tailwind、类型包和 CLI 由配置/工具链使用。`works` 后台、`media:deploy:safe` 兼容别名、旧字体分片/许可、迁移及备份均有保留用途。
+
+esbuild 的[上游公告](https://github.com/evanw/esbuild/security/advisories/GHSA-67mh-4wv8-2f99)影响开发 serve 功能，修复版本为 0.25.0 起；本站旧加载器只调用 transform，未发现启用受影响服务的路径。仍移除旧版本，覆盖只作用于 `@esbuild-kit/core-utils`，没有整体升级工具链。
+
+## 验证
+
+| 检查 | 本轮结果 |
+|---|---|
+| `pnpm check` | 41 个测试文件、359 项测试通过，含类型、lint、格式和覆盖率门禁 |
+| 辅助模块覆盖率 | 语句 95.92%、分支 94.57%、函数 91.56%、行 96.50%；不代表组件或全项目覆盖率 |
+| `pnpm audit --prod` | info / low / moderate / high / critical 均为 0 |
+| `pnpm audit`（含开发依赖） | 修复后所有严重级别均为 0；锁文件依赖条目从 680 降到 657 |
+| `pnpm e2e` | 独立测试库迁移/导入、161 页生产构建（含测试样本）、33 项流程全部通过（15 后台、18 桌面/移动公开流程），包括真实 WebGL context 丢失/恢复和 resize |
+| 定向 `pnpm smoke` | 独立测试库生产构建的 8 页全部通过，覆盖中英文介绍/实验室履历、贴纸墙、揭角、标题与后台登录；含资源、异常、控制台/CSP、脚本预算 |
+| `git diff --check` | 通过 |
+| 测试后清理 | 只读复核原简历节点已恢复，六类 `e2e-created-*` 行均为 0；临时会话与锁已删除 |
+
+本机沙箱不能写默认 SWC 原生缓存，首次检查因此失败；设置 `SWC_NATIVE_BINDING_CACHE=/private/tmp/fhfs-site-swc` 后通过，无需修改项目或依赖。CodeRabbit CLI 0.7.3 当前未登录，本轮使用源码审查与架构独立复核，没有 CodeRabbit 自动报告。
+
+本机公开浏览器流程仍出现媒体域名被代理解析到 `198.19.0.97` 的情况，Next 图片优化器按 SSRF 保护拒绝该请求。流程测试通过不表示所有媒体请求通过；此前 8 页定向 smoke 不含说说媒体，本机全量 sitemap smoke 尚受此环境限制。应按 [TESTING.md](TESTING.md) 调整代理的 fake-IP 过滤，不开启 `dangerouslyAllowLocalIP`。合并前仍须以本轮 PR 的云端全量 smoke 验收，发布后再检查生产站点。
+
+## 备份、恢复与线上保障
+
+- 最新 main 的 [自然 E2E](https://github.com/fanhefeng/fhfs-site/actions/runs/38490006605) 已成功，检查时云端空闲后才启动本机回归。
+- 首次 [自然私有创建](https://github.com/fanhefeng/fhfs-site/actions/runs/38486137481) 已于 10 月 14 日 07:45 开始并成功，创建、数据库取回验证与 health 步骤均执行；此前 [自然 health](https://github.com/fanhefeng/fhfs-site/actions/runs/38461968074) 也成功。原“首个自然 create 待观察”已完成，GitHub 调度时间仍不是 SLA。
+- [独立云端巡检](https://github.com/fanhefeng/fhfs-site/actions/runs/38490334591) 的工作流审计、加密仓库新鲜度和 Healthchecks 信号均实际执行成功。配置与窗口见 [CLOUD-MONITORING.md](CLOUD-MONITORING.md)。
+- 私有存储与 Neon / Cloudflare 分离。既有完整恢复验证为数据库及 281 个媒体文件共 282 个文件的大小/SHA-256 一致；真实 SQL 恢复为 17 表、14 序列及迁移一致。[云端恢复证据](https://github.com/fanhefeng/fhfs-site/actions/runs/38381161831) 保留。它们是此前验收，不是本轮重复下载/恢复。
+- 每月真实 SQL 恢复、每日私有创建、季度全量字节验证已经启用。操作与回退分别见 [PRIVATE-BACKUP.md](PRIVATE-BACKUP.md)、[RECOVERY.md](RECOVERY.md)。恢复密码仍需用户独立保管，不能只依赖本机或 GitHub Secrets。
+
+## 后续优先级
+
+| 优先级 | 项目 | 验收重点 |
+|---|---|---|
+| P1 | 恢复凭据独立保管、完整部署切换演练 | 确认离线/密码管理器可取回；既有 190 秒 SQL 恢复不等于完整灾难恢复 RTO |
+| P2 | 介绍页冷访问性能 | 既有实际限速冷访问 LCP 约 3.2 秒，高于 1.8 秒目标；暖连接/CSS 缓存曾为 924/932 毫秒。先测 TLS、HTML/CSS 请求链，不把 TTFB 全归为服务器处理或用降画质替代诊断 |
+| P2 | 真机与人工无障碍 | WebKit/axe 既有结果不能替代 iOS 系统播放器、触摸、省电、VoiceOver、键盘与放大表单验收 |
+| P2 | 本机媒体域名解析 | 代理排除媒体域名并确认返回公网地址后，再跑包含说说页的全量 smoke |
+| P2 | 真实用户性能 | 现场 INP 尚未测量，实验室 TBT 不能代替；先明确采样与隐私约定 |
+
+可选双语段落仍按原策略允许留空隐藏；本轮只修复后台承诺至少一种语言、前台必须显示标题的两处。Cache Components、数据库驱动和全站架构没有足以要求立刻迁移的证据。

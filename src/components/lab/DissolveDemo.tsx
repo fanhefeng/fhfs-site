@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import * as THREE from "three";
 import { gsap, useGSAP, ScrollTrigger, EASE } from "@/lib/client/gsap";
+import { mountCanvasLoop } from "@/lib/client/canvasLoop";
 import { releaseRenderer } from "@/lib/client/three/release";
 
 type Props = {
@@ -138,9 +139,8 @@ void main(){
  * midpoint. Scrolling *back up* still regrows it, because scrub runs the tween
  * backwards; that is the reverse the copy promises, and it stays.
  *
- * Renders only when something changed (`dirty`), and drops to one frame in
- * four while the threshold is parked, which is what keeps a pinned WebGL
- * canvas from costing anything while the reader is not scrolling.
+ * Renders only when something changed (`dirty`) and stops on the last frame
+ * while parked. Hidden/off-screen canvases leave the shared clock entirely.
  */
 export function DissolveDemo({ image, accent, hint, headline, body, tail, fallbackNote }: Props) {
   const scope = useRef<HTMLDivElement>(null);
@@ -201,61 +201,9 @@ export function DissolveDemo({ image, accent, hint, headline, body, tail, fallba
     const geometry = new THREE.PlaneGeometry(2, 2);
     scene.add(new THREE.Mesh(geometry, material));
 
-    const resize = () => {
-      const el = stickyRef.current;
-      const w = el?.clientWidth || window.innerWidth;
-      const h = el?.clientHeight || window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, w * h > 2_600_000 ? 1.5 : 2);
-      renderer.setPixelRatio(dpr);
-      renderer.setSize(w, h, false);
-      uniforms.uRes.value.set(w * dpr, h * dpr);
-      dirtyRef.current = true;
-    };
-    resize();
-
-    // The canvas follows the sticky box, not the window: a phone's address
-    // bar resizes the window without resizing a 100svh box, and re-measuring
-    // the pin is ScrollTrigger's own resize handling, which knows to ignore
-    // exactly that. Calling refresh() here used to make the pin jump.
-    const stickyEl = stickyRef.current;
-    const observer = stickyEl ? new ResizeObserver(resize) : null;
-    if (stickyEl) observer!.observe(stickyEl);
-    else window.addEventListener("resize", resize, { passive: true });
-
-    let visible = true;
-    const onVisibility = () => {
-      visible = !document.hidden;
-      if (visible) dirtyRef.current = true;
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    // three rebuilds its own state when the context comes back and uploads
-    // the texture again on the next draw — but nothing asks for that draw,
-    // so the restored canvas would sit blank until the next scroll.
-    const onRestored = () => {
-      dirtyRef.current = true;
-    };
-    canvas.addEventListener("webglcontextrestored", onRestored);
-
-    let disposed = false;
-    const teardown = () => {
-      if (disposed) return;
-      disposed = true;
-      gsap.ticker.remove(tick);
-      observer?.disconnect();
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("visibilitychange", onVisibility);
-      canvas.removeEventListener("webglcontextrestored", onRestored);
-      uniforms.uTex.value?.dispose();
-      geometry.dispose();
-      material.dispose();
-      releaseRenderer(renderer);
-    };
-
     // One clock for the whole site: gsap.ticker already drives Lenis, and
     // adding a second rAF loop here would fight it for frames.
     const tick = (_time: number, delta: number) => {
-      if (disposed || !visible) return;
-
       const sp = Math.min(Math.max(sweep.current.value, 0), 1);
       // Capped at 0.78 so a band of canopy always frames the top — the
       // composition falls apart once the image is allowed to vanish entirely.
@@ -276,12 +224,30 @@ export function DissolveDemo({ image, accent, hint, headline, body, tail, fallba
       renderer.render(scene, camera);
     };
 
+    const loop = mountCanvasLoop({
+      canvas,
+      box: () => stickyRef.current,
+      dirty: dirtyRef,
+      resize: (width, height, dpr) => {
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(width, height, false);
+        uniforms.uRes.value.set(width * dpr, height * dpr);
+      },
+      frame: tick,
+      release: () => {
+        uniforms.uTex.value?.dispose();
+        geometry.dispose();
+        material.dispose();
+        releaseRenderer(renderer);
+      },
+    });
+
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin("anonymous");
     loader.load(
       image,
       (texture) => {
-        if (disposed) {
+        if (loop.disposed) {
           texture.dispose();
           return;
         }
@@ -292,22 +258,21 @@ export function DissolveDemo({ image, accent, hint, headline, body, tail, fallba
         uniforms.uTex.value = texture;
         uniforms.uTexSize.value.set(texture.image.width, texture.image.height);
         dirtyRef.current = true;
-        renderer.render(scene, camera);
-        gsap.ticker.add(tick);
+        loop.start();
         setLive(true);
         ScrollTrigger.refresh();
       },
       undefined,
       () => {
-        if (disposed) return;
+        if (loop.disposed) return;
         // Nothing will ever be drawn: give the context back now rather than
         // hold it, and its observers, until the reader leaves the page.
-        teardown();
+        loop.dispose();
         setDegraded(true);
       },
     );
 
-    return teardown;
+    return loop.dispose;
   }, [image]);
 
   useGSAP(

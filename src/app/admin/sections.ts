@@ -156,7 +156,7 @@ export const SECTION_GROUPS: AdminGroup[] = [
           "全站每一行字，按页面分组。默认在 messages/*.json，这里只存改过的——清空一条就回到默认。",
         view: null,
         // The count is how many lines have been edited away from the files,
-        // not how many there are: 634 of those, and none of them a row.
+        // not the total number of lines in the catalogues.
         unit: "条改过",
       },
       {

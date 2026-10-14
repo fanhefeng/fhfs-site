@@ -143,6 +143,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     accent: "#4c7a5b",
     sources: [
       "components/lab/DissolveDemo.tsx",
+      "lib/client/canvasLoop.ts",
       "lib/client/three/guards.ts",
       "lib/client/three/release.ts",
     ],
@@ -210,6 +211,7 @@ export const LAB_ENTRIES: LabEntry[] = [
     sources: [
       "components/lab/LensSliderDemo.tsx",
       "components/lab/lensRenderer.ts",
+      "lib/client/canvasLoop.ts",
       "lib/lensSlider.ts",
     ],
   },

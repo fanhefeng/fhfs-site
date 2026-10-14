@@ -82,13 +82,7 @@ function rehypeLazyImages() {
 /**
  * Markdown → HTML, run once when a post is saved rather than on every render.
  *
- * This replaces the MDX bundle that content-collections used to compile. None
- * of the prose here ever used MDX's actual powers — no components, no imports,
- * no expressions — so the only thing MDX bought was an esbuild dependency that
- * does not travel well into a serverless function.
- *
- * The plugin list is carried over verbatim from the old `content-collections.ts`,
- * and that matters: `.prose-editorial` in globals.css styles the output by
+ * `.prose-editorial` in globals.css styles the output by
  * element and by the attributes rehype-pretty-code emits. Every token still
  * ships `color: var(--shiki-light)` plus a `--shiki-dark` custom property, and
  * `code[data-theme*=" "]` still decides which one wins per theme. Change the

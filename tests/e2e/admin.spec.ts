@@ -126,6 +126,9 @@ test("draft preview requires a live session and exits back to public visibility"
     expect((await visitor.request.get("http://localhost:3100/zh/blog/e2e-draft")).status()).toBe(
       404,
     );
+    expect(
+      await (await visitor.request.get("http://localhost:3100/sitemap.xml")).text(),
+    ).not.toContain("e2e-draft");
     await authenticate(page);
     await page.goto("/admin/preview?kind=post&slug=e2e-draft&locale=zh");
     await expect(page.locator("main h1")).toHaveText("私有测试草稿");
@@ -385,6 +388,120 @@ test("resume experience validation preserves input and saves invalidate resume a
       await publicPage.goto(route);
       await expect(publicPage.getByText(city.zh, { exact: true })).toHaveCount(0);
     }
+  } finally {
+    await visitor.close();
+  }
+});
+
+test("intro copy written in one language remains readable in the other language", async ({
+  page,
+  browser,
+}) => {
+  await authenticate(page);
+  await page.goto("/admin/intro");
+  await page.getByRole("button", { name: /FRONTEND/ }).click();
+  const form = page.locator("form").filter({ has: page.locator('input[name="title.zh"]') });
+  const names = ["kicker", "title", "period", "body", "bullets"].flatMap((field) => [
+    `${field}.zh`,
+    `${field}.en`,
+  ]);
+  const original = await Promise.all(
+    names.map(async (name) => [name, await form.locator(`[name="${name}"]`).inputValue()] as const),
+  );
+  const visitor = await browser.newContext({
+    baseURL: "http://localhost:3100",
+    javaScriptEnabled: false,
+  });
+  try {
+    const publicPage = await visitor.newPage();
+    for (const [written, other] of [
+      ["zh", "en"],
+      ["en", "zh"],
+    ] as const) {
+      // Warm the public page before saving, so this also crosses cache invalidation.
+      await publicPage.goto(`/${other}/intro`);
+      for (const name of names) await form.locator(`[name="${name}"]`).fill("");
+      const title = `Single-language intro ${written}`;
+      await form.locator(`[name="title.${written}"]`).fill(title);
+      await form.locator(`[name="kicker.${written}"]`).fill("Only one translation");
+      await form.locator(`[name="period.${written}"]`).fill("2030 – present");
+      await form.locator(`[name="body.${written}"]`).fill("A readable introduction.");
+      await form.locator(`[name="bullets.${written}"]`).fill("One preserved bullet");
+      if (written === "en") {
+        const held = Promise.withResolvers<void>();
+        await page.route("**/admin/intro", async (route) => {
+          if (route.request().method() === "POST") await held.promise;
+          await route.continue();
+        });
+        try {
+          await form.getByRole("button", { name: "保存", exact: true }).click();
+          await expect(form.getByRole("button", { name: "保存中…", exact: true })).toBeDisabled();
+          await expect(form.getByRole("status")).toHaveCount(0);
+        } finally {
+          held.resolve();
+        }
+      } else {
+        await form.getByRole("button", { name: "保存", exact: true }).click();
+      }
+      await expect(form.getByRole("button", { name: "保存", exact: true })).toBeEnabled();
+      await expect(form.getByRole("status")).toContainText("已保存");
+      await publicPage.reload();
+      const document = publicPage.getByRole("region", {
+        name: other === "en" ? en.intro.resumeRegion : zh.intro.resumeRegion,
+        includeHidden: true,
+      });
+      await expect(document.getByRole("heading", { name: title, includeHidden: true })).toHaveCount(
+        1,
+      );
+      await expect(document).toContainText("Only one translation");
+      await expect(document).toContainText("2030 – present");
+      await expect(document).toContainText("A readable introduction.");
+      await expect(document).toContainText("One preserved bullet");
+    }
+  } finally {
+    try {
+      await expect(form.getByRole("button", { name: "保存", exact: true })).toBeEnabled();
+      for (const [name, value] of original) await form.locator(`[name="${name}"]`).fill(value);
+      await form.getByRole("button", { name: "保存", exact: true }).click();
+      await expect(form.getByRole("button", { name: "保存", exact: true })).toBeEnabled();
+      await expect(form.getByRole("status")).toContainText("已保存");
+    } finally {
+      await visitor.close();
+    }
+  }
+});
+
+test("a single-language timeline title and unknown date fall back on the public changelog", async ({
+  page,
+  browser,
+}) => {
+  const visitor = await browser.newContext({ baseURL: "http://localhost:3100" });
+  const key = `e2e-created-timeline-${Date.now()}`;
+  const title = `单语履历验证 ${key}`;
+  try {
+    const publicPage = await visitor.newPage();
+    await publicPage.goto("/en/lab/changelog");
+    await authenticate(page);
+    await page.goto("/admin/timeline");
+    await page.getByRole("button", { name: "新条目", exact: true }).click();
+    await page.locator('input[name="key"]').fill(key);
+    await page.locator('input[name="version"]').fill("e2e");
+    await page.locator('input[name="dateLabel.zh"]').fill("时间待考");
+    await page.locator('input[name="title.zh"]').fill(title);
+    await page.locator('textarea[name="note.zh"]').fill("没有英文时仍可读取的说明");
+    await page.getByRole("button", { name: "保存", exact: true }).click();
+    await expect(page.getByRole("main").getByRole("status")).toContainText("已保存");
+    await publicPage.reload();
+    const entry = publicPage.locator("[data-entry]").filter({ hasText: title });
+    await expect(entry.getByRole("heading", { name: title, exact: true })).toHaveCount(1);
+    await expect(entry).toContainText("没有英文时仍可读取的说明");
+    await expect(entry.getByRole("button", { name: /时间待考/ })).toHaveCount(1);
+    await page.getByRole("button", { name: new RegExp(title) }).click();
+    await page.getByRole("button", { name: new RegExp(`删除这条.*${key}`) }).click();
+    await page.getByRole("button", { name: "确认删除", exact: true }).click();
+    await expect(page.getByRole("button", { name: new RegExp(title) })).toHaveCount(0);
+    await publicPage.reload();
+    await expect(publicPage.getByText(title, { exact: true })).toHaveCount(0);
   } finally {
     await visitor.close();
   }

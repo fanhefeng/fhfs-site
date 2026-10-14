@@ -93,3 +93,59 @@ test("calendar dates expose named links that work with the keyboard", async ({ p
   await page.keyboard.press("Enter");
   await expect.poll(() => new URL(page.url()).hash).toBe(target);
 });
+
+for (const [study, selector] of [
+  ["dissolve", ".dz-canvas"],
+  ["lens-slider", ".ls-canvas"],
+] as const) {
+  test(`${study}: the canvas redraws after context restoration and resize`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript(() => {
+      for (const method of ["drawArrays", "drawElements"] as const) {
+        // The original receiver is supplied by Reflect.apply below.
+        // eslint-disable-next-line typescript/unbound-method
+        const original = WebGL2RenderingContext.prototype[method];
+        WebGL2RenderingContext.prototype[method] = function (...args: number[]) {
+          const canvas = this.canvas;
+          if (canvas instanceof HTMLCanvasElement) {
+            canvas.dataset.testDraws = String(Number(canvas.dataset.testDraws ?? 0) + 1);
+          }
+          Reflect.apply(original, this, args);
+        };
+      }
+    });
+    await page.goto(`/zh/lab/${study}`);
+    const canvas = page.locator(selector);
+    await canvas.scrollIntoViewIfNeeded();
+    const draws = async () => Number((await canvas.getAttribute("data-test-draws")) ?? 0);
+    await expect.poll(draws).toBeGreaterThan(0);
+    const before = await draws();
+    await canvas.evaluate(async (element) => {
+      const context = (element as HTMLCanvasElement).getContext("webgl2");
+      const extension = context?.getExtension("WEBGL_lose_context");
+      if (!extension) throw new Error("The browser must support a real WebGL context restore");
+      const lost = new Promise<void>((resolve) =>
+        element.addEventListener("webglcontextlost", () => resolve(), { once: true }),
+      );
+      const restored = new Promise<void>((resolve) =>
+        element.addEventListener("webglcontextrestored", () => resolve(), { once: true }),
+      );
+      extension.loseContext();
+      await lost;
+      // Chrome permits restoration after the loss event has finished dispatching,
+      // rather than in the microtask that resumes this listener's promise.
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+      extension.restoreContext();
+      await restored;
+    });
+    await expect.poll(draws).toBeGreaterThan(before);
+    const width = await canvas.evaluate((element) => (element as HTMLCanvasElement).width);
+    const viewport = page.viewportSize()!;
+    await page.setViewportSize({ width: viewport.width + 80, height: viewport.height });
+    await expect
+      .poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).width))
+      .not.toBe(width);
+    expect(errors).toEqual([]);
+  });
+}

@@ -3,6 +3,7 @@ import { pageLocale } from "@/i18n/page";
 import { site } from "@/config/site";
 import { sectionMetadata } from "@/lib/server/seo";
 import { getIntroNodes } from "@/lib/server/content";
+import { inLocale } from "@/lib/localized";
 import { INTRO_STICKERS, type IntroCopy, type IntroLink } from "@/lib/intro/stickers";
 import { IntroStage } from "@/components/intro/IntroStage";
 
@@ -30,16 +31,17 @@ export default async function IntroPage({ params }: PageProps<"/[locale]/intro">
   const nodes = await getIntroNodes();
   const byKey = new Map(nodes.map((node) => [node.key, node]));
   const copy: IntroCopy[] = INTRO_STICKERS.flatMap((sticker) => {
-    const node = byKey.get(sticker.id);
-    if (!node) return [];
+    const row = byKey.get(sticker.id);
+    if (!row) return [];
+    const node = inLocale(row, locale);
     return [
       {
         id: sticker.id,
-        kicker: node.kicker[locale],
-        title: node.title[locale],
-        period: node.period?.[locale],
-        body: node.body[locale],
-        bullets: node.bullets[locale] ?? [],
+        kicker: node.kicker,
+        title: node.title,
+        period: node.period ?? undefined,
+        body: node.body,
+        bullets: node.bullets,
       },
     ];
   });

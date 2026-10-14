@@ -2,7 +2,7 @@ import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messagefor
 /**
  * The rules of the copy overlay, in one place.
  *
- * `messages/*.json` holds every line the site can say — 885 of them — and is
+ * `messages/*.json` holds every line the site can say and is
  * the default. `copy_blocks` holds only the ones that have been edited since:
  * a row is an override, and a key with no row reads as the file says. That is
  * what makes "clear the field" mean *restore the default* rather than "say
@@ -13,8 +13,6 @@ import { parse, TYPE, type MessageFormatElement } from "@formatjs/icu-messagefor
  * from the catalogue, the form (client) renders the group names, and the
  * action checks a value before writing it.
  */
-
-export type CopyLocale = "zh" | "en";
 
 /** A message catalogue, as it comes out of `messages/*.json`. */
 export type Catalogue = Record<string, unknown>;

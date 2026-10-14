@@ -279,15 +279,15 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
   if (entry.slug === "changelog") {
     text.title = t(`${ns}.title`);
     text.ariaLabel = t(`${ns}.listAria`);
-    entries = (await getTimeline()).map((row) => {
-      const dateText = row.date ?? row.dateLabel?.[locale] ?? "—";
+    entries = inLocale(await getTimeline(), locale).map((row) => {
+      const dateText = row.date ?? (row.dateLabel || "—");
       return {
         id: row.key,
         label: `fhf ${row.version}`,
         year: row.date ? row.date.slice(0, 4) : "—",
         date: { text: dateText, aria: t(`${ns}.dotAria`, { date: dateText }) },
-        title: row.title[locale],
-        note: row.note[locale],
+        title: row.title,
+        note: row.note,
       };
     });
   }
