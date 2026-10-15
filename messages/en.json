@@ -572,8 +572,8 @@
       "hello": {
         "name": "Hello handwriting",
         "tagline": "SVG paths · stroke-dashoffset · GSAP timeline",
-        "summary": "A connected hello and a stroke-by-stroke 你好, inspired by Apple’s welcome animation.",
-        "note": "The lettering consists of hand-drawn Bézier paths in writing order, with no handwriting font to load. Each stroke has pathLength normalized to 1 and stroke-dasharray set to 1. Animating stroke-dashoffset from 1 to 0 reveals a rounded line along the path. Duration is proportional to each stroke’s measured length. English joins are continuous; Chinese strokes have a 75 ms pen lift between them. The finished greeting holds for 1.8 seconds, fades out, then repeats. Pausing preserves the current drawing, and leaving the viewport or hiding the tab also pauses the timeline. Background and speed change independently; the guide shows the complete paths. The lettering is drawn for this study, inspired by the welcome animation, without Apple’s fonts or animation assets.",
+        "summary": "Apple’s Hello lettering, drawn stroke by stroke in English and Chinese.",
+        "note": "The lettering uses the original English and Chinese paths from macOS’s Hello welcome animation (Macintosh Skeletal 2.0). The curves, writing order and joins are preserved as rounded 2D SVG strokes, with no system-font fallback. Each stroke has pathLength normalized to 1 and stroke-dasharray set to 1. Animating stroke-dashoffset from 1 to 0 reveals the line. Duration is proportional to each stroke’s measured length, with a 75 ms pen lift between Chinese strokes. The finished greeting holds for 1.8 seconds, fades out, then repeats. Pausing preserves the current drawing, and leaving the viewport or hiding the tab also pauses the timeline. Background and speed change independently; the guide shows the complete paths. The lettering belongs to Apple; its source and conversion are recorded in the project credits.",
         "label": "Hello · handwriting",
         "lede": "Change the greeting, background or writing speed. Pause to inspect a stroke, or show the guide to see the complete lettering.",
         "hello": "hello",
