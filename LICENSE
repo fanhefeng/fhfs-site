@@ -3,7 +3,8 @@ This repository holds two kinds of thing, under two different terms.
 1. THE CODE — MIT License
 
 Everything that is source code: src/, scripts/, drizzle/, the configuration
-files at the root, and the documentation's code samples.
+files at the root, and the documentation's code samples, except the
+Apple-derived greeting paths in src/lib/hello.ts (see below).
 
 Copyright (c) 2026 fhf
 
@@ -33,6 +34,8 @@ in the repository so the site has a diffable history, not so they can be
 reused.
 
 Third-party material keeps its own terms and is not the author's to license:
+the Apple Hello greeting paths in src/lib/hello.ts (© Apple, Inc. 2025,
+all rights reserved; no Apple rights are granted by this license),
 the Yozai typeface (SIL OFL 1.1, public/fonts/yozai/LICENSE.txt), the Draco
 decoder (Apache-2.0), the Unsplash photographs, and the film stills, music
 recordings, photographs and 3D model credited in docs/CREDITS.md, which

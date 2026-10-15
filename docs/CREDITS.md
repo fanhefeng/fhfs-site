@@ -42,8 +42,23 @@
 
 ## 手写动画
 
-/lab/hello 的手写动画以 Apple 的 Hello 欢迎动画为视觉参考；英文与中文笔迹是本项目手工绘制的
-贝塞尔路径（`src/lib/hello.ts`），没有提取或使用 Apple 的字体、字形文件或动画素材。
+/lab/hello 的英文 hello 与中文「你好」采用 macOS 系统 Hello 欢迎动画的原始中心线路径，
+字体数据标识为 **Macintosh Skeletal 2.0**，© Apple, Inc. 2025. All rights reserved。
+字形属于 Apple，不属于本项目的 MIT 授权；这里只用于个人网站的动画实验。
+
+来源是本机 `/System/Library/PrivateFrameworks/SetupAssistantSupportUI.framework/Versions/A/Resources/Hello/`
+中的 `en.json` 和 `zh_CN.json`，不是 `HelloText/` 中较早的 Macintosh 3D 1.1.0 版本。
+原文件的 SHA-256：
+
+- `en.json`：`cffcce1326962c6d35515cd052ecc496a210e47a3ee55acc19feebf34d4cdb0a`
+- `zh_CN.json`：`889f7290b7d1e5c33b98011f54fbb00b14d84a405c820218821e0159a00aa026`
+
+转换结果在 `src/lib/hello.ts`。每个原始 stroke 保留为一条 SVG 路径（英文 2 条、中文 13 条），
+首段的 `p0` 对应 `M`，各段的 `p1`、`p2`、`p3` 对应三次贝塞尔 `C`，不再手工重画。
+以所有控制点的 x/y 边界中点为 `(cx, cy)`，统一映射为
+`x′ = 340 + 0.24 × (x − cx)`、`y′ = 160 − 0.24 × (y − cy)`，保留四位小数。
+二维等宽描边取各控制点第四维半径的算术平均值乘以 `2 × 0.24`；未还原原动画的三维光照与材质。
+GSAP 时间轴和播放控制由本项目实现，不加载或分发完整字体文件。
 
 ## 剧照
 
