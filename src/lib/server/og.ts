@@ -34,10 +34,10 @@ export const OG_BG = `radial-gradient(ellipse 110% 85% at 6% -12%, rgba(180,83,9
 
 /**
  * Font stack for every text node in an OG image: Latin from Nunito, CJK from
- * Noto Sans SC (Yozai is self-hosted, not on Google Fonts, so cards keep Noto). Satori resolves per glyph and falls back family by family,
+ * Resource Han Rounded, matching the site's Chinese. Satori resolves per glyph and falls back family by family,
  * then picks the nearest registered weight inside a family.
  */
-export const OG_FONT_FAMILY = "Nunito, NotoSansSC";
+export const OG_FONT_FAMILY = "Nunito, RoundedSC";
 
 type OgWeight = 400 | 500 | 600 | 700;
 
@@ -54,9 +54,9 @@ export type OgFont = {
 const files = {
   latinBody: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/Nunito-400.woff")),
   latinDisplay: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/Nunito-700.woff")),
-  cjkBody: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/NotoSansSC-400.woff")),
+  cjkBody: () => readFile(path.join(process.cwd(), "src/lib/server/og-fonts/RoundedSC-400.woff")),
   cjkDisplay: () =>
-    readFile(path.join(process.cwd(), "src/lib/server/og-fonts/NotoSansSC-600.woff")),
+    readFile(path.join(process.cwd(), "src/lib/server/og-fonts/RoundedSC-600.woff")),
 };
 
 const loaded = new Map<keyof typeof files, Promise<ArrayBuffer>>();
@@ -72,8 +72,8 @@ function load(key: keyof typeof files): Promise<ArrayBuffer> {
   return pending;
 }
 
-/** Latin-extended is in Nunito; CJK and fullwidth punctuation need Noto. */
-const CJK_RE = /[⺀-⿿　-〿㐀-䶿一-鿿豈-﫿︰-﹏＀-￯]/;
+/** Latin-extended is in Nunito; CJK and fullwidth punctuation need RoundedSC. */
+const CJK_RE = /\p{Script=Han}|[⺀-⿿　-〿︰-﹏＀-￯]/u;
 
 export async function loadOgFonts(displayText: string, bodyText: string): Promise<OgFont[]> {
   const jobs: Promise<OgFont>[] = [];
@@ -82,7 +82,7 @@ export async function loadOgFonts(displayText: string, bodyText: string): Promis
   };
   push("latinDisplay", "Nunito", 700);
   push("latinBody", "Nunito", 400);
-  if (CJK_RE.test(displayText)) push("cjkDisplay", "NotoSansSC", 600);
-  if (CJK_RE.test(bodyText)) push("cjkBody", "NotoSansSC", 400);
+  if (CJK_RE.test(displayText)) push("cjkDisplay", "RoundedSC", 600);
+  if (CJK_RE.test(bodyText)) push("cjkBody", "RoundedSC", 400);
   return Promise.all(jobs);
 }

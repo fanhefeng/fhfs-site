@@ -1,6 +1,6 @@
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
@@ -17,7 +17,7 @@ pnpm format       # vp fmt (Oxfmt, printWidth 100)
 pnpm dev          # dev server
 pnpm build        # prerenders from the DB — fails loudly on a missing/malformed env var (src/config/env.ts)
 pnpm smoke [url]  # every page in the sitemap, in this machine's Chrome: 4xx, exceptions, console/CSP errors
-pnpm assets       # after touching public/: re-hash, rewrite assets.gen.json + yozai.css
+pnpm assets       # after touching public/: re-hash, rewrite assets.gen.json + font CSS
 pnpm media:music <src> <name>   # encode a record the way the others were, report loop silence
 pnpm db:generate  # after editing src/db/schema.ts, then:
 pnpm db:migrate
@@ -163,8 +163,13 @@ webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SY
   `font-accent` / `--font-stack-accent` (`src/app/fonts.ts`, `globals.css`;
   DESIGN-LOG 10-03). No italic is loaded, so `italic` beside it is a slant
   the browser shears on; a title-size line names its weight, `font-normal`
-  or `.accent-light` — never `font-weight: 300`, which drops the Chinese
-  behind it onto Songti SC Light. A line that is not in the page's language
+  or `.accent-light`. All Chinese, including metadata, code, admin fields and
+  accent text, uses self-hosted Resource Han Rounded through the shared
+  `--font-stack-cjk` token (`src/app/rounded.css`). Each Latin stack keeps its
+  existing face first, then that token; never add a separate Chinese face to
+  one role. Its unicode ranges exclude Latin. `conventions.test.ts` checks
+  the stacks, and `rounded.test.ts` checks the pinned subset bytes/ranges.
+  A line that is not in the page's language
   (the slogan is English on both) gets `lang` from its own words through
   `langOfText` (`src/lib/localized.ts`); the CJK tracking guard reads it.
 - **URL state on a static page** — the software shelf's `?app=` / `?cat=`,
@@ -195,7 +200,7 @@ webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SY
   the plain file, and only the hashed address is cached for a year
   (`src/config/immutable.ts` has the folder lists and the address shapes). After
   adding, replacing or removing a file there, run `pnpm assets` and commit
-  `src/lib/assets.gen.json` (and `src/app/yozai.css`, whose font URLs it
+  `src/lib/assets.gen.json` (and `src/app/rounded.css` / the legacy `yozai.css`, whose font URLs it
   rewrites); a new top-level folder goes into `IMMUTABLE_DIRS`. Tests fail on
   a stale manifest, an unlisted folder, or a path written without `asset()`.
   Only `src/app/[locale]/not-found.tsx` loads its stage through

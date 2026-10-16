@@ -29,9 +29,12 @@ describe("the committed hashes", () => {
     expect(read("src/lib/assets.gen.json")).toBe(serializeManifest(buildManifest(root)));
   });
 
-  it("are the ones yozai.css asks for — run `pnpm assets` if not", () => {
-    const css = read("src/app/yozai.css");
-    expect(css).toBe(hashCssUrls(css, buildManifest(root)));
+  it("are the ones font stylesheets ask for — run `pnpm assets` if not", () => {
+    const manifest = buildManifest(root);
+    for (const name of ["yozai", "rounded"]) {
+      const css = read(`src/app/${name}.css`);
+      expect(css).toBe(hashCssUrls(css, manifest));
+    }
   });
 });
 

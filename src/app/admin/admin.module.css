@@ -5,11 +5,9 @@
 }
 
 .root :where(input, textarea, pre, code) {
-  /* Technical fields keep aligned Latin characters; Chinese uses Yozai
-     rather than falling through to the platform's default monospace face. */
-  --font-stack-mono:
-    var(--font-geist-mono), "Yozai", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC",
-    ui-monospace, monospace;
+  /* Technical fields keep aligned Latin characters and the same Chinese
+     family as prose, labels and accent text. */
+  --font-stack-mono: var(--font-geist-mono), var(--font-stack-cjk), ui-monospace, monospace;
 }
 
 .root :where(pre, code) {

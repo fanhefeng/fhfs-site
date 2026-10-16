@@ -1,6 +1,6 @@
 /**
  * Article body wrapper. All typography lives in the `.prose-editorial` rules
- * in globals.css (68ch measure, serif pull quotes, amber underlines,
+ * in globals.css (68ch measure, accent pull quotes, amber underlines,
  * dual-theme code blocks) — the component stays a plain container so article
  * pages never grow prose styling of their own.
  *

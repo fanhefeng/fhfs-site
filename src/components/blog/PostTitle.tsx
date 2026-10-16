@@ -46,10 +46,10 @@ export function PostTitle({
         //
         // `autoSplit` because the lines are measured in whatever font is on
         // screen right now, and for a Chinese title that is usually not the
-        // final one: Yozai is served in unicode-range slices with `display:
+        // final one: Chinese is served in unicode-range slices with `display:
         // swap`, so the slices this headline needs are still in flight when
         // this runs. Lines cut against the fallback face break in different
-        // places once Yozai lands. With autoSplit the split listens for the
+        // places once its font lands. With autoSplit the split listens for the
         // font to finish (and for the width to change), re-splits, and
         // rebuilds the animation from `onSplit` at the time it had reached —
         // which is why the tween is created there and returned, not here.
