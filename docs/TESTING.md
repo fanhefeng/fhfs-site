@@ -63,6 +63,7 @@ pnpm e2e          # 准备 → 独立生产构建 → 3100 端口启动 → 浏�
 `.e2e/lock` 防止本机并行写入；若进程被强制杀死，先确认运行已停止，才删除遗留 lock。
 测试占用 3100 端口，已有服务会拒绝开始。
 上传流程另使用 8787 端口的本地 Wrangler KV 模拟器（本机全局 CLI 由 `vp install -g wrangler` 安装）。
+CI 在浏览器测试前安装固定版本的 Wrangler 4.145.0，并允许其 esbuild / workerd 安装脚本。
 图片、音频、视频、封面与清理均写本地 KV；仅在 E2E_BUILD 时允许站点使用 `E2E_MEDIA_ORIGIN`。
 模拟器、临时配置及密钥随运行器退出清理，不使用生产媒体凭据或存储。上传/草稿/取消竞态及定期清理见 [MEDIA-UPLOADS.md](MEDIA-UPLOADS.md)。
 运行器仅对子进程设置 `E2E_BUILD=true`，使用 `.e2e/next` 和 `tsconfig.e2e.json`。
