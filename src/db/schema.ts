@@ -37,6 +37,24 @@ export const appCategoryEnum = pgEnum("app_category", ["desktop", "tool", "game"
 export const chipToneEnum = pgEnum("chip_tone", ["paper", "ink", "accent"]);
 export const secretKindEnum = pgEnum("secret_kind", ["essay", "podcast"]);
 
+/** Upload leases, not content. A save retains its files in the same SQL statement. */
+export const mediaUploads = pgTable(
+  "media_uploads",
+  {
+    id: text().primaryKey(),
+    batch: text().notNull(),
+    path: text().notNull().unique(),
+    size: integer().notNull(),
+    contentType: text("content_type").notNull(),
+    state: text()
+      .$type<"uploading" | "ready" | "retained" | "deleting" | "deleted" | "expired">()
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    discardedAt: timestamp("discarded_at", { withTimezone: true }),
+  },
+  (t) => [index("media_uploads_batch").on(t.batch), index("media_uploads_state").on(t.state)],
+);
+
 /** Every bilingual short field is this shape — the old `localeSchema`. */
 export type Localized = { zh: string; en: string };
 

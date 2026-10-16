@@ -35,7 +35,7 @@ async function referenced(): Promise<string[]> {
   const db = connect();
   const text: string[] = [];
   for (const [name, table] of Object.entries(schema)) {
-    if (!isTable(table) || name === "loginAttempts") continue;
+    if (!isTable(table) || name === "loginAttempts" || name === "mediaUploads") continue;
     text.push(JSON.stringify(await db.select().from(table as typeof schema.moments)));
   }
   return mediaPaths(text.join("\n"), MEDIA_ORIGIN);

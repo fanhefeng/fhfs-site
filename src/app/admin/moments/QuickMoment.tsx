@@ -4,6 +4,7 @@ import { postMoment } from "../actions/moments";
 import { SaveControls } from "../ui/SaveControls";
 import { cardClass, hintClass, textareaClass } from "../styles";
 import { useSaveAction } from "../ui/useSaveAction";
+import { MediaField } from "../ui/MediaField";
 
 /**
  * 发一条: the board's form cut to what a line posted from a phone needs — the
@@ -27,10 +28,17 @@ export function QuickMoment() {
           className={`${textareaClass} text-body`}
         />
       </label>
+      <MediaField
+        name="media"
+        label="图片 / 语音 / 视频（可空）"
+        kind="list"
+        defaultValue=""
+        rows={2}
+      />
       <p className={hintClass}>
-        发出去就是公开的，时间按此刻。要配图、选文集、写出处或存草稿，去「说说」里写。
+        发出去就是公开的，时间按此刻。要选文集、写出处或存草稿，去「说说」里写。
       </p>
-      <SaveControls state={state} pending={pending} label="发布" />
+      <SaveControls state={state} pending={pending} label="发布" cancelable />
     </form>
   );
 }

@@ -15,6 +15,16 @@
 type Rule = { required: boolean; valid: (value: string) => boolean; shape: string };
 
 export const ENV_RULES: Record<string, Rule> = {
+  E2E_MEDIA_ORIGIN: {
+    required: false,
+    valid: (v) => /^http:\/\/127\.0\.0\.1:\d+$/.test(v),
+    shape: "the local KV emulator origin, supplied only by pnpm e2e",
+  },
+  MEDIA_UPLOAD_SECRET: {
+    required: false,
+    valid: (v) => v.length >= 32,
+    shape: "a dedicated random upload signing secret, shared only with the media Worker",
+  },
   HEALTHCHECKS_PING_URL: {
     required: false,
     valid: (v) =>

@@ -30,6 +30,7 @@ const TABLES = [
   "resume_profiles",
   "resume_experiences",
   "login_attempts",
+  "media_uploads",
 ];
 
 console.log("row counts");

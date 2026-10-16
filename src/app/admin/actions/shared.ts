@@ -17,6 +17,7 @@ import { readingMinutes } from "@/lib/reading";
 
 import { asset } from "@/lib/asset";
 import { isImmutable } from "@/config/immutable";
+import { saveWithUploads } from "../media/storage";
 
 /**
  * Every write the admin can make.
@@ -136,16 +137,27 @@ export async function upsertKeyed<T extends KeyedTable>(
 ): Promise<ActionState | null> {
   if (isNew) {
     if (await taken(table, eq(table.key, row.key))) return existsError(row.key);
-    await db.insert(table).values(row).onConflictDoNothing({ target: table.key });
-    return null;
+    const saved = await saveWithUploads(
+      db
+        .insert(table)
+        .values(row)
+        .onConflictDoNothing({ target: table.key })
+        .returning({ id: table.id }),
+      row,
+    );
+    return saved.error ? { error: saved.error } : null;
   }
   const set = "updatedAt" in table ? { ...row, updatedAt: new Date() } : row;
-  const updated = await db
-    .update(table)
-    .set(set as PgUpdateSetSource<T>)
-    .where(eq(table.key, row.key))
-    .returning({ id: table.id });
-  return updated.length ? null : goneError(row.key);
+  const updated = await saveWithUploads(
+    db
+      .update(table)
+      .set(set as PgUpdateSetSource<T>)
+      .where(eq(table.key, row.key))
+      .returning({ id: table.id }),
+    row,
+  );
+  if (updated.error) return { error: updated.error };
+  return updated.rows?.length ? null : goneError(row.key);
 }
 
 /** A long-form table — posts and secrets — addressed by `(slug, locale)`. */
@@ -218,18 +230,26 @@ export async function upsertLongform<T extends LongformTable>(
         error: `slug 已存在：${row.locale} 下已经有「${row.slug}」了，换一个或去编辑原文。`,
       };
     }
-    await db
-      .insert(table)
-      .values(row)
-      .onConflictDoNothing({ target: [table.slug, table.locale] });
-    return null;
+    const saved = await saveWithUploads(
+      db
+        .insert(table)
+        .values(row)
+        .onConflictDoNothing({ target: [table.slug, table.locale] })
+        .returning({ id: table.id }),
+      row,
+    );
+    return saved.error ? { error: saved.error } : null;
   }
-  const updated = await db
-    .update(table)
-    .set({ ...row, updatedAt: new Date() } as PgUpdateSetSource<T>)
-    .where(and(eq(table.slug, row.slug), eq(table.locale, row.locale)))
-    .returning({ id: table.id });
-  return updated.length ? null : goneError(`${row.slug}.${row.locale}`);
+  const updated = await saveWithUploads(
+    db
+      .update(table)
+      .set({ ...row, updatedAt: new Date() } as PgUpdateSetSource<T>)
+      .where(and(eq(table.slug, row.slug), eq(table.locale, row.locale)))
+      .returning({ id: table.id }),
+    row,
+  );
+  if (updated.error) return { error: updated.error };
+  return updated.rows?.length ? null : goneError(`${row.slug}.${row.locale}`);
 }
 
 /** Deletes the piece a delete form names, if it names one. */

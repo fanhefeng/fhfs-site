@@ -17,11 +17,13 @@ export function SaveControls({
   pending,
   label = "保存",
   sticky = false,
+  cancelable = false,
 }: {
   state: ActionState;
   pending: boolean;
   label?: string;
   sticky?: boolean;
+  cancelable?: boolean;
 }) {
   const [saved, setSaved] = useState(false);
 
@@ -37,6 +39,15 @@ export function SaveControls({
 
   const messages = (
     <>
+      {cancelable && (
+        <button
+          type="reset"
+          disabled={pending}
+          className="min-h-9 font-mono text-meta text-fg-secondary underline-offset-4 hover:text-fg hover:underline disabled:opacity-40"
+        >
+          取消本次编辑
+        </button>
+      )}
       {!pending && state.error && (
         <p role="alert" className="flex items-center gap-2 text-caption text-accent">
           <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />

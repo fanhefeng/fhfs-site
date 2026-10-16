@@ -49,7 +49,7 @@ export function contentSecurityPolicy({ dev }: { dev: boolean }): string {
     "font-src": ["'self'"],
     // blob: because GLTFLoader fetches those unpacked textures; the dev
     // server adds its hot-reload socket.
-    "connect-src": ["'self'", "blob:", ...(dev ? ["ws:"] : [])],
+    "connect-src": ["'self'", "blob:", MEDIA_ORIGIN, ...(dev ? ["ws:"] : [])],
     // DRACOLoader builds its workers from a blob.
     "worker-src": ["'self'", "blob:"],
     "object-src": ["'none'"],

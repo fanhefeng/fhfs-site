@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
   type FormEvent,
 } from "react";
 import { unstable_rethrow } from "next/navigation";
@@ -58,11 +59,20 @@ export function useSaveAction(action: SaveAction) {
   );
   const [state, dispatch, pending] = useActionState<ActionState, FormData>(guarded, {});
   const formRef = useRef<HTMLFormElement | null>(null);
+  const [uploadError, setUploadError] = useState("");
+  const [cancelled, setCancelled] = useState(false);
+  const resettingAfterSave = useRef(false);
 
   const onSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const form = event.currentTarget;
+      setUploadError("");
+      setCancelled(false);
+      if (form.querySelector('[data-upload-pending="true"]')) {
+        setUploadError("文件还在上传，完成后再保存。");
+        return;
+      }
       formRef.current = form;
       const { submitter } = event.nativeEvent as SubmitEvent;
       const data = new FormData(form, submitter);
@@ -72,8 +82,25 @@ export function useSaveAction(action: SaveAction) {
   );
 
   useEffect(() => {
-    if (state.ok) formRef.current?.reset();
+    if (state.ok) {
+      resettingAfterSave.current = true;
+      formRef.current?.reset();
+      resettingAfterSave.current = false;
+    }
   }, [state]);
 
-  return { state, pending, formProps: { action: dispatch, onSubmit } };
+  return {
+    state: cancelled ? {} : uploadError ? { error: uploadError } : state,
+    pending,
+    formProps: {
+      action: dispatch,
+      onSubmit,
+      onReset: () => {
+        if (!resettingAfterSave.current) {
+          setCancelled(true);
+          setUploadError("");
+        }
+      },
+    },
+  };
 }

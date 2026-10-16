@@ -6,7 +6,7 @@ import en from "../../messages/en.json";
 import { asset } from "../../src/lib/asset";
 import { MEDIA_ORIGIN } from "../../src/config/csp";
 
-type TestSession = { secret: string; password: string };
+type TestSession = { secret: string; password: string; mediaSecret: string };
 let session: TestSession;
 test.beforeAll(async () => {
   try {
@@ -32,6 +32,186 @@ async function authenticate(page: Page, expired = false) {
     },
   ]);
 }
+
+async function localMedia(page: Page) {
+  await page.route(`${MEDIA_ORIGIN}/**`, async (route) => {
+    const url = new URL(route.request().url());
+    if (!url.pathname.includes("/moments/uploads/")) {
+      await route.continue();
+      return;
+    }
+    const response = await route.fetch({ url: `http://127.0.0.1:8787${url.pathname}` });
+    await route.fulfill({ response });
+  });
+}
+const uploadPicture = {
+  name: "e2e-picture.png",
+  mimeType: "image/png",
+  buffer: Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==",
+    "base64",
+  ),
+};
+
+test("scheduled cleanup removes abandoned and late uploads while keeping retained files", async ({
+  request,
+}) => {
+  const response = await request.post("/api/media/cleanup", {
+    headers: { authorization: `Bearer ${session.mediaSecret}` },
+  });
+  expect(response.ok()).toBe(true);
+  expect(await response.json()).toEqual({ removed: 3 });
+  for (const index of [1, 2, 3])
+    expect(
+      (
+        await request.head(
+          `http://127.0.0.1:8787/moments/uploads/00000000-0000-4000-8000-00000000000${index}.jpg`,
+        )
+      ).status(),
+    ).toBe(404);
+  expect(
+    (
+      await request.head(
+        "http://127.0.0.1:8787/moments/uploads/00000000-0000-4000-8000-000000000004.jpg",
+      )
+    ).status(),
+  ).toBe(200);
+  const again = await request.post("/api/media/cleanup", {
+    headers: { authorization: `Bearer ${session.mediaSecret}` },
+  });
+  expect(await again.json()).toEqual({ removed: 0 });
+});
+
+test("audio and video uploads fill duration, dimensions and a playable poster before publishing", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await localMedia(page);
+  await authenticate(page);
+  await page.goto("/admin");
+  const form = page.locator("form").filter({ has: page.locator('textarea[name="media"]') });
+  // A half-second of silence and a tiny generated colour clip, no external fixtures.
+  const wave = Buffer.alloc(8044);
+  wave.write("RIFF", 0);
+  wave.writeUInt32LE(8036, 4);
+  wave.write("WAVEfmt ", 8);
+  wave.writeUInt32LE(16, 16);
+  wave.writeUInt16LE(1, 20);
+  wave.writeUInt16LE(1, 22);
+  wave.writeUInt32LE(8000, 24);
+  wave.writeUInt32LE(16000, 28);
+  wave.writeUInt16LE(2, 32);
+  wave.writeUInt16LE(16, 34);
+  wave.write("data", 36);
+  wave.writeUInt32LE(8000, 40);
+  await form.getByLabel("选择上传的媒体文件", { exact: true }).setInputFiles([
+    { name: "silence.wav", mimeType: "audio/wav", buffer: wave },
+    {
+      name: "clip.mp4",
+      mimeType: "video/mp4",
+      buffer: await readFile("tests/e2e/fixtures/upload-clip.mp4"),
+    },
+  ]);
+  const field = form.locator('textarea[name="media"]');
+  await expect(field).toHaveValue(/audio .*0\.5s\nvideo .*160x90 [0-9.]+s poster=https:/, {
+    timeout: 75000,
+  });
+  const value = await field.inputValue();
+  const gallery = form.getByRole("group", { name: "媒体预览", exact: true });
+  await gallery.locator("video").evaluate(async (video: HTMLVideoElement) => {
+    video.muted = true;
+    await video.play();
+  });
+  await expect
+    .poll(() => gallery.locator("video").evaluate((video: HTMLVideoElement) => video.videoWidth))
+    .toBe(160);
+  await form.screenshot({ path: ".e2e/admin-upload-preview.png" });
+  await form.getByRole("button", { name: "取消本次编辑", exact: true }).click();
+  for (const src of value.match(/https:\/\/[^\s]+/g) ?? []) {
+    const path = new URL(src).pathname;
+    await expect
+      .poll(async () => (await page.request.head(`http://127.0.0.1:8787${path}`)).status())
+      .toBe(404);
+  }
+});
+
+test("selected uploads preview immediately and cancellation removes the staged file", async ({
+  page,
+}) => {
+  await localMedia(page);
+  await authenticate(page);
+  await page.goto("/admin");
+  const composer = page.locator("form").filter({ has: page.locator('textarea[name="media"]') });
+  await composer.getByLabel("选择上传的媒体文件", { exact: true }).setInputFiles(uploadPicture);
+  await expect(composer.locator('img[src^="blob:"]')).toBeVisible();
+  const field = composer.locator('textarea[name="media"]');
+  await expect(field).toHaveValue(/image https:.*\/moments\/uploads\//, { timeout: 75000 });
+  const src = (await field.inputValue()).split(" ")[1]!;
+  const local = `http://127.0.0.1:8787${new URL(src).pathname}`;
+  expect((await page.request.head(local)).status()).toBe(200);
+  await composer.getByRole("button", { name: "取消本次编辑", exact: true }).click();
+  await expect(field).toHaveValue("");
+  await expect.poll(async () => (await page.request.head(local)).status()).toBe(404);
+});
+
+test("saving a draft retains its upload against cancellation and reload", async ({ page }) => {
+  await localMedia(page);
+  await authenticate(page);
+  let batch = "";
+  page.on("request", (request) => {
+    if (
+      request.url().endsWith("/admin/media/uploads") &&
+      request.postDataJSON()?.action === "start"
+    )
+      batch = (request.postDataJSON() as { batch: string }).batch;
+  });
+  await page.goto("/admin/moments");
+  await page.getByRole("button", { name: "写一条", exact: true }).click();
+  const form = page.locator("form").filter({ has: page.locator('textarea[name="media"]') });
+  const key = `e2e-created-upload-${Date.now()}`;
+  await form.locator('input[name="key"]').fill(key);
+  await form.locator('textarea[name="content"]').fill("带媒体的草稿");
+  await form.getByText("草稿", { exact: true }).click();
+  await form.getByLabel("选择上传的媒体文件", { exact: true }).setInputFiles(uploadPicture);
+  const field = form.locator('textarea[name="media"]');
+  await expect(field).toHaveValue(/image https:.*\/moments\/uploads\//, { timeout: 75000 });
+  const media = await field.inputValue();
+  const src = media.split(" ")[1]!;
+  await form.getByRole("button", { name: "保存", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("status")).toContainText("已保存");
+  const cancelled = await page.request.post("/admin/media/uploads", {
+    headers: { origin: "http://localhost:3100" },
+    data: { action: "cancel", batch },
+  });
+  expect(cancelled.ok()).toBe(true);
+  expect((await page.request.head(`http://127.0.0.1:8787${new URL(src).pathname}`)).status()).toBe(
+    200,
+  );
+  await page.reload();
+  await page.getByRole("searchbox", { name: "筛选这张表", exact: true }).fill(key);
+  await page.getByRole("button", { name: /带媒体的草稿/ }).click();
+  await expect(page.locator('textarea[name="media"]')).toHaveValue(media);
+});
+
+test("a cancelled upload cannot be saved by a stale editor", async ({ page }) => {
+  await localMedia(page);
+  await authenticate(page);
+  await page.goto("/admin/moments");
+  await page.getByRole("button", { name: "写一条", exact: true }).click();
+  const form = page.locator("form").filter({ has: page.locator('textarea[name="media"]') });
+  await form.locator('input[name="key"]').fill(`e2e-created-cancelled-${Date.now()}`);
+  await form.locator('textarea[name="content"]').fill("取消后保留的正文");
+  await form.getByLabel("选择上传的媒体文件", { exact: true }).setInputFiles(uploadPicture);
+  const field = form.locator('textarea[name="media"]');
+  await expect(field).toHaveValue(/image https:.*\/moments\/uploads\//, { timeout: 75000 });
+  const old = await field.inputValue();
+  await form.getByRole("button", { name: "移除并清理", exact: true }).click();
+  await expect(field).toHaveValue("");
+  await field.fill(old);
+  await form.getByRole("button", { name: "保存", exact: true }).click();
+  await expect(form.getByRole("alert")).toContainText("已被清理");
+  await expect(form.locator('textarea[name="content"]')).toHaveValue("取消后保留的正文");
+});
 
 test("an administrator can log in with the generated test password", async ({ page }) => {
   await page.goto("/admin/login");

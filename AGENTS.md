@@ -124,6 +124,10 @@ webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SY
   that is `upsertKeyed(table, row, isNew)` in `shared.ts`.
   `conventions.test.ts` checks the session-first, invalidate-last shape of
   every action.
+  Operational upload leases are the exception: `admin/media/uploads` checks
+  its session and Origin before reading JSON; `admin/media/storage.ts` owns
+  lease transitions. These writes do not invalidate public content. The
+  hourly cleanup route authenticates with the dedicated Worker secret.
 - **Environment and origin**: every variable is described in
   `src/config/env.ts` and documented in `.env.example` (a test keeps them in
   step); a new `process.env.X` needs a rule there. `site.url` comes from the
@@ -230,9 +234,13 @@ webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SY
   runs to the end (what a player asks for), hands the asset's own stream
   back for the runtime to pipe. Keep bytes out of JavaScript there, and
   measure a change with `wrangler tail`.
-  There is no uploading from the admin (a Worker on the free plan has nowhere
-  to put one): add a file to `media/files/`, deploy — it prints the media
-  field's line for each file nothing points at yet — then paste that line.
+  Admin uploads now use the Worker's `UPLOADS` KV binding, alongside legacy
+  static files (2026-10-16, docs/MEDIA-UPLOADS.md). New addresses are under
+  `/moments/uploads/`; the browser previews local files before upload. Saves
+  retain leases atomically with their content write through `saveWithUploads`;
+  cancellation and the hourly sweep delete only unretained uploads. Drafts
+  retain files too. `pnpm e2e` tests against local KV, never production media.
+  Static imports still use `media/files/` and `media:deploy`.
   The list is one file per line (`parseMedia` in `src/lib/forms.ts`); a site
   path into `public/` is still accepted, and a save refuses one the manifest
   does not know (`unknownAsset` in `actions/shared.ts`).

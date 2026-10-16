@@ -3,6 +3,7 @@ import path from "node:path";
 import { describe, expect, it } from "vite-plus/test";
 import { MEDIA_ORIGIN } from "@/config/csp";
 import { mediaPaths } from "@/lib/mediaSite";
+import { UPLOAD_ID, UPLOAD_PREFIX } from "@/lib/mediaUploads";
 
 const root = path.resolve(import.meta.dirname, "../../..");
 
@@ -46,6 +47,15 @@ describe("the media site's size table", () => {
     ) as Record<string, number>;
     const referenced = mediaPaths(backup, MEDIA_ORIGIN);
     expect(referenced.length).toBeGreaterThan(0);
-    expect(referenced.filter((p) => !(p in sizes))).toEqual([]);
+    expect(
+      referenced.filter(
+        (p) =>
+          !(p in sizes) &&
+          !(
+            p.startsWith(UPLOAD_PREFIX) &&
+            UPLOAD_ID.test(p.slice(UPLOAD_PREFIX.length).split(".")[0] ?? "")
+          ),
+      ),
+    ).toEqual([]);
   });
 });

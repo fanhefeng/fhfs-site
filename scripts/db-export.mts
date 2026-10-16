@@ -30,10 +30,11 @@
 import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { stringify as toYaml } from "yaml";
 import * as schema from "../src/db/schema";
 import { connect } from "./connect.mjs";
+import { uploadIds } from "../src/lib/mediaUploads";
 
 const db = connect();
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -108,7 +109,18 @@ const data = {
     .from(schema.navItems)
     .orderBy(asc(schema.navItems.sort), asc(schema.navItems.href)),
   copyBlocks: await db.select().from(schema.copyBlocks).orderBy(asc(schema.copyBlocks.key)),
+  mediaUploads: [] as (typeof schema.mediaUploads.$inferSelect)[],
 };
+
+// Export only leases for URLs already present in this public snapshot.
+// Temporary uploads and files belonging solely to drafts stay private.
+const publicUploadIds = uploadIds(data);
+if (publicUploadIds.length)
+  data.mediaUploads = await db
+    .select()
+    .from(schema.mediaUploads)
+    .where(inArray(schema.mediaUploads.id, publicUploadIds))
+    .orderBy(asc(schema.mediaUploads.id));
 
 // Serial ids and timestamps are restatements of the data, not part of it —
 // leaving them out keeps the diff to what someone actually changed.
@@ -122,7 +134,19 @@ try {
   await writeFile(
     path.join(STAGE, "db.json"),
     JSON.stringify(
-      Object.fromEntries(Object.entries(data).map(([table, rows]) => [table, strip(rows as any)])),
+      Object.fromEntries(
+        Object.entries(data).map(([table, rows]) => [
+          table,
+          table === "mediaUploads"
+            ? (rows as typeof data.mediaUploads).map(
+                ({ createdAt: _createdAt, discardedAt: _discardedAt, ...row }) => ({
+                  ...row,
+                  state: "retained",
+                }),
+              )
+            : strip(rows as any),
+        ]),
+      ),
       null,
       2,
     ) + "\n",

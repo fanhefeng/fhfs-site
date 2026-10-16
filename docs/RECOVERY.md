@@ -36,7 +36,7 @@ git 历史里**没有**它们——2026-10-01 改写历史时把
 （10-02 起，旧的 48 个 PR 也都在那里）。都没有的话，视频和图片得从原平台重新下载。
 
 真正只存在于数据库、丢了就没有第二份的，只有 `backup/db.json` 里那些表——除了登录限流用的
-`login_attempts`，schema 里的每一张都在里面（`tables.test.ts` 守着这一点）。
+`login_attempts` 和临时上传租约 `media_uploads`，内容表都在里面（`tables.test.ts` 守着这一点）。上传租约仅导出公开内容实际引用的部分，恢复时保留 UUID；详见 [MEDIA-UPLOADS.md](MEDIA-UPLOADS.md)。
 
 **草稿不进公开备份。** 仓库和 `db-snapshots` 分支都是公开的，导出草稿等于当晚就把它
 发出去，所以 `db:export` 只写已发布的文章、秘密、说说、电影和偶像。私有 restic 备份另含草稿，

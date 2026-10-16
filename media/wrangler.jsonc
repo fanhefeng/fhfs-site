@@ -9,7 +9,10 @@
   "assets": {
     "directory": "./files",
     "binding": "ASSETS",
-    "run_worker_first": ["/moments/*"],
+    "run_worker_first": ["/moments/*", "/_uploads/*"],
   },
   "observability": { "enabled": false },
+  "kv_namespaces": [{ "binding": "UPLOADS", "id": "175c82b5b1344cef9022466565bbbc84" }],
+  "vars": { "UPLOAD_SITE_ORIGIN": "https://fhfs-site.vercel.app" },
+  "triggers": { "crons": ["17 * * * *"] },
 }
