@@ -96,7 +96,7 @@ export function RecordList({
     <>
       <div className="flex flex-wrap items-center gap-3">
         {rows.length > 8 && (
-          <div className="relative min-w-0 flex-1 sm:max-w-xs">
+          <div className="relative min-w-0 basis-full sm:max-w-xs sm:flex-1 sm:basis-auto">
             <svg
               viewBox="0 0 16 16"
               aria-hidden
@@ -116,7 +116,7 @@ export function RecordList({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="筛选…"
               aria-label="筛选这张表"
-              className={`${fieldSkin} h-10 w-full pr-3 pl-9 text-body placeholder:text-fg-tertiary/60`}
+              className={`${fieldSkin} h-12 w-full pr-3 pl-9 text-body placeholder:text-fg-tertiary`}
             />
           </div>
         )}
@@ -129,7 +129,7 @@ export function RecordList({
                 type="button"
                 onClick={() => setView(value)}
                 aria-pressed={current === value}
-                className={`inline-flex min-h-10 items-center gap-1.5 rounded-chip border px-3 text-caption transition-colors ${
+                className={`inline-flex min-h-11 items-center gap-1.5 rounded-chip border px-3 text-caption transition-colors ${
                   current === value
                     ? "border-fg bg-fg text-bg"
                     : "border-line bg-surface-raised text-fg-secondary hover:border-fg-tertiary/40 hover:text-fg"
@@ -184,7 +184,7 @@ export function RecordList({
                 type="button"
                 onClick={() => setOpen(isOpen ? null : row.id)}
                 aria-expanded={isOpen}
-                className={`group flex min-h-12 w-full items-baseline gap-4 px-2 py-2.5 text-left transition-colors hover:bg-surface/60 ${
+                className={`group flex min-h-15 w-full items-baseline gap-3 px-2 py-3.5 text-left transition-colors hover:bg-surface/60 ${
                   isOpen ? "bg-surface/60" : ""
                 }`}
               >
@@ -196,18 +196,20 @@ export function RecordList({
                 >
                   {isOpen ? "−" : "+"}
                 </span>
-                <span
-                  className={`min-w-0 flex-1 truncate text-body group-hover:text-accent ${
-                    row.draft ? "text-fg-secondary" : ""
-                  }`}
-                >
-                  {row.label || <span className="text-fg-tertiary">（空）</span>}
-                </span>
-                {row.meta && (
-                  <span className="max-w-[45%] shrink-0 text-right font-mono text-meta text-fg-tertiary">
-                    {row.meta}
+                <span className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+                  <span
+                    className={`line-clamp-2 min-w-0 flex-1 break-words text-body group-hover:text-accent ${
+                      row.draft ? "text-fg-secondary" : ""
+                    }`}
+                  >
+                    {row.label || <span className="text-fg-tertiary">（空）</span>}
                   </span>
-                )}
+                  {row.meta && (
+                    <span className="font-mono text-meta break-words text-fg-tertiary sm:max-w-[40%] sm:text-right">
+                      {row.meta}
+                    </span>
+                  )}
+                </span>
               </button>
 
               {!isOpen && Boolean(row.media?.length) && (

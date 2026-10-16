@@ -38,11 +38,11 @@ export default async function PostsIndex() {
           <li key={`${post.slug}.${post.locale}`}>
             <Link
               href={`/admin/posts/${post.slug}/${post.locale}`}
-              className="group flex min-h-12 flex-wrap items-baseline gap-x-4 gap-y-1 px-2 py-3 transition-colors hover:bg-surface/60"
+              className="group flex min-h-15 flex-wrap items-baseline gap-x-3 gap-y-1 px-2 py-3.5 transition-colors hover:bg-surface/60"
             >
               <span className="font-mono text-meta text-fg-tertiary tabular-nums">{post.date}</span>
               <span className="font-mono text-meta uppercase text-fg-tertiary">{post.locale}</span>
-              <span className="flex-1 text-body transition-colors group-hover:text-accent">
+              <span className="order-first w-full min-w-0 break-words text-body transition-colors group-hover:text-accent sm:order-none sm:w-auto sm:flex-1">
                 {post.title}
               </span>
               {post.draft && (

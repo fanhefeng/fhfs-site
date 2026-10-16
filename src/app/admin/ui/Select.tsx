@@ -171,7 +171,7 @@ export function Select({
     return (
       <div
         id={id}
-        className={`${fieldSkin} flex min-h-11 w-full cursor-not-allowed items-center bg-surface px-3.5 py-2.5 text-body text-fg-tertiary hover:border-line`}
+        className={`${fieldSkin} flex min-h-12 w-full cursor-not-allowed items-center bg-surface px-3.5 py-2.5 text-body text-fg-tertiary hover:border-line`}
       >
         {selected?.label ?? value}
       </div>
@@ -198,7 +198,7 @@ export function Select({
           open ? setOpen(false) : openAt(options.findIndex((o) => o.value === value))
         }
         onKeyDown={onKeyDown}
-        className={`${fieldSkin} flex min-h-11 w-full items-center gap-3 px-3.5 py-2.5 text-left text-body ${
+        className={`${fieldSkin} flex min-h-12 w-full items-center gap-3 px-3.5 py-2.5 text-left text-body ${
           open ? "border-accent" : ""
         }`}
       >

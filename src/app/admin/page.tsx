@@ -3,7 +3,7 @@ import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "./AdminChrome";
 import { sectionCounts } from "./counts";
 import { SECTION_GROUPS } from "./sections";
-import { cardClass, metaClass } from "./styles";
+import { cardClass, sectionHeadingClass } from "./styles";
 import { QuickMoment } from "./moments/QuickMoment";
 
 /**
@@ -23,7 +23,7 @@ export default async function AdminHome() {
   return (
     <AdminChrome title="内容">
       <section className="mb-10">
-        <h2 className={metaClass}>发一条说说</h2>
+        <h2 className={sectionHeadingClass}>发一条说说</h2>
         <div className="mt-3">
           <QuickMoment />
         </div>
@@ -32,7 +32,7 @@ export default async function AdminHome() {
         {SECTION_GROUPS.map((group) => (
           <section key={group.id}>
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h2 className={metaClass}>{group.label}</h2>
+              <h2 className={sectionHeadingClass}>{group.label}</h2>
               <p className="text-caption text-fg-tertiary">{group.caption}</p>
             </div>
 
@@ -41,7 +41,7 @@ export default async function AdminHome() {
                 <li key={section.href}>
                   <Link
                     href={section.href}
-                    className={`${cardClass} group flex h-full flex-col gap-2 p-4 transition-[border-color,box-shadow] hover:border-fg-tertiary/30 hover:shadow-card`}
+                    className={`${cardClass} group flex h-full flex-col gap-3 p-5 transition-[border-color,box-shadow] hover:border-fg-tertiary/30 hover:shadow-card`}
                   >
                     <span className="flex items-baseline justify-between gap-3">
                       <span className="text-heading transition-colors group-hover:text-accent">
@@ -59,12 +59,6 @@ export default async function AdminHome() {
           </section>
         ))}
       </div>
-
-      <p className="mt-10 max-w-[62ch] text-caption text-fg-tertiary">
-        保存之后前台会立即失效重取，不用重新部署。改动只写进数据库—— 想留一份带 diff
-        的纯文本副本，在本地跑 <code>pnpm db:export</code> 并提交
-        <code> backup/</code>。
-      </p>
     </AdminChrome>
   );
 }

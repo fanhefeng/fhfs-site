@@ -86,7 +86,7 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
   return (
     <figure
       ref={figure}
-      className={`min-w-0 overflow-hidden rounded-chip border border-line bg-surface-raised ${compact ? "w-40 sm:w-48" : ""}`}
+      className={`min-w-0 overflow-hidden rounded-chip border border-line bg-surface-raised ${compact ? (media.kind === "audio" ? "w-full sm:w-72" : "w-40 sm:w-48") : ""}`}
     >
       {failed ? (
         <p role="status" className="p-4 text-caption text-fg-tertiary">
@@ -139,7 +139,7 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
           className={`aspect-video w-full bg-black object-contain ${compact ? "" : "max-h-80 min-h-32"}`}
         />
       )}
-      <figcaption className="flex min-w-0 items-center gap-2 border-t border-line px-3 py-2 text-caption">
+      <figcaption className="flex min-w-0 items-center gap-2 border-t border-line px-3 py-1 text-caption">
         <span className="shrink-0 text-fg-tertiary">{KIND_LABEL[media.kind]}</span>
         <span className="min-w-0 flex-1 truncate text-fg-secondary" title={name}>
           {name}
@@ -149,7 +149,7 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`打开原文件：${name}`}
-          className="shrink-0 text-fg-secondary underline decoration-line underline-offset-4 hover:text-accent"
+          className="inline-flex min-h-11 shrink-0 items-center text-fg-secondary underline decoration-line underline-offset-4 hover:text-accent"
         >
           原文件 ↗
         </a>
@@ -177,7 +177,7 @@ export function MediaGallery({
             ? "flex flex-wrap gap-2"
             : items.length === 1
               ? "max-w-xl"
-              : "grid items-start gap-3 sm:grid-cols-2 lg:grid-cols-3"
+              : "grid items-start gap-4 sm:grid-cols-2"
         }
       >
         {visible.map((media, index) => (

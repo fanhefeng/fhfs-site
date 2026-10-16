@@ -46,14 +46,14 @@ export default async function SecretsIndex() {
           <li key={`${row.slug}.${row.locale}`}>
             <Link
               href={`/admin/secrets/${row.slug}/${row.locale}`}
-              className="group flex min-h-12 flex-wrap items-baseline gap-x-4 gap-y-1 px-2 py-3 transition-colors hover:bg-surface/60"
+              className="group flex min-h-15 flex-wrap items-baseline gap-x-3 gap-y-1 px-2 py-3.5 transition-colors hover:bg-surface/60"
             >
               <span className="font-mono text-meta text-fg-tertiary tabular-nums">{row.date}</span>
               <span className="font-mono text-meta uppercase text-fg-tertiary">{row.locale}</span>
               <span className="font-mono text-meta text-accent">
                 {row.kind === "podcast" ? "播客" : "随笔"}
               </span>
-              <span className="flex-1 text-body transition-colors group-hover:text-accent">
+              <span className="order-first w-full min-w-0 break-words text-body transition-colors group-hover:text-accent sm:order-none sm:w-auto sm:flex-1">
                 {row.title}
               </span>
               {row.draft && (

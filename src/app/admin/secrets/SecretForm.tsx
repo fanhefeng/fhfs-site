@@ -28,7 +28,7 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
       doc={secret}
       isNew={isNew}
       previewKind="secret"
-      headCols="sm:grid-cols-[1fr_9rem_9rem_10rem]"
+      headCols="md:grid-cols-[minmax(0,1fr)_9rem_9rem_10rem]"
       head={
         <div className="space-y-1.5">
           <span id={kindLabel} className={labelClass}>

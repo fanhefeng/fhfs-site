@@ -51,7 +51,7 @@ export function Segmented({
             className="peer sr-only"
           />
           <span
-            className={`block rounded-[calc(var(--r-chip)-0.25rem)] px-3.5 py-1.5 text-caption text-fg-secondary transition-colors peer-focus-visible:ring-[3px] peer-focus-visible:ring-accent/25 ${chosen}`}
+            className={`flex min-h-11 items-center rounded-[calc(var(--r-chip)-0.25rem)] px-3.5 py-2 text-caption text-fg-secondary transition-colors peer-focus-visible:ring-[3px] peer-focus-visible:ring-accent/25 ${chosen}`}
           >
             {option.label}
           </span>
@@ -83,7 +83,7 @@ export function Toggle({
 }) {
   return (
     <div>
-      <label className="flex cursor-pointer items-center gap-3">
+      <label className="flex min-h-11 cursor-pointer flex-wrap items-center gap-3">
         <input
           type="checkbox"
           name={name}
