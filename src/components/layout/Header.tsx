@@ -481,7 +481,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   useEffect(refit, [locale, refit]);
 
   // So does the web fonts' arrival: the wide screen's default open measures
-  // the tray at mount, which can be before Yozai and Geist Mono have landed,
+  // the tray at mount, which can be before the Chinese face and Geist Mono have landed,
   // and a width taken in the fallback faces can clip the last item by a few
   // pixels once the real ones swap in. Effects run once more than they need
   // to on a locale switch; a rebuild at progress(1) is invisible.

@@ -1,17 +1,9 @@
 import localFont from "next/font/local";
 
-/* Editorial type trio. globals.css assembles the runtime stacks from these
- * variables. Latin is Nunito — rounded terminals to sit beside the Yozai
- * rounded CJK face (self-hosted, see yozai.css); behind Yozai the stacks
- * name the system CJK faces (PingFang, Songti, YaHei, SimSun, the Noto CJK
- * locals on Linux and Android) and nothing that downloads.
- *
- * The Noto Sans SC / Noto Serif SC webfonts used to stand in those stacks
- * as the last resort. They cost 222 @font-face rules — two CSS files, 67 KB
- * compressed, on every page — to declare fonts that never fetched a byte:
- * Yozai covers GB2312, PingFang covers the rest on Apple devices, and the
- * one glyph in a thousand that falls through lands on the system's own CJK
- * face just as well.
+/* Editorial Latin trio, unchanged when switching Chinese to Resource Han
+ * Rounded (2026-10-16). globals.css places the shared Chinese family behind
+ * each face, including mono and accent. Its variable unicode-range subsets
+ * are self-hosted through rounded.css; no build downloads a font.
  *
  * Shared because `global-not-found` renders outside the [locale] root layout
  * and has to dress itself. */

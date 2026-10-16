@@ -36,7 +36,12 @@ export const IMMUTABLE_DIRS = [
  * too many to list to the browser one hash each: the ninety frames, the font
  * slices. Each sits inside one of `IMMUTABLE_DIRS`.
  */
-export const ASSET_SETS = ["/draco", "/fonts/yozai", "/lab/scroll-video/frames"] as const;
+export const ASSET_SETS = [
+  "/draco",
+  "/fonts/yozai",
+  "/fonts/rounded",
+  "/lab/scroll-video/frames",
+] as const;
 
 /**
  * Folders in `public/` that are deliberately left out — a file that must keep

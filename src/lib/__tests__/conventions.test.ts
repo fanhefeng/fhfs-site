@@ -272,6 +272,26 @@ describe("the accent face", () => {
 });
 
 describe("fonts", () => {
+  it("uses one Chinese family behind the existing Latin faces in every role", () => {
+    const css = readFileSync(path.join(src, "app/globals.css"), "utf8");
+    expect(css).toContain('@import "./rounded.css"');
+    expect(css).not.toContain('@import "./yozai.css"');
+    const cjk = /--font-stack-cjk:([^;]+);/.exec(css)?.[1];
+    expect(cjk?.trim().startsWith('"FHFS Rounded SC"')).toBe(true);
+    for (const [role, latin] of [
+      ["sans", "nunito"],
+      ["accent", "josefin"],
+      ["mono", "geist-mono"],
+    ]) {
+      const stack = new RegExp(`--font-stack-${role}:([^;]+);`).exec(css)?.[1];
+      expect(stack?.trim().startsWith(`var(--font-${latin}), var(--font-stack-cjk)`)).toBe(true);
+    }
+    const admin = readFileSync(path.join(src, "app/admin/admin.module.css"), "utf8");
+    // The admin's UI metadata stays in Nunito; technical fields stay in Geist Mono.
+    expect(admin).toContain("--font-stack-mono: var(--font-stack-sans)");
+    expect(admin).toMatch(/var\(--font-geist-mono\), var\(--font-stack-cjk\)/);
+  });
+
   it("never require a font provider during builds or OG regeneration", () => {
     const externalFonts = files.filter(({ text }) =>
       /next\/font\/google|fonts\.(?:googleapis|gstatic)\.com/.test(text),

@@ -111,13 +111,21 @@ ESPN 频道「'Mamba out' - Remembering Kobe Bryant's farewell speech after his 
 
 ## 字体
 
-中文沿用 [Yozai 0.868](https://github.com/lxgw/yozai-font/releases/tag/v0.868) 的字形，
+全站中文与 OG 图片自 2026-10-16 使用
+[Resource Han Rounded CN 1.910](https://github.com/CyanoHao/Resource-Han-Rounded/releases/tag/v1.910)
+（资源圆体，Cyano Hao，基于 Adobe / Google 的思源黑体，SIL OFL 1.1）。
+衍生分片家族名为 `FHFS Rounded SC`，固定完整圆角与 200–900 可变字重，
+完整 OFL 在 `public/fonts/rounded/v1/LICENSE.txt` 及
+`src/lib/server/og-fonts/rounded-OFL.txt`。来源、工具链与产物哈希见 `tools/rounded.gen.json`，
+重建方法见 [`FONTS.md`](FONTS.md)。英文的三套字体保持原样。
+
+旧中文 [Yozai 0.868](https://github.com/lxgw/yozai-font/releases/tag/v0.868) 的字形，
 可复现 Web 子集的内部名为 FHFS Round CJK（CSS 别名 Yozai），遵循 SIL OFL 1.1，原作者信息保留。
 许可全文在 `public/fonts/yozai/frequency-v1/LICENSE.txt`；两个字重各 86 片按 `unicode-range`
 加载，自托管（`src/app/yozai.css`）。旧分片与原许可保留供缓存兼容。拉丁字是 Nunito、Josefin Sans（2026-10-03 起替换
 Lora）与 Geist Mono（均为 OFL，通过 `next/font/local` 读取已提交的 WOFF2，`src/app/fonts.ts`）。
-OG 图使用 Nunito 400 / 700、Noto Sans SC 400 / 600 的服务器本地 WOFF。
-这些字体来自 Google Fonts 仓库固定提交 `bd8f81ddb5c74d5c8897b36ad88b440266245103`，
+OG 拉丁沿用 Nunito 400 / 700；原 Noto Sans SC 400 / 600 文件保留为旧配方产物，当前不再读取。
+这些拉丁与旧 OG 字体来自 Google Fonts 仓库固定提交 `bd8f81ddb5c74d5c8897b36ad88b440266245103`，
 各自的 OFL 全文保留在 `src/app/font-files/` 与 `src/lib/server/og-fonts/`；
 源 URL、源哈希和产物哈希在 `tools/fonts.gen.json`，生成方法见 [`FONTS.md`](FONTS.md)。
 

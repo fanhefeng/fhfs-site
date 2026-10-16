@@ -98,6 +98,7 @@ export default defineConfig({
       "next-env.d.ts",
       "src/lib/assets.gen.json",
       "src/app/yozai.css",
+      "src/app/rounded.css",
       // Prose. A formatter would re-flow tables and list markers in documents
       // that are read far more than they are diffed.
       "*.md",
