@@ -44,6 +44,77 @@ async function localMedia(page: Page) {
     await route.fulfill({ response });
   });
 }
+
+test("admin editing stays readable and usable across narrow screens and themes", async ({
+  page,
+}) => {
+  await authenticate(page);
+  for (const theme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto("/admin");
+    const form = page.locator("form").filter({ has: page.locator('textarea[name="media"]') });
+    const content = form.getByLabel("说说正文", { exact: true });
+    await content.fill("中文排版与 English editing，缩放后保留输入。");
+    await form
+      .getByLabel("图片 / 语音 / 视频", { exact: false })
+      .fill("audio /music/lu-xiaoyu.mp3 60s\nimage /films/secret/rain.jpg 100x100");
+    await expect(form.getByRole("group", { name: "媒体预览", exact: true })).toBeVisible();
+
+    for (const width of [320, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: width < 640 ? 844 : 900 });
+      await expect(content).toHaveValue("中文排版与 English editing，缩放后保留输入。");
+      const layout = await page.evaluate(() => {
+        const editor = document.querySelector('textarea[name="content"]')!;
+        const label = document.querySelector("label[for]")!;
+        const publish = Array.from(document.querySelectorAll("button")).find(
+          (button) => button.textContent === "发布",
+        )!;
+        return {
+          viewport: document.documentElement.clientWidth,
+          page: document.documentElement.scrollWidth,
+          inputSize: parseFloat(getComputedStyle(editor).fontSize),
+          labelSize: parseFloat(getComputedStyle(label).fontSize),
+          buttonHeight: publish.getBoundingClientRect().height,
+          font: getComputedStyle(editor).fontFamily,
+        };
+      });
+      expect(layout.page).toBeLessThanOrEqual(layout.viewport);
+      expect(layout.inputSize).toBeGreaterThanOrEqual(16);
+      expect(layout.labelSize).toBeGreaterThanOrEqual(14);
+      expect(layout.buttonHeight).toBeGreaterThanOrEqual(44);
+      expect(layout.font).toContain("FHFS Rounded SC");
+      if (width === 390 || width === 1280)
+        await page.screenshot({ path: `.e2e/admin-layout-${theme}-${width}.png`, fullPage: true });
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole("button", { name: "板块", exact: true }).click();
+    await expect(page.locator("#admin-drawer").getByRole("link", { name: /^说说/ })).toBeVisible();
+    await page.getByRole("button", { name: "板块", exact: true }).press("Escape");
+    await expect(page.getByRole("button", { name: "板块", exact: true })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    await expect(content).toHaveValue("中文排版与 English editing，缩放后保留输入。");
+  }
+
+  for (const route of ["/admin/posts", "/admin/posts/new", "/admin/secrets/new"]) {
+    await page.goto(route);
+    await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+    for (const width of [320, 640, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        await page.evaluate(() => document.documentElement.clientWidth),
+      );
+      if (route === "/admin/secrets/new")
+        expect(
+          await page.locator('input[name="slug"]').evaluate((input) => input.clientWidth),
+        ).toBeGreaterThanOrEqual(144);
+    }
+  }
+  await page.screenshot({ path: ".e2e/admin-layout-longform.png", fullPage: true });
+});
+
 const uploadPicture = {
   name: "e2e-picture.png",
   mimeType: "image/png",

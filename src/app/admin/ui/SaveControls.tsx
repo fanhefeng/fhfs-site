@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { ActionState } from "../actions/shared";
-import { buttonClass } from "../styles";
+import { buttonClass, ghostButtonClass } from "../styles";
 
 /**
  * The submit button and the error/saved lines every admin form ends with.
@@ -43,7 +43,7 @@ export function SaveControls({
         <button
           type="reset"
           disabled={pending}
-          className="min-h-9 font-mono text-meta text-fg-secondary underline-offset-4 hover:text-fg hover:underline disabled:opacity-40"
+          className={`${ghostButtonClass} disabled:pointer-events-none disabled:opacity-45`}
         >
           取消本次编辑
         </button>
@@ -91,14 +91,14 @@ export function SaveControls({
 
   if (sticky) {
     return (
-      <div className="sticky bottom-0 z-20 mt-6 flex flex-wrap items-center gap-4 border-t border-line bg-bg/92 py-4 backdrop-blur-sm">
+      <div className="sticky bottom-0 z-20 mt-6 flex flex-wrap items-center gap-3 border-t border-line bg-bg pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {button}
         {messages}
       </div>
     );
   }
   return (
-    <div className="flex flex-wrap items-center gap-4">
+    <div className="flex flex-wrap items-center gap-3 border-t border-line pt-5">
       {button}
       {messages}
     </div>

@@ -65,7 +65,7 @@ export function DeleteRow({
           ref={armRef}
           type="button"
           onClick={() => arm(true)}
-          className="text-caption text-fg-tertiary transition-colors hover:text-accent"
+          className="min-h-11 text-caption break-all text-fg-tertiary transition-colors hover:text-accent"
         >
           {label}（{what}）
         </button>

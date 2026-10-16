@@ -184,7 +184,7 @@ export function RowsField({
       <button
         type="button"
         onClick={() => setRows((all) => [...all, make({ ...spec.blank })])}
-        className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-line px-3 font-mono text-meta text-fg-secondary transition-colors hover:border-fg-tertiary hover:text-fg"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-chip border border-line px-4 text-caption text-fg-secondary transition-colors hover:border-fg-tertiary hover:text-fg"
       >
         <span aria-hidden className="text-fg-tertiary">
           +
@@ -213,7 +213,7 @@ function RowButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className="grid size-8 place-items-center rounded-full border border-line font-mono text-meta text-fg-secondary transition-colors hover:border-fg-tertiary hover:text-fg disabled:pointer-events-none disabled:opacity-35"
+      className="grid size-11 place-items-center rounded-chip border border-line font-mono text-meta text-fg-secondary transition-colors hover:border-fg-tertiary hover:text-fg disabled:pointer-events-none disabled:opacity-35"
     >
       {children}
     </button>

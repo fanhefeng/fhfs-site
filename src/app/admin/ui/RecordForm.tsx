@@ -2,7 +2,14 @@
 
 import { useId } from "react";
 import type { ActionState } from "../actions/shared";
-import { hintClass, inputClass, labelClass, metaClass, monoClass, textareaClass } from "../styles";
+import {
+  hintClass,
+  inputClass,
+  labelClass,
+  monoClass,
+  sectionHeadingClass,
+  textareaClass,
+} from "../styles";
 import { SaveControls } from "./SaveControls";
 import { DeleteRow } from "./DeleteRow";
 import { Select, type SelectOption } from "./Select";
@@ -335,22 +342,24 @@ export function RecordForm({
 
   return (
     <>
-      <form {...formProps} className="space-y-6" {...check.formProps}>
+      <form {...formProps} className="space-y-8" {...check.formProps}>
         {isNew && <input type="hidden" name="isNew" value="1" />}
 
         {groups.map((group) =>
           foldEmpty && !isNew && group.name && !group.fields.some(hasValue) ? (
             <details key={group.name}>
-              <summary className={`${metaClass} cursor-pointer border-b border-line pb-2`}>
+              <summary
+                className={`${sectionHeadingClass} cursor-pointer border-b border-line pb-3`}
+              >
                 {group.name}
                 <span className="ml-2 text-fg-tertiary normal-case">都空着 · 点开填写</span>
               </summary>
-              <div className="mt-5 space-y-5">{group.fields.map(renderField)}</div>
+              <div className="mt-6 space-y-6">{group.fields.map(renderField)}</div>
             </details>
           ) : (
-            <div key={group.name ?? "_"} className="space-y-5">
+            <div key={group.name ?? "_"} className="space-y-6">
               {group.name && (
-                <h3 className={`${metaClass} border-b border-line pb-2`}>{group.name}</h3>
+                <h3 className={`${sectionHeadingClass} border-b border-line pb-3`}>{group.name}</h3>
               )}
               {group.fields.map(renderField)}
             </div>
@@ -363,7 +372,7 @@ export function RecordForm({
             href={view}
             target="_blank"
             rel="noreferrer"
-            className={`${hintClass} inline-block underline decoration-line underline-offset-4 hover:text-accent`}
+            className={`${hintClass} inline-flex min-h-11 items-center underline decoration-line underline-offset-4 hover:text-accent`}
           >
             在站上看上次保存的版本 ↗
           </a>

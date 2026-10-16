@@ -27,16 +27,16 @@ export const fieldSkin =
   // Set by `useFieldErrors` on a field that failed its constraint.
   "aria-invalid:border-accent aria-invalid:hover:border-accent";
 
-export const inputClass = `w-full px-3.5 py-2.5 text-body placeholder:text-fg-tertiary/60 read-only:bg-surface read-only:text-fg-tertiary read-only:hover:border-line ${fieldSkin}`;
+export const inputClass = `min-h-12 w-full px-3.5 py-2.5 text-body placeholder:text-fg-tertiary read-only:bg-surface read-only:text-fg-tertiary read-only:hover:border-line ${fieldSkin}`;
 
 /** Textareas get the same skin, plus room to breathe and a grab handle. */
-export const textareaClass = `${inputClass} resize-y leading-relaxed`;
+export const textareaClass = `${inputClass} block resize-y leading-relaxed`;
 
 /** For the fields that hold code, keys and markdown rather than prose. */
 export const monoClass = "font-mono text-caption";
 
 export const labelClass =
-  "flex items-baseline gap-2 font-mono text-meta uppercase tracking-meta text-fg-tertiary";
+  "flex flex-wrap items-baseline gap-x-2 text-caption font-semibold text-fg-secondary";
 
 /** The dimmer line under a label that explains the field. */
 export const hintClass = "text-caption text-fg-tertiary";
@@ -53,7 +53,7 @@ export const ghostButtonClass =
 
 /** Destructive, and quiet until hovered — deleting is never the default move. */
 export const dangerButtonClass =
-  "inline-flex min-h-10 items-center gap-2 rounded-chip border border-line px-3.5 text-caption text-fg-tertiary " +
+  "inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-3.5 text-caption text-fg-tertiary " +
   "transition-[color,border-color] hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-45";
 
 /** A surface a step above the page: form panels, list rows, dashboard cards. */
@@ -61,3 +61,8 @@ export const cardClass = "rounded-card border border-line bg-surface-raised";
 
 /** The mono kicker used for group names, counts and timestamps. */
 export const metaClass = "font-mono text-meta uppercase tracking-meta text-fg-tertiary";
+
+export const sectionHeadingClass = "text-body font-semibold text-fg";
+
+export const pageWidthClass =
+  "mx-auto w-full max-w-4xl px-4 pt-7 pb-12 sm:px-8 sm:pt-9 lg:px-10 lg:pt-10";

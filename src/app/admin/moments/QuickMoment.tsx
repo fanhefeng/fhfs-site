@@ -18,7 +18,7 @@ export function QuickMoment() {
   const { state, pending, formProps } = useSaveAction(postMoment);
 
   return (
-    <form {...formProps} className={`${cardClass} space-y-3 p-4`}>
+    <form {...formProps} className={`${cardClass} space-y-5 p-4 sm:p-6`}>
       <label className="block">
         <span className="sr-only">说说正文</span>
         <textarea

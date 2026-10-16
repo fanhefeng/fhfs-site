@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { sectionCounts } from "./counts";
 import { groupOf, sectionByHref } from "./sections";
-import { ghostButtonClass, metaClass } from "./styles";
+import { ghostButtonClass, metaClass, pageWidthClass } from "./styles";
 import { AdminSidebar } from "./AdminSidebar";
 
 /**
@@ -62,7 +62,7 @@ export async function AdminChrome({
       <AdminSidebar counts={counts} />
 
       <main className="min-w-0 flex-1">
-        <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8 lg:py-12">
+        <div className={pageWidthClass}>
           <header className="border-b border-line pb-6">
             {/* The dashboard is "内容" itself — a crumb pointing at the page you
                 are already on is furniture, so it only appears below it. */}
@@ -89,7 +89,7 @@ export async function AdminChrome({
             </p>
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
-              <h1 className="flex items-baseline gap-3 text-title">
+              <h1 className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1 text-title">
                 {title}
                 {count !== undefined && meta && (
                   <span className="font-mono text-meta text-fg-tertiary tabular-nums">
@@ -119,7 +119,7 @@ export async function AdminChrome({
             </div>
 
             {(blurb ?? meta?.blurb) && (
-              <p className="mt-3 max-w-[70ch] text-caption text-fg-tertiary">
+              <p className="mt-3 max-w-[62ch] text-caption text-fg-secondary">
                 {blurb ?? meta?.blurb}
               </p>
             )}

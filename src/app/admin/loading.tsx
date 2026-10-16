@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { AdminSidebar } from "./AdminSidebar";
+import { pageWidthClass } from "./styles";
 
 /**
  * What a click in the admin shows while the next page reads its rows.
@@ -25,7 +26,7 @@ export default function AdminLoading() {
     <div className="lg:flex">
       <AdminSidebar />
       <main className="min-w-0 flex-1" aria-busy="true">
-        <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-8 lg:py-12">
+        <div className={pageWidthClass}>
           <div className="border-b border-line pb-6">
             <div className="h-3 w-24 rounded-full bg-surface" />
             <div className="mt-4 h-7 w-40 rounded-chip bg-surface" />

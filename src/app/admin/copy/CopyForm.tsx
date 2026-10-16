@@ -42,7 +42,7 @@ export function CopyForm({ namespace, entries }: { namespace: string; entries: C
       <input type="hidden" name="namespace" value={namespace} />
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative min-w-0 flex-1 sm:max-w-xs">
+        <div className="relative min-w-0 basis-full sm:max-w-xs sm:flex-1 sm:basis-auto">
           <svg
             viewBox="0 0 16 16"
             aria-hidden
@@ -62,7 +62,7 @@ export function CopyForm({ namespace, entries }: { namespace: string; entries: C
             onChange={(event) => setQuery(event.target.value)}
             placeholder="按 key 或文案找…"
             aria-label="筛选文案"
-            className={`${fieldSkin} h-10 w-full pr-3 pl-9 text-body placeholder:text-fg-tertiary/60`}
+            className={`${fieldSkin} h-12 w-full pr-3 pl-9 text-body placeholder:text-fg-tertiary`}
           />
         </div>
 
@@ -155,7 +155,7 @@ function Only({
       type="button"
       onClick={onPress}
       aria-pressed={active}
-      className={`rounded-chip border px-2.5 py-1 font-mono text-meta transition-colors ${
+      className={`min-h-11 rounded-chip border px-3 py-2 text-caption transition-colors ${
         active
           ? "border-accent bg-accent/10 text-accent"
           : "border-line text-fg-tertiary hover:text-fg"

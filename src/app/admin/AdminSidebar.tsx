@@ -57,7 +57,7 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
   );
 
   const nav = (
-    <nav className="space-y-7">
+    <nav className="space-y-6">
       {SECTION_GROUPS.map((group) => (
         <div key={group.id}>
           <h2 className={`${metaClass} px-3`}>{group.label}</h2>
@@ -69,7 +69,7 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
                   <Link
                     href={section.href}
                     aria-current={isCurrent ? "page" : undefined}
-                    className={`relative flex min-h-10 items-center gap-3 rounded-chip px-3 text-body transition-colors ${
+                    className={`relative flex min-h-11 items-center gap-3 rounded-chip px-3 text-body transition-colors ${
                       isCurrent
                         ? "bg-surface text-fg"
                         : "text-fg-secondary hover:bg-surface/60 hover:text-fg"
@@ -106,7 +106,7 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
       href="/admin"
       className="font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
     >
-      fhf · admin
+      fhf<span className="hidden sm:inline"> · admin</span>
     </Link>
   );
 
@@ -114,7 +114,7 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
     <form action={logout}>
       <button
         type="submit"
-        className="font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
+        className="min-h-11 px-2 font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
       >
         退出
       </button>
@@ -124,8 +124,8 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
   return (
     <>
       {/* ≥lg: the column that is always there. */}
-      <aside className="hidden lg:flex lg:h-dvh lg:sticky lg:top-0 lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-line lg:bg-bg">
-        <div className="flex items-center justify-between px-6 py-5">
+      <aside className="hidden lg:flex lg:h-dvh lg:sticky lg:top-0 lg:w-60 lg:shrink-0 lg:flex-col lg:border-r lg:border-line lg:bg-bg">
+        <div className="flex items-center justify-between px-6 py-3">
           {brand}
           {signOut}
         </div>
@@ -136,13 +136,13 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
       </aside>
 
       {/* <lg: a bar, and the same nav behind it. */}
-      <div className="sticky top-0 z-40 flex items-center gap-3 border-b border-line bg-bg/92 px-4 py-3 backdrop-blur-sm lg:hidden">
+      <div className="sticky top-0 z-40 flex items-center gap-3 border-b border-line bg-bg px-4 py-2 lg:hidden">
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls="admin-drawer"
-          className="flex size-9 items-center justify-center rounded-chip border border-line text-fg-secondary transition-colors hover:text-fg"
+          className="flex size-11 items-center justify-center rounded-chip border border-line text-fg-secondary transition-colors hover:text-fg"
         >
           <span className="sr-only">板块</span>
           <svg viewBox="0 0 16 16" aria-hidden className="size-4">
@@ -173,7 +173,7 @@ export function AdminSidebar({ counts }: { counts?: SectionCounts }) {
           />
           <div
             id="admin-drawer"
-            className="absolute inset-x-0 top-[57px] max-h-[calc(100dvh-57px)] overflow-y-auto border-b border-line bg-bg px-3 py-6 shadow-lift animate-[admin-pop_160ms_ease-out]"
+            className="absolute inset-x-0 top-[61px] max-h-[calc(100dvh-61px)] overflow-y-auto border-b border-line bg-bg px-3 py-6 shadow-lift animate-[admin-pop_160ms_ease-out]"
           >
             {nav}
           </div>

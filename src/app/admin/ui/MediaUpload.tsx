@@ -8,7 +8,7 @@ import {
   type UploadedMedia,
 } from "@/lib/client/mediaUpload";
 import { uploadFile } from "@/lib/mediaUploads";
-import { hintClass } from "../styles";
+import { ghostButtonClass, hintClass } from "../styles";
 import { MediaPreview } from "./MediaPreview";
 
 type Item = {
@@ -177,11 +177,7 @@ export function MediaUpload({
           void add(files);
         }}
       />
-      <button
-        type="button"
-        onClick={() => input.current?.click()}
-        className="inline-flex min-h-9 items-center rounded-full border border-line px-3 font-mono text-meta text-fg-secondary hover:text-fg"
-      >
+      <button type="button" onClick={() => input.current?.click()} className={ghostButtonClass}>
         ＋ 上传{kind === "image" ? "图片" : kind === "audio" ? "音频" : "图片 / 音频 / 视频"}
       </button>
       <p className={hintClass}>
@@ -195,7 +191,7 @@ export function MediaUpload({
       )}
       {items.map((item) => (
         <div key={item.id} className="space-y-2 rounded-chip border border-line p-3">
-          <div className="flex items-center justify-between gap-3 text-caption">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-caption">
             <span className="min-w-0 break-all">
               {item.name} · {item.busy ? "上传中…" : item.error ? "未完成" : "已上传，等待保存"}
             </span>
@@ -204,7 +200,7 @@ export function MediaUpload({
               onClick={() => {
                 void remove(item);
               }}
-              className="shrink-0 text-fg-secondary underline underline-offset-4"
+              className="min-h-11 shrink-0 text-fg-secondary underline underline-offset-4"
             >
               移除并清理
             </button>

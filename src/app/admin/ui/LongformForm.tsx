@@ -74,7 +74,7 @@ export function LongformForm({
 
   return (
     <>
-      <form {...formProps} className="space-y-5" {...check.formProps}>
+      <form {...formProps} className="space-y-6" {...check.formProps}>
         {/* Tells the action to refuse an existing address and, once saved, to
             redirect to the edit page: this page's props are a blank draft, and
             a saved form resets to its props (useSaveAction) — without the
@@ -177,7 +177,7 @@ export function LongformForm({
                 })}`}
                 target="_blank"
                 rel="noopener"
-                className="font-mono text-meta text-fg-secondary underline-offset-4 hover:text-accent hover:underline"
+                className="inline-flex min-h-11 items-center text-caption text-fg-secondary underline-offset-4 hover:text-accent hover:underline"
               >
                 在站上看上次保存的版本 ↗
               </a>
@@ -294,7 +294,7 @@ function ViewButton({
       aria-pressed={pressed}
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-full border px-3 py-1 font-mono text-meta transition-colors ${
+      className={`min-h-11 rounded-chip border px-4 py-2 text-caption transition-colors ${
         pressed
           ? "border-fg bg-fg text-bg"
           : "border-line text-fg-secondary hover:border-fg-tertiary"
