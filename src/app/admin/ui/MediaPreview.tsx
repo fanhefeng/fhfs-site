@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { asset } from "@/lib/asset";
 import { validMediaSrc } from "@/lib/forms";
 import type { MomentMedia } from "@/lib/moments";
@@ -49,6 +49,24 @@ export function MediaPreview({
 
 function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }) {
   const [failed, setFailed] = useState(false);
+  const figure = useRef<HTMLElement | null>(null);
+  const [showPoster, setShowPoster] = useState(!compact);
+  useEffect(() => {
+    if (!compact || media.kind !== "video") return;
+    // The board has dozens of saved videos. Fetch their posters only as the
+    // list approaches them, just as the native image previews are lazy.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShowPoster(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "240px" },
+    );
+    if (figure.current) observer.observe(figure.current);
+    return () => observer.disconnect();
+  }, [compact, media.kind]);
   const src = mediaAddress(media.src.trim());
   const poster = media.poster ? mediaAddress(media.poster.trim()) : null;
   const name = fileName(media.src);
@@ -66,6 +84,7 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
 
   return (
     <figure
+      ref={figure}
       className={`min-w-0 overflow-hidden rounded-chip border border-line bg-surface-raised ${compact ? "w-40 sm:w-48" : ""}`}
     >
       {failed ? (
@@ -109,14 +128,14 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
         // oxlint-disable-next-line jsx-a11y/media-has-caption
         <video
           src={src}
-          poster={poster ?? undefined}
+          poster={showPoster ? (poster ?? undefined) : undefined}
           controls
           playsInline
           preload="none"
           aria-label={`视频预览：${name}`}
           onError={() => setFailed(true)}
           onPlay={(event) => pauseOtherMedia(event.currentTarget)}
-          className={`w-full bg-black object-contain ${compact ? "aspect-video" : "max-h-80 min-h-32"}`}
+          className={`aspect-video w-full bg-black object-contain ${compact ? "" : "max-h-80 min-h-32"}`}
         />
       )}
       <figcaption className="flex min-w-0 items-center gap-2 border-t border-line px-3 py-2 text-caption">
