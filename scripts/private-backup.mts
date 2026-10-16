@@ -14,7 +14,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MEDIA_ORIGIN } from "../src/config/csp";
-import { mediaPaths, MEDIA_FILE_LIMIT } from "../src/lib/mediaSite";
+import { mediaPaths } from "../src/lib/mediaSite";
+import { BackupMediaError, downloadBackupMedia } from "../src/lib/node/backupMedia";
 import {
   parsePrivateManifest,
   postgresEnvironment,
@@ -112,6 +113,7 @@ async function stageBackup(stage: string) {
       "Set BACKUP_DATABASE_URL to the direct URL of the private backup read-only role",
     );
   // Native pg_dump owns the consistent snapshot; no second JS connection is opened.
+  console.log("Exporting the private database archive.");
   await run(
     "pg_dump",
     [
@@ -141,6 +143,7 @@ async function stageBackup(stage: string) {
     throw error;
   });
   const media = new Set([...local, ...references.map((item) => item.slice(1))]);
+  console.log(`Database archive ready; collecting ${media.size} media files.`);
   const files = ["database.dump"];
   for (const relative of [...media].sort()) {
     if (!safeBackupPath(relative) || !relative.startsWith("moments/")) {
@@ -155,28 +158,15 @@ async function stageBackup(stage: string) {
       await copyFile(file, destination);
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-      const response = await fetch(`${MEDIA_ORIGIN}/${relative}`, {
-        signal: AbortSignal.timeout(60_000),
-      });
-      if (!response.ok) throw new BackupError("A referenced media file could not be downloaded");
-      const length = Number(response.headers.get("content-length"));
-      if (length > MEDIA_FILE_LIMIT) throw new BackupError("Media file exceeds the asset limit");
-      const chunks: Uint8Array[] = [];
-      let bytes = 0;
-      if (!response.body) throw new BackupError("Empty media response");
-      for await (const chunk of response.body) {
-        bytes += chunk.length;
-        if (bytes > MEDIA_FILE_LIMIT) throw new BackupError("Media file exceeds the asset limit");
-        chunks.push(chunk);
-      }
-      if (bytes === 0) throw new BackupError("Empty media file");
-      await writeFile(destination, Buffer.concat(chunks));
+      await writeFile(destination, await downloadBackupMedia(`${MEDIA_ORIGIN}/${relative}`));
     }
     files.push(`media/${relative}`);
+    if ((files.length - 1) % 50 === 0) console.log(`Collected ${files.length - 1} media files.`);
   }
   const manifest = await createPrivateManifest(stage, files);
   await writeFile(path.join(stage, "snapshot.json"), JSON.stringify(manifest, null, 2));
   await verifyPrivateManifest(stage, manifest);
+  console.log("Private staging files and integrity manifest verified.");
   return manifest.files.length - 1;
 }
 
@@ -380,6 +370,7 @@ async function main() {
   try {
     if (command === "create") {
       const mediaCount = await stageBackup(stage);
+      console.log("Uploading the encrypted recovery snapshot.");
       await run(
         "restic",
         ["backup", ".", "--tag", TAG, "--host", HOST, "--group-by", "host,tags", "--json"],
@@ -435,7 +426,7 @@ try {
   await main();
 } catch (error) {
   console.error(
-    error instanceof BackupError
+    error instanceof BackupError || error instanceof BackupMediaError
       ? error.message
       : "Private backup failed during an integrity, filesystem or connection check; private details withheld",
   );
