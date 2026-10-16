@@ -8,16 +8,22 @@
 *.png binary
 *.webp binary
 *.woff2 binary
+*.woff binary
 *.mp3 binary
 *.m4a binary
 *.mp4 binary
 *.glb binary
 *.wasm binary
 
+# These vendored licenses retain the upstream CRLF bytes pinned by the font recipe.
+public/fonts/rounded/**/LICENSE.txt -text
+src/lib/server/og-fonts/rounded-OFL.txt -text
+
 # Generated or vendored: collapsed in GitHub's diffs, left out of language stats.
 pnpm-lock.yaml linguist-generated
 src/lib/assets.gen.json linguist-generated
 src/app/yozai.css linguist-generated
+src/app/rounded.css linguist-generated
 drizzle/meta/** linguist-generated
 backup/** linguist-generated
 public/draco/** linguist-vendored
