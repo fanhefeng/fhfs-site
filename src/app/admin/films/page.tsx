@@ -213,6 +213,7 @@ export default async function FilmsAdminPage() {
           label: row.title.zh || row.title.en,
           meta: row.draft ? `${row.year} · 草稿` : row.year,
           draft: row.draft,
+          media: row.stills.map(({ src }) => ({ kind: "image" as const, src })),
           view: `/admin/preview?${new URLSearchParams({ kind: "film", slug: row.key, locale: "zh" })}`,
           data: {
             ...row,

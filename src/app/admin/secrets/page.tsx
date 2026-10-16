@@ -6,6 +6,7 @@ import { requireAdminPage } from "@/lib/server/auth/session";
 import { AdminChrome } from "../AdminChrome";
 import { ghostButtonClass } from "../styles";
 import { Note } from "../ui/Note";
+import { MediaPreview } from "../ui/MediaPreview";
 
 export default async function SecretsIndex() {
   await requireAdminPage();
@@ -18,6 +19,7 @@ export default async function SecretsIndex() {
       date: secrets.date,
       draft: secrets.draft,
       duration: secrets.duration,
+      audio: secrets.audio,
       readingMinutes: secrets.readingMinutes,
     })
     .from(secrets)
@@ -63,6 +65,11 @@ export default async function SecretsIndex() {
                 {row.kind === "podcast" ? `${row.duration ?? "?"}m` : `${row.readingMinutes}m`}
               </span>
             </Link>
+            {row.kind === "podcast" && row.audio && (
+              <div className="max-w-xl px-2 pb-4">
+                <MediaPreview media={{ kind: "audio", src: row.audio }} />
+              </div>
+            )}
           </li>
         ))}
       </ul>

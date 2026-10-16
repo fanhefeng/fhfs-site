@@ -169,6 +169,7 @@ export default async function IdolsAdminPage() {
           label: row.name.zh || row.name.en,
           meta: row.draft ? `${row.years} · 草稿` : row.years,
           draft: row.draft,
+          media: row.photos.map(({ src }) => ({ kind: "image" as const, src })),
           view: `/admin/preview?${new URLSearchParams({ kind: "idol", slug: row.key, locale: "zh" })}`,
           data: {
             ...row,

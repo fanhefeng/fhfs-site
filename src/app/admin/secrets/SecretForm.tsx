@@ -5,6 +5,7 @@ import { deleteSecret, saveSecret } from "../actions/secrets";
 import { inputClass, labelClass } from "../styles";
 import { Select } from "../ui/Select";
 import { LongformForm, type LongformDraft } from "../ui/LongformForm";
+import { MediaField } from "../ui/MediaField";
 
 export type SecretDraft = LongformDraft & {
   kind: "essay" | "podcast";
@@ -47,15 +48,13 @@ export function SecretForm({ secret, isNew }: { secret: SecretDraft; isNew: bool
       extrasCols="sm:grid-cols-[1fr_8rem_auto]"
       extras={
         <>
-          <label className="space-y-1.5">
-            <span className={labelClass}>音频地址（播客必填；站内路径或媒体站地址）</span>
-            <input
-              name="audio"
-              defaultValue={secret.audio}
-              placeholder="/secrets/episode-1.mp3"
-              className={inputClass}
-            />
-          </label>
+          <MediaField
+            name="audio"
+            label="音频地址（播客必填；站内路径或媒体站地址）"
+            kind="audio"
+            defaultValue={secret.audio}
+            placeholder="/secrets/episode-1.mp3"
+          />
           <label className="space-y-1.5">
             <span className={labelClass}>时长（分钟）</span>
             <input

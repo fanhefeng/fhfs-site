@@ -11,8 +11,18 @@ import { useFieldErrors } from "./fieldErrors";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import { RowsField, type RowsSpec } from "./RowsField";
 import { useSaveAction } from "./useSaveAction";
+import { MediaField } from "./MediaField";
 
 export type Field =
+  | {
+      name: string;
+      label: string;
+      kind: "media";
+      mediaKind: "image" | "audio" | "list";
+      rows?: number;
+      hint?: string;
+      group?: string;
+    }
   | {
       name: string;
       label: string;
@@ -162,6 +172,20 @@ export function RecordForm({
 
   const renderField = (field: Field) => {
     const labelId = `${formId}-${field.name}`;
+
+    if (field.kind === "media") {
+      return (
+        <MediaField
+          key={field.name}
+          name={field.name}
+          label={field.label}
+          kind={field.mediaKind}
+          defaultValue={value(field.name)}
+          hint={field.hint}
+          rows={field.rows}
+        />
+      );
+    }
 
     if (field.kind === "localized" || field.kind === "localizedArea") {
       return (

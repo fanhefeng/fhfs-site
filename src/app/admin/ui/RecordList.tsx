@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { ActionState } from "../actions/shared";
 import { RecordForm, type Field, type RecordData } from "./RecordForm";
 import { cardClass, fieldSkin, ghostButtonClass, hintClass, metaClass } from "../styles";
+import { MediaGallery, type PreviewMedia } from "./MediaPreview";
 
 type ListRow = {
   /** Stable identity, and the key React uses. */
@@ -17,6 +18,8 @@ type ListRow = {
   /** The row's own page out front, when it has one — drafts included, through
    *  the preview (`/admin/preview`). */
   view?: string;
+  /** Saved files can be checked without opening their editing form. */
+  media?: PreviewMedia[];
   data: RecordData;
 };
 
@@ -194,16 +197,24 @@ export function RecordList({
                   {isOpen ? "−" : "+"}
                 </span>
                 <span
-                  className={`flex-1 truncate text-body group-hover:text-accent ${
+                  className={`min-w-0 flex-1 truncate text-body group-hover:text-accent ${
                     row.draft ? "text-fg-secondary" : ""
                   }`}
                 >
                   {row.label || <span className="text-fg-tertiary">（空）</span>}
                 </span>
                 {row.meta && (
-                  <span className="shrink-0 font-mono text-meta text-fg-tertiary">{row.meta}</span>
+                  <span className="max-w-[45%] shrink-0 text-right font-mono text-meta text-fg-tertiary">
+                    {row.meta}
+                  </span>
                 )}
               </button>
+
+              {!isOpen && Boolean(row.media?.length) && (
+                <div className="px-2 pt-1 pb-4 sm:pl-8">
+                  <MediaGallery items={row.media!} compact limit={3} />
+                </div>
+              )}
 
               {isOpen && (
                 <div className="px-2 pt-2 pb-8 animate-[admin-pop_160ms_ease-out]">
