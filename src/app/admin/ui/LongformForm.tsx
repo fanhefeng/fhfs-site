@@ -10,6 +10,7 @@ import { useSaveAction } from "./useSaveAction";
 import { Select } from "./Select";
 import { Toggle } from "./Segmented";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
+import { MediaUpload } from "./MediaUpload";
 
 /** What a post and a secret both are, as the form edits them. */
 export type LongformDraft = {
@@ -193,9 +194,19 @@ export function LongformForm({
               className={`${textareaClass} ${monoClass}`}
             />
           </MarkdownPreview>
+          <MediaUpload
+            kind="image"
+            onUploaded={(media) => {
+              if (body.current) body.current.value += `\n\n![图片](${media.src})\n`;
+            }}
+            onRemove={(src) => {
+              if (body.current)
+                body.current.value = body.current.value.replace(`![图片](${src})`, "");
+            }}
+          />
         </div>
 
-        <SaveControls state={state} pending={pending} sticky />
+        <SaveControls state={state} pending={pending} sticky cancelable />
       </form>
 
       {!isNew && (

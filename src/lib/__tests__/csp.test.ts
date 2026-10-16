@@ -22,10 +22,10 @@ describe("contentSecurityPolicy", () => {
   it("lets nothing load from another origin, save the board's media from the media site", () => {
     for (const [name, values] of Object.entries(prod)) {
       expect(foreign(values), name).toEqual(
-        name === "media-src" || name === "img-src" ? [MEDIA_HOST] : [],
+        name === "media-src" || name === "img-src" || name === "connect-src" ? [MEDIA_HOST] : [],
       );
     }
-    expect(foreign(prod["connect-src"]!)).toEqual([]);
+    expect(foreign(prod["connect-src"]!)).toEqual([MEDIA_HOST]);
   });
 
   it("falls back to self, and shuts the doors that have no business open", () => {

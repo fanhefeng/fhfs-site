@@ -7,9 +7,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { eq, like, or, sql } from "drizzle-orm";
 import { connect } from "./connect.mjs";
-import { films, idols, moments, posts, resumeExperiences, timelineEntries } from "../src/db/schema";
+import {
+  films,
+  idols,
+  moments,
+  posts,
+  resumeExperiences,
+  timelineEntries,
+  mediaUploads,
+} from "../src/db/schema";
 import { hashPassword } from "../src/lib/server/auth/password";
 import { testDatabaseProblem } from "../src/lib/e2e";
+import { signUpload, UPLOAD_PREFIX } from "../src/lib/mediaUploads";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const operation = process.argv[2];
@@ -103,6 +112,7 @@ async function stopChildren() {
 }
 const secret = randomBytes(32).toString("hex");
 const password = randomBytes(24).toString("base64url");
+const mediaSecret = randomBytes(32).toString("hex");
 const env = {
   ...process.env,
   DATABASE_URL: testUrl!,
@@ -111,6 +121,8 @@ const env = {
   ADMIN_PASSWORD_HASH: hashPassword(password),
   E2E_BASE_URL: "http://localhost:3100",
   E2E_BUILD: "true",
+  MEDIA_UPLOAD_SECRET: mediaSecret,
+  E2E_MEDIA_ORIGIN: "http://127.0.0.1:8787",
 };
 function run(args: string[]): Promise<void> {
   interrupted.signal.throwIfAborted();
@@ -129,6 +141,7 @@ function run(args: string[]): Promise<void> {
 try {
   await run(["db:migrate"]);
   await run(["db:import"]);
+  await db.delete(mediaUploads);
   interrupted.signal.throwIfAborted();
   fixturesReady = true;
   await db
@@ -180,9 +193,110 @@ try {
     );
   } else {
     interrupted.signal.throwIfAborted();
-    await writeFile(path.join(state, "session.json"), JSON.stringify({ secret, password }), {
-      mode: 0o600,
+    await new Promise<void>((resolve, reject) => {
+      const probe = createServer();
+      probe.once("error", () =>
+        reject(new Error("Port 8787 is occupied; stop its server before pnpm e2e")),
+      );
+      probe.listen(8787, "127.0.0.1", () =>
+        probe.close((error) => (error ? reject(error) : resolve())),
+      );
     });
+    await mkdir(path.join(state, "media-fixtures"), { recursive: true });
+    await writeFile(path.join(state, "media-fixtures/empty.txt"), "E2E only");
+    await writeFile(
+      path.join(state, "media-worker.json"),
+      JSON.stringify({
+        name: "fhfs-media-e2e",
+        main: "../media/worker.ts",
+        compatibility_date: "2026-09-01",
+        assets: { directory: "./media-fixtures", binding: "ASSETS", run_worker_first: true },
+        kv_namespaces: [{ binding: "UPLOADS", id: "local-e2e" }],
+        vars: { MEDIA_UPLOAD_SECRET: mediaSecret, UPLOAD_SITE_ORIGIN: "http://localhost:3100" },
+      }),
+      { mode: 0o600 },
+    );
+    await rm(path.join(state, "media-storage"), { recursive: true, force: true });
+    const mediaWorker = spawn(
+      "wrangler",
+      [
+        "dev",
+        "--local",
+        "--config",
+        path.join(state, "media-worker.json"),
+        "--port",
+        "8787",
+        "--persist-to",
+        path.join(state, "media-storage"),
+      ],
+      { cwd: ROOT, env, stdio: "inherit", detached: true },
+    );
+    children.add(mediaWorker);
+    mediaWorker.once("close", () => children.delete(mediaWorker));
+    let mediaStartError: Error | undefined;
+    mediaWorker.on("error", (error) => {
+      mediaStartError = error;
+    });
+    let mediaReady = false;
+    for (let attempt = 0; attempt < 60; attempt++) {
+      interrupted.signal.throwIfAborted();
+      if (mediaStartError) throw new Error("The upload E2E suite requires the global wrangler CLI");
+      if (mediaWorker.exitCode !== null) throw new Error("Local media emulator failed to start");
+      try {
+        await fetch(`${env.E2E_MEDIA_ORIGIN}/ready`, { signal: AbortSignal.timeout(1000) });
+        mediaReady = true;
+        break;
+      } catch {
+        /* wait for the owned local emulator */
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    if (!mediaReady) throw new Error("Local media emulator did not become ready");
+    // Old abandoned files, a late in-flight write and an old retained file.
+    // These writes are under the same database guard and local-only service.
+    const cleanupFixtures = (["ready", "uploading", "deleted", "retained"] as const).map(
+      (status, index) => ({
+        id: `00000000-0000-4000-8000-00000000000${index + 1}`,
+        batch: "00000000-0000-4000-8000-000000000010",
+        state: status,
+        path: `${UPLOAD_PREFIX}00000000-0000-4000-8000-00000000000${index + 1}.jpg`,
+        size: 4,
+        contentType: "image/jpeg",
+        createdAt: new Date(Date.now() - 48 * 3600000),
+        discardedAt: status === "deleted" ? new Date(Date.now() - 3600000) : null,
+      }),
+    );
+    await db.insert(mediaUploads).values(cleanupFixtures).onConflictDoNothing();
+    for (const fixture of cleanupFixtures) {
+      const token = await signUpload(
+        {
+          path: fixture.path,
+          size: 4,
+          type: "image/jpeg",
+          origin: env.E2E_BASE_URL,
+          expires: Math.floor(Date.now() / 1000) + 600,
+        },
+        mediaSecret,
+      );
+      const response = await fetch(`${env.E2E_MEDIA_ORIGIN}/_uploads${fixture.path}`, {
+        method: "PUT",
+        headers: {
+          origin: env.E2E_BASE_URL,
+          authorization: `Bearer ${token}`,
+          "content-type": "image/jpeg",
+          "content-length": "4",
+        },
+        body: new Uint8Array([1, 2, 3, 4]),
+      });
+      if (!response.ok) throw new Error("Could not prepare local cleanup fixtures");
+    }
+    await writeFile(
+      path.join(state, "session.json"),
+      JSON.stringify({ secret, password, mediaSecret }),
+      {
+        mode: 0o600,
+      },
+    );
     // Next still generates the root type entry even with a custom distDir.
     // Restore it after the test; leave the normal build and cache untouched.
     typeSnapshot = {
@@ -242,6 +356,8 @@ try {
       await stopChildren();
     } finally {
       await rm(path.join(state, "session.json"), { force: true });
+      await rm(path.join(state, "media-worker.json"), { force: true });
+      await rm(path.join(state, "media-storage"), { recursive: true, force: true });
       if (operation !== "prepare")
         await rm(path.join(state, "next/cache"), { recursive: true, force: true });
       if (typeSnapshot) {
@@ -251,6 +367,7 @@ try {
       }
       // Keep prepared fixtures for inspection; remove only rows created by tests.
       if (fixturesReady) {
+        await db.delete(mediaUploads);
         await db.delete(posts).where(like(posts.slug, "e2e-created-%"));
         await db.delete(films).where(like(films.key, "e2e-created-%"));
         await db.delete(moments).where(like(moments.key, "e2e-created-%"));

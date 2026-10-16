@@ -15,7 +15,12 @@ const intlProxy = createMiddleware(routing);
  * redirect reaches `fetch` as the login page — a 200 full of HTML — so an
  * expired session drew the login form inside the preview.
  */
-const PASS_THROUGH = new Set(["/admin/login", "/admin/preview/exit", "/admin/preview/markdown"]);
+const PASS_THROUGH = new Set([
+  "/admin/login",
+  "/admin/preview/exit",
+  "/admin/preview/markdown",
+  "/admin/media/uploads",
+]);
 
 /**
  * Two things share this file, and the order matters.

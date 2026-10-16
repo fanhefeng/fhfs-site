@@ -100,6 +100,18 @@ describe("the database", () => {
 });
 
 describe("admin server actions", () => {
+  it("checks the upload lease session and Origin before reading its payload", () => {
+    const route = files.find(({ file }) => file === "app/admin/media/uploads/route.ts")!;
+    const post = declarations(route.text).find((d) =>
+      /^export\s+async\s+function\s+POST\b/.test(d),
+    )!;
+    const implementation = body(post);
+    expect(implementation.slice(1).trim().split(";")[0]).toContain("adminSession()");
+    expect(implementation.indexOf('request.headers.get("origin")')).toBeGreaterThan(0);
+    expect(implementation.indexOf('request.headers.get("origin")')).toBeLessThan(
+      implementation.indexOf("request.json()"),
+    );
+  });
   const actionFiles = files.filter(
     ({ file, text }) =>
       file.startsWith("app/admin/") &&

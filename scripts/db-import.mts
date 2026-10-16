@@ -54,6 +54,16 @@ async function batch(label: string, statements: BatchItem<"pg">[], rows = statem
   console.log(`  ${label.padEnd(20)}${rows}`);
 }
 
+await batch(
+  "media_uploads",
+  (data.mediaUploads ?? []).map((row) =>
+    db
+      .insert(schema.mediaUploads)
+      .values({ ...row, state: "retained" })
+      .onConflictDoUpdate({ target: schema.mediaUploads.id, set: { ...row, state: "retained" } }),
+  ),
+);
+
 // Both derived columns are re-derived: HTML is always this pipeline's output
 // (same contract as savePost), so a hand-edited backup cannot put markup in
 // the database the sanitising renderer never produced; and the reading time

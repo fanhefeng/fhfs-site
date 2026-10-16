@@ -1,9 +1,10 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { hintClass, inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { Select, type SelectOption } from "./Select";
 import { MediaPreview } from "./MediaPreview";
+import { MediaUpload } from "./MediaUpload";
 
 type RowData = { [field: string]: unknown };
 
@@ -69,6 +70,15 @@ export function RowsField({
   const make = (data: RowData): Row => ({ uid: next.current++, data });
   const [rows, setRows] = useState<Row[]>(() => defaultRows.map(make));
   const groupId = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const defaults = useRef(defaultRows);
+  defaults.current = defaultRows;
+  useEffect(() => {
+    const form = root.current?.closest("form");
+    const reset = () => setRows(defaults.current.map((data) => ({ uid: next.current++, data })));
+    form?.addEventListener("reset", reset);
+    return () => form?.removeEventListener("reset", reset);
+  }, []);
 
   const move = (from: number, to: number) =>
     setRows((all) => {
@@ -80,7 +90,7 @@ export function RowsField({
     });
 
   return (
-    <div role="group" aria-labelledby={groupId} className="space-y-3">
+    <div ref={root} role="group" aria-labelledby={groupId} className="space-y-3">
       <div>
         <span id={groupId} className={labelClass}>
           {label}
@@ -90,6 +100,26 @@ export function RowsField({
         </span>
         {hint && <p className={`mt-1 ${hintClass}`}>{hint}</p>}
       </div>
+
+      {spec.pictures && (
+        <MediaUpload
+          showReadyPreview={false}
+          kind="image"
+          onUploaded={(media) =>
+            setRows((all) => [
+              ...all,
+              make({
+                ...spec.blank,
+                id: `upload-${crypto.randomUUID()}`,
+                src: media.src,
+                width: media.width,
+                height: media.height,
+              }),
+            ])
+          }
+          onRemove={(src) => setRows((all) => all.filter((row) => row.data.src !== src))}
+        />
+      )}
 
       {rows.length > 0 && (
         <ol className="space-y-3">

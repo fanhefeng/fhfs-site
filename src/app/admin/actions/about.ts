@@ -7,6 +7,7 @@ import { parseLocale, raw, str } from "@/lib/forms";
 import { renderMarkdown } from "@/lib/server/markdown";
 import { TAGS } from "@/lib/server/content";
 import { invalidate, SESSION_EXPIRED, type ActionState } from "./shared";
+import { saveWithUploads } from "../media/storage";
 
 export async function saveAbout(_prev: ActionState, form: FormData): Promise<ActionState> {
   if (!(await adminSession())) return SESSION_EXPIRED;
@@ -22,13 +23,18 @@ export async function saveAbout(_prev: ActionState, form: FormData): Promise<Act
     bodyHtml: await renderMarkdown(bodyMd),
   };
 
-  await db
-    .insert(schema.abouts)
-    .values(row)
-    .onConflictDoUpdate({
-      target: schema.abouts.locale,
-      set: { ...row, updatedAt: new Date() },
-    });
+  const saved = await saveWithUploads(
+    db
+      .insert(schema.abouts)
+      .values(row)
+      .onConflictDoUpdate({
+        target: schema.abouts.locale,
+        set: { ...row, updatedAt: new Date() },
+      })
+      .returning({ locale: schema.abouts.locale }),
+    row,
+  );
+  if (saved.error) return { error: saved.error };
 
   invalidate(TAGS.about);
   return { ok: true };

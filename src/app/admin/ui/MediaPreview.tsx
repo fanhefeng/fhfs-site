@@ -6,12 +6,13 @@ import { validMediaSrc } from "@/lib/forms";
 import type { MomentMedia } from "@/lib/moments";
 import { pauseOtherMedia } from "@/lib/client/mediaPlayback";
 
-export type PreviewMedia = Pick<MomentMedia, "kind" | "src"> & { poster?: string };
+export type PreviewMedia = Pick<MomentMedia, "kind" | "src"> & { poster?: string; local?: boolean };
 
 const KIND_LABEL = { image: "图片", audio: "音频", video: "视频" };
 
 /** An incomplete address must never throw out an editor's unsaved text. */
-function mediaAddress(src: string): string | null {
+function mediaAddress(src: string, local = false): string | null {
+  if (local && src.startsWith("blob:")) return src;
   if (!validMediaSrc(src)) return null;
   try {
     return asset(src);
@@ -67,7 +68,7 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
     if (figure.current) observer.observe(figure.current);
     return () => observer.disconnect();
   }, [compact, media.kind]);
-  const src = mediaAddress(media.src.trim());
+  const src = mediaAddress(media.src.trim(), media.local);
   const poster = media.poster ? mediaAddress(media.poster.trim()) : null;
   const name = fileName(media.src);
 

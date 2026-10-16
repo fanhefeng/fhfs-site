@@ -39,7 +39,7 @@ const FIELDS: Field[] = [
     kind: "media",
     mediaKind: "list",
     rows: 4,
-    hint: "一行一个文件：image https://fhfs-media…/moments/x.jpg 1080x1440 · audio …/x.m4a 90s · video …/x.mp4 720x1280 30s poster=…/x.jpg。文件放进媒体站（media/files/moments/，pnpm media:deploy），部署完会把这几行打印出来，复制过来即可。",
+    hint: "上传后自动填写。也可以粘贴已有文件的媒体信息，每行一个，图片、音频和视频可混合。",
   },
   {
     name: "original",

@@ -14,12 +14,15 @@ const tables = Object.entries(schema)
   .map(([name, table]) => [name, getTableName(table as PgTable)] as const);
 
 /**
- * Tables that hold no content: nothing to back up, nothing to restore. A new
- * table is content until it is named here with its reason.
+ * Tables with no complete public snapshot. A new table is content until it
+ * is named here with its reason.
  */
 const NOT_CONTENT = new Set([
   // Failed-login timestamps by IP; they expire by themselves.
   "loginAttempts",
+  // Temporary leases/tombstones stay private. Export includes only the leases
+  // referenced by the public snapshot; old snapshots can omit this subset.
+  "mediaUploads",
 ]);
 
 const content = tables.filter(([name]) => !NOT_CONTENT.has(name));

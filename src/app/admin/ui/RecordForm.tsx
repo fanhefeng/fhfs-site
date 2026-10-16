@@ -357,7 +357,7 @@ export function RecordForm({
           ),
         )}
 
-        <SaveControls state={state} pending={pending} />
+        <SaveControls state={state} pending={pending} cancelable />
         {view && !isNew && (
           <a
             href={view}
