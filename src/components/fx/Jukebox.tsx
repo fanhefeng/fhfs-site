@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { holdMusic, jukebox, releaseMusic, reportFailure, useJukebox } from "@/lib/client/jukebox";
 import type { TrackFiles } from "@/lib/tracks";
+import { pauseOtherMedia } from "@/lib/client/mediaPlayback";
 
 /** Players whose file would not load: `paused` still reads false on them. */
 const failed = new WeakSet<HTMLMediaElement>();
@@ -90,9 +91,7 @@ export function Jukebox({ files }: { files: TrackFiles }) {
     };
     const onPlay = (e: Event) => {
       if (!isOther(e.target)) return;
-      for (const media of others()) {
-        if (media !== e.target && !media.paused) media.pause();
-      }
+      pauseOtherMedia(e.target, audioRef.current);
       // A player taken out of the page mid-play — a card the filter hid —
       // is paused by the browser, and says so on the element itself, but
       // that `pause` never reaches the document. So listen on the element.

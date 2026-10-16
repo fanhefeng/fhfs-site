@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { hintClass, inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { Select, type SelectOption } from "./Select";
+import { MediaPreview } from "./MediaPreview";
 
 type RowData = { [field: string]: unknown };
 
@@ -117,7 +118,11 @@ export function RowsField({
                   </RowButton>
                 </span>
               </div>
-              <div className={spec.pictures ? "grid gap-4 sm:grid-cols-[7rem_1fr]" : undefined}>
+              <div
+                className={
+                  spec.pictures ? "grid items-start gap-4 sm:grid-cols-[12rem_1fr]" : undefined
+                }
+              >
                 {spec.pictures && <Thumb src={leaf(row.data.src)} />}
                 <div className="grid gap-3 sm:grid-cols-4">
                   {spec.fields.map((field) => (
@@ -185,18 +190,11 @@ function RowButton({
   );
 }
 
-/** The picture a row describes, straight from its address — `public/` serves the plain path. */
 function Thumb({ src }: { src: string }) {
   return src ? (
-    // oxlint-disable-next-line nextjs/no-img-element
-    <img
-      src={src}
-      alt=""
-      loading="lazy"
-      className="aspect-square w-28 rounded-lg border border-line bg-surface object-cover"
-    />
+    <MediaPreview media={{ kind: "image", src }} />
   ) : (
-    <span className="grid aspect-square w-28 place-items-center rounded-lg border border-dashed border-line font-mono text-meta text-fg-tertiary">
+    <span className="grid min-h-28 place-items-center rounded-chip border border-dashed border-line font-mono text-meta text-fg-tertiary">
       没有图
     </span>
   );

@@ -3,6 +3,8 @@ import { SignJWT } from "jose";
 import { expect, test, type Page } from "@playwright/test";
 import zh from "../../messages/zh.json";
 import en from "../../messages/en.json";
+import { asset } from "../../src/lib/asset";
+import { MEDIA_ORIGIN } from "../../src/config/csp";
 
 type TestSession = { secret: string; password: string };
 let session: TestSession;
@@ -215,6 +217,84 @@ test("an unknown local media file is refused while keeping the moment text", asy
   await page.getByRole("button", { name: "保存", exact: true }).click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText("不在 assets.gen.json");
   await expect(page.getByLabel("正文", { exact: false })).toHaveValue("媒体校验失败后仍在的正文");
+});
+
+test("media previews follow unsaved files and keep valid previews beside an incomplete line", async ({
+  page,
+}) => {
+  await authenticate(page);
+  await page.goto("/admin/moments");
+  await page.getByRole("button", { name: "写一条", exact: true }).click();
+  const form = page.locator("form").filter({ has: page.locator('textarea[name="media"]') });
+  const source = form.getByLabel("图片 / 语音 / 视频", { exact: false });
+  const picture = "/films/secret/rain.jpg";
+  const sound = "/music/lu-xiaoyu.mp3";
+  const clip = `${MEDIA_ORIGIN}/moments/m-20231018-135059-1.mp4`;
+  await form.locator('textarea[name="content"]').fill("仍未保存的说说");
+  await source.fill(
+    `image ${picture} 100x100\naudio ${sound} 60s\naudio /music/mia-and-sebastians-theme.mp3 60s\nvideo ${clip} 100x100 10s poster=${picture}`,
+  );
+  const gallery = form.getByRole("group", { name: "媒体预览", exact: true });
+  const image = gallery.getByRole("img", { name: "图片预览：rain.jpg", exact: true });
+  await expect(image).toHaveAttribute("src", asset(picture));
+  await image.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth))
+    .toBeGreaterThan(0);
+  const audio = gallery.locator("audio").first();
+  await expect(audio).toHaveAttribute("src", asset(sound));
+  await audio.evaluate(async (element: HTMLAudioElement) => {
+    element.muted = true;
+    await element.play();
+  });
+  await expect
+    .poll(() => audio.evaluate((element: HTMLAudioElement) => element.currentTime))
+    .toBeGreaterThan(0);
+  const secondAudio = gallery.locator("audio").last();
+  await secondAudio.evaluate(async (element: HTMLAudioElement) => {
+    element.muted = true;
+    await element.play();
+  });
+  await expect.poll(() => audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(true);
+  await secondAudio.evaluate((element: HTMLAudioElement) => element.pause());
+  const video = gallery.locator("video");
+  await expect(video).toHaveAttribute("poster", asset(picture));
+  await expect(video).toHaveAttribute("controls", "");
+  await expect(video).toHaveAttribute("preload", "none");
+  await expect(video).not.toHaveAttribute("autoplay");
+  await gallery.screenshot({ path: ".e2e/admin-media-preview.png" });
+  await source.fill(`image ${picture} 100x100\nimage /unfinished.jpg`);
+  await expect(image).toBeVisible();
+  await expect(form.getByRole("status")).toContainText("第 2 行");
+  await expect(form.locator('textarea[name="content"]')).toHaveValue("仍未保存的说说");
+  await source.fill("image /films/missing.jpg 100x100");
+  await expect(form.getByRole("status")).toContainText("无法预览");
+  await expect(form.locator('textarea[name="content"]')).toHaveValue("仍未保存的说说");
+  await source.fill(`image ${picture} 100x100`);
+  await expect(image).toBeVisible();
+  await form.evaluate((element: HTMLFormElement) => element.reset());
+  await expect(source).toHaveValue("");
+  await expect(gallery).toHaveCount(0);
+});
+
+test("podcast audio and picture rows show their files before saving", async ({ page }) => {
+  await authenticate(page);
+  await page.goto("/admin/secrets/new");
+  const audio = "/music/lu-xiaoyu.mp3";
+  await page.getByLabel("音频地址", { exact: false }).fill(audio);
+  await expect(page.locator("audio")).toHaveAttribute("src", asset(audio));
+  await page.goto("/admin/films");
+  await page.getByRole("button", { name: "新电影", exact: true }).click();
+  const pictures = page.getByRole("group", { name: /每一张/ });
+  await pictures.getByRole("button", { name: "加一张", exact: true }).click();
+  const picture = "/films/secret/rain.jpg";
+  await pictures.locator('input[name="stills.0.src"]').fill(picture);
+  await expect(pictures.getByRole("img")).toHaveAttribute("src", asset(picture));
+  await expect(
+    pictures.getByRole("link", { name: "查看原图：rain.jpg", exact: true }),
+  ).toHaveAttribute("href", asset(picture));
+  await pictures.getByRole("button", { name: "去掉这张", exact: true }).click();
+  await expect(pictures.getByRole("img")).toHaveCount(0);
 });
 
 test("film rows preserve edited text when reordered, saved, previewed and deleted", async ({

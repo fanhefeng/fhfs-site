@@ -36,9 +36,9 @@ const FIELDS: Field[] = [
   {
     name: "media",
     label: "图片 / 语音 / 视频（可空）",
-    kind: "area",
+    kind: "media",
+    mediaKind: "list",
     rows: 4,
-    mono: true,
     hint: "一行一个文件：image https://fhfs-media…/moments/x.jpg 1080x1440 · audio …/x.m4a 90s · video …/x.mp4 720x1280 30s poster=…/x.jpg。文件放进媒体站（media/files/moments/，pnpm media:deploy），部署完会把这几行打印出来，复制过来即可。",
   },
   {
@@ -156,6 +156,7 @@ export default async function MomentsAdminPage() {
             label,
             meta: `${row.pinned ? "置顶 · " : ""}${time}${row.collection ? ` · ${row.collection}` : ""}${firstLine && files ? ` · ${files}` : ""}${row.draft ? " · 草稿" : ""}`,
             draft: row.draft,
+            media: row.media,
             data: {
               ...row,
               media: formatMedia(row.media),

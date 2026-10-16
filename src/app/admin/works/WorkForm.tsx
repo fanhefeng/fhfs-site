@@ -7,6 +7,7 @@ import { SaveControls } from "../ui/SaveControls";
 import { useFieldErrors } from "../ui/fieldErrors";
 import { KEY_MESSAGE, KEY_PATTERN } from "@/lib/forms";
 import { useSaveAction } from "../ui/useSaveAction";
+import { MediaField } from "../ui/MediaField";
 
 export type WorkDraft = {
   key: string;
@@ -87,12 +88,12 @@ export function WorkForm({ work, isNew }: { work: WorkDraft; isNew: boolean }) {
             <span className={labelClass}>链接（可空）</span>
             <input name="url" defaultValue={work.url ?? ""} className={inputClass} />
           </label>
-          <label className="space-y-1.5">
-            {/* 列存在、也会保存，但作品墙目前不在站上（/portfolio 已下线，
-                挂上第一件作品时再议页面）——等渲染端接上前先如实标注。 */}
-            <span className={labelClass}>封面路径（暂未生效）</span>
-            <input name="cover" defaultValue={work.cover ?? ""} className={inputClass} />
-          </label>
+          <MediaField
+            name="cover"
+            label="封面路径（前台暂未使用）"
+            kind="image"
+            defaultValue={work.cover ?? ""}
+          />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
