@@ -130,7 +130,7 @@ GitHub Secrets：`BACKUP_DATABASE_URL`、`RESTIC_REPOSITORY`、`RESTIC_PASSWORD`
 S3 凭据对应 `BACKUP_AWS_ACCESS_KEY_ID`、`BACKUP_AWS_SECRET_ACCESS_KEY`，仓库变量
 `BACKUP_AWS_REGION`。首次手工验证后设置仓库变量 `PRIVATE_BACKUP_ENABLED=true`。
 
-`.github/workflows/private-backup.yml` 每天北京时间 04:17 创建，并立即从异地仓库取回数据库校验；10:37、16:37、22:37
+`.github/workflows/private-backup.yml` 每天北京时间 04:17 创建，并立即从异地仓库取回数据库校验；04:37、10:37、16:37、22:37
 独立检查新鲜度，每年 1/4/7/10 月 2 日 05:47 完整取回并做字节验证。36 小时没有成功快照即失败。
 每月 8 日 06:53 另向受保护的专用库真实恢复数据库，需要上述独立恢复 Secret。
 调度避开整点，但 GitHub 不保证准点执行。

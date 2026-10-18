@@ -7,7 +7,10 @@ GitHub Actions 的 `monitor.yml` 执行只读巡检，Healthchecks.io 独立监�
 
 - 每 6 小时执行（UTC 01:11 / 07:11 / 13:11 / 19:11），main 的私有备份、浏览器流程或公开快照工作流结束后也执行。
 - 验证三个工作流 active，`PRIVATE_BACKUP_ENABLED`、`PRIVATE_RESTORE_ENABLED`、`E2E_ENABLED` 为 true。
-- create、公开快照、browser flows 最近实际成功不超过 36 小时；health 不超过 12 小时；SQL 恢复不超过 35 天。
+- create、公开快照、browser flows 最近实际成功不超过 36 小时；备份健康检查不超过 12 小时；SQL 恢复不超过 35 天。
+- 独立 health 全天每 6 小时调度（北京时间 04:37 / 10:37 / 16:37 / 22:37），12 小时窗口留出一轮调度余量。
+- 健康检查的新鲜度接受独立 health，或完成创建、数据库取回验证及 health 的 create；仍验证对应 job 的关键步骤实际成功，不只看工作流总状态。
+- 故障与新鲜度分开判定：各操作的最新失败、取消、超时及待验重跑仍独立告警；成功 create 不能清除 health 失败，成功 health 不能清除 create、verify 或恢复失败。每日 create 与自然 create 的 36 小时要求不由 health 替代。
 - 验证 job 与关键步骤实际执行；全部 skipped 不算成功，新失败不能被旧成功掩盖。
 - 按最新执行尝试排序；失败、取消、超时与需处理状态不按创建时间截断查询，防止旧任务重跑或季度失败消失。
 - 恢复要求原生逐表行/列、迁移、序列比对摘要，且日志时间位于实际恢复步骤内。日志过期或无法访问即报告无法验证。
@@ -24,6 +27,7 @@ GitHub API 使用短期 Actions token，仅 `contents:read` / `actions:read`。
 审计与真实仓库 health 全通过后才发送成功；失败发送 `/fail`。
 整个巡检停用、长时间排队或无法上报时，最后成功信号超过 12 小时后由外部服务告警。
 状态刚变坏且没有完成事件时，要等下一轮巡检，通常最多 6 小时加调度延迟。
+明确的工作流失败完成后，通过 `workflow_run` 触发巡检并上报 `/fail`，不等上述新鲜度窗口或外部 Grace 到期。
 GitHub 调度、外部服务及邮件传输均可能延迟；已有 GitHub 失败通知保留。
 
 上报只有固定服务名和成功/失败，不含连接串、草稿、原生日志或备份内容。
@@ -53,5 +57,18 @@ Healthchecks 不持有数据库、restic、B2、GitHub 或网站后台凭据。
 - ping URL 泄露须更换检查地址与 Secret，并验证新信号；只删日志不能撤销旧地址。
 - 回退时先启用并验证本地巡检，再停云端并暂停外部检查，避免空窗或持续误报。
 - 服务套餐、邮件地址或通知设置变更后重新验证送达。
+
+## 2026-10-18 告警复盘
+
+北京时间 13:49:14 的 DOWN 来自主动失败信号。独立 health 上次于 01:31 启动，
+10:37 的下一轮延迟至 15:24，审计因此报 `health: successful run is outside the 12 hour window`。
+当天 06:27 的 create 和 07:20 的巡检实际都确认备份正常；旧判断只按独立 health 的运行名取证，
+且 22:37 至次日 10:37 本来就相隔 12 小时，没有调度余量。15:26:38 后恢复，告警约持续 1 小时 37 分钟。
+这次反映备份巡检证据过期，不能据此认定网站 HTTP 宕机。
+
+修复补齐凌晨 health，并接受 create 内真实执行的健康检查作为新鲜度证据，保留最新失败的独立判断。
+不延长 12 小时健康窗口、36 小时快照窗口或外部看门狗窗口；本轮巡检仍必须读取真实加密仓库。
+回归测试重放该次延迟、最新失败被其他成功覆盖、待验重跑、缺失/过期证据及自然 create 超期。
+GitHub 调度没有准点保证，超出余量的长时间延迟仍应告警，不能承诺消除所有由调度引起的通知。
 
 资料：[Healthchecks](https://healthchecks.io/docs/)、[GitHub 工作流停用规则](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows)。
