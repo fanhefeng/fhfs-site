@@ -49,29 +49,95 @@ export type MonitorJob = {
 
 export const NATURAL_CREATE_DEADLINE = Date.parse("2026-10-14T08:17:00Z");
 
+export type MonitorCheck = {
+  label: string;
+  runs: MonitorRun[];
+  hours: number;
+  step: string;
+  /** Additional runs that execute the same critical step, for freshness only. */
+  freshnessRuns?: MonitorRun[];
+};
+
+/** Keep the production audit's history selection testable without GitHub credentials. */
+export function monitorChecks(
+  privateRuns: MonitorRun[],
+  browserRuns: MonitorRun[],
+  publicRuns: MonitorRun[],
+  now: number,
+): MonitorCheck[] {
+  const checks: MonitorCheck[] = [
+    {
+      label: "create",
+      runs: privateRuns.filter((r) => r.display_title === "private backup / create"),
+      hours: 36,
+      step: "Run backup operation and verify freshness",
+    },
+    {
+      label: "health",
+      runs: privateRuns.filter((r) => r.display_title === "private backup / health"),
+      // Create also runs health, after both creation and database verification.
+      // Keep failure history separate: a create must never clear a failed health run.
+      freshnessRuns: privateRuns.filter((r) =>
+        ["private backup / health", "private backup / create"].includes(r.display_title),
+      ),
+      hours: 12,
+      step: "Run backup operation and verify freshness",
+    },
+    {
+      label: "restore-database",
+      runs: privateRuns.filter((r) => r.display_title === "private backup / restore-database"),
+      hours: 35 * 24,
+      step: "Restore into the guarded disposable database",
+    },
+    { label: "browser flows", runs: browserRuns, hours: 36, step: "Run pnpm e2e" },
+    {
+      label: "public snapshot",
+      runs: publicRuns,
+      hours: 36,
+      step: "Commit the snapshot, if it says anything new",
+    },
+  ];
+  if (now >= NATURAL_CREATE_DEADLINE)
+    checks.push({
+      label: "natural create",
+      runs: privateRuns.filter(
+        (r) => r.display_title === "private backup / create" && r.event === "schedule",
+      ),
+      hours: 36,
+      step: "Run backup operation and verify freshness",
+    });
+  return checks;
+}
+
 export function assessRuns(
   runs: MonitorRun[],
   now: number,
   hours: number,
   branch: string,
-  scheduledOnly = false,
+  {
+    scheduledOnly = false,
+    freshnessRuns = runs,
+  }: { scheduledOnly?: boolean; freshnessRuns?: MonitorRun[] } = {},
 ): { problems: string[]; successful?: MonitorRun } {
-  const completed = runs
-    .filter(
-      (r) =>
-        r.head_branch === branch &&
-        r.status === "completed" &&
-        (!scheduledOnly || r.event === "schedule"),
-    )
-    .sort(latestAttemptFirst);
+  const eligible = (history: MonitorRun[]) =>
+    history
+      .filter(
+        (r) =>
+          r.head_branch === branch &&
+          r.status === "completed" &&
+          (!scheduledOnly || r.event === "schedule"),
+      )
+      .sort(latestAttemptFirst);
+  const completed = eligible(runs);
+  const freshness = eligible(freshnessRuns);
   const problems: string[] = [];
   if (runs.some((r) => r.head_branch === branch && r.run_attempt > 1 && r.status !== "completed"))
     problems.push("rerun is awaiting verification");
-  if (completed.some((r) => !Number.isFinite(Date.parse(r.run_started_at))))
+  if ([...completed, ...freshness].some((r) => !Number.isFinite(Date.parse(r.run_started_at))))
     problems.push("invalid run timestamp");
   if (completed[0] && completed[0].conclusion !== "success")
     problems.push(`latest completed run is ${completed[0].conclusion ?? "unknown"}`);
-  const successful = completed.find((r) => r.conclusion === "success");
+  const successful = freshness.find((r) => r.conclusion === "success");
   if (!successful) problems.push("no successful run");
   else {
     const age = now - Date.parse(successful.run_started_at);

@@ -3,7 +3,7 @@ import {
   assessRuns,
   latestAttemptFirst,
   mergeRunAttempts,
-  NATURAL_CREATE_DEADLINE,
+  monitorChecks,
   requiredJob,
   restoreComparisonPassed,
   validHealthchecksUrl,
@@ -138,42 +138,7 @@ async function audit() {
   const [privateRuns, browserRuns, publicRuns] = await Promise.all(
     files.map((file) => runs(file, now)),
   );
-  const specifications = [
-    {
-      label: "create",
-      runs: privateRuns!.filter((r) => r.display_title === "private backup / create"),
-      hours: 36,
-      step: "Run backup operation and verify freshness",
-    },
-    {
-      label: "health",
-      runs: privateRuns!.filter((r) => r.display_title === "private backup / health"),
-      hours: 12,
-      step: "Run backup operation and verify freshness",
-    },
-    {
-      label: "restore-database",
-      runs: privateRuns!.filter((r) => r.display_title === "private backup / restore-database"),
-      hours: 35 * 24,
-      step: "Restore into the guarded disposable database",
-    },
-    { label: "browser flows", runs: browserRuns!, hours: 36, step: "Run pnpm e2e" },
-    {
-      label: "public snapshot",
-      runs: publicRuns!,
-      hours: 36,
-      step: "Commit the snapshot, if it says anything new",
-    },
-  ];
-  if (now >= NATURAL_CREATE_DEADLINE)
-    specifications.push({
-      label: "natural create",
-      runs: privateRuns!.filter(
-        (r) => r.display_title === "private backup / create" && r.event === "schedule",
-      ),
-      hours: 36,
-      step: "Run backup operation and verify freshness",
-    });
+  const specifications = monitorChecks(privateRuns!, browserRuns!, publicRuns!, now);
   // Other real backup operations must not be hidden by a successful create.
   for (const operation of ["verify", "verify-database"]) {
     if (
@@ -194,7 +159,9 @@ async function audit() {
   }
   const verified = new Set<number>();
   for (const spec of specifications) {
-    const assessment = assessRuns(spec.runs, now, spec.hours, branch);
+    const assessment = assessRuns(spec.runs, now, spec.hours, branch, {
+      freshnessRuns: spec.freshnessRuns,
+    });
     problems.push(...assessment.problems.map((problem) => `${spec.label}: ${problem}`));
     const run = assessment.successful;
     if (!run || verified.has(run.id)) continue;
