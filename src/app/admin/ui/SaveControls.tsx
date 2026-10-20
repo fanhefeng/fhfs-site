@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ActionState } from "../actions/shared";
 import { buttonClass, ghostButtonClass } from "../styles";
 
@@ -26,6 +26,29 @@ export function SaveControls({
   cancelable?: boolean;
 }) {
   const [saved, setSaved] = useState(false);
+  const controls = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const bar = controls.current;
+    const form = bar?.closest("form");
+    if (!sticky || !bar || !form) return;
+
+    // Scroll-to-field (including keyboard focus and validation) must clear
+    // the whole bar. Its height changes when messages wrap or fonts resize.
+    const measure = () => {
+      form.style.setProperty(
+        "--admin-save-height",
+        `${Math.ceil(bar.getBoundingClientRect().height)}px`,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(bar);
+    return () => {
+      observer.disconnect();
+      form.style.removeProperty("--admin-save-height");
+    };
+  }, [sticky]);
 
   useEffect(() => {
     if (!state.ok) {
@@ -49,7 +72,10 @@ export function SaveControls({
         </button>
       )}
       {!pending && state.error && (
-        <p role="alert" className="flex items-center gap-2 text-caption text-accent">
+        <p
+          role="alert"
+          className="flex min-w-0 max-w-full items-center gap-2 text-caption text-accent [overflow-wrap:anywhere]"
+        >
           <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
           {state.error}
         </p>
@@ -57,9 +83,9 @@ export function SaveControls({
       {!pending && saved && (
         <p
           role="status"
-          className="flex items-center gap-2 text-caption text-fg-secondary transition-opacity duration-500"
+          className="flex min-w-0 max-w-full items-center gap-2 text-caption text-fg-secondary transition-opacity duration-500"
         >
-          <svg viewBox="0 0 12 12" aria-hidden className="size-3 text-accent">
+          <svg viewBox="0 0 12 12" aria-hidden className="size-3 shrink-0 text-accent">
             <path
               d="M2.5 6.5 5 9l4.5-6"
               fill="none"
@@ -91,7 +117,11 @@ export function SaveControls({
 
   if (sticky) {
     return (
-      <div className="sticky bottom-0 z-20 mt-6 flex flex-wrap items-center gap-3 border-t border-line bg-bg pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div
+        ref={controls}
+        data-sticky-save=""
+        className="sticky bottom-0 z-20 -mx-4 mt-6 flex flex-wrap items-center gap-3 border-t border-line bg-bg px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10"
+      >
         {button}
         {messages}
       </div>

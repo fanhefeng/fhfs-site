@@ -374,6 +374,12 @@ test("draft preview requires a live session and exits back to public visibility"
   page,
   browser,
 }) => {
+  // This checks the editor's returning visit; entry effects have their own
+  // public flow. They must not mask the footer while viewport geometry runs.
+  await page.addInitScript(() => {
+    sessionStorage.setItem("fhfs-overture-seen", "1");
+    sessionStorage.setItem("fhfs-splash-seen", "1");
+  });
   const visitor = await browser.newContext();
   try {
     expect((await visitor.request.get("http://localhost:3100/zh/blog/e2e-draft")).status()).toBe(
@@ -386,6 +392,32 @@ test("draft preview requires a live session and exits back to public visibility"
     await page.goto("/admin/preview?kind=post&slug=e2e-draft&locale=zh");
     await expect(page.locator("main h1")).toHaveText("私有测试草稿");
     await expect(page.getByRole("button", { name: "退出预览" })).toBeVisible();
+    await page.getByRole("button", { name: "退出预览" }).click({ trial: true });
+    for (const width of [320, 390, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      const exit = page.getByRole("button", { name: "退出预览" });
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await expect(exit).toBeInViewport();
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await expect
+        .poll(() =>
+          page.evaluate(() => {
+            const banner = document.querySelector('form[action="/admin/preview/exit"]')!;
+            return (
+              document.querySelector("footer")!.getBoundingClientRect().bottom <=
+              banner.getBoundingClientRect().top + 1
+            );
+          }),
+        )
+        .toBe(true);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        await page.evaluate(() => document.documentElement.clientWidth),
+      );
+      expect(
+        await exit.evaluate((button) => button.getBoundingClientRect().height),
+      ).toBeGreaterThanOrEqual(44);
+    }
+    await page.screenshot({ path: ".e2e/draft-preview-footer.png" });
     await authenticate(page, true);
     expect((await page.reload())?.status()).toBe(404);
     await authenticate(page);
@@ -445,13 +477,48 @@ test("copy overrides update the public page and clearing restores the catalogue"
 test("invalid ICU copy is refused without clearing the edited value", async ({ page }) => {
   await authenticate(page);
   await page.goto("/admin/copy?ns=home");
-  const invalid = "尚未保存的 {e2eUnexpectedArgument}";
+  const argument = `e2eUnexpectedArgument${"LongUnbrokenName".repeat(12)}`;
+  const invalid = `尚未保存的 {${argument}}`;
   await page.locator('input[name="home.slogan.zh"]').fill(invalid);
   await page.getByRole("button", { name: "保存这一组", exact: true }).click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
-    "默认文案里没有 {e2eUnexpectedArgument}",
+    `默认文案里没有 {${argument}}`,
   );
   await expect(page.locator('input[name="home.slogan.zh"]')).toHaveValue(invalid);
+  for (const width of [320, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect
+      .poll(() =>
+        page.locator('input[name="home.slogan.zh"]').evaluate((input) => {
+          const bar = input.closest("form")!.querySelector("[data-sticky-save]")!;
+          return (
+            parseFloat(getComputedStyle(input).scrollMarginBottom) >=
+            bar.getBoundingClientRect().height + 16
+          );
+        }),
+      )
+      .toBe(true);
+    await page.locator('input[name="home.slogan.zh"]').evaluate((input) => {
+      input.focus();
+      input.scrollIntoView({ block: "end" });
+    });
+    const layout = await page.locator('input[name="home.slogan.zh"]').evaluate((input) => {
+      const bar = input.closest("form")!.querySelector("[data-sticky-save]")!;
+      const alert = bar.querySelector('[role="alert"]')!.getBoundingClientRect();
+      return {
+        fieldBottom: input.getBoundingClientRect().bottom,
+        barTop: bar.getBoundingClientRect().top,
+        alertRight: alert.right,
+        viewport: document.documentElement.clientWidth,
+        page: document.documentElement.scrollWidth,
+      };
+    });
+    expect(layout.fieldBottom).toBeLessThanOrEqual(layout.barTop);
+    expect(layout.alertRight).toBeLessThanOrEqual(layout.viewport);
+    expect(layout.page).toBeLessThanOrEqual(layout.viewport);
+    await expect(page.locator('input[name="home.slogan.zh"]')).toHaveValue(invalid);
+    if (width === 390) await page.screenshot({ path: ".e2e/admin-sticky-save-error.png" });
+  }
   await page.reload();
   await expect(page.locator('input[name="home.slogan.zh"]')).toHaveValue(zh.home.slogan);
 });
