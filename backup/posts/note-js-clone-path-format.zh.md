@@ -1,15 +1,13 @@
 ---
-title: 深克隆、path 与千分位：JavaScript 三则
+title: Javascript 知识
 date: 2024-12-03
 tags:
   - 前端
-  - 手札
-summary: 三件小事，各值一段笔记：用 WeakMap 挡住循环引用的深克隆，path.join 与 path.resolve
-  的分野，以及一个只匹配「位置」的千分位正则。
+summary: 用 WeakMap 挡住循环引用的深克隆，path.join 与 path.resolve 的分野，以及一个只匹配「位置」的千分位正则。
 ---
 
 
-这三则彼此并不相关，只是都小到不值得单独成文，又都曾在某个时刻让我停下来查过一次。记在一起，下次就不必再查。
+Javascript 知识
 
 ## 深度克隆
 

@@ -1,9 +1,8 @@
 ---
-title: 一台 Mac 的三个名字
+title: ComputerName、HostName、LocalHostName
 date: 2024-12-20
 tags:
   - macOS
-  - 手札
 summary: ComputerName、HostName、LocalHostName 各自回答的是谁的提问；附 scutil 常用命令与 Finder 隐藏文件的开关。
 ---
 
