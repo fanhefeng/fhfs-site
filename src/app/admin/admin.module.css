@@ -40,6 +40,19 @@
   font-family: var(--font-stack-mono);
 }
 
+/* A bottom-sticky save row covers the viewport's last pixels while the form
+ * scrolls. Keep focused/scrolled fields above its measured height, including
+ * when a save error wraps onto more lines. The mobile header needs room too. */
+.root form:has(> [data-sticky-save]) :where(input, textarea, select, button, [tabindex]) {
+  scroll-margin-block: 5rem calc(var(--admin-save-height, 5rem) + 1rem);
+}
+
+@media (min-width: 1024px) {
+  .root form:has(> [data-sticky-save]) :where(input, textarea, select, button, [tabindex]) {
+    scroll-margin-block-start: 1rem;
+  }
+}
+
 /* Keep editable text at 16px on phones, including technical fields, so iOS
  * does not zoom the page when an editor focuses an input. */
 @media (max-width: 639px) {
