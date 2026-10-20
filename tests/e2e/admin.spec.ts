@@ -374,6 +374,12 @@ test("draft preview requires a live session and exits back to public visibility"
   page,
   browser,
 }) => {
+  // This checks the editor's returning visit; entry effects have their own
+  // public flow. They must not mask the footer while viewport geometry runs.
+  await page.addInitScript(() => {
+    sessionStorage.setItem("fhfs-overture-seen", "1");
+    sessionStorage.setItem("fhfs-splash-seen", "1");
+  });
   const visitor = await browser.newContext();
   try {
     expect((await visitor.request.get("http://localhost:3100/zh/blog/e2e-draft")).status()).toBe(
@@ -386,6 +392,7 @@ test("draft preview requires a live session and exits back to public visibility"
     await page.goto("/admin/preview?kind=post&slug=e2e-draft&locale=zh");
     await expect(page.locator("main h1")).toHaveText("私有测试草稿");
     await expect(page.getByRole("button", { name: "退出预览" })).toBeVisible();
+    await page.getByRole("button", { name: "退出预览" }).click({ trial: true });
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 844 });
       const exit = page.getByRole("button", { name: "退出预览" });
