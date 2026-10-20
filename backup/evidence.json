@@ -1,0 +1,62 @@
+[
+  {
+    "tableName": "abouts",
+    "publicRows": 2
+  },
+  {
+    "tableName": "apps",
+    "publicRows": 6
+  },
+  {
+    "tableName": "chips",
+    "publicRows": 22
+  },
+  {
+    "tableName": "copy_blocks",
+    "publicRows": 0
+  },
+  {
+    "tableName": "films",
+    "publicRows": 3
+  },
+  {
+    "tableName": "idols",
+    "publicRows": 1
+  },
+  {
+    "tableName": "intro_nodes",
+    "publicRows": 7
+  },
+  {
+    "tableName": "moments",
+    "publicRows": 580
+  },
+  {
+    "tableName": "nav_items",
+    "publicRows": 11
+  },
+  {
+    "tableName": "posts",
+    "publicRows": 5
+  },
+  {
+    "tableName": "resume_experiences",
+    "publicRows": 0
+  },
+  {
+    "tableName": "resume_profiles",
+    "publicRows": 1
+  },
+  {
+    "tableName": "secrets",
+    "publicRows": 0
+  },
+  {
+    "tableName": "timeline_entries",
+    "publicRows": 6
+  },
+  {
+    "tableName": "works",
+    "publicRows": 0
+  }
+]
