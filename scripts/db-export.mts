@@ -123,7 +123,8 @@ const [
       tableName: schema.adminContentState.tableName,
       publicRows: schema.adminContentState.publicRows,
     })
-    .from(schema.adminContentState),
+    .from(schema.adminContentState)
+    .orderBy(asc(schema.adminContentState.tableName)),
 ]);
 
 const data = {
