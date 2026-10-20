@@ -37,8 +37,9 @@ import { isNavGroup, type NavGroup } from "@/lib/nav";
  * **All of it is cached with tags.** Pages stay statically generated; the tags
  * a getter declares get collected into that page's ISR entry, so one
  * `updateTag("content")` from the admin invalidates the pages, the sitemap,
- * the feed and the OG images together. `revalidate: false` means an entry
- * lives until a tag kills it — no polling, no background recompute.
+ * the feed and the OG images together. Tags only belong to this deployment;
+ * a 30-second revalidation window also picks up edits made by fhfs against
+ * the shared database, without a call between the two applications.
  *
  * **Nothing request-variable is captured from module scope.** `unstable_cache`
  * keys on a function's arguments but not on the variables it closes over, so
@@ -72,7 +73,7 @@ export const TAGS = {
 
 const cacheOptions = (...tags: string[]) => ({
   tags: [TAGS.content, ...tags],
-  revalidate: false as const,
+  revalidate: 30,
 });
 
 // ---------------------------------------------------------------------------
@@ -835,8 +836,8 @@ const loadCopyOverrides = unstable_cache(
  * The one query on every page's render path, so it fails soft.
  *
  * The catch sits *outside* the cache on purpose: an error must not be stored.
- * Neon's free tier sleeps, and a cold-start timeout cached under
- * `revalidate: false` would pin an empty override layer in place for a year.
+ * Neon's free tier sleeps, and caching a cold-start timeout would replace
+ * working overrides with the catalogue's defaults for the cache window.
  * Failing here instead means the render falls back to the JSON catalogue and
  * the next read of this function tries the table again — the site reads
  * slightly out of date rather than not at all.
@@ -844,8 +845,8 @@ const loadCopyOverrides = unstable_cache(
  * What "the next read" is depends on the page. A request-time render (draft
  * preview, an error page) asks again on the next request. A prerendered page
  * does not: if this one query fails while a save is regenerating it, the page
- * is stored with the catalogue's lines and keeps them until the next save —
- * which is the price of the rule above, and why the error is logged.
+ * can temporarily use the catalogue's lines until its next revalidation.
+ * Keep the error visible so repeated database failures can be investigated.
  */
 export async function getCopyOverrides(locale: Locale): Promise<Record<string, unknown>> {
   try {

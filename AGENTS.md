@@ -144,10 +144,13 @@ webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SY
   above the provider, so it reads `ERROR_COPY` (`src/lib/errorCopy.ts`), a
   copy of the catalogues' `error` lines — change both, `errorCopy.test.ts`
   compares them.
-- **Database**: Neon Postgres over the HTTP driver (`src/db/index.ts`) — no
-  multi-statement transactions, and the schema is designed so none are needed
-  (tags are array columns, saves are single upserts). Schema in
-  `src/db/schema.ts`, migrations via drizzle-kit. The driver's `fetch` is
+- **Database**: Neon Postgres over the HTTP driver (`src/db/index.ts`). Admin
+  content writes use `db.batch` in one Read Committed transaction: lock the
+  table, verify its old counts, write content/upload leases, then record the
+  new expected counts in `admin_content_state`. Both deployments use this
+  protocol; see `docs/BACKUP-EDIT-AUDIT.md`. Public exports read content and
+  expected counts together in one read-only Repeatable Read transaction.
+  Schema is in `src/db/schema.ts`, migrations via drizzle-kit. The driver's `fetch` is
   wrapped in `src/db/index.ts` to retry a *connection-level* failure (the
   `fetch failed` a proxied network throws now and then); that is only safe
   because every statement is idempotent — keep writes as keyed upserts or
@@ -273,7 +276,7 @@ webhook/cache checks live in the `github*.test.ts` tests; setup: `docs/GITHUB-SY
   `IDOL_TRACKS` — the only idol with one, so a map there rather than a
   column on every row. `media.test.ts` checks the
   size of every picture in `public/` that `backup/db.json` lists.
-- **About and résumé** read one table: the three rows of
+- **About and résumé** read one table: the rows of
   `resume_experiences` are the cities (`company` the place, `role` one line
   of what the work was, oldest first), drawn on `/about` by
   `components/about/Changelog.tsx` and listed again on `/resume`. The lab's
@@ -331,8 +334,9 @@ README.md, the third in DESIGN-LOG 10-03):
 # Content lives in Postgres
 
 `src/lib/server/content.ts` is the only place the site reads content. Every getter is
-wrapped in `unstable_cache` with tags and `revalidate: false`, which is what
-lets a page stay statically prerendered while still being invalidatable — in a
+wrapped in `unstable_cache` with tags and a 30-second revalidation window,
+so edits made by either independent deployment reach this site's cache too.
+Pages stay statically prerendered while still being invalidatable — in a
 prerender those tags are collected into the page's ISR entry, so `updateTag`
 from a Server Action reaches the pages, the sitemap, the feed and the OG
 images together. Two rules follow:
@@ -352,8 +356,8 @@ Cache Components (`cacheComponents: true` / `'use cache'`) is off. What
 used to rule it out — next-intl passing the locale through `React.cache`,
 which a cached scope cannot see — is gone since the move to root params
 (2026-09-29), which `'use cache'` can read. What remains is the switch
-itself: every getter in `content.ts` is `unstable_cache` with tags and
-`revalidate: false`, and Next 16 names `'use cache'` + `cacheTag` its
+itself: every getter in `content.ts` is `unstable_cache` with tags and a bounded
+revalidation window, and Next 16 names `'use cache'` + `cacheTag` its
 replacement. That is one deliberate change of the whole read layer, verified
 against the route table (every public page must stay prerendered), not
 something to start one getter at a time.
@@ -397,10 +401,12 @@ Content keeps a diffable history that way; keep it current after bulk edits.
 That copy only moves when someone opens a pull request, so a nightly workflow
 (`.github/workflows/backup.yml`) exports on its own and commits a snapshot to
 the `db-snapshots` branch when the content changed. It is gated on
-`scripts/db-snapshot-guard.mts`: a table that had rows and came back empty
-fails the run rather than overwriting the last good snapshot — the reasoning,
-and the pure function it calls, are in `src/lib/backup.ts`. A red `backup` run
-is a real alarm. Restoring — a wrong edit, a lost project, a lost Neon account
+`scripts/db-snapshot-guard.mts`: public counts must match the transactional
+admin edit evidence. Intentional empty tables are valid; unexplained decreases
+or missing evidence fail rather than overwriting the last good snapshot.
+The protocol and rollout are in `docs/BACKUP-EDIT-AUDIT.md`; its pure checks
+are in `src/lib/backupAudit.ts`. A red `backup` run is a real alarm.
+Restoring — a wrong edit, a lost project, a lost Neon account
 and the three files that would have to change to move off Neon — is
 `docs/RECOVERY.md`.
 
