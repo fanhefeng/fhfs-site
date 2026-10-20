@@ -1,4 +1,5 @@
 "use server";
+import { auditedBatch } from "../backup";
 
 import { db } from "@/db";
 
@@ -65,7 +66,10 @@ export async function saveNavItems(_prev: ActionState, form: FormData): Promise<
   // with no header.
   const values = rows.map((row) => ({ ...row, group: row.group || null }));
   const wipe = db.delete(schema.navItems);
-  await db.batch(values.length ? [wipe, db.insert(schema.navItems).values(values)] : [wipe]);
+  await auditedBatch(
+    schema.navItems,
+    values.length ? [wipe, db.insert(schema.navItems).values(values)] : [wipe],
+  );
 
   invalidate(TAGS.nav);
   return { ok: true };

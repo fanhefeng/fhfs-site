@@ -34,9 +34,10 @@ import { asc, eq, inArray } from "drizzle-orm";
 import { stringify as toYaml } from "yaml";
 import * as schema from "../src/db/schema";
 import { connect } from "./connect.mjs";
+import { snapshotProblems } from "../src/lib/backupAudit";
 import { uploadIds } from "../src/lib/mediaUploads";
 
-const db = connect();
+const db = connect(undefined, { isolationLevel: "RepeatableRead", readOnly: true });
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = path.join(ROOT, "backup");
 /**
@@ -55,60 +56,92 @@ const STAGE = path.join(ROOT, ".backup.staging");
  * differently each time. That turns an unchanged database into a file that
  * keeps rewriting itself, and a diff that cries wolf is a diff nobody reads.
  */
-const data = {
-  posts: await db
+const [
+  posts,
+  abouts,
+  secrets,
+  moments,
+  timelineEntries,
+  apps,
+  works,
+  films,
+  idols,
+  introNodes,
+  resumeProfiles,
+  resumeExperiences,
+  chips,
+  navItems,
+  copyBlocks,
+  evidence,
+] = await db.batch([
+  db
     .select()
     .from(schema.posts)
     .where(eq(schema.posts.draft, false))
     .orderBy(asc(schema.posts.slug), asc(schema.posts.locale)),
-  abouts: await db.select().from(schema.abouts).orderBy(asc(schema.abouts.locale)),
-  secrets: await db
+  db.select().from(schema.abouts).orderBy(asc(schema.abouts.locale)),
+  db
     .select()
     .from(schema.secrets)
     .where(eq(schema.secrets.draft, false))
     .orderBy(asc(schema.secrets.slug), asc(schema.secrets.locale)),
-  moments: await db
+  db
     .select()
     .from(schema.moments)
     .where(eq(schema.moments.draft, false))
     .orderBy(asc(schema.moments.postedAt), asc(schema.moments.key)),
-  timelineEntries: await db
+  db
     .select()
     .from(schema.timelineEntries)
     .orderBy(asc(schema.timelineEntries.sort), asc(schema.timelineEntries.key)),
-  apps: await db.select().from(schema.apps).orderBy(asc(schema.apps.sort), asc(schema.apps.key)),
-  works: await db
-    .select()
-    .from(schema.works)
-    .orderBy(asc(schema.works.sort), asc(schema.works.key)),
-  films: await db
+  db.select().from(schema.apps).orderBy(asc(schema.apps.sort), asc(schema.apps.key)),
+  db.select().from(schema.works).orderBy(asc(schema.works.sort), asc(schema.works.key)),
+  db
     .select()
     .from(schema.films)
     .where(eq(schema.films.draft, false))
     .orderBy(asc(schema.films.sort), asc(schema.films.key)),
-  idols: await db
+  db
     .select()
     .from(schema.idols)
     .where(eq(schema.idols.draft, false))
     .orderBy(asc(schema.idols.sort), asc(schema.idols.key)),
-  introNodes: await db
+  db
     .select()
     .from(schema.introNodes)
     .orderBy(asc(schema.introNodes.sort), asc(schema.introNodes.key)),
-  resumeProfiles: await db
-    .select()
-    .from(schema.resumeProfiles)
-    .orderBy(asc(schema.resumeProfiles.key)),
-  resumeExperiences: await db
+  db.select().from(schema.resumeProfiles).orderBy(asc(schema.resumeProfiles.key)),
+  db
     .select()
     .from(schema.resumeExperiences)
     .orderBy(asc(schema.resumeExperiences.sort), asc(schema.resumeExperiences.key)),
-  chips: await db.select().from(schema.chips).orderBy(asc(schema.chips.sort), asc(schema.chips.id)),
-  navItems: await db
-    .select()
-    .from(schema.navItems)
-    .orderBy(asc(schema.navItems.sort), asc(schema.navItems.href)),
-  copyBlocks: await db.select().from(schema.copyBlocks).orderBy(asc(schema.copyBlocks.key)),
+  db.select().from(schema.chips).orderBy(asc(schema.chips.sort), asc(schema.chips.id)),
+  db.select().from(schema.navItems).orderBy(asc(schema.navItems.sort), asc(schema.navItems.href)),
+  db.select().from(schema.copyBlocks).orderBy(asc(schema.copyBlocks.key)),
+  db
+    .select({
+      tableName: schema.adminContentState.tableName,
+      publicRows: schema.adminContentState.publicRows,
+    })
+    .from(schema.adminContentState),
+]);
+
+const data = {
+  posts,
+  abouts,
+  secrets,
+  moments,
+  timelineEntries,
+  apps,
+  works,
+  films,
+  idols,
+  introNodes,
+  resumeProfiles,
+  resumeExperiences,
+  chips,
+  navItems,
+  copyBlocks,
   mediaUploads: [] as (typeof schema.mediaUploads.$inferSelect)[],
 };
 
@@ -122,6 +155,11 @@ if (publicUploadIds.length)
     .where(inArray(schema.mediaUploads.id, publicUploadIds))
     .orderBy(asc(schema.mediaUploads.id));
 
+const problems = snapshotProblems(data, evidence);
+if (problems.length) throw new Error(`Backup refused: ${problems.join("; ")}`);
+if (data.mediaUploads.length !== publicUploadIds.length)
+  throw new Error("Backup refused: a public upload lease is missing");
+
 // Serial ids and timestamps are restatements of the data, not part of it —
 // leaving them out keeps the diff to what someone actually changed.
 const strip = <T extends Record<string, unknown>>(rows: T[]) =>
@@ -131,6 +169,7 @@ await rm(STAGE, { recursive: true, force: true });
 await mkdir(path.join(STAGE, "posts"), { recursive: true });
 
 try {
+  await writeFile(path.join(STAGE, "evidence.json"), JSON.stringify(evidence, null, 2) + "\n");
   await writeFile(
     path.join(STAGE, "db.json"),
     JSON.stringify(

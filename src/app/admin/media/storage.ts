@@ -1,3 +1,5 @@
+import type { PgTable } from "drizzle-orm/pg-core";
+import { auditedExecute } from "../backup";
 import "server-only";
 import { and, eq, inArray, lt, or, sql, type SQLWrapper } from "drizzle-orm";
 import { db } from "@/db";
@@ -22,11 +24,13 @@ export function uploadServiceOrigin() {
  * A cancellation either wins before it (save rolls back), or observes retained
  * files afterwards. A failed content write rolls back its retention as well.
  */
-export async function saveWithUploads(query: SQLWrapper, row: unknown) {
+export async function saveWithUploads(table: PgTable, query: SQLWrapper, row: unknown) {
   const ids = uploadIds(row);
-  if (!ids.length) return { rows: (await db.execute(query)).rows };
+  if (!ids.length) return { rows: (await auditedExecute(table, query)).rows };
   try {
-    const rows = await db.execute(sql`
+    const rows = await auditedExecute(
+      table,
+      sql`
       WITH upload_locks AS MATERIALIZED (
         SELECT id FROM ${mediaUploads}
         WHERE id IN (${sql.join(
@@ -43,7 +47,8 @@ export async function saveWithUploads(query: SQLWrapper, row: unknown) {
         1 / CASE WHEN (SELECT count(*) FROM upload_locks) = ${ids.length} THEN 1 ELSE 0 END AS upload_guard,
         (SELECT count(*) FROM retained) AS upload_count
       FROM saved
-    `);
+    `,
+    );
     return { rows: rows.rows };
   } catch (error) {
     // Only this guard divides. Neon/Drizzle may wrap the Postgres error.

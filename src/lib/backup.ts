@@ -1,4 +1,7 @@
 /**
+ * Legacy snapshot comparison, retained for historical callers/tests. The live
+ * export now validates authenticated edit counts in backupAudit.ts instead.
+ *
  * The one question a new snapshot has to answer before it is allowed to
  * replace the last one.
  *

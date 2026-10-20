@@ -46,6 +46,8 @@ Healthchecks 不持有数据库、restic、B2、GitHub 或网站后台凭据。
 
 逐项证据记录在发布 PR；自然巡检与自然 create 分别验收，手工和 `workflow_run` 不能冒充 schedule。
 
+公开快照现在核对两个后台事务记录的预期行数，正常清空可自动备份；异常减少、归零或缺失证据仍告警。部署与一次性初始化见 [后台编辑与备份保护](BACKUP-EDIT-AUDIT.md)。
+
 ## 排障与回退
 
 - 先看 Actions 的 `cloud monitor`：API 审计、restic health、状态上报分开显示。

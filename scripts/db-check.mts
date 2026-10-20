@@ -14,6 +14,7 @@ const rows = async (text: string) => (await db.execute(sql.raw(text))).rows as a
  *  is a table this command quietly says nothing about — which is the one
  *  thing it exists not to do. */
 const TABLES = [
+  "admin_content_state",
   "posts",
   "abouts",
   "secrets",

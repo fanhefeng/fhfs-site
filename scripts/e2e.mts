@@ -6,6 +6,8 @@ import { createServer } from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { eq, like, or, sql } from "drizzle-orm";
+import * as schema from "../src/db/schema";
+import { BACKUP_TABLES, backupAuditQueries } from "../src/lib/backupAudit";
 import { connect } from "./connect.mjs";
 import {
   films,
@@ -307,6 +309,18 @@ try {
     };
     // A new fixture set must not reuse unstable_cache from the preceding run.
     await rm(path.join(state, "next/cache"), { recursive: true, force: true });
+    // Fixture writes above are already confined to the marked test endpoint.
+    // Initialize operational evidence after fixtures, before exercising admins.
+    await db.delete(schema.adminContentState);
+    const auditWrites = Object.keys(BACKUP_TABLES).map((key) =>
+      db.execute(
+        backupAuditQueries(schema[key as keyof typeof BACKUP_TABLES], "isolated-e2e-fixture")
+          .record,
+      ),
+    );
+    const [firstAudit, ...otherAudits] = auditWrites;
+    if (!firstAudit) throw new Error("No backup audit fixtures");
+    await db.batch([firstAudit, ...otherAudits]);
     await run(["build"]);
     interrupted.signal.throwIfAborted();
     server = spawn(

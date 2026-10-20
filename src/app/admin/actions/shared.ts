@@ -1,3 +1,4 @@
+import { auditedExecute } from "../backup";
 import "server-only";
 import { updateTag } from "next/cache";
 
@@ -138,6 +139,7 @@ export async function upsertKeyed<T extends KeyedTable>(
   if (isNew) {
     if (await taken(table, eq(table.key, row.key))) return existsError(row.key);
     const saved = await saveWithUploads(
+      table,
       db
         .insert(table)
         .values(row)
@@ -149,6 +151,7 @@ export async function upsertKeyed<T extends KeyedTable>(
   }
   const set = "updatedAt" in table ? { ...row, updatedAt: new Date() } : row;
   const updated = await saveWithUploads(
+    table,
     db
       .update(table)
       .set(set as PgUpdateSetSource<T>)
@@ -231,6 +234,7 @@ export async function upsertLongform<T extends LongformTable>(
       };
     }
     const saved = await saveWithUploads(
+      table,
       db
         .insert(table)
         .values(row)
@@ -241,6 +245,7 @@ export async function upsertLongform<T extends LongformTable>(
     return saved.error ? { error: saved.error } : null;
   }
   const updated = await saveWithUploads(
+    table,
     db
       .update(table)
       .set({ ...row, updatedAt: new Date() } as PgUpdateSetSource<T>)
@@ -257,5 +262,8 @@ export async function deleteLongform(table: LongformTable, form: FormData): Prom
   const slug = str(form, "slug");
   const locale = parseLocale(str(form, "locale"));
   if (!slug || !locale) return;
-  await db.delete(table).where(and(eq(table.slug, slug), eq(table.locale, locale)));
+  await auditedExecute(
+    table,
+    db.delete(table).where(and(eq(table.slug, slug), eq(table.locale, locale))),
+  );
 }

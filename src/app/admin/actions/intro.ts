@@ -1,4 +1,5 @@
 "use server";
+import { auditedExecute } from "../backup";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -43,6 +44,9 @@ export async function deleteIntroNode(form: FormData): Promise<void> {
   await requireAdmin();
   const key = str(form, "key");
   if (!key) return;
-  await db.delete(schema.introNodes).where(eq(schema.introNodes.key, key));
+  await auditedExecute(
+    schema.introNodes,
+    db.delete(schema.introNodes).where(eq(schema.introNodes.key, key)),
+  );
   invalidate(TAGS.intro);
 }

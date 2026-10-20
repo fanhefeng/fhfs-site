@@ -4,6 +4,7 @@ import { getTableName, is } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vite-plus/test";
 import * as schema from "@/db/schema";
+import { BACKUP_TABLES } from "@/lib/backupAudit";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const read = (file: string) => readFileSync(`${root}${file}`, "utf8");
@@ -18,6 +19,8 @@ const tables = Object.entries(schema)
  * is named here with its reason.
  */
 const NOT_CONTENT = new Set([
+  // Operational expected counts, never public content.
+  "adminContentState",
   // Failed-login timestamps by IP; they expire by themselves.
   "loginAttempts",
   // Temporary leases/tombstones stay private. Export includes only the leases
@@ -31,6 +34,11 @@ const content = tables.filter(([name]) => !NOT_CONTENT.has(name));
 // scripts treat every table a little differently, so they cannot be derived.
 // One forgotten is a backup that silently lacks a table, found at restore.
 describe("every table in the schema", () => {
+  it("has matching transactional edit evidence for every content table", () => {
+    expect(Object.entries(BACKUP_TABLES).sort(([a], [b]) => a.localeCompare(b))).toEqual(
+      [...content].sort(([a], [b]) => a.localeCompare(b)),
+    );
+  });
   it("is found", () => {
     expect(tables.length).toBeGreaterThan(10);
     expect([...NOT_CONTENT].filter((name) => !tables.some(([t]) => t === name))).toEqual([]);

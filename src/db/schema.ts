@@ -37,6 +37,26 @@ export const appCategoryEnum = pgEnum("app_category", ["desktop", "tool", "game"
 export const chipToneEnum = pgEnum("chip_tone", ["paper", "ink", "accent"]);
 export const secretKindEnum = pgEnum("secret_kind", ["essay", "podcast"]);
 
+/** Operational backup evidence. Never exported as public content. Both admins
+ * update it atomically with content; the backup role can only read it.
+ */
+export const adminContentState = pgTable(
+  "admin_content_state",
+  {
+    tableName: text("table_name").primaryKey(),
+    totalRows: integer("total_rows").notNull(),
+    publicRows: integer("public_rows").notNull(),
+    revision: text().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      "admin_content_state_counts",
+      sql`${t.totalRows} >= ${t.publicRows} AND ${t.publicRows} >= 0`,
+    ),
+  ],
+);
+
 /** Upload leases, not content. A save retains its files in the same SQL statement. */
 export const mediaUploads = pgTable(
   "media_uploads",
