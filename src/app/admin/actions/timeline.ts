@@ -1,4 +1,5 @@
 "use server";
+import { auditedExecute } from "../backup";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -60,6 +61,9 @@ export async function deleteTimelineEntry(form: FormData): Promise<void> {
   await requireAdmin();
   const key = str(form, "key");
   if (!key) return;
-  await db.delete(schema.timelineEntries).where(eq(schema.timelineEntries.key, key));
+  await auditedExecute(
+    schema.timelineEntries,
+    db.delete(schema.timelineEntries).where(eq(schema.timelineEntries.key, key)),
+  );
   invalidate(TAGS.timeline);
 }

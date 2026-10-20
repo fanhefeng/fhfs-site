@@ -1,26 +1,14 @@
-/**
- * Refuses a snapshot that lost a table.
- *
- * Stands between `db:export` and the commit the nightly backup makes on its
- * own (.github/workflows/backup.yml). The reasoning is in `src/lib/backup.ts`;
- * the short version is that an export which succeeds but comes back empty
- * writes a file full of empty arrays over the last good one, and nobody is
- * watching a job that passes.
- *
- * The comparison is against the newest real snapshot there is. The workflow
- * hands over the one it last committed on `db-snapshots`: main's `backup/`
- * only moves with a pull request, so a table filled in the admin and emptied
- * again between two of them would pass a check against main. Without an
- * argument — the first run, before the branch exists, or by hand — it is
- * `backup/` as `HEAD` has it, before `db:export` overwrote the working tree.
- *
- *   pnpm db:export && pnpm tsx scripts/db-snapshot-guard.mts [last/db.json]
+/** Validate a complete export against transactional admin-edit evidence.
+ * Intentional clearing is valid; unexplained loss or missing evidence blocks
+ * the commit. The last snapshot also detects a formerly exported table omitted
+ * by a newer exporter. No acknowledgement flags or production writes here.
  */
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { tablesEmptied, type Snapshot } from "../src/lib/backup";
+import { snapshotProblems, type BackupState } from "../src/lib/backupAudit";
+import { type Snapshot } from "../src/lib/backup";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -37,13 +25,19 @@ const before = JSON.parse(committed) as Snapshot;
 console.log(`comparing against ${against ?? "HEAD:backup/db.json"}`);
 const after = JSON.parse(await readFile(path.join(ROOT, "backup", "db.json"), "utf8")) as Snapshot;
 
-const emptied = tablesEmptied(before, after);
+const evidence = JSON.parse(
+  await readFile(path.join(ROOT, "backup", "evidence.json"), "utf8"),
+) as BackupState[];
+const problems = snapshotProblems(after, evidence);
+for (const name of Object.keys(before)) {
+  if (!(name in after)) problems.push(`${name}: previous snapshot table is missing`);
+}
 
-if (emptied.length) {
+if (problems.length) {
   console.error(
-    `refusing the snapshot: ${emptied.join(", ")} had rows and came back empty.\n` +
-      "Either the database is in trouble or the export read the wrong one. If the\n" +
-      "table really was emptied on purpose, run `pnpm db:export` by hand and commit it.",
+    `Public snapshot refused: ${problems.join("; ")}.\n` +
+      "Authenticated admin edits and their expected row counts must agree. " +
+      "Inspect the source database and edit evidence; do not bypass this guard.",
   );
   process.exit(1);
 }

@@ -43,6 +43,9 @@ if (!url) {
  */
 neonConfig.fetchFunction = withConnectionRetry((input, init) => fetch(input, init));
 
-export const db = drizzle(url, { schema });
+export const db = drizzle({
+  connection: { connectionString: url, isolationLevel: "ReadCommitted" },
+  schema,
+});
 
 export * from "./schema";

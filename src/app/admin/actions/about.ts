@@ -24,6 +24,7 @@ export async function saveAbout(_prev: ActionState, form: FormData): Promise<Act
   };
 
   const saved = await saveWithUploads(
+    schema.abouts,
     db
       .insert(schema.abouts)
       .values(row)

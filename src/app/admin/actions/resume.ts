@@ -1,4 +1,5 @@
 "use server";
+import { auditedExecute } from "../backup";
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -73,13 +74,16 @@ export async function saveResumeProfile(_prev: ActionState, form: FormData): Pro
     note: note.zh || note.en ? note : null,
   };
 
-  await db
-    .insert(schema.resumeProfiles)
-    .values(row)
-    .onConflictDoUpdate({
-      target: schema.resumeProfiles.key,
-      set: { ...row, updatedAt: new Date() },
-    });
+  await auditedExecute(
+    schema.resumeProfiles,
+    db
+      .insert(schema.resumeProfiles)
+      .values(row)
+      .onConflictDoUpdate({
+        target: schema.resumeProfiles.key,
+        set: { ...row, updatedAt: new Date() },
+      }),
+  );
 
   invalidate(TAGS.resume);
   return { ok: true };
@@ -141,6 +145,9 @@ export async function deleteResumeExperience(form: FormData): Promise<void> {
   await requireAdmin();
   const key = str(form, "key");
   if (!key) return;
-  await db.delete(schema.resumeExperiences).where(eq(schema.resumeExperiences.key, key));
+  await auditedExecute(
+    schema.resumeExperiences,
+    db.delete(schema.resumeExperiences).where(eq(schema.resumeExperiences.key, key)),
+  );
   invalidate(TAGS.resume);
 }

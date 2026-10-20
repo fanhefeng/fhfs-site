@@ -10,14 +10,17 @@
  * more patient delays — a script has nobody waiting on a page — and a line
  * on stderr each time, so a slow restore says what it is doing.
  */
-import { neonConfig } from "@neondatabase/serverless";
+import { type HTTPTransactionOptions, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "../src/db/schema";
 import { withConnectionRetry } from "../src/lib/retryFetch";
 
 const RETRY_DELAYS = [500, 1500, 4000, 8000];
 
-export function connect(explicitUrl?: string) {
+export function connect(
+  explicitUrl?: string,
+  transaction: Pick<HTTPTransactionOptions<false, false>, "isolationLevel" | "readOnly"> = {},
+) {
   try {
     process.loadEnvFile(".env.local");
   } catch {
@@ -36,7 +39,7 @@ export function connect(explicitUrl?: string) {
     },
   );
 
-  return drizzle(url, { schema });
+  return drizzle({ connection: { connectionString: url, ...transaction }, schema });
 }
 
 export type Db = ReturnType<typeof connect>;
