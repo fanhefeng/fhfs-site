@@ -26,10 +26,10 @@ overrides:
 # The toolchain moves as one: vite-plus, and the Vite and Vitest it pins.
 # Bump them together, to what the new vite-plus lists as its dependencies.
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
-  vitest: 5.0.3
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
+  vitest: 5.0.5
   vite-plus: 1.3.0
-  "@vitest/coverage-v8": 5.0.3
+  "@vitest/coverage-v8": 5.0.5
 peerDependencyRules:
   allowAny:
     - vite
