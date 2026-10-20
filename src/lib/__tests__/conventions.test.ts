@@ -93,9 +93,14 @@ describe("the database", () => {
     expect(uncached).toEqual([]);
   });
 
-  it("is never cached with a revalidate window in content.ts", () => {
+  it("refreshes shared public content within a 30-second cache window", () => {
     const content = files.find(({ file }) => file === "lib/server/content.ts")!;
-    expect(content.text.match(/revalidate:\s*\d+/g) ?? []).toEqual([]);
+    const source = content.text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    const windows = [...source.matchAll(/\brevalidate:\s*(false|\d+)\b/g)].map((m) => m[1]!);
+    expect(windows.length).toBeGreaterThan(0);
+    expect(
+      windows.filter((value) => value === "false" || Number(value) <= 0 || Number(value) > 30),
+    ).toEqual([]);
   });
 });
 
