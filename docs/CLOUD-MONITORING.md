@@ -106,3 +106,13 @@ GitHub 调度没有准点保证，超出余量的长时间延迟仍应告警，�
 
 官方来源：[restic 0.19.1](https://github.com/restic/restic/releases/tag/v0.19.1)、
 [官方二进制校验说明](https://restic.readthedocs.io/en/stable/020_installation.html#official-binaries)。
+
+10 月 23 日修复分支实测：
+
+- [云端巡检 39928359058](https://github.com/fanhefeng/fhfs-site/actions/runs/39928359058)
+  首次无缓存，完成官方 Linux 发布包下载、摘要校验、真实仓库 health 与成功上报，整轮约 39 秒。
+- [独立 health 39928488680](https://github.com/fanhefeng/fhfs-site/actions/runs/39928488680)
+  命中同一压缩包缓存，重新校验后完成真实仓库 health，整轮约 33 秒；未执行 Postgres 安装或恢复。
+- 两次均为修复分支的 `workflow_dispatch`，不替代 main 的自然调度证据。
+- 本地 `pnpm check` 的 434 项测试、`pnpm build`、生产依赖审计、ShellCheck、actionlint
+  及 restic 0.19.1 的临时本地加密仓库往返与篡改检测均通过；完整公开浏览器 smoke 的 61 页全部通过。
