@@ -41,17 +41,28 @@ jobs:
           AUDIT_REPOSITORY: ${{ github.repository }}
           AUDIT_BRANCH: ${{ github.event.repository.default_branch }}
         run: pnpm exec tsx scripts/monitor.mts audit "$AUDIT_REPOSITORY" "$AUDIT_BRANCH"
+      # Cache is optional. A cache outage falls back to the bounded official download.
+      - name: Cache verified restic archive
+        uses: actions/cache@v6
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
+        with:
+          path: ${{ runner.temp }}/fhfs-restic-download
+          key: restic-linux-amd64-${{ hashFiles('scripts/install-restic.sh') }}
+      - name: Install verified restic
+        timeout-minutes: 3
+        run: bash scripts/install-restic.sh "$RUNNER_TEMP/fhfs-restic-download" "$RUNNER_TEMP/fhfs-restic-bin"
       - name: Read encrypted repository freshness
+        timeout-minutes: 3
         env:
           RESTIC_REPOSITORY: ${{ secrets.RESTIC_REPOSITORY }}
           RESTIC_PASSWORD: ${{ secrets.RESTIC_PASSWORD }}
           AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ vars.BACKUP_AWS_REGION }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y restic
-          pnpm backup:private health
+        run: pnpm backup:private health
       - name: Report to independent watchdog
         if: always()
         env:

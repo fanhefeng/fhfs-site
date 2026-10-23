@@ -35,6 +35,20 @@ Healthchecks 不持有数据库、restic、B2、GitHub 或网站后台凭据。
 专用 ping URL 具有上报权，保存在 Actions Secret `HEALTHCHECKS_PING_URL`，不进入代码和公共日志。
 管理 API 密钥只在配置/演练期间使用，收尾撤销，不放入 Actions。
 
+## 巡检工具安装
+
+云端巡检与独立 `health` 共用 `scripts/install-restic.sh`，固定官方 restic 0.19.1 的 Linux amd64
+发布包与 SHA-256；不再调用 Ubuntu 软件源安装 restic。下载连接超时 10 秒、单次最多 30 秒，
+最多三次尝试；安装步骤最多 3 分钟，云端真实仓库 health 步骤最多 3 分钟，整体仍为 12 分钟。
+
+缓存只保存压缩包，不保存可执行文件或健康结果；每次使用前重新校验摘要，再解压到本次 runner
+的独立目录。缓存步骤最多 1 分钟，缓存不可用时直接下载；下载失败、摘要不符或实际 health
+失败均使巡检失败并发送 `/fail`，只有缓存本身允许 `continue-on-error`。
+
+每日创建与恢复操作仍需安装 Postgres 客户端；独立 `health` 不走这条软件源路径。
+12 小时 health、36 小时备份与自然 create、35 天恢复证据和外部看门狗窗口均保持不变。
+CI 用相同安装脚本执行临时本地加密仓库往返与篡改检测，不接触生产数据库或远端备份仓库。
+
 ## 迁移顺序
 
 1. 创建正式和独立演练检查，确认邮箱集成；保留本地巡检。
@@ -74,3 +88,21 @@ Healthchecks 不持有数据库、restic、B2、GitHub 或网站后台凭据。
 GitHub 调度没有准点保证，超出余量的长时间延迟仍应告警，不能承诺消除所有由调度引起的通知。
 
 资料：[Healthchecks](https://healthchecks.io/docs/)、[GitHub 工作流停用规则](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/disable-and-enable-workflows)。
+
+## 2026-10-22 软件源超时告警复盘
+
+北京时间 20:56:27，[巡检 39782444132](https://github.com/fanhefeng/fhfs-site/actions/runs/39782444132)
+的工作流审计全部通过，随后 `apt-get update` 访问 `azure.archive.ubuntu.com` 多次重试后停滞。
+21:08:42 GitHub 记录 `The job has exceeded the maximum execution time of 12m0s` 并取消任务；
+`always()` 状态上报于 21:08:43 发送失败，Healthchecks 随即 DOWN。该轮尚未执行真实仓库 health。
+
+22:09:33，[下一轮巡检 39793174607](https://github.com/fanhefeng/fhfs-site/actions/runs/39793174607)
+完成真实仓库检查并发送成功，Healthchecks 恢复 UP，持续约 1 小时 1 分钟。两轮使用相同代码；
+证据指向 runner 软件源访问停滞，没有显示备份损坏或网站 HTTP 宕机。
+
+修复移除两条健康巡检路径的 apt 依赖，固定并校验官方二进制，限制下载时间且允许缓存故障回退。
+回归直接执行工作流中的 shell，模拟软件源不可用、真实 health 非零退出、取消状态、下载超时与
+损坏压缩包；失败仍上报 `/fail`，不会以旧成功或缓存结果冒充真实健康。
+
+官方来源：[restic 0.19.1](https://github.com/restic/restic/releases/tag/v0.19.1)、
+[官方二进制校验说明](https://restic.readthedocs.io/en/stable/020_installation.html#official-binaries)。

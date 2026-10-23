@@ -51,6 +51,13 @@ jobs:
       # gate as local `pnpm check`.
       - run: pnpm check
 
+      # Synthetic bytes and a temporary local restic repository; no database or remote storage.
+      - name: Verify pinned backup client and local encrypted round trip
+        timeout-minutes: 3
+        run: |
+          bash scripts/install-restic.sh "$RUNNER_TEMP/fhfs-restic-download" "$RUNNER_TEMP/fhfs-restic-bin"
+          PATH="$RUNNER_TEMP/fhfs-restic-bin:$PATH" pnpm backup:private:selftest
+
       - run: pnpm audit --prod --audit-level high
 
   # What `check` cannot see. A relative import one folder too shallow, a page
@@ -91,5 +98,5 @@ jobs:
       - if: env.DATABASE_URL != ''
         run: |
           pnpm start &
-          for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/robots.txt && break; sleep 1; done
+          for _ in $(seq 1 30); do curl -sf -o /dev/null http://localhost:3000/robots.txt && break; sleep 1; done
           pnpm smoke http://localhost:3000
