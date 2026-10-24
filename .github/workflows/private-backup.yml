@@ -58,17 +58,32 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+        timeout-minutes: 3
+      # Cache is optional. A cache outage falls back to the bounded official download.
+      - name: Cache verified restic archive
+        uses: actions/cache@v6
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 1
+        with:
+          path: ${{ runner.temp }}/fhfs-restic-download
+          key: restic-linux-amd64-${{ hashFiles('scripts/install-restic.sh') }}
+      - name: Install verified restic
+        timeout-minutes: 3
+        run: bash scripts/install-restic.sh "$RUNNER_TEMP/fhfs-restic-download" "$RUNNER_TEMP/fhfs-restic-bin"
       - name: Install native backup clients
+        if: steps.operation.outputs.value != 'health'
+        timeout-minutes: 8
         env:
           OPERATION: ${{ steps.operation.outputs.value }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y restic
           if [ "$OPERATION" != health ]; then
-            sudo apt-get install -y postgresql-common
+            sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
+            sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y postgresql-common
             sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
-            sudo apt-get update
-            sudo apt-get install -y postgresql-client-18
+            sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
+            sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 install -y postgresql-client-18
             echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
           fi
       - name: Run backup operation and verify freshness

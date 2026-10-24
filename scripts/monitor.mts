@@ -4,7 +4,6 @@ import {
   latestAttemptFirst,
   mergeRunAttempts,
   monitorChecks,
-  requiredJob,
   restoreComparisonPassed,
   validHealthchecksUrl,
   type MonitorJob,
@@ -15,12 +14,17 @@ import { is } from "drizzle-orm";
 import { getTableConfig, PgTable } from "drizzle-orm/pg-core";
 import * as schema from "../src/db/schema";
 import { withConnectionRetry } from "../src/lib/retryFetch";
+import {
+  JOB_EVIDENCE_WINDOW_MS,
+  MonitorEvidenceError,
+  readJobEvidence,
+} from "../src/lib/node/monitorEvidence";
 
 class MonitorError extends Error {}
 const [command, repository, branch = "main"] = process.argv.slice(2);
 const readFetch = withConnectionRetry(fetch, [500, 1500]);
 
-async function github(path: string): Promise<Response> {
+async function github(path: string, signal?: AbortSignal): Promise<Response> {
   const token = process.env.GITHUB_TOKEN;
   if (!token) throw new MonitorError("GITHUB_TOKEN is missing");
   const response = await readFetch(`https://api.github.com/repos/${repository}/${path}`, {
@@ -30,15 +34,15 @@ async function github(path: string): Promise<Response> {
       "X-GitHub-Api-Version": "2022-11-28",
     },
     redirect: "manual",
-    signal: AbortSignal.timeout(30_000),
+    signal: AbortSignal.any([AbortSignal.timeout(30_000), ...(signal ? [signal] : [])]),
   });
   if (!response.ok && response.status !== 302)
     throw new MonitorError(`GitHub verification unavailable (HTTP ${response.status})`);
   return response;
 }
 
-async function json<T>(path: string): Promise<T> {
-  const response = await github(path);
+async function json<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const response = await github(path, signal);
   if (response.status === 302) throw new MonitorError("Unexpected GitHub metadata redirect");
   return (await response.json()) as T;
 }
@@ -157,22 +161,43 @@ async function audit() {
     if (history[0] && history[0].conclusion !== "success")
       problems.push(`${operation}: latest run did not succeed`);
   }
-  const verified = new Set<number>();
-  for (const spec of specifications) {
+  const assessments = specifications.map((spec) => {
     const assessment = assessRuns(spec.runs, now, spec.hours, branch, {
       freshnessRuns: spec.freshnessRuns,
     });
     problems.push(...assessment.problems.map((problem) => `${spec.label}: ${problem}`));
+    return { spec, assessment };
+  });
+  // Known workflow failures or stale backups do not wait for metadata retries.
+  if (problems.length) throw new MonitorError(problems.join("\n"));
+  const verified = new Set<number>();
+  const evidenceDeadline = Date.now() + JOB_EVIDENCE_WINDOW_MS;
+  for (const { spec, assessment } of assessments) {
     const run = assessment.successful;
     if (!run || verified.has(run.id)) continue;
-    const data = await json<{ jobs: MonitorJob[] }>(`actions/runs/${run.id}/jobs?per_page=100`);
-    if (!Array.isArray(data.jobs)) throw new MonitorError("Invalid job evidence");
-    const job = requiredJob(data.jobs, spec.step);
-    if (!job) problems.push(`${spec.label}: critical step did not execute successfully`);
-    else if (spec.label === "restore-database" && !(await nativeRestoreLog(job)))
-      problems.push("restore-database: native comparison evidence is missing");
+    let job: MonitorJob;
+    try {
+      job = await readJobEvidence(run, spec.step, json, { deadline: evidenceDeadline });
+    } catch (error) {
+      if (!(error instanceof MonitorEvidenceError)) throw error;
+      throw new MonitorError(
+        `${spec.label}: ${error.message} (run ${run.id}, attempt ${run.run_attempt})`,
+      );
+    }
+    if (spec.label === "restore-database" && !(await nativeRestoreLog(job)))
+      throw new MonitorError("restore-database: native comparison evidence is missing");
     else console.log(`${spec.label}: actual successful ${run.event} run ${run.id}`);
     verified.add(run.id);
+  }
+  // Waiting for metadata never extends the age of the accepted backup evidence.
+  for (const spec of specifications) {
+    const final = assessRuns(spec.runs, Date.now(), spec.hours, branch, {
+      freshnessRuns: spec.freshnessRuns,
+    });
+    for (const problem of final.problems) {
+      const message = `${spec.label}: ${problem}`;
+      if (!problems.includes(message)) problems.push(message);
+    }
   }
   if (problems.length) throw new MonitorError(problems.join("\n"));
   console.log("Cloud workflow audit passed; encrypted repository freshness is checked separately.");
