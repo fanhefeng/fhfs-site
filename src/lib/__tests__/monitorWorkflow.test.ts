@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vite-plus/test";
 import { parse } from "yaml";
 
 type Step = {
+  if?: string;
   name?: string;
   run?: string;
   uses?: string;
@@ -49,6 +50,24 @@ function harness() {
 }
 
 describe("cloud monitor workflow execution", () => {
+  it("bounds dependency setup and audit separately while retaining the watchdog", () => {
+    for (const job of [monitor, backup]) {
+      const dependencies = job.steps.find((s) => s.run === "pnpm install --frozen-lockfile")!;
+      expect(dependencies["timeout-minutes"]).toBe(3);
+      expect(dependencies["continue-on-error"]).not.toBe(true);
+    }
+    expect(
+      step(monitor.steps, "Audit workflow state and actual execution")["timeout-minutes"],
+    ).toBe(4);
+    expect(step(monitor.steps, "Report to independent watchdog").if).toBe("always()");
+    const native = step(backup.steps, "Install native backup clients");
+    expect(native["timeout-minutes"]).toBe(8);
+    expect(native.if).toBe("steps.operation.outputs.value != 'health'");
+    expect(native.run).toContain("Acquire::http::Timeout=20");
+    expect(native.run).toContain("Acquire::https::Timeout=20");
+    expect(native.run).toContain("Acquire::Retries=2");
+  });
+
   it("runs the real health command even when the Ubuntu mirror is unavailable", () => {
     const fixture = harness();
     const result = fixture.execute(step(monitor.steps, "Read encrypted repository freshness").run!);
