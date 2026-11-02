@@ -82,6 +82,11 @@ export const COPY_GROUPS: CopyGroup[] = [
   },
   { id: "home", label: "首页 · 正文三节", blurb: "软件、文章、最近这三节的标题，和「找到我」。" },
   { id: "blog", label: "文章 /blog", blurb: "列表页和文章页上除正文以外的文字。" },
+  {
+    id: "notebook",
+    label: "手记 /blog/notes",
+    blurb: "手记目录、分类、阅读页和资料来源的固定文字。",
+  },
   { id: "software", label: "软件 /software", blurb: "页面标题、分类名和唱机上的标签。" },
   { id: "lab", label: "实验室 /lab", blurb: "每一则的名字、摘要、说明和演示里的文字。" },
   {

@@ -1,6 +1,7 @@
 import type { App } from "@/lib/server/content";
 import type { Locale } from "@/i18n/routing";
 import type { GithubProject, Release, RepositoryStats } from "@/lib/githubData";
+import { appGithubRepo } from "@/lib/githubData";
 
 /** The four buckets the segmented filter offers, in display order — the same
  *  union `App["category"]` carries out of the database enum. */
@@ -83,6 +84,7 @@ export function toSoftwareApp(
   github?: GithubProject,
 ): SoftwareApp {
   const category = app.category;
+  const repo = appGithubRepo(app);
   const release = github?.release ?? undefined;
   const downloadable =
     (category === "desktop" || category === "tool") && Boolean(release?.downloads.length);
@@ -105,7 +107,7 @@ export function toSoftwareApp(
     version: release?.version,
     release,
     stats: github?.stats ?? undefined,
-    repoUrl: app.repo ? `https://github.com/${app.repo}` : undefined,
+    repoUrl: repo ? `https://github.com/${repo}` : undefined,
     downloadUrl: downloadable ? release?.url : undefined,
   };
 }

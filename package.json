@@ -35,7 +35,8 @@
     "db:check": "tsx scripts/db-check.mts",
     "db:export": "tsx scripts/db-export.mts",
     "db:import": "tsx scripts/db-import.mts",
-    "admin:password": "tsx scripts/admin-password.mts"
+    "admin:password": "tsx scripts/admin-password.mts",
+    "import:notebook": "node --import tsx scripts/import-notebook.ts"
   },
   "dependencies": {
     "@formatjs/icu-messageformat-parser": "3.5.21",

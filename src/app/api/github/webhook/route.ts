@@ -1,5 +1,5 @@
 import { revalidateTag } from "next/cache";
-import { githubCacheTag, githubEventRepo } from "@/lib/githubData";
+import { appGithubRepo, githubCacheTag, githubEventRepo } from "@/lib/githubData";
 import { getApps } from "@/lib/server/content";
 import { readGithubBody, validGithubSignature } from "@/lib/server/githubWebhook";
 
@@ -28,7 +28,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!repo) return Response.json({ ignored: true });
 
   const apps = await getApps();
-  if (!apps.some((app) => app.repo?.toLowerCase() === repo.toLowerCase())) {
+  if (!apps.some((app) => appGithubRepo(app) === repo.toLowerCase())) {
     return Response.json({ ignored: true });
   }
 

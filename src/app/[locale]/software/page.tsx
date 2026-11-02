@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { appGithubRepo } from "@/lib/githubData";
 import { pageLocale } from "@/i18n/page";
 import { getApps } from "@/lib/server/content";
 import { getGithubProjects } from "@/lib/server/github";
@@ -25,9 +26,9 @@ export default async function SoftwarePage({ params }: PageProps<"/[locale]/soft
   const t = await getTranslations("software");
 
   const rows = await getApps();
-  const github = await getGithubProjects(rows.map((app) => app.repo));
+  const github = await getGithubProjects(rows.map(appGithubRepo));
   const apps = rows.map((app, i) =>
-    toSoftwareApp(app, i, locale, app.repo ? github.get(app.repo) : undefined),
+    toSoftwareApp(app, i, locale, github.get(appGithubRepo(app) ?? "")),
   );
 
   return (

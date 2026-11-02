@@ -25,22 +25,22 @@ export function SectionHeader({
 }) {
   return (
     <Reveal>
-      <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
-        <h2 id={id} className="flex items-baseline gap-3 text-title">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
+        <h2 id={id} className="flex min-w-0 max-w-full items-baseline gap-3 text-title">
           {index ? (
             <span
               aria-hidden="true"
-              className="font-mono text-meta uppercase tracking-meta text-fg-tertiary"
+              className="shrink-0 font-mono text-meta uppercase tracking-meta text-fg-tertiary"
             >
               № {index}
             </span>
           ) : null}
-          {title}
+          <span className="min-w-0 break-words">{title}</span>
         </h2>
         {href && viewAllLabel ? (
           <Link
             href={href}
-            className="hit-ext font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
+            className="hit-ext ml-auto max-w-full shrink-0 break-words font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
           >
             {viewAllLabel}
           </Link>

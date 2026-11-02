@@ -62,7 +62,7 @@ export default async function FilmsPage({ params }: PageProps<"/[locale]/films">
                   )}
                 </span>
                 <span className="mt-3 flex items-baseline justify-between gap-4">
-                  <span className="text-heading text-fg transition-colors group-hover:text-accent">
+                  <span className="text-heading text-fg underline decoration-transparent underline-offset-4 transition-colors group-hover:text-accent group-hover:decoration-current group-focus-visible:decoration-current">
                     {film.title}
                   </span>
                   <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
@@ -79,9 +79,6 @@ export default async function FilmsPage({ params }: PageProps<"/[locale]/films">
                   {film.track && (
                     <span>{t("record", { title: tTracks(`${film.track}.title`) })}</span>
                   )}
-                </span>
-                <span className="mt-2 block font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                  {t("open")} →
                 </span>
               </Link>
             </li>

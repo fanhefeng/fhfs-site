@@ -4,6 +4,7 @@ import { getPosts, getAllTags } from "@/lib/server/content";
 import { sectionMetadata } from "@/lib/server/seo";
 import { YearIndex } from "@/components/blog/PostCard";
 import { TagPill } from "@/components/blog/TagPill";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/fx/Reveal";
 
 export const generateMetadata = sectionMetadata("blog", "/blog");
@@ -30,6 +31,26 @@ export default async function BlogPage({ params }: PageProps<"/[locale]/blog">) 
           </p>
         )}
       </Reveal>
+
+      <Link
+        href="/blog/notes"
+        className="group mb-12 flex items-center justify-between gap-6 border-y border-line py-6"
+      >
+        <span>
+          <span className="font-mono text-meta uppercase tracking-meta text-accent">
+            {t("notebookTitle")}
+          </span>
+          <span className="mt-2 block text-small leading-relaxed text-fg-secondary">
+            {t("notebookDescription")}
+          </span>
+        </span>
+        <span
+          aria-hidden
+          className="text-fg-tertiary transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none"
+        >
+          ↗
+        </span>
+      </Link>
 
       {tags.length > 0 && (
         <Reveal

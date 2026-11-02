@@ -9,8 +9,29 @@ export type Release = {
   downloads: { name: string; url: string; size: number }[];
 };
 
-export type RepositoryStats = { stars: number; forks: number };
+export type RepositoryStats = {
+  stars: number;
+  forks: number;
+  language: string | null;
+  pushedAt: string | null;
+};
 export type GithubProject = { release: Release | null; stats: RepositoryStats | null };
+
+/** An explicit repo wins; a GitHub project website also works without a repo field. */
+export function appGithubRepo(app: { repo: string | null; website?: string }): string | null {
+  if (app.repo && validGithubRepo(app.repo)) return app.repo.toLowerCase();
+  if (!app.website) return null;
+  try {
+    const url = new URL(app.website);
+    if (url.origin !== "https://github.com" || url.username || url.password) return null;
+    const parts = url.pathname.split("/");
+    if (!parts[1] || !parts[2]) return null;
+    const repo = `${parts[1]}/${parts[2].replace(/\.git$/, "")}`;
+    return validGithubRepo(repo) ? repo.toLowerCase() : null;
+  } catch {
+    return null;
+  }
+}
 
 /** GitHub repository names are case-insensitive; cache invalidation must be too. */
 export const githubCacheTag = (repo: string): string => `github:${repo.toLowerCase()}`;
@@ -88,7 +109,15 @@ export function parseGithubStats(value: unknown): RepositoryStats | null {
   if (!row || row.private !== false || !count(row.stargazers_count) || !count(row.forks_count)) {
     return null;
   }
-  return { stars: row.stargazers_count, forks: row.forks_count };
+  return {
+    stars: row.stargazers_count,
+    forks: row.forks_count,
+    language: typeof row.language === "string" && row.language.trim() ? row.language.trim() : null,
+    pushedAt:
+      typeof row.pushed_at === "string" && Number.isFinite(Date.parse(row.pushed_at))
+        ? new Date(row.pushed_at).toISOString()
+        : null,
+  };
 }
 
 const SYNC_EVENTS = new Set([

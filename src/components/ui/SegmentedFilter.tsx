@@ -36,15 +36,31 @@ export function SegmentedFilter({ options, value, onChange, ariaLabel, className
       const pill = pillRef.current;
       if (!root || !pill) return;
       const btn = root.querySelector<HTMLElement>(`[data-seg="${CSS.escape(value)}"]`);
-      if (!btn) return;
-      const next = { x: btn.offsetLeft, width: btn.offsetWidth };
+      if (!btn) {
+        Flip.killFlipsOf(pill, false);
+        gsap.set(pill, { autoAlpha: 0 });
+        return;
+      }
+      const next = {
+        x: btn.offsetLeft,
+        width: btn.offsetWidth,
+        autoAlpha: 1,
+        // An interrupted Flip leaves sizing constraints on the element.
+        // Reset those before measuring the next destination.
+        clearProps: "height,minWidth,maxWidth,minHeight,maxHeight",
+      };
 
       if (!animate) {
+        Flip.killFlipsOf(pill, false);
         gsap.set(pill, next);
         return;
       }
-      // Capture where the pill is, move it, let Flip play the difference.
-      const state = Flip.getState(pill);
+      // Capture the rendered position before stopping a previous flight.
+      // getState's default completes it first, causing rapid switches to jump.
+      // GSAP supports kill here; its bundled state type omits the option.
+      const captureOptions: Flip.FlipStateVars & { kill: boolean } = { kill: false };
+      const state = Flip.getState(pill, captureOptions);
+      Flip.killFlipsOf(pill, false);
       gsap.set(pill, next);
       Flip.from(state, { duration: 0.42, ease: EASE.default, absolute: false });
     },
@@ -61,15 +77,12 @@ export function SegmentedFilter({ options, value, onChange, ariaLabel, className
     { dependencies: [place], scope: rootRef },
   );
 
-  /* Re-seat on resize (label widths change with the viewport) — never
-   * animated, it is a layout correction, not a transition. One observer for
-   * the control's life, reading the current `place` through a ref: rebuilt on
-   * every change, its first notification (which every observer delivers on
-   * `observe`) landed one frame into the Flip and set the pill at its end,
-   * then the tween pulled it back — a one-frame flash on every switch. The
-   * initial notification is skipped for the same reason, and so is any that
-   * arrives mid-Flip; the Flip is already heading for the right slot. */
+  /* Layout corrections are instant. Observe the labels too: a translated
+   * label or a loaded font can change offsets inside a fixed-width scroller
+   * without resizing its outer box. Skip the observer's initial notification
+   * so mounting it does not interrupt a selection transition. */
   const placeRef = useRef(place);
+  const optionValues = options.map((option) => option.value).join("\n");
   useEffect(() => {
     placeRef.current = place;
   }, [place]);
@@ -82,21 +95,39 @@ export function SegmentedFilter({ options, value, onChange, ariaLabel, className
         first = false;
         return;
       }
-      if (pillRef.current && Flip.isFlipping(pillRef.current)) return;
       placeRef.current(false);
     });
     ro.observe(root);
-    return () => ro.disconnect();
-  }, []);
+    root.querySelectorAll<HTMLElement>("[data-seg]").forEach((button) => ro.observe(button));
+    let live = true;
+    void document.fonts.ready.then(() => {
+      if (live) placeRef.current(false);
+    });
+    return () => {
+      live = false;
+      ro.disconnect();
+    };
+  }, [optionValues]);
 
   const onKeyDown = useCallback(
     (e: ReactKeyboardEvent<HTMLDivElement>) => {
       const dir = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-      if (!dir) return;
+      if ((!dir && e.key !== "Home" && e.key !== "End") || options.length === 0) return;
+      const focused =
+        e.target instanceof Element ? e.target.closest<HTMLElement>("[data-seg]") : null;
+      if (!focused || !e.currentTarget.contains(focused)) return;
       e.preventDefault();
-      const i = options.findIndex((o) => o.value === value);
-      const next = options[(i + dir + options.length) % options.length]!;
-      onChange(next.value);
+      const i = options.findIndex((o) => o.value === focused.dataset.seg);
+      if (i < 0) return;
+      const next =
+        options[
+          e.key === "Home"
+            ? 0
+            : e.key === "End"
+              ? options.length - 1
+              : (i + dir + options.length) % options.length
+        ]!;
+      if (next.value !== value) onChange(next.value);
       rootRef.current
         ?.querySelector<HTMLElement>(`[data-seg="${CSS.escape(next.value)}"]`)
         ?.focus();

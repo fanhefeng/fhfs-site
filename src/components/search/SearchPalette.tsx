@@ -93,13 +93,16 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
   const optionId = (i: number) => `${listId}-${i}`;
 
   const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
+    // Result navigation belongs to the field; the close button keeps its
+    // native Enter/Space behaviour, and composition keys belong to the IME.
+    if (event.target !== inputRef.current || event.nativeEvent.isComposing) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       if (hits.length === 0) return;
       const next = (active + (event.key === "ArrowDown" ? 1 : -1) + hits.length) % hits.length;
       setActive(next);
       document.getElementById(optionId(next))?.scrollIntoView({ block: "nearest" });
-    } else if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+    } else if (event.key === "Enter") {
       event.preventDefault();
       document.getElementById(optionId(active))?.click();
     }
@@ -124,8 +127,7 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
       ref={dialogRef}
       aria-label={t("dialogAria")}
       onClose={onClosed}
-      // The field's keys, heard as they bubble: the field is the only thing
-      // in here that takes focus.
+      // The field's result-navigation keys, heard as they bubble.
       onKeyDown={onKeyDown}
       onClick={(event) => {
         // A press on the backdrop is a press on the dialog itself.
@@ -169,6 +171,24 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
             className="h-14 min-w-0 flex-1 bg-transparent text-body text-fg placeholder:text-fg-tertiary [&::-webkit-search-cancel-button]:appearance-none"
           />
           <kbd className="hidden shrink-0 font-mono text-meta text-fg-tertiary sm:block">esc</kbd>
+          <button
+            type="button"
+            aria-label={t("closeAria")}
+            onClick={() => dialogRef.current?.close()}
+            className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-fg-secondary transition-colors hover:text-fg sm:hidden"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="size-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
         </div>
 
         {status && <p className="px-5 py-6 text-caption text-fg-secondary">{status}</p>}

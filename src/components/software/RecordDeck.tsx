@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { gsap, useGSAP, EASE } from "@/lib/client/gsap";
 import { Vinyl } from "./Vinyl";
+import { GithubStats } from "./GithubStats";
 import { catalogueNumber, type SoftwareApp } from "./appMeta";
 
 /* The deck is drawn in one 500 × 400 box: the platter's centre at (190, 200),
@@ -377,10 +378,9 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${t(app.cta)} — ${app.name}`}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-fg px-5 text-caption font-medium text-bg transition-opacity duration-200 hover:opacity-85"
+            className="inline-flex min-h-11 items-center rounded-full bg-fg px-5 text-caption font-medium text-bg transition-opacity duration-200 hover:opacity-85"
           >
             {t(app.cta)}
-            <span aria-hidden>↗</span>
           </a>
           {app.version || app.platforms.length > 0 ? (
             <p className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
@@ -406,15 +406,28 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
               href={app.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="min-h-8 content-center text-fg-secondary hover:text-accent"
+              className="min-h-8 content-center text-fg-secondary underline decoration-line underline-offset-4 hover:text-accent"
             >
-              {t("source")} <span aria-hidden>↗</span>
+              {t("source")}
             </a>
-            {app.stats ? (
-              <>
-                <span>{t("stars", { count: app.stats.stars })}</span>
-                <span>{t("forks", { count: app.stats.forks })}</span>
-              </>
+            {app.stats ? <GithubStats stats={app.stats} repoUrl={app.repoUrl} /> : null}
+          </div>
+        ) : null}
+        {app.stats?.language || app.stats?.pushedAt || app.release?.publishedAt ? (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-meta text-fg-tertiary">
+            {app.stats?.language ? (
+              <span>{t("language", { language: app.stats.language })}</span>
+            ) : null}
+            {app.stats?.pushedAt ? (
+              <time dateTime={app.stats.pushedAt}>
+                {t("updated", {
+                  date: format.dateTime(new Date(app.stats.pushedAt), {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  }),
+                })}
+              </time>
             ) : null}
             {app.release?.publishedAt ? (
               <time dateTime={app.release.publishedAt}>
@@ -443,8 +456,8 @@ export function RecordDeck({ apps, current, arrival, deckRef }: Props) {
                     rel="noopener noreferrer"
                     className="flex min-h-9 items-center justify-between gap-3 py-1 hover:text-accent"
                   >
-                    <span className="min-w-0 break-all">
-                      {file.name} <span aria-hidden>↗</span>
+                    <span className="min-w-0 break-all underline decoration-line underline-offset-4">
+                      {file.name}
                     </span>
                     <span className="shrink-0 font-mono text-meta text-fg-tertiary">
                       {file.size >= 1024 * 1024

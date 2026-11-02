@@ -23,9 +23,6 @@ export function ReadingChipDemo({ accent, label, body }: Props) {
         {DEMO_CSS}
       </style>
       <p className="spn-body">{body}</p>
-      <p className="spn-arrow" aria-hidden="true">
-        ↙
-      </p>
       <ReadingChip className="rcd-chip" />
     </StudyPanel>
   );

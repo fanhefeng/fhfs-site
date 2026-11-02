@@ -12,6 +12,7 @@ import type { NavLink } from "@/lib/nav";
 import { feedTypes } from "@/lib/server/seo";
 import { trackFiles } from "@/lib/server/trackFiles";
 import { THEME_COLOR } from "@/lib/theme";
+import { PublicWebMCP } from "@/components/agent/PublicWebMCP";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PreviewBanner } from "@/components/layout/PreviewBanner";
@@ -152,6 +153,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Footer items={footerLinks} />
           <PreviewBanner />
           <SearchLauncher />
+          <PublicWebMCP />
         </NextIntlClientProvider>
       </body>
     </html>

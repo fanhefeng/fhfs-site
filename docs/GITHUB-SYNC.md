@@ -1,7 +1,8 @@
 # GitHub 数据同步
 
 `/admin/apps` 的 `repo`（`owner/name`）决定接入哪些仓库。现有六款软件已填好。
-GitHub 是版本号、发布日期、Release 下载文件、Star 与 Fork 数量的来源；双语介绍、
+留空时也会从 GitHub 项目网址识别仓库；显式 repo 优先，软件页、首页和 Webhook 共用识别规则。
+GitHub 是版本号、发布日期、Release 下载文件、Star、Fork、主要语言与代码更新时间的来源；双语介绍、
 官网、分类和平台仍在后台编辑。没有 Release 时显示第一个 tag，指向实际 tag 的源码树，
 不编造发布日期或安装包。
 

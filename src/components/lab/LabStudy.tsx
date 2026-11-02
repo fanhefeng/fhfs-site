@@ -70,6 +70,7 @@ const LensSliderDemo = dynamic(() => import("./LensSliderDemo").then((m) => m.Le
 // before its chunk lands, and the wall paints over.
 const NeonSignDemo = dynamic(() => import("./NeonSignDemo").then((m) => m.NeonSignDemo));
 const HelloDemo = dynamic(() => import("./HelloDemo").then((m) => m.HelloDemo));
+const MagazineDemo = dynamic(() => import("./MagazineDemo").then((m) => m.MagazineDemo));
 
 /* ---- the site's own effects: text in the DOM, GSAP over it ---- */
 const SidewaysDemo = dynamic(() => import("./SidewaysDemo").then((m) => m.SidewaysDemo));
@@ -147,6 +148,8 @@ export function LabStudy({ slug, accent, text, entries, cards, wall, standIn, fi
   };
   const file = (name: string): string => need(files?.[name], `files.${name}`);
   switch (slug) {
+    case "magazine":
+      return <MagazineDemo accent={accent} text={text} />;
     case "hello":
       return <HelloDemo accent={accent} text={text} />;
     case "scroll-video":

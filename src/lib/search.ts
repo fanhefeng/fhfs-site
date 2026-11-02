@@ -5,10 +5,9 @@
  * opens; everything here runs in the browser against that list, so a key
  * press never waits on the network.
  *
- * Matching is by substring, lower-cased, every word of the query required:
- * the text is mostly Chinese, which has no spaces to tokenise on, and a
- * few hundred short entries are searched faster than any index could be
- * built for them.
+ * Every query term is required. Chinese keeps substring matching; Latin
+ * terms match at word starts, so AI does not find "waited" or "again".
+ * A few hundred short entries need no separately built search index.
  */
 
 /** What an entry is — the palette groups and labels by it. */
@@ -41,6 +40,17 @@ export type SearchHit = SearchEntry & { snippet: string };
 export const queryTerms = (query: string): string[] =>
   query.toLowerCase().split(/\s+/).filter(Boolean);
 
+/** Both arguments are lower-cased; CJK text can border a Latin word. */
+function termIndex(text: string, term: string): number {
+  let at = text.indexOf(term);
+  if (!/^[a-z0-9]/.test(term)) return at;
+  while (at !== -1) {
+    if (at === 0 || !/[a-z0-9]/.test(text[at - 1]!)) return at;
+    at = text.indexOf(term, at + 1);
+  }
+  return -1;
+}
+
 /**
  * A line of `text` around the first place a term occurs, `radius` characters
  * either side, with an ellipsis where it was cut; the text's opening when no
@@ -51,7 +61,7 @@ export function snippet(text: string, terms: readonly string[], radius = 36): st
   const lower = flat.toLowerCase();
   let at = -1;
   for (const term of terms) {
-    const i = lower.indexOf(term);
+    const i = termIndex(lower, term);
     if (i !== -1 && (at === -1 || i < at)) at = i;
   }
   if (at === -1) return flat.length > radius * 2 ? `${flat.slice(0, radius * 2)}…` : flat;
@@ -74,8 +84,8 @@ export function search(entries: readonly SearchEntry[], query: string, limit = 4
   entries.forEach((entry, order) => {
     const title = entry.title.toLowerCase();
     const all = `${title}\n${entry.text.toLowerCase()}`;
-    if (!terms.every((term) => all.includes(term))) return;
-    const inTitle = terms.filter((term) => title.includes(term)).length;
+    if (!terms.every((term) => termIndex(all, term) !== -1)) return;
+    const inTitle = terms.filter((term) => termIndex(title, term) !== -1).length;
     const score = inTitle * 100 - SEARCH_KINDS.indexOf(entry.kind);
     scored.push({ entry, score, order });
   });

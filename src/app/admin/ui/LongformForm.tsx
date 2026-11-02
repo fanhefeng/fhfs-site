@@ -179,7 +179,7 @@ export function LongformForm({
                 rel="noopener"
                 className="inline-flex min-h-11 items-center text-caption text-fg-secondary underline-offset-4 hover:text-accent hover:underline"
               >
-                在站上看上次保存的版本 ↗
+                在站上看上次保存的版本
               </a>
             )}
           </div>

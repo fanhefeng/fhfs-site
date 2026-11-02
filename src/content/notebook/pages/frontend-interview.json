@@ -1,0 +1,409 @@
+{
+  "html": "<h2 id=\"js-数据类型有哪些\"><a href=\"#js-数据类型有哪些\">js 数据类型有哪些？</a></h2>\n<ol>\n<li>基本数据类型\nstring\nnumber\nboolean\nundefined\nnull\nBigInt\nsymbol</li>\n<li>引用数据类型\nobject</li>\n</ol>\n<h2 id=\"判断数据类型的方法\"><a href=\"#判断数据类型的方法\">判断数据类型的方法</a></h2>\n<h3 id=\"typeof\"><a href=\"#typeof\">typeof</a></h3>\n<blockquote>\n<p>优点：能够快速区分基本数据类型</p>\n<p>缺点：不能将 Object、Array 和 null 区分，都返回 object</p>\n</blockquote>\n<ol>\n<li>\n<p><code>typeof</code>的作用？</p>\n<p>区分数据类型，可以返回 8 种数据类型：\n<code>string</code> -> string\n<code>number</code> -> number\n<code>boolean</code> -> boolean\n<code>undefined</code> -> undefined\n<code>()=>{}</code> -> function\n<code>Object/Array/null</code> -> object\nsymbol -> symbol\nBigInt -> bigint</p>\n</li>\n<li>\n<p><code>typeof</code>  能正确区分数据类型吗？</p>\n<p>不能。对于原始类型，除  <code>null</code>  都可以正确判断；对于引用类型，除  <code>function</code>  外，都会返回  <code>\"object\"</code></p>\n</li>\n<li>\n<p><code>typeof</code>  注意事项</p>\n<ul>\n<li><code>typeof</code>  返回值为  <code>string</code>  格式，注意类似这种考题: <code>typeof(typeof(undefined)) -> \"string\"</code></li>\n<li><code>typeof</code>  未定义的变量不会报错，返回  <code>\"undefiend\"</code></li>\n<li><code>typeof(null) -> \"object\"</code>: 遗留已久的  <code>bug</code></li>\n<li><code>typeof</code>无法区别数组与普通对象: <code>typeof([]) -> \"object\"</code></li>\n<li><code>typeof(NaN) -> \"number\"</code></li>\n</ul>\n</li>\n</ol>\n<h4 id=\"typeof-为什么对-null-错误的显示\"><a href=\"#typeof-为什么对-null-错误的显示\">typeof 为什么对 null 错误的显示</a></h4>\n<p>这只是 JS 存在的一个悠久 Bug。在 JS 的最初版本中使用的是 32 位系统，为了性能考虑使用低位存储变量的类型信息，000 开头代表是对象，然而 null 表示为全零，所以将它错误的判断为 object</p>\n<h4 id=\"typeofabc-和-typeof-abc都是-string-那么-typeof-是操作符还是函数\"><a href=\"#typeofabc-和-typeof-abc都是-string-那么-typeof-是操作符还是函数\">typeof('abc') 和 typeof 'abc'都是 string, 那么 typeof 是操作符还是函数？</a></h4>\n<ol>\n<li>\n<p><code>typeof</code>  的返回值之一为<code>'function'</code>，如果  <code>typeof</code>  为  <code>function</code>，那么  <code>typeof(typeof)</code>  会返回<code>'function'</code>，但是经测试，上述代码浏览器会抛出错误。因此可以证明  <code>typeof</code>  并非函数。</p>\n</li>\n<li>\n<p>既然  <code>typeof</code>  不是函数，那  <code>typeof</code>  后面的括号的作用是？</p>\n<blockquote>\n<p>括号的作用是进行分组而非函数的调用。—— 《javascript 高级程序设计》</p>\n</blockquote>\n</li>\n</ol>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"js\" data-theme=\"github-light tokyo-night\"><code data-language=\"js\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 举个例子</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> func</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // is equal to typeof func</span></span></code></pre></figure>\n<h3 id=\"instanceof\"><a href=\"#instanceof\">instanceof</a></h3>\n<blockquote>\n<p>优点：能够区分 Array、Object 和 Function，适合用于判断自定义的类实例对象</p>\n<p>缺点：Number，Boolean，String 基本数据类型不能判断</p>\n</blockquote>\n<h4 id=\"instanceof-原理模拟实现\"><a href=\"#instanceof-原理模拟实现\">instanceof 原理，模拟实现</a></h4>\n<p>什么是 instanceof？你能模拟实现一个 instanceof 吗？</p>\n<ol>\n<li>\n<p><code>instanceof</code>  判断对象的原型链上是否存在构造函数的原型。只能判断引用类型。</p>\n</li>\n<li>\n<p><code>instanceof</code>  常用来判断  <code>A</code>  是否为  <code>B</code>  的实例</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"js\" data-theme=\"github-light tokyo-night\"><code data-language=\"js\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// A是B的实例，返回true，否则返回false</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 判断A的原型链上是否有B的原型</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\">A</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> instaceof</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> B</span></span></code></pre></figure>\n</li>\n<li>\n<p>模拟实现  <code>instanceof</code></p>\n<p>思想：沿原型链往上查找</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"js\" data-theme=\"github-light tokyo-night\"><code data-language=\"js\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">function</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> instance_of</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">Case</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> Constructor</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t// 基本数据类型返回false</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t// 兼容一下函数对象</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\tif</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> ((</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> Case</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> !=</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">object</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> &#x26;&#x26;</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> Case</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> !=</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">function</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">||</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> Case</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ==</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">null</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> false</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">\tlet</span><span style=\"--shiki-light:#24292E;--shiki-dark:#BB9AF7\"> CaseProto</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> Object</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">getPrototypeOf</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">Case</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\twhile</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\">true</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t// 查到原型链顶端，仍未查到，返回false</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\t\tif</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">CaseProto</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ==</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> null</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> false</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t// 找到相同的原型</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\t\tif</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">CaseProto</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ===</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\"> Constructor</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#7DCFFF\">prototype</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">return</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\"> true</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">\t\tCaseProto</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> Object</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">getPrototypeOf</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">CaseProto</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t}</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span></span></code></pre></figure>\n</li>\n</ol>\n<h3 id=\"objectprototypetostringcall\"><a href=\"#objectprototypetostringcall\">Object.prototype.toString.call()</a></h3>\n<blockquote>\n<p>优点：精准判断数据类型</p>\n<p>缺点：写法繁琐不容易记，推荐进行封装后使用</p>\n</blockquote>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"js\" data-theme=\"github-light tokyo-night\"><code data-language=\"js\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(()</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> =></span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {})</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Function]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">({})</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Object]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">([])</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Array]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object String]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\">22</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Number]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\">undefined</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object undefined]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#FF9E64\">null</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object null]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">new</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> Date</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">())</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Date]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">Math</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Math]</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">toString</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">call</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">window</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\"> // [object Window]</span></span></code></pre></figure>\n<h2 id=\"let-const-var-区别\"><a href=\"#let-const-var-区别\">let const var 区别</a></h2>\n<h3 id=\"var\"><a href=\"#var\">var</a></h3>\n<ol>\n<li>存在变量提升</li>\n<li>可以重复声明</li>\n<li>在函数中使用 var 声明变量的时候，该变量是局部的</li>\n</ol>\n<h3 id=\"let\"><a href=\"#let\">let</a></h3>\n<ol>\n<li>不存在变量提升，let 声明变量前，该变量不能使用（暂时性死区）</li>\n<li>let 命令所在的代码块内有效，在块级作用域内有效</li>\n<li>let 不允许在相同作用域中重复声明，注意是相同作用域，不同作用域有重复声明不会报错</li>\n</ol>\n<h3 id=\"const\"><a href=\"#const\">const</a></h3>\n<ol>\n<li>const 声明一个只读的变量，声明后，值就不能改变</li>\n<li>const 必须初始化</li>\n<li>const 并不是变量的值不能改动，而是变量指向的内存地址所保存的数据不得改动</li>\n</ol>\n<h3 id=\"区别\"><a href=\"#区别\">区别</a></h3>\n<ol>\n<li>\n<p>变量提升</p>\n<ul>\n<li>var 声明的变量存在变量提升，即变量可以在声明之前调用，值为 undefined</li>\n<li>let 和 const 不存在变量提升，即它们所声明的变量一定要在声明后使用，否则报错</li>\n</ul>\n</li>\n<li>\n<p>块级作用域</p>\n<ul>\n<li>var 不存在块级作用域</li>\n<li>let 和 const 存在块级作用域</li>\n</ul>\n</li>\n<li>\n<p>重复声明</p>\n<ul>\n<li>var 允许重复声明变量</li>\n<li>let 和 const 在同一作用域不允许重复声明变量</li>\n</ul>\n</li>\n<li>\n<p>修改声明的变量</p>\n<ul>\n<li>var 和 let 可以</li>\n<li>const 声明一个只读的常量。一旦声明，常量的值就不能改变，但对于对象和数据这种引用类型，内存地址不能修改，可以修改里面的值。</li>\n</ul>\n</li>\n</ol>\n<h2 id=\"箭头函数与普通函数区别\"><a href=\"#箭头函数与普通函数区别\">箭头函数与普通函数区别</a></h2>\n<ol>\n<li>箭头函数没有 this，它的 this 是通过作用域链查到外层作用域的 this，且指向函数定义时的 this 而非执行时。</li>\n<li>不可以用作构造函数，不能使用 new 命令，否则会报错</li>\n<li>箭头函数没有 arguments 对象，如果要用，使用 rest 参数代替</li>\n<li>不可以使用 yield 命令，因此箭头函数不能用作 Generator 函数。</li>\n<li>不能用 call/apply/bind 修改 this 指向，但可以通过修改外层作用域的 this 来间接修改。</li>\n<li>箭头函数没有 prototype 属性。</li>\n</ol>\n<h2 id=\"使用-react-or-vue\"><a href=\"#使用-react-or-vue\">使用 react or vue？</a></h2>\n<p>根据公司实际情况决定\n<a href=\"https://my.oschina.net/u/4090830/blog/5587296\">https://my.oschina.net/u/4090830/blog/5587296</a></p>\n<h2 id=\"vue2-和-vue3-的区别\"><a href=\"#vue2-和-vue3-的区别\">Vue2 和 Vue3 的区别</a></h2>\n<p><a href=\"https://www.xiaohongshu.com/explore/63acfd7e000000001b01483e\">https://www.xiaohongshu.com/explore/63acfd7e000000001b01483e</a></p>\n<h2 id=\"模块化-commonjsamdcmdumdes-module\"><a href=\"#模块化-commonjsamdcmdumdes-module\">模块化 CommonJS/AMD/CMD/UMD/ES Module</a></h2>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">((</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">root</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> factory</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> =></span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\tif</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> define</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ===</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">function</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> &#x26;&#x26;</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> define</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">amd</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t// AMD</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">\t\tdefine</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">factory</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t} </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">else</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\"> exports</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ===</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">object</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t// CommonJS</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\">\t\tmodule</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\">exports</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> factory</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">()</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t} </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">else</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> if</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\">typeof</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> define</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> ===</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\"> \"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">function</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> &#x26;&#x26;</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> define</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">cmd</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t// CMD</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">\t\tdefine</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">function</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">require</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> exports</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> module</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\">\t\t\tmodule</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\">exports</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> factory</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">()</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t})</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t} </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">else</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t// 都不是</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">\t\troot</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">umdModule</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> factory</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">()</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t}</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">})(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#F7768E\">this</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> ()</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> =></span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">\tconsole</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">log</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">我是UMD</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t// todo...</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">})</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span></code></pre></figure>\n<h2 id=\"说一下-commonjs-和-es-module-的差异\"><a href=\"#说一下-commonjs-和-es-module-的差异\">说一下 CommonJS 和 ES Module 的差异</a></h2>\n<p>两者的模块导入导出语法不同，CommonJs 是通过 module.exports，exports 导出，require 导入；ESModule 则是 export 导出，import 导入。\nCommonJs 是运行时加载模块，ESModule 是在静态编译期间就确定模块的依赖。\nESModule 在编译期间会将所有 import 提升到顶部，CommonJs 不会提升 require。\nCommonJs 导出的是一个值拷贝，会对加载结果进行缓存，一旦内部再修改这个值，则不会同步到外部。ESModule 是导出的一个引用，内部修改可以同步到外部。\nCommonJs 中顶层的 this 指向这个模块本身，而 ESModule 中顶层 this 指向 undefined。\nCommonJS 加载的是整个模块，将所有的接口全部加载进来，ESModule 可以单独加载其中的某个接口。</p>\n<h2 id=\"v8-垃圾回收\"><a href=\"#v8-垃圾回收\">v8 垃圾回收</a></h2>\n<p><a href=\"https://zhuanlan.zhihu.com/p/520393745\">https://zhuanlan.zhihu.com/p/520393745</a></p>\n<h2 id=\"内存泄漏\"><a href=\"#内存泄漏\">内存泄漏</a></h2>\n<p><a href=\"https://zhuanlan.zhihu.com/p/411103328\">https://zhuanlan.zhihu.com/p/411103328</a></p>\n<h2 id=\"js-运行机制\"><a href=\"#js-运行机制\">js 运行机制</a></h2>\n<p><a href=\"https://zhuanlan.zhihu.com/p/595496575\">https://zhuanlan.zhihu.com/p/595496575</a></p>\n<h2 id=\"url-输入到页面解析发生了什么\"><a href=\"#url-输入到页面解析发生了什么\">url 输入到页面解析发生了什么</a></h2>\n<h3 id=\"一-判断用户输入的是-url-还是-query\"><a href=\"#一-判断用户输入的是-url-还是-query\">一、 判断用户输入的是 URL 还是 query？</a></h3>\n<p>如果是搜索内容，地址栏会使用浏览器默认的搜索引擎，来合成新的带搜索关键字的 URL。<br>\n若符合 URL 规则，整合 URL + 对应协议头(http/https)形成完整的 URL<br>\nURL 结构:Protocol://Host:port/Path?Query#Fragment<br>\n浏览器接收到输入的 URL 后，先对 URL 解析，把我们请求需要的协议、域名、端口、路径这些信息解析提取出来并构造一个 HTTP 请求。</p>\n<h3 id=\"二-浏览器发送请求前尝试缓存命中\"><a href=\"#二-浏览器发送请求前尝试缓存命中\">二、 浏览器发送请求前，尝试缓存命中</a></h3>\n<ol>\n<li>根据请求头的 expires 和 cache-control:max-age 判断资源是否命中，如果命中。直接从缓存中获取资源，返回状态码为 200 的响应。</li>\n<li>如果没有命中，根据请求头 If-modified-since: Last-Modified 或者 If-none-match:ETag 发送一个 get 请求询问服务器缓存是否修改，如果没有修改返回 304，从缓存中获取资源。如果修改了返回状态码为 200 的请求资源结果。\n这里的 2 已经进入网络请求的流程。协商缓存时在 DNS 之后发生的</li>\n</ol>\n<h3 id=\"三-网络进程会查找本地缓存是否缓存了该资源如果有缓存资源那么直接返回资源给浏览器进程如果在缓存中没有查找到资源那么直接进入网络请求流程第一步是要进行-dns-解析获取-ip-地址\"><a href=\"#三-网络进程会查找本地缓存是否缓存了该资源如果有缓存资源那么直接返回资源给浏览器进程如果在缓存中没有查找到资源那么直接进入网络请求流程第一步是要进行-dns-解析获取-ip-地址\">三、 网络进程会查找本地缓存是否缓存了该资源。如果有缓存资源，那么直接返回资源给浏览器进程；如果在缓存中没有查找到资源，那么直接进入网络请求流程。第一步是要进行 DNS 解析获取 IP 地址。</a></h3>\n<p>先在客户端进行查询有没有解析过的记录(DNS 缓存)，在这里任何一步找到就会结束查找流程。如果都没有找到，开始迭代查询。</p>\n<ol>\n<li>先去 DNS 根域名(.)服务器查询，属于哪个顶级域名服务器(.com)，然后返回顶级域名服务器 IP</li>\n<li>再根据返回的 IP 去顶级域名服务器查找，属于哪个权限域名服务器(xxx.com)，返回权限域名服务器 IP</li>\n<li>再根据返回的 IP 去权限域名服务器查找 4. 找到了就返回目标地址的 IP，没有就报错 > 优化:DNS 预解析 > 大型网站，有多个不同服务器资源的情况下，都可采取 DNS 预解析 > rel=\"dns-prefetch\"，提前解析，减少页面卡顿。 > 当网页打开时，浏览器会在加载网页时对网页中的域名进行解析缓存，这样在你单击当前网页中的连接时就无需进行 DNS 的解析，减少用户等待时间，提高用户体验。</li>\n</ol>\n<h3 id=\"四使用-ip-地址建立-tcp-连接-三次握手\"><a href=\"#四使用-ip-地址建立-tcp-连接-三次握手\">四、使用 IP 地址建立 TCP 连接 三次握手</a></h3>\n<ol>\n<li>第一次握手: 客户端随机初始化序列号，TCP 报文序列号 seq=x，SYN 同步标志位为 1，用来建立连接，然后把该报文发送给服务端，客户端进入等待服务端确认的状态。</li>\n<li>第二次握手:服务器端收到客户端发来的 SYN 同步标志位=1 的数据包后，知道是在建立连接。服务器自己也生成初始序列号，TCP 报文序列号 seq=y，SYN 同步标志位和 ACK 确认标志位置 1，表示建立连接之后的响应。ack 确认号=x+1，期望收到对方下一个报文段的第一个数据字节序列号位 x+1，作为客户端建立连接请求的应答。</li>\n<li>第三次握手:客户端收到服务端的确认应答后，检查 ack 确认号是否 x+1，ACK 确认标志位是否=1。若正确就返回 ack 确认号为 y+1,序列号为 x+1，及 ACK=1 的数据包发送给服务器，确认服务器的应答。</li>\n<li>服务器端收到应答包，检查 ack 确认号是否=y+1 来确认是否建立连接成功。</li>\n</ol>\n<h4 id=\"为什么要三次握手\"><a href=\"#为什么要三次握手\">为什么要三次握手？</a></h4>\n<ol>\n<li>建立 TCP 连接会先经历三次握手，目的是确保数据到达目的–> 客户端和服务端的接收和发送能力没有问题</li>\n<li>第二次握手 服务器端同时返回 SYN 建立连接+ACK 确认，说明客户端发送的建立连接请求服务器端可以接收到，说明客户端发送能力 ok。</li>\n<li>第三次握手 客户端向服务器发送 ACK 确认标志=1，表示对服务器端的应答，说明服务器发送能力 ok，服务端的接收能力 ok。</li>\n<li>服务器端收到应答包，检查成功，说明客户端的接收能力 ok，建立连接。</li>\n</ol>\n<h4 id=\"为何不能是两次握手\"><a href=\"#为何不能是两次握手\">为何不能是两次握手？</a></h4>\n<p>可能连接请求因网络滞留了一段时间，以至于到达服务端已经失效了，但是服务端会误认为是个新的连接请求，于是向客户端发出确认报文，同意建立连接。假设采用两次握手，那么服务端发出确认报文，表示连接已建立，但客户端并没有发出确认建立的连接，也不会向服务端发送任何数据，服务端因连接占用导致资源浪费。</p>\n<h4 id=\"三次握手过程中可以携带数据吗-第三次握手可以\"><a href=\"#三次握手过程中可以携带数据吗-第三次握手可以\">三次握手过程中可以携带数据吗？ (第三次握手可以)</a></h4>\n<ol>\n<li>假如第一次握手可以携带数据的话，如果有人要恶意攻击服务器，那他每次都在第一次握手中的 SYN 报文中放入大量的数据。因为攻击者根本就不理服务器的接收、发送能力是否正常，然后疯狂着重复发 SYN 报文的话，这会让服务器花费很多时间、内存空间来接收这些报文。</li>\n<li>也就是说，第一次握手不可以放数据，其中一个简单的原因就是会让服务器更加容易受到攻击了。而对于第三次的话，此时客户端已经处于 ESTABLISHED 状态。对于客户端来说，他已经建立起连接了，并且也已经知道服务器的接收、发送能力是正常的了，所以能携带数据也没啥毛病。</li>\n</ol>\n<h4 id=\"syn-洪泛攻击\"><a href=\"#syn-洪泛攻击\">syn 洪泛攻击</a></h4>\n<ol>\n<li>SYN 攻击就是 Client 在短时间内伪造大量不存在的 IP 地址，并向 Server 不断地发送 SYN 包，Server 则回复确认包，并等待 Client 确认，由于源地址不存在，因此 Server 需要不断重发直至超时，这些伪造的 SYN 包将长时间占用未连接队列，导致正常的 SYN 请求因为队列满而被丢弃，从而引起网络拥塞甚至系统瘫痪。SYN 攻击是一种典型的 DoS/DDoS 攻击。</li>\n<li>检测 SYN 攻击非常的方便，当你在服务器上看到大量的半连接状态时，特别是源 IP 地址是随机的，基本上可以断定这是一次 SYN 攻击。</li>\n</ol>\n<p><em>解决办法</em>:</p>\n<ol>\n<li>缩短超时时间</li>\n<li>过滤网关</li>\n</ol>\n<h3 id=\"五http-请求\"><a href=\"#五http-请求\">五、HTTP 请求</a></h3>\n<p>服务器接收到请求信息后，会根据请求信息生成响应行、响应头和响应体等信息，并发给网络进程。浏览器接收到响应数据之后，如果是 http1.1 以下则直接关闭连接，否则双方都可以根据情况选择关闭 TCP 连接或者保留重用，现在浏览器默认都会保持连接(keep-alive)。</p>\n<h3 id=\"六关闭-tcp-连接-四次挥手\"><a href=\"#六关闭-tcp-连接-四次挥手\">六、关闭 TCP 连接 四次挥手</a></h3>\n<p>TCP 连接是全双工的，因此，每个方向都必须要单独进行关闭</p>\n<ol>\n<li>第一次挥手:客户端打算关闭连接，发送 FIN 标志位置 1 的报文，表示客户端没有发送给服务端的数据了，要关闭连接了。</li>\n<li>第二次挥手:服务器收到客户端的 FIN 报文后，发送 ACK 确认标志位=1，表示你的关闭请求我收到啦，你可以关闭了。</li>\n<li>可能服务器端还有未完成的数据传递，所以请客户端继续等待。</li>\n<li>第三次挥手：当服务器确认没有数据发送之后，发送 FIN 为 1、ack=u+1、seq=w 的 FIN 报文，准备关闭连接</li>\n<li>第四次挥手:客户端收到 FIN 报文后，向服务器进行应答。服务器会等待客户端的应答后才会真正断开连接，如果服务器没有收到应答报文则会重传。客户端等待 2*报文段最大生存时间 后依然没有收到回复，说明服务器端已正常关闭，客户端也可以关闭连接了。</li>\n</ol>\n<h4 id=\"为什么要等待-2-个报文段最大生存时间\"><a href=\"#为什么要等待-2-个报文段最大生存时间\">为什么要等待 2 个报文段最大生存时间？</a></h4>\n<ol>\n<li>假设第四次挥手的 ACK 应答包丢失，服务器没有收到应答报文则会重传 FIN 报文，在 2 个报文段最大生存时间之内 如果客户端再次收到 FIN 报文 重发 ACK 应答报文。保证双方都可以正常进入关闭状态</li>\n<li>确保在创建新连接时，先前网络中残余的数据都丢失了</li>\n</ol>\n<h4 id=\"为什么连接的时候是三次握手关闭的时候却是四次握手\"><a href=\"#为什么连接的时候是三次握手关闭的时候却是四次握手\">为什么连接的时候是三次握手，关闭的时候却是四次握手？</a></h4>\n<ol>\n<li>因为当 Server 端收到 Client 端的 SYN 连接请求报文后，可以直接发送 SYN+ACK 报文。其中 ACK 报文是用来应答的，SYN 报文是用来同步的。</li>\n<li>但是关闭连接时，当 Server 端收到 FIN 报文时，可能服务器还有数据需要发送，所以只能先回复一个 ACK 报文，告诉 Client 端，“你发的 FIN 报文我收到了”。只有等到我 Server 端所有的报文都发送完了，我才能发送 FIN 报文，因此不能一起发送。故需要四步握手。</li>\n</ol>\n<h2 id=\"asyncawait-怎么实现的\"><a href=\"#asyncawait-怎么实现的\">async/await 怎么实现的？</a></h2>\n<p>通过 generator 函数实现</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">function</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> generatorToAsync</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">generatorFun</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\treturn</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\"> function</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> () {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">\t\tconst</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> gen</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> generatorFun</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">apply</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#F7768E\">this</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#F7768E\"> arguments</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\t\treturn</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> new</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\"> Promise</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">((</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> reject</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">=></span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\t\t\tfunction</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> step</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> arg</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">\t\t\t\tlet</span><span style=\"--shiki-light:#24292E;--shiki-dark:#BB9AF7\"> res</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\t\t\t\ttry</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">\t\t\t\t\tres</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> gen</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">[</span><span style=\"--shiki-light:#24292E;--shiki-dark:#7DCFFF\">key</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">](</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">arg</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t} </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">catch</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">error</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\t\t\t\t\treturn</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> reject</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">error</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t}</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#9D7CD8;--shiki-dark-font-style:italic\">\t\t\t\tconst</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\"> {</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> value</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#BB9AF7\"> done</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\"> }</span><span style=\"--shiki-light:#D73A49;--shiki-dark:#89DDFF\"> =</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> res</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">\t\t\t\tif</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> (</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">done</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\t\t\t\t\treturn</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">value</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t} </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">else</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\t\t\t\t\treturn</span><span style=\"--shiki-light:#005CC5;--shiki-dark:#0DB9D7\"> Promise</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">resolve</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\">value</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">.</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">then</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t\t\t(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">val</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">=></span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\t\t\t\t\t\t\treturn</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> step</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">next</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> val</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t\t\t}</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t\t\t(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">err</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">) </span><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">=></span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-light-font-style:inherit;--shiki-dark:#BB9AF7;--shiki-dark-font-style:italic\">\t\t\t\t\t\t\treturn</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> step</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">throw</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#24292E;--shiki-dark:#C0CAF5\"> err</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t\t\t}</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t\t)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t\t}</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t\t}</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t\t\t// 首次执行</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\">\t\t\tstep</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#032F62;--shiki-dark:#9ECE6A\">next</span><span style=\"--shiki-light:#032F62;--shiki-dark:#89DDFF\">\"</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t\t})</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">\t}</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">;</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span></span></code></pre></figure>\n<h2 id=\"性能优化\"><a href=\"#性能优化\">性能优化</a></h2>\n<p><a href=\"https://juejin.cn/post/7188894691356573754\">https://juejin.cn/post/7188894691356573754</a></p>\n<h3 id=\"vue-diff-算法\"><a href=\"#vue-diff-算法\">Vue diff 算法</a></h3>\n<ol>\n<li>当数据发生改变时，订阅者 watcher 就会调用 patch 给真实的 DOM 打补丁\n通过 isSameVnode 进行判断，相同则调用 patchVnode 方法</li>\n<li>patchVnode 做了以下操作：\n找到对应的真实 dom，称为 el\n如果都有都有文本节点且不相等，将 el 文本节点设置为 Vnode 的文本节点\n如果 oldVnode 有子节点而 VNode 没有，则删除 el 子节点\n如果 oldVnode 没有子节点而 VNode 有，则将 VNode 的子节点真实化后添加到 el\n如果两者都有子节点，则执行 updateChildren 函数比较子节点</li>\n<li>updateChildren 主要做了以下操作：\n设置新旧 VNode 的头尾指针\n新旧头尾指针进行比较，循环向中间靠拢，根据情况调用 patchVnode 进行 patch 重复流程、调用 createElem 创建一个新节点，从哈希表寻找 key 一致的 VNode 节点再分情况操作</li>\n</ol>\n<h2 id=\"js-代码题-控制并发量\"><a href=\"#js-代码题-控制并发量\">JS 代码题 控制并发量</a></h2>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">//function fetch(url) {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">//  return Promise.resolve(url);</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">//}</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// let urls = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// promiseLimit(urls, 3).then(resList => console.log(resList));</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">// 并发量限制</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#D73A49;--shiki-dark:#BB9AF7\">function</span><span style=\"--shiki-light:#6F42C1;--shiki-dark:#7AA2F7\"> promiseLimit</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">(</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\">urls</span><span style=\"--shiki-light:#24292E;--shiki-dark:#89DDFF\">,</span><span style=\"--shiki-light:#E36209;--shiki-dark:#E0AF68\"> limit</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">)</span><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\"> {</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">\t// ... 具体实现</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#24292E;--shiki-dark:#9ABDF5\">}</span></span></code></pre></figure>\n<h2 id=\"编程题\"><a href=\"#编程题\">编程题</a></h2>\n<p>编程题一：（注意复杂度要求）</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">/*</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">构造两个以整型数字为值的链表，其中的值是单调递增的。</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">将两个链表合并，保持递增。</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">要求空间复杂度 O(1)</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">*/</span></span></code></pre></figure>\n<p>编程题二：</p>\n<figure data-rehype-pretty-code-figure=\"\"><pre tabindex=\"0\" data-language=\"javascript\" data-theme=\"github-light tokyo-night\"><code data-language=\"javascript\" data-theme=\"github-light tokyo-night\" style=\"display: grid;\"><span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">/*</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">标题</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">单链表每隔k个元素做一次反转</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">题目描述</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">给定一个链表，每隔k个元素做一次反转</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">Example:</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">Inputs: 1->2->3->4->5->6->7->8->NULL and k = 3</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">Output: 3->2->1->6->5->4->8->7->NULL.</span></span>\n<span data-line=\"\"> </span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">Inputs: 1->2->3->4->5->6->7->8->NULL and k = 5</span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">Output: 5->4->3->2->1->8->7->6->NULL. </span></span>\n<span data-line=\"\"><span style=\"--shiki-light:#6A737D;--shiki-light-font-style:inherit;--shiki-dark:#51597D;--shiki-dark-font-style:italic\">*/</span></span></code></pre></figure>\n<h2 id=\"编程题给定由--组成的字符串判断括号是否正确匹配\"><a href=\"#编程题给定由--组成的字符串判断括号是否正确匹配\">编程题：给定由 []{}() 组成的字符串，判断括号是否正确匹配。</a></h2>\n<h2 id=\"计算机网络基础\"><a href=\"#计算机网络基础\">计算机网络基础</a></h2>\n<h2 id=\"ast\"><a href=\"#ast\">AST</a></h2>\n<h2 id=\"继承\"><a href=\"#继承\">继承</a></h2>\n<h2 id=\"安全crsfxss\"><a href=\"#安全crsfxss\">安全（crsf/xss）</a></h2>\n<h2 id=\"小程序\"><a href=\"#小程序\">小程序</a></h2>\n<h2 id=\"canvas\"><a href=\"#canvas\">canvas</a></h2>\n<h2 id=\"手写代码promisereduce深拷贝考虑循环引用等\"><a href=\"#手写代码promisereduce深拷贝考虑循环引用等\">手写代码：Promise，reduce，深拷贝（考虑循环引用）等</a></h2>\n<h2 id=\"设计模式\"><a href=\"#设计模式\">设计模式</a></h2>\n<h2 id=\"cicd-jenkins\"><a href=\"#cicd-jenkins\">CI/CD Jenkins</a></h2>\n<h2 id=\"flexgrid-布局\"><a href=\"#flexgrid-布局\">flex/grid 布局</a></h2>\n<h2 id=\"防抖和节流应用场景\"><a href=\"#防抖和节流应用场景\">防抖和节流（应用场景）</a></h2>\n<h2 id=\"二叉树\"><a href=\"#二叉树\">二叉树</a></h2>\n<h2 id=\"http-缓存\"><a href=\"#http-缓存\">http 缓存</a></h2>\n<h2 id=\"ts泛型infer-关键字void-和-never-的区别\"><a href=\"#ts泛型infer-关键字void-和-never-的区别\">TS:泛型，infer 关键字，void 和 never 的区别</a></h2>\n<h2 id=\"asyncawait-和-promise-什么区别\"><a href=\"#asyncawait-和-promise-什么区别\">async/await 和 Promise 什么区别？</a></h2>\n<h2 id=\"generator-函数和-async-函数有什么区别\"><a href=\"#generator-函数和-async-函数有什么区别\">generator 函数和 async 函数有什么区别</a></h2>\n<h2 id=\"react-相关问题\"><a href=\"#react-相关问题\">React 相关问题</a></h2>\n<h3 id=\"你是怎么理解-jsx-的\"><a href=\"#你是怎么理解-jsx-的\">你是怎么理解 JSX 的？</a></h3>\n<h3 id=\"react-组件是怎么渲染为-dom-元素到页面上的\"><a href=\"#react-组件是怎么渲染为-dom-元素到页面上的\">React 组件是怎么渲染为 DOM 元素到页面上的？</a></h3>\n<h3 id=\"react-中-setstate-调用以后会经历哪些流程\"><a href=\"#react-中-setstate-调用以后会经历哪些流程\">React 中 setState 调用以后会经历哪些流程？</a></h3>\n<h3 id=\"怎么理解-react-中的受控组件和非受控组件\"><a href=\"#怎么理解-react-中的受控组件和非受控组件\">怎么理解 React 中的受控组件和非受控组件？</a></h3>\n<h3 id=\"使用过哪些-react-hooks\"><a href=\"#使用过哪些-react-hooks\">使用过哪些 React Hooks？</a></h3>\n<h3 id=\"usestate-是怎么实现的\"><a href=\"#usestate-是怎么实现的\">useState 是怎么实现的？</a></h3>\n<h3 id=\"说一下-react-中的-diff-算法\"><a href=\"#说一下-react-中的-diff-算法\">说一下 React 中的 Diff 算法</a></h3>\n<h3 id=\"react-的-hoc-是什么\"><a href=\"#react-的-hoc-是什么\">React 的 HOC 是什么？</a></h3>\n<h3 id=\"react-中-fiber-有了解过吗\"><a href=\"#react-中-fiber-有了解过吗\">React 中 Fiber 有了解过吗？</a></h3>\n<h3 id=\"usecallback-和-usememo-有什么区别\"><a href=\"#usecallback-和-usememo-有什么区别\">useCallback 和 useMemo 有什么区别</a></h3>\n<h3 id=\"hooks-可以放在函数的内部吗为什么\"><a href=\"#hooks-可以放在函数的内部吗为什么\">hooks 可以放在函数的内部吗？为什么？</a></h3>\n<h3 id=\"react-router-如何实现权限拦截\"><a href=\"#react-router-如何实现权限拦截\">React Router 如何实现权限拦截？</a></h3>\n<h3 id=\"对-react-hooks-的理解\"><a href=\"#对-react-hooks-的理解\">对 React Hooks 的理解</a></h3>\n<h3 id=\"useeffect-的返回值有什么作用执行时机\"><a href=\"#useeffect-的返回值有什么作用执行时机\">useEffect 的返回值有什么作用，执行时机。</a></h3>\n<h3 id=\"usememousecallbackuseref-的作用\"><a href=\"#usememousecallbackuseref-的作用\">useMemo，useCallback，useRef 的作用。</a></h3>\n<h3 id=\"对-react-的-fiber-架构有什么了解吗中间的节点怎么通过链表连接起来\"><a href=\"#对-react-的-fiber-架构有什么了解吗中间的节点怎么通过链表连接起来\">对 React 的 Fiber 架构有什么了解吗？中间的节点怎么通过链表连接起来。</a></h3>\n<h2 id=\"能说一下-redux-的原理吗\"><a href=\"#能说一下-redux-的原理吗\">能说一下 Redux 的原理吗？</a></h2>\n<h2 id=\"webpack-有做过-loader-和-plugin-吗\"><a href=\"#webpack-有做过-loader-和-plugin-吗\">Webpack 有做过 Loader 和 Plugin 吗？</a></h2>\n<h2 id=\"position-定位的方式说一下-sticky\"><a href=\"#position-定位的方式说一下-sticky\">position 定位的方式。说一下 sticky</a></h2>\n<h2 id=\"es6-新增了哪些数据类型说一下用法\"><a href=\"#es6-新增了哪些数据类型说一下用法\">ES6 新增了哪些数据类型，说一下用法。</a></h2>\n<h2 id=\"cors-如何实现跨域\"><a href=\"#cors-如何实现跨域\">CORS 如何实现跨域？</a></h2>\n<h2 id=\"说一下使用-webpack-的优化\"><a href=\"#说一下使用-webpack-的优化\">说一下使用 Webpack 的优化</a></h2>\n<h2 id=\"webpack-和-vitevite-为什么快\"><a href=\"#webpack-和-vitevite-为什么快\">Webpack 和 Vite，Vite 为什么快？</a></h2>\n<h2 id=\"同一个请求发送多次如何保证获取的是最后一次的结果\"><a href=\"#同一个请求发送多次如何保证获取的是最后一次的结果\">同一个请求发送多次，如何保证获取的是最后一次的结果</a></h2>\n<h2 id=\"vue2-中的-mixin-原理是什么\"><a href=\"#vue2-中的-mixin-原理是什么\">Vue2 中的 mixin 原理是什么？</a></h2>\n<h2 id=\"上线后怎么提示用户刷新当前页面\"><a href=\"#上线后怎么提示用户刷新当前页面\">上线后怎么提示用户刷新当前页面？</a></h2>\n<h2 id=\"对-node-是否有了解如何读取一个-20g-大小的文件\"><a href=\"#对-node-是否有了解如何读取一个-20g-大小的文件\">对 Node 是否有了解？如何读取一个 20G 大小的文件</a></h2>\n<h2 id=\"node-中-master-和-slave-是否了解\"><a href=\"#node-中-master-和-slave-是否了解\">Node 中 master 和 slave 是否了解</a></h2>\n<h2 id=\"发版是怎么做的\"><a href=\"#发版是怎么做的\">发版是怎么做的？</a></h2>\n<h2 id=\"项目有什么监控比如性能类的回答了-sentry\"><a href=\"#项目有什么监控比如性能类的回答了-sentry\">项目有什么监控，比如性能类的。（回答了 sentry）</a></h2>\n<h2 id=\"sentry-推送信息是什么方式\"><a href=\"#sentry-推送信息是什么方式\">sentry 推送信息是什么方式？</a></h2>\n<h2 id=\"less-和-sass-什么区别\"><a href=\"#less-和-sass-什么区别\">less 和 sass 什么区别？</a></h2>\n<h2 id=\"udp-协议有什么优点\"><a href=\"#udp-协议有什么优点\">UDP 协议有什么优点？</a></h2>\n<h2 id=\"http-103-是什么意思\"><a href=\"#http-103-是什么意思\">HTTP 103 是什么意思？</a></h2>\n<h2 id=\"iframe-中外面如何获取里面的真实高度跨-iframe-通信是否了解过\"><a href=\"#iframe-中外面如何获取里面的真实高度跨-iframe-通信是否了解过\">iframe 中，外面如何获取里面的真实高度？跨 iframe 通信是否了解过？</a></h2>\n<h2 id=\"浏览器内存泄漏是否可以通过开发者工具看到如何看到\"><a href=\"#浏览器内存泄漏是否可以通过开发者工具看到如何看到\">浏览器内存泄漏是否可以通过开发者工具看到，如何看到？</a></h2>\n<h2 id=\"weakset-和-weakmap-有什么区别是否可以遍历\"><a href=\"#weakset-和-weakmap-有什么区别是否可以遍历\">WeakSet 和 WeakMap 有什么区别？是否可以遍历？</a></h2>\n<h2 id=\"订阅发布和观察者模式有什么区别\"><a href=\"#订阅发布和观察者模式有什么区别\">订阅发布和观察者模式有什么区别？</a></h2>\n<h2 id=\"单例模式和工厂函数有什么区别\"><a href=\"#单例模式和工厂函数有什么区别\">单例模式和工厂函数有什么区别。</a></h2>\n<h2 id=\"webpack-如何实现热更新\"><a href=\"#webpack-如何实现热更新\">Webpack 如何实现热更新？</a></h2>\n<h2 id=\"webpack-和-vite-热更新区别\"><a href=\"#webpack-和-vite-热更新区别\">Webpack 和 Vite 热更新区别？</a></h2>\n<h2 id=\"vue3-的-hook-和-react-的差别\"><a href=\"#vue3-的-hook-和-react-的差别\">Vue3 的 hook 和 React 的差别</a></h2>\n<h2 id=\"ts-any-和-unknow-的区别\"><a href=\"#ts-any-和-unknow-的区别\">TS any 和 unknow 的区别</a></h2>\n<h2 id=\"使用-https-一定是安全的吗\"><a href=\"#使用-https-一定是安全的吗\">使用 HTTPS 一定是安全的吗？</a></h2>\n<h2 id=\"tree-shaking-的原理commonjs-能用吗tree-shaking-有什么副作用吗\"><a href=\"#tree-shaking-的原理commonjs-能用吗tree-shaking-有什么副作用吗\">Tree Shaking 的原理，CommonJS 能用吗，Tree Shaking 有什么副作用吗？</a></h2>\n<h2 id=\"http11-和-http2-做了什么队头阻塞有没有了解过在-http2-中有这个问题吗\"><a href=\"#http11-和-http2-做了什么队头阻塞有没有了解过在-http2-中有这个问题吗\">HTTP1.1 和 HTTP2 做了什么？队头阻塞有没有了解过，在 HTTP2 中有这个问题吗？</a></h2>\n<h2 id=\"有了解过-http3-吗为什么使用-udp\"><a href=\"#有了解过-http3-吗为什么使用-udp\">有了解过 HTTP3 吗？为什么使用 UDP？</a></h2>\n<h2 id=\"vue-的-nexttick-是用来做什么的它的原理是什么\"><a href=\"#vue-的-nexttick-是用来做什么的它的原理是什么\">Vue 的 nextTick 是用来做什么的？它的原理是什么？</a></h2>\n<h2 id=\"vue-中-set-是做什么的写一个-set-的伪代码\"><a href=\"#vue-中-set-是做什么的写一个-set-的伪代码\">Vue 中 $set 是做什么的。写一个 $set 的伪代码。</a></h2>\n<h2 id=\"vue2-和-vue3-响应式的性能有区别吗为什么\"><a href=\"#vue2-和-vue3-响应式的性能有区别吗为什么\">Vue2 和 Vue3 响应式的性能有区别吗？为什么？</a></h2>\n<h2 id=\"vue3-有什么其他的优化比如静态节点的优化\"><a href=\"#vue3-有什么其他的优化比如静态节点的优化\">Vue3 有什么其他的优化，比如静态节点的优化。</a></h2>\n<h2 id=\"vue2-和-vue3-的-diff-用了什么算法库\"><a href=\"#vue2-和-vue3-的-diff-用了什么算法库\">Vue2 和 Vue3 的 diff 用了什么算法库？</a></h2>\n<h2 id=\"vueextend-有用过吗什么原理\"><a href=\"#vueextend-有用过吗什么原理\">Vue.extend 有用过吗？什么原理？</a></h2>\n<h2 id=\"keepalive-有用过吗实现机制如果一个组件既在-exclude-又在-include-会被缓存吗为什么这么设计\"><a href=\"#keepalive-有用过吗实现机制如果一个组件既在-exclude-又在-include-会被缓存吗为什么这么设计\">KeepAlive 有用过吗？实现机制。如果一个组件既在 exclude 又在 include 会被缓存吗？为什么这么设计？</a></h2>\n<h2 id=\"webpack-和-vite-的构建流程有什么差异\"><a href=\"#webpack-和-vite-的构建流程有什么差异\">Webpack 和 Vite 的构建流程有什么差异。</a></h2>\n<h2 id=\"this-有哪几种指向\"><a href=\"#this-有哪几种指向\">this 有哪几种指向。</a></h2>\n<h2 id=\"说一下你用过-meta-标签\"><a href=\"#说一下你用过-meta-标签\">说一下你用过 meta 标签</a></h2>\n<h2 id=\"项目是怎么部署的怎么监听服务怎么灰度上线\"><a href=\"#项目是怎么部署的怎么监听服务怎么灰度上线\">项目是怎么部署的？怎么监听服务，怎么灰度上线。</a></h2>\n<h2 id=\"js-数组去重怎么实现回答-set如果要对对象去重怎么做\"><a href=\"#js-数组去重怎么实现回答-set如果要对对象去重怎么做\">JS 数组去重怎么实现。（回答 Set）如果要对对象去重怎么做。</a></h2>\n<h2 id=\"怎么做技术选型\"><a href=\"#怎么做技术选型\">怎么做技术选型</a></h2>\n<h2 id=\"proxy-和-reflect-有什么关系\"><a href=\"#proxy-和-reflect-有什么关系\">Proxy 和 Reflect 有什么关系？</a></h2>\n<h2 id=\"react-hooks-和-vue3-的-compose-api-有什么区别\"><a href=\"#react-hooks-和-vue3-的-compose-api-有什么区别\">React hooks 和 Vue3 的 compose api 有什么区别？</a></h2>\n<h2 id=\"vue-或-react-中我们连续三次赋值比如-thisa会怎么实现\"><a href=\"#vue-或-react-中我们连续三次赋值比如-thisa会怎么实现\">Vue 或 React 中我们连续三次赋值，比如 this.a，会怎么实现？</a></h2>\n<h2 id=\"modulechunkbundle-是什么意思\"><a href=\"#modulechunkbundle-是什么意思\">module，chunk，bundle 是什么意思</a></h2>\n<h2 id=\"你可以说一下对-webpackviteesbuildswc-的理解\"><a href=\"#你可以说一下对-webpackviteesbuildswc-的理解\">你可以说一下对 Webpack，Vite，EsBuild，SWC 的理解。</a></h2>\n<h2 id=\"如何进行选择\"><a href=\"#如何进行选择\">如何进行选择？</a></h2>\n<h2 id=\"打包速度慢怎么解决\"><a href=\"#打包速度慢怎么解决\">打包速度慢怎么解决？</a></h2>\n<h2 id=\"webpack-和-vite-区别\"><a href=\"#webpack-和-vite-区别\">Webpack 和 Vite 区别。</a></h2>\n<h2 id=\"http11-和-http2-的区别\"><a href=\"#http11-和-http2-的区别\">HTTP1.1 和 HTTP2 的区别？</a></h2>\n<h2 id=\"浏览器对队头阻塞有什么优化\"><a href=\"#浏览器对队头阻塞有什么优化\">浏览器对队头阻塞有什么优化？</a></h2>\n<h2 id=\"说一下-link-和-script-标签的加载过程中会对-dom-树构建有什么影响\"><a href=\"#说一下-link-和-script-标签的加载过程中会对-dom-树构建有什么影响\">说一下 link 和 script 标签的加载过程中会对 DOM 树构建有什么影响？</a></h2>\n<h2 id=\"从垃圾回收的标记清除原理来理解一下闭包goao\"><a href=\"#从垃圾回收的标记清除原理来理解一下闭包goao\">从垃圾回收的标记清除原理来理解一下闭包。GO/AO</a></h2>\n<h2 id=\"为什么-es-module-需要把-import-放在顶部commonjs-不需要\"><a href=\"#为什么-es-module-需要把-import-放在顶部commonjs-不需要\">为什么 ES Module 需要把 import 放在顶部，CommonJS 不需要？</a></h2>\n<h2 id=\"强缓存和协商缓存的区别\"><a href=\"#强缓存和协商缓存的区别\">强缓存和协商缓存的区别</a></h2>\n<h2 id=\"原型链六种继承优劣\"><a href=\"#原型链六种继承优劣\">原型链六种继承优劣</a></h2>\n<h2 id=\"websocket-是怎么保持的长连接\"><a href=\"#websocket-是怎么保持的长连接\">websocket 是怎么保持的长连接</a></h2>\n<h2 id=\"为什么-vue-叫渐进式\"><a href=\"#为什么-vue-叫渐进式\">为什么 vue 叫渐进式</a></h2>\n<h2 id=\"react-和-vue-虚拟-dom-的却别以及-diff-算法的区别\"><a href=\"#react-和-vue-虚拟-dom-的却别以及-diff-算法的区别\">react 和 vue 虚拟 dom 的却别以及 diff 算法的区别</a></h2>\n<h2 id=\"hmr-原理\"><a href=\"#hmr-原理\">HMR 原理</a></h2>\n<h2 id=\"loader-和-plugin-哪个先开启引入plugin-和-loader-的区别\"><a href=\"#loader-和-plugin-哪个先开启引入plugin-和-loader-的区别\">loader 和 plugin 哪个先开启引入？plugin 和 loader 的区别</a></h2>\n<h2 id=\"安全性-xss-csrf\"><a href=\"#安全性-xss-csrf\">安全性 XSS CSRF</a></h2>\n<h2 id=\"单点登录\"><a href=\"#单点登录\">单点登录</a></h2>\n<h2 id=\"hr-面\"><a href=\"#hr-面\">HR 面</a></h2>\n<p>自我介绍一下自己（可引导提问）<br>\n你认为你做的最有亮点的事情<br>\n有什么事情是你认为你做的不够好的<br>\n什么事情是你认为比较有成就感的</p>",
+  "toc": [
+    {
+      "id": "js-数据类型有哪些",
+      "title": "js 数据类型有哪些？"
+    },
+    {
+      "id": "判断数据类型的方法",
+      "title": "判断数据类型的方法"
+    },
+    {
+      "id": "let-const-var-区别",
+      "title": "let const var 区别"
+    },
+    {
+      "id": "箭头函数与普通函数区别",
+      "title": "箭头函数与普通函数区别"
+    },
+    {
+      "id": "使用-react-or-vue",
+      "title": "使用 react or vue？"
+    },
+    {
+      "id": "vue2-和-vue3-的区别",
+      "title": "Vue2 和 Vue3 的区别"
+    },
+    {
+      "id": "模块化-commonjsamdcmdumdes-module",
+      "title": "模块化 CommonJS/AMD/CMD/UMD/ES Module"
+    },
+    {
+      "id": "说一下-commonjs-和-es-module-的差异",
+      "title": "说一下 CommonJS 和 ES Module 的差异"
+    },
+    {
+      "id": "v8-垃圾回收",
+      "title": "v8 垃圾回收"
+    },
+    {
+      "id": "内存泄漏",
+      "title": "内存泄漏"
+    },
+    {
+      "id": "js-运行机制",
+      "title": "js 运行机制"
+    },
+    {
+      "id": "url-输入到页面解析发生了什么",
+      "title": "url 输入到页面解析发生了什么"
+    },
+    {
+      "id": "asyncawait-怎么实现的",
+      "title": "async/await 怎么实现的？"
+    },
+    {
+      "id": "性能优化",
+      "title": "性能优化"
+    },
+    {
+      "id": "js-代码题-控制并发量",
+      "title": "JS 代码题 控制并发量"
+    },
+    {
+      "id": "编程题",
+      "title": "编程题"
+    },
+    {
+      "id": "编程题给定由--组成的字符串判断括号是否正确匹配",
+      "title": "编程题：给定由 []{}() 组成的字符串，判断括号是否正确匹配。"
+    },
+    {
+      "id": "计算机网络基础",
+      "title": "计算机网络基础"
+    },
+    {
+      "id": "ast",
+      "title": "AST"
+    },
+    {
+      "id": "继承",
+      "title": "继承"
+    },
+    {
+      "id": "安全crsfxss",
+      "title": "安全（crsf/xss）"
+    },
+    {
+      "id": "小程序",
+      "title": "小程序"
+    },
+    {
+      "id": "canvas",
+      "title": "canvas"
+    },
+    {
+      "id": "手写代码promisereduce深拷贝考虑循环引用等",
+      "title": "手写代码：Promise，reduce，深拷贝（考虑循环引用）等"
+    },
+    {
+      "id": "设计模式",
+      "title": "设计模式"
+    },
+    {
+      "id": "cicd-jenkins",
+      "title": "CI/CD Jenkins"
+    },
+    {
+      "id": "flexgrid-布局",
+      "title": "flex/grid 布局"
+    },
+    {
+      "id": "防抖和节流应用场景",
+      "title": "防抖和节流（应用场景）"
+    },
+    {
+      "id": "二叉树",
+      "title": "二叉树"
+    },
+    {
+      "id": "http-缓存",
+      "title": "http 缓存"
+    },
+    {
+      "id": "ts泛型infer-关键字void-和-never-的区别",
+      "title": "TS:泛型，infer 关键字，void 和 never 的区别"
+    },
+    {
+      "id": "asyncawait-和-promise-什么区别",
+      "title": "async/await 和 Promise 什么区别？"
+    },
+    {
+      "id": "generator-函数和-async-函数有什么区别",
+      "title": "generator 函数和 async 函数有什么区别"
+    },
+    {
+      "id": "react-相关问题",
+      "title": "React 相关问题"
+    },
+    {
+      "id": "能说一下-redux-的原理吗",
+      "title": "能说一下 Redux 的原理吗？"
+    },
+    {
+      "id": "webpack-有做过-loader-和-plugin-吗",
+      "title": "Webpack 有做过 Loader 和 Plugin 吗？"
+    },
+    {
+      "id": "position-定位的方式说一下-sticky",
+      "title": "position 定位的方式。说一下 sticky"
+    },
+    {
+      "id": "es6-新增了哪些数据类型说一下用法",
+      "title": "ES6 新增了哪些数据类型，说一下用法。"
+    },
+    {
+      "id": "cors-如何实现跨域",
+      "title": "CORS 如何实现跨域？"
+    },
+    {
+      "id": "说一下使用-webpack-的优化",
+      "title": "说一下使用 Webpack 的优化"
+    },
+    {
+      "id": "webpack-和-vitevite-为什么快",
+      "title": "Webpack 和 Vite，Vite 为什么快？"
+    },
+    {
+      "id": "同一个请求发送多次如何保证获取的是最后一次的结果",
+      "title": "同一个请求发送多次，如何保证获取的是最后一次的结果"
+    },
+    {
+      "id": "vue2-中的-mixin-原理是什么",
+      "title": "Vue2 中的 mixin 原理是什么？"
+    },
+    {
+      "id": "上线后怎么提示用户刷新当前页面",
+      "title": "上线后怎么提示用户刷新当前页面？"
+    },
+    {
+      "id": "对-node-是否有了解如何读取一个-20g-大小的文件",
+      "title": "对 Node 是否有了解？如何读取一个 20G 大小的文件"
+    },
+    {
+      "id": "node-中-master-和-slave-是否了解",
+      "title": "Node 中 master 和 slave 是否了解"
+    },
+    {
+      "id": "发版是怎么做的",
+      "title": "发版是怎么做的？"
+    },
+    {
+      "id": "项目有什么监控比如性能类的回答了-sentry",
+      "title": "项目有什么监控，比如性能类的。（回答了 sentry）"
+    },
+    {
+      "id": "sentry-推送信息是什么方式",
+      "title": "sentry 推送信息是什么方式？"
+    },
+    {
+      "id": "less-和-sass-什么区别",
+      "title": "less 和 sass 什么区别？"
+    },
+    {
+      "id": "udp-协议有什么优点",
+      "title": "UDP 协议有什么优点？"
+    },
+    {
+      "id": "http-103-是什么意思",
+      "title": "HTTP 103 是什么意思？"
+    },
+    {
+      "id": "iframe-中外面如何获取里面的真实高度跨-iframe-通信是否了解过",
+      "title": "iframe 中，外面如何获取里面的真实高度？跨 iframe 通信是否了解过？"
+    },
+    {
+      "id": "浏览器内存泄漏是否可以通过开发者工具看到如何看到",
+      "title": "浏览器内存泄漏是否可以通过开发者工具看到，如何看到？"
+    },
+    {
+      "id": "weakset-和-weakmap-有什么区别是否可以遍历",
+      "title": "WeakSet 和 WeakMap 有什么区别？是否可以遍历？"
+    },
+    {
+      "id": "订阅发布和观察者模式有什么区别",
+      "title": "订阅发布和观察者模式有什么区别？"
+    },
+    {
+      "id": "单例模式和工厂函数有什么区别",
+      "title": "单例模式和工厂函数有什么区别。"
+    },
+    {
+      "id": "webpack-如何实现热更新",
+      "title": "Webpack 如何实现热更新？"
+    },
+    {
+      "id": "webpack-和-vite-热更新区别",
+      "title": "Webpack 和 Vite 热更新区别？"
+    },
+    {
+      "id": "vue3-的-hook-和-react-的差别",
+      "title": "Vue3 的 hook 和 React 的差别"
+    },
+    {
+      "id": "ts-any-和-unknow-的区别",
+      "title": "TS any 和 unknow 的区别"
+    },
+    {
+      "id": "使用-https-一定是安全的吗",
+      "title": "使用 HTTPS 一定是安全的吗？"
+    },
+    {
+      "id": "tree-shaking-的原理commonjs-能用吗tree-shaking-有什么副作用吗",
+      "title": "Tree Shaking 的原理，CommonJS 能用吗，Tree Shaking 有什么副作用吗？"
+    },
+    {
+      "id": "http11-和-http2-做了什么队头阻塞有没有了解过在-http2-中有这个问题吗",
+      "title": "HTTP1.1 和 HTTP2 做了什么？队头阻塞有没有了解过，在 HTTP2 中有这个问题吗？"
+    },
+    {
+      "id": "有了解过-http3-吗为什么使用-udp",
+      "title": "有了解过 HTTP3 吗？为什么使用 UDP？"
+    },
+    {
+      "id": "vue-的-nexttick-是用来做什么的它的原理是什么",
+      "title": "Vue 的 nextTick 是用来做什么的？它的原理是什么？"
+    },
+    {
+      "id": "vue-中-set-是做什么的写一个-set-的伪代码",
+      "title": "Vue 中 $set 是做什么的。写一个 $set 的伪代码。"
+    },
+    {
+      "id": "vue2-和-vue3-响应式的性能有区别吗为什么",
+      "title": "Vue2 和 Vue3 响应式的性能有区别吗？为什么？"
+    },
+    {
+      "id": "vue3-有什么其他的优化比如静态节点的优化",
+      "title": "Vue3 有什么其他的优化，比如静态节点的优化。"
+    },
+    {
+      "id": "vue2-和-vue3-的-diff-用了什么算法库",
+      "title": "Vue2 和 Vue3 的 diff 用了什么算法库？"
+    },
+    {
+      "id": "vueextend-有用过吗什么原理",
+      "title": "Vue.extend 有用过吗？什么原理？"
+    },
+    {
+      "id": "keepalive-有用过吗实现机制如果一个组件既在-exclude-又在-include-会被缓存吗为什么这么设计",
+      "title": "KeepAlive 有用过吗？实现机制。如果一个组件既在 exclude 又在 include 会被缓存吗？为什么这么设计？"
+    },
+    {
+      "id": "webpack-和-vite-的构建流程有什么差异",
+      "title": "Webpack 和 Vite 的构建流程有什么差异。"
+    },
+    {
+      "id": "this-有哪几种指向",
+      "title": "this 有哪几种指向。"
+    },
+    {
+      "id": "说一下你用过-meta-标签",
+      "title": "说一下你用过 meta 标签"
+    },
+    {
+      "id": "项目是怎么部署的怎么监听服务怎么灰度上线",
+      "title": "项目是怎么部署的？怎么监听服务，怎么灰度上线。"
+    },
+    {
+      "id": "js-数组去重怎么实现回答-set如果要对对象去重怎么做",
+      "title": "JS 数组去重怎么实现。（回答 Set）如果要对对象去重怎么做。"
+    },
+    {
+      "id": "怎么做技术选型",
+      "title": "怎么做技术选型"
+    },
+    {
+      "id": "proxy-和-reflect-有什么关系",
+      "title": "Proxy 和 Reflect 有什么关系？"
+    },
+    {
+      "id": "react-hooks-和-vue3-的-compose-api-有什么区别",
+      "title": "React hooks 和 Vue3 的 compose api 有什么区别？"
+    },
+    {
+      "id": "vue-或-react-中我们连续三次赋值比如-thisa会怎么实现",
+      "title": "Vue 或 React 中我们连续三次赋值，比如 this.a，会怎么实现？"
+    },
+    {
+      "id": "modulechunkbundle-是什么意思",
+      "title": "module，chunk，bundle 是什么意思"
+    },
+    {
+      "id": "你可以说一下对-webpackviteesbuildswc-的理解",
+      "title": "你可以说一下对 Webpack，Vite，EsBuild，SWC 的理解。"
+    },
+    {
+      "id": "如何进行选择",
+      "title": "如何进行选择？"
+    },
+    {
+      "id": "打包速度慢怎么解决",
+      "title": "打包速度慢怎么解决？"
+    },
+    {
+      "id": "webpack-和-vite-区别",
+      "title": "Webpack 和 Vite 区别。"
+    },
+    {
+      "id": "http11-和-http2-的区别",
+      "title": "HTTP1.1 和 HTTP2 的区别？"
+    },
+    {
+      "id": "浏览器对队头阻塞有什么优化",
+      "title": "浏览器对队头阻塞有什么优化？"
+    },
+    {
+      "id": "说一下-link-和-script-标签的加载过程中会对-dom-树构建有什么影响",
+      "title": "说一下 link 和 script 标签的加载过程中会对 DOM 树构建有什么影响？"
+    },
+    {
+      "id": "从垃圾回收的标记清除原理来理解一下闭包goao",
+      "title": "从垃圾回收的标记清除原理来理解一下闭包。GO/AO"
+    },
+    {
+      "id": "为什么-es-module-需要把-import-放在顶部commonjs-不需要",
+      "title": "为什么 ES Module 需要把 import 放在顶部，CommonJS 不需要？"
+    },
+    {
+      "id": "强缓存和协商缓存的区别",
+      "title": "强缓存和协商缓存的区别"
+    },
+    {
+      "id": "原型链六种继承优劣",
+      "title": "原型链六种继承优劣"
+    },
+    {
+      "id": "websocket-是怎么保持的长连接",
+      "title": "websocket 是怎么保持的长连接"
+    },
+    {
+      "id": "为什么-vue-叫渐进式",
+      "title": "为什么 vue 叫渐进式"
+    },
+    {
+      "id": "react-和-vue-虚拟-dom-的却别以及-diff-算法的区别",
+      "title": "react 和 vue 虚拟 dom 的却别以及 diff 算法的区别"
+    },
+    {
+      "id": "hmr-原理",
+      "title": "HMR 原理"
+    },
+    {
+      "id": "loader-和-plugin-哪个先开启引入plugin-和-loader-的区别",
+      "title": "loader 和 plugin 哪个先开启引入？plugin 和 loader 的区别"
+    },
+    {
+      "id": "安全性-xss-csrf",
+      "title": "安全性 XSS CSRF"
+    },
+    {
+      "id": "单点登录",
+      "title": "单点登录"
+    },
+    {
+      "id": "hr-面",
+      "title": "HR 面"
+    }
+  ]
+}

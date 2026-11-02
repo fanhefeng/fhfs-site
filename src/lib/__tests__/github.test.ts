@@ -96,7 +96,7 @@ describe("GitHub cached reads", () => {
     );
     expect((await getGithubProjects([repo])).get(repo)).toEqual({
       release: null,
-      stats: { stars: 1, forks: 0 },
+      stats: { stars: 1, forks: 0, language: null, pushedAt: null },
     });
     fetcher.mockImplementation(async (input) =>
       urlOf(input).endsWith("/latest") ? Response.json(release) : new Response("not json"),

@@ -55,6 +55,29 @@ describe("search", () => {
     expect(search(entries, "OsI").length).toBe(3);
   });
 
+  it("matches Latin word prefixes without finding AI inside unrelated words", () => {
+    const mixed = [
+      entry({ title: "AI 编程", href: "/ai" }),
+      entry({ text: "今天用AI写代码", href: "/chinese-ai" }),
+      entry({ text: "I waited for you again", href: "/unrelated" }),
+      entry({ text: "ScrollTrigger containerAnimation", href: "/animation" }),
+      entry({ title: "React", href: "/react" }),
+      entry({ title: "Preact", href: "/preact" }),
+    ];
+    expect(search(mixed, "AI").map((hit) => hit.href)).toEqual(["/ai", "/chinese-ai"]);
+    expect(search(mixed, "rea").map((hit) => hit.href)).toEqual(["/react"]);
+  });
+
+  it("keeps Chinese substring matching and punctuation in technical terms", () => {
+    const mixed = [
+      entry({ title: "Next.js 七层模型", href: "/next" }),
+      entry({ title: "C++ 入门", href: "/cpp" }),
+    ];
+    expect(search(mixed, "层模").map((hit) => hit.href)).toEqual(["/next"]);
+    expect(search(mixed, "next.js 七层").map((hit) => hit.href)).toEqual(["/next"]);
+    expect(search(mixed, "c++").map((hit) => hit.href)).toEqual(["/cpp"]);
+  });
+
   it("finds nothing for an empty query, and stops at the limit", () => {
     expect(search(entries, " ")).toEqual([]);
     expect(search(entries, "o", 1)).toHaveLength(1);
@@ -69,5 +92,10 @@ describe("search", () => {
     const [hit] = search(entries, "比特");
     expect(hit!.snippet).toBe("从报文到比特流");
     expect(search(entries, "僧侣")[0]!.snippet).toBe("");
+  });
+
+  it("cuts a snippet around a matching word instead of an earlier substring", () => {
+    const text = `I waited ${"很".repeat(80)} AI 编程`;
+    expect(snippet(text, ["ai"], 5)).toBe("…很很很很 AI 编程");
   });
 });

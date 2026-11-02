@@ -64,6 +64,29 @@ export async function generateMetadata({
  * not in the file.
  */
 const STUDY_KEYS: Record<LabEntry["key"], string[]> = {
+  magazine: [
+    "label",
+    "lede",
+    "coverAria",
+    "edition",
+    "coverKicker",
+    "coverTitle",
+    "coverBody",
+    "read",
+    "save",
+    "saved",
+    "stageNote",
+    "live",
+    "fallback",
+    "turnAria",
+    "turnLeft",
+    "turnRight",
+    "reset",
+    "flatView",
+    "spatialView",
+    "liveHint",
+    "flatHint",
+  ],
   hello: [
     "label",
     "lede",
@@ -355,7 +378,7 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
       <header className="mx-auto w-full max-w-[720px] px-6 pt-24 pb-10">
         <Link
           href="/lab"
-          className="hit-ext inline-flex min-h-11 items-center font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
+          className="hit-ext inline-flex min-h-11 items-center font-mono text-meta uppercase tracking-meta text-fg-tertiary underline decoration-line underline-offset-4 transition-colors hover:text-accent"
         >
           {t("backToIndex")}
         </Link>
@@ -371,10 +394,9 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
           href={sourceUrl(entry.sources[0]!)}
           target="_blank"
           rel="noreferrer"
-          className="hit-ext mt-5 inline-flex min-h-11 items-center gap-1.5 font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
+          className="hit-ext mt-5 inline-flex min-h-11 items-center font-mono text-meta uppercase tracking-meta text-fg-tertiary underline decoration-line underline-offset-4 transition-colors hover:text-accent"
         >
           {t("viewSource")}
-          <span aria-hidden="true">↗</span>
         </a>
       </header>
 
@@ -413,15 +435,9 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
                   href={sourceUrl(path)}
                   target="_blank"
                   rel="noreferrer"
-                  className="group flex min-h-11 items-center justify-between gap-4 py-2.5 font-mono text-caption text-fg transition-colors hover:text-accent"
+                  className="flex min-h-11 items-center py-2.5 font-mono text-caption text-fg underline decoration-line underline-offset-4 transition-colors hover:text-accent"
                 >
                   <span className="min-w-0 break-all">src/{path}</span>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 text-fg-tertiary transition-colors group-hover:text-accent"
-                  >
-                    ↗
-                  </span>
                 </a>
               </li>
             ))}
@@ -458,10 +474,9 @@ export default async function LabDemoPage({ params }: PageProps<"/[locale]/lab/[
 
         <Link
           href="/lab"
-          className="hit-ext mt-8 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
+          className="hit-ext mt-8 inline-flex min-h-11 items-center rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
         >
           {t("back")}
-          <span aria-hidden="true">→</span>
         </Link>
       </section>
     </main>
@@ -487,11 +502,11 @@ function Neighbour({
       className={`group flex min-h-11 flex-col gap-1.5 py-5${end ? " items-end text-right" : ""}`}
     >
       <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-        {!end && <span aria-hidden="true">← </span>}
         {label} · {entry.ordinal}
-        {end && <span aria-hidden="true"> →</span>}
       </span>
-      <span className="text-body text-fg transition-colors group-hover:text-accent">{name}</span>
+      <span className="text-body text-fg underline decoration-transparent underline-offset-4 transition-colors group-hover:text-accent group-hover:decoration-current group-focus-visible:decoration-current">
+        {name}
+      </span>
     </Link>
   );
 }

@@ -24,6 +24,7 @@ export type Messages = Record<string, unknown>;
 export const CLIENT_NAMESPACES = [
   "about",
   "blog",
+  "notebook",
   "common",
   "error",
   "footer",

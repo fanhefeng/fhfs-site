@@ -438,17 +438,9 @@ function MomentCard({ item }: { item: BoardMoment }) {
                 type="button"
                 onClick={press}
                 aria-expanded={expanded}
-                className="hit-ext inline-flex shrink-0 items-center gap-1.5 font-mono text-meta uppercase tracking-meta text-fg-secondary transition-colors hover:text-accent"
+                className="hit-ext inline-flex shrink-0 items-center font-mono text-meta uppercase tracking-meta text-fg-secondary underline decoration-line underline-offset-4 transition-colors hover:text-accent"
               >
                 {expanded ? t("collapse") : t("expand")}
-                {/* Which way the text will go — the words alone read as a
-                    caption, and this is the one thing on the card that opens. */}
-                <span
-                  aria-hidden="true"
-                  className={`transition-transform duration-300 ease-out ${expanded ? "rotate-180" : ""}`}
-                >
-                  ↓
-                </span>
               </button>
             )}
           </footer>

@@ -29,7 +29,10 @@ export function LocaleSwitcher({ className }: { className?: string }) {
     <button
       type="button"
       onClick={() =>
-        router.replace(`${pathname}${window.location.search}`, { locale: other, scroll: false })
+        router.replace(`${pathname}${window.location.search}${window.location.hash}`, {
+          locale: other,
+          scroll: false,
+        })
       }
       aria-label={t("localeSwitchAria")}
       // hit-ext keeps the ≥44px touch target without inflating the chip.

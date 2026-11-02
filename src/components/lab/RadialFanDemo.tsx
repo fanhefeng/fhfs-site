@@ -21,9 +21,6 @@ export function RadialFanDemo({ accent, label, body, shareTitle }: Props) {
   return (
     <StudyPanel accent={accent} label={label}>
       <p className="spn-body">{body}</p>
-      <p className="spn-arrow" aria-hidden="true">
-        ↘
-      </p>
       <RadialFab shareTitle={shareTitle} always />
     </StudyPanel>
   );

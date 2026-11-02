@@ -189,9 +189,9 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
         <p className="mt-14">
           <Link
             href="/blog"
-            className="hit-ext relative font-mono text-meta uppercase tracking-meta text-fg-secondary transition-colors duration-200 hover:text-accent"
+            className="hit-ext relative font-mono text-meta uppercase tracking-meta text-fg-secondary underline decoration-line underline-offset-4 transition-colors duration-200 hover:text-accent"
           >
-            ← {t("backToList")}
+            {t("backToList")}
           </Link>
         </p>
       </main>

@@ -29,7 +29,6 @@ export function DoorDemo({ accent, label, body, action, homeHref }: Props) {
       <p className="spn-body">{body}</p>
       <button type="button" className="spn-btn" onClick={replay}>
         {action}
-        <span aria-hidden="true">→</span>
       </button>
     </StudyPanel>
   );

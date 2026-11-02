@@ -9,8 +9,11 @@ const readers = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/server/content", () => readers);
 
+vi.mock("server-only", () => ({}));
+
 import sitemap from "@/app/sitemap";
 import { site } from "@/config/site";
+import notebook from "@/content/notebook/index.json";
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -33,7 +36,7 @@ beforeEach(() => {
 describe("sitemap from published edition metadata", () => {
   it("lists only real editions and shares their actual language links", async () => {
     const result = await sitemap();
-    const articles = result.filter((entry) => /\/(blog|secrets)\/[^/]+$/.test(entry.url));
+    const articles = result.filter((entry) => /\/(blog|secrets)\/(?!notes$)[^/]+$/.test(entry.url));
     expect(articles.map((entry) => entry.url)).toEqual([
       `${site.url}/en/blog/both`,
       `${site.url}/zh/blog/both`,
@@ -76,5 +79,23 @@ describe("sitemap from published edition metadata", () => {
       result.find((entry) => entry.url === `${site.url}/zh/blog`)?.lastModified,
     ).toBeUndefined();
     expect(result.some((entry) => /\/secrets\/[^/]+$/.test(entry.url))).toBe(false);
+  });
+
+  it("lists the notebook in both languages but each note only in its original language", async () => {
+    const result = await sitemap();
+    const notes = result.filter((entry) => /\/blog\/notes\/[^/]+$/.test(entry.url));
+    expect(notes).toHaveLength(notebook.length);
+    for (const note of notebook) {
+      const path = `/blog/notes/${note.slug}`;
+      const row = notes.find((entry) => entry.url === `${site.url}/${note.locale}${path}`)!;
+      expect(row.alternates?.languages).toEqual({
+        [note.locale === "zh" ? "zh-CN" : "en"]: row.url,
+      });
+      expect(row.lastModified).toEqual(note.date ? new Date(note.date) : undefined);
+    }
+    for (const locale of ["zh", "en"])
+      expect(result).toContainEqual(
+        expect.objectContaining({ url: `${site.url}/${locale}/blog/notes` }),
+      );
   });
 });

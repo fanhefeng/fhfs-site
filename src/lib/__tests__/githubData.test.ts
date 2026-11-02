@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import {
+  appGithubRepo,
   githubCacheTag,
   githubEventRepo,
   parseGithubRelease,
@@ -99,6 +100,8 @@ describe("GitHub public data", () => {
     expect(parseGithubStats({ private: false, stargazers_count: 0, forks_count: 3 })).toEqual({
       stars: 0,
       forks: 3,
+      language: null,
+      pushedAt: null,
     });
     for (const value of [
       null,
@@ -109,6 +112,62 @@ describe("GitHub public data", () => {
       { private: false, stargazers_count: 1.5, forks_count: 2 },
     ])
       expect(parseGithubStats(value)).toBeNull();
+  });
+
+  it("reads the primary language and last push without requiring optional metadata", () => {
+    const stats = { private: false, stargazers_count: 42, forks_count: 7 };
+    expect(
+      parseGithubStats({ ...stats, language: "TypeScript", pushed_at: "2026-11-01T08:00:00Z" }),
+    ).toEqual({
+      stars: 42,
+      forks: 7,
+      language: "TypeScript",
+      pushedAt: "2026-11-01T08:00:00.000Z",
+    });
+    expect(parseGithubStats({ ...stats, language: 3, pushed_at: "invalid" })).toEqual({
+      stars: 42,
+      forks: 7,
+      language: null,
+      pushedAt: null,
+    });
+  });
+});
+
+describe("project repository selection", () => {
+  it("prefers an explicit repo and normalizes GitHub's case-insensitive names", () => {
+    expect(
+      appGithubRepo({ repo: "FanHeFeng/Portreaper", website: "https://github.com/other/repo" }),
+    ).toBe(repo);
+  });
+
+  it("recognizes GitHub project websites, clone URLs and release links", () => {
+    for (const path of [
+      "/FanHeFeng/Portreaper",
+      "/fanhefeng/portreaper/",
+      "/fanhefeng/portreaper.git",
+      "/fanhefeng/portreaper/releases/latest?from=site#downloads",
+    ]) {
+      expect(appGithubRepo({ repo: null, website: `https://github.com${path}` })).toBe(repo);
+    }
+  });
+
+  it("ignores websites without a repository and never accepts an arbitrary API host", () => {
+    for (const website of [
+      undefined,
+      "broken",
+      "https://github.com",
+      "https://github.com/fanhefeng",
+      "https://github.com/fanhefeng/",
+      "https://github.com/fanhefeng/..",
+      "https://github.com/owner/%2Fsecret",
+      "https://github.com/owner/.git",
+      "https://github.com.evil.example/owner/repo",
+      "https://user:password@github.com/owner/repo",
+      "https://example.com/owner/repo",
+      "http://github.com/owner/repo",
+    ]) {
+      expect(appGithubRepo({ repo: null, website })).toBeNull();
+    }
   });
 });
 

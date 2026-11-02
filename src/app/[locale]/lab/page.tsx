@@ -75,9 +75,6 @@ export default async function LabPage({ params }: PageProps<"/[locale]/lab">) {
                       </span>
                       <span className="lab-desc">{t(`items.${entry.key}.summary`)}</span>
                     </span>
-                    <span className="lab-arrow" aria-hidden="true">
-                      →
-                    </span>
                   </Link>
                 </li>
               ))}
@@ -123,8 +120,7 @@ const INDEX_CSS = `
 
 .lab-row { position: relative; border-top: 1px solid var(--line); }
 .lab-row:last-child { border-bottom: 1px solid var(--line); }
-/* Same accent rule as the craft log: it slides in from the left on hover and
-   is the only motion a text row gets. */
+/* The accent rule and title underline mark the whole row as a link. */
 .lab-row::before {
   content: "";
   position: absolute;
@@ -142,7 +138,7 @@ const INDEX_CSS = `
 
 .lab-link {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: baseline;
   gap: 0 1rem;
   padding: 1.35rem 0 1.35rem 1rem;
@@ -168,7 +164,13 @@ const INDEX_CSS = `
   font-size: 1.0625rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 0.25s ease-out;
 }
+.lab-link:hover .lab-name,
+.lab-link:focus-visible .lab-name { text-decoration-color: var(--row-accent); }
 /* Beside the name when it fits, on its own line when it does not, and
    wrapping there — never clipped. Some taglines run to three clauses, and on
    a phone even the short ones are wider than the column. */
@@ -188,16 +190,5 @@ const INDEX_CSS = `
   font-size: 0.9375rem;
   line-height: 1.65;
   color: var(--fg-secondary);
-}
-
-.lab-arrow {
-  align-self: center;
-  color: var(--fg-tertiary);
-  transition: transform 0.25s ease-out, color 0.25s ease-out;
-}
-.lab-link:hover .lab-arrow,
-.lab-link:focus-visible .lab-arrow {
-  transform: translateX(3px);
-  color: var(--accent);
 }
 `;
