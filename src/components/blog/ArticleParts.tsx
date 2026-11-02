@@ -59,11 +59,11 @@ export function ArticleNeighbours({
       {older && (
         <Link href={`${base}/${older.slug}`} className="group flex flex-col gap-1.5">
           <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-            ← {prev}
+            {prev}
           </span>
           <span
             lang={langOf(older)}
-            className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
+            className="text-heading text-fg underline decoration-transparent underline-offset-4 transition-colors duration-200 group-hover:text-accent group-hover:decoration-current group-focus-visible:decoration-current"
           >
             {older.title}
           </span>
@@ -75,11 +75,11 @@ export function ArticleNeighbours({
           className="group flex flex-col gap-1.5 sm:col-start-2 sm:items-end sm:text-right"
         >
           <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-            {next} →
+            {next}
           </span>
           <span
             lang={langOf(newer)}
-            className="text-heading text-fg transition-colors duration-200 group-hover:text-accent"
+            className="text-heading text-fg underline decoration-transparent underline-offset-4 transition-colors duration-200 group-hover:text-accent group-hover:decoration-current group-focus-visible:decoration-current"
           >
             {newer.title}
           </span>

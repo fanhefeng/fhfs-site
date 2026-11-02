@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Sticker } from "@/components/ui/Sticker";
 import { Vinyl } from "./Vinyl";
+import { GithubStats } from "./GithubStats";
 import { catalogueNumber, sleeveInk, type SoftwareApp } from "./appMeta";
 
 /* Printed paper: the same turbulence as the page's grain layer, standing
@@ -101,6 +102,11 @@ export function Sleeve({ app, index, onDeck, onPick }: Props) {
         <span className="mt-0.5 line-clamp-2 block text-caption text-fg-secondary">
           {app.tagline}
         </span>
+        {app.stats ? (
+          <span className="mt-2 block">
+            <GithubStats stats={app.stats} />
+          </span>
+        ) : null}
         <span
           className={`mt-1.5 block font-mono text-meta uppercase tracking-meta ${
             onDeck ? "text-accent" : "text-fg-tertiary"

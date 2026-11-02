@@ -98,7 +98,9 @@
     "fabShareDone": "Link copied",
     "fabTop": "Back to top",
     "fabRss": "RSS feed",
-    "fabTheme": "Toggle theme"
+    "fabTheme": "Toggle theme",
+    "notebookTitle": "Notebook · Essays / Everyday / IT",
+    "notebookDescription": "A small stack of writing and learning notes, brought over from Obsidian."
   },
   "about": {
     "title": "About",
@@ -154,7 +156,7 @@
     "sourceLede": "The files this one is made of, on GitHub:",
     "viewSource": "Source · GitHub",
     "back": "Back to the lab",
-    "backToIndex": "← Lab",
+    "backToIndex": "Back to the lab",
     "hint": "Scroll",
     "prev": "Previous",
     "next": "Next",
@@ -569,6 +571,33 @@
         "label": "The island",
         "body": "At the top of the page. On a wide screen it folds after 48px of scrolling down and unfolds after 48px of scrolling back up."
       },
+      "magazine": {
+        "name": "A magazine in space",
+        "tagline": "HTML-in-Canvas · a cover you can read",
+        "summary": "A small magazine cover in three dimensions. Select its words, follow a link, or tuck in a bookmark.",
+        "note": "The cover uses the site’s existing typefaces and light and dark palettes. On supported browsers, a live HTML subtree becomes a WebGL texture; one perspective matrix aligns the printed surface with native text selection, focus and links. The light only changes colour, keeping interaction geometry intact. Pointer movement tilts the cover; buttons work on touch screens and with a keyboard. Holding the pointer down or focusing the cover stops it moving so it can be read. Frames are drawn on changes, and rendering pauses off screen or in hidden tabs. Unsupported browsers, Save-Data, forced colours and GPU or loading failures keep the plain HTML edition. The bookmark lasts while this study is open and survives switching editions.",
+        "label": "Paper, with a little depth",
+        "lede": "A cover for the little things worth keeping. Try selecting a sentence or leaving a bookmark.",
+        "coverAria": "fhf’s magazine, first issue",
+        "edition": "VOL. 01\nNOV. 2026",
+        "coverKicker": "Field notes · 随手记",
+        "coverTitle": "A small world,\nin print.",
+        "coverBody": "Writing, software, and the details in between. A few things collected along the way.",
+        "read": "Meet the editor",
+        "save": "Bookmark",
+        "saved": "Bookmarked",
+        "stageNote": "fhf’s / The paper collection",
+        "live": "Spatial edition · selectable type",
+        "fallback": "Paper edition · selectable type",
+        "turnAria": "Turn the magazine",
+        "turnLeft": "Turn left",
+        "turnRight": "Turn right",
+        "reset": "Reset",
+        "flatView": "Read flat",
+        "spatialView": "Return to 3D",
+        "liveHint": "Move your pointer to tilt, or use the turn buttons. Select text, try the bookmark, or open the editor’s page.",
+        "flatHint": "Select the words, leave a bookmark, or meet the editor. The paper edition works with ordinary HTML."
+      },
       "hello": {
         "name": "Hello handwriting",
         "tagline": "SVG paths · stroke-dashoffset · GSAP timeline",
@@ -645,7 +674,7 @@
     "title": "Idols",
     "subtitle": "My idols. Kobe is the first.",
     "open": "Open",
-    "backToIndex": "← Idols",
+    "backToIndex": "Back to idols",
     "kobe": {
       "statueKicker": "The statue · Star Plaza · 2024",
       "statueTitle": "The statue pointing at the sky",
@@ -696,7 +725,7 @@
     "title": "Films",
     "subtitle": "A page each: the synopsis, the memorable lines and the stills.",
     "open": "Open",
-    "backToIndex": "← Films",
+    "backToIndex": "Back to films",
     "countStills": "{count, plural, one {# still} other {# stills}}",
     "record": "Music · {title}",
     "facts": {
@@ -737,6 +766,8 @@
     "source": "GitHub",
     "stars": "Star {count, number}",
     "forks": "Fork {count, number}",
+    "language": "Language: {language}",
+    "updated": "Code updated {date}",
     "published": "Released {date}",
     "downloads": "Downloads ({count})",
     "deckAria": "On the deck: {name}",
@@ -796,6 +827,7 @@
     "buttonAria": "Search the site",
     "buttonTitle": "Search (⌘K or /)",
     "dialogAria": "Site search",
+    "closeAria": "Close search",
     "inputAria": "Search for",
     "placeholder": "Posts, moments, studies, pages…",
     "resultsAria": "Results",
@@ -813,6 +845,46 @@
       "film": "Film",
       "idol": "Idol",
       "moment": "Moment"
+    }
+  },
+  "notebook": {
+    "title": "Notebook",
+    "eyebrow": "The open notebook",
+    "subtitle": "Life, in writing. Learning, in the margins.",
+    "intro": "A few essays, thoughts that never quite became essays, and notes left while making things. Take your time.",
+    "all": "All",
+    "filterAria": "Filter by section",
+    "search": "Find a note…",
+    "count": "{count, plural, one {# entry} other {# entries}}",
+    "empty": "No matching notes. Try another search.",
+    "readingTime": "{minutes} min",
+    "undated": "Date unrecorded",
+    "backToBlog": "Writing",
+    "backToList": "Back to notebook",
+    "related": "Keep browsing",
+    "contents": "Contents · {count} sections",
+    "contentsAria": "Sections in this note",
+    "fallbackZh": "This note is available in Chinese. The original text follows.",
+    "fallbackEn": "This note is available in English. The original text follows.",
+    "source": "Reference",
+    "referenceSource": "Reading shelf · Original author",
+    "readOriginal": "Read the original",
+    "sections": {
+      "writing": "Essays",
+      "life": "Everyday",
+      "it": "IT notes"
+    },
+    "descriptions": {
+      "writing": "An experience, given room on the page.",
+      "life": "Cooking, reading, and passing thoughts.",
+      "it": "Learning by making. A trail for my future self."
+    },
+    "formats": {
+      "essay": "Essay",
+      "fragment": "Fragment",
+      "study": "Study note",
+      "reference": "Reading reference",
+      "observation": "Observation"
     }
   }
 }

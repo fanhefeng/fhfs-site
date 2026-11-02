@@ -19,9 +19,6 @@ export function IslandDemo({ accent, label, body }: Props) {
       <style href="lab-island" precedence="medium">
         {DEMO_CSS}
       </style>
-      <p className="spn-arrow" aria-hidden="true">
-        ↑
-      </p>
       <p className="spn-body">{body}</p>
     </StudyPanel>
   );

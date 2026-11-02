@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { htmlLang, routing } from "@/i18n/routing";
+import { appGithubRepo } from "@/lib/githubData";
 import { pageLocale } from "@/i18n/page";
 import { localeAlternates } from "@/lib/server/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -51,7 +52,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     getApps(),
     getMoments(),
   ]);
-  const releases = await getLatestReleases(allApps.map((app) => app.repo));
+  const releases = await getLatestReleases(allApps.map(appGithubRepo));
 
   const posts: WritingItem[] = allPosts.slice(0, POST_COUNT).map((post) => ({
     slug: post.slug,
@@ -70,7 +71,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const study = newestLabEntry();
   let latest: { name: string; release: Release } | undefined;
   for (const app of allApps) {
-    const release = app.repo ? releases.get(app.repo) : undefined;
+    const release = releases.get(appGithubRepo(app) ?? "");
     if (!release?.publishedAt) continue;
     if (!latest || release.publishedAt > latest.release.publishedAt!) {
       latest = { name: app.name, release };

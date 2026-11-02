@@ -1,0 +1,25 @@
+{
+  "html": "<p>A method to deliver smooth, high-quality vide across various devices and network conditions.</p>\n<h2 id=\"the-abr-workflow\"><a href=\"#the-abr-workflow\">The ABR Workflow</a></h2>\n<h3 id=\"1-create-versions\"><a href=\"#1-create-versions\">1. Create Versions</a></h3>\n<p>create multiple versions of the video at different quality levels(bitrates).</p>\n<h3 id=\"2-chop-into-chunks\"><a href=\"#2-chop-into-chunks\">2. Chop into Chunks</a></h3>\n<p>Chop each version into small segments, usually a few seconds long.</p>\n<h3 id=\"3-intelligently-switch\"><a href=\"#3-intelligently-switch\">3. Intelligently Switch</a></h3>\n<p>The player switches between quality levels to ensure smooth playback.</p>\n<h2 id=\"the-abr-kings\"><a href=\"#the-abr-kings\">The ABR Kings</a></h2>\n<p>Two major protocols: HLS vs. DASH</p>\n<h3 id=\"hlshttp-live-streaming\"><a href=\"#hlshttp-live-streaming\">HLS(HTTP Live Streaming)</a></h3>\n<p>Developed by Apple.</p>\n<p>Uses <code>.ts</code>(Transport Stream) video segments and a text-based <code>.m3u8</code> manifest file.</p>\n<p>HLS organizes everything in a file called a manifest, and it ends in <code>.m3u8</code></p>\n<h3 id=\"mpeg-dash\"><a href=\"#mpeg-dash\">MPEG-DASH</a></h3>\n<p>Moving Picture Experts Group.</p>\n<p>Dynamic Adaptive Streaming over HTTP.</p>\n<p>An open, international standard. It typically uses <code>.m4s</code> segments and an XML-based <code>.mpd</code>(media presentation description) manifest file.</p>\n<h2 id=\"drm\"><a href=\"#drm\">DRM</a></h2>\n<p>Digital rights management.</p>\n<h2 id=\"cmaf\"><a href=\"#cmaf\">CMAF</a></h2>\n<p>The common media application format.</p>\n<p>A standardized container format that allows you to use the same set of video files for HLS and DASH.</p>\n<h2 id=\"ffmpeg\"><a href=\"#ffmpeg\">FFmpeg</a></h2>\n<p>A powerful, open-source tool that can transcode, segment, and generate manifests for ABR streaming.</p>",
+  "toc": [
+    {
+      "id": "the-abr-workflow",
+      "title": "The ABR Workflow"
+    },
+    {
+      "id": "the-abr-kings",
+      "title": "The ABR Kings"
+    },
+    {
+      "id": "drm",
+      "title": "DRM"
+    },
+    {
+      "id": "cmaf",
+      "title": "CMAF"
+    },
+    {
+      "id": "ffmpeg",
+      "title": "FFmpeg"
+    }
+  ]
+}

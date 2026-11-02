@@ -98,7 +98,9 @@
     "fabShareDone": "链接已复制",
     "fabTop": "回到顶部",
     "fabRss": "RSS 订阅",
-    "fabTheme": "切换主题"
+    "fabTheme": "切换主题",
+    "notebookTitle": "手记 · 写作 / 生活 / IT",
+    "notebookDescription": "从 Obsidian 搬来的一叠文字，长短不一，慢慢翻。"
   },
   "about": {
     "title": "关于",
@@ -154,7 +156,7 @@
     "sourceLede": "这一则由下面这些文件写成，都在 GitHub 上：",
     "viewSource": "源码 · GitHub",
     "back": "回实验室",
-    "backToIndex": "← 实验室",
+    "backToIndex": "回实验室",
     "hint": "向下滚动",
     "prev": "上一则",
     "next": "下一则",
@@ -569,6 +571,33 @@
         "label": "灵动岛",
         "body": "就在页面顶部。宽屏上往下滚 48 像素它会折叠，往回滚 48 像素再展开。"
       },
+      "magazine": {
+        "name": "纸上的小世界",
+        "tagline": "HTML-in-Canvas · 可以阅读的立体封面",
+        "summary": "把一张杂志封面放进三维空间。文字可以选择，链接可以打开，也能夹上一枚书签。",
+        "note": "封面沿用本站的中英文字体和明暗配色。支持的浏览器将真实 HTML 子树绘制成 WebGL 纹理，用同一个透视矩阵对齐画面、文字选择、焦点和链接；光泽只改变颜色，保持交互位置一致。鼠标移动让封面轻轻倾斜，触屏与键盘可以用按钮转动。按住鼠标或聚焦封面时停止移动，方便阅读。只在变化时绘制，离开视口或隐藏标签页会暂停。不支持接口、开启省流量或强制颜色，以及 GPU 或加载失败时，保留普通 HTML 纸面版。书签在本次打开实验期间保留，切换纸面与立体版也不会丢失。",
+        "label": "纸张，有了一点厚度",
+        "lede": "把值得留下的小事，装订成册。试着选中一句话，或给这一页夹上书签。",
+        "coverAria": "fhf’s 杂志，创刊号",
+        "edition": "创刊号 / VOL. 01\nNOV. 2026",
+        "coverKicker": "随手记 · Field notes",
+        "coverTitle": "把日常，\n装订成册。",
+        "coverBody": "写作、软件，还有它们之间的小事。一路走来，慢慢收集。",
+        "read": "认识主编",
+        "save": "夹书签",
+        "saved": "已夹书签",
+        "stageNote": "fhf’s / 纸上收藏",
+        "live": "立体版 · 文字可以选择",
+        "fallback": "纸面版 · 文字可以选择",
+        "turnAria": "转动杂志",
+        "turnLeft": "向左转",
+        "turnRight": "向右转",
+        "reset": "归位",
+        "flatView": "平面阅读",
+        "spatialView": "返回立体",
+        "liveHint": "移动鼠标或用按钮转动封面。选中文字、夹上书签，也可以打开主编的页面。",
+        "flatHint": "选中文字、夹上书签，或认识主编。纸面版使用普通 HTML，照常阅读。"
+      },
       "hello": {
         "name": "Hello 手写动画",
         "tagline": "SVG 路径 · stroke-dashoffset · GSAP 时间轴",
@@ -645,7 +674,7 @@
     "title": "偶像",
     "subtitle": "我的偶像，第一位是科比。",
     "open": "查看",
-    "backToIndex": "← 偶像",
+    "backToIndex": "回偶像列表",
     "kobe": {
       "statueKicker": "铜像 · Star Plaza · 2024",
       "statueTitle": "右手指天的铜像",
@@ -696,7 +725,7 @@
     "title": "电影",
     "subtitle": "每部一页：简介、经典台词和剧照。",
     "open": "查看",
-    "backToIndex": "← 电影",
+    "backToIndex": "回电影列表",
     "countStills": "{count} 张剧照",
     "record": "音乐 · {title}",
     "facts": {
@@ -737,6 +766,8 @@
     "source": "GitHub",
     "stars": "Star {count, number}",
     "forks": "Fork {count, number}",
+    "language": "主要语言：{language}",
+    "updated": "代码更新于 {date}",
     "published": "发布于 {date}",
     "downloads": "下载文件（{count}）",
     "deckAria": "唱机上：{name}",
@@ -796,6 +827,7 @@
     "buttonAria": "搜索全站",
     "buttonTitle": "搜索（⌘K 或 /）",
     "dialogAria": "全站搜索",
+    "closeAria": "关闭搜索",
     "inputAria": "搜索内容",
     "placeholder": "搜文章、说说、实验、页面……",
     "resultsAria": "搜索结果",
@@ -813,6 +845,46 @@
       "film": "电影",
       "idol": "偶像",
       "moment": "说说"
+    }
+  },
+  "notebook": {
+    "title": "手记",
+    "eyebrow": "The open notebook",
+    "subtitle": "写下生活，也记下那些还在学习的事。",
+    "intro": "一些长文，一些没长成文章的念头，还有写代码时留下的笔记。留在这里，慢慢翻。",
+    "all": "全部",
+    "filterAria": "按内容分类",
+    "search": "找一篇手记…",
+    "count": "{count} 篇手记",
+    "empty": "暂时没有匹配的手记，试试其他关键词。",
+    "readingTime": "{minutes} 分钟",
+    "undated": "日期未记",
+    "backToBlog": "文章",
+    "backToList": "返回手记",
+    "related": "接着翻翻",
+    "contents": "本篇目录 · {count} 节",
+    "contentsAria": "本篇章节",
+    "fallbackZh": "这篇手记暂时只有中文，以下保留原文。",
+    "fallbackEn": "这篇手记用英文写成，以下保留原文。",
+    "source": "参考资料",
+    "referenceSource": "阅读收藏 · 原作者",
+    "readOriginal": "阅读原文",
+    "sections": {
+      "writing": "写作",
+      "life": "生活笔记",
+      "it": "IT 笔记"
+    },
+    "descriptions": {
+      "writing": "把一段经历，认真写完。",
+      "life": "做饭、阅读，和一闪而过的念头。",
+      "it": "边做边学，给未来的自己留条线索。"
+    },
+    "formats": {
+      "essay": "文章",
+      "fragment": "短记",
+      "study": "学习笔记",
+      "reference": "阅读收藏",
+      "observation": "观察记录"
     }
   }
 }

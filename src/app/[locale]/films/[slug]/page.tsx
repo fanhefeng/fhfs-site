@@ -65,7 +65,7 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
   const backToIndex = (
     <Link
       href="/films"
-      className="hit-ext inline-flex min-h-11 items-center font-mono text-meta uppercase tracking-meta text-fg-tertiary transition-colors hover:text-accent"
+      className="hit-ext inline-flex min-h-11 items-center font-mono text-meta uppercase tracking-meta text-fg-tertiary underline decoration-line underline-offset-4 transition-colors hover:text-accent"
     >
       {t("backToIndex")}
     </Link>
@@ -178,7 +178,7 @@ export default async function FilmPage({ params }: PageProps<"/[locale]/films/[s
         <p className="font-mono text-meta text-fg-tertiary">{film.credit}</p>
         <Link
           href="/films"
-          className="hit-ext mt-8 inline-flex min-h-11 items-center gap-2 rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
+          className="hit-ext mt-8 inline-flex min-h-11 items-center rounded-chip border border-line px-4 py-2.5 text-caption text-fg transition-colors hover:border-accent hover:text-accent"
         >
           {t("backToIndex")}
         </Link>

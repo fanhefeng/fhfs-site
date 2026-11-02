@@ -49,13 +49,12 @@ export function NowStrip({ items, title, index }: Props) {
               </span>
               <span
                 lang={item.lang}
-                className="line-clamp-2 flex-1 text-heading underline decoration-transparent decoration-1 underline-offset-4 transition-colors duration-[250ms] group-hover:decoration-accent"
+                className="line-clamp-2 flex-1 text-heading underline decoration-transparent decoration-1 underline-offset-4 transition-colors duration-[250ms] group-hover:decoration-accent group-focus-visible:decoration-accent"
               >
                 {item.title}
               </span>
               <span className="shrink-0 font-mono text-meta text-fg-tertiary tabular-nums sm:pt-1">
                 {item.stamp}
-                {item.external ? <span aria-hidden="true"> ↗</span> : null}
               </span>
             </>
           );

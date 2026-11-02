@@ -53,15 +53,12 @@ export default async function IdolsPage({ params }: PageProps<"/[locale]/idols">
                   )}
                 </span>
                 <span className="mt-3 flex items-baseline justify-between gap-4">
-                  <span className="text-heading text-fg transition-colors group-hover:text-accent">
+                  <span className="text-heading text-fg underline decoration-transparent underline-offset-4 transition-colors group-hover:text-accent group-hover:decoration-current group-focus-visible:decoration-current">
                     {idol.name}
                   </span>
                   <span className="font-mono text-meta uppercase tracking-meta text-fg-tertiary">
                     {idol.years}
                   </span>
-                </span>
-                <span className="mt-1 block font-mono text-meta uppercase tracking-meta text-fg-tertiary">
-                  {t("open")} →
                 </span>
               </Link>
             </li>

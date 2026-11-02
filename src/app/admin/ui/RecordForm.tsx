@@ -374,7 +374,7 @@ export function RecordForm({
             rel="noreferrer"
             className={`${hintClass} inline-flex min-h-11 items-center underline decoration-line underline-offset-4 hover:text-accent`}
           >
-            在站上看上次保存的版本 ↗
+            在站上看上次保存的版本
           </a>
         )}
       </form>

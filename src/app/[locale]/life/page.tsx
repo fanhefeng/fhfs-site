@@ -143,9 +143,9 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
                         <li key={link.href}>
                           <Link
                             href={link.href}
-                            className="hit-ext inline-flex min-h-9 items-center text-caption text-fg-secondary transition-colors hover:text-accent"
+                            className="hit-ext inline-flex min-h-9 items-center text-caption text-fg-secondary underline decoration-line underline-offset-4 transition-colors hover:text-accent"
                           >
-                            {link.label} →
+                            {link.label}
                           </Link>
                         </li>
                       ))}

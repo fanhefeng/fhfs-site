@@ -77,6 +77,17 @@ describe("GitHub webhook boundary", () => {
     expect(state.revalidateTag).not.toHaveBeenCalled();
   });
 
+  it("also refreshes repositories inferred from a project's GitHub website", async () => {
+    state.getApps.mockResolvedValue([
+      { repo: null, website: "https://github.com/FanHeFeng/Portreaper" },
+    ]);
+    expect(await (await POST(request("push"))).json()).toEqual({
+      ok: true,
+      repo: "fanhefeng/portreaper",
+    });
+    expect(state.revalidateTag).toHaveBeenCalledWith("github:fanhefeng/portreaper", { expire: 0 });
+  });
+
   it("rejects disabled, unsigned, tampered, invalid JSON and oversized requests", async () => {
     vi.stubEnv("GITHUB_WEBHOOK_SECRET", "");
     expect((await POST(request("release"))).status).toBe(503);

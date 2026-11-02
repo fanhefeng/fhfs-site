@@ -1,0 +1,13 @@
+{
+  "html": "<h2 id=\"变量与函数的可见性\"><a href=\"#变量与函数的可见性\">变量与函数的可见性</a></h2>\n<p>Solidity对函数和状态变量提供了4种可见性：<code>external</code>、<code>public</code>、<code>internal</code>、<code>private</code>。</p>\n<h3 id=\"public\"><a href=\"#public\">public</a></h3>\n<p>声明为 <code>public</code> 的函数或变量，他们既可以在合约内部访问，也以合约接口形式暴露合约外部（其他合约或链下）调用。</p>\n<p>另外，<code>public</code> 类型的状态变量，会自动创建一个同名的外部函数（称为访问器），来获取状态变量的值。</p>\n<h3 id=\"external\"><a href=\"#external\">external</a></h3>\n<p><code>external</code> 不可以修饰状态变量，声明为 <code>external</code> 的函数只能在外部调用，因此称为外部函数。</p>\n<p>如何想在合约内部调用外部函数，需要使用<code>this.func()</code> （而不是 <code>func()</code>）。</p>\n<p>所有暴露给外部的函数 （声明为 <code>external</code> 和 <code>public</code>），构成了合约的对外接口。</p>\n<h3 id=\"internal\"><a href=\"#internal\">internal</a></h3>\n<p>声明为 <code>internal</code> 函数和状态变量只能在当前合约中调用或者在派生合约（子合约）里访问。</p>\n<h3 id=\"private\"><a href=\"#private\">private</a></h3>\n<p>声明为 <code>private</code> 函数和状态变量仅可在当前定义它们的合约中使用，并且不能被派生合约使用。</p>\n<h2 id=\"数据类型\"><a href=\"#数据类型\">数据类型</a></h2>\n<p>Solidity 类型分为：</p>\n<ul>\n<li>值类型（Value Types）</li>\n<li>引用类型（Reference Types）</li>\n<li>映射类型（Mapping Types）</li>\n</ul>\n<h3 id=\"值类型\"><a href=\"#值类型\">值类型</a></h3>\n<p>值类型变量用表示可以用32个字节表示的数据，在赋值或传参时，总是进行拷贝。</p>\n<p>值类型包含：</p>\n<ul>\n<li>布尔类型（Booleans）</li>\n<li>整型（Integers）</li>\n<li>定长浮点型（Fixed Point Numbers）</li>\n<li>定长字节数组（Fixed-size byte arrays）</li>\n<li>有理数和整型常量（Rational and Integer Literals)</li>\n<li>字符串常量（String literals）</li>\n<li>十六进制常量（Hexadecimal literals）</li>\n<li>枚举（Enums）</li>\n<li>函数类型（Function Types）</li>\n<li>地址类型（Address)</li>\n<li>地址常量（Address Literals）</li>\n<li>用户定义值类型</li>\n</ul>\n<h3 id=\"引用类型\"><a href=\"#引用类型\">引用类型</a></h3>\n<p>引用类型用来表示复杂类型，占用的空间超过32字节，拷贝时开销很大，因此可以使用引用的方式，通过多个不同名称的变量指向一个值。引用类型包括<strong>数组</strong>和<strong>结构体</strong>。</p>\n<p>在定义引用类型时，有一个额外属性来标识数据的存储位置，这个属性有：</p>\n<ul>\n<li>memory（内存）： 变量在运行时存在，其生命周期只存在于函数调用期间。</li>\n<li>storage（存储）：保存状态变量，只要合约存在就一直保存在区块链中。</li>\n<li>calldata（调用数据）：用来存储函数参数的特殊数据位置，用来接收外部数据，是一个不可修改的、非持久的函数参数存储区域。</li>\n</ul>\n<p>记住一个规则：<strong>不同引用类型在进行赋值的时候，只有在不同的数据位置赋值时会进行一份拷贝，而在同一数据位置内通常是增加一个引用</strong>。</p>\n<h3 id=\"映射类型\"><a href=\"#映射类型\">映射类型</a></h3>\n<p>映射类型和<code>Java</code>的Map、<code>Python</code>的Dict在功能上差不多，它是一种键值对的映射关系存储结构，定义方式为<code>mapping(KT => KV)</code>。</p>",
+  "toc": [
+    {
+      "id": "变量与函数的可见性",
+      "title": "变量与函数的可见性"
+    },
+    {
+      "id": "数据类型",
+      "title": "数据类型"
+    }
+  ]
+}

@@ -346,9 +346,6 @@ export function NeonSplash({ label, welcome, sign, enter, enterHint }: Props) {
                 onClick={() => enterRefFn.current?.()}
               >
                 <span>{enter}</span>
-                <span className="ns-enter-arrow" aria-hidden="true">
-                  →
-                </span>
               </button>
               <p className="ns-enter-hint">{enterHint}</p>
             </div>
@@ -473,7 +470,6 @@ html[data-js][data-splash="due"] { background-color: #0a0a0f; }
   appearance: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
   min-height: 2.75rem;
   margin: 0;
   padding: 0.7rem 1.4rem;
@@ -501,11 +497,6 @@ html[data-js][data-splash="due"] { background-color: #0a0a0f; }
   outline-offset: 4px;
 }
 .ns-enter:active { transform: scale(0.97); }
-.ns-enter-arrow {
-  display: inline-block;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.ns-enter:hover .ns-enter-arrow { transform: translateX(3px); }
 
 .ns-enter-hint {
   margin: 0;

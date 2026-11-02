@@ -125,15 +125,9 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
                 <li key={row.href} className="border-b border-line">
                   <Link
                     href={row.href}
-                    className="group flex min-h-14 items-center justify-between gap-4 text-heading text-fg transition-colors hover:text-accent"
+                    className="flex min-h-14 items-center text-heading text-fg underline decoration-transparent underline-offset-4 transition-colors hover:text-accent hover:decoration-current focus-visible:decoration-current"
                   >
                     {tNav(row.labelKey)}
-                    <span
-                      aria-hidden="true"
-                      className="font-mono text-body font-normal text-fg-tertiary transition-[translate,color] duration-200 group-hover:translate-x-1 group-hover:text-accent"
-                    >
-                      →
-                    </span>
                   </Link>
                 </li>
               ))}

@@ -159,12 +159,4 @@ const PANEL_CSS = `
   transition: border-color 0.2s ease-out, color 0.2s ease-out;
 }
 .spn-btn:hover { border-color: var(--spn-accent); color: var(--spn-accent); }
-
-/* The arrow that points off the panel to where the effect is. */
-.spn-arrow {
-  margin: 0;
-  font-family: var(--font-stack-mono);
-  font-size: 1.5rem;
-  color: var(--fg-tertiary);
-}
 `;

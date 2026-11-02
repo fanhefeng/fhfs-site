@@ -151,7 +151,7 @@ function MediaFile({ media, compact }: { media: PreviewMedia; compact: boolean }
           aria-label={`打开原文件：${name}`}
           className="inline-flex min-h-11 shrink-0 items-center text-fg-secondary underline decoration-line underline-offset-4 hover:text-accent"
         >
-          原文件 ↗
+          原文件
         </a>
       </figcaption>
     </figure>

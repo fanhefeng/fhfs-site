@@ -255,13 +255,9 @@ export function Opening({
               <div className="flex flex-wrap items-baseline gap-x-4">
                 <dt>{contactTitle}</dt>
                 {contacts.map((contact) => {
-                  const inner = (
-                    <>
-                      {contact.label}
-                      <span aria-hidden="true"> ↗</span>
-                    </>
-                  );
-                  const className = "hit-ext text-fg-secondary transition-colors hover:text-accent";
+                  const inner = contact.label;
+                  const className =
+                    "hit-ext text-fg-secondary underline decoration-line underline-offset-4 transition-colors hover:text-accent focus-visible:text-accent";
                   return "email" in contact ? (
                     <dd key={contact.email}>
                       <MailLink email={contact.email} className={className}>
@@ -290,7 +286,6 @@ export function Opening({
             className="hit-ext text-fg-secondary underline decoration-accent/60 decoration-1 underline-offset-4 transition-colors hover:text-accent"
           >
             {aboutLink.label}
-            <span aria-hidden="true"> →</span>
           </Link>
         </div>
       </div>

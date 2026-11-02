@@ -107,6 +107,8 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   const trayRef = useRef<HTMLDivElement>(null);
   const navRowRef = useRef<HTMLElement>(null);
   const indicatorRef = useRef<HTMLSpanElement>(null);
+  /** A pointer/focus preview never changes the current page. */
+  const indicatorPreviewRef = useRef<HTMLAnchorElement | null>(null);
   const ringRef = useRef<HTMLSpanElement>(null);
   const lightRef = useRef<SVGFEPointLightElement>(null);
   const burgerRef = useRef<HTMLButtonElement>(null);
@@ -136,7 +138,14 @@ export function Header({ links, menuLinks, allLinks }: Props) {
     if (!nav || !ind) return;
     // "page" on the page's own door, "true" on the door of the room the
     // reader is in — the capsule sits under either.
-    const active = nav.querySelector<HTMLElement>("a[aria-current]");
+    const preview = indicatorPreviewRef.current;
+    const active =
+      preview && nav.contains(preview)
+        ? preview
+        : nav.querySelector<HTMLElement>("a[aria-current]");
+    // A new target starts from the rendered position, not the old tween's
+    // destination. This also cancels an in-flight fade when re-entering.
+    gsap.killTweensOf(ind);
     if (!active) {
       gsap.to(ind, { autoAlpha: 0, duration: 0.15, overwrite: "auto" });
       return;
@@ -474,6 +483,7 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   // Route change while the tray is open (browser Back, etc.): the capsule
   // indicator Flips across to the new aria-current link.
   useEffect(() => {
+    indicatorPreviewRef.current = null;
     if (expandedRef.current) fitIndicator(false);
   }, [pathname, fitIndicator]);
 
@@ -575,8 +585,23 @@ export function Header({ links, menuLinks, allLinks }: Props) {
                   ref={navRowRef}
                   aria-label={t("ariaLabel")}
                   className="relative flex items-center"
+                  onPointerLeave={() => {
+                    const focused = document.activeElement;
+                    indicatorPreviewRef.current =
+                      focused instanceof HTMLAnchorElement && navRowRef.current?.contains(focused)
+                        ? focused
+                        : null;
+                    fitIndicator(false);
+                  }}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) {
+                      indicatorPreviewRef.current = null;
+                      fitIndicator(false);
+                    }
+                  }}
                 >
-                  {/* Flip-translated capsule under the aria-current page. */}
+                  {/* A temporary pointer/focus preview, returning to the
+                      aria-current page when the reader leaves the row. */}
                   <span
                     ref={indicatorRef}
                     aria-hidden="true"
@@ -591,6 +616,15 @@ export function Header({ links, menuLinks, allLinks }: Props) {
                         aria-current={
                           isActivePath(pathname, item.href) ? "page" : active ? "true" : undefined
                         }
+                        onPointerEnter={(event) => {
+                          if (event.pointerType === "touch") return;
+                          indicatorPreviewRef.current = event.currentTarget;
+                          fitIndicator(false);
+                        }}
+                        onFocus={(event) => {
+                          indicatorPreviewRef.current = event.currentTarget;
+                          fitIndicator(false);
+                        }}
                         // Collapse first, then RouteTransition takes over —
                         // below the wide breakpoint, where the tray was pressed
                         // open. A wide screen lands on the next page's top,

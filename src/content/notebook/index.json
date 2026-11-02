@@ -1,0 +1,323 @@
+[
+  {
+    "slug": "solitude",
+    "title": "为什么我喜欢独处",
+    "section": "writing",
+    "format": "essay",
+    "locale": "zh",
+    "tags": ["独处", "关系"],
+    "summary": {
+      "zh": "从合租、相处和那些不易说出口的拒绝，写到一个人生活的自在。",
+      "en": "On shared homes, the difficulty of saying no, and making room for oneself."
+    },
+    "readingMinutes": 2
+  },
+  {
+    "slug": "community-canteen",
+    "title": "北京某社区食堂的感动",
+    "section": "writing",
+    "format": "essay",
+    "locale": "zh",
+    "tags": ["北京", "生活"],
+    "summary": {
+      "zh": "一顿普通的午饭，和一位把日子过得热气腾腾的食堂服务员。",
+      "en": "An ordinary lunch, and a canteen worker whose warmth stays with you."
+    },
+    "readingMinutes": 5
+  },
+  {
+    "slug": "a-career-imagined",
+    "title": "我的职业生涯",
+    "section": "writing",
+    "format": "essay",
+    "locale": "zh",
+    "tags": ["旧文", "成长", "电脑"],
+    "summary": {
+      "zh": "高一时写下的职业想象：想做一个电脑高手，想自己设计网页。",
+      "en": "A school essay imagining a future with computers, software, and making websites."
+    },
+    "context": {
+      "zh": "高一时的旧文，保留当时的表达。具体写作日期未记。",
+      "en": "An early school essay, preserved in its original voice. The exact date is unknown."
+    },
+    "readingMinutes": 3
+  },
+  {
+    "slug": "starting-again",
+    "title": "从头再来",
+    "section": "writing",
+    "format": "essay",
+    "locale": "zh",
+    "tags": ["旧文", "成长"],
+    "summary": {
+      "zh": "窗外下着小雨，一个学生写给自己的重新出发。",
+      "en": "A rainy window, a student's resolve, and the wish to begin again."
+    },
+    "context": {
+      "zh": "学生时代的旧文，保留当时的表达。具体写作日期未记。",
+      "en": "A piece from school days, preserved in its original voice. The exact date is unknown."
+    },
+    "readingMinutes": 2
+  },
+  {
+    "slug": "kitchen-notes",
+    "title": "食谱",
+    "section": "life",
+    "format": "fragment",
+    "locale": "zh",
+    "tags": ["做饭", "日常"],
+    "summary": {
+      "zh": "西红柿炒鸡蛋、面汤、小米绿豆粥。几道留给自己的家常做法。",
+      "en": "Tomatoes and eggs, soup, and millet porridge: a few everyday kitchen reminders."
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "things-i-said",
+    "title": "我说的 · 几则",
+    "section": "life",
+    "format": "fragment",
+    "locale": "zh",
+    "tags": ["随想", "北京", "生活"],
+    "summary": {
+      "zh": "关于离开北京、妈妈蒸的包子，以及偶然照亮日常的人。",
+      "en": "On Beijing, steamed buns packed by Mum, and people who light up the everyday."
+    },
+    "context": {
+      "zh": "选自不同时期的随笔，按原有顺序收录五则。",
+      "en": "Five fragments from different moments, kept in their original order."
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "ideas",
+    "title": "点子",
+    "section": "life",
+    "format": "fragment",
+    "locale": "zh",
+    "tags": ["想法", "产品"],
+    "summary": {
+      "zh": "随手记下的产品和生活点子。有些还只是一句话。",
+      "en": "Product and everyday ideas jotted down before they slip away."
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "jobs-stanford",
+    "title": "乔布斯斯坦福大学演讲",
+    "section": "life",
+    "format": "reference",
+    "locale": "zh",
+    "tags": ["阅读", "演讲"],
+    "summary": {
+      "zh": "收在阅读夹里的一篇演讲：找到自己热爱的事。附斯坦福原文。",
+      "en": "A saved commencement speech about finding work you love, linked to Stanford's original."
+    },
+    "source": {
+      "author": "Steve Jobs",
+      "title": "You've got to find what you love",
+      "url": "https://news.stanford.edu/stories/2005/06/youve-got-find-love-jobs-says"
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "a-fathers-back",
+    "title": "爸爸的背影",
+    "section": "life",
+    "format": "reference",
+    "locale": "zh",
+    "tags": ["阅读", "亲情"],
+    "summary": {
+      "zh": "阅读夹中的一篇亲情文章。作者马徐骏，保留书目信息。",
+      "en": "A saved essay about a father, by Ma Xujun. A bibliographic record."
+    },
+    "source": {
+      "author": "马徐骏",
+      "title": "爸爸的背影"
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "frontend-deployment",
+    "title": "前端部署与运维原理详解",
+    "section": "it",
+    "format": "study",
+    "locale": "zh",
+    "tags": ["前端", "部署", "Docker", "TanStack Start"],
+    "date": "2026-06-28",
+    "summary": {
+      "zh": "从浏览器要什么讲起，梳理 SPA、全栈框架、反向代理和容器之间的关系。",
+      "en": "From browser assets to full-stack servers, reverse proxies, and containers."
+    },
+    "readingMinutes": 24
+  },
+  {
+    "slug": "frontend-interview",
+    "title": "前端面试总结",
+    "section": "it",
+    "format": "study",
+    "locale": "zh",
+    "tags": ["JavaScript", "React", "Vue", "网络"],
+    "summary": {
+      "zh": "语言、框架、网络和工程化的复习提纲，保留待补充的问题。",
+      "en": "A revision outline spanning languages, frameworks, networking, and tooling, including open questions."
+    },
+    "context": {
+      "zh": "这是一份持续补充的复习提纲；部分条目只记录问题。",
+      "en": "A working revision outline; some entries are questions awaiting notes."
+    },
+    "readingMinutes": 16
+  },
+  {
+    "slug": "typescript-decorators",
+    "title": "TypeScript 装饰器",
+    "section": "it",
+    "format": "reference",
+    "locale": "zh",
+    "tags": ["TypeScript", "装饰器"],
+    "summary": {
+      "zh": "类、方法、属性与初始化器的学习入口。原笔记摘录自阮一峰的 TypeScript 教程。",
+      "en": "A reading entry for decorators, class members, and initializers, from WangDoc's TypeScript tutorial."
+    },
+    "source": {
+      "author": "阮一峰 / 网道",
+      "title": "TypeScript 装饰器",
+      "url": "https://wangdoc.com/typescript/decorator"
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "adaptive-bitrate",
+    "title": "Adaptive Bitrate",
+    "section": "it",
+    "format": "study",
+    "locale": "en",
+    "tags": ["视频", "HLS", "DASH", "FFmpeg"],
+    "summary": {
+      "zh": "关于自适应码率、分片和流媒体协议的一页英文学习卡片。",
+      "en": "A compact study note on adaptive bitrate, segments, and streaming protocols."
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "ethers-notes",
+    "title": "ethers.js 学习笔记",
+    "section": "it",
+    "format": "study",
+    "locale": "zh",
+    "tags": ["Web3", "ethers.js", "Ethereum"],
+    "summary": {
+      "zh": "从单位换算、编码到 Provider、合约和事件，记录边学边试的代码。",
+      "en": "Learning notes and code on units, encoding, providers, contracts, and events."
+    },
+    "context": {
+      "zh": "原笔记混有 ethers 不同版本的 API。示例保留用于学习回顾，使用前请对照对应版本文档。",
+      "en": "These notes mix APIs from different ethers versions. Check the matching documentation before using a snippet."
+    },
+    "source": {
+      "author": "ethers",
+      "title": "ethers v6 documentation",
+      "url": "https://docs.ethers.org/v6/"
+    },
+    "readingMinutes": 5
+  },
+  {
+    "slug": "solidity-notes",
+    "title": "Solidity 学习笔记",
+    "section": "it",
+    "format": "study",
+    "locale": "zh",
+    "tags": ["Web3", "Solidity", "智能合约"],
+    "summary": {
+      "zh": "函数可见性、数据类型与存储位置的基础学习记录。",
+      "en": "Study notes on visibility, data types, and storage locations."
+    },
+    "context": {
+      "zh": "学习中的阶段性记录，保留原有表述，尚未逐项校订。",
+      "en": "A working study note, preserved as written and not yet fully revised."
+    },
+    "readingMinutes": 2
+  },
+  {
+    "slug": "web3-learning",
+    "title": "Web3 学习日记 · 技术篇",
+    "section": "it",
+    "format": "study",
+    "locale": "zh",
+    "tags": ["Web3", "Ethereum", "ABI"],
+    "summary": {
+      "zh": "课程入口、尚未解开的疑问，以及 Interface、账户和 EVM 的技术笔记。",
+      "en": "Courses, open questions, and technical notes on interfaces, accounts, and the EVM."
+    },
+    "context": {
+      "zh": "选录原笔记的课程与技术部分。",
+      "en": "Selected course and technical sections from the original notebook."
+    },
+    "readingMinutes": 2
+  },
+  {
+    "slug": "bitcoin-whitepaper",
+    "title": "Bitcoin Whitepaper",
+    "section": "it",
+    "format": "reference",
+    "locale": "en",
+    "tags": ["Web3", "Bitcoin", "论文"],
+    "summary": {
+      "zh": "收藏的比特币白皮书，直接前往原文阅读。",
+      "en": "A saved reference to the Bitcoin whitepaper. Read the original paper."
+    },
+    "source": {
+      "author": "Satoshi Nakamoto",
+      "title": "Bitcoin: A Peer-to-Peer Electronic Cash System",
+      "url": "https://bitcoin.org/bitcoin.pdf"
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "css-reference-shelf",
+    "title": "CSS 案例收藏",
+    "section": "it",
+    "format": "study",
+    "locale": "zh",
+    "tags": ["CSS", "动效", "界面"],
+    "summary": {
+      "zh": "玻璃、旋钮、按钮和鼠标跟随效果。保留案例与创作者的原始链接。",
+      "en": "Glass, knobs, buttons, and cursor effects, with links to the original creators."
+    },
+    "context": {
+      "zh": "案例索引，作品与代码的授权以各原始页面为准。",
+      "en": "A reference index. Each original page carries its own terms for the work and code."
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "focused-form-memory",
+    "title": "表单聚焦后的内存观察",
+    "section": "it",
+    "format": "observation",
+    "locale": "zh",
+    "tags": ["浏览器", "内存", "待复现"],
+    "summary": {
+      "zh": "一次关于聚焦表单与游离节点的现象记录，等待补齐复现条件。",
+      "en": "An observation about focused form controls and detached nodes, awaiting a reproduction."
+    },
+    "context": {
+      "zh": "原记录没有浏览器版本、复现代码或堆快照，暂作为待验证的观察保留。",
+      "en": "The original note has no browser version, reproduction, or heap snapshot; it remains an unverified observation."
+    },
+    "readingMinutes": 1
+  },
+  {
+    "slug": "web-development-ideas",
+    "title": "网站开发备忘",
+    "section": "it",
+    "format": "fragment",
+    "locale": "zh",
+    "tags": ["WebMCP", "想法"],
+    "summary": {
+      "zh": "关于让网站向 AI 提供可读取工具的一条开发备忘。",
+      "en": "A brief reminder about giving AI tools a way to read a website."
+    },
+    "readingMinutes": 1
+  }
+]
