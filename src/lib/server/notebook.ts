@@ -1,6 +1,8 @@
 import "server-only";
 import index from "@/content/notebook/index.json";
-import type { NoteBody, NoteSummary } from "@/lib/notebook";
+import { noteDestination, type NoteBody, type NoteSummary } from "@/lib/notebook";
+
+import type { Locale } from "@/i18n/routing";
 
 const notes: NoteSummary[] = index as NoteSummary[];
 const bodies: Record<string, () => Promise<{ default: NoteBody }>> = {
@@ -28,6 +30,48 @@ const bodies: Record<string, () => Promise<{ default: NoteBody }>> = {
 
 export function getNotes(): NoteSummary[] {
   return notes;
+}
+
+export function getImportedSummaries(destination: "/blog" | "/secrets", locale: Locale) {
+  return notes
+    .filter((note) => noteDestination(note) === destination)
+    .map((note) => ({
+      slug: note.slug,
+      locale: note.locale,
+      title: note.title,
+      date: note.date ?? null,
+      summary: note.summary[locale],
+      tags: note.tags,
+      format: note.format,
+      readingMinutes: note.readingMinutes,
+      isFallback: note.locale !== locale,
+    }));
+}
+
+/** Database ownership includes drafts, even though only public rows are returned. */
+export function mergeImported<T extends { slug: string }>(
+  rows: T[],
+  imported: T[],
+  owners: readonly { slug: string }[],
+): T[] {
+  const slugs = new Set(owners.map((row) => row.slug));
+  return [...rows, ...imported.filter((row) => !slugs.has(row.slug))];
+}
+
+export async function getImportedArticle(
+  destination: "/blog" | "/secrets",
+  slug: string,
+  locale: Locale,
+) {
+  const summary = getImportedSummaries(destination, locale).find((note) => note.slug === slug);
+  if (!summary) return null;
+  const note = await getNote(slug);
+  if (!note) return null;
+  return {
+    ...summary,
+    html: note.html,
+    note: { format: note.format, context: note.context, source: note.source, toc: note.toc },
+  };
 }
 
 export async function getNote(slug: string) {

@@ -53,13 +53,13 @@ export function IndexRow({
    *  list — or a screen reader pronounces 中文 with English rules. */
   titleLang?: string;
   /** `YYYY-MM-DD`; the row prints the month and day, the section the year. */
-  date: string;
+  date: string | null;
   /** Always shown, in the accent: what kind of piece this is. */
   tag?: ReactNode;
   /** Shown on hover: how long it takes. */
   detail?: ReactNode;
 }) {
-  const [, month, day] = date.split("-");
+  const [, month, day] = date?.split("-") ?? [];
   return (
     <li className="border-b border-line last:border-b-0">
       <Link href={href} className="group flex min-h-11 items-baseline gap-4 py-3.5 sm:gap-8">
@@ -81,9 +81,11 @@ export function IndexRow({
               {detail}
             </span>
           )}
-          <time dateTime={date} className="tabular-nums">
-            {month}.{day}
-          </time>
+          {date && (
+            <time dateTime={date} className="tabular-nums">
+              {month}.{day}
+            </time>
+          )}
         </span>
       </Link>
     </li>

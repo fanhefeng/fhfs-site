@@ -1,3 +1,4 @@
+import { SecretIndex } from "@/components/secrets/SecretIndex";
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
@@ -14,6 +15,22 @@ import { roomMeta } from "@/components/life/rooms";
 export const generateMetadata = sectionMetadata("life", "/life");
 
 type SubLink = { href: string; label: string };
+const ROW_CSS = `
+.life-row::before {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 1.5rem;
+  bottom: 1.5rem;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--row-accent);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+.life-row:hover::before,
+.life-row:focus-within::before { opacity: 0.75; }
+`;
 
 /**
  * 生活 — the corridor the rooms open off. One line per room, in the order
@@ -25,6 +42,7 @@ type SubLink = { href: string; label: string };
 export default async function LifePage({ params }: PageProps<"/[locale]/life">) {
   const locale = await pageLocale(params);
   const t = await getTranslations("life");
+  const tSecrets = await getTranslations("secrets");
   const tNav = await getTranslations("nav");
   const tTracks = await getTranslations("tracks");
 
@@ -94,7 +112,7 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
       </Reveal>
 
       {rooms.length === 0 ? (
-        <p className="text-body text-fg-secondary">{t("none")}</p>
+        secrets.length === 0 && <p className="text-body text-fg-secondary">{t("none")}</p>
       ) : (
         <Reveal as="ol" role="list" stagger={0.06} className="border-t border-line">
           {rooms.map((room, i) => {
@@ -175,28 +193,15 @@ export default async function LifePage({ params }: PageProps<"/[locale]/life">) 
         </Reveal>
       )}
 
+      {secrets.length > 0 && (
+        <div className={rooms.length > 0 ? "mt-14" : undefined}>
+          <SecretIndex items={secrets} yearAria={(year) => tSecrets("yearAria", { year })} />
+        </div>
+      )}
+
       <style href="life-index" precedence="medium">
         {ROW_CSS}
       </style>
     </main>
   );
 }
-
-/** The same accent rule the lab index draws: it appears on the left on hover,
- *  and is the only motion a text row gets. */
-const ROW_CSS = `
-.life-row::before {
-  content: "";
-  position: absolute;
-  left: -1rem;
-  top: 1.5rem;
-  bottom: 1.5rem;
-  width: 2px;
-  border-radius: 2px;
-  background: var(--row-accent);
-  opacity: 0;
-  transition: opacity 0.25s ease-out;
-}
-.life-row:hover::before,
-.life-row:focus-within::before { opacity: 0.75; }
-`;

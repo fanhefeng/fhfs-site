@@ -11,24 +11,9 @@ import {
   type PublishedEdition,
 } from "@/lib/server/content";
 import { LAB_ENTRIES } from "@/components/lab/entries";
-import { getNotes } from "@/lib/server/notebook";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
-  for (const locale of routing.locales) {
-    entries.push({
-      url: `${site.url}/${locale}/blog/notes`,
-      alternates: { languages: localeLanguages("/blog/notes") },
-    });
-  }
-  for (const note of getNotes()) {
-    const path = `/blog/notes/${note.slug}`;
-    entries.push({
-      url: `${site.url}/${note.locale}${path}`,
-      lastModified: note.date ? new Date(note.date) : undefined,
-      alternates: { languages: localeLanguages(path, [note.locale]) },
-    });
-  }
   // Every slug is *served* under both prefixes — the read layer falls back to
   // the other language rather than 404ing — but only the locales that have
   // their own version are listed. A fallback URL is a duplicate of the
@@ -43,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getFilms(),
   ]);
   const newestPost = editions.posts
-    .map(({ date }) => new Date(date))
+    .flatMap(({ date }) => (date ? [new Date(date)] : []))
     .reduce<Date | undefined>(
       (newest, date) => (newest && newest >= date ? newest : date),
       undefined,
@@ -109,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       for (const { locale, date } of versions) {
         entries.push({
           url: `${site.url}/${locale}/${section}/${slug}`,
-          lastModified: new Date(date),
+          lastModified: date ? new Date(date) : undefined,
           alternates: {
             languages: localeLanguages(`/${section}/${slug}`, available),
           },

@@ -14,7 +14,6 @@ import {
 import { inLocale } from "@/lib/localized";
 import { stampInZone } from "@/lib/moments";
 import type { SearchEntry } from "@/lib/search";
-import { getNotes } from "@/lib/server/notebook";
 import { LAB_ENTRIES } from "@/components/lab/entries";
 
 export const dynamic = "force-static";
@@ -28,9 +27,8 @@ export function generateStaticParams() {
 /**
  * The search palette's index for one language: every page, article, secret,
  * app, lab study, film, idol and moment, as a title, some text to match and
- * an address. Built once and cached like the feed — the getters' tags reach
- * it, so a save in the admin rebuilds it with the pages. Fetched only when
- * the palette first opens; no page carries it.
+ * an address. The public getters supply the same bounded cache as the pages;
+ * the palette revalidates this index on every open. No page carries it.
  *
  * Moments go in whole: five hundred short lines are about seventy kilobytes,
  * half that on the wire, and a search that missed an old line would be the
@@ -38,12 +36,12 @@ export function generateStaticParams() {
  */
 export async function GET(_request: Request, { params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return new Response("Not found", { status: 404 });
   const l: Locale = hasLocale(routing.locales, locale) ? locale : routing.defaultLocale;
-  const [tn, tl, ts, notebook] = await Promise.all([
+  const [tn, tl, ts] = await Promise.all([
     getTranslations({ locale: l, namespace: "nav" }),
     getTranslations({ locale: l, namespace: "lab" }),
     getTranslations({ locale: l, namespace: "software" }),
-    getTranslations({ locale: l, namespace: "notebook" }),
   ]);
   const [nav, posts, secrets, apps, films, idols, moments] = await Promise.all([
     getAllNavItems(),
@@ -56,20 +54,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
   ]);
 
   const entries: SearchEntry[] = [
-    {
-      kind: "page",
-      title: notebook("title"),
-      text: notebook("subtitle"),
-      href: "/blog/notes",
-    },
-    ...getNotes().map((note) => ({
-      kind: "post" as const,
-      title: note.title,
-      text: [note.summary[l], ...note.tags].join(" "),
-      href: `/blog/notes/${note.slug}`,
-      meta: note.date,
-      tags: note.tags,
-    })),
     ...nav.map((row) => ({
       kind: "page" as const,
       title: tn(row.labelKey),
@@ -81,14 +65,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ loc
       title: post.title,
       text: [post.summary, ...post.tags].join(" "),
       href: `/blog/${post.slug}`,
-      meta: post.date,
+      meta: post.date ?? undefined,
+      tags: post.tags,
     })),
     ...secrets.map((secret) => ({
       kind: "secret" as const,
       title: secret.title,
-      text: secret.summary,
+      text: [secret.summary, ...(secret.tags ?? [])].join(" "),
       href: `/secrets/${secret.slug}`,
-      meta: secret.date,
+      meta: secret.date ?? undefined,
+      tags: secret.tags,
     })),
     ...apps.map((app) => ({
       kind: "app" as const,

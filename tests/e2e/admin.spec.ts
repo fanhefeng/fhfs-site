@@ -33,6 +33,111 @@ async function authenticate(page: Page, expired = false) {
   ]);
 }
 
+async function newPost(page: Page, suffix: string) {
+  await authenticate(page);
+  await page.goto("/admin/posts/new");
+  // The sticky bar's measurement is written by an effect, after hydration.
+  // SSR fields can be filled before their client handlers have attached.
+  await page.waitForFunction(() =>
+    Boolean(
+      document
+        .querySelector<HTMLTextAreaElement>('textarea[name="bodyMd"]')
+        ?.form?.style.getPropertyValue("--admin-save-height"),
+    ),
+  );
+  await page.getByLabel("slug", { exact: true }).fill(`e2e-created-preview-${suffix}`);
+  await page.getByLabel("标题", { exact: true }).fill("新站隔离浏览器测试");
+  await page.getByLabel("正文（Markdown）", { exact: true }).fill("仅存在于隔离测试数据库。");
+}
+
+declare global {
+  interface Window {
+    previewRequests: {
+      signal?: AbortSignal | null;
+      resolve: (response: Response) => void;
+    }[];
+  }
+}
+
+async function controlPreview(page: Page) {
+  await page.evaluate(() => {
+    const original = window.fetch.bind(window);
+    window.previewRequests = [];
+    // Deliberately ignore AbortSignal: a late response body must still be harmless.
+    window.fetch = (input, init) =>
+      (typeof input === "string" ? input : input instanceof URL ? input.href : input.url) ===
+      "/admin/preview/markdown"
+        ? new Promise<Response>((resolve) =>
+            window.previewRequests.push({ signal: init?.signal, resolve }),
+          )
+        : original(input, init);
+  });
+}
+
+test("returning to write invalidates late preview results and preserves the next request", async ({
+  page,
+}) => {
+  await newPost(page, "preview-race");
+  await controlPreview(page);
+  const body = page.getByLabel("正文（Markdown）", { exact: true });
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.previewRequests.length)).toBe(1);
+  await page.getByRole("button", { name: "写", exact: true }).click();
+  expect(await page.evaluate(() => window.previewRequests[0]!.signal?.aborted)).toBe(true);
+  await body.fill("新的未保存正文");
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.previewRequests.length)).toBe(2);
+  await page.evaluate(() => window.previewRequests[0]!.resolve(new Response("<p>过期的预览</p>")));
+  await expect(body).toBeVisible();
+  await expect(body).toHaveValue("新的未保存正文");
+  await expect(page.getByRole("button", { name: "渲染中…", exact: true })).toBeDisabled();
+  await expect(page.getByText("过期的预览", { exact: true })).toHaveCount(0);
+  await page.evaluate(() => window.previewRequests[1]!.resolve(new Response("<p>当前的预览</p>")));
+  await expect(page.getByText("当前的预览", { exact: true })).toBeVisible();
+  await expect(body).toBeHidden();
+
+  await page.evaluate(() =>
+    document
+      .querySelector<HTMLTextAreaElement>('textarea[name="bodyMd"]')!
+      .form!.addEventListener("reset", (e) => e.preventDefault(), { once: true }),
+  );
+  await page.getByRole("button", { name: "取消本次编辑", exact: true }).click();
+  await expect(page.getByText("当前的预览", { exact: true })).toBeVisible();
+  await expect(body).toHaveValue("新的未保存正文");
+  await page.getByRole("button", { name: "取消本次编辑", exact: true }).click();
+  await expect(body).toBeVisible();
+  await expect(body).toHaveValue("");
+  await expect(page.getByText("当前的预览", { exact: true })).toHaveCount(0);
+});
+
+test("reset cancels a pending preview; expired sessions and retries retain editor text", async ({
+  page,
+}) => {
+  await newPost(page, "preview-reset");
+  await controlPreview(page);
+  const body = page.getByLabel("正文（Markdown）", { exact: true });
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.previewRequests.length)).toBe(1);
+  await page.getByRole("button", { name: "取消本次编辑", exact: true }).click();
+  await expect(body).toHaveValue("");
+  await expect
+    .poll(() => page.evaluate(() => window.previewRequests[0]!.signal?.aborted))
+    .toBe(true);
+  await page.evaluate(() => window.previewRequests[0]!.resolve(new Response("", { status: 503 })));
+  await expect(page.getByText("预览失败（503）。", { exact: true })).toHaveCount(0);
+  await body.fill("会话过期时仍保留");
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.evaluate(() => window.previewRequests[1]!.resolve(new Response("", { status: 401 })));
+  await expect(
+    page.getByText("登录过期了，先在新标签页重新登录，这里的内容不会丢。", { exact: true }),
+  ).toBeVisible();
+  await expect(body).toHaveValue("会话过期时仍保留");
+  await page.getByRole("button", { name: "预览", exact: true }).click();
+  await page.evaluate(() => window.previewRequests[2]!.resolve(new Response("<p>重试成功</p>")));
+  await expect(page.getByText("重试成功", { exact: true })).toBeVisible();
+  await expect(body).toHaveValue("会话过期时仍保留");
+});
+
 async function localMedia(page: Page) {
   await page.route(`${MEDIA_ORIGIN}/**`, async (route) => {
     const url = new URL(route.request().url());

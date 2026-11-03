@@ -9,9 +9,9 @@ import { htmlLang, type Locale } from "@/i18n/routing";
  */
 
 /** The standfirst, in the accent face. */
-export function ArticleSummary({ children }: { children: string }) {
+export function ArticleSummary({ children, lang }: { children: string; lang?: string }) {
   return (
-    <p className="mt-5 font-accent text-[1.1875rem] leading-relaxed text-fg-secondary">
+    <p lang={lang} className="mt-5 font-accent text-[1.1875rem] leading-relaxed text-fg-secondary">
       {children}
     </p>
   );

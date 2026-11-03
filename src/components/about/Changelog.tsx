@@ -130,20 +130,57 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
           paused: true,
         });
 
-        const show = () => pop.timeScale(1).play();
-        const hide = () => pop.timeScale(2.2).reverse();
+        let hovered = false;
+        let focused = false;
+        let dismissed = false;
+        const sync = () => {
+          if ((hovered || focused) && !dismissed) pop.timeScale(1).play();
+          else pop.timeScale(2.2).reverse();
+        };
+        const enter = () => {
+          hovered = true;
+          if (!focused) dismissed = false;
+          sync();
+        };
+        const leave = () => {
+          hovered = false;
+          if (!focused) dismissed = false;
+          sync();
+        };
+        const focus = () => {
+          focused = true;
+          dismissed = false;
+          sync();
+        };
+        const blur = () => {
+          focused = false;
+          if (!hovered) dismissed = false;
+          sync();
+        };
+        const click = () => {
+          dismissed = false;
+          pop.timeScale(1).play();
+        };
+        const key = (event: KeyboardEvent) => {
+          if (event.key !== "Escape" || dismissed || (!hovered && !focused)) return;
+          event.preventDefault();
+          dismissed = true;
+          sync();
+        };
 
-        node.addEventListener("pointerenter", show);
-        node.addEventListener("focus", show);
-        node.addEventListener("click", show);
-        node.addEventListener("pointerleave", hide);
-        node.addEventListener("blur", hide);
+        node.addEventListener("pointerenter", enter);
+        node.addEventListener("focus", focus);
+        node.addEventListener("click", click);
+        node.addEventListener("pointerleave", leave);
+        node.addEventListener("blur", blur);
+        document.addEventListener("keydown", key);
         teardown.push(() => {
-          node.removeEventListener("pointerenter", show);
-          node.removeEventListener("focus", show);
-          node.removeEventListener("click", show);
-          node.removeEventListener("pointerleave", hide);
-          node.removeEventListener("blur", hide);
+          node.removeEventListener("pointerenter", enter);
+          node.removeEventListener("focus", focus);
+          node.removeEventListener("click", click);
+          node.removeEventListener("pointerleave", leave);
+          node.removeEventListener("blur", blur);
+          document.removeEventListener("keydown", key);
           pop.kill();
         });
       }
@@ -211,7 +248,7 @@ export function Changelog({ entries, title, ariaLabel, className }: Props) {
                   <span
                     data-tip
                     aria-hidden="true"
-                    className="pointer-events-none absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-chip bg-fg px-2.5 py-1 font-mono text-[11px] tracking-meta text-bg shadow-card [font-variant-numeric:tabular-nums]"
+                    className="pointer-events-auto absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-chip bg-fg px-2.5 py-1 font-mono text-[11px] tracking-meta text-bg shadow-card before:absolute before:inset-x-0 before:top-full before:h-2 before:content-[''] [font-variant-numeric:tabular-nums]"
                   >
                     {entry.date.text}
                   </span>

@@ -8,6 +8,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+# UI preferences
+
+Use clear text and interaction states without decorative arrows, chevrons or
+hover-only direction marks. Prefer text for pagination, back links and
+disclosure controls. Retain only functional or explicitly requested direction
+marks, without changing content or keyboard behavior. See DESIGN.md §5.2.
+
 # Commands
 
 ```bash

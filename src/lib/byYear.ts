@@ -27,4 +27,4 @@ export function groupByYear<T>(items: readonly T[], yearOf: (item: T) => string)
 
 /** The year of a `YYYY-MM-DD` day, read off the string rather than through a
  *  `Date` — parsing one would move the day by the server's zone. */
-export const yearOfDate = (row: { date: string }): string => row.date.slice(0, 4);
+export const yearOfDate = (row: { date: string | null }): string => row.date?.slice(0, 4) ?? "";

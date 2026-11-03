@@ -17,6 +17,7 @@ export function SecretIndex({
   yearAria: (year: string) => string;
 }) {
   const t = useTranslations("secrets");
+  const tn = useTranslations("notebook");
   const length = (item: SecretSummary) =>
     item.kind === "podcast"
       ? item.duration != null
@@ -25,7 +26,11 @@ export function SecretIndex({
       : t("readingTime", { minutes: item.readingMinutes });
 
   return groupByYear(items, yearOfDate).map(({ year, items: yearItems }) => (
-    <YearSection key={year} label={yearAria(year)} heading={year}>
+    <YearSection
+      key={year}
+      label={year ? yearAria(year) : tn("undated")}
+      heading={year || tn("undated")}
+    >
       {yearItems.map((item) => (
         <IndexRow
           key={item.slug}
@@ -33,7 +38,11 @@ export function SecretIndex({
           title={item.title}
           titleLang={item.isFallback ? htmlLang(item.locale) : undefined}
           date={item.date}
-          tag={t(item.kind === "podcast" ? "kindPodcast" : "kindEssay")}
+          tag={
+            item.format
+              ? tn(`formats.${item.format}`)
+              : t(item.kind === "podcast" ? "kindPodcast" : "kindEssay")
+          }
           detail={length(item)}
         />
       ))}

@@ -98,9 +98,7 @@
     "fabShareDone": "链接已复制",
     "fabTop": "回到顶部",
     "fabRss": "RSS 订阅",
-    "fabTheme": "切换主题",
-    "notebookTitle": "手记 · 写作 / 生活 / IT",
-    "notebookDescription": "从 Obsidian 搬来的一叠文字，长短不一，慢慢翻。"
+    "fabTheme": "切换主题"
   },
   "about": {
     "title": "关于",
@@ -718,7 +716,8 @@
         "title": "电影",
         "line": "看了很多遍的几部：《大话西游》《不能说的秘密》《爱乐之城》。"
       }
-    }
+    },
+    "backToList": "返回生活"
   },
   "films": {
     "kicker": "电影",
@@ -848,37 +847,12 @@
     }
   },
   "notebook": {
-    "title": "手记",
-    "eyebrow": "The open notebook",
-    "subtitle": "写下生活，也记下那些还在学习的事。",
-    "intro": "一些长文，一些没长成文章的念头，还有写代码时留下的笔记。留在这里，慢慢翻。",
-    "all": "全部",
-    "filterAria": "按内容分类",
-    "search": "找一篇手记…",
-    "count": "{count} 篇手记",
-    "empty": "暂时没有匹配的手记，试试其他关键词。",
-    "readingTime": "{minutes} 分钟",
     "undated": "日期未记",
-    "backToBlog": "文章",
-    "backToList": "返回手记",
-    "related": "接着翻翻",
     "contents": "本篇目录 · {count} 节",
     "contentsAria": "本篇章节",
-    "fallbackZh": "这篇手记暂时只有中文，以下保留原文。",
-    "fallbackEn": "这篇手记用英文写成，以下保留原文。",
     "source": "参考资料",
     "referenceSource": "阅读收藏 · 原作者",
     "readOriginal": "阅读原文",
-    "sections": {
-      "writing": "写作",
-      "life": "生活笔记",
-      "it": "IT 笔记"
-    },
-    "descriptions": {
-      "writing": "把一段经历，认真写完。",
-      "life": "做饭、阅读，和一闪而过的念头。",
-      "it": "边做边学，给未来的自己留条线索。"
-    },
     "formats": {
       "essay": "文章",
       "fragment": "短记",

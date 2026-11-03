@@ -45,6 +45,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const th = await getTranslations("grove");
   const td = await getTranslations("splash");
   const tn = await getTranslations("nav");
+  const tNote = await getTranslations("notebook");
   const tl = await getTranslations("lab");
 
   const [allPosts, allApps, moments] = await Promise.all([
@@ -58,7 +59,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     slug: post.slug,
     title: post.title,
     lang: post.isFallback ? htmlLang(post.locale) : undefined,
-    date: post.date.replaceAll("-", "."),
+    date: post.date?.replaceAll("-", ".") ?? tNote("undated"),
     readingTime: t("readingTime", { minutes: post.readingMinutes }),
   }));
 

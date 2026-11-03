@@ -27,6 +27,8 @@ import {
 } from "@/db/schema";
 import type { Locale } from "@/i18n/routing";
 import type { MomentMedia } from "@/lib/moments";
+import type { NoteDetails, NoteFormat } from "@/lib/notebook";
+import { getImportedArticle, getImportedSummaries, mergeImported } from "./notebook";
 import { isNavGroup, type NavGroup } from "@/lib/nav";
 
 /**
@@ -89,8 +91,9 @@ export type PostSummary = {
   slug: string;
   locale: Locale;
   title: string;
-  /** A calendar day, `YYYY-MM-DD`: sorts as a string, parses as a Date. */
-  date: string;
+  /** A calendar day, or null when the imported original has no recorded date. */
+  date: string | null;
+  format?: NoteFormat;
   summary: string;
   tags: string[];
   readingMinutes: number;
@@ -98,7 +101,7 @@ export type PostSummary = {
   isFallback: boolean;
 };
 
-export type Post = PostSummary & { html: string };
+export type Post = PostSummary & { html: string; note?: NoteDetails };
 
 export type About = { locale: Locale; title: string; html: string };
 
@@ -142,38 +145,45 @@ const summaryColumns = {
 /**
  * What "this locale's index" means, in one place.
  *
- * Four queries below select different columns out of the same idea: one
- * published row per slug, preferring the asked-for locale. `DISTINCT ON (slug)`
- * keeps the first row per slug and `localeFirst` decides which that is, so a
- * post written only in Chinese still appears on the English index — flagged,
- * so the article page can say so.
+ * Public indexes prefer a published row, then the requested locale.
+ * A draft-only slug remains an ownership marker until publicRows removes it,
+ * preventing a static import from resurfacing. `DISTINCT ON (slug)` keeps
+ * one row per address; a published translation can still provide a fallback.
  *
  * Drizzle's builder cannot be wrapped in a generic helper without its column
  * types collapsing, so what is shared here is the *rule* rather than the query
  * skeleton: change the fallback or what counts as published, and there is
  * still only one place to change it.
  */
-const publishedOnly = eq(posts.draft, false);
-
 const indexOrder = (locale: Locale) =>
-  [posts.slug, sql`(${posts.locale} = ${locale}) desc`, asc(posts.id)] as const;
+  [posts.slug, asc(posts.draft), sql`(${posts.locale} = ${locale}) desc`, asc(posts.id)] as const;
 
 /** For a single post, where `DISTINCT ON` is one `LIMIT 1` instead. */
 const localeFirst = (locale: Locale) => sql`(${posts.locale} = ${locale}) desc`;
 
 /** Newest first. ISO dates sort correctly as strings. */
-const byDateDesc = <T extends { date: string }>(rows: T[]) =>
-  rows.sort((a, b) => b.date.localeCompare(a.date));
+const byDateDesc = <T extends { date: string | null }>(rows: T[]) =>
+  rows.sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+
+/** Keep draft ownership internal; never return draft fields to public callers. */
+function publicRows<T extends { draft: boolean }>(rows: T[]): Omit<T, "draft">[] {
+  return rows.filter((row) => !row.draft).map(({ draft: _draft, ...row }) => row);
+}
 
 export const getPosts = unstable_cache(
   async (locale: Locale): Promise<PostSummary[]> => {
     const rows = await db
-      .selectDistinctOn([posts.slug], summaryColumns)
+      .selectDistinctOn([posts.slug], { ...summaryColumns, draft: posts.draft })
       .from(posts)
-      .where(publishedOnly)
       .orderBy(...indexOrder(locale));
 
-    return byDateDesc(rows.map((row) => ({ ...row, isFallback: row.locale !== locale })));
+    return byDateDesc(
+      mergeImported<PostSummary>(
+        publicRows(rows).map((row) => ({ ...row, isFallback: row.locale !== locale })),
+        getImportedSummaries("/blog", locale),
+        rows,
+      ),
+    );
   },
   ["posts-by-locale"],
   cacheOptions(TAGS.posts),
@@ -185,29 +195,18 @@ export const getPosts = unstable_cache(
 export const getPost = unstable_cache(
   async (slug: string, locale: Locale, drafts = false): Promise<Post | null> => {
     const [row] = await db
-      .select({ ...summaryColumns, html: posts.bodyHtml })
+      .select({ ...summaryColumns, html: posts.bodyHtml, draft: posts.draft })
       .from(posts)
-      .where(and(eq(posts.slug, slug), drafts ? undefined : publishedOnly))
-      .orderBy(localeFirst(locale), asc(posts.id))
+      .where(eq(posts.slug, slug))
+      .orderBy(...(drafts ? [] : [asc(posts.draft)]), localeFirst(locale), asc(posts.id))
       .limit(1);
 
-    if (!row) return null;
-    return { ...row, isFallback: row.locale !== locale };
+    if (!row) return getImportedArticle("/blog", slug, locale);
+    if (row.draft && !drafts) return null;
+    const { draft: _draft, ...post } = row;
+    return { ...post, isFallback: post.locale !== locale };
   },
   ["post"],
-  cacheOptions(TAGS.posts),
-);
-
-export const getAllSlugs = unstable_cache(
-  async (): Promise<string[]> => {
-    const rows = await db
-      .selectDistinct({ slug: posts.slug })
-      .from(posts)
-      .where(publishedOnly)
-      .orderBy(posts.slug);
-    return rows.map((row) => row.slug);
-  },
-  ["all-slugs"],
   cacheOptions(TAGS.posts),
 );
 
@@ -221,56 +220,38 @@ export const getAllSlugs = unstable_cache(
  * same question without the 28 KB answer.
  */
 export const getPostEditions = unstable_cache(
-  async (slug: string): Promise<{ locale: Locale; date: string }[]> =>
-    db
-      .select({ locale: posts.locale, date: posts.date })
+  async (slug: string): Promise<{ locale: Locale; date: string | null }[]> => {
+    const rows = await db
+      .select({ locale: posts.locale, date: posts.date, draft: posts.draft })
       .from(posts)
-      .where(and(eq(posts.slug, slug), publishedOnly))
-      .orderBy(asc(posts.locale)),
+      .where(eq(posts.slug, slug))
+      .orderBy(asc(posts.locale));
+    return rows.length
+      ? publicRows(rows)
+      : getImportedSummaries("/blog", "zh")
+          .filter((note) => note.slug === slug)
+          .map(({ locale, date }) => ({ locale, date }));
+  },
   ["post-editions"],
   cacheOptions(TAGS.posts),
 );
 
-/**
- * The previous and next article by publication date.
- *
- * Deliberately its own query rather than an index lookup into `getPosts()`:
- * it still walks every published row to find the neighbours, but fetches only
- * slug/title/date — not the summaries, tags and reading times the full index
- * carries.
- */
-export const getAdjacentPosts = unstable_cache(
-  async (
-    slug: string,
-    locale: Locale,
-  ): Promise<{
-    older: { slug: string; title: string; locale: Locale } | null;
-    newer: { slug: string; title: string; locale: Locale } | null;
-  }> => {
-    const ordered = byDateDesc(
-      await db
-        .selectDistinctOn([posts.slug], {
-          slug: posts.slug,
-          title: posts.title,
-          date: posts.date,
-          // Which language the title is in: a neighbour may be a fallback row,
-          // and the page marks that with `lang`.
-          locale: posts.locale,
-        })
-        .from(posts)
-        .where(publishedOnly)
-        .orderBy(...indexOrder(locale)),
-    );
-    const index = ordered.findIndex((row) => row.slug === slug);
-    if (index === -1) return { older: null, newer: null };
+/** Neighbours use the same dated-then-undated order as the public index. */
+// Derived views share the index cache, without extending its 30-second lifetime.
+export async function getAdjacentPosts(slug: string, locale: Locale) {
+  return neighbours(await getPosts(locale), slug);
+}
 
-    const pick = (row?: (typeof ordered)[number]) =>
-      row ? { slug: row.slug, title: row.title, locale: row.locale } : null;
-    return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
-  },
-  ["adjacent-posts"],
-  cacheOptions(TAGS.posts),
-);
+function neighbours<T extends { slug: string; title: string; locale: Locale }>(
+  ordered: T[],
+  slug: string,
+) {
+  const index = ordered.findIndex((row) => row.slug === slug);
+  const pick = (row?: T) => (row ? { slug: row.slug, title: row.title, locale: row.locale } : null);
+  return index < 0
+    ? { older: null, newer: null }
+    : { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
+}
 
 /**
  * Tags with their counts, most used first.
@@ -279,27 +260,17 @@ export const getAdjacentPosts = unstable_cache(
  * Chinese post carries 手札, the English one carries notes — so this counts
  * within one locale's view of the index.
  */
-export const getAllTags = unstable_cache(
-  async (locale: Locale): Promise<{ tag: string; count: number }[]> => {
-    const rows = await db
-      .selectDistinctOn([posts.slug], { tags: posts.tags, date: posts.date })
-      .from(posts)
-      .where(publishedOnly)
-      .orderBy(...indexOrder(locale));
-
-    // Counted newest-first so that tags sharing a count come out in the order
-    // a reader meets them down the index, rather than in slug order.
-    const counts = new Map<string, number>();
-    for (const row of byDateDesc(rows)) {
-      for (const tag of row.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
-    }
-    return [...counts.entries()]
-      .map(([tag, count]) => ({ tag, count }))
-      .sort((a, b) => b.count - a.count);
-  },
-  ["all-tags"],
-  cacheOptions(TAGS.posts),
-);
+export async function getAllTags(locale: Locale): Promise<{ tag: string; count: number }[]> {
+  const rows = await getPosts(locale);
+  // Count in the order a reader meets the tags down the index.
+  const counts = new Map<string, number>();
+  for (const row of rows) {
+    for (const tag of row.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count);
+}
 
 /**
  * Posts carrying a tag, as seen from one locale.
@@ -311,23 +282,9 @@ export const getAllTags = unstable_cache(
  * `/zh/blog/tags/notes` on the strength of its English edition's tags. A tag
  * that this locale never uses finds nothing, and the page 404s.
  */
-export const getPostsByTag = unstable_cache(
-  async (tag: string, locale: Locale): Promise<PostSummary[]> => {
-    const rows = await db
-      .selectDistinctOn([posts.slug], summaryColumns)
-      .from(posts)
-      .where(publishedOnly)
-      .orderBy(...indexOrder(locale));
-
-    return byDateDesc(
-      rows
-        .filter((row) => row.tags.includes(tag))
-        .map((row) => ({ ...row, isFallback: row.locale !== locale })),
-    );
-  },
-  ["posts-by-tag"],
-  cacheOptions(TAGS.posts),
-);
+export async function getPostsByTag(tag: string, locale: Locale): Promise<PostSummary[]> {
+  return (await getPosts(locale)).filter((row) => row.tags.includes(tag));
+}
 
 // ---------------------------------------------------------------------------
 // Secrets — 《不能说的秘密》, the essays and episodes
@@ -340,9 +297,12 @@ export type SecretSummary = {
   locale: Locale;
   kind: SecretKind;
   title: string;
-  /** A calendar day, `YYYY-MM-DD`. */
-  date: string;
+  /** A calendar day, or null when the imported original has no recorded date. */
+  date: string | null;
+  format?: NoteFormat;
   summary: string;
+  /** Imported originals retain their topic keywords for search. */
+  tags?: string[];
   audio: string | null;
   /** Minutes, for an episode; null when unknown or not an episode. */
   duration: number | null;
@@ -350,7 +310,7 @@ export type SecretSummary = {
   isFallback: boolean;
 };
 
-export type Secret = SecretSummary & { html: string };
+export type Secret = SecretSummary & { html: string; note?: NoteDetails };
 
 const secretColumns = {
   slug: secrets.slug,
@@ -364,21 +324,38 @@ const secretColumns = {
   readingMinutes: secrets.readingMinutes,
 };
 
-/* The same three rules as the posts above: published rows only, one row per
-   slug preferring this locale, and a single-row variant of that preference. */
-const secretPublished = eq(secrets.draft, false);
+/* As with posts: published editions first, locale second; drafts still own
+   their slug so an unpublished replacement cannot expose the static original. */
 const secretIndexOrder = (locale: Locale) =>
-  [secrets.slug, sql`(${secrets.locale} = ${locale}) desc`, asc(secrets.id)] as const;
+  [
+    secrets.slug,
+    asc(secrets.draft),
+    sql`(${secrets.locale} = ${locale}) desc`,
+    asc(secrets.id),
+  ] as const;
 const secretLocaleFirst = (locale: Locale) => sql`(${secrets.locale} = ${locale}) desc`;
+
+const importedSecrets = (locale: Locale): SecretSummary[] =>
+  getImportedSummaries("/secrets", locale).map((note) => ({
+    ...note,
+    kind: "essay",
+    audio: null,
+    duration: null,
+  }));
 
 export const getSecrets = unstable_cache(
   async (locale: Locale): Promise<SecretSummary[]> => {
     const rows = await db
-      .selectDistinctOn([secrets.slug], secretColumns)
+      .selectDistinctOn([secrets.slug], { ...secretColumns, draft: secrets.draft })
       .from(secrets)
-      .where(secretPublished)
       .orderBy(...secretIndexOrder(locale));
-    return byDateDesc(rows.map((row) => ({ ...row, isFallback: row.locale !== locale })));
+    return byDateDesc(
+      mergeImported<SecretSummary>(
+        publicRows(rows).map((row) => ({ ...row, isFallback: row.locale !== locale })),
+        importedSecrets(locale),
+        rows,
+      ),
+    );
   },
   ["secrets-by-locale"],
   cacheOptions(TAGS.secrets),
@@ -388,96 +365,87 @@ export const getSecrets = unstable_cache(
 export const getSecret = unstable_cache(
   async (slug: string, locale: Locale, drafts = false): Promise<Secret | null> => {
     const [row] = await db
-      .select({ ...secretColumns, html: secrets.bodyHtml })
+      .select({ ...secretColumns, html: secrets.bodyHtml, draft: secrets.draft })
       .from(secrets)
-      .where(and(eq(secrets.slug, slug), drafts ? undefined : secretPublished))
-      .orderBy(secretLocaleFirst(locale), asc(secrets.id))
+      .where(eq(secrets.slug, slug))
+      .orderBy(...(drafts ? [] : [asc(secrets.draft)]), secretLocaleFirst(locale), asc(secrets.id))
       .limit(1);
-    if (!row) return null;
-    return { ...row, isFallback: row.locale !== locale };
+    if (!row) {
+      const note = await getImportedArticle("/secrets", slug, locale);
+      return note ? { ...note, kind: "essay", audio: null, duration: null } : null;
+    }
+    if (row.draft && !drafts) return null;
+    const { draft: _draft, ...secret } = row;
+    return { ...secret, isFallback: secret.locale !== locale };
   },
   ["secret"],
   cacheOptions(TAGS.secrets),
 );
 
-export const getAllSecretSlugs = unstable_cache(
-  async (): Promise<string[]> => {
-    const rows = await db
-      .selectDistinct({ slug: secrets.slug })
-      .from(secrets)
-      .where(secretPublished)
-      .orderBy(secrets.slug);
-    return rows.map((row) => row.slug);
-  },
-  ["all-secret-slugs"],
-  cacheOptions(TAGS.secrets),
-);
-
 /** Which languages a secret was really written in — see `getPostEditions`. */
 export const getSecretEditions = unstable_cache(
-  async (slug: string): Promise<{ locale: Locale; date: string }[]> =>
-    db
-      .select({ locale: secrets.locale, date: secrets.date })
+  async (slug: string): Promise<{ locale: Locale; date: string | null }[]> => {
+    const rows = await db
+      .select({ locale: secrets.locale, date: secrets.date, draft: secrets.draft })
       .from(secrets)
-      .where(and(eq(secrets.slug, slug), secretPublished))
-      .orderBy(asc(secrets.locale)),
+      .where(eq(secrets.slug, slug))
+      .orderBy(asc(secrets.locale));
+    return rows.length
+      ? publicRows(rows)
+      : getImportedSummaries("/secrets", "zh")
+          .filter((note) => note.slug === slug)
+          .map(({ locale, date }) => ({ locale, date }));
+  },
   ["secret-editions"],
   cacheOptions(TAGS.secrets),
 );
 
-export type PublishedEdition = { slug: string; locale: Locale; date: string };
+export type PublishedEdition = { slug: string; locale: Locale; date: string | null };
 
 /** All actual editions for the sitemap, in one HTTP batch regardless of slug count. */
 export const getSitemapEditions = unstable_cache(
   async (): Promise<{ posts: PublishedEdition[]; secrets: PublishedEdition[] }> => {
     const [postEditions, secretEditions] = await db.batch([
       db
-        .select({ slug: posts.slug, locale: posts.locale, date: posts.date })
+        .select({ slug: posts.slug, locale: posts.locale, date: posts.date, draft: posts.draft })
         .from(posts)
-        .where(publishedOnly)
         .orderBy(asc(posts.slug), asc(posts.locale)),
       db
-        .select({ slug: secrets.slug, locale: secrets.locale, date: secrets.date })
+        .select({
+          slug: secrets.slug,
+          locale: secrets.locale,
+          date: secrets.date,
+          draft: secrets.draft,
+        })
         .from(secrets)
-        .where(secretPublished)
         .orderBy(asc(secrets.slug), asc(secrets.locale)),
     ]);
-    return { posts: postEditions, secrets: secretEditions };
+    const editions = (destination: "/blog" | "/secrets") =>
+      getImportedSummaries(destination, "zh").map(({ slug, locale, date }) => ({
+        slug,
+        locale,
+        date,
+      }));
+    return {
+      posts: mergeImported<PublishedEdition>(
+        publicRows(postEditions),
+        editions("/blog"),
+        postEditions,
+      ),
+      secrets: mergeImported<PublishedEdition>(
+        publicRows(secretEditions),
+        editions("/secrets"),
+        secretEditions,
+      ),
+    };
   },
   ["sitemap-editions"],
   cacheOptions(TAGS.posts, TAGS.secrets),
 );
 
-export const getAdjacentSecrets = unstable_cache(
-  async (
-    slug: string,
-    locale: Locale,
-  ): Promise<{
-    older: { slug: string; title: string; locale: Locale } | null;
-    newer: { slug: string; title: string; locale: Locale } | null;
-  }> => {
-    const ordered = byDateDesc(
-      await db
-        .selectDistinctOn([secrets.slug], {
-          slug: secrets.slug,
-          title: secrets.title,
-          date: secrets.date,
-          // As with posts: a neighbour may be the other language's row.
-          locale: secrets.locale,
-        })
-        .from(secrets)
-        .where(secretPublished)
-        .orderBy(...secretIndexOrder(locale)),
-    );
-    const index = ordered.findIndex((row) => row.slug === slug);
-    if (index === -1) return { older: null, newer: null };
-    const pick = (row?: (typeof ordered)[number]) =>
-      row ? { slug: row.slug, title: row.title, locale: row.locale } : null;
-    return { older: pick(ordered[index + 1]), newer: pick(ordered[index - 1]) };
-  },
-  ["adjacent-secrets"],
-  cacheOptions(TAGS.secrets),
-);
+export async function getAdjacentSecrets(slug: string, locale: Locale) {
+  return neighbours(await getSecrets(locale), slug);
+}
 
 // ---------------------------------------------------------------------------
 // Moments — 《多的是你不知道的事》, the board
@@ -897,4 +865,13 @@ export const getAllNavItems = unstable_cache(
 export async function getNavItems(surface: NavSurface): Promise<NavItem[]> {
   const rows = await getAllNavItems();
   return rows.filter((row) => row.surfaces.includes(surface));
+}
+
+/** Build-time routes use the same public index and database ownership rules. */
+export async function getAllSlugs(): Promise<string[]> {
+  return (await getPosts("zh")).map((row) => row.slug);
+}
+
+export async function getAllSecretSlugs(): Promise<string[]> {
+  return (await getSecrets("zh")).map((row) => row.slug);
 }

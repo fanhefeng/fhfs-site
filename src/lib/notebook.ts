@@ -1,7 +1,6 @@
 import type { Locale } from "@/i18n/routing";
 
-export const NOTE_SECTIONS = ["writing", "life", "it"] as const;
-export type NoteSection = (typeof NOTE_SECTIONS)[number];
+export type NoteSection = "writing" | "life" | "it";
 export type NoteFormat = "essay" | "fragment" | "study" | "reference" | "observation";
 export type NoteText = Record<Locale, string>;
 
@@ -24,14 +23,10 @@ export type NoteBody = {
   toc: { id: string; title: string }[];
 };
 
-/** Search and filters share one predicate, including an empty query. */
-export function filterNotes(notes: NoteSummary[], section: string | null, query: string) {
-  const words = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
-  return notes.filter((note) => {
-    if (section && note.section !== section) return false;
-    const text = [note.title, note.summary.zh, note.summary.en, ...note.tags]
-      .join(" ")
-      .toLocaleLowerCase();
-    return words.every((word) => text.includes(word));
-  });
+/** Imported content joins the site's existing writing and life destinations. */
+export function noteDestination(note: Pick<NoteSummary, "section">): "/blog" | "/secrets" {
+  return note.section === "it" ? "/blog" : "/secrets";
 }
+
+export type NoteDetails = Pick<NoteSummary, "format" | "context" | "source"> &
+  Pick<NoteBody, "toc">;

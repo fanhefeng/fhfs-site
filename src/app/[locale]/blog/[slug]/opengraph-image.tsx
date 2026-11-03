@@ -53,7 +53,7 @@ export default async function PostOgImage({
   const counterpart = await getPost(slug, other);
   const subtitle = counterpart && counterpart.title !== title ? counterpart.title : null;
 
-  const date = post ? post.date.replaceAll("-", ".") : "";
+  const date = post?.date?.replaceAll("-", ".") ?? "";
   const meta = [date, ...(post?.tags ?? []).slice(0, 3)].filter(Boolean).join("  ·  ");
   const host = new URL(site.url).host;
 

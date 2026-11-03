@@ -17,7 +17,7 @@ const SearchPalette = dynamic(() => import("./SearchPalette").then((m) => m.Sear
  */
 export function SearchLauncher() {
   // null until first opened — then the palette stays mounted, closed or not,
-  // so its index is not fetched twice.
+  // so the query survives; each open revalidates the public index.
   const [open, setOpen] = useState<boolean | null>(null);
 
   useEffect(() => {

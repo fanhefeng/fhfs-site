@@ -5,22 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { lockScroll, unlockScroll } from "@/lib/client/scrollLock";
 import { search, type SearchEntry, type SearchHit } from "@/lib/search";
-
-/** One fetch per language per visit, however often the palette opens. */
-const indexes = new Map<string, Promise<SearchEntry[]>>();
-const loadIndex = (locale: string) => {
-  let index = indexes.get(locale);
-  if (!index) {
-    index = fetch(`/${locale}/search.json`).then((response) => {
-      if (!response.ok) throw new Error(String(response.status));
-      return response.json() as Promise<SearchEntry[]>;
-    });
-    // A failed fetch is not remembered — the next open tries again.
-    index.catch(() => indexes.delete(locale));
-    indexes.set(locale, index);
-  }
-  return index;
-};
+import { loadSearchIndex } from "@/lib/client/searchIndex";
 
 /**
  * ⌘K: one field over everything the site holds, in a native `<dialog>` so
@@ -46,8 +31,12 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
     if (!open) return;
     let live = true;
     setFailed(false);
-    loadIndex(locale).then(
-      (index) => live && setEntries(index),
+    setEntries(null);
+    setActive(0);
+    loadSearchIndex(locale).then(
+      (index) => {
+        if (live) setEntries(index);
+      },
       () => live && setFailed(true),
     );
     return () => {

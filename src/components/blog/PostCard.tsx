@@ -13,8 +13,13 @@ export function YearIndex({
   yearAria: (year: string) => string;
 }) {
   const t = useTranslations("blog");
+  const tn = useTranslations("notebook");
   return groupByYear(posts, yearOfDate).map(({ year, items }) => (
-    <YearSection key={year} label={yearAria(year)} heading={year}>
+    <YearSection
+      key={year}
+      label={year ? yearAria(year) : tn("undated")}
+      heading={year || tn("undated")}
+    >
       {items.map((post) => (
         <IndexRow
           key={post.slug}

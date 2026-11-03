@@ -123,6 +123,37 @@ export function Header({ links, menuLinks, allLinks }: Props) {
   /** The open tray is one the reader pressed open, not the wide screen's own. */
   const pressedOpenRef = useRef(false);
 
+  // Scripted focus handoffs can inherit :focus-visible from an earlier
+  // keyboard interaction. Keep the focus, but hide its outline after a
+  // pointer press. Listen on the document so Tab from outside the nav also
+  // restores the indicator. Only these two navigation surfaces are affected.
+  useEffect(() => {
+    const surfaces = [rootRef.current, document.getElementById("fullnav")];
+    const onPointerDown = () => {
+      for (const surface of surfaces) surface?.setAttribute("data-nav-pointer", "");
+    };
+    const clearPointer = () => {
+      for (const surface of surfaces) surface?.removeAttribute("data-nav-pointer");
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.metaKey ||
+        event.altKey ||
+        event.ctrlKey ||
+        ["Shift", "Control", "Alt", "Meta"].includes(event.key)
+      )
+        return;
+      clearPointer();
+    };
+    document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("keydown", onKeyDown, true);
+      clearPointer();
+    };
+  }, []);
+
   useEffect(() => {
     expandedRef.current = expanded;
   }, [expanded]);

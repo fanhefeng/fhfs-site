@@ -1,3 +1,4 @@
+import { ImportedNoteDetails } from "@/components/blog/ImportedNoteDetails";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
@@ -98,6 +99,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
   const locale = await pageLocale(params);
   const { slug } = await params;
   const t = await getTranslations("blog");
+  const tn = await getTranslations("notebook");
   const format = await getFormatter();
   const post = await getPost(slug, locale, await showDrafts());
   if (!post) notFound();
@@ -118,7 +120,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
             "@type": "BlogPosting",
             headline: post.title,
             description: post.summary,
-            datePublished: post.date,
+            ...(post.date ? { datePublished: post.date } : {}),
             author: { "@type": "Person", name: site.author },
             // The same URL `generateMetadata` calls canonical: on a fallback
             // render this prefix is not where the text lives, and two URLs each
@@ -131,7 +133,10 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
             readers' pronunciation and for the crawler's language detection.
             The notice inside stays in the page's own language, hence its own
             lang below. */}
-        <article lang={post.isFallback ? htmlLang(post.locale) : undefined}>
+        <article
+          lang={post.isFallback || post.note ? htmlLang(post.locale) : undefined}
+          className="min-w-0 [overflow-wrap:anywhere]"
+        >
           <header className="mb-12">
             {/* The line's own words are this locale's, even on a fallback
                 render — but the tags are the author's, in whatever language
@@ -148,17 +153,22 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
                 {t("title")}
               </Link>
               <span aria-hidden>·</span>
-              <time dateTime={post.date} lang={post.isFallback ? htmlLang(locale) : undefined}>
-                {format.dateTime(new Date(post.date), {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
+              {post.date ? (
+                <time dateTime={post.date} lang={post.isFallback ? htmlLang(locale) : undefined}>
+                  {format.dateTime(new Date(post.date), {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              ) : (
+                <span>{tn("undated")}</span>
+              )}
               <span aria-hidden>·</span>
               <span lang={post.isFallback ? htmlLang(locale) : undefined}>
                 {t("readingTime", { minutes })}
               </span>
+              {post.format && <span className="text-accent">{tn(`formats.${post.format}`)}</span>}
               {post.tags.map((tag) => (
                 <TagPill key={tag} tag={tag} />
               ))}
@@ -166,13 +176,20 @@ export default async function PostPage({ params }: PageProps<"/[locale]/blog/[sl
 
             <PostTitle title={post.title} className="text-title md:text-display-sm" />
 
-            {post.summary && <ArticleSummary>{post.summary}</ArticleSummary>}
+            {post.summary && (
+              <ArticleSummary lang={post.note ? htmlLang(locale) : undefined}>
+                {post.summary}
+              </ArticleSummary>
+            )}
           </header>
 
           {post.isFallback && (
             <FallbackNotice locale={locale}>{t("fallbackNotice")}</FallbackNotice>
           )}
 
+          {post.note && (
+            <ImportedNoteDetails note={post.note} locale={locale} textLocale={post.locale} />
+          )}
           <Mdx html={post.html} />
         </article>
 

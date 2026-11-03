@@ -84,8 +84,8 @@ export const COPY_GROUPS: CopyGroup[] = [
   { id: "blog", label: "文章 /blog", blurb: "列表页和文章页上除正文以外的文字。" },
   {
     id: "notebook",
-    label: "手记 /blog/notes",
-    blurb: "手记目录、分类、阅读页和资料来源的固定文字。",
+    label: "文章与生活 · 导入内容",
+    blurb: "文章和生活中导入内容的类型、日期说明、目录和资料来源文字。",
   },
   { id: "software", label: "软件 /software", blurb: "页面标题、分类名和唱机上的标签。" },
   { id: "lab", label: "实验室 /lab", blurb: "每一则的名字、摘要、说明和演示里的文字。" },

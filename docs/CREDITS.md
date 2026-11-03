@@ -135,9 +135,9 @@ OG 拉丁沿用 Nunito 400 / 700；原 Noto Sans SC 400 / 600 文件保留为旧
 `src/lib/server/github.ts`，`fetch` 缓存一小时；未登录配额 60 次/小时足够，设 `GITHUB_TOKEN`
 可放宽）。
 
-## 手记中的阅读资料
+## Obsidian 导入内容的阅读资料
 
-`/blog/notes` 收录的原创写作与随笔保留作者原有权利。阅读收藏通过资料卡链接原文，不复制所收藏文章的全文或附件：
+`/blog` 与 `/secrets` 收录的 Obsidian 原创写作与随笔保留作者原有权利。阅读收藏通过资料卡链接原文，不复制所收藏文章的全文或附件：
 
 - Steve Jobs，2005 年斯坦福毕业演讲：[Stanford Report](https://news.stanford.edu/stories/2005/06/youve-got-find-love-jobs-says)。
 - 阮一峰 / 网道：[TypeScript 装饰器](https://wangdoc.com/typescript/decorator)。

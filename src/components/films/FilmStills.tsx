@@ -345,6 +345,7 @@ export function FilmStills({ ratio, stills, text }: Props) {
                 height={still.height}
                 alt={still.alt}
                 sizes="100vw"
+                unoptimized
                 loading="eager"
                 draggable={false}
                 className="max-h-[calc(100dvh-11rem)] w-auto max-w-full select-none rounded-card object-contain"
@@ -375,17 +376,13 @@ export function FilmStills({ ratio, stills, text }: Props) {
               onClick={() => step(-1)}
               aria-label={text.prev}
               className={`${VIEWER_BUTTON} absolute bottom-4 left-4 md:bottom-auto md:left-6 md:top-1/2 md:-translate-y-1/2`}
-            >
-              <span aria-hidden="true">←</span>
-            </button>
+            ></button>
             <button
               type="button"
               onClick={() => step(1)}
               aria-label={text.next}
               className={`${VIEWER_BUTTON} absolute bottom-4 right-4 md:bottom-auto md:right-6 md:top-1/2 md:-translate-y-1/2`}
-            >
-              <span aria-hidden="true">→</span>
-            </button>
+            ></button>
             <p className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 font-mono text-meta uppercase tracking-meta text-white/40 md:block">
               {text.hint}
             </p>

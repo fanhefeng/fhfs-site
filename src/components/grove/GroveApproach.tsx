@@ -288,18 +288,6 @@ export function GroveApproach({ caption, cards }: Props) {
               </p>
               <a className="ga-cap-link" href={caption.link.href}>
                 {caption.link.label}
-                <svg
-                  viewBox="0 0 16 16"
-                  width="13"
-                  height="13"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  aria-hidden="true"
-                >
-                  <path d="M3.5 8h9M9 4.5 12.5 8 9 11.5" />
-                </svg>
               </a>
             </div>
           )}

@@ -98,9 +98,7 @@
     "fabShareDone": "Link copied",
     "fabTop": "Back to top",
     "fabRss": "RSS feed",
-    "fabTheme": "Toggle theme",
-    "notebookTitle": "Notebook · Essays / Everyday / IT",
-    "notebookDescription": "A small stack of writing and learning notes, brought over from Obsidian."
+    "fabTheme": "Toggle theme"
   },
   "about": {
     "title": "About",
@@ -718,7 +716,8 @@
         "title": "Films",
         "line": "The ones watched too many times: A Chinese Odyssey, Secret, La La Land."
       }
-    }
+    },
+    "backToList": "Back to life"
   },
   "films": {
     "kicker": "Films",
@@ -848,37 +847,12 @@
     }
   },
   "notebook": {
-    "title": "Notebook",
-    "eyebrow": "The open notebook",
-    "subtitle": "Life, in writing. Learning, in the margins.",
-    "intro": "A few essays, thoughts that never quite became essays, and notes left while making things. Take your time.",
-    "all": "All",
-    "filterAria": "Filter by section",
-    "search": "Find a note…",
-    "count": "{count, plural, one {# entry} other {# entries}}",
-    "empty": "No matching notes. Try another search.",
-    "readingTime": "{minutes} min",
     "undated": "Date unrecorded",
-    "backToBlog": "Writing",
-    "backToList": "Back to notebook",
-    "related": "Keep browsing",
     "contents": "Contents · {count} sections",
     "contentsAria": "Sections in this note",
-    "fallbackZh": "This note is available in Chinese. The original text follows.",
-    "fallbackEn": "This note is available in English. The original text follows.",
     "source": "Reference",
     "referenceSource": "Reading shelf · Original author",
     "readOriginal": "Read the original",
-    "sections": {
-      "writing": "Essays",
-      "life": "Everyday",
-      "it": "IT notes"
-    },
-    "descriptions": {
-      "writing": "An experience, given room on the page.",
-      "life": "Cooking, reading, and passing thoughts.",
-      "it": "Learning by making. A trail for my future self."
-    },
     "formats": {
       "essay": "Essay",
       "fragment": "Fragment",

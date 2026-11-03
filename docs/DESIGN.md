@@ -240,6 +240,8 @@ display 大字 404 + 一句话 + 两条出路（回首页/看文章）；一角*
 
 ### 5.2 项目契约（跨组件耦合，破坏即回归）
 
+- **界面默认不用装饰性箭头**：按钮、链接、导航、卡片和列表入口以明确文案、排版和正常交互状态表达操作，不附加右箭头、斜箭头、chevron、尖括号或悬停箭头。分页、返回和展开优先使用文字与状态；仅保留功能必需或用户明确要求的方向标记。检查默认、悬停和聚焦态，包括 SVG 与 CSS 伪元素；不改写正文内容或键盘方向键行为。
+
 - 主题三件套：localStorage `'fhfs-theme'` / `data-theme` / `'fhfs:theme'` 事件。
 - 滚动锁定：覆盖层暂停走 `window.__lenis.stop()` + overflow hidden，恢复必须 `scrollTo(y,{immediate,force}) → start() → ScrollTrigger.refresh()`。
 - Loader 握手：sessionStorage `'fhfs-overture-seen'` + `'fhfs:overture-done'` 事件。

@@ -1,6 +1,14 @@
 "use client";
 
-import { useId, useRef, useState, type ReactNode, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import type { ActionState } from "../actions/shared";
 import { inputClass, labelClass, monoClass, textareaClass } from "../styles";
 import { SaveControls } from "./SaveControls";
@@ -236,30 +244,75 @@ function MarkdownPreview({
   const [html, setHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const task = useRef<AbortController | null>(null);
   const showing = html !== null;
 
+  const write = useCallback(() => {
+    const previous = task.current;
+    task.current = null;
+    previous?.abort();
+    setHtml(null);
+    setError(null);
+    setBusy(false);
+  }, []);
+
+  useEffect(() => {
+    const form = source.current?.form;
+    let live = true;
+    let resetTimer: number | undefined;
+    // A native click can checkpoint microtasks between reset listeners. Wait
+    // for the full dispatch, including later preventDefault(), and its default action.
+    const reset = (event: Event) => {
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        if (live && !event.defaultPrevented) write();
+      }, 0);
+    };
+    form?.addEventListener("reset", reset);
+    return () => {
+      live = false;
+      window.clearTimeout(resetTimer);
+      form?.removeEventListener("reset", reset);
+      const previous = task.current;
+      task.current = null;
+      previous?.abort();
+    };
+  }, [source, write]);
+
   const preview = async () => {
+    task.current?.abort();
+    const controller = new AbortController();
+    task.current = controller;
     setBusy(true);
     setError(null);
     try {
       const response = await fetch("/admin/preview/markdown", {
         method: "POST",
         body: source.current?.value ?? "",
+        signal: controller.signal,
       });
+      if (task.current !== controller) return;
       if (response.status === 401) setError("登录过期了，先在新标签页重新登录，这里的内容不会丢。");
       else if (!response.ok) setError(`预览失败（${response.status}）。`);
-      else setHtml(await response.text());
+      else {
+        const rendered = await response.text();
+        if (task.current === controller) setHtml(rendered);
+      }
     } catch {
-      setError("预览失败：连不上服务器。");
+      if (task.current === controller && !controller.signal.aborted)
+        setError("预览失败：连不上服务器。");
     } finally {
-      setBusy(false);
+      if (task.current === controller) {
+        task.current = null;
+        setBusy(false);
+      }
     }
   };
 
   return (
     <>
       <div role="group" aria-label="正文视图" className="flex gap-2">
-        <ViewButton pressed={!showing} onClick={() => setHtml(null)}>
+        <ViewButton pressed={!showing} onClick={write}>
           写
         </ViewButton>
         <ViewButton pressed={showing} onClick={() => void preview()} disabled={busy}>
