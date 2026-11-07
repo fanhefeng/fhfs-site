@@ -148,19 +148,18 @@ describe("cloud monitoring policy", () => {
     );
   });
 
-  it("schedules health checks at most six hours apart, including overnight", () => {
+  it.each([
+    ["monitor.yml", 11, 1],
+    ["private-backup.yml", 37, 2],
+  ])("schedules %s every three hours at its own offset", (file, minute, firstHour) => {
     const workflow = readFileSync(
-      new URL("../../../.github/workflows/private-backup.yml", import.meta.url),
+      new URL(`../../../.github/workflows/${file}`, import.meta.url),
       "utf8",
     );
-    const hours = /cron: "37 ([\d,]+) \* \* \*"/
-      .exec(workflow)![1]!
-      .split(",")
-      .map(Number)
-      .sort((a, b) => a - b);
-    const gaps = hours.map((hour, i) => (hours[(i + 1) % hours.length]! - hour + 24) % 24);
-    expect(hours.length).toBe(4);
-    expect(Math.max(...gaps)).toBe(6);
+    const hours = new RegExp(`cron: "${minute} ([\\d,]+) \\* \\* \\*"`).exec(workflow)?.[1];
+    expect(hours?.split(",").map(Number)).toEqual(
+      Array.from({ length: 8 }, (_, i) => firstHour + 3 * i),
+    );
   });
 
   it("keeps the newest attempt and update when parallel API responses overlap", () => {
