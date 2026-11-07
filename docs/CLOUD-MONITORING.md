@@ -5,10 +5,10 @@ GitHub Actions 的 `monitor.yml` 执行只读巡检，Healthchecks.io 独立监�
 
 ## 检查范围
 
-- 每 6 小时执行（UTC 01:11 / 07:11 / 13:11 / 19:11），main 的私有备份、浏览器流程或公开快照工作流结束后也执行。
+- 每 3 小时执行（UTC 01:11 起），main 的私有备份、浏览器流程或公开快照工作流结束后也执行。
 - 验证三个工作流 active，`PRIVATE_BACKUP_ENABLED`、`PRIVATE_RESTORE_ENABLED`、`E2E_ENABLED` 为 true。
 - create、公开快照、browser flows 最近实际成功不超过 36 小时；备份健康检查不超过 12 小时；SQL 恢复不超过 35 天。
-- 独立 health 全天每 6 小时调度（北京时间 04:37 / 10:37 / 16:37 / 22:37），12 小时窗口留出一轮调度余量。
+- 独立 health 全天每 3 小时调度（北京时间 01:37 起），与云端巡检错峰。漏两轮时，下一轮若准时开始仍在 12 小时窗口内。
 - 健康检查的新鲜度接受独立 health，或完成创建、数据库取回验证及 health 的 create；仍验证对应 job 的关键步骤实际成功，不只看工作流总状态。
 - 故障与新鲜度分开判定：各操作的最新失败、取消、超时及待验重跑仍独立告警；成功 create 不能清除 health 失败，成功 health 不能清除 create、verify 或恢复失败。每日 create 与自然 create 的 36 小时要求不由 health 替代。
 - 验证 job 与关键步骤实际执行；全部 skipped 不算成功，新失败不能被旧成功掩盖。
@@ -26,7 +26,7 @@ GitHub API 使用短期 Actions token，仅 `contents:read` / `actions:read`。
 检查名 `fhfs-site cloud monitor`，Period 6 小时、Grace 6 小时，仅 POST。
 审计与真实仓库 health 全通过后才发送成功；失败发送 `/fail`。
 整个巡检停用、长时间排队或无法上报时，最后成功信号超过 12 小时后由外部服务告警。
-状态刚变坏且没有完成事件时，要等下一轮巡检，通常最多 6 小时加调度延迟。
+状态刚变坏且没有完成事件时，要等下一轮巡检，通常最多 3 小时加调度延迟。
 明确的工作流失败完成后，通过 `workflow_run` 触发巡检并上报 `/fail`，不等上述新鲜度窗口或外部 Grace 到期。
 GitHub 调度、外部服务及邮件传输均可能延迟；已有 GitHub 失败通知保留。
 

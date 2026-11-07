@@ -2,7 +2,7 @@ name: cloud monitor
 
 on:
   schedule:
-    - cron: "11 1,7,13,19 * * *" # Every six hours, off the busy hour boundary.
+    - cron: "11 1,4,7,10,13,16,19,22 * * *" # Every three hours, off the busy hour boundary.
   workflow_run:
     workflows: [private backup, browser flows, backup]
     types: [completed]
