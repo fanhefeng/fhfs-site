@@ -1,6 +1,7 @@
 import type { App } from "@/lib/server/content";
 import type { Locale } from "@/i18n/routing";
 import type { GithubProject, Release, RepositoryStats } from "@/lib/githubData";
+import { desktopPreview } from "@/lib/desktopPreview";
 import { appGithubRepo } from "@/lib/githubData";
 
 /** The four buckets the segmented filter offers, in display order — the same
@@ -44,6 +45,7 @@ export type SoftwareApp = {
   repoUrl?: string;
   /** A release with downloadable files, rather than the app's home page. */
   downloadUrl?: string;
+  desktopPreview?: ReturnType<typeof desktopPreview>;
 };
 
 /**
@@ -90,6 +92,7 @@ export function toSoftwareApp(
     (category === "desktop" || category === "tool") && Boolean(release?.downloads.length);
   return {
     id: app.key,
+    desktopPreview: desktopPreview(repo, locale),
     name: app.name,
     tagline: app.tagline[locale],
     description: app.description[locale],
