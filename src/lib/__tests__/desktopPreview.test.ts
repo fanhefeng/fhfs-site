@@ -17,9 +17,9 @@ describe("explicit desktop preview", () => {
       expect(preview.description).toContain("Apple Silicon");
       expect(preview.description).toContain("Raycast");
       expect(preview.downloadUrl).toBe(
-        "https://github.com/fanhefeng/file-tidy/releases/download/desktop-v0.5.3/File.Tidy-0.5.3-arm64.dmg",
+        "https://github.com/fanhefeng/file-tidy/releases/download/desktop-v0.5.4/File.Tidy-0.5.4-arm64.dmg",
       );
-      expect(preview.releaseUrl).toContain("/releases/tag/desktop-v0.5.3");
+      expect(preview.releaseUrl).toContain("/releases/tag/desktop-v0.5.4");
     }
   });
 });
