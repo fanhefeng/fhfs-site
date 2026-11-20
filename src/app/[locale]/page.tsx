@@ -1,3 +1,4 @@
+import { SnapshotNotice } from "@/components/blog/SnapshotNotice";
 import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -132,6 +133,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         enterHint={td("enterHint")}
       />
       <main id="main" className="flex-1">
+        {allPosts[0]?.snapshotAt && (
+          <div className="mx-auto max-w-[720px] px-6 pt-24">
+            <SnapshotNotice locale={locale} snapshotAt={allPosts[0]?.snapshotAt} />
+          </div>
+        )}
         <JsonLd
           data={{
             "@context": "https://schema.org",

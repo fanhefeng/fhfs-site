@@ -77,6 +77,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// A render using an outage snapshot also rechecks the live source within this window.
+export const revalidate = 30;
+
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {

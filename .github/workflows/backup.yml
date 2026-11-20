@@ -90,6 +90,13 @@ jobs:
           set -euo pipefail
           SNAP="$RUNNER_TEMP/snapshot"
 
+          # Keep the version stable across unchanged exports.
+          if [ -f "$SNAP/backup/snapshot-version.json" ] && cmp -s backup/db.json "$SNAP/backup/db.json"; then
+            cp "$SNAP/backup/snapshot-version.json" backup/snapshot-version.json
+          else
+            node scripts/write-public-snapshot-version.mjs
+          fi
+
           # An orphan branch on the first run.
           if [ -d "$SNAP/.git" ]; then
             rm -rf "$SNAP/backup"
