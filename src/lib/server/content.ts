@@ -1,5 +1,5 @@
 import "server-only";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "./snapshotCache";
 import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
@@ -30,6 +30,7 @@ import type { MomentMedia } from "@/lib/moments";
 import type { NoteDetails, NoteFormat } from "@/lib/notebook";
 import { getImportedArticle, getImportedSummaries, mergeImported } from "./notebook";
 import { isNavGroup, type NavGroup } from "@/lib/nav";
+import { snapshotContent } from "./snapshotContent";
 
 /**
  * Every read the site does, in one file.
@@ -88,6 +89,8 @@ const cacheOptions = (...tags: string[]) => ({
  * pages, the feed, the sitemap and the OG cards never touch it.
  */
 export type PostSummary = {
+  /** Timestamp of the published export while the database is unavailable. */
+  snapshotAt?: string;
   slug: string;
   locale: Locale;
   title: string;
@@ -187,6 +190,7 @@ export const getPosts = unstable_cache(
   },
   ["posts-by-locale"],
   cacheOptions(TAGS.posts),
+  snapshotContent.posts,
 );
 
 /** One article, in this locale if it has it. `drafts` is for Draft Mode
@@ -208,6 +212,7 @@ export const getPost = unstable_cache(
   },
   ["post"],
   cacheOptions(TAGS.posts),
+  snapshotContent.post,
 );
 
 /**
@@ -234,6 +239,7 @@ export const getPostEditions = unstable_cache(
   },
   ["post-editions"],
   cacheOptions(TAGS.posts),
+  snapshotContent.postEditions,
 );
 
 /** Neighbours use the same dated-then-undated order as the public index. */
@@ -359,6 +365,7 @@ export const getSecrets = unstable_cache(
   },
   ["secrets-by-locale"],
   cacheOptions(TAGS.secrets),
+  snapshotContent.secrets,
 );
 
 /** One secret — `drafts` as for `getPost`. */
@@ -380,6 +387,7 @@ export const getSecret = unstable_cache(
   },
   ["secret"],
   cacheOptions(TAGS.secrets),
+  snapshotContent.secret,
 );
 
 /** Which languages a secret was really written in — see `getPostEditions`. */
@@ -398,6 +406,7 @@ export const getSecretEditions = unstable_cache(
   },
   ["secret-editions"],
   cacheOptions(TAGS.secrets),
+  snapshotContent.secretEditions,
 );
 
 export type PublishedEdition = { slug: string; locale: Locale; date: string | null };
@@ -441,6 +450,7 @@ export const getSitemapEditions = unstable_cache(
   },
   ["sitemap-editions"],
   cacheOptions(TAGS.posts, TAGS.secrets),
+  snapshotContent.sitemapEditions,
 );
 
 export async function getAdjacentSecrets(slug: string, locale: Locale) {
@@ -493,6 +503,7 @@ export const getMoments = unstable_cache(
   },
   ["moments"],
   cacheOptions(TAGS.moments),
+  snapshotContent.moments,
 );
 
 // ---------------------------------------------------------------------------
@@ -517,6 +528,7 @@ export const getFilms = unstable_cache(
       .orderBy(asc(films.sort), asc(films.key)),
   ["films"],
   cacheOptions(TAGS.films),
+  snapshotContent.films,
 );
 
 /** One film — `drafts` as for `getPost`. */
@@ -531,6 +543,7 @@ export const getFilm = unstable_cache(
   },
   ["film"],
   cacheOptions(TAGS.films),
+  snapshotContent.film,
 );
 
 /** The idols on the wall, in its order. */
@@ -543,6 +556,7 @@ export const getIdols = unstable_cache(
       .orderBy(asc(idols.sort), asc(idols.key)),
   ["idols"],
   cacheOptions(TAGS.idols),
+  snapshotContent.idols,
 );
 
 /** One idol — `drafts` as for `getPost`. */
@@ -557,6 +571,7 @@ export const getIdol = unstable_cache(
   },
   ["idol"],
   cacheOptions(TAGS.idols),
+  snapshotContent.idol,
 );
 
 // ---------------------------------------------------------------------------
@@ -582,6 +597,7 @@ export const getAbout = unstable_cache(
   },
   ["about"],
   cacheOptions(TAGS.about),
+  snapshotContent.about,
 );
 
 export const getTimeline = unstable_cache(
@@ -602,6 +618,7 @@ export const getTimeline = unstable_cache(
       .orderBy(asc(timelineEntries.sort), asc(timelineEntries.key)),
   ["timeline"],
   cacheOptions(TAGS.timeline),
+  snapshotContent.timeline,
 );
 
 export const getApps = unstable_cache(
@@ -623,6 +640,7 @@ export const getApps = unstable_cache(
       .orderBy(asc(apps.sort), asc(apps.key)),
   ["apps"],
   cacheOptions(TAGS.apps),
+  snapshotContent.apps,
 );
 
 // The `works` table has no getter: /portfolio went offline (it 308s to
@@ -644,6 +662,7 @@ export const getChips = unstable_cache(
       .orderBy(asc(chips.sort), asc(chips.id)),
   ["chips"],
   cacheOptions(TAGS.chips),
+  snapshotContent.chips,
 );
 
 export type IntroNode = {
@@ -673,6 +692,7 @@ export const getIntroNodes = unstable_cache(
       .orderBy(asc(introNodes.sort), asc(introNodes.key)),
   ["intro-nodes"],
   cacheOptions(TAGS.intro),
+  snapshotContent.introNodes,
 );
 
 export type ResumeProfile = {
@@ -734,6 +754,7 @@ export const getResumeProfile = unstable_cache(
   },
   ["resume-profile"],
   cacheOptions(TAGS.resume),
+  snapshotContent.resumeProfile,
 );
 
 export const getResumeExperiences = unstable_cache(
@@ -753,6 +774,7 @@ export const getResumeExperiences = unstable_cache(
       .orderBy(asc(resumeExperiences.sort), asc(resumeExperiences.key)),
   ["resume-experiences"],
   cacheOptions(TAGS.resume),
+  snapshotContent.resumeExperiences,
 );
 
 /**
@@ -858,6 +880,7 @@ export const getAllNavItems = unstable_cache(
   },
   ["nav-items"],
   cacheOptions(TAGS.nav),
+  snapshotContent.navItems,
 );
 
 /** One list, filtered per surface — Header, Footer, FullNav and the sitemap.

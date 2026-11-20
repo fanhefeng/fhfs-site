@@ -1,3 +1,4 @@
+import { SnapshotNotice } from "@/components/blog/SnapshotNotice";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
@@ -66,6 +67,7 @@ export default async function TagPage({ params }: PageProps<"/[locale]/blog/tags
 
   return (
     <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
+      <SnapshotNotice locale={locale} snapshotAt={posts[0]?.snapshotAt} />
       <Reveal as="section" className="mb-12">
         <p className="mb-4 font-mono text-meta uppercase tracking-meta text-fg-tertiary">
           {t("tags")}

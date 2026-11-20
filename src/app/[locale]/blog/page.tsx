@@ -1,3 +1,4 @@
+import { SnapshotNotice } from "@/components/blog/SnapshotNotice";
 import { getTranslations } from "next-intl/server";
 import { pageLocale } from "@/i18n/page";
 import { getPosts, getAllTags } from "@/lib/server/content";
@@ -21,6 +22,7 @@ export default async function BlogPage({ params }: PageProps<"/[locale]/blog">) 
 
   return (
     <main id="main" className="mx-auto w-full max-w-[720px] flex-1 px-6 pb-28 pt-32 md:pt-40">
+      <SnapshotNotice locale={locale} snapshotAt={posts[0]?.snapshotAt} />
       <Reveal as="section" className="mb-12">
         <h1 className="text-display-sm">{t("title")}</h1>
         <p className="mt-4 max-w-[46ch] text-body text-fg-secondary">{t("subtitle")}</p>
